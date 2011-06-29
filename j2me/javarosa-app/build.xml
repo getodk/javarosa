@@ -1,0 +1,303 @@
+<!-- The JavaRosa build script is structured as follows:
+     Modifiable properties are stored in the external build.properties file
+     The classpath for external jars is defined in the Build taskdef
+
+     NOTE: Binary Libraries (.zip is the convention in j2me) are declared
+     seperately in the binaryLibraries property. Not on the classpath!
+
+     The BuildPolish target is associated with building the jar/jad files
+
+     All other non-test targets essentially modify properties associated with the
+     Build target
+-->
+<project name="JavaRosa" default="LaunchEmulator">
+	<!-- Main Target: Call to build the project -->
+	<!-- This is the main work target, it actually builds the code -->
+	<target name="BuildPolish" depends="init,CompileAndLinkSource,RetrieveDevices" description="This is the controller for the J2ME build process.">
+		<!-- Definition of the J2ME Polish task:                      -->
+		<!-- Note that this takes place here (rather than in the script in general) in order to allow the libraries jar to be compiled from source before the classpath is evaluated-->
+		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/pim.jar:${polish.home}/import/location.jar:${polish.home}/import/jsr234.jar" />
+			<path id="classpath.base">
+		</path>
+		
+		<!-- If not already set, set to nothing -->
+		<property name="dest.suffix" value=""/>
+		
+		<!-- If not already set, set to nothing -->
+		<property name="device.dir.dist" value="${dir.dist.root}${dest.suffix}"/>
+		
+		<buildPolish>
+			<info name="${app.name}"
+				version="${app.version}"
+				description="${app.description}"
+				vendorName="${app.vendor}"
+				infoUrl="${app.infoUrl}"
+				jarName="${app.jarName}"
+				jarUrl="${deploy-url}${app.jarName}" copyright="" />
+
+			<!-- selection of supported devices, set this in build.properties -->
+			<deviceRequirements if="build.batch">
+				<requirement name="Feature" value="javarosa" />
+			</deviceRequirements>
+			
+			<deviceRequirements unless="build.batch">
+				<requirement name="Identifier" value="${device.identifier.test}" />
+			</deviceRequirements>
+
+			<!-- build settings -->
+			<!-- 'menu' here designates that we're using the fullscreen Polish UI with native menus -->
+			<!-- We should see if we can set these first two attributes as properties instead-->
+			<build fullscreen="menu"
+				usePolishGui="${javarosa.usepolishui}"
+				workDir="${dir.work}"
+				destDir="${device.dir.dist}">
+				
+				<libraries>
+					<!-- The J2MEUnit Library is causing problems with blackberry builds. It should probably be moved 
+					     somewhere where it won't be included by default (as it isn't necessary for deployed apps -->
+					<library dir="${dir.lib}"/>
+					<!--library file="${dir.lib}${file.separator}kxml2-2.3.0.jar"/-->
+					<!--library file="${dir.lib}${file.separator}regexp-me.jar"/-->
+				</libraries>
+
+				<jad>
+					<attribute name="App-Version" value="${jrdemo.version}" />
+					<attribute name="JRDemo-Build-Version" value="${jrdemo-build-version}" />
+					<attribute name="JR-Build-Version" value="${jr-build-version}" />
+					<attribute name="Polish-Device" value="${polish.identifier}" />
+					<attribute name="JRDemo-Post-Url" value="${jrdemo.postUrl}" />
+					<attribute name="Form-Server-Url" value="${jrdemo.formListUrl}" />
+					<attribute name="Default-View" value="${jrdemo.defaultview}"/>
+				</jad>
+				
+				
+				<!-- We rely on the jad file to be able to change properties post-compile, so
+				we need to ensure that any non-static properties don't make it into the manifest file-->
+				<manifestFilter>
+					Manifest-Version, MIDlet-Name, MIDlet-Version, MIDlet-Vendor,
+					MIDlet-Description?, MIDlet-Icon?, MIDlet-Info-URL?,
+					MIDlet-1, MIDlet-2?, MIDlet-3?, MIDlet-4?, MIDlet-5?, 
+					MicroEdition-Profile, MicroEdition-Configuration,
+					MIDlet-Data-Size?,
+					MicroEdition-*,
+					Polish-*
+				</manifestFilter>
+				
+				<!-- midlets definition -->
+				<midlet class="${app.class}" name="${app.name}" />
+
+				<!-- Code source files to include in compilation -->
+				<!-- All source-level inclusions should be made here -->
+				<sources>
+					<source dir="${dir.src}"/>
+					<source dir="${dir.locationsrc}" if="${app.uselocation}" />					
+				</sources>
+
+				<!-- Build variables -->
+				<variables includeAntProperties="true">
+					<variable file="configuration/configuration.properties" />
+					<variable name="polish.TextField.useDirectInput" value="true" unless="polish.international"/>
+					<variable name="polish.FullScreen" value="false" if="${ isOS( Windows ) }" />
+					<variable name="obfuscate.force.no" value="true" if="${ isOS( Windows ) }" /> 
+				</variables>
+
+				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
+                <resources defaultexcludes="no" excludes="readme.txt, *.orig, polish.css">
+                    <root dir="${dir.resources-external}" />
+                    <root dir="${dir.resources}" />
+                    <!-- Set the language for the strings in the application -->
+                    <localization>
+                        <locale name="none" />
+                    </localization>
+                </resources>
+
+				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code
+					 more difficult, and compresses the built JAR -->
+				<!-- obfuscator settings: do not obfuscate when the test-property is true  -->
+				<obfuscator name="ProGuard" unless="((noobfuscate or test) and not release) or polish.blackberry or obfuscate.force.no">
+					<parameter name="optimize" value="true" />
+					<!--parameter name="printmapping" value="obfuscation_mapping.txt" /-->
+					
+					<!-- none of the parameter names below can be the same, or else they will clobber previous parameters; hence the varied spacing -->
+					<parameter name="keep,allowshrinking" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />
+					<parameter name="keep, allowshrinking" value="!abstract class org.javarosa.core.model.instance.* implements org.javarosa.core.model.IFormDataModel" />
+					<parameter name="keep ,allowshrinking" value="!abstract class org.javarosa.core.model.data.* implements org.javarosa.core.model.data.IAnswerData" />
+					<parameter name="keep,  allowshrinking" value="!abstract class org.javarosa.model.xform.* implements org.javarosa.core.model.IDataReference" />
+					<parameter name="keep     " value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
+					<parameter name="keep , allowshrinking" value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
+					<parameter name="keep" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
+					<parameter name="keep  ,allowshrinking" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
+					<parameter name="keep,   allowshrinking" value="!abstract class org.javarosa.communication.** implements org.javarosa.core.services.transport.ITransportDestination"/>
+					<parameter name="keep " value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
+					<parameter name="keep,    allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
+					<parameter name="keep  " value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
+					<parameter name="keep,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
+					<parameter name="keep  ,   allowShrinking" value="class org.javarosa.model.GraphDataGroup"/>
+					<parameter name="keep      " value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
+					<parameter name="keep   ,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
+					<parameter name="keep        ,       allowShrinking" value="class * implements org.javarosa.services.transport.TransportMessage"/>
+					<parameter name="keep       ,         allowShrinking" value="class * implements org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper"/>
+					<parameter name="keep              " value="class org.javarosa.core.model.SubmissionProfile"/>
+					<parameter name="keep          ,            allowShrinking" value="class org.javarosa.core.model.SubmissionProfile"/>
+					<parameter name="keep            ,              allowShrinking" value="class * extends org.javarosa.core.model.SubmissionProfile"/>
+				</obfuscator>
+
+				<!-- log settings: only use debug setting when the test-property is true -->
+				<debug if="test" showLogOnError="true" verbose="true" level="error">
+					<filter pattern="org.celllife.singlequestionscreen.*" level="debug" />
+				</debug>
+				<!-- Properties of the actual javac compiler -->
+				<compiler debug="on" includeJavaRuntime="yes"/>
+				
+				<postcompiler name="java5"/>
+				<postcompiler name="serialization" if="org.javarosa.polish.serialization"/>
+				
+
+			</build>
+
+			<!-- execution of emulator(s) -->
+			<!-- Target one: Run emulator and profiling tools if debugging is enabled -->
+			<emulator wait="true" securityDomain="trusted" enableProfiler="true" enableMemoryMonitor="true" enableNetworkMonitor="false" if="debug">
+				<!-- Enable the following line to test memory constraints on the device -->
+				<!--parameter name="-Xheapsize" value="2897152"/-->
+			</emulator>
+
+			<!-- Target two: Run emulator only, with no profiling tools if debugging is disabled but testing is -->
+			<emulator wait="true" trace="none" securityDomain="trusted" enableProfiler="false" enableMemoryMonitor="false" enableNetworkMonitor="false" if="test and not debug">
+				<!-- Enable the following line to test memory constraints on the device -->
+				<parameter name="-Xheapsize" value="22897152"/>
+				<!--debugger port="6001" /-->
+			</emulator>
+
+		</buildPolish>
+	</target>
+	
+	<target name="RetrieveDevices" description="Retrieves custom device library from the shared resources">
+		<copy file="${device.list}" todir="${basedir}" overwrite="true"/>
+	</target>
+	
+	<target name="CompileAndLinkSource" if="compile.from.source.true">
+			<ant antfile="${dir.jrlibs}/build.xml" target="package" inheritAll="false" inheritRefs="false">
+				<property name="polish.home" value="${polish.home}"/>
+				<property name="wtk.home" value="${wtk.home}"/>
+			</ant>
+			<copy file="${dir.jrlibs}/dist/j2merosa-libraries.jar" todir="${dir.tools}"/>
+	</target>
+
+	<!-- Main Target: Call to build the project and call up the emulator -->
+	<!-- Builds the code and invokes the emulator -->
+	<target name="LaunchEmulator" depends="enableEmulator,BuildPolish" description="invokes the emulator">
+	</target>
+
+	<!-- Main Target: Call to clean directories created by a build -->
+	<target name="Clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
+		<delete dir="${dir.build}" />
+		<delete dir="${dir.dist.root}" />
+	</target>
+	
+	<!-- Main Target: Call to clean the emulator's RMS -->
+	<target name="CleanRMS" description="cleans the emulator's database">
+		<delete dir="${j2mewtk.home}/appdb/DefaultColorPhone"/>
+	</target>
+	
+	<!-- Main Target: Cleans, and then runs the build target -->
+	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish"/>
+	
+	<!-- Main Target: Cleans, enables all release configurations and runs the build target -->
+	<target name="BuildRelease" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, enableRelease, BuildPolish"/>
+
+	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
+	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, Clean, enableEmulator, BuildPolish" />
+
+	<target name="BuildRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, enableEmulator, BuildPolish" />
+
+	
+	<!-- Main Target: Runs the build with all debug properties enabled -->
+	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
+	
+	<target name="DecomposeJar" depends="BuildClean">
+		<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
+	    <py-run script="${dir.tools}/jar_usage.py" optimize="0" python="${pythonexec}">
+	      <arg value="${basedir}\dist\${app.jarName}"/>
+	      <arg value="${basedir}\dist\obfuscation_mapping.txt"/>
+	    </py-run>
+	</target>
+	
+	<!-- This target should prevent us from needing to re-run BuildClean for additional targets -->
+	<target name="BuildServerExtras" depends="SetBatch,BuildClean"/>
+	
+	<target name="SetBatch">
+		<property name="build.batch" value="true"/>
+		<property name="dest.suffix" value="${file.separator}${polish.identifier}${file.separator}"/>
+	</target>
+	      	
+
+	<!-- Initialization for the build targets                    -->
+	<target name="init">
+		<ant antfile="${dir.root}/core/build.xml" target="extract-libs" inheritAll="true" inheritRefs="false" />
+		
+		<!-- Disable the Emulator by default -->
+		<property name="test" value="false" />
+		<condition property="compile.from.source.true">
+			<equals arg1="${compile.source}" arg2="true" />
+		</condition>
+		
+		<exec executable="hg" outputproperty="jrdemo-build-version">
+			<arg line="parents --template {node|short}"/>
+		</exec>
+
+		<taskdef name="if" onerror="report" classname="net.sf.antcontrib.logic.IfTask" classpath="${dir.tools}/ant-contrib.jar" />
+		<if>
+			<equals arg1="${compile.source}" arg2="true" />
+			<then>
+				<exec executable="hg" outputproperty="jr-build-version">
+					<arg line="parents --template {node|short} -R &quot;${dir.root}&quot;"/>
+				</exec>
+			</then>
+			<else>
+				<unzip src="${dir.tools}/j2merosa-libraries.jar" dest="${dir.build}">
+				    <patternset>
+				        <include name="javarosa.properties"/>
+				    </patternset>
+				</unzip>
+				<property file="${dir.build}/javarosa.properties" /> 
+			</else>
+		</if>
+
+	</target>
+
+	<target name="supressOutput">
+		<property name="${debug.output}" value="none"/>
+	</target>
+	
+	<target name="enableRelease">
+		<property name="release" value="true"/>
+	</target>
+
+	<target name="disableObfuscator">
+		<property name="noobfuscate" value="true"/>
+	</target>
+	<!-- Sets the 'debug' ANT variable to true -->
+	<target name="enableDebug">
+		<property name="debug" value="true" />
+	</target>
+
+	<!-- Enables the emulator by setting 'test' to be true, and setting a working directory -->
+	<target name="enableEmulator">
+		<property name="test" value="true" />
+		<property name="dir.work" value="build/test" />
+	</target>
+	
+	<!-- import properties which introduce localization hacks for 
+		     j2me polish commands and UI elements                     -->
+	<property file="${basedir}/polish.localehacks.properties" />
+	
+	<!-- import local specific properties                          -->
+	<property file="${basedir}/local.properties" />
+	
+	<!-- import build specific properties                          -->
+	<property file="${basedir}/build.properties" />
+
+	<!-- import global properties                                 -->
+	<property file="${polish.home}/global.properties" />
+</project>
