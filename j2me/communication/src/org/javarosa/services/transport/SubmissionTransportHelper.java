@@ -23,7 +23,7 @@ public class SubmissionTransportHelper {
 		return new SubmissionProfile(new XPathReference("/"), "post", url, null);
 	}
 	
-	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile) throws IOException {
+	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile, boolean cacheable) throws IOException {
 		//If there is a submission profile, we need to use the relevant portions.
 		if(profile.getMethod().toLowerCase().equals("post")) {
 			
@@ -31,7 +31,10 @@ public class SubmissionTransportHelper {
 			String url = profile.getAction();
 		
 			IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(instance, profile.getRef());
-			return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
+			SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
+			message.setCacheable(cacheable);
+			message.setOpenRosaApiVersion(null);
+			return message;
 		} else if(profile.getMethod().toLowerCase().equals("smspush")) {
 			
 			//#if polish.api.wmapi

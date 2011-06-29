@@ -84,7 +84,7 @@ public class JRDemoFormEntryState extends FormEntryState {
 			try {
 				Logger.log("formentry","writing data: " + instanceData.getName());
 				storage.write(instanceData);
-				final int record = instanceData.getID();	
+				final int record = instanceData.getID();
 
 				TransportMessage message = JRDemoContext._().buildMessage(instanceData, profile);
 				
@@ -92,7 +92,7 @@ public class JRDemoFormEntryState extends FormEntryState {
 	
 					public void sendData(TransportMessage message) {
 						
-						FormTransportState send = new FormTransportState(message) {
+						JRDemoFormTransportState send = new JRDemoFormTransportState(message, record) {
 							public void done() {
 								JRDemoUtil.goToList(cameFromFormList);
 							}
@@ -103,10 +103,6 @@ public class JRDemoFormEntryState extends FormEntryState {
 						};
 							
 						send.start();
-						
-						// Now that we've ensured that the data is in the transport queue, we need to remove it
-						// from storage? What normally happens if a message can't send immediately?
-						StorageManager.getStorage(FormInstance.STORAGE_KEY).remove(record);
 					}
 	
 					public void skipSend(TransportMessage message) {

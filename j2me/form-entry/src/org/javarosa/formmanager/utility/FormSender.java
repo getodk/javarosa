@@ -45,31 +45,23 @@ public class FormSender {
 
 	TransportMessage message;
 	private ISubmitStatusObserver observer;
-	private FormTransportViews views;
+	FormTransportSubmitStatusScreen view;
 
 	/**
 	 * @param shell
 	 * @param activity
 	 */
-	public FormSender(FormTransportViews views, TransportMessage message) {
-		this.views = views;
+	public FormSender(FormTransportSubmitStatusScreen view, TransportMessage message) {
+		this.view = view;
 		this.message = message;
 	}
 	
-	private FormTransportSubmitStatusScreen createDisplay() {
 
-		FormTransportSubmitStatusScreen statusScreen = views.getSubmitStatusScreen();
-		J2MEDisplay.setView(statusScreen);
-		setObserver(statusScreen);
-		return statusScreen;
-	}
-	
 	public void setObserver(ISubmitStatusObserver o) {
 		this.observer = o;
 	}
 
 	public void sendData() {
-		FormTransportSubmitStatusScreen screen = createDisplay();
 		if (this.message == null)
 			throw new RuntimeException(
 					"null data when trying to send single data");
@@ -80,13 +72,7 @@ public class FormSender {
 					+ this.message.getCacheIdentifier());
 
 			SenderThread thread = TransportService.send(message);
-			
-			//ctsims, April 16, 2010: Race condition: The transport service
-			//needs to have a cache identifier for the message here before
-			//the display can do anything. Show the screen first, but only
-			//start polling once the cache identifier is available.
-			screen.reinit(this.message.getCacheIdentifier());
-			
+			view.reinit(message.getCacheIdentifier());
 			thread.addListener(observer);
 		}
 		catch(TransportException e) {
