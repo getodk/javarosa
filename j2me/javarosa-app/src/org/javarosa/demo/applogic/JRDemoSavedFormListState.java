@@ -31,12 +31,9 @@ public class JRDemoSavedFormListState implements JRDemoSavedFormListTransitions{
 			//Link to the FormDef so we can find the appropriate submission profile
 			FormDefFetcher fd = new FormDefFetcher(new ModelRmsRetrievalMethod(data), JRDemoContext._().getPreloaders(), JRDemoContext._().getFuncHandlers());
 			SubmissionProfile profile = fd.getFormDef().getSubmissionProfile();
-			send = new JRDemoFormTransportState(data, profile) {
+			send = new JRDemoFormTransportState(data, profile, data.getID()) {
 
 				public void done() {
-
-					IStorageUtility forms = StorageManager.getStorage(FormInstance.STORAGE_KEY);
-					forms.remove(data);
 					new JRDemoSavedFormListState().start();				
 				}
 

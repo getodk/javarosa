@@ -9,6 +9,5 @@ public interface JRDemoSavedFormListTransitions {
 	void savedFormSelected(int formId,int instanceId);
 	
 	public void sendDataFormInstance(FormInstance data);
-
-
+	
 }

@@ -50,6 +50,7 @@ public class JRDemoSavedFormListController implements HandledCommandListener {
 		if (d == view) {
 			if (c == List.SELECT_COMMAND) {
 				int index = view.getSelectedIndex();
+				
 				if (index != -1){
 					SavedFormListItem listItem  = (SavedFormListItem) formInfo.elementAt(index);
 					FormInstance formInstance = JRDemoUtil.getSavedFormInstance(listItem.getFormId(),listItem.getInstanceId());
@@ -57,6 +58,7 @@ public class JRDemoSavedFormListController implements HandledCommandListener {
 				}
 			} else 	if (c == view.CMD_SEND_DATA) {
 				int index = view.getSelectedIndex();
+				
 				if (index != -1){
 					SavedFormListItem listItem  = (SavedFormListItem) formInfo.elementAt(index);
 					FormInstance formInstance = JRDemoUtil.getSavedFormInstance(listItem.getFormId(),listItem.getInstanceId());

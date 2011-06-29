@@ -160,7 +160,7 @@ public class JRDemoContext {
 		}
 		
 		try {
-			return SubmissionTransportHelper.createMessage(data, profile);
+			return SubmissionTransportHelper.createMessage(data, profile, false);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error Serializing Data to be transported");
