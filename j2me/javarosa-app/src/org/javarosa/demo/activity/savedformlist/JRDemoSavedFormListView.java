@@ -15,7 +15,7 @@ public class JRDemoSavedFormListView extends List {
 	
 	public JRDemoSavedFormListView (String title, Vector formNames) {
 		super(title, List.IMPLICIT);
-	
+		
 		for (int i = 0; i < formNames.size(); i++) {
 			append( ((SavedFormListItem)formNames.elementAt(i) ).toString(), null);
 		}

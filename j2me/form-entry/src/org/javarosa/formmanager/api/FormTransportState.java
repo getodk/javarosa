@@ -26,10 +26,10 @@ import org.javarosa.services.transport.TransportMessage;
 public abstract class FormTransportState implements FormTransportStateTransitions, State, HandledCommandListener, HandledItemStateListener {
 	//not separating out state/controller/etc, as form send is already kind of a mess
 	
-	FormTransportStateTransitions transitions;
-	FormTransportSubmitStatusScreen screen;
+	protected FormTransportStateTransitions transitions;
+	protected FormTransportSubmitStatusScreen screen;
 	
-	FormSender sender;
+	protected FormSender sender;
 
 	public FormTransportState(TransportMessage message) {
 		this(message, null);
@@ -37,8 +37,8 @@ public abstract class FormTransportState implements FormTransportStateTransition
 	
 	public FormTransportState(TransportMessage message, TransportResponseProcessor responder) {
 		FormTransportViews views = new FormTransportViews(this, this, responder);
-		sender = new FormSender(views, message);
 		screen = views.getSubmitStatusScreen();
+		sender = new FormSender(screen, message);
 		this.transitions = this;
 	}
 	
