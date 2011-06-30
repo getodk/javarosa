@@ -333,7 +333,7 @@ public class FormEntryCaption implements FormElementStateListener {
 		ro.header = getRepeatText("mainheader");
 		
 		ro.add = null;
-    	if (form.canCreateRepeat(form.getChildInstanceRef(index))) {
+    	if (form.canCreateRepeat(form.getChildInstanceRef(index), index)) {
     		ro.add = getRepeatText(has_repetitions ? "add" : "add-empty");
     	}
     	ro.delete = null;
