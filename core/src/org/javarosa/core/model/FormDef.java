@@ -329,9 +329,32 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return relev;
 	}
 
-	public boolean canCreateRepeat(TreeReference repeatRef) {
-		//no-op currently
-		//TODO: check # child constraints on parent
+	public boolean canCreateRepeat(TreeReference repeatRef, FormIndex repeatIndex) {
+		GroupDef repeat = (GroupDef)this.getChild(repeatIndex);
+		
+		//Check to see if this repeat can have children added by the user
+		if(repeat.noAddRemove) {
+			//Check to see if there's a count to use to determine how many children this repeat
+			//should have
+			if(repeat.getCountReference() != null) {
+				int currentMultiplicity = repeatIndex.getElementMultiplicity();
+				
+				//get the total multiplicity possible
+				long fullcount = ((Integer)this.getInstance().getDataValue(repeat.getCountReference()).getValue()).intValue();
+				
+				if(fullcount <= currentMultiplicity) {
+					return false;
+				}
+			} else {
+				//Otherwise the user can never add repeat instances 
+				return false;
+			}
+		}
+		
+		//TODO: If we think the node is still relevant, we also need to figure out a way to test that assumption against
+		//the repeat's constraints.
+		
+		
 		return true;
 	}
 	

@@ -384,7 +384,7 @@ public class FormEntryModel {
         
         boolean relevant;
         if (isAskNewRepeat) {
-            relevant = form.isRepeatRelevant(ref) && form.canCreateRepeat(ref);
+            relevant = form.isRepeatRelevant(ref) && form.canCreateRepeat(ref, index);
             //repeat junctures are still relevant if no new repeat can be created; that option
             //is simply missing from the menu
         } else if (isRepeatJuncture) {
