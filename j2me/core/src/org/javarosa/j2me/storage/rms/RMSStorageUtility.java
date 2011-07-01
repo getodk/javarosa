@@ -457,8 +457,8 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			
 			commitIndex(info, idIndex);
 			
-			deleteActionCache = null;
-			transactionKey = null;
+			this.deleteActionCache = null;
+			this.transactionKey = null;
 			
 			setClean();
 			storageModified();
