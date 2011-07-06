@@ -29,72 +29,25 @@ polish.rss.command.select=Montrer
 polish.rss.command.followlink=Aller
 
 # used for predictive setup
-polish.predictive.command.enable=Activer la saisie prédictive
-polish.predictive.command.disable=Désactiver la saisie prédictive
-polish.predictive.command.install=Installer la saisie prédictive
-polish.predictive.registerNewWord.label=Nouveau mot:
-polish.predictive.registerNewWord.command=Ajouter un nouveau mot
-polish.predictive.download.title=Texte prédictif
-polish.predictive.download.message=La version du dictionnaire de texte predictif est incorrecte ou introuvable. Appuyez sur OK pour installer le dictionnaire.
-polish.predictive.local.title=Texte predictif
-polish.predictive.local.message=La version du dictionnaire de texte predictif est incorrecte ou introuvable. Appuyez sur OK pour installer le dictionnaire.
-polish.predictive.title=Saisie prédictive
-polish.predictive.wordNotFound=Mot non trouvé
 
-polish.predictive.setup.title=Configuration prédictive
-polish.predictive.setup.info=Installation du dictionnaire utilisé pour la saisie prédictive. Veuillez patienter un instant ...
-polish.predictive.setup.status.delete=Suppression de l'installation précédente …
-polish.predictive.setup.status.install=Installation en cours...
-polish.predictive.setup.status.finished=Installation terminée, veuillez appuyer sur la commande sortir ...
-polish.predictive.setup.cancel=Voulez-vous vraiment annuler l'installation? Cela peut entraîner des effets indésirables.
-polish.predictive.setup.error=Une erreur s'est produite:
-polish.predictive.setup.cmd.cancel=Annuler
-polish.predictive.setup.cmd.exit=Sortir
-polish.predictive.setup.cmd.yes=Oui
-polish.predictive.setup.cmd.no=Non
 
 #Javarosa-specific
 
 plussign=/add.png
-question=/question.png
-questioncompulsory=/questioncompulsory.png
 
 splashscreen=/splash.png
 
 
-menu.NewCase=Nouvelle case
-menu.FollowUp=Visite de suivi
-menu.Referral=Suivi de la référence
-menu.ViewOpen=Voir les nouvelles cases ouvertes
-menu.Resolve=Résoudre l'affaire
 menu.Save=Enregistrer
 menu.Exit=Sortir
-menu.GetNewForms=Recevoir de nouveaux formulaires
-menu.Camera=Appareil photo
-menu.Recorder=Enregistreur
-menu.ImageManagement=Gestion des images
-menu.ViewSaved=Voir les formulaires enregistré
-menu.Delete=Supprimer
-menu.ShareForms=Partager les formes
 menu.Settings=Paramètres
 menu.SaveAndExit=Enregistrer et quitter
-menu.SendForm=Envoyer le formulaire
 menu.Next=Suivant
 menu.Back=Retour
 menu.ViewAnswers=Voir les réponses
 menu.SendNow=Envoyer maintenant
 menu.SendLater=Envoyer plus tard (sauvegarder)
 menu.SendToNewServer=Envoyer à un nouveau serveur
-menu.Scan=Scanner
-menu.SendData=Envoyer des données
-menu.send.all=Envoyer tous les éléments sauvegardés
-menu.send.all.val=Envoyer tous les éléments sauvegardést (${0})
-menu.sync=Synchronisation avec le serveur
-menu.Edit=Editer
-menu.Review=Revoir
-menu.Refresh=Actualiser
-menu.MessageStatus=Etat du message
-menu.Empty=Vide
 menu.Login=Connectez-vous
 menu.Demo=Démo
 menu.Capture=Capturer
@@ -102,60 +55,26 @@ menu.retry=Réessayer
 
 settings.language=Langue
 
-view.loading=Chargement
 
-hint.TypeOrScan=Taper votre reponse, ou choisissez Scan pour numériser le code-barres
 
-title.ScanBarcode=Scanner le code à barres
-title.FormsList=Liste des formulaires
-title.Login=Connectez-vous
-title.SavedForms=Les formulaires enregistrés
 
 button.Next=Fait
-button.Yes=OUI
 button.No=NON
 
 question.SendNow=Envoyer des données maintenant?
 
-view.sending.SendStatus=Etat d'envoi
-view.sending.SendingInProgress=Envoi en cours
-view.sending.SuccessfullyTransmitted=Formulaire transmis avec succès
-view.sending.CurrentlySending=\ nFormulaire en cours d'envoi
-view.sending.SuccessfullySubmitted=Le formulaire a été soumis avec succès! Votre référence est:
-view.sending.SubmissionFailed=Echec de l'envoi du formulaire! Veuillez réessayer plus tard dans \'Vue Enregister \'.
-view.sending.SubmissionTakingLong=L'envoi prendra beaucoup de temps; vous pouvez vérifier l'état et / ou de renvoyer plus tard dans \'affichage enregistré \'
-view.sending.SubmissionErrorUnknown=Erreur inconnue d'envoi; formulaire pas encore envoyé!
-view.sending.CompulsoryQuestionsIncomplete=Il ya des questions obligatoires auquelles vous devez repondre d'abord avant de continuer
-view.sending.CompulsoryQuestionIncomplete=Cette question est obligatoire. S'il vous plaît répondre pour continuer.
-view.sending.FormUneditable=Vous ne pouvez pas éditer vos réponses pendant l'examen du formulaire
 view.sending.RequiredQuestion=Question requise; Vous devez répondre
-view.sending.of=De
-view.sending.ok=OK
 # inaenda in swahili
-view.sending.endOfSendingMessage=
 
  
 
-prop.healthunit=Unité de santé
-prop.healthunitcode=Code sanitaire
-prop.subcounty=Sous-comté
-prop.district=District
-prop.hsd=HSD
-prop.finyear=Exercice
 
-form.property.url=URL:
 
-form.login.commcareversion=Version Commcare
-form.login.buildnumber=Numéro de version
 form.login.username=Nom d'utilisateur:
 form.login.password=Mot de passe:
 form.login.login=Connectez-vous
-form.login.login.successful=Connexion réussie
-form.login.loading.profile=Chargement de votre profil
 
-activity.login.loginincorrect=Connexion échouée
 activity.login.tryagain=S'il vous plaît réessayer
-activity.login.demomode=Mode Démo
 activity.login.demomode.intro=Vous demarrez Commcare en mode Demo. Le mode démo est pour le test et la pratique uniquement! Connectez-vous avec votre compte d'utilisateur pour effectuer des visites de clients.
 
 
@@ -165,12 +84,8 @@ form.user.confirmpassword=Confirmer le mot de passe:
 form.user.userid=ID de l'utilisateur:
 form.user.giveadmin=Donner à cet utilisateur des droits d'administrateur?
 form.user.fillinboth =S'il vous plaît remplir à la fois nom d'utilisateur et le mot de passe
-form.user.reenterpasswords=S'il vous plaît, saisir de nouveau votre mot de passe, il ya incoherence entre le mot de passe et celui saisi dans la boîte de confirmation
-form.user.usernametaken=Nom d'utilisateur ${0} déjà utilisé. Veuillez choisir un autre
 
 activity.adduser.adduser=Ajouter un utilisateur
-activity.adduser.useradded=L'utilisateur ajouté
-activity.adduser.useraddedsucc=Utilisateur ajouté avec succès
 activity.adduser.problem=Problème:
 activity.adduser.problem.nametaken=Nom d'utilisateur ${0} déjà utilisé. Veuillez choisir un autre
 activity.adduser.problem.emptyuser=Le nom d'utilisateur et le mot de passe doivent  tous les deux être donnés 
@@ -186,71 +101,32 @@ activity.locationcapture.Latitude=Latitude
 activity.locationcapture.Longitude=Longitude
 activity.locationcapture.Altitude=Altitude
 activity.locationcapture.Accuracy=Précision
-activity.locationcapture.LocationError=Erreur de localisation
-activity.locationcapture.GPSNotAvailable=GPS non disponible
 activity.locationcapture.capturelocationhint=Utiliser un GPS pour obtenir l'emplacement
 
-formreview.period.select=Selectioner la période d'examen
-formreview.period.today=Entré aujourd'hui
-formreview.period.yesterday=Entré hier
-formreview.period.week.this=Entré cette semaine
-formreview.period.week.last=Entré la semaine dernière
 
 formview.repeat.addNew=Ajouter de nouvelles repetitions?
-formview.CompulsoryQuestionIncomplete=Cette question est obligatoire. S'il vous plaît répondre pour continuer.
 
 
-activity.edituser.edituser=Editer l'utilisateur
 
-Pregnancy=Grossesse
-household.visit=Visite des ménages
-household.id=ID du ménage
-NewBirth=Nouvelle naissance
 
-PendingReferrals=Dans l'attente de renvois
-Today=Aujourd'hui
-Yesterday=Hier
-NoPendingReferrals=Aucune attente de renvois
-Select=Sélectionner
-Resolve=Résoudre
-ReferralFor=Renvoi pour
-Back=Retour
-Camera=Appareil photo
-Delete=Supprimer
-FormNotLoaded=Formulaire non chargé
 
-Exit=Sortir
-GetNewForms=Obtenez des nouveaux formulaires
-ImageManagement=Gestion des images
 menu.ok=OK
 
-date=Date
-time=L'heure
-name=Nom
 
-model.name.long=Nom du formulaire
-model.date.long=Date d'entrée
-model.time.long=L'heure d'entrée
 
-Recorder=Enregistreur
-SendDataNow=Envoyer des données maintenant
 
-sending.view.done.title=Fini
 sending.view.done=formulaire complet, merci
 sending.view.submit=Soumettre le formulaire
 sending.view.now=Envoyer maintenant
 sending.view.later=Envoyer plus tard
 sending.view.when=Envoyer des données maintenant
-sending.view.new=Envoyer à un nouveau serveur
 
 sending.status.multi=En cours d'envoi ${0} de ${1}. Transmis avec succès ${2} de ${3}.
 sending.status.title=Etat d'envoi
 sending.status.none=Pas de formulaires à envoyer
 sending.status.going=Envoi en cours
 
-sending.message.details=Détails du message
 sending.message.send=Envoyer un message
-message.list.messages=Messages
 message.log=Journal des Messages
 message.details=Afficher les détails
 message.send.unsent=Envoyer les éléments sauvegardés
@@ -263,11 +139,7 @@ sending.status.long=La Soumission prend trop de temps
 sending.status.success=Soumis avec succès
 sending.status.failed=Echec de la soumission
 sending.status.error=Erreur inconnue de soumission
-sending.status.didnotunderstand=N'a pas compris la réponse du serveur [${0}]
 
-menu.transport=Menu de Transport 
-Settings= Paramètres
-ViewSaved=Voir les éléments enregistrés
 
 
 date.today=Aujourd'hui
@@ -277,34 +149,11 @@ date.tomorrow=Demain
 date.nago=Il ya ${0} jours
 date.nfromnow=${0} jours à partir d'aujourd'hui
 
-pregnancy.edd.approaching=En approche
 yes=Oui
 no=Non
 
 #added because the translations were out of sync. Should be cleaned up at some point.
-DebugLog=Journal de débogage
-PendingReferral=  Rufaa  ambazo  hazijakamilika
-RecentFollowups=  Ufuatiliaji wa Karibuni
-ChooseMgonjwa=  Chagua  Mgonjwa
-Find=  Tafuta
-ReferralFor=  Rufaa  kwa  ajili ya 
-Resolve=  Kamilisha
-Loading=  Inafunguka
-Sending=  Inatumwa
-Language=  Lugha
-Save=  Tunza  
-SaveandExit=  Tunza na  Toka
-Mark=  Chagua
-Unmark=  Usichague
-Clear=  Futa
-Next=  Mbele
-Review=  Pitia  tena 
-Update=  Badilisha         
-Sort=  Panga
-SortBy=  Panga kwa
-Cancel=  Kataa
 
-id=Namba
 
 user.registration.title=Enregistrement de l'utilisateur
 user.registration.attempt=En Contact du server pour enregistrer l'utilisateur ...
@@ -335,14 +184,11 @@ entity.nomatch=Aucun resultat
 entity.detail.title=${0} Détails
 entity.sort.title=Trier par …
 
-case.title=Sélectionner une action
 
 loading.screen.message=Chargement en cours …
 loading.screen.title=Chargement en cours
 
 #Used by chatterbox dynamically for the "name" of the xform itext locale 
-locale.name.english=English
-locale.name.swahili=Swahili
 
 case.name=Nom
 case.id=ID
@@ -365,7 +211,6 @@ log.submit.next.weekly=Journal hebdomadaire suivant 
 user.create.header=Nouvel utilisateur
 
 sending.status.success=Soumis avec succès. Aujourd'hui, nous avons reçu de vous, ${0} formulaires.
-sending.status.problem.datasafe=Soumis avec succès. Vos données sont sauvégardées, mais nous avons fait une petite erreur. Nous y travaillons.
 
 user.entity.name=Utilisateur
 user.entity.username=Nom d'utilisateur
@@ -387,5 +232,4 @@ sw=Kiswahili
 af=Afrikaans
 
 #OQPS Messages
-formentry.triggertitle=Message
 formentry.invalid.input=Valeur invalide ${0} entrée
