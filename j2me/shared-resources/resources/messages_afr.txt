@@ -28,111 +28,36 @@ polish.rss.command.select=Wys
 polish.rss.command.followlink=Gaan
 
 # used for predictive setup
-polish.predictive.command.enable=Enable Predictive Input
-polish.predictive.command.disable=Disable Predictive Input
-polish.predictive.command.install=Install Predictive Input
-polish.predictive.registerNewWord.label=New Word: 
-polish.predictive.registerNewWord.command=Add New Word
-polish.predictive.download.title=Predictive Text
-polish.predictive.download.message=The predictive dictionary  could not be found or has the wrong version. Press OK to exit the application and download the dictionary.
-polish.predictive.local.title=Predictive Text
-polish.predictive.local.message=The predictive dictionary has the wrong version or could not be found. Press OK to install the dictionary.
-polish.predictive.title=Predictive Input
-polish.predictive.wordNotFound=Word not found
 
-polish.predictive.setup.title=Predictive Setup
-polish.predictive.setup.info=Installing the dictionary used for predictive input. Please wait a moment ...
-polish.predictive.setup.status.delete=Deleting previous installation ...
-polish.predictive.setup.status.install=Installing ...
-polish.predictive.setup.status.finished=Finished, please press exit ...
-polish.predictive.setup.cancel=Do you really want to cancel the installation ? This may result in unwanted effects.
-polish.predictive.setup.error=An error has occured:
-polish.predictive.setup.cmd.cancel=Terug
-polish.predictive.setup.cmd.exit=Gaan Uit
-polish.predictive.setup.cmd.yes=Ja
-polish.predictive.setup.cmd.no=nee
 
 #Javarosa-specific
-menu.NewCase=New Case
-menu.FollowUp=Follow Up on Existing Case
-menu.Referral=Follow Up on Referral
-menu.ViewOpen=View Open Cases
-menu.Resolve=Resolve Case
 menu.Save=Berg
 menu.Exit=Gaan Uit
-menu.GetNewForms=Kry Nuwe Vorms
-menu.Camera=Kamera
-menu.Recorder=Stemopnemer
-menu.ImageManagement=Beeld Bestuurem
-menu.ViewSaved=Hersien Gestoorde Vorms
-menu.Delete=Skrap
-menu.ShareForms=Deel Vorms
 menu.Settings=Instellings
 menu.SaveAndExit=Berg en Gaan Uit
-menu.SendForm=Stuur Vorm
 menu.Next=Volgende
 menu.Back=Terug
 menu.ViewAnswers=Bekyk Antwoorde
 menu.SendNow=Stuur Nou
 menu.SendLater=Stuur Later (Berg)
 menu.SendToNewServer=Stuur na nuwe adres
-menu.Scan=Neem af
-menu.SendData=Stuur Vorm
-menu.Edit=Voeg Nog Info By
-menu.Review=Bekyk
-menu.Refresh=Hervat
-menu.MessageStatus=Boodskap Status
-menu.Empty=Maak Leeg
 
-hint.TypeOrScan=Tik jou antwoord in, of kies Neem af on die barcode af te neem
 
-title.ScanBarcode=Barcode
-title.FormsList=Vorms Lys
-title.Login=Login
-title.SavedForms=Gestoorde Vorms
 
 button.Next=VOLGENDE
 
 question.SendNow=Stuur data nou?
 
-view.sending.SendingInProgress=Uitsending aan t'gang...
-view.sending.SuccessfullyTransmitted=Vorm is gestuur!
-view.sending.CurrentlySending=\nBesig on vorm te stuur
-view.sending.SuccessfullySubmitted=Vorm is suksesvol gestuur! Rekordnommer:  
-view.sending.SubmissionFailed=Submissie gefaal! Probeer om die vorm later te stuur onder \'Hersien Gestoorde Vorms\'.
-view.sending.SubmissionTakingLong=Submissie duur tamelik lank; bekyk status of herstuur die vorm later onder \'Hersien Gestoorde Vorms\'
-view.sending.SubmissionErrorUnknown=Onbekenste fout, vorm nie gestuur nie!
-view.sending.CompulsoryQuestionsIncomplete=Daar is verpligtende vrae wat nie beantwoord is nie. Vrae wat met * begin more beantwoord wees.
-view.sending.CompulsoryQuestionIncomplete=Hierdie vraag is verpligtend. Please answer dit om voort te gaan.
-view.sending.FormUneditable=Vorm is nie uitgeebaar nie.
 view.sending.RequiredQuestion=Required question; You must answer
-view.sending.of=of
-view.sending.ok=ok
-view.sending.endOfSendingMessage=
 
-Pregnancy=Pregnancy
-NewBirth=New Birth
 
-view.loading=Loading
 
-prop.healthunit=Health Unit
-prop.healthunitcode=Health Unit Code
-prop.subcounty=Subcounty
-prop.district=District
-prop.hsd=HSD
-prop.finyear=Financial Year
 
-form.login.commcareversion=CommCare Version
-form.login.buildnumber=Build Number
 form.login.username=Username:
 form.login.password=Password:
 form.login.login=Login
-form.login.login.successful=Login suksesvol
-form.login.loading.profile=Profiel word gelaai
 
-activity.login.loginincorrect=Login verkeerd
 activity.login.tryagain=Probeer asb. weer
-activity.login.demomode=Demo Mode
 activity.login.demomode.intro=You are starting in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
 
 form.user.name=Naam (ie: loginID):
@@ -141,15 +66,10 @@ form.user.confirmpassword=Confirm Password:
 form.user.userid=User ID:
 form.user.giveadmin=Give this user admin rights?
 form.user.fillinboth =Please fill in both username and password
-form.user.reenterpasswords=Please re-enter your password, the password and password confirmation box did not match
-form.user.usernametaken=Username ${0} already taken. Please choose another username
 
 activity.adduser.adduser=Add User
-activity.adduser.useradded=User added 
-activity.adduser.useraddedsucc=User added successfully
 activity.adduser.problem=Problem:
 activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
  
-activity.edituser.edituser=Edit User
