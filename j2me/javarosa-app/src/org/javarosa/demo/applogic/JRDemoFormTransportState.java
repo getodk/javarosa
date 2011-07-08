@@ -26,7 +26,7 @@ public abstract class JRDemoFormTransportState extends FormTransportState implem
 	public JRDemoFormTransportState(FormInstance tree, SubmissionProfile profile, int formId) throws IOException {
 		this(JRDemoContext._().buildMessage(tree, profile), formId);
 	}
-	
+
 	public JRDemoFormTransportState(TransportMessage message, int formId) {
 		super(message);
 		themessage = message; 
@@ -68,6 +68,11 @@ public abstract class JRDemoFormTransportState extends FormTransportState implem
 			}
 		}
 	}
+	
+	
+	//DO NOT REMOVE. S40 BUG WORKAROUNDS
+	public abstract void done();
+	public abstract void sendToBackground(); 
 
 	//Forward along to children
 	

@@ -121,4 +121,6 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 			fail("Failure while fetching XForm: " + message.getFailureReason());
 		}
 	}
+	
+	public abstract void done();
 }
