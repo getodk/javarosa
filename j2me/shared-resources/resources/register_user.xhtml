@@ -73,7 +73,7 @@
 			<bind nodeset="registration/date" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start"/>
 			<bind nodeset="registration/registering_phone_id" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
 			
-			<bind nodeset="confirmpass" type="xsd:int" jr:preload="user" jr:preloadParams="password" jr:constraint="/user_registration/registration/password = ." jr:constraintMsg="Passwords do not match!"/>
+			<bind nodeset="confirmpass" required="true()" type="xsd:int" jr:preload="user" jr:preloadParams="password" jr:constraint="/user_registration/registration/password = ." jr:constraintMsg="Passwords do not match!"/>
 			<bind nodeset="loadedguid" type="xsd:string" jr:preload="user" jr:preloadParams="uuid" />
 			<bind nodeset="freshguid" type="xsd:string" jr:preload="uid" jr:preloadParams="general" />
 			

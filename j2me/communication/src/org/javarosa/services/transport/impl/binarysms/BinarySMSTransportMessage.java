@@ -5,6 +5,8 @@ package org.javarosa.services.transport.impl.binarysms;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.wireless.messaging.BinaryMessage;
@@ -25,8 +27,9 @@ import org.javarosa.services.transport.impl.BasicTransportMessage;
  * 
  */
 public class BinarySMSTransportMessage extends BasicTransportMessage {
-	
-	byte[] content;
+		
+	byte[] raw;
+	Vector<byte[]> content;
 
 	/**
 	 * 
@@ -39,13 +42,46 @@ public class BinarySMSTransportMessage extends BasicTransportMessage {
 	public BinarySMSTransportMessage() {
 		//ONLY FOR DESERIALIZING
 	}
+	
+	/**
+	 * @param str
+	 * @param destinationURL
+	 * @throws UnsupportedEncodingException 
+	 */
+	public BinarySMSTransportMessage(String str, String destinationURL) throws UnsupportedEncodingException {
+		this.destinationURL = destinationURL;
+		setContent(str.getBytes("UTF-16"));
+	}
+	
 	/**
 	 * @param str
 	 * @param destinationURL
 	 */
 	public BinarySMSTransportMessage(byte[] bytes, String destinationURL) {
 		this.destinationURL = destinationURL;
-		this.content = bytes;
+		setContent(bytes);
+	}
+	
+	private void setContent(byte[] bytes) {
+		raw = bytes;
+		content = new Vector<byte[]>();
+		for(int i = 0 ; i <= bytes.length / 140; ++i) {
+			int chunk = 140;
+			if(i == bytes.length / 140) {
+				//Last chunk, doesn't need to be as long 
+				chunk = bytes.length % 140;
+			}
+			if(chunk == 0) {
+				continue;
+			}
+			
+			byte[] message = new byte[chunk];
+			
+			for(int j = 0 ; j < message.length ; ++j) {
+				message[j] = bytes[i*140 + j]; 
+			}
+			content.addElement(message);
+		}
 	}
 
 	public boolean isCacheable() {
@@ -81,7 +117,10 @@ public class BinarySMSTransportMessage extends BasicTransportMessage {
 
 			// create a MessageConnection
 			conn = getConnection(this.getDestinationURL());
-			sendMessage((byte[]) this.getContent(), conn);
+			Vector<byte[]> data = (Vector<byte[]>)this.getContent();
+			for(byte[] messageContent : data) {
+				sendMessage(messageContent, conn);
+			}
 
 		} catch (Exception e) {
 			System.out.println("Connection failed: ");
@@ -134,13 +173,13 @@ public class BinarySMSTransportMessage extends BasicTransportMessage {
 			throws IOException, DeserializationException {
 		super.readExternal(in, pf);
 		destinationURL = ExtUtil.readString(in);
-		content = ExtUtil.readBytes(in);
+		setContent(ExtUtil.readBytes(in));
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		super.writeExternal(out);
 		ExtUtil.writeString(out, destinationURL);
-		ExtUtil.writeBytes(out, content);
+		ExtUtil.writeBytes(out, raw);
 	}
 
 }

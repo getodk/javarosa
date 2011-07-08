@@ -5,6 +5,7 @@ package org.javarosa.services.transport.impl.sms;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
@@ -34,9 +35,9 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 public class SMSTransportMessage extends BasicTransportMessage {
 
 	/**
-	 * SMS messages can be no longer than 140 characters in length
+	 * SMS messages can be no longer than 160 bytes in length
 	 */
-	public final static int MAX_SMS_LENGTH = 140;
+	public final static int MAX_SMS_BYTES = 140;
 
 	/**
 	 * 
@@ -55,12 +56,24 @@ public class SMSTransportMessage extends BasicTransportMessage {
 	/**
 	 * @param str
 	 * @param destinationURL
+	 * @throws UnsupportedEncodingException 
 	 */
-	public SMSTransportMessage(String str, String destinationURL) {
+	public SMSTransportMessage(String payload, String destinationURL) throws UnsupportedEncodingException {
 		this.destinationURL = destinationURL;
-		content = splitSMS(str);
+		
+		//Try to convert the string to ascii by outputting UTF-8 and re-importing it. Incompatible
+		//(non-7-bit) characters will be read in as extra chars
+		String asciiString = new String(payload.getBytes("UTF-8"),"ASCII");
+		//A UTF-16 string should always represent the string properly, so it's our gold standard
+		String unicodeString = new String(payload.getBytes("UTF-16BE"),"UTF-16BE");
+		
+		if(asciiString.length() != unicodeString.length()) {
+			content = splitSMS(payload, "UTF-16BE");
+		} else {			
+			content = splitSMS(payload, "ASCII");
+		}
 	}
-
+	
 	public boolean isCacheable() {
 		return false;
 	}
@@ -75,29 +88,36 @@ public class SMSTransportMessage extends BasicTransportMessage {
 
 	/**
 	 * 
-	 * SMS can be of maximum 140 characters in length.
-	 * 
+	 * SMS messages must be 160 bytes or less each.
+	 *  
 	 * If the message to be sent is greater, it is partitioned.
 	 * 
 	 * @param str
 	 * @return Vector of strings to be sent as separate messages
+	 * @throws UnsupportedEncodingException 
 	 */
-	private Vector splitSMS(String str) {
-		String message = str;
+	private Vector splitSMS(String str, String encoding) throws UnsupportedEncodingException {
 		Vector v = new Vector();
+		
+		String currentMessage = "";
 
-		// if message is too long split it
-		while (message.length() > MAX_SMS_LENGTH) {
-			String part = message.substring(0, MAX_SMS_LENGTH);
-			v.addElement(part);
-			message = message.substring(MAX_SMS_LENGTH + 1);
+		//TODO: This might take a _looooooooooooong_ time if our message is huge. Test.
+		
+		// Go through one char at a time building output strings in
+		// the given encoding
+		for(int i = 0 ; i < str.length() ; ++i) {
+			if((currentMessage + str.charAt(i)).getBytes(encoding).length <= MAX_SMS_BYTES) {
+				currentMessage += str.charAt(i);
+			} else {
+				v.addElement(currentMessage);
+				currentMessage = "";
+				currentMessage += str.charAt(i);
+			}
 		}
-
-		// whatever remaining of the message after
-		// chopping out 140 character length chunks
-		// must also be added
-		if (message.length() > 0)
-			v.addElement(message);
+		
+		v.addElement(currentMessage);
+		
+		
 		return v;
 	}
 
@@ -114,11 +134,6 @@ public class SMSTransportMessage extends BasicTransportMessage {
 	public void setDestinationURL(String destinationURL) {
 		this.destinationURL = destinationURL;
 	}
-	
-	
-	
-	
-	
 	
 	public void send() {
 		MessageConnection conn = null;
