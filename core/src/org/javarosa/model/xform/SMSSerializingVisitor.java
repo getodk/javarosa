@@ -94,7 +94,8 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		}
 		model.accept(this);
 		if (theSmsStr != null) {
-			return theSmsStr.getBytes("UTF-8");
+			//Encode in UTF-16 by default, since it's the default for complex messages
+			return theSmsStr.getBytes("UTF-16BE");
 		} else {
 			return null;
 		}
@@ -117,7 +118,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		}
 		model.accept(this);
 		if (theSmsStr != null) {
-			byte[] form = theSmsStr.getBytes("UTF-8");
+			byte[] form = theSmsStr.getBytes("UTF-16");
 			return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_SMS);
 		} else {
 			return null;

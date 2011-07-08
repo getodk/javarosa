@@ -42,8 +42,11 @@ public class SubmissionTransportHelper {
 			//URL
 			String phoneUri = profile.getAction();
 		
-			String payload = new String(new SMSSerializingVisitor().serializeInstance(instance, profile.getRef()));
-			return new org.javarosa.services.transport.impl.sms.SMSTransportMessage(payload,phoneUri);
+			byte[] data = new SMSSerializingVisitor().serializeInstance(instance, profile.getRef());
+			
+			String payload = new String(data,"UTF-16BE");
+			
+			return new org.javarosa.services.transport.impl.sms.SMSTransportMessage(payload,phoneUri);	
 			
 			//#else
 			//# throw new RuntimeException("SMS Messages not enabled on current device"); 
