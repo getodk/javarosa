@@ -79,13 +79,6 @@ public class JRDemoContext {
 			
 		UserUtility.populateAdminUser(m);
 		loadRootTranslator();
-		
-		try {
-			StorageManager.getStorage(FormDef.STORAGE_KEY).write(XFormUtils.getFormFromResource("/smstest.xhtml"));
-		} catch (StorageFullException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}	
 
 	private void loadModules() {

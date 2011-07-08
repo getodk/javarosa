@@ -27,8 +27,9 @@ public class JRDemoFormListController implements HandledCommandListener {
 		formInfo = JRDemoUtil.getFormList();
 		
 		Vector formNames = new Vector();
-		for (Enumeration e = formInfo.elements(); e.hasMoreElements(); )
+		for (Enumeration e = formInfo.elements(); e.hasMoreElements(); ) {
 			formNames.addElement(e.nextElement());
+		}
 
 		
 		view = new JRDemoFormListView(Localization.get("jrdemo.formlist.title"), formNames, JRDemoContext._().getUser().isAdminUser());
