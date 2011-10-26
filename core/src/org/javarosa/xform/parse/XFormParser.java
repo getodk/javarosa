@@ -1358,11 +1358,8 @@ public class XFormParser {
 		}
 		return false;
 	}
-
-	private void parseBind (Element e) {
-		DataBinding binding  = new DataBinding();
-		
-		Vector usedAtts = new Vector();
+	
+	protected DataBinding processStandardBindAttributes( Vector usedAtts, Element e) {
 		usedAtts.addElement(ID_ATTR);
 		usedAtts.addElement(NODESET_ATTR);
 		usedAtts.addElement("type");
@@ -1374,6 +1371,9 @@ public class XFormParser {
 		usedAtts.addElement("calculate");
 		usedAtts.addElement("preload");
 		usedAtts.addElement("preloadParams");
+
+		DataBinding binding  = new DataBinding();
+		
 		
 		binding.setId(e.getAttributeValue("", ID_ATTR));
 
@@ -1447,7 +1447,15 @@ public class XFormParser {
 
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
+		
+		return binding;
+	}
 
+	protected void parseBind (Element e) {
+		Vector usedAtts = new Vector();
+
+		DataBinding binding = processStandardBindAttributes( usedAtts, e);
+		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
@@ -1500,7 +1508,7 @@ public class XFormParser {
 		return r;
 	}
 	
-	private void addBinding (DataBinding binding) {
+	protected void addBinding (DataBinding binding) {
 		bindings.addElement(binding);
 		
 		if (binding.getId() != null) {
