@@ -26,7 +26,9 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
 
 /**
@@ -36,6 +38,14 @@ import org.kxml2.kdom.Element;
  *
  */
 public class XFormUtils {
+	private static IXFormParserFactory _factory = new XFormParserFactory();
+	
+	public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
+		IXFormParserFactory oldFactory = _factory;
+		_factory = factory;
+		return oldFactory;
+	}
+	
 	public static FormDef getFormFromResource (String resource) {
 		InputStream is = System.class.getResourceAsStream(resource);
 		if (is == null) {
@@ -59,7 +69,7 @@ public class XFormUtils {
 		}
 		
 		try {
-			return new XFormParser(isr).parse();
+			return _factory.getXFormParser(isr).parse();
 		} finally {
 			try {
 				isr.close();
