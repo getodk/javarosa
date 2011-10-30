@@ -2198,7 +2198,7 @@ public class XFormParser {
 				}
 			}	
 		} else {
-			String text = getXMLText(node, false);
+			String text = getXMLText(node, true);
 			if (text != null && text.trim().length() > 0) { //ignore text that is only whitespace
 				//TODO: custom data types? modelPrototypes?
 				
