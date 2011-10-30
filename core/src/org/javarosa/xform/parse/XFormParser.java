@@ -787,6 +787,7 @@ public class XFormParser {
 		Vector usedAtts = new Vector();
 		usedAtts.addElement(REF_ATTR);
 		String hint = getXMLText(e, true);
+		String hintInnerText = getLabel(e);
 		String ref = e.getAttributeValue("", REF_ATTR);
 
 		if (ref != null) {
@@ -799,6 +800,7 @@ public class XFormParser {
 				throw new RuntimeException("malformed ref [" + ref + "] for <hint>");
 			}
 		} else {
+		    q.setHelpInnerText(hintInnerText);
 			q.setHelpText(hint);
 		}
 		

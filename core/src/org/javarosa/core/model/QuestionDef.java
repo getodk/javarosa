@@ -55,7 +55,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String labelInnerText;
 	private String helpText;
 	private String textID; /* The id (ref) pointing to the localized values of (pic-URIs,audio-URIs,text) */
-
+	private String helpInnerText;
 
 
 
@@ -238,6 +238,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+        setHelpInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 
 		setControlType(ExtUtil.readInt(dis));
 		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
@@ -259,7 +260,8 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpTextID()));
-				
+        ExtUtil.write(dos, new ExtWrapNullable(getHelpInnerText()));
+
 		ExtUtil.writeNumeric(dos, getControlType());
 		
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
@@ -302,6 +304,14 @@ public class QuestionDef implements IFormElement, Localizable {
 	public String getLabelInnerText() {
 		return labelInnerText;
 	}
+	
+    public void setHelpInnerText(String helpInnerText) {
+        this.helpInnerText = helpInnerText;
+    }
+
+    public String getHelpInnerText() {
+        return helpInnerText;
+    }
 	
 	public String getTextID() {
 		return textID;
