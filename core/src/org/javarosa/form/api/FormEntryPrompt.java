@@ -282,9 +282,13 @@ public class FormEntryPrompt extends FormEntryCaption {
 
 		String textID = ((QuestionDef)element).getHelpTextID();
 		String helpText = ((QuestionDef)element).getHelpText();
+		String helpInnerText = ((QuestionDef)element).getHelpInnerText();
+		
 		try{
 			if (textID != null) {
 				helpText=localizer().getLocalizedText(textID);
+			} else {
+			    helpText=substituteStringArgs(((QuestionDef)element).getHelpInnerText());
 			}
 		}catch(NoLocalizedTextException nlt){
 			//use fallback helptext
