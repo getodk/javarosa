@@ -819,8 +819,7 @@ public class XFormParser {
 		labelUA.addElement(REF_ATTR);
 		valueUA.addElement(FORM_ATTR);
 		
-		
-		String label = null;
+		String labelInnerText = null;
 		String textRef = null;
 		String value = null;
 
@@ -835,7 +834,7 @@ public class XFormParser {
 				if(XFormUtils.showUnusedAttributeWarning(child, labelUA)){
 					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
 				}
-				label = getXMLText(child, true);
+				labelInnerText = getLabel(child);
 				String ref = child.getAttributeValue("", REF_ATTR);
 
 				if (ref != null) {
@@ -873,7 +872,7 @@ public class XFormParser {
 			}
 		}
 		
-		if (textRef == null && label == null) {
+		if (textRef == null && labelInnerText == null) {
 			throw new XFormParseException("<item> without proper <label>",e);
 		}
 		if (value == null) {
@@ -883,7 +882,7 @@ public class XFormParser {
 		if (textRef != null) {
 			q.addSelectChoice(new SelectChoice(textRef, value));
 		} else {
-			q.addSelectChoice(new SelectChoice(null,label, value, false));
+			q.addSelectChoice(new SelectChoice(null,labelInnerText, value, false));
 		}
 		
 		//print unused attribute warning message for parent element
