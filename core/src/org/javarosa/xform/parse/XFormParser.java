@@ -854,20 +854,22 @@ public class XFormParser {
 					System.out.println(XFormUtils.unusedAttWarning(child, valueUA));
 				}
 				
-				if (value.length() > MAX_VALUE_LEN) {
-					System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length " + MAX_VALUE_LEN + " chars" + getVagueLocation(child));
-				}
+				if (value != null)  {
+				    if (value.length() > MAX_VALUE_LEN) {
+				        System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length " + MAX_VALUE_LEN + " chars" + getVagueLocation(child));
+				    }
 				
-				//validate
-				for (int k = 0; k < value.length(); k++) {
-					char c = value.charAt(k);
-									
-					if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
-						boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
-						System.err.println("XForm Parse WARNING: " + (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] " +
-								(isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks" + getVagueLocation(child));
-						break;
-					}
+    				//validate
+    				for (int k = 0; k < value.length(); k++) {
+    					char c = value.charAt(k);
+    									
+    					if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
+    						boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
+    						System.err.println("XForm Parse WARNING: " + (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] " +
+    								(isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks" + getVagueLocation(child));
+    						break;
+    					}
+    				}
 				}
 			}
 		}
