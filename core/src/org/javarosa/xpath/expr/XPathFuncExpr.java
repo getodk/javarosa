@@ -146,6 +146,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return toNumeric(argVals[0]);
 		} else if (name.equals("int") && args.length == 1) { //non-standard
 			return toInt(argVals[0]);
+		} else if (name.equals("round") && args.length == 2) { // non-standard Excel-style round(value,decimal place)
+			Double aval = toNumeric(argVals[0]);
+			Double bval = toNumeric(argVals[1]);
+			return Math.pow(10.0, -bval) * Math.round(aval / Math.pow(10.0, -bval));
 		} else if (name.equals("string") && args.length == 1) {
 			return toString(argVals[0]);			
 		} else if (name.equals("date") && args.length == 1) { //non-standard
