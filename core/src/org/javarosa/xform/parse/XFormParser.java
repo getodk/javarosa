@@ -529,6 +529,19 @@ public class XFormParser {
 			}
 		}
 	}
+
+	protected void processAdditionalAttributes(QuestionDef question, Element e, Vector usedAtts) {
+		// save all the unused attributes verbatim...
+		for(int i=0;i<e.getAttributeCount();i++){
+			String name = e.getAttributeName(i);
+			if ( usedAtts.contains(name) ) continue;
+			question.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
+		}
+
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
+	}
 	
 	protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
 		Vector usedAtts = new Vector();
@@ -544,9 +557,8 @@ public class XFormParser {
         }
 		
 		usedAtts.addElement("mediatype");
-		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
-		}
+		
+		processAdditionalAttributes(question, e, usedAtts);
 		
         return question;
     }
@@ -625,11 +637,7 @@ public class XFormParser {
 			
 		parent.addChild(question);
 		
-
-		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
-		}
-		
+		processAdditionalAttributes(question, e, usedAtts);
 		
 		return question;
 	}
@@ -1098,6 +1106,13 @@ public class XFormParser {
 			}
 		}
 		
+		// save all the unused attributes verbatim...
+		for(int i=0;i<e.getAttributeCount();i++){
+			String name = e.getAttributeName(i);
+			if ( usedAtts.contains(name) ) continue;
+			group.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
+		}
+
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
@@ -1451,6 +1466,13 @@ public class XFormParser {
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 		
+		// save all the unused attributes verbatim...
+		for(int i=0;i<e.getAttributeCount();i++){
+			String name = e.getAttributeName(i);
+			if ( usedAtts.contains(name) ) continue;
+			binding.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
+		}
+
 		return binding;
 	}
 
@@ -1458,7 +1480,7 @@ public class XFormParser {
 		Vector usedAtts = new Vector();
 
 		DataBinding binding = processStandardBindAttributes( usedAtts, e);
-		
+
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
@@ -2139,6 +2161,7 @@ public class XFormParser {
 			
 		node.setPreloadHandler(bind.getPreload());
 		node.setPreloadParams(bind.getPreloadParams());
+		node.setBindAttributes(bind.getAdditionalAttributes());
 	}
 	
 	//apply properties to instance nodes that are determined by controls bound to those nodes

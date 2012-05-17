@@ -1149,7 +1149,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return children;
 	}
 
-	public void setChildren(Vector children) {
+	public void setChildren(Vector<IFormElement> children) {
 		this.children = (children == null ? new Vector() : children);
 	}
 
@@ -1349,5 +1349,26 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		//In the mean time, though, we can only promise that the default one will be used.
 		
 		return submissionProfiles.get(DEFAULT_SUBMISSION_PROFILE);
+	}
+
+
+	@Override
+	public void setAdditionalAttribute(String namespace, String name,
+			String value) {
+		// Do nothing. Not supported.
+	}
+
+
+	@Override
+	public String getAdditionalAttribute(String namespace, String name) {
+		// Not supported.
+		return null;
+	}
+
+
+	@Override
+	public Vector<TreeElement> getAdditionalAttributes() {
+		// Not supported.
+		return new Vector<TreeElement>();
 	}
 }
