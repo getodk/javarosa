@@ -34,7 +34,6 @@ import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -70,6 +69,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	private Constraint constraint = null;
 	private String preloadHandler = null;
 	private String preloadParams = null;
+	private Vector<TreeElement> bindAttributes = new Vector<TreeElement>();
 
 	private boolean relevant = true;
 	private boolean enabled = true;
@@ -106,18 +106,63 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * Construct a TreeElement which represents an attribute with the provided 
 	 * namespace and name.
 	 *  
-	 * @param namespace
+	 * @param namespace - if null will be converted to empty string
 	 * @param name
+	 * @param value
 	 * @return A new instance of a TreeElement
 	 */
-	public static TreeElement constructAttributeElement(String namespace, String name) {
+	public static TreeElement constructAttributeElement(String namespace, String name, String value) {
 		TreeElement element = new TreeElement(name);
 		element.isAttribute = true;
-		element.namespace = namespace;
+		element.namespace = (namespace == null) ? "" : namespace;
 		element.multiplicity = TreeReference.INDEX_ATTRIBUTE;
+		element.value = new UncastData(value);
 		return element;
 	}
+	
+	/**
+	 * Retrieves the TreeElement representing the attribute for
+	 * the provided namespace and name, or null if none exists.
+	 * 
+	 * If 'null' is provided for the namespace, it will match the first
+	 * attribute with the matching name.
+	 * 
+	 * @param attributes - list of attributes to search
+	 * @param namespace
+	 * @param name
+	 * @return TreeElement
+	 */
+	public static TreeElement getAttribute(Vector<TreeElement> attributes, String namespace, String name) {
+		for (TreeElement attribute : attributes) {
+			if(attribute.getName().equals(name) && (namespace == null || namespace.equals(attribute.namespace))) {
+				return attribute;
+			}
+		}
+		return null;
+	}
 
+	public static void setAttribute(TreeElement parent, Vector<TreeElement> attrs, String namespace, String name, String value) {
+
+		TreeElement attribut = getAttribute(attrs, namespace, name);
+		if ( attribut != null ) {
+			if (value == null) {
+				attrs.remove(attribut);
+			} else {
+				attribut.setValue(new UncastData(value));
+			}
+			return;
+		}
+		
+		// null-valued attributes are a "remove-this" instruction... ignore them
+		if ( value == null ) return;
+		
+		// create an attribute...
+		TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
+		attr.setParent(parent);
+
+		attrs.addElement(attr);
+	}
+	
 	public boolean isLeaf() {
 		return (children.size() == 0);
 	}
@@ -270,8 +315,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		newNode.constraint = constraint;
 		newNode.preloadHandler = preloadHandler;
 		newNode.preloadParams = preloadParams;
+		newNode.bindAttributes = bindAttributes;
 
-		newNode.setAttributesFromSingleStringVector(getSingleStringAttributeVector());
+		newNode.attributes = new Vector<TreeElement>();
+		for (int i = 0; i < attributes.size(); i++) {
+			TreeElement attr = (TreeElement) attributes.elementAt(i);
+			newNode.setAttribute(attr.getNamespace(), attr.getName(), attr.getAttributeValue());
+		}
+
 		if (value != null) {
 			newNode.value = value.clone();
 		}
@@ -350,6 +401,46 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		}
 	}
 
+	public void setBindAttributes(Vector<TreeElement> bindAttributes ) {
+		// create new tree elements for all the bind definitions...
+		for ( TreeElement ref : bindAttributes ) {
+			setBindAttribute(ref.getNamespace(), ref.getName(), ref.getAttributeValue());
+		}
+	}
+	
+	public Vector<TreeElement> getBindAttributes() {
+		return bindAttributes;
+	}
+	
+	/**
+	 * Retrieves the TreeElement representing an arbitrary bind attribute
+	 * for this element at the provided namespace and name, or null if none exists.
+	 * 
+	 * If 'null' is provided for the namespace, it will match the first
+	 * attribute with the matching name.
+	 * 
+	 * @param index
+	 * @return TreeElement
+	 */
+	public TreeElement getBindAttribute(String namespace, String name) {
+		return getAttribute(bindAttributes, namespace, name);
+	}
+
+	/**
+	 * get value of the bind attribute with namespace:name' in the vector
+	 * 
+	 * @param index
+	 * @return String
+	 */
+	public String getBindAttributeValue(String namespace, String name) {
+		TreeElement element = getBindAttribute(namespace,name);
+		return element == null ? null: getAttributeValue(element);
+	}
+	
+	public void setBindAttribute(String namespace, String name, String value) {
+		setAttribute(this, bindAttributes, namespace, name, value);
+	}
+	
 	public void setEnabled(boolean enabled) {
 		setEnabled(enabled, false);
 	}
@@ -473,6 +564,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		}
 	}
 	
+	public String getAttributeValue() {
+		if ( !isAttribute ) {
+			throw new IllegalStateException("this is not an attribute");
+		}
+		return getValue().uncast().getString();
+	}
 	
 	/**
 	 * Retrieves the TreeElement representing the attribute at
@@ -485,12 +582,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @return TreeElement
 	 */
 	public TreeElement getAttribute(String namespace, String name) {
-		for (TreeElement attribute : attributes) {
-			if(attribute.getName().equals(name) && (namespace == null || namespace.equals(attribute.namespace))) {
-				return attribute;
-			}
-		}
-		return null;
+		return getAttribute(attributes, namespace, name);
 	}
 
 	/**
@@ -509,96 +601,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * 
 	 * */
 	public void setAttribute(String namespace, String name, String value) {
-
-		for (int i = attributes.size() - 1; i >= 0; i--) {
-			TreeElement attribut =  attributes.elementAt(i);
-			if (attribut.name.equals(name) && (namespace == null || namespace.equals(attribut.namespace))) {
-				if (value == null) {
-					attributes.removeElementAt(i);
-				} else {
-					attribut.setValue(new UncastData(value));
-				}
-				return;
-			}
-		}
-		
-		if(namespace == null) { namespace = ""; }
-		
-		TreeElement attr = TreeElement.constructAttributeElement(namespace, name);
-		attr.setValue(new UncastData(value));
-		attr.setParent(this);
-
-		attributes.addElement(attr);
+		setAttribute(this, attributes, namespace, name, value);
 	}
-
-	/**
-	 * A method for producing a vector of single strings - from the current
-	 * attribute vector of string [] arrays.
-	 * 
-	 * @return
-	 */
-	public Vector getSingleStringAttributeVector() {
-		Vector strings = new Vector();
-		if (attributes.size() == 0)
-			return null;
-		else {
-			for (int i = 0; i < this.attributes.size(); i++) {
-				TreeElement attribute = attributes.elementAt(i);
-				String value = getAttributeValue(attribute);
-				if (attribute.namespace == null || attribute.namespace == "")
-					strings.addElement(new String(attribute.getName() + "=" + value));
-				else
-					strings.addElement(new String(attribute.namespace + ":" + attribute.getName()
-							+ "=" + value));
-			}
-			return strings;
-		}
-	}
-
-	/**
-	 * Method to repopulate the attribute vector from a vector of singleStrings
-	 * 
-	 * @param attStrings
-	 */
-	public void setAttributesFromSingleStringVector(Vector attStrings) {
-		this.attributes = new Vector(0);
-		if (attStrings != null) {
-			for (int i = 0; i < attStrings.size(); i++) {
-				addSingleAttribute(i, attStrings);
-			}
-		}
-	}
-
-	private void addSingleAttribute(int i, Vector attStrings) {
-		String att = (String) attStrings.elementAt(i);
-		String[] array = new String[3];
-		int start = 0;
-		// get namespace
-		
-		int pos = -1;
-		
-		// Clayton Sims - Jun 1, 2009 : Updated this code:
-		//	We want to find the _last_ possible ':', not the
-		// first one. Namespaces can have URLs in them.
-		//int pos = att.indexOf(":");
-		while(att.indexOf(":",pos+1) != -1) {
-			pos = att.indexOf(":",pos+1);
-		}
-		if (pos == -1) {
-			array[0] = null;
-			start = 0;
-		} else {
-			array[0] = att.substring(start, pos);
-			start = ++pos;
-		}
-		// get attribute name
-		pos = att.indexOf("=");
-		array[1] = att.substring(start, pos);
-		start = ++pos;
-		array[2] = att.substring(start);
-		this.setAttribute(array[0], array[1], array[2]);
-	}
-
+	
 	/* ==== SERIALIZATION ==== */
 
 	/*
@@ -678,9 +683,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		preloadHandler = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		preloadParams = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 
-		Vector attStrings = ExtUtil.nullIfEmpty((Vector) ExtUtil.read(in,
-				new ExtWrapList(String.class), pf));
-		setAttributesFromSingleStringVector(attStrings);
+		bindAttributes = ExtUtil.readAttributes(in, this);
+		
+		attributes = ExtUtil.readAttributes(in, this);
 	}
 
 	/*
@@ -743,8 +748,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadHandler));
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadParams));
 
-		Vector attStrings = getSingleStringAttributeVector();
-		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(attStrings)));
+		ExtUtil.writeAttributes(out, bindAttributes);
+		
+		ExtUtil.writeAttributes(out, attributes);
 	}
 
 	//rebuilding a node from an imported instance
@@ -945,6 +951,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		this.name = name;
 	}
 
+	public String getNamespace() {
+		return namespace;
+	}
+	
 	public int getMult() {
 		return multiplicity;
 	}

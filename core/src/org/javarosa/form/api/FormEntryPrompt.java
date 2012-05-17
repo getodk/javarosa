@@ -213,6 +213,9 @@ public class FormEntryPrompt extends FormEntryCaption {
         }
     }
 
+    public Vector<TreeElement> getBindAttributes() {
+    	return mTreeElement.getBindAttributes();
+    }
     public Vector<SelectChoice> getSelectChoices() {
     	QuestionDef q = getQuestion();
     	

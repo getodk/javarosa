@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.OrderedHashtable;
 
@@ -150,6 +151,15 @@ public class ExtUtil {
 		}
 	}
 	
+	public static void writeAttributes(DataOutputStream out, Vector<TreeElement> attributes) throws IOException {
+		ExtUtil.writeNumeric(out,  attributes.size());
+		for ( TreeElement e : attributes ) {
+			ExtUtil.write(out, e.getNamespace());
+			ExtUtil.write(out,  e.getName());
+			ExtUtil.write(out, e.getAttributeValue());
+		}
+	}
+	
 	public static Object read (DataInputStream in, Class type) throws IOException, DeserializationException {
 		return read(in, type, null);
 	}
@@ -260,6 +270,21 @@ public class ExtUtil {
 			ints[i] = (int)ExtUtil.readNumeric(in);
 		}
 		return ints;
+	}
+	
+	public static Vector<TreeElement> readAttributes(DataInputStream in, TreeElement parent) throws IOException {
+		int size = (int) ExtUtil.readNumeric(in);
+		Vector<TreeElement> attributes = new Vector<TreeElement>();
+		for ( int i = 0 ; i < size; ++i ) {
+			String namespace = ExtUtil.readString(in);
+			String name = ExtUtil.readString(in);
+			String value = ExtUtil.readString(in);
+			
+			TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
+			attr.setParent(parent);
+			attributes.addElement(attr);
+		}
+		return attributes;
 	}
 	
 	public static int toInt (long l) {

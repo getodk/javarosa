@@ -21,8 +21,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.lang.String;
 
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -57,7 +57,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String textID; /* The id (ref) pointing to the localized values of (pic-URIs,audio-URIs,text) */
 	private String helpInnerText;
 
-
+	private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>();
 
 	private Vector<SelectChoice> choices;
 	private ItemsetBinding dynamicChoices;
@@ -120,6 +120,22 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.helpText = helpText;
 	}
 	
+	
+	public void setAdditionalAttribute(String namespace, String name, String value) {
+		TreeElement.setAttribute(null, additionalAttributes, namespace, name, value);
+	}
+
+	public String getAdditionalAttribute(String namespace, String name) {
+		TreeElement e = TreeElement.getAttribute(additionalAttributes, namespace, name);
+		if ( e != null ) {
+			return e.getAttributeValue();
+		}
+		return null;
+	}
+	
+	public Vector<TreeElement> getAdditionalAttributes() {
+		return additionalAttributes;
+	}
 
     public String getHelpTextID () {
         return helpTextID;
@@ -241,6 +257,9 @@ public class QuestionDef implements IFormElement, Localizable {
         setHelpInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 
 		setControlType(ExtUtil.readInt(dis));
+
+		additionalAttributes = ExtUtil.readAttributes(dis, null);
+
 		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
 		for (int i = 0; i < getNumChoices(); i++) {
 			choices.elementAt(i).setIndex(i);
@@ -263,6 +282,8 @@ public class QuestionDef implements IFormElement, Localizable {
         ExtUtil.write(dos, new ExtWrapNullable(getHelpInnerText()));
 
 		ExtUtil.writeNumeric(dos, getControlType());
+		
+		ExtUtil.writeAttributes(dos, additionalAttributes);
 		
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
 		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
