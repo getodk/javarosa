@@ -3,6 +3,8 @@
  */
 package org.javarosa.formmanager.api;
 
+import javax.microedition.media.Player;
+
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.form.api.FormEntryPrompt;
 
@@ -43,4 +45,26 @@ public interface FormMultimediaController {
      * @return
      */
 	public int playAudioOnDemand(FormEntryPrompt fep,SelectChoice select);
+	
+	/**
+	 * Attaches a video player that this controller should be triggering and providing
+	 * the interface for. The controller is not responsible for managing the player's
+	 * lifecycle, only its interaction.
+	 * 
+	 * Any attached player will be detached before the incoming player is attached
+	 * 
+	 * @param player The player 
+	 */
+	public void attachVideoPlayer(Player player);
+	
+	/**
+	 * Detaches a video player, allowing its resources to be freed and removing any
+	 * interface items that were created to manage the player.
+	 * 
+	 * If the player is not currently attached, this is a no-op (since the player
+	 * would have already been attached when the present one is)
+	 * 
+	 * @param player The player
+	 */
+	public void detachVideoPlayer(Player player);
 }

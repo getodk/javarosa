@@ -22,7 +22,7 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.table.VaccinationTable;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
-import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
+import org.javarosa.formmanager.view.widgets.ExpandedWidget;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.NumericListData;
@@ -67,7 +67,7 @@ public class ImmunizationWidget extends ExpandedWidget {
 	
 
 	public int getNextMode () {
-		return ChatterboxWidget.NEXT_ON_MANUAL;
+		return ExpandedWidget.NEXT_ON_MANUAL;
 	}
 
 	public int widgetType() {

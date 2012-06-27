@@ -27,6 +27,7 @@ import java.util.Vector;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathException;
@@ -69,7 +70,7 @@ public class XPathEvalTest extends TestCase {
 		XPathExpression xpe = null;
 		boolean exceptionExpected = (expected instanceof XPathException);
 		if (ec == null) {
-			ec = new EvaluationContext();
+			ec = new EvaluationContext(model);
 		}
 		
 		try {
@@ -105,15 +106,16 @@ public class XPathEvalTest extends TestCase {
 	public void doTests () {
 		EvaluationContext ec = getFunctionHandlers();
 		
+		FormInstance instance = createTestInstance();
+		
 		/* unsupporteds */
 		testEval("/union | /expr", null, null, new XPathUnsupportedException());
 		testEval("/descendant::blah", null, null, new XPathUnsupportedException());
 		testEval("/cant//support", null, null, new XPathUnsupportedException());
 		testEval("/text()", null, null, new XPathUnsupportedException());
 		testEval("/namespace:*", null, null, new XPathUnsupportedException());
-		testEval("/blah[5]", null, null, new XPathUnsupportedException());
-		testEval("(filter-expr)[5]", null, null, new XPathUnsupportedException());
-		testEval("(filter-expr)/path", null, null, new XPathUnsupportedException());
+		testEval("(filter-expr)[5]", instance, null, new XPathUnsupportedException());
+		testEval("(filter-expr)/data", instance, null, new XPathUnsupportedException());
 		/* numeric literals */
 		testEval("5", null, null, new Double(5.0));
 		testEval("555555.555", null, null, new Double(555555.555));
@@ -403,7 +405,6 @@ public class XPathEvalTest extends TestCase {
 			fail("Custom function handler did not successfully send data to external source");
 		
 		/* fetching from model */
-//		FormInstance dm1 = newDataModel();
 //		testEval("/", dm1, null, "");
 //		testEval("/non-existent", dm1, null, "");
 //		
@@ -514,8 +515,16 @@ public class XPathEvalTest extends TestCase {
 		return q;
 	}
 	*/
+	
+	public FormInstance createTestInstance() {
+		TreeElement data = new TreeElement("data");
+		data.addChild(new TreeElement("path"));
+		FormInstance instance = new FormInstance(data);
+		return instance;
+	}
+	
 	private EvaluationContext getFunctionHandlers () {
-		EvaluationContext ec = new EvaluationContext();
+		EvaluationContext ec = new EvaluationContext(null);
 		final Class[][] allPrototypes = {
 				{Double.class, Double.class},
 				{Double.class},
@@ -533,13 +542,13 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return Boolean.TRUE; }
+			public Object eval (Object[] args, EvaluationContext ec) { return Boolean.TRUE; }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler(){
 
 			public String getName() { return "regex";	}
-			public Object eval(Object[] args) { 
+			public Object eval(Object[] args, EvaluationContext ec) { 
 				System.out.println("EVAL REGEX TESTS:");
 				for (int i = 0; i< args.length; i++){
 					System.out.println("REGEX ARGS: " +args[i].toString());
@@ -568,7 +577,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return new Double(((Double)args[0]).doubleValue() +  ((Double)args[1]).doubleValue()); }
+			public Object eval (Object[] args, EvaluationContext ec) { return new Double(((Double)args[0]).doubleValue() +  ((Double)args[1]).doubleValue()); }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
@@ -582,7 +591,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return printArgs(args); }
+			public Object eval (Object[] args, EvaluationContext ec) { return printArgs(args); }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
@@ -593,7 +602,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return true; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return printArgs(args); }
+			public Object eval (Object[] args, EvaluationContext ec) { return printArgs(args); }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
@@ -601,7 +610,7 @@ public class XPathEvalTest extends TestCase {
 			public Vector getPrototypes () { return null; }
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return Boolean.FALSE; }
+			public Object eval (Object[] args, EvaluationContext ec) { return Boolean.FALSE; }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
@@ -609,7 +618,7 @@ public class XPathEvalTest extends TestCase {
 			public Vector getPrototypes () { return new Vector(); }
 			public boolean rawArgs () { return true; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) {
+			public Object eval (Object[] args, EvaluationContext ec) {
 				StringBuffer sb = new StringBuffer();
 				for (int i = 0; i < args.length; i++)
 					sb.append(XPathFuncExpr.toString(args[i]));
@@ -625,7 +634,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return new IExprDataType () {
+			public Object eval (Object[] args, EvaluationContext ec) { return new IExprDataType () {
 					public Boolean toBoolean () { return Boolean.TRUE; }
 					public Double toNumeric () { return new Double(5.0); }
 					public String toString () { return "hi"; }
@@ -641,7 +650,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return new Object(); }
+			public Object eval (Object[] args, EvaluationContext ec) { return new Object(); }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
@@ -652,7 +661,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) { return ((Boolean)args[0]).booleanValue() ? new CustomSubType() : new CustomType(); }
+			public Object eval (Object[] args, EvaluationContext ec) { return ((Boolean)args[0]).booleanValue() ? new CustomSubType() : new CustomType(); }
 		});
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
@@ -663,7 +672,7 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
-			public Object eval (Object[] args) {
+			public Object eval (Object[] args, EvaluationContext ec) {
 				if (args.length != 5 || !(args[0] instanceof Boolean) || !(args[1] instanceof Double) ||
 						!(args[2] instanceof String) || !(args[3] instanceof Date) || !(args[4] instanceof CustomType))
 					fail("Types in custom function handler not converted properly/prototype not matched properly");
@@ -675,7 +684,7 @@ public class XPathEvalTest extends TestCase {
 	}
 	
 	private EvaluationContext getVariableContext() {
-		EvaluationContext ec = new EvaluationContext();
+		EvaluationContext ec = new EvaluationContext(null);
 		
 		ec.setVariable("var_float_five", new Float(5.0));
 		ec.setVariable("var_string_five", "five");
@@ -734,7 +743,7 @@ public class XPathEvalTest extends TestCase {
 			p.addElement(new Class[0]);
 			return p;
 		}
-		public Object eval (Object[] args) { return val; }
+		public Object eval (Object[] args, EvaluationContext ec) { return val; }
 	};
 	
 	StatefulFunc write = new StatefulFunc () {
@@ -744,7 +753,7 @@ public class XPathEvalTest extends TestCase {
 			p.addElement(proto);
 			return p;
 		}
-		public Object eval (Object[] args) { val = (String)args[0]; return Boolean.TRUE; }
+		public Object eval (Object[] args, EvaluationContext ec) { val = (String)args[0]; return Boolean.TRUE; }
 	};
 }
 

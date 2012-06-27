@@ -18,11 +18,12 @@ package org.javarosa.demo.util;
 
 import java.util.Vector;
 
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 
 public class TestFunctionHandler implements IFunctionHandler {
 
-	public Object eval(Object[] args) {
+	public Object eval(Object[] args, EvaluationContext ec) {
 		if (args.length == 1) {
 			String s = (String)args[0];
 			return s + s;

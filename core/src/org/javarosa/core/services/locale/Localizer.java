@@ -282,7 +282,7 @@ public class Localizer implements Externalizable {
 		resources.addElement(resource);
 		localeResources.put(locale, resources);
 		
-		if(locale.equals(currentLocale)) {
+		if(locale.equals(currentLocale) || locale.equals(defaultLocale)) {
 			loadCurrentLocaleResources();
 		}
 	}

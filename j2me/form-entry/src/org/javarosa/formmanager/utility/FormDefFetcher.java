@@ -16,6 +16,7 @@
 
 package org.javarosa.formmanager.utility;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
@@ -59,7 +60,7 @@ public class FormDefFetcher {
 		
 		//A lot of this should probably not be with the form.
 		initPreloadHandlers(form);
-		form.setEvaluationContext(initEvaluationContext());
+		form.setEvaluationContext(initEvaluationContext(new EvaluationContext(null)));
 		form.initialize(instance == null);
 		
 		return form;
@@ -73,9 +74,7 @@ public class FormDefFetcher {
 		}
 	}
 	
-	private EvaluationContext initEvaluationContext () {
-		EvaluationContext ec = new EvaluationContext();
-		
+	private EvaluationContext initEvaluationContext (EvaluationContext ec) {
 		if(funcHandlers != null) {
 			for (int i = 0; i < funcHandlers.size(); i++) {
 				ec.addFunctionHandler(funcHandlers.elementAt(i));

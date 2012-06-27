@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view;
 
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.formmanager.api.FormMultimediaController;
 
 
 /**
@@ -44,4 +45,6 @@ public interface IFormEntryView {
 	 * @param index
 	 */
 	public void show(FormIndex index);
+	
+	public void attachFormMediaController(FormMultimediaController mediacontroller);
 }

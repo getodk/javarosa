@@ -22,6 +22,11 @@ import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.formmanager.view.widgets.ExpandedWidget;
+import org.javarosa.formmanager.view.widgets.IWidgetStyle;
+import org.javarosa.formmanager.view.widgets.IWidgetStyleEditable;
+import org.javarosa.formmanager.view.widgets.LabelWidget;
+import org.javarosa.formmanager.view.widgets.TextEntryWidget;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPItemCommandListener;
 import org.javarosa.j2me.log.HandledPItemStateListener;
@@ -31,6 +36,7 @@ import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
+import de.enough.polish.ui.MoreUIAccess;
 import de.enough.polish.ui.Style;
 
 public class ChatterboxWidget extends Container implements IQuestionWidget, HandledPItemStateListener, HandledPItemCommandListener {
@@ -41,10 +47,6 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 	public static final int VIEW_COLLAPSED = 1;
 	/** A Label that will never be interacted with **/
 	public static final int VIEW_LABEL = 2;
-	
-	public static final int NEXT_ON_MANUAL = 1;
-	public static final int NEXT_ON_ENTRY = 2;
-	public static final int NEXT_ON_SELECT = 3;
 	
 	/** Only valid for Labels **/
 	private boolean pinned = false;
@@ -81,8 +83,9 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 	}
 	
 	public void destroy () {
-		if (viewState == VIEW_EXPANDED)
+		if (viewState == VIEW_EXPANDED) {
 			detachWidget();
+		}
 		
 		prompt.unregister();
 	}
@@ -136,8 +139,9 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 	}
 
 	private void reset () {
-		if (viewState == VIEW_EXPANDED)
+		if (viewState == VIEW_EXPANDED) {
 			detachWidget();
+		}
 		
 		activeStyle.reset();
 		clear();
@@ -155,28 +159,77 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 		widget.setItemCommandListener(this);
 		
 		switch(expandedStyle.getNextMode()) {
-		case NEXT_ON_MANUAL:
+		case ExpandedWidget.NEXT_ON_MANUAL:
+			widget.setDefaultCommand(nextCommand);
 			break;
-		case NEXT_ON_ENTRY: 
+		case ExpandedWidget.NEXT_ON_ENTRY: 
 			widget.setItemStateListener(this);
 			break;
-		case NEXT_ON_SELECT:
+		case ExpandedWidget.NEXT_ON_SELECT:
 			widget.setDefaultCommand(nextCommand);
 			break;
 		}
 		this.focusChild(this.itemsList.size()-1);
 	}
 	
+	public int getRelativeScrollYOffset() {
+		if (!this.enableScrolling && this.parent instanceof Container) {
+			
+			// Clayton Sims - Feb 9, 2009 : Had to go through and modify this code again.
+			// The offsets are now accumulated through all of the parent containers, not just
+			// one.
+			Item walker = this.parent;
+			int offset = 0;
+			
+			//Walk our parent containers and accumulate their offsets.
+			while(walker instanceof Container) {
+				// Clayton Sims - Apr 3, 2009 : 
+				// If the container can scroll, it's relativeY is useless, it's in a frame and
+				// the relativeY isn't actually applicable.
+				// Actually, this should almost certainly _just_ break out of the loop if
+				// we hit something that scrolls, but if we have multiple scrolling containers
+				// nested, someone _screwed up_.
+				if(!MoreUIAccess.isScrollingContainer((Container)walker)) {
+					offset += walker.relativeY;
+				}
+				walker = walker.getParent();
+			}
+			
+			//The value returned here (The + offest part) is the fix.
+			int absOffset = ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
+			
+			return absOffset;
+			
+			// Clayton Sims - Feb 10, 2009 : Rolled back because it doesn't work on the 3110c, apparently!
+			// Fixing soon.
+			//return ((Container)this.parent).getScrollYOffset() + this.relativeY + this.parent.relativeY;
+		}
+		int offset = this.targetYOffset;
+		//#ifdef polish.css.scroll-mode
+			if (!this.scrollSmooth) {
+				offset = this.yOffset;
+			}
+		//#endif
+		return offset;
+	}
+	
+	//Do not try to scroll yourself. Signal upwards that you're part of something else
+	public int getScrollHeight() {
+		return -1;
+	}
+
+	
 	private void detachWidget () {
 		Item widget = expandedStyle.getInteractiveWidget();
+		expandedStyle.reset();
 		
 		switch(expandedStyle.getNextMode()) {
-		case NEXT_ON_MANUAL:
+		case ExpandedWidget.NEXT_ON_MANUAL:
 			break;
-		case NEXT_ON_ENTRY: 
+		case ExpandedWidget.NEXT_ON_ENTRY: 
 			widget.setItemStateListener(null);
 			break;
-		case NEXT_ON_SELECT:
+		case ExpandedWidget.NEXT_ON_SELECT:
 			if(widget.getDefaultCommand() != null) {
 				widget.removeCommand(widget.getDefaultCommand());
 			}
@@ -227,19 +280,8 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 	
 	public void UIHack (int hackType) {
 		if (hackType == Chatterbox.UIHACK_SELECT_PRESS) {
-			if (expandedStyle.getNextMode() == NEXT_ON_SELECT && expandedStyle instanceof TextEntryWidget) {
-				String text = (((TextEntryWidget)expandedStyle).textField()).getText();
-				System.out.println("Text equals: " + text);
-				if (text == null || text.length() == 0) {
-					_commandAction(nextCommand, expandedStyle.getInteractiveWidget());
-				}
-				else {
-					//Jan 14, 2009 - I don't know why only the P1i was setup to do this. Seems weird to me...
-					
-					_commandAction(nextCommand, expandedStyle.getInteractiveWidget());
-					//#if device.identifier == Sony-Ericsson/P1i
-					//#endif
-				}
+			if (expandedStyle.getNextMode() == ExpandedWidget.NEXT_ON_SELECT && expandedStyle instanceof TextEntryWidget) {
+				_commandAction(nextCommand, expandedStyle.getInteractiveWidget());
 			}
 		}
 	}

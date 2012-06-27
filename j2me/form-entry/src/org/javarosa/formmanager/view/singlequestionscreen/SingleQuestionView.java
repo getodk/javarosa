@@ -16,8 +16,17 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.microedition.lcdui.Image;
+
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.Reference;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryCaption;
@@ -25,22 +34,26 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.FormEntryState;
+import org.javarosa.formmanager.api.FormMultimediaController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.LocationQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.formmanager.view.summary.FormSummaryController;
 import org.javarosa.formmanager.view.summary.FormSummaryState;
+import org.javarosa.formmanager.view.widgets.GeoPointWidget;
+import org.javarosa.formmanager.view.widgets.WidgetFactory;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.utilities.media.MediaUtils;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.Screen;
 
 public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		HandledPCommandListener {
@@ -51,6 +64,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	private boolean goingForward;
 	private NewRepeatScreen repeatScreen;
 	private String backupTitle;
+	private SingleQuestionScreenFactory factory;
 	
 	//TODO: Replace with something non-static once question count works properly
 	private int numQuestions = -1;
@@ -108,8 +122,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		if(groupTitle == "") {
 			groupTitle = backupTitle;
 		}
-		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
-				prompt, groupTitle, fromFormView, goingForward, controller.isEntryOptimized());
+		currentQuestionScreen = factory.getQuestionScreen(prompt, groupTitle, fromFormView, goingForward);
 
 		if (model.getLanguages() != null && model.getLanguages().length > 0) {
 			currentQuestionScreen.addLanguageCommands(model.getLanguages());
@@ -124,6 +137,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	}
 
 	public void destroy() {
+		cleanUpResources();
 	}
 
 	public void show() {
@@ -147,14 +161,27 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		//clear guess
 		currentGuess = -1;
 		
+		cleanUpResources();
+
 		FormSummaryState summaryState = new FormSummaryState(controller);
 		summaryState.start();
+	}
+	
+	private void cleanUpResources() {
+		if(currentQuestionScreen != null) {
+			currentQuestionScreen.releaseMedia();
+		}
 	}
 
 	public void refreshView() {
 		if (model.getEvent() == FormEntryController.EVENT_QUESTION) {
 			FormEntryPrompt prompt = model.getQuestionPrompt();
+			SingleQuestionScreen last = currentQuestionScreen;
 			SingleQuestionScreen view = getView(prompt, this.goingForward);
+			
+			if(last != null && last != currentQuestionScreen) {
+				last.releaseMedia();
+			}
 			J2MEDisplay.setView(view);
 		}
 		else if (model.getEvent() == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
@@ -167,6 +194,9 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 									: "another ")
 							+ hierachy[hierachy.length - 1].getLongText() + "?");
 			repeatScreen.setCommandListener(this);
+			if(currentQuestionScreen != null) {
+				currentQuestionScreen.releaseMedia();
+			}
 			J2MEDisplay.setView(repeatScreen);
 		}
 	}
@@ -193,13 +223,12 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				processModelEvent(event);
 			} else if (command == currentQuestionScreen.viewAnswersCommand) {
 				viewAnswers();
-			} else if (command == LocationQuestionScreen.captureCommand) {
+			} else if (command == GeoPointWidget.captureCommand) {
 				try {
 					controller.suspendActivity(FormEntryState.MEDIA_LOCATION);
 				} catch (UnavailableServiceException ue) {
-					J2MEDisplay.showError(Localization
-							.get("activity.locationcapture.LocationError"), Localization
-							.get("activity.locationcapture.GPSNotAvailable"));
+					J2MEDisplay.showError(Localization.get("activity.locationcapture.LocationError"), 
+							              Localization.get("activity.locationcapture.GPSNotAvailable"));
 				}
 			}
 
@@ -317,12 +346,36 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			int event = controller.stepToNextEvent();
 			processModelEvent(event);
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
-			J2MEDisplay.showError("Validation failure", model
-					.getQuestionPrompt().getConstraintText());
+			String constraintMsg = model.getQuestionPrompt().getConstraintText(answer);
+			String constraintImage = model.getQuestionPrompt().getConstraintText(FormEntryCaption.TEXT_FORM_IMAGE, answer);
+			String constraintAudio = model.getQuestionPrompt().getConstraintText(FormEntryCaption.TEXT_FORM_AUDIO, answer);
+			
+			Image image = null;
+			
+			if(constraintImage != null) {
+				try {
+					Reference ref = ReferenceManager._().DeriveReference(constraintImage);
+				
+					InputStream is = ref.getStream();
+					image = Image.createImage(is);
+					is.close();
+				} catch (InvalidReferenceException e) {
+					Logger.exception(e);
+				} catch (IOException e) {
+					Logger.exception(e);
+				}
+			}
+			J2MEDisplay.showError("Validation failure", constraintMsg, image);
+			if(constraintAudio != null) {
+				MediaUtils.playAudio(constraintAudio);
+			}
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-			String txt = Localization
-					.get("formview.CompulsoryQuestionIncomplete");
+			String txt = Localization.get("view.sending.RequiredQuestion");
 			J2MEDisplay.showError("Question Required", txt);
 		}
+	}
+
+	public void attachFormMediaController(FormMultimediaController mediacontroller) {	
+		this.factory = new SingleQuestionScreenFactory(controller, mediacontroller, new WidgetFactory(controller.isEntryOptimized()));
 	}
 }

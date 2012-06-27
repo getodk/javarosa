@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
@@ -186,7 +187,7 @@ public class RestoreUtils {
 	public static void applyDataType (FormInstance dm, String path, TreeReference parent, int dataType) {
 		TreeReference ref = childRef(path, parent);
 		
-		Vector v = dm.expandReference(ref);
+		Vector v = new EvaluationContext(dm).expandReference(ref);
 		for (int i = 0; i < v.size(); i++) {
 			TreeElement e = dm.resolveReference((TreeReference)v.elementAt(i));
 			e.dataType = dataType;

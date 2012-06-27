@@ -18,5 +18,6 @@
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/mmapi.jar"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar" sourcepath="/J2ME_POLISH_HOME/j2mepolish-src"/>
 	<classpathentry exported="true" kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/wmapi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

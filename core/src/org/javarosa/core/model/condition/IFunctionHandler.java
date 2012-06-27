@@ -48,5 +48,5 @@ public interface IFunctionHandler {
 	/**
 	 * Evaluate the function
 	 */
-	Object eval(Object[] args);
+	Object eval(Object[] args, EvaluationContext ec);
 }

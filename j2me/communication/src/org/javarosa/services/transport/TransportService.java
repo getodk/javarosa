@@ -72,6 +72,12 @@ public class TransportService {
 		CACHE();
 		SENDER  = new TransporterSharingSender();
 	}
+	
+	public static void reinit() {
+		synchronized(CACHE_LOCK) { 
+			T_CACHE = new TransportMessageStore();
+		}
+	}
 
 	/**
 	 * 

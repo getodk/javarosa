@@ -78,4 +78,16 @@ public interface Reference {
 	 * reference is read only
 	 */
 	public void remove() throws IOException;
+	
+	/**
+	 * Determines any platform-specific and reference-type specific
+	 * alternatives versions of this reference which may exist. Useful
+	 * when only certain media or references are available on a platform
+	 * and you need to figure out whether a platform-specific version
+	 * might be present.
+	 * 
+	 * NOTE: There is no guarantee that returned references will exist, 
+	 * they should be tested.  
+	 */
+	public Reference[] probeAlternativeReferences();
 }

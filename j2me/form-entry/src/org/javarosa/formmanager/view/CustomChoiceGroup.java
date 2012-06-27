@@ -4,13 +4,16 @@
 package org.javarosa.formmanager.view;
 
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Image;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.MoreUIAccess;
+import de.enough.polish.ui.Screen;
 import de.enough.polish.ui.Style;
+import de.enough.polish.ui.StyleSheet;
 
 /**
  * @author ctsims
@@ -20,26 +23,29 @@ public class CustomChoiceGroup extends ChoiceGroup {
 	
 	private boolean autoSelect;
 	protected int lastSelected = -1;
-	private int style;
+	private int choiceType;
 	
+	private boolean numericNavigation;
+	
+	private boolean touched;
 	
 	//Do this better
-	public CustomChoiceGroup(String s, int choiceType, boolean autoSelect) {
-		super(s,choiceType);
-		this.style = choiceType;
-		this.autoSelect = autoSelect;
+	public CustomChoiceGroup(String s, int choiceType, boolean autoSelect, boolean numericNavigation) {
+		this(s,choiceType,autoSelect,numericNavigation,null);
 	}
 
-	public CustomChoiceGroup(String s, int choiceType, boolean autoSelect, Style style) {
-		super(s,choiceType, style);
-		this.style = choiceType;
+	public CustomChoiceGroup(String s, int choiceType, boolean autoSelect, boolean numericNavigation, Style style) {
+		super(s,choiceType, new String[0], null, style, true);
+		this.choiceType = choiceType;
 		this.autoSelect = autoSelect;
+		this.numericNavigation = numericNavigation;
+		this.touched = !numericNavigation;
 	}
 		
 		/** Hack #1 & Hack #3**/
 		// j2me polish refuses to produce events in the case where select items
 		// are already selected. This code intercepts key presses that toggle
-		// selection, and clear any existing selection to prevent the supression
+		// selection, and clear any existing selection to prevent the suppression
 		// of the appropriate commands.
 		//
 		// Hack #3 is due to the fact that multiple choice items won't fire updates
@@ -54,6 +60,12 @@ public class CustomChoiceGroup extends ChoiceGroup {
 			boolean gameActionIsFire = getScreen().isGameActionFire(
 					keyCode, gameAction);
 			if (gameActionIsFire) {
+				
+				//In numeric navigation mode, so we only want to allow navigation with those keys, and
+				//require that they be used before moving on
+				if(numericNavigation &&!touched) {
+					return false;
+				}
 				ChoiceItem choiceItem = (ChoiceItem) this.focusedItem;
 				if(this.choiceType != ChoiceGroup.MULTIPLE) {
 					//Hack #1
@@ -152,7 +164,12 @@ public class CustomChoiceGroup extends ChoiceGroup {
 					doAudio(index, false);
 				} 
 			}
+			
 			super.focusChild(index, item, direction);
+		}
+		
+		private boolean isNumKey(int keyCode) {
+			return keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9;
 		}
 		
 		//This hack handles whether a widget should automatically be advanced
@@ -160,19 +177,48 @@ public class CustomChoiceGroup extends ChoiceGroup {
 		//currently ready to be selected.
 		protected boolean handleKeyPressed(int keyCode, int gameAction){
 			
-			//Only catch 1-9 and only then when autoselect isn't enabled.
-			if(autoSelect || !(keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9)){
-				return super.handleKeyPressed(keyCode,gameAction);
-			}else{
-				int index = keyCode-Canvas.KEY_NUM1;
-				if(index < this.itemsList.size()){
-					doAudio(index,true);
-					super.focusChild(index);
-				}else{
+			//We might want to handle number keys if we aren't focussed, but we don't want to handle anything else
+			if(!this.isFocused && !isNumKey(keyCode)) {
+				return false;
+			}
+			
+			//In numeric navigation mode, so we only want to allow navigation with those keys, and
+			//hide other cues
+			if(numericNavigation) {
+				//Reject up and down
+				if((gameAction == Canvas.UP || gameAction == Canvas.DOWN) && !isNumKey(keyCode)) {
+					return false;
+				}
+				
+				//If the user hasn't made a navigation choice, swallow the fire key.
+				if(!touched && getScreen().isGameActionFire(keyCode, gameAction)) {
+					return false;
+				}
+			}
+			
+			//
+			if(isNumKey(keyCode)) {
+				
+				touch();
+				
+				if(!autoSelect) {
+					int index = keyCode-Canvas.KEY_NUM1;
+					if(index < this.itemsList.size()){
+						doAudio(index,true);
+						if(this.parent != null && this.parent instanceof Container) {
+							Container c = (Container)this.parent;
+							c.focusChild(c.indexOf(this));
+						}
+						super.focusChild(index);
+					}else{
+						return super.handleKeyPressed(keyCode,gameAction);
+					}
+					return true;
+				} else {
 					return super.handleKeyPressed(keyCode,gameAction);
 				}
-				return true;
 			}
+			return super.handleKeyPressed(keyCode,gameAction);
 		}
 		
 		private void doAudio(int index, boolean force){
@@ -191,5 +237,55 @@ public class CustomChoiceGroup extends ChoiceGroup {
 
 		public void setLastSelected(int index) {
 			this.lastSelected = index;
+		}
+
+		public void touch() {
+			if(!touched) {
+				this.itemStyle = StyleSheet.getStyle("listitem");
+				this.changeChildStyles("uninitializedListItem", "listitem");
+				this.changeChildStyles("cgEmptyFocus", "cgItemFocused");
+				touched = true;
+			}
+		}
+		
+		public void setImplicit(Screen screen) {
+			this.autoFocusEnabled = true;
+			this.screen = screen;
+		}
+		
+		private void disableNumericNav() {
+			numericNavigation = false;
+			touch();
+		}
+		
+		
+		//TODO: Hate this duplication, not sure if there's a cleaner way to get around
+		//how polish does this, though
+		public int append(String stringPart, Image imagePart) {
+			if(numericNavigation) {
+				//#style uninitializedListItem
+				int index =  super.append(stringPart, imagePart);
+				if(index >= 9) {
+					disableNumericNav();
+				}
+				return index;
+			} else {
+				//#style listitem
+				return super.append(stringPart, imagePart);
+			}
+		}
+
+		public int append(ChoiceItem item) {
+			if(numericNavigation) {
+				//#style uninitializedListItem
+				int index =  super.append(item);
+				if(index >= 9) {
+					disableNumericNav();
+				}
+				return index;
+			} else {
+				//#style listitem
+				return super.append(item);
+			}
 		}
 }

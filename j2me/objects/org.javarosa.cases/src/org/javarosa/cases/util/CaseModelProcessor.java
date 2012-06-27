@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import org.javarosa.cases.model.Case;
 import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
@@ -231,7 +232,11 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		Date followup = DateUtils.dateAdd(date,3);
 		Vector followupDates = referral.getChildrenWithName("followup_date");
 		if(followupDates.size() >= 1 && ((TreeElement)followupDates.elementAt(0)).isRelevant()) {
-			followup = (Date)(((TreeElement)followupDates.elementAt(0))).getValue().getValue();
+			IAnswerData followupDate = (((TreeElement)followupDates.elementAt(0))).getValue();
+			if(followupDate == null) {
+				throw new MalformedCaseModelException("Invalid <referral> model. followup_date is present, but empty!","<followup_date>");
+			}
+			followup = (Date)followupDate.getValue();
 		}
 		
 		for(int i=0; i < referral.getNumChildren(); ++i ){

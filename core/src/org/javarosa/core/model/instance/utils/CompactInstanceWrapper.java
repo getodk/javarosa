@@ -162,7 +162,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	public static FormInstance loadTemplateInstance (int formID) {
 		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
 		FormDef f = (FormDef)forms.read(formID);
-		return (f != null ? f.getInstance() : null);
+		return (f != null ? f.getMainInstance() : null);
 	}
 	
 	/**

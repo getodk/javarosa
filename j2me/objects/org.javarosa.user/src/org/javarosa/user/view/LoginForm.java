@@ -35,7 +35,7 @@ import de.enough.polish.ui.TextField;
 
 public class LoginForm extends FramedForm {
 
-	private final static int DEFAULT_COMMAND_PRIORITY = 1;
+	private final static int DEFAULT_COMMAND_PRIORITY = 3;
 
 	//#if javarosa.login.demobutton
 	private StringItem demoButton;
@@ -44,7 +44,7 @@ public class LoginForm extends FramedForm {
 	//#endif
 
 	public final static Command CMD_CANCEL_LOGIN = new Command(Localization.get("menu.Exit"),
-			Command.SCREEN, DEFAULT_COMMAND_PRIORITY);
+			Command.CANCEL, 2);
 	public final static Command CMD_LOGIN_BUTTON = new Command(Localization.get("menu.Login"),
 			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
 

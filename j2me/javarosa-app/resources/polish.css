@@ -189,12 +189,24 @@ focused{
     background-color: selectedBg;
 }
 
-.cgItemFocused {
+.cgItemFocused extends focused {
    focused-style: .cgFocused;
+   /* To make room for the border */
+   margin-right: 2;
+}
+
+.cgEmptyFocus extends cgItemFocused {
+    background-color: white;
+    border-color: white;
+    before: white;
+}
+
+.uninitializedListItem extends listitem {
+	focused-style: .cgEmptyFocus;
 }
 
 listitem {
-	focused-style: .cgFocused;
+	focused-style: .cgItemFocused;
 }
 radiobox {
 	focused-style: .cgFocused;

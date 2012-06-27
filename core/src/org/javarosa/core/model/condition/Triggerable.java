@@ -57,7 +57,7 @@ public abstract class Triggerable implements Externalizable {
 
 		for (int i = 0; i < targets.size(); i++) {
 			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
-			Vector v = instance.expandReference(targetRef);		
+			Vector v = evalContext.expandReference(targetRef);		
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.elementAt(j);
 				apply(affectedRef, result, instance, f);

@@ -1,0 +1,19 @@
+#JRDemo specifics
+jrdemo.formlist.title=可用的表格
+jrdemo.formlist.command.viewsaved=视图已保存
+jrdemo.formlist.command.downloadforms=下载新表格
+
+jrdemo.remoteformlist.title=选择下载表格
+jrdemo.remoteformlist.command.downloadform=下载
+
+jrdemo.savedformlist.title=保存表格数据
+jrdemo.savedformlist.command.senddata=发送到服务器
+
+jrdemo.selectlanguage.title=第一步: 选择语言
+
+jrdemo.posturi=表格提交URL 
+jrdemo.formuri=表格提交服务器
+jrdemo.downloading=下载中
+jrdemo.fetching=表格提交中，请稍等...
+jrdemo.searching=搜索中...
+jrdemo.contacting=正在连接服务器，请稍等...

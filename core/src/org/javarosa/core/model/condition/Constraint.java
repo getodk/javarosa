@@ -43,13 +43,18 @@ public class Constraint implements Externalizable {
 		attemptConstraintCompile();
 	}
 	
-	public String getConstraintMessage(EvaluationContext ec, FormInstance instance) {
+	public String getConstraintMessage(EvaluationContext ec, FormInstance instance, String textForm) {
 		if(xPathConstraintMsg == null) {
-			return constraintMsg;
+			//If the request is for getting a constraint message in a specific format (like audio) from 
+			//itext, and there's no xpath, we couldn't possibly fulfill it
+			return textForm == null ? constraintMsg : null;
 		} else{
+        	if(textForm != null) {
+        		ec.setOutputTextForm(textForm);
+        	} 
 			try{
 				Object value = xPathConstraintMsg.eval(instance, ec);
-				if(value != null) {
+				if(value != "") {
 					return (String)value;
 				}
 				return null;
