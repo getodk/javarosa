@@ -146,6 +146,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return toNumeric(argVals[0]);
 		} else if (name.equals("int") && args.length == 1) { //non-standard
 			return toInt(argVals[0]);
+		} else if (name.equals("round") && args.length == 2) { // non-standard Excel-style round(value,decimal place)
+			Double aval = toNumeric(argVals[0]);
+			Double bval = toNumeric(argVals[1]);
+			return Math.pow(10.0, -bval) * Math.round(aval / Math.pow(10.0, -bval));
 		} else if (name.equals("string") && args.length == 1) {
 			return toString(argVals[0]);			
 		} else if (name.equals("date") && args.length == 1) { //non-standard
@@ -228,7 +232,7 @@ public class XPathFuncExpr extends XPathExpression {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
 			if (handler != null) {
-				return evalCustomFunction(handler, argVals);
+				return evalCustomFunction(handler, argVals, evalContext);
 			} else {
 				throw new XPathUnhandledException("function \'" + name + "\'");
 			}
@@ -247,7 +251,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param args
 	 * @return
 	 */
-	private static Object evalCustomFunction (IFunctionHandler handler, Object[] args) {
+	private static Object evalCustomFunction (IFunctionHandler handler, Object[] args, EvaluationContext ec) {
 		Vector prototypes = handler.getPrototypes();
 		Enumeration e = prototypes.elements();
 		Object[] typedArgs = null;
@@ -257,9 +261,9 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 
 		if (typedArgs != null) {
-			return handler.eval(typedArgs);
+			return handler.eval(typedArgs, ec);
 		} else if (handler.rawArgs()) {
-			return handler.eval(args);  //should we have support for expanding nodesets here?
+			return handler.eval(args, ec);  //should we have support for expanding nodesets here?
 		} else {
 			throw new XPathTypeMismatchException("for function \'" + handler.getName() + "\'");
 		}

@@ -9,6 +9,7 @@ import java.util.Vector;
 import javax.microedition.io.file.FileSystemRegistry;
 
 import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
@@ -49,8 +50,8 @@ public class J2meFileSystemProperties implements IPropertyRules {
 						fileroots.addElement(root);
 					}
 				}
-			} catch(Exception e) {
-				//TODO: This should probably be a java.lang.security exception catch
+			} catch(SecurityException e) {
+				this.securityException(e);
 				if(fileroots.size() > 0 ) {
 					//got something....
 					return fileroots;
@@ -102,8 +103,7 @@ public class J2meFileSystemProperties implements IPropertyRules {
 			}
 		}
 		if(root != null) {
-			currentRoot = new J2meFileRoot(root);
-			ReferenceManager._().addReferenceFactory(currentRoot);
+			registerReferenceFactory(root);
 		}
 	}
 	
@@ -227,15 +227,24 @@ public class J2meFileSystemProperties implements IPropertyRules {
 	 */
 	public void handlePropertyChanges(String propertyName) {
 		if(propertyName.equals(FILE_SYSTEM_ROOT)) {
-			if(currentRoot != null) {
-				ReferenceManager._().removeReferenceFactory(currentRoot);
-			}
-			String newRoot = PropertyManager._().getSingularProperty(FILE_SYSTEM_ROOT);
-			if(newRoot != null) {
-				currentRoot = new J2meFileRoot(newRoot);
-				ReferenceManager._().addReferenceFactory(currentRoot);
-			}
+			registerReferenceFactory(PropertyManager._().getSingularProperty(FILE_SYSTEM_ROOT));
 		}
 	}
-
+	
+	private void registerReferenceFactory(String newRoot) {
+		if(currentRoot != null) {
+			ReferenceManager._().removeReferenceFactory(currentRoot);
+		}
+		if(newRoot != null) {
+			currentRoot = root(newRoot);
+			ReferenceManager._().addReferenceFactory(currentRoot);
+		}
+	}
+	
+	protected J2meFileRoot root(String root) {
+		return new J2meFileRoot(root);
+	}
+	protected void securityException(SecurityException e) {
+		Logger.log("security_file", e.getMessage());
+	}
 }

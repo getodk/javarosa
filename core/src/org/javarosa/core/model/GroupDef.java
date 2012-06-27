@@ -21,8 +21,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.lang.String;
 
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -43,7 +43,7 @@ public class GroupDef implements IFormElement, Localizable {
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
-
+    private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>();
 
 	private String labelInnerText;
 	private String appearanceAttr;
@@ -90,6 +90,22 @@ public class GroupDef implements IFormElement, Localizable {
 	
 	public void setBind(IDataReference binding) {
 		this.binding = binding;
+	}
+	
+	public void setAdditionalAttribute(String namespace, String name, String value) {
+		TreeElement.setAttribute(null, additionalAttributes, namespace, name, value);
+	}
+
+	public String getAdditionalAttribute(String namespace, String name) {
+		TreeElement e = TreeElement.getAttribute(additionalAttributes, namespace, name);
+		if ( e != null ) {
+			return e.getAttributeValue();
+		}
+		return null;
+	}
+
+	public Vector<TreeElement> getAdditionalAttributes() {
+		return additionalAttributes;
 	}
 	
 	public Vector getChildren() {
@@ -188,6 +204,8 @@ public class GroupDef implements IFormElement, Localizable {
 		entryHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 		delHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 		mainHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+
+		additionalAttributes = ExtUtil.readAttributes(dis, null);
 	}
 
 	/** Write the group definition object to the supplied stream. */
@@ -213,6 +231,7 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(delHeader));
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(mainHeader));
 		
+		ExtUtil.writeAttributes(dos, additionalAttributes);
 	}
 	
 	public void registerStateObserver (FormElementStateListener qsl) {

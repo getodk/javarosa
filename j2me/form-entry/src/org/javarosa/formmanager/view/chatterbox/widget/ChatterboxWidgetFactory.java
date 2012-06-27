@@ -21,39 +21,39 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.FormMultimediaController;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.formmanager.view.chatterbox.FakedFormEntryPrompt;
+import org.javarosa.formmanager.view.widgets.CollapsedWidget;
+import org.javarosa.formmanager.view.widgets.IWidgetStyle;
+import org.javarosa.formmanager.view.widgets.IWidgetStyleEditable;
+import org.javarosa.formmanager.view.widgets.LabelWidget;
+import org.javarosa.formmanager.view.widgets.SelectOneEntryWidget;
+import org.javarosa.formmanager.view.widgets.WidgetFactory;
 
 import de.enough.polish.ui.ChoiceGroup;
-import de.enough.polish.ui.TextField;
 
 public class ChatterboxWidgetFactory {
 	Chatterbox cbox;
-	
-	PrototypeFactoryDeprecated widgetFactory;
-	
+		
 	private FormMultimediaController mediaController;
 	
 	boolean readOnly = false;
 	
-	boolean optimizeEntry = true;
+	WidgetFactory widgetFactory;
 	
 	public ChatterboxWidgetFactory (Chatterbox cbox, FormMultimediaController mediaController) {
-		widgetFactory = new PrototypeFactoryDeprecated();
-		this.cbox = cbox;
-		this.mediaController = mediaController;
+		this(cbox, mediaController, new WidgetFactory(true));
 	}
 	
-	public void registerExtendedWidget(int controlType, IWidgetStyle prototype) {
-		widgetFactory.addNewPrototype(String.valueOf(controlType), prototype.getClass());
+	public ChatterboxWidgetFactory (Chatterbox cbox, FormMultimediaController mediaController, WidgetFactory factory) {
+		this.cbox = cbox;
+		this.mediaController = mediaController;
+		this.widgetFactory = factory;
 	}
 	
 	/**
@@ -77,83 +77,11 @@ public class ChatterboxWidgetFactory {
 		collapsedStyle = new CollapsedWidget();
 		((CollapsedWidget)collapsedStyle).setSeekable(this.readOnly);
 		
-		switch (controlType) {
-		case Constants.CONTROL_INPUT:
-		case Constants.CONTROL_SECRET:
-			switch (dataType) {
-			case Constants.DATATYPE_INTEGER:
-				expandedStyle = new NumericEntryWidget();
-				pw(controlType, (NumericEntryWidget)expandedStyle);
-				break;
-			case Constants.DATATYPE_LONG:
-				expandedStyle = new NumericEntryWidget(false, new LongData());
-				pw(controlType, (NumericEntryWidget)expandedStyle);
-				break;
-			case Constants.DATATYPE_DECIMAL:
-				expandedStyle = new NumericEntryWidget(true, new DecimalData());
-				pw(controlType, (NumericEntryWidget)expandedStyle);
-				break;
-			case Constants.DATATYPE_DATE_TIME:
-				expandedStyle = new DateEntryWidget(true);
-				break;
-			case Constants.DATATYPE_DATE:
-				//#if javarosa.useNewDatePicker 
-				expandedStyle = new SimpleDateEntryWidget();
-				//expandedStyle = new InlineDateEntryWidget();
-				//#else
-				expandedStyle = new DateEntryWidget();
-				//#endif
-				break;
-			case Constants.DATATYPE_TIME:
-				expandedStyle = new TimeEntryWidget();
-				break;
-			case Constants.DATATYPE_GEOPOINT:
-				expandedStyle = new GeoPointWidget();
-				break;
-			}
-			break;
-		case Constants.CONTROL_SELECT_ONE:
-			int style;
-
-			if ("minimal".equals(appearanceAttr))
-				style = ChoiceGroup.POPUP;
-			else
-				style = ChoiceGroup.EXCLUSIVE;
-
-			expandedStyle = new SelectOneEntryWidget(style,optimizeEntry);
-			break;
-		case Constants.CONTROL_SELECT_MULTI:
-			expandedStyle = new SelectMultiEntryWidget(optimizeEntry);
-			break;
-		case Constants.CONTROL_TEXTAREA:
-			expandedStyle = new TextEntryWidget();
-			break;
-		case Constants.CONTROL_TRIGGER:
-			expandedStyle = new MessageWidget();
-			break;
-		case Constants.CONTROL_IMAGE_CHOOSE:
-			expandedStyle = new ImageChooserWidget();
-			break;
-		case Constants.CONTROL_AUDIO_CAPTURE:
-			expandedStyle = new AudioCaptureWidget();
-			break;	
-		}
-
-		if (expandedStyle == null) { //catch types text, null, unsupported
-			expandedStyle = new TextEntryWidget();
-			if(controlType == Constants.CONTROL_SECRET) {
-				((TextEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
-			}
-			
-			String name = String.valueOf(controlType); //huh? controlType is an int
-			Object widget = widgetFactory.getNewInstance(name);
-			if (widget != null) {
-				expandedStyle = (IWidgetStyleEditable) widget;
-			}
-		}
+		expandedStyle = widgetFactory.getWidget(controlType,dataType,appearanceAttr);
 		
-		if (collapsedStyle == null || expandedStyle == null)
+		if (collapsedStyle == null || expandedStyle == null) {
 			throw new IllegalStateException("No appropriate widget to render question");
+		}
 		
 		expandedStyle.registerMultimediaController(mediaController);
 		ChatterboxWidget widget = new ChatterboxWidget(cbox, prompt, initViewState, collapsedStyle, expandedStyle);
@@ -161,11 +89,6 @@ public class ChatterboxWidgetFactory {
 		return widget;
 	}
 	
-	private void pw(int controlType, NumericEntryWidget w) {
-		if(controlType == Constants.CONTROL_SECRET) {
-			w.setConstraint(TextField.PASSWORD);
-		}
-	}
 	
     public ChatterboxWidget getNewRepeatWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
     	//GroupDef repeat = (GroupDef)f.explodeIndex(index).lastElement();
@@ -240,8 +163,4 @@ public class ChatterboxWidgetFactory {
     public void setReadOnly(boolean readOnly) {
     	this.readOnly = readOnly;
     }
-
-	public void setOptimizeEntry(boolean entryOptimized) {
-		this.optimizeEntry = entryOptimized;
-	}
 }

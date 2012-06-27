@@ -46,6 +46,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	public static final String TEXT_FORM_SHORT = "short";
 	public static final String TEXT_FORM_AUDIO = "audio";
 	public static final String TEXT_FORM_IMAGE = "image";
+	public static final String TEXT_FORM_VIDEO = "video";
 
 	protected IQuestionWidget viewWidget;
 
@@ -398,11 +399,12 @@ public class FormEntryCaption implements FormElementStateListener {
 	}
 
 	public void formElementStateChanged(IFormElement element, int changeFlags) {
-		if (this.element != element)
-			throw new IllegalStateException(
-					"Widget received event from foreign question");
-		if (viewWidget != null)
+		if (this.element != element) {
+			throw new IllegalStateException("Widget received event from foreign question");
+		}
+		if (viewWidget != null) {
 			viewWidget.refreshWidget(changeFlags);
+		}
 	}
 
 	public void formElementStateChanged(TreeElement instanceNode,

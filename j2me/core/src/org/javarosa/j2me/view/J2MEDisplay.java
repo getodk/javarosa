@@ -21,6 +21,7 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Image;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.api.State;
@@ -69,12 +70,16 @@ public class J2MEDisplay {
 	}
 	
 	public static void showError (String title, String message) {
-		showError(title, message, null, null);
+		showError(title, message, null, null, null);
 	}
 	
-	public static Alert showError (String title, String message, Displayable next, CommandListener customListener) {
+	public static void showError (String title, String message, Image image) {
+		showError(title, message, image, null, null);
+	}
+	
+	public static Alert showError (String title, String message, Image image, Displayable next, CommandListener customListener) {
 		//#style mailAlert
-		final Alert alert = new Alert(title, message, null, AlertType.ERROR);
+		final Alert alert = new Alert(title, message, image, AlertType.ERROR);
 		alert.setTimeout(Alert.FOREVER);
 
 		if (customListener != null) {

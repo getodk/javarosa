@@ -109,7 +109,7 @@ public class FormEntryModel {
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
             if (((GroupDef) element).getRepeat()) {
-                if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
+                if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && form.getMainInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
                     return FormEntryController.EVENT_PROMPT_NEW_REPEAT;
                 } else if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
                 	return FormEntryController.EVENT_REPEAT_JUNCTURE;
@@ -130,7 +130,7 @@ public class FormEntryModel {
      * @return
      */
     protected TreeElement getTreeElement(FormIndex index) {
-        return form.getInstance().resolveReference(index.getReference());
+        return form.getMainInstance().resolveReference(index.getReference());
     }
 
 
@@ -355,7 +355,7 @@ public class FormEntryModel {
         if (isAskNewRepeat) {
             return false;
         } else {
-            TreeElement node = form.getInstance().resolveReference(ref);
+            TreeElement node = form.getMainInstance().resolveReference(ref);
             return !node.isEnabled();
         }
     }
@@ -390,7 +390,7 @@ public class FormEntryModel {
         } else if (isRepeatJuncture) {
         	relevant = form.isRepeatRelevant(ref);
         } else {
-            TreeElement node = form.getInstance().resolveReference(ref);
+            TreeElement node = form.getMainInstance().resolveReference(ref);
             relevant = node.isRelevant(); // check instance flag first
         }
 
@@ -402,7 +402,7 @@ public class FormEntryModel {
                 // This should be safe now that the TreeReference is contained
                 // in the ancestor index itself
                 TreeElement ancestorNode =
-                        form.getInstance().resolveReference(ancestorIndex.getLocalReference());
+                        form.getMainInstance().resolveReference(ancestorIndex.getLocalReference());
 
                 if (!ancestorNode.isRelevant()) {
                     relevant = false;
@@ -450,11 +450,11 @@ public class FormEntryModel {
             if (e instanceof GroupDef) {
                 GroupDef g = (GroupDef) e;
                 if (g.getRepeat() && g.getCountReference() != null) {
-                    IAnswerData count = getForm().getInstance().getDataValue(g.getCountReference());
+                    IAnswerData count = getForm().getMainInstance().getDataValue(g.getCountReference());
                     if (count != null) {
                         long fullcount = ((Integer) count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);
-                        TreeElement element = getForm().getInstance().resolveReference(ref);
+                        TreeElement element = getForm().getMainInstance().resolveReference(ref);
                         if (element == null) {
                             if (index.getInstanceIndex() < fullcount) {
                             	
@@ -584,7 +584,7 @@ public class FormEntryModel {
 						
 					} else {
 					
-						if (form.getInstance().resolveReference(form.getChildInstanceRef(elements,	multiplicities)) == null) {
+						if (form.getMainInstance().resolveReference(form.getChildInstanceRef(elements,	multiplicities)) == null) {
 							descend = false; // repeat instance does not exist; do not descend into it
 							exitRepeat = true;
 						}
@@ -726,7 +726,7 @@ public class FormEntryModel {
 	private boolean setRepeatNextMultiplicity(Vector elements, Vector multiplicities) {
 		// find out if node is repeatable
 		TreeReference nodeRef = form.getChildInstanceRef(elements, multiplicities);
-		TreeElement node = form.getInstance().resolveReference(nodeRef);
+		TreeElement node = form.getMainInstance().resolveReference(nodeRef);
 		if (node == null || node.repeatable) { // node == null if there are no
 			// instances of the repeat
 			int mult;
@@ -734,7 +734,7 @@ public class FormEntryModel {
 				mult = 0; // no repeats; next is 0
 			} else {
 				String name = node.getName();
-				TreeElement parentNode = form.getInstance().resolveReference(nodeRef.getParentRef());
+				TreeElement parentNode = form.getMainInstance().resolveReference(nodeRef.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
 			multiplicities.setElementAt(new Integer(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR ? TreeReference.INDEX_REPEAT_JUNCTURE : mult), multiplicities.size() - 1);

@@ -19,24 +19,35 @@ package org.javarosa.formmanager.view.singlequestionscreen.screen;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
+import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.JrFormEntryController;
+import org.javarosa.formmanager.view.IQuestionWidget;
+import org.javarosa.formmanager.view.widgets.ExpandedWidget;
+import org.javarosa.formmanager.view.widgets.IWidgetStyleEditable;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
+import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemCommandListener;
+import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.Ticker;
+import de.enough.polish.ui.UiAccess;
 
-public abstract class SingleQuestionScreen extends FramedForm {
+public class SingleQuestionScreen extends FramedForm implements ItemCommandListener, ItemStateListener, IQuestionWidget {
 
 	protected FormEntryPrompt prompt;
 	private Gauge progressBar;
     
+	private IWidgetStyleEditable widget;
 	protected IAnswerData answer;
+	JrFormEntryController fec;
 
 	// GUI elements
 	public Command previousCommand;
@@ -44,24 +55,61 @@ public abstract class SingleQuestionScreen extends FramedForm {
 	public Command viewAnswersCommand;
 	public Command languageSubMenu;
 	public Command[] languageCommands;
+	
+	Command[] itemCommandQueue;
 
 	public static Command nextItemCommand = new Command(Localization
-			.get("menu.Next"), Command.SCREEN, 1);
+			.get("menu.Next"), Command.OK, 1);
 	
 	//#style button
 	public StringItem nextItem = new StringItem(null, Localization
 			.get("button.Next"), Item.BUTTON);
-
+	
 	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(groupName, style);
+		throw new RuntimeException("Deprecated!");
+	}
+
+	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, IWidgetStyleEditable widget, JrFormEntryController fec, Style style) {
+		super(groupName, style);
+		itemCommandQueue = new Command[1];
 		this.prompt = prompt;
+		this.widget = widget;
+		this.fec = fec;
 		this.setUpCommands();
 		this.createView();
 	}
 
-	public abstract void createView();
+	public void createView() {
+		widget.initWidget(prompt, this.container);
+		widget.refreshWidget(prompt, FormElementStateListener.CHANGE_INIT);
+		addNavigationWidgets();
+		attachWidget();
+	}
+	
+	private void attachWidget () {
+		Item item = widget.getInteractiveWidget();
+		
+		item.addCommand(nextItemCommand);
+		item.setItemCommandListener(this);
+		
+		switch(widget.getNextMode()) {
+		case ExpandedWidget.NEXT_ON_MANUAL:
+			item.setDefaultCommand(nextItemCommand);
+			break;
+		case ExpandedWidget.NEXT_ON_ENTRY: 
+			item.setItemStateListener(this);
+			break;
+		case ExpandedWidget.NEXT_ON_SELECT:
+			item.setDefaultCommand(nextItemCommand);
+			break;
+		}
 
-	public abstract IAnswerData getWidgetValue();
+	}
+
+	public IAnswerData getWidgetValue() {
+		return widget.getData();
+	}
 	
 	public void configureProgressBar(int cur, int total) {
 		if(progressBar == null) {
@@ -83,7 +131,7 @@ public abstract class SingleQuestionScreen extends FramedForm {
 //		nextCommand = new Command(Localization.get("menu.Next"),
 //				Command.SCREEN, 0);
 		previousCommand = new Command(Localization.get("menu.Back"),
-				Command.SCREEN, 2);
+				Command.BACK, 2);
 		viewAnswersCommand = new Command(Localization.get("menu.ViewAnswers"),
 				Command.SCREEN, 3);
 
@@ -93,9 +141,10 @@ public abstract class SingleQuestionScreen extends FramedForm {
 	}
 
 	public void addNavigationWidgets() {
-		this.append(nextItem);
-		nextItem.setDefaultCommand(nextItemCommand); // add Command to Item.
-		
+		if(this.widget.getNextMode() != ExpandedWidget.NEXT_ON_MANUAL) {
+			this.append(nextItem);
+			nextItem.setDefaultCommand(nextItemCommand); // add Command to Item.
+		}
 //		if(!((groupName==null)||(groupName.equals("")))){
 //			//#style groupName
 //			 StringItem groupNameTitle = new StringItem(null,groupName, Item.LAYOUT_EXPAND);
@@ -120,4 +169,69 @@ public abstract class SingleQuestionScreen extends FramedForm {
 		J2MEDisplay.setView(this);
 	}
 
+	public void itemStateChanged(Item item) {
+		if(item.equals(widget.getInteractiveWidget())) {
+			this.callCommandListener(nextItemCommand);
+		}
+	}
+		
+	public void commandAction(Command c, Item item) {
+		if(loaded && (this.getKeyStates() & UiAccess.FIRE_PRESSED) != 0) {
+			//we're still in the middle of input, delay the outcome until it's done.
+			synchronized(itemCommandQueue) {
+				itemCommandQueue[0] = c;
+			}
+		} else {
+			//We didn't get this command until we're unloaded, so just go for it
+			CommandListener listener = this.getCommandListener();
+			listener.commandAction(c, this);
+		}
+	}
+
+	boolean loaded = false;
+	//int loadedKey;
+	//We only want to handle paired key events, so releases without a press (generally
+	//coming from a different screen) need to be absorbed.
+	protected boolean handleKeyPressed(int keyCode, int gameAction) {
+		if(fec.handleKeyEvent(keyCode)) { return true; }
+		synchronized(itemCommandQueue) {
+			this.getKeyStates();
+			itemCommandQueue[0] = null;
+		}
+		if((this.getKeyStates() & UiAccess.FIRE_PRESSED) != 0) {
+			loaded = true;
+		}
+		return super.handleKeyPressed(keyCode, gameAction);
+	}
+
+	protected boolean handleKeyReleased(int keyCode, int gameAction) {
+		//Clear key states
+		this.getKeyStates();
+		loaded = false;
+		synchronized(itemCommandQueue) {
+			if(itemCommandQueue[0] != null) {
+				CommandListener listener = this.getCommandListener();
+				listener.commandAction(itemCommandQueue[0], this);
+				itemCommandQueue[0] = null;
+				return true;
+			}
+		}
+		return super.handleKeyReleased(keyCode, gameAction);
+	}
+
+	public void refreshWidget(int changeFlags) {
+		widget.refreshWidget(prompt, changeFlags);		
+	}
+	
+	public void releaseMedia() {
+		widget.releaseMedia();
+	}
+
+	public void releaseResources() {
+		if(prompt != null) { 
+			prompt.unregister();
+			widget.reset();
+		}
+		super.releaseResources();
+	}
 }

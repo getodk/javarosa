@@ -1174,6 +1174,11 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * @return index hashtable, which maps integer record ID -> record locator
 	 */
 	public Hashtable getIDIndexRecord () {
+		//If we're in the middle of a transaction, we get this index from that
+		//transaction (so we don't have to keep reading/writing it)
+		if(this.transactionKey != null) {
+			return (Hashtable)this.deleteActionCache[1];
+		}
 		return (Hashtable)getIndexStore().readRecord(ID_INDEX_REC_ID, new ExtWrapMap(Integer.class, RMSRecordLoc.class));		
 	}
 	
@@ -1223,7 +1228,13 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 *   failed and did not properly clean itself up, this call will fail. 
 	 */
 	public void checkNotCorrupt () {
-		checkStatusOK(false);
+		if(this.transactionKey == null) {
+			//If we're not in a transaction, dirty won't cut it
+			checkStatusOK(false);
+		} else {
+			//Otherwise, it's ok if we're dirty, since we're currently doing something
+			checkStatusOK(true);
+		}
 	}
 	
 	/**

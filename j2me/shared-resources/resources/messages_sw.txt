@@ -65,6 +65,7 @@ form.login.username=Jina:
 form.login.password=Ufunguo:
 form.login.login=Ingia
 
+activity.login.loginincorrect=Umekosea kufungua
 activity.login.tryagain=Tafadhali jaribu tena
 activity.login.demomode.intro=Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi
 

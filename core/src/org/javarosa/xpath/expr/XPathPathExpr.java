@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
@@ -83,7 +84,6 @@ public class XPathPathExpr extends XPathExpression {
 	public TreeReference getReference (boolean allowPredicates) throws XPathUnsupportedException {
 		TreeReference ref = new TreeReference();
 		boolean parentsAllowed;
-		
 		switch (init_context) {
 		case XPathPathExpr.INIT_CONTEXT_ROOT:
 			ref.setRefLevel(TreeReference.REF_ABSOLUTE);
@@ -93,16 +93,39 @@ public class XPathPathExpr extends XPathExpression {
 			ref.setRefLevel(0);
 			parentsAllowed = true;
 			break;
-		default: throw new XPathUnsupportedException("filter expression");
-		}
-		
-		for (int i = 0; i < steps.length; i++) {
-			XPathStep step = steps[i];
-			
-			if (!allowPredicates && step.predicates.length > 0) {
-				throw new XPathUnsupportedException("predicates");
+		case XPathPathExpr.INIT_CONTEXT_EXPR:
+			ref.setRefLevel(TreeReference.REF_ABSOLUTE); //i assume when refering the non main instance you have to be absolute
+			if (this.filtExpr.x != null && this.filtExpr.x instanceof XPathFuncExpr)
+			{
+				XPathFuncExpr func = (XPathFuncExpr)(this.filtExpr.x);
+				if(func.id.toString().equals("instance"))
+				{
+					if(func.args.length != 1)
+					{
+						throw new XPathUnsupportedException("instance() function used with "+func.args.length+ " arguements. Expecting 1 arguement");
+					}
+					if(!(func.args[0] instanceof XPathStringLiteral))
+					{
+						throw new XPathUnsupportedException("instance() function expecting 1 string literal arguement arguement");
+					}
+					XPathStringLiteral strLit = (XPathStringLiteral)(func.args[0]);
+					//we've got a non-standard instance in play, watch out
+					ref.setInstanceName(strLit.s);
+				} else {
+					//We only support expression root contexts for instance refs, everything else is an illegal filter
+					throw new XPathUnsupportedException("filter expression");
+				}
+			} else {
+				//We only support expression root contexts for instance refs, everything else is an illegal filter
+				throw new XPathUnsupportedException("filter expression");
 			}
 			
+			parentsAllowed = false;
+			break;
+		default: throw new XPathUnsupportedException("filter expression");
+		}
+		for (int i = 0; i < steps.length; i++) {
+			XPathStep step = steps[i];					
 			if (step.axis == XPathStep.AXIS_SELF) {
 				if (step.test != XPathStep.TEST_TYPE_NODE) {
 					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
@@ -135,19 +158,48 @@ public class XPathPathExpr extends XPathExpression {
 			} else {
 				throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 			}
+			
+			if(step.predicates.length > 0) {
+				int refLevel = ref.getRefLevel();
+				Vector<XPathExpression> v = new Vector<XPathExpression>();
+				for(int j = 0; j < step.predicates.length; j++)
+				{
+					v.addElement(step.predicates[j]);
+				}
+				ref.addPredicate(i, v);		
+			}
 		}		
-		
 		return ref;
 	}
 
-	public XPathNodeset eval (FormInstance m, EvaluationContext evalContext) {
+	public XPathNodeset eval (FormInstance m, EvaluationContext ec) {		
 		TreeReference genericRef = getReference();
-		if (genericRef.isAbsolute() && m.getTemplatePath(genericRef) == null) {
+
+		TreeReference ref = genericRef.contextualize(ec.getContextRef());
+		
+		//We don't necessarily know the model we want to be working with until we've contextualized the 
+		//node
+		
+		//check if this nodeset refers to a non-main instance
+		if(ref.getInstanceName() != null && ref.isAbsolute())
+		{
+			FormInstance nonMain = ec.getInstance(ref.getInstanceName());
+			if(nonMain != null)
+			{
+				m = nonMain;
+			}
+			else
+			{
+				throw new XPathTypeMismatchException("Instance referenced by " + genericRef + " does not exists");
+			}
+		}
+		//Otherwise we'll leave 'm' as set to the main instance 
+		
+		if (ref.isAbsolute() && m.getTemplatePath(ref) == null) {
 			throw new XPathTypeMismatchException("Node " + genericRef.toString() + " does not exist!");
 		}
 		
-		TreeReference ref = genericRef.contextualize(evalContext.getContextRef());
-		Vector<TreeReference> nodesetRefs = m.expandReference(ref);
+		Vector<TreeReference> nodesetRefs = ec.expandReference(ref);
 		
 		//to fix conditions based on non-relevant data, filter the nodeset by relevancy
 		for (int i = 0; i < nodesetRefs.size(); i++) {
@@ -157,7 +209,7 @@ public class XPathPathExpr extends XPathExpression {
 			}
 		}
 		
-		return new XPathNodeset(nodesetRefs, m, evalContext);
+		return new XPathNodeset(nodesetRefs, m, ec);
 	}
 
 //	

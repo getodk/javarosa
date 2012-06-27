@@ -74,6 +74,7 @@ form.login.username=Nom d'utilisateur:
 form.login.password=Mot de passe:
 form.login.login=Connectez-vous
 
+activity.login.loginincorrect=Connexion échouée
 activity.login.tryagain=S'il vous plaît réessayer
 activity.login.demomode.intro=Vous demarrez Commcare en mode Demo. Le mode démo est pour le test et la pratique uniquement! Connectez-vous avec votre compte d'utilisateur pour effectuer des visites de clients.
 
@@ -114,7 +115,7 @@ menu.ok=OK
 
 
 
-
+sending.view.done.title=Finished
 sending.view.done=formulaire complet, merci
 sending.view.submit=Soumettre le formulaire
 sending.view.now=Envoyer maintenant

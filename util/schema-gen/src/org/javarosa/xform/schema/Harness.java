@@ -16,10 +16,15 @@
 
 package org.javarosa.xform.schema;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
@@ -30,6 +35,7 @@ public class Harness {
 	public static final int MODE_SUMMARY_SPREADSHEET = 3;
 	public static final int MODE_CSV_DUMP = 4;
 	public static final int MODE_CSV_IMPORT = 5;
+	public static final int MODE_VALIDATE_MODEL = 6;
 	
 	public static void main(String[] args) {
 		int mode = -1;
@@ -44,10 +50,47 @@ public class Harness {
 			mode = MODE_CSV_DUMP;
 		} else if (args[0].equals("csvimport")) {
 			mode = MODE_CSV_IMPORT;
+		} else if (args[0].equals("validatemodel")) {
+			mode = MODE_VALIDATE_MODEL;
 		} else {
 			System.out.println("Usage: java -jar form_translate.jar [schema|summary|csvdump] < form.xml > output");
 			System.out.println("or: java -jar form_translate.jar csvimport [delimeter] [encoding] [outcoding] < translations.csv > itextoutput");
+			System.out.println("or: java -jar form_translate.jar validatemodel /path/to/xform /path/to/instance");
 			System.exit(1);
+		}
+		
+		if(mode == MODE_VALIDATE_MODEL) {
+			
+			String formPath = args[1];
+			String modelPath = args[2];
+			
+			FileInputStream formInput = null;
+			FileInputStream instanceInput = null;
+			
+			try {
+				formInput = new FileInputStream(formPath);
+			} catch (FileNotFoundException e) {
+				System.out.println("Couldn't find file at: " + formPath);
+				System.exit(1);
+			}
+			
+			try {
+				instanceInput = new FileInputStream(modelPath);
+			} catch (FileNotFoundException e) {
+				System.out.println("Couldn't find file at: " + modelPath);
+				System.exit(1);
+			}
+			
+			try {
+				FormInstanceValidator validator = new FormInstanceValidator(formInput, instanceInput);
+				validator.simulateEntryTest();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+			
+			System.out.println("Form instance appears to be valid");
+			System.exit(0);
 		}
 		
 		

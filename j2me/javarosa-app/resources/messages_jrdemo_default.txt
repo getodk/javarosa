@@ -13,7 +13,7 @@ jrdemo.selectlanguage.title=First run: Select a language
 
 jrdemo.posturi=Form Submit URL
 jrdemo.formuri=Form Fetch Server
-jrdemo.downloading=Downloadng
+jrdemo.downloading=Downloading
 jrdemo.fetching=Please Wait. Fetching Form...
 jrdemo.searching=Searching
 jrdemo.contacting=Please Wait. Contacting Server...

@@ -18,19 +18,24 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.Reference;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
@@ -38,7 +43,7 @@ import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.FormMultimediaController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
@@ -47,12 +52,14 @@ import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
-import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
-import org.javarosa.formmanager.view.chatterbox.widget.GeoPointWidget;
+import org.javarosa.formmanager.view.widgets.CollapsedWidget;
+import org.javarosa.formmanager.view.widgets.GeoPointWidget;
+import org.javarosa.formmanager.view.widgets.WidgetFactory;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.utilities.media.MediaUtils;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Container;
@@ -129,15 +136,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     	};
 
-    	widgetFactory = new ChatterboxWidgetFactory(this, controller);
-    	widgetFactory.setReadOnly(model.isReadOnlyMode());
-    	widgetFactory.setOptimizeEntry(controller.isEntryOptimized());
-    	
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
     	activeQuestionIndex = FormIndex.createBeginningOfFormIndex(); //null is not allowed
-    	
-    	initGUI();
     	
     	//#if device.identifier == Sony-Ericsson/P1i
     	KEY_CENTER_LETS_HOPE = 13;
@@ -157,11 +158,14 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 
     public void destroy () {
     	for (int i = 0; i < size(); i++) {
-    		((ChatterboxWidget)get(i)).destroy();
+    		//As long as everything is collapsed, we should clear all relevant resources.
+    		ChatterboxWidget cw = ((ChatterboxWidget)get(i));
+    		cw.setViewState(ChatterboxWidget.VIEW_COLLAPSED);    		
     	}
     }
     
     public void show () {
+    	initGUI();
     	J2MEDisplay.setView(this);
     }
     
@@ -647,7 +651,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	}
     	if (activeIsInterstitial) {
     		if (frame.getData() == null) {
-    			this.queueError(null, PROMPT_REQUIRED_QUESTION);
+    			this.queueError(null, PROMPT_REQUIRED_QUESTION, null, null);
     			return;
     		}
     		String answer = ((Selection)frame.getData().getValue()).getValue();
@@ -697,60 +701,24 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	} else {
     		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-	        	this.queueError(null, PROMPT_REQUIRED_QUESTION);
+	        	this.queueError(null, PROMPT_REQUIRED_QUESTION, null, null);
 	    	} else if (status == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 	    		String msg = frame.getPrompt().getConstraintText(frame.getData());
-	    		this.queueError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
+	    		String image = frame.getPrompt().getConstraintText(FormEntryCaption.TEXT_FORM_IMAGE, frame.getData());
+	    		String audio = frame.getPrompt().getConstraintText(FormEntryCaption.TEXT_FORM_AUDIO, frame.getData());
+	    		this.queueError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL, image, audio);
 	     	} else {
 	     		step(controller.stepToNextEvent());
 	     	}
     	}
     }
-    
-//    public void questionIndexChanged (FormIndex questionIndex) {
-//   		jumpToQuestion(questionIndex);
-//    }    
-    
-//	public void saveStateChanged (int instanceID, boolean dirty) {
-//		//do nothing
-//	}
-	
+
     public void keyPressed(int keyCode) {
     	try {
 	    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
 	    	super.keyPressed(keyCode);
-	    	if(multiLingual && keyCode == POUND_KEYCODE && !USE_HASH_FOR_AUDIO) {
-	    		controller.cycleLanguage();
-	    	} else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
-	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) {return;}
-	    		//Get prompt
-	    		FormEntryPrompt fep = model.getQuestionPrompt();
-	    		
-	    		try{
-	    			if(fep != null && fep.getAudioText() != null) {
-	    				// log that audio file was (attempted to be) played
-	    				// TODO: move this to some sort of 'form entry diagnostics' framework
-	    				// instead of bloating the logs
-	    				String audio = fep.getAudioText();
-	    				
-	    				//extract just the audio filename to reduce log size
-	    				String audioShort;
-	    				try {
-	    					Vector<String> pieces = DateUtils.split(audio, "/", false);
-	    					String filename = pieces.lastElement();
-	    					int suffixIx = filename.lastIndexOf('.');
-	    					audioShort = (suffixIx != -1 ? filename.substring(0, suffixIx) : filename);
-	    				} catch (Exception e) {
-	    					audioShort = audio;
-	    				}	    				
-	    				Logger.log("audio", audioShort);
-	    			}
-	    		} catch(Exception e) {
-	    			//Nothing
-	    		}
-	    		
-	    		controller.playAudioOnDemand(fep);
-	    	}else if (keyCode == KEY_CENTER_LETS_HOPE) {
+	    	if(!controller.handleKeyEvent(keyCode)) {
+	    		if (keyCode == KEY_CENTER_LETS_HOPE) {
 		    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
 						ChatterboxWidget widget = activeFrame();
 						if (widget != null) {
@@ -758,6 +726,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 						}
 				}
 	        	indexWhenKeyPressed = keyDownSelectedWidget;
+	    	}
 	    	}
 	    	
     	} catch (Exception e) {
@@ -883,27 +852,60 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	
 	String alertTitle;
 	String msg;
+	Image alertImage;
+	String audioURI;
 	private void raiseAlert() {
 		if(alertTitle != null || msg != null) {
 			final String at = alertTitle;
 			final String m = msg;
+			final Image alIm = alertImage;
+			final String aURI = audioURI;
 			final long time = new Date().getTime();
 			Runnable r = new Runnable() {
 	
 				public void run() {
 					while(new Date().getTime() < time + 300);
-					J2MEDisplay.showError(at, m);
+					J2MEDisplay.showError(at, m, alIm);
+					if(aURI != null) {
+						MediaUtils.playAudio(aURI);
+					}
 				}
 				
 			};
 			new HandledThread(r).start();
 			alertTitle = null;
 			msg = null;
+			alertImage = null;
+			audioURI = null;
 		}
 	}
 	
-	private void queueError(String title, String msg) {
+	private void queueError(String title, String msg, String image, String audio) {
 			alertTitle = title;
 			this.msg = msg;
+			
+			//Try to load the image
+			this.alertImage = null;
+			if(image != null) { 
+				try {
+					Reference ref = ReferenceManager._().DeriveReference(image);
+					InputStream in = ref.getStream();
+					this.alertImage = Image.createImage(in);
+					in.close();
+				} catch (IOException e) {
+					Logger.exception(e);
+				} catch(InvalidReferenceException ire) {
+					Logger.exception(ire);
+				}
+			}
+			
+			//Try to load the image
+			this.audioURI = audio;
+	}
+
+
+	public void attachFormMediaController(FormMultimediaController mediacontroller) {
+    	widgetFactory = new ChatterboxWidgetFactory(this, mediacontroller,new WidgetFactory(controller.isEntryOptimized()));
+    	widgetFactory.setReadOnly(model.isReadOnlyMode());
 	}
 }

@@ -7,7 +7,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.view.chatterbox.widget.LabelWidget;
+import org.javarosa.formmanager.view.widgets.LabelWidget;
 
 import de.enough.polish.ui.TextField;
 

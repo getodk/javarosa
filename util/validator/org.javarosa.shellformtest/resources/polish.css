@@ -56,6 +56,8 @@ colors {
 	popupFontColor: black;
 	
 	selectedBg: #D5D8DD;
+	selectedBgSense: #00FFEE;
+	borderSense: #2685FF;
 }
 .loginView {
 	background {
@@ -133,16 +135,6 @@ title{
 }
 
 focused{
-	/*
-	background-color: white;
-	border-type: round-rect;
-	border-arc: 6;
-	border-color: yellow;
-	border-width: 2;
-	layout: left | expand;
-	font-color: black;
-	font-style: bold;
-	*/
 	layout: left | expand;
 	background-color: focusedBackground;
 	border {
@@ -177,7 +169,6 @@ focused{
 		color:dimagiBlue;
 	}
 	layout: right | expand;
-
 /*
 	margin-top: 1;
 	margin-bottom: 1;
@@ -191,20 +182,42 @@ focused{
     background-color: selectedBg;
 }
 
-.cgItemFocused {
-   focused-style: .cgFocused;
+.cgItemFocused extends cgFocused {
+   /* To make room for the border */
+   margin-right: 2;
+}
+
+.cgSenseItemFocused extends cgItemFocused {
+   /* To make room for the border */
+    background-color: selectedBgSense;
+    border-color: borderSense;
+}
+
+.cgEmptyFocus extends cgItemFocused {
+    background-color: white;
+    border-color: white;
+    before: white;
+}
+
+.uninitializedListItem extends listitem {
+	focused-style: .cgEmptyFocus;
 }
 
 listitem {
-	focused-style: .cgFocused;
+	focused-style: .cgItemFocused;
 }
+
+.senseListItem extends listitem{
+	focused-style: .cgSenseItemFocused;
+}
+
 radiobox {
 	focused-style: .cgFocused;
 }
 checkbox {
 	focused-style: .cgFocused;
 }
-popup {
+popup {	
 	focused-style: .cgFocused;
 }
 

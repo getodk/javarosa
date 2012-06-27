@@ -18,6 +18,7 @@ package org.javarosa.core.model;
 
 import java.util.Vector;
 
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.util.externalizable.Externalizable;
 
@@ -116,4 +117,29 @@ public interface IFormElement extends Localizable, Externalizable {
 	public String getAppearanceAttr();
 	
 	public void setAppearanceAttr (String appearanceAttr);
+	
+	/**
+	 * Capture additional attributes on a Question or Group
+	 * 
+	 * @param namespace
+	 * @param name
+	 * @param value
+	 */
+	public void setAdditionalAttribute(String namespace, String name, String value);
+
+	/**
+	 * Retrieve the value of an additional attribute on a Question or Group
+	 * @param namespace
+	 * @param name
+	 * @return
+	 */
+	public String getAdditionalAttribute(String namespace, String name);
+	
+	/**
+	 * Retrieve all additional attributes on a Question or Group
+	 * 
+	 * @return
+	 */
+	public Vector<TreeElement> getAdditionalAttributes();	
+
 }

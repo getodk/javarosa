@@ -14,27 +14,17 @@
  * the License.
  */
 
-package org.javarosa.patient.activity;
+package org.javarosa.formmanager.view.widgets;
 
-import org.javarosa.core.api.State;
-import org.javarosa.patient.activity.view.PatientEditControllerView;
+import de.enough.polish.ui.Item;
 
-public abstract class EditPatientState implements EditPatientTransitions, State {
+public interface IWidgetComponentWrapper {
+	
+	public void init();
+	
+	public Item wrapEntryWidget(Item i);
 
-	protected int patID;
+	public Item wrapInteractiveWidget(Item interactiveWidget);
 	
-	public EditPatientState (int patID) {
-		this.patID = patID;
-	}
-	
-	public void start () {
-		PatientEditControllerView controller = getController();
-		controller.setTransitions(this);
-		controller.start();
-	}
-	
-	protected PatientEditControllerView getController () {
-		return new PatientEditControllerView("Edit Patient", patID);
-	}
-	
+	public int wrapNextMode(int topReturnMode);
 }

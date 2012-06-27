@@ -19,7 +19,7 @@ import org.javarosa.core.reference.Reference;
  */
 public class J2meFileRoot extends PrefixedRootFactory {
 	
-	private String localRoot;
+	protected String localRoot;
 	
 	/**
 	 * Creates a RootFactory which derives file roots

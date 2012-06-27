@@ -4,6 +4,7 @@
 package org.javarosa.services.transport;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.instance.FormInstance;
@@ -20,7 +21,7 @@ import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessag
 public class SubmissionTransportHelper {
 	
 	public static SubmissionProfile defaultPostSubmission(String url) {
-		return new SubmissionProfile(new XPathReference("/"), "post", url, null);
+		return new SubmissionProfile(new XPathReference("/"), "post", url, null, new Hashtable<String,String>());
 	}
 	
 	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile, boolean cacheable) throws IOException {

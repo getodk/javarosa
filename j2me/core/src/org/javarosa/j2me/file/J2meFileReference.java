@@ -6,7 +6,9 @@ package org.javarosa.j2me.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
@@ -93,15 +95,20 @@ public class J2meFileReference implements Reference
 		FileConnection connector = connector();
 		if(!connector.exists()) {
 			connector.create();
+			if(!connector.exists()) {
+				throw new IOException("File still doesn't exist at  " + this.getLocalURI() + " after create worked succesfully. Reference is probably incorrect");
+			}
 		} else {
 			//TODO: Delete exist file, maybe? Probably....
 		}
 		return connector.openOutputStream();
 	}
 	
-	private FileConnection connector() throws IOException {
-		String uri = getLocalURI();
-		
+	protected FileConnection connector() throws IOException {
+		return connector(getLocalURI());
+	}
+	
+	protected FileConnection connector(String uri) throws IOException {
 		synchronized (connections) {
 
 			// We only want to allow one connection to a file at a time.
@@ -112,7 +119,6 @@ public class J2meFileReference implements Reference
 				FileConnection connection = (FileConnection) Connector.open(uri);
 				// Store the newly opened connection for reuse.
 				connections.put(uri, connection);
-
 				return connection;
 			}
 		}
@@ -151,5 +157,40 @@ public class J2meFileReference implements Reference
 	 */
 	public String getLocalURI() {
 		return "file:///" + localPart + referencePart;
+	}
+	
+	public Reference[] probeAlternativeReferences() {
+		//showtime
+		String local = this.getLocalURI();
+		String folder = local.substring(0,local.lastIndexOf('/') + 1);
+		
+		String folderPart = folder.substring(("file:///" + localPart).length(),folder.length());
+		
+		int finalIndex = local.length();
+		if(local.lastIndexOf('.') != -1 && local.lastIndexOf('/') < local.lastIndexOf('.')) {
+			finalIndex = local.lastIndexOf('.');
+		}
+		String fileNoExt = local.substring(local.lastIndexOf('/') + 1, finalIndex);
+		
+		try {
+			Vector<Reference> results = new Vector<Reference>();
+			for(Enumeration en = connector(folder).list(fileNoExt + ".*", true) ; en.hasMoreElements() ; ) {
+				String file = (String)en.nextElement();
+				String referencePart = folderPart + file;
+				if(!referencePart.equals(this.referencePart)) {
+					results.addElement(new J2meFileReference(localPart, referencePart));
+				}
+			}
+			
+			Reference[] refs = new Reference[results.size()];
+			for(int i = 0 ; i < refs.length ; ++i) {
+				refs[i] = results.elementAt(i);
+			}
+			
+			return refs;
+		} catch (IOException e) {
+			return new Reference[0];
+		}
+		
 	}
 }

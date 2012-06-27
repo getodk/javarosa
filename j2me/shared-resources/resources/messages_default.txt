@@ -61,7 +61,7 @@ button.No=NO
 
 question.SendNow=Send data now?
 
-view.sending.RequiredQuestion=Required question; You must answer
+view.sending.RequiredQuestion=Required question. Please answer it to continue
 
  
 
@@ -73,6 +73,7 @@ form.login.login=Login
 
 activity.login.tryagain=Please try again
 activity.login.demomode.intro=You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
+activity.login.loginincorrect=Login incorrect
 
 
 form.user.name=Name (ie: loginID):
@@ -99,6 +100,8 @@ activity.locationcapture.Longitude=Longitude
 activity.locationcapture.Altitude=Altitude
 activity.locationcapture.Accuracy=Accuracy
 activity.locationcapture.capturelocationhint=Use a GPS to get location
+activity.locationcapture.LocationError=Location Error
+activity.locationcapture.GPSNotAvailable=GPS Not Available
 
 
 formview.repeat.addNew=Add new repeat?
@@ -110,7 +113,7 @@ menu.ok=OK
 
 
 
-
+sending.view.done.title=Finished
 sending.view.done=Form Complete, thanks!
 sending.view.submit=Submit Form
 sending.view.now=Send Now
@@ -205,7 +208,7 @@ log.submit.next.weekly=Next Weekly Log
 
 user.create.header=New User
 
-sending.status.success=Successfully Submitted. Today we have received ${0} forms from you.
+sending.status.success=Successfully Submitted.
 
 user.entity.name=User
 user.entity.username=Username
@@ -226,6 +229,7 @@ es=Español
 sw=Kiswahili
 af=Afrikaans
 fra=French
+zh=Chinese
 
 #OQPS Messages
 formentry.invalid.input=Invalid Value ${0} Entered

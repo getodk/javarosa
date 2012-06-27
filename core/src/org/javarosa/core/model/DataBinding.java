@@ -19,10 +19,12 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -63,6 +65,8 @@ public class DataBinding  implements Externalizable {
 	private String preloadParams;
 	public String constraintMessage;
 	
+	private Vector<TreeElement> additionalAttrs = new Vector<TreeElement>();
+	 
 	public DataBinding () {
 		relevantAbsolute = true;
 		requiredAbsolute = false;
@@ -138,6 +142,14 @@ public class DataBinding  implements Externalizable {
 	public void setPreloadParams(String preloadParams) {
 		this.preloadParams = preloadParams;
 	}
+	
+	public void setAdditionalAttribute(String namespace, String name, String value) {
+		TreeElement.setAttribute(null, additionalAttrs, namespace, name, value);
+	}
+
+	public Vector<TreeElement> getAdditionalAttributes() {
+		return additionalAttrs;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
@@ -149,7 +161,7 @@ public class DataBinding  implements Externalizable {
 		setPreloadParams((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
 		ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged());
 		
-		//don't bother reading relevancy/required/readonly/constraint/calculate right now; they're only used during parse anyway		
+		//don't bother reading relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway		
 	}
 
 	/* (non-Javadoc)
@@ -162,7 +174,7 @@ public class DataBinding  implements Externalizable {
 		ExtUtil.write(out, new ExtWrapNullable(getPreloadParams()));
 		ExtUtil.write(out, new ExtWrapTagged(ref));
 
-		//don't bother writing relevancy/required/readonly/constraint/calculate right now; they're only used during parse anyway
+		//don't bother writing relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
 	}
 	
 	

@@ -27,9 +27,8 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.IGraphTemplate;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LineChart;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LinePointsItem;
-import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
-import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
-import org.javarosa.formmanager.view.chatterbox.widget.WidgetEscapeComponent;
+import org.javarosa.formmanager.view.widgets.ExpandedWidget;
+import org.javarosa.formmanager.view.widgets.WidgetEscapeComponent;
 import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.patient.util.DateValueTuple;
 
@@ -151,7 +150,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getNextMode()
 	 */
 	public int getNextMode () {
-		return wec.wrapNextMode(ChatterboxWidget.NEXT_ON_SELECT);
+		return wec.wrapNextMode(ExpandedWidget.NEXT_ON_SELECT);
 	}
 	
 	/*

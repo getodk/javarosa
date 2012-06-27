@@ -22,6 +22,7 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.FormInstance;
@@ -56,7 +57,7 @@ public class InstanceSchema {
 		if (uiVersion != null)
 			schema.setAttribute(null, "uiVersion", uiVersion);
 		
-		processSelectChoices(schema, f, f.getInstance());
+		processSelectChoices(schema, f, f);
 		schema.addChild(Node.ELEMENT, schemizeInstance(f.getInstance().getRoot()));
 		
 		Document schemaXML = new Document();
@@ -138,7 +139,7 @@ public class InstanceSchema {
 		return e;
 	}
 	
-	private static void processSelectChoices (Element e, IFormElement fe, FormInstance model) {
+	private static void processSelectChoices (Element e, IFormElement fe, FormDef form) {
 		if (fe instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)fe;
 			int controlType = q.getControlType();
@@ -146,18 +147,30 @@ public class InstanceSchema {
 			
 			if (controlType == Constants.CONTROL_SELECT_ONE || controlType == Constants.CONTROL_SELECT_MULTI) {
 				String choiceTypeName = getChoiceTypeName(ref);
-				writeChoices(e, choiceTypeName, q.getChoices());
+
+				Vector<SelectChoice> choices;
+				//Figure out the choices involved if they are complex
+				ItemsetBinding itemset = q.getDynamicChoices();
+		    	if (itemset != null) {
+		    		form.populateDynamicChoices(itemset, ref);
+		    		choices = itemset.getChoices();
+		    	} else { //static choices
+		    		choices = q.getChoices();
+		    	}
+
+				
+				writeChoices(e, choiceTypeName, choices);
 				
 				if (controlType == Constants.CONTROL_SELECT_MULTI) {
 					writeListType(e, choiceTypeName);
 				}
 				
-				choiceTypeMapping.put(model.getTemplatePath(ref),
+				choiceTypeMapping.put(form.getInstance().getTemplatePath(ref),
 						(controlType == Constants.CONTROL_SELECT_MULTI ? "list." : "") + choiceTypeName);
 			}
 		} else {
 			for (int i = 0; i < fe.getChildren().size(); i++) {
-				processSelectChoices(e, fe.getChild(i), model);
+				processSelectChoices(e, fe.getChild(i), form);
 			}
 		}
 	}

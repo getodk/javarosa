@@ -27,6 +27,7 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.Restorable;
@@ -35,9 +36,11 @@ import org.javarosa.core.model.utils.IInstanceVisitor;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.expr.XPathExpression;
 
 
 /**
@@ -70,8 +73,10 @@ public class FormInstance implements Persistable, Restorable {
 	public String uiVersion;
 	
 	private Hashtable namespaces = new Hashtable();
+	
 
 	public FormInstance() {
+		
 	}
 
 	/**
@@ -83,8 +88,11 @@ public class FormInstance implements Persistable, Restorable {
 	public FormInstance(TreeElement root) {
 		setID(-1);
 		setFormId(-1);
-		setRoot(root);
+		setRoot(root);	
 	}
+	
+	
+	
 
 	/**
 	 * Sets the root element of this Model's tree
@@ -94,8 +102,16 @@ public class FormInstance implements Persistable, Restorable {
 	 */
 	public void setRoot(TreeElement topLevel) {
 		root = new TreeElement();
-		if (topLevel != null)
+		if(this.getName() != null) {
+			root.setInstanceName(this.getName());
+		}
+		if (topLevel != null) {
 			root.addChild(topLevel);
+		}
+	}
+	
+	public TreeElement getBase() {
+		return root;
 	}
 
 	/**
@@ -263,88 +279,120 @@ public class FormInstance implements Persistable, Restorable {
 		return nodes;
 	}
 
-	public Vector<TreeReference> expandReference(TreeReference ref) {
-		return expandReference(ref, false);
-	}
-
-	// take in a potentially-ambiguous ref, and return a vector of refs for all nodes that match the passed-in ref
-	// meaning, search out all repeated nodes that match the pattern of the passed-in ref
-	// every ref in the returned vector will be unambiguous (no index will ever be INDEX_UNBOUND)
-	// does not return template nodes when matching INDEX_UNBOUND, but will match templates when INDEX_TEMPLATE is explicitly set
-	// return null if ref is relative, otherwise return vector of refs (but vector will be empty is no refs match)
-	// '/' returns {'/'}
-	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
-	public Vector<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
-		if (!ref.isAbsolute())
-			return null;
-
-		Vector<TreeReference> v = new Vector<TreeReference>();
-		expandReference(ref, root, v, includeTemplates);
-		return v;
-	}
-
-	// recursive helper function for expandReference
-	// sourceRef: original path we're matching against
-	// node: current node that has matched the sourceRef thus far
-	// templateRef: explicit path that refers to the current node
-	// refs: Vector to collect matching paths; if 'node' is a target node that
-	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef, TreeElement node, Vector<TreeReference> refs, boolean includeTemplates) {
-		int depth = node.getDepth();
-
-		if (depth == sourceRef.size()) {
-			refs.addElement(node.getRef());
-		} else {
-			String name = sourceRef.getName(depth);
-			int mult = sourceRef.getMultiplicity(depth);
-			Vector<TreeElement> set = new Vector<TreeElement>();
-			
-			if (node.getNumChildren() > 0) {
-				if (mult == TreeReference.INDEX_UNBOUND) {
-					int count = node.getChildMultiplicity(name);
-					for (int i = 0; i < count; i++) {
-						TreeElement child = node.getChild(name, i);
-						if (child != null) {
-							set.addElement(child);
-						} else {
-							throw new IllegalStateException(); // missing/non-sequential
-							// nodes
-						}
-					}
-					if (includeTemplates) {
-						TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-						if (template != null) {
-							set.addElement(template);
-						}
-					}
-				} else if(mult != TreeReference.INDEX_ATTRIBUTE){
-					//TODO: Make this test mult >= 0?
-					//If the multiplicity is a simple integer, just get
-					//the appropriate child
-					TreeElement child = node.getChild(name, mult);
-					if (child != null) {
-						set.addElement(child);
-					}
-				}
-			}
-			
-			if(mult == TreeReference.INDEX_ATTRIBUTE) {
-				TreeElement attribute = node.getAttribute(null, name);
-				set.addElement(attribute);
-			}
-	
-			for (Enumeration e = set.elements(); e.hasMoreElements();) {
-				expandReference(sourceRef, (TreeElement)e.nextElement(), refs, includeTemplates);
-			}
-		}
-	}
+//	public Vector<TreeReference> expandReference(TreeReference ref) {
+//		return expandReference(ref, false);
+//	}
+//
+//	// take in a potentially-ambiguous ref, and return a vector of refs for all nodes that match the passed-in ref
+//	// meaning, search out all repeated nodes that match the pattern of the passed-in ref
+//	// every ref in the returned vector will be unambiguous (no index will ever be INDEX_UNBOUND)
+//	// does not return template nodes when matching INDEX_UNBOUND, but will match templates when INDEX_TEMPLATE is explicitly set
+//	// return null if ref is relative, otherwise return vector of refs (but vector will be empty is no refs match)
+//	// '/' returns {'/'}
+//	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
+//	public Vector<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
+//		if (!ref.isAbsolute()) {
+//			return null;
+//		}
+//
+//		Vector<TreeReference> v = new Vector<TreeReference>();
+//		expandReference(ref, root, v, includeTemplates);
+//		return v;
+//	}
+//
+//	// recursive helper function for expandReference
+//	// sourceRef: original path we're matching against
+//	// node: current node that has matched the sourceRef thus far
+//	// templateRef: explicit path that refers to the current node
+//	// refs: Vector to collect matching paths; if 'node' is a target node that
+//	// matches sourceRef, templateRef is added to refs
+//	private void expandReference(TreeReference sourceRef, TreeElement node, Vector<TreeReference> refs, boolean includeTemplates) {
+//		int depth = node.getDepth();
+//		Vector<XPathExpression> predicates = null;
+//		if (depth == sourceRef.size()) {
+//			refs.addElement(node.getRef());
+//		} else {
+//			String name = sourceRef.getName(depth);
+//			predicates = sourceRef.getPredicate(depth);
+//			//ETHERTON: Is this where we should test for predicates?
+//			int mult = sourceRef.getMultiplicity(depth);
+//			Vector<TreeElement> set = new Vector<TreeElement>();
+//			
+//			if (node.getNumChildren() > 0) {
+//				if (mult == TreeReference.INDEX_UNBOUND) {
+//					int count = node.getChildMultiplicity(name);
+//					for (int i = 0; i < count; i++) {
+//						TreeElement child = node.getChild(name, i);
+//						if (child != null) {
+//							set.addElement(child);
+//						} else {
+//							throw new IllegalStateException(); // missing/non-sequential
+//							// nodes
+//						}
+//					}
+//					if (includeTemplates) {
+//						TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
+//						if (template != null) {
+//							set.addElement(template);
+//						}
+//					}
+//				} else if(mult != TreeReference.INDEX_ATTRIBUTE){
+//					//TODO: Make this test mult >= 0?
+//					//If the multiplicity is a simple integer, just get
+//					//the appropriate child
+//					TreeElement child = node.getChild(name, mult);
+//					if (child != null) {
+//						set.addElement(child);
+//					}
+//				}
+//			}
+//			
+//			if(mult == TreeReference.INDEX_ATTRIBUTE) {
+//				TreeElement attribute = node.getAttribute(null, name);
+//				set.addElement(attribute);
+//			}
+//	
+//			for (Enumeration e = set.elements(); e.hasMoreElements();) {
+//				//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+//				TreeElement treeElement = (TreeElement)e.nextElement();				
+//				if(predicates != null)
+//				{
+//					TreeReference treeRef = treeElement.getRef();
+//					boolean passedAll = true;
+//					for(XPathExpression xpe : predicates)
+//					{
+//						//test the predicate on the treeElement
+//						EvaluationContext evalContext = new EvaluationContext(new EvaluationContext(), treeRef);
+//						Object o = xpe.eval(this, evalContext);
+//						if(o instanceof Boolean)
+//						{
+//							boolean passed = ((Boolean)o).booleanValue();
+//							if(!passed)
+//							{
+//								passedAll = false;
+//								break;
+//							}
+//						}
+//					}
+//					if(passedAll)
+//					{
+//						expandReference(sourceRef, treeElement, refs, includeTemplates);
+//					}
+//				}
+//				else
+//				{
+//					expandReference(sourceRef, treeElement, refs, includeTemplates);
+//				}
+//			}
+//		}
+//	}
 
 	// retrieve the template node for a given repeated node ref may be ambiguous
 	// return null if node is not repeatable
 	// assumes templates are built correctly and obey all data model validity rules
 	public TreeElement getTemplate(TreeReference ref) {
 		TreeElement node = getTemplatePath(ref);
-		return (node == null ? null : node.repeatable ? node : null);
+		return (node == null ? null : ((node.repeatable || node.isAttribute) ? node : null));
 	}
 
 	public TreeElement getTemplatePath(TreeReference ref) {
@@ -469,6 +517,7 @@ public class FormInstance implements Persistable, Restorable {
 		
 		namespaces = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 		setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
+
 	}
 
 	/*
@@ -485,7 +534,7 @@ public class FormInstance implements Persistable, Restorable {
 		ExtUtil.write(out, new ExtWrapNullable(schema));
 		ExtUtil.write(out, new ExtWrapNullable(dateSaved));
 		ExtUtil.write(out, new ExtWrapMap(namespaces));
-		ExtUtil.write(out, getRoot());
+		ExtUtil.write(out, getRoot());	
 	}
 
 	public String getName() {
@@ -730,6 +779,16 @@ public class FormInstance implements Persistable, Restorable {
 		}
 		
 		return cloned;
+	}
+	
+	public String toString()
+	{
+		String name = "NULL";
+		if(this.name != null)
+		{
+			name = this.name;
+		}
+		return name;
 	}
 	
 }

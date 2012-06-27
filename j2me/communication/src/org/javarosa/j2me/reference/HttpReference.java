@@ -62,5 +62,7 @@ public class HttpReference implements Reference {
 		return URI;
 	}
 	
-	
+	public Reference[] probeAlternativeReferences() {
+		return new Reference [0];
+	}
 }

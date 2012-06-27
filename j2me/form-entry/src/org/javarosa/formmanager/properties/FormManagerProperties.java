@@ -43,6 +43,10 @@ public class FormManagerProperties implements IPropertyRules {
 	    public final static String EXTRA_KEY_LANGUAGE_CYCLE = "cycle";
 	    public final static String EXTRA_KEY_AUDIO_PLAYBACK = "audio";
 	    
+	    public final static String LOOSE_MEDIA = "loose_media";
+	    public final static String LOOSE_MEDIA_YES = "yes";
+	    public final static String LOOSE_MEDIA_NO = "no";
+	    
 	    /**
 	     * Creates the JavaRosa set of property rules
 	     */
@@ -59,9 +63,12 @@ public class FormManagerProperties implements IPropertyRules {
 	        Vector hashkeyAudio = new Vector();
 	        hashkeyAudio.addElement(EXTRA_KEY_LANGUAGE_CYCLE);
 	        hashkeyAudio.addElement(EXTRA_KEY_AUDIO_PLAYBACK);
-	         
 	        rules.put(EXTRA_KEY_FORMAT,hashkeyAudio);
-
+	        
+	        Vector looseMedia = new Vector();
+	        looseMedia.addElement(LOOSE_MEDIA_YES);	        
+	        looseMedia.addElement(LOOSE_MEDIA_NO);
+	        rules.put(LOOSE_MEDIA, looseMedia);
 	    }
 
 	    /** (non-Javadoc)

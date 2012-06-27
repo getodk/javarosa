@@ -201,8 +201,10 @@ public class TextFormTests extends TestCase {
 			fail("Could not add individual select choice"+fep.getSelectChoices().toString());
 		}
 
+		Object a = onetext;
+		Object b = fep.getSelectChoiceText(one);
+		this.assertEquals("Invalid select choice text returned",a, b);
 		
-		this.assertEquals("Invalid select choice text returned", onetext, fep.getSelectChoiceText(one));
 		this.assertEquals("Invalid select choice text returned", twotext, fep.getSelectChoiceText(two));
 		
 		this.assertNull("Form Entry Caption incorrectly contains Image Text", fep.getSpecialFormSelectChoiceText(one, FormEntryCaption.TEXT_FORM_IMAGE));
