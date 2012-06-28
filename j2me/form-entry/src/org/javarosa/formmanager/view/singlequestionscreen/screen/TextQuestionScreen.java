@@ -92,7 +92,7 @@ public class TextQuestionScreen extends SingleQuestionScreen implements InvalidI
 
 	public void invalidNativeInput(String input) {
 		System.out.println("loaded: " + loaded);
-		J2MEDisplay.showError(null,Localization.get("formentry.invalid.input", new String[] {input}), null, new CommandListener() {
+		J2MEDisplay.showError(null,Localization.get("formentry.invalid.input", new String[] {input}), null, this, new CommandListener() {
 			private int count = 1;
 			public void commandAction(Command arg0, Displayable arg1) {
 				if(count < 1) {
