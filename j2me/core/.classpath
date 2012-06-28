@@ -6,18 +6,18 @@
 			<attribute name="javadoc_location" value="http://java.sun.com/j2se/1.3/docs/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar" sourcepath="/J2ME_POLISH_HOME/j2mepolish-src/j2me/src">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/C:/Users/adewinter/workspace/dimagi/library stuff/midpng-javadoc-final/javadoc/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/pim.jar"/>
-	<classpathentry exported="true" kind="lib" path="/javarosa-libs/kxml2-2.3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="/javarosa-libs/regexp-me.jar"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/mmapi.jar"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar" sourcepath="/J2ME_POLISH_HOME/j2mepolish-src"/>
-	<classpathentry exported="true" kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/wmapi.jar"/>
+	<classpathentry exported="true" kind="lib" path="/lib/j2meunit-javarosa.jar"/>
+	<classpathentry exported="true" kind="lib" path="/lib/kxml2-2.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/lib/regexp-me.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
