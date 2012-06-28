@@ -148,8 +148,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return toInt(argVals[0]);
 		} else if (name.equals("round") && args.length == 2) { // non-standard Excel-style round(value,decimal place)
 			Double aval = toNumeric(argVals[0]);
-			Double bval = toNumeric(argVals[1]);
-			return Math.pow(10.0, -bval) * Math.round(aval / Math.pow(10.0, -bval));
+			Double bval = toInt(argVals[1]);
+			return round(aval, bval);
 		} else if (name.equals("string") && args.length == 1) {
 			return toString(argVals[0]);			
 		} else if (name.equals("date") && args.length == 1) { //non-standard
@@ -631,6 +631,68 @@ public class XPathFuncExpr extends XPathExpression {
 			sum += toNumeric(argVals[i]).doubleValue();
 		}
 		return new Double(sum);
+	}
+	
+	/**
+	 * round function like in Excel.
+	 * 
+	 * @param num
+	 * @param dblDecim
+	 * @return
+	 */
+	private static Double round(double num, double numDecim) {
+		long p=0;
+
+		// rounding doesn't affect special values...
+		if ( num == Double.NaN || 
+			 num == Double.NEGATIVE_INFINITY ||
+			 num == Double.POSITIVE_INFINITY ) {
+			return new Double(num);
+		}
+		
+		// absurdly large rounding requests yield NaN...
+		if ( numDecim > 30.0 || numDecim < -30.0 ) {
+			return new Double(Double.NaN);
+		}
+
+		// ignore fractional numDecim rounding values.
+		// any numDecim that is more than 0.5 is considered "1"
+		
+		if ( numDecim < 0.0 ) {
+			// we want to retain 100's or higher value
+			// round( 33.33, 1) = 30.0
+			// divide everything by 10's.
+			while ( numDecim <= -0.5 ) {
+				num /= 10.0;
+				++p;
+				++numDecim;
+			}
+		} else {
+			// we want to retain a fractional value
+			// round( 33.33, -1) = 3.3
+			// multiply everything by 10's.
+			while ( numDecim >= 0.5 ) {
+				num *= 10.0;
+				--p;
+				--numDecim;
+			}
+		}
+		// truncate with a 0.5 offset to round to the nearest long...
+		num = (double)((long) (num+0.5));
+		
+		// and now restore the number to the appropriate scale.
+		if ( p < 0 ) {
+			while ( p < 0 ) {
+				num /= 10.0;
+				++p;
+			}
+		} else {
+			while ( p > 0 ) {
+				num *= 10.0;
+				--p;
+			}
+		}
+		return new Double(num);
 	}
 
 	/**

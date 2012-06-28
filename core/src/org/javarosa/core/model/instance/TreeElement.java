@@ -147,7 +147,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		TreeElement attribut = getAttribute(attrs, namespace, name);
 		if ( attribut != null ) {
 			if (value == null) {
-				attrs.remove(attribut);
+				attrs.removeElement(attribut);
 			} else {
 				attribut.setValue(new UncastData(value));
 			}
