@@ -47,11 +47,11 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen implements Ite
 			//#style choiceGroup
 			cg = new CustomChoiceGroup("*"
 					+ prompt.getLongText(),
-					ChoiceGroup.EXCLUSIVE, true);
+					ChoiceGroup.EXCLUSIVE, true, false);
 		} else {
 			//#style choiceGroup
 			cg = new CustomChoiceGroup(prompt.getLongText(),
-					ChoiceGroup.EXCLUSIVE, true);
+					ChoiceGroup.EXCLUSIVE, true, false);
 		}
 
 		Enumeration itr = (prompt.getSelectChoices().elements());
