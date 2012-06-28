@@ -3,8 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
-	<classpathentry exported="true" kind="lib" path="/javarosa-libs/bouncycastle-lw.jar"/>
-	<classpathentry kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar" sourcepath="/javarosa-libs/j2meunit-javarosa.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
+	<classpathentry kind="lib" path="/lib/bouncycastle-lw.jar"/>
+	<classpathentry kind="lib" path="/lib/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

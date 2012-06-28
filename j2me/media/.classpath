@@ -3,6 +3,6 @@
 	<classpathentry excluding="**/Barcode*.java|**/barcode/" kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
