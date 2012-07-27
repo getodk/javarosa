@@ -84,26 +84,45 @@ public class XPathConditional implements IConditionExpr {
 		}
 	}
 	
-	public Vector getTriggers () {
-		Vector triggers = new Vector();
-		getTriggers(expr, triggers);
+	public Vector<TreeReference> getTriggers () {
+		Vector<TreeReference> triggers = new Vector<TreeReference>();
+		getTriggers(expr, triggers, null);
 		return triggers;
 	}
 	
-	private static void getTriggers (XPathExpression x, Vector v) {
+	private static void getTriggers (XPathExpression x, Vector<TreeReference> v, TreeReference contextRef) {
 		if (x instanceof XPathPathExpr) {
 			TreeReference ref = ((XPathPathExpr)x).getReference();
-			if (!v.contains(ref))
-				v.addElement(ref);
+			TreeReference contextualized = ref;
+			if(contextRef != null) { 
+				contextualized = ref.contextualize(contextRef);
+			}
+			if (!v.contains(contextualized)) { 
+				v.addElement(contextualized);
+			} 
+			for(int i = 0; i < ref.size() ; i++) {
+				Vector<XPathExpression> predicates = ref.getPredicate(i);
+				if(predicates == null) {
+					continue;
+				}
+				
+				//we can't generate this properly without an absolute reference
+				if(!ref.isAbsolute()) { throw new IllegalArgumentException("can't get triggers for relative references");}
+				TreeReference predicateContext = ref.getSubReference(i);
+				
+				for(XPathExpression predicate : predicates) {
+					getTriggers(predicate, v, predicateContext);
+				}
+			}
 		} else if (x instanceof XPathBinaryOpExpr) {
-			getTriggers(((XPathBinaryOpExpr)x).a, v);
-			getTriggers(((XPathBinaryOpExpr)x).b, v);			
+			getTriggers(((XPathBinaryOpExpr)x).a, v, contextRef);
+			getTriggers(((XPathBinaryOpExpr)x).b, v, contextRef);			
 		} else if (x instanceof XPathUnaryOpExpr) {
-			getTriggers(((XPathUnaryOpExpr)x).a, v);
+			getTriggers(((XPathUnaryOpExpr)x).a, v, contextRef);
 		} else if (x instanceof XPathFuncExpr) {
 			XPathFuncExpr fx = (XPathFuncExpr)x;
 			for (int i = 0; i < fx.args.length; i++)
-				getTriggers(fx.args[i], v);
+				getTriggers(fx.args[i], v, contextRef);
 		}
 	}
 	

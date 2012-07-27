@@ -19,6 +19,10 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 	
 	Double min;
 	Double max;
+	
+	T minCast;
+	T maxCast;
+	
 	boolean minInclusive;
 	boolean maxInclusive;
 	
@@ -45,7 +49,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 	}
 	
 	public T getMin() {
-		return min == null ? null : castToValue(min);
+		return min == null ? null : minCast;
 	}
 	
 	public boolean isMinInclusive() {
@@ -53,7 +57,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 	}
 	
 	public T getMax() {
-		return max == null ? null : castToValue(max);
+		return max == null ? null : maxCast;
 	}
 	
 	public boolean isMaxInclusive() {
@@ -80,15 +84,17 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 		if(ltr && !gtr) {
 			max = new Double(val);
 			maxInclusive = eq;
+			maxCast= castToValue(max);
 		}
 		
 		if(!ltr && gtr) {
 			min = new Double(val);
 			minInclusive = eq;
+			minCast = castToValue(min);
 		}
 	}
 	
-	protected abstract T castToValue(double value);
+	protected abstract T castToValue(double value) throws UnpivotableExpressionException;
 	
 	protected abstract double unit();
 }

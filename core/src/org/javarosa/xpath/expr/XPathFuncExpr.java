@@ -131,6 +131,19 @@ public class XPathFuncExpr extends XPathExpression {
 		
 		Hashtable funcHandlers = evalContext.getFunctionHandlers();
 		
+		//TODO: Func handlers should be able to declare the desire for short circuiting as well
+		if(name.equals("if") && args.length == 3) {
+			return ifThenElse(model, evalContext, args, argVals);	
+		} else if (name.equals("coalesce") && args.length == 2) {
+			//Not sure if unpacking here is quiiite right, but it seems right
+			argVals[0] = XPathFuncExpr.unpack(args[0].eval(model, evalContext));
+			if(!isNull(argVals[0])) { return argVals[0]; }
+			else {
+				argVals[1] = args[1].eval(model, evalContext);
+				return argVals[1];
+			}
+		} 
+		
 		for (int i = 0; i < args.length; i++) {
 			argVals[i] = args[i].eval(model, evalContext);
 		}
@@ -160,14 +173,22 @@ public class XPathFuncExpr extends XPathExpression {
 			return boolStr(argVals[0]);
 		} else if (name.equals("format-date") && args.length == 2) {
 			return dateStr(argVals[0], argVals[1]);
-		} else if (name.equals("if") && args.length == 3) { //non-standard
-			return ifThenElse(argVals[0], argVals[1], argVals[2]);	
 		} else if ((name.equals("selected") || name.equals("is-selected")) && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
 		} else if (name.equals("count-selected") && args.length == 1) { //non-standard
 			return countSelected(argVals[0]);		
-		} else if (name.equals("coalesce") && args.length == 2) {
-			return (!isNull(argVals[0]) ? argVals[0] : argVals[1]);
+		} else if (name.equals("selected-at") && args.length == 2) { //non-standard
+            return selectedAt(argVals[0], argVals[1]);              
+		} else if (name.equals("position") && (args.length == 0 || args.length == 1)) {
+			//TODO: Technically, only the 0 length argument is valid here.
+			if(args.length == 1) {
+				return position(((XPathNodeset)argVals[0]).getRefAt(0));
+			} else {
+				if(evalContext.getContextPosition() != -1) { 
+					return new Double(1+evalContext.getContextPosition());
+				}
+				return position(evalContext.getContextRef());
+			}
 		} else if (name.equals("count") && args.length == 1) {
 			return count(argVals[0]);
 		} else if (name.equals("sum") && args.length == 1) {
@@ -176,6 +197,18 @@ public class XPathFuncExpr extends XPathExpression {
 			} else {
 				throw new XPathTypeMismatchException("not a nodeset");				
 			}
+		} else if (name.equals("max")) {
+            if (argVals[0] instanceof XPathNodeset) {
+                    return max(((XPathNodeset)argVals[0]).toArgList());
+            } else {
+                    return max(argVals);                            
+            }
+		}  else if (name.equals("min")) {
+            if (argVals[0] instanceof XPathNodeset) {
+                    return min(((XPathNodeset)argVals[0]).toArgList());
+            } else {
+                    return min(argVals);                            
+            }
 		} else if (name.equals("today") && args.length == 0) {
 			return DateUtils.roundDate(new Date());
 		} else if (name.equals("now") && args.length == 0) {
@@ -572,10 +605,15 @@ public class XPathFuncExpr extends XPathExpression {
 			return "";
 		}
 	}
+
+	private Double position(TreeReference refAt) {
+		return new Double(1+refAt.getMultLast());
+	}
 	
-	public static Object ifThenElse (Object o1, Object o2, Object o3) {
-		boolean b = toBoolean(o1).booleanValue();
-		return (b ? o2 : o3);
+	public static Object ifThenElse (FormInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) {
+		argVals[0] = args[0].eval(model, ec);
+		boolean b = toBoolean(argVals[0]).booleanValue();
+		return (b ? args[1].eval(model, ec) : args[2].eval(model, ec));
 	}
 	
 	/**
@@ -603,6 +641,20 @@ public class XPathFuncExpr extends XPathExpression {
 
 		return new Double(DateUtils.split(s, " ", true).size());
 	}
+
+    /**
+     * Get the Nth item in a selected list
+     * 
+     * @param o1 XML-serialized answer to multi-select question (i.e, space-delimited choice values)
+     * @param o2 the integer index into the list to return
+     * @return
+     */
+    public static String selectedAt (Object o1, Object o2) {
+        String selection = (String)unpack(o1);
+        int index = toInt(o2).intValue();
+        
+        return (String) DateUtils.split(selection, " ", true).elementAt(index);
+    }
 	
 	/**
 	 * count the number of nodes in a nodeset
@@ -694,6 +746,28 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 		return new Double(num);
 	}
+
+    /**
+     * Identify the largest value from the list of provided values.
+     * 
+     * @param argVals
+     * @return
+     */
+    private static Object max(Object[] argVals) {
+        double max = Double.MIN_VALUE;
+        for (int i = 0; i < argVals.length; i++) {
+                max = Math.max(max, toNumeric(argVals[i]).doubleValue());
+        }
+        return new Double(max);
+    }
+    
+    private static Object min(Object[] argVals) {
+        double min = Double.MAX_VALUE;
+        for (int i = 0; i < argVals.length; i++) {
+                min = Math.min(min, toNumeric(argVals[i]).doubleValue());
+        }
+        return new Double(min);
+    }
 
 	/**
 	 * concatenate an abritrary-length argument list of string values together

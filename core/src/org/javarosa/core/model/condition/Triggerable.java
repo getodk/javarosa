@@ -33,9 +33,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public abstract class Triggerable implements Externalizable {	
 	public IConditionExpr expr;
-	public Vector targets;
+	public Vector<TreeReference> targets;
 	public TreeReference contextRef;  //generic ref used to turn triggers into absolute references
-		
+	public TreeReference originalContextRef;
+	
 	public Triggerable () {
 		
 	}
@@ -43,6 +44,7 @@ public abstract class Triggerable implements Externalizable {
 	public Triggerable (IConditionExpr expr, TreeReference contextRef) {
 		this.expr = expr;
 		this.contextRef = contextRef;
+		this.originalContextRef = contextRef;
 		this.targets = new Vector();
 	}
 	
@@ -52,12 +54,23 @@ public abstract class Triggerable implements Externalizable {
 	
 	public abstract boolean canCascade ();
 	
-	public void apply (FormInstance instance, EvaluationContext evalContext, FormDef f) {
-		Object result = eval(instance, evalContext);
+	/**
+	 * Not for re-implementation, dispatches all of the evaluation 
+	 * @param instance
+	 * @param evalContext
+	 * @param f
+	 */
+	public final void apply (FormInstance instance, EvaluationContext parentContext, TreeReference context, FormDef f) {
+		//The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
+		//for the actual expressions, so we need genericize that ref against the current context
+		TreeReference ungenericised = originalContextRef.contextualize(context);
+		EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
+
+		Object result = eval(instance, ec);
 
 		for (int i = 0; i < targets.size(); i++) {
-			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
-			Vector v = evalContext.expandReference(targetRef);		
+			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(ec.getContextRef());
+			Vector v = ec.expandReference(targetRef);		
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.elementAt(j);
 				apply(affectedRef, result, instance, f);
@@ -70,15 +83,15 @@ public abstract class Triggerable implements Externalizable {
 			targets.addElement(target);
 	}
 	
-	public Vector getTargets () {
+	public Vector<TreeReference> getTargets () {
 		return targets;
 	}
 	
-	public Vector getTriggers () {
-		Vector relTriggers = expr.getTriggers();
-		Vector absTriggers = new Vector();
+	public Vector<TreeReference> getTriggers () {
+		Vector<TreeReference> relTriggers = expr.getTriggers();
+		Vector<TreeReference> absTriggers = new Vector<TreeReference>();
 		for (int i = 0; i < relTriggers.size(); i++) {
-			absTriggers.addElement(((TreeReference)relTriggers.elementAt(i)).anchor(contextRef));
+			absTriggers.addElement(((TreeReference)relTriggers.elementAt(i)).anchor(originalContextRef));
 		}
 		return absTriggers;		
 	}
@@ -91,13 +104,13 @@ public abstract class Triggerable implements Externalizable {
 			
 			if (this.expr.equals(t.expr)) {
 				//check triggers
-				Vector Atriggers = this.getTriggers();
-				Vector Btriggers = t.getTriggers();
+				Vector<TreeReference> Atriggers = this.getTriggers();
+				Vector<TreeReference> Btriggers = t.getTriggers();
 				
 				//order and quantity don't matter; all that matters is every trigger in A exists in B and vice versa
 				for (int k = 0; k < 2; k++) {
-					Vector v1 = (k == 0 ? Atriggers : Btriggers);
-					Vector v2 = (k == 0 ? Btriggers : Atriggers);
+					Vector<TreeReference> v1 = (k == 0 ? Atriggers : Btriggers);
+					Vector<TreeReference> v2 = (k == 0 ? Btriggers : Atriggers);
 				
 					for (int i = 0; i < v1.size(); i++) {
 						if (v2.indexOf(v1.elementAt(i)) == -1) {
@@ -117,12 +130,14 @@ public abstract class Triggerable implements Externalizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		targets = (Vector)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
+		originalContextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+		targets = (Vector<TreeReference>)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(expr));
 		ExtUtil.write(out, contextRef);
+		ExtUtil.write(out, originalContextRef);
 		ExtUtil.write(out, new ExtWrapList(targets));
 	}	
 	
