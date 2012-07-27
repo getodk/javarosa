@@ -450,7 +450,7 @@ public class FormEntryModel {
             if (e instanceof GroupDef) {
                 GroupDef g = (GroupDef) e;
                 if (g.getRepeat() && g.getCountReference() != null) {
-                    IAnswerData count = getForm().getMainInstance().getDataValue(g.getCountReference());
+                    IAnswerData count = getForm().getMainInstance().resolveReference(g.getCountReference()).getValue();
                     if (count != null) {
                         long fullcount = ((Integer) count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);

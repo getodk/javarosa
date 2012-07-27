@@ -333,7 +333,6 @@ public class XFormParser {
 				FormInstance fi = parseInstance(e, false);
 				loadInstanceData(e, fi.getRoot(), _f);
 				_f.addNonMainInstance(fi);
-
 			}
 		}
 		//now parse the main instance
@@ -1750,6 +1749,9 @@ public class XFormParser {
 					if(TreeReference.NAME_WILDCARD.equals(srcRef.getName(j))) {
 						nonstatic = false;
 					}
+				}
+				if (srcRef.getInstanceName() != null) {
+					nonstatic = false;
 				}
 				if(nonstatic) {
 					refs.addElement(srcRef);

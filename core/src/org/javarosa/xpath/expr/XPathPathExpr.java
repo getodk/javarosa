@@ -27,6 +27,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -94,12 +95,13 @@ public class XPathPathExpr extends XPathExpression {
 			parentsAllowed = true;
 			break;
 		case XPathPathExpr.INIT_CONTEXT_EXPR:
-			ref.setRefLevel(TreeReference.REF_ABSOLUTE); //i assume when refering the non main instance you have to be absolute
 			if (this.filtExpr.x != null && this.filtExpr.x instanceof XPathFuncExpr)
 			{
 				XPathFuncExpr func = (XPathFuncExpr)(this.filtExpr.x);
 				if(func.id.toString().equals("instance"))
 				{
+					ref.setRefLevel(TreeReference.REF_ABSOLUTE); //i assume when refering the non main instance you have to be absolute
+					parentsAllowed = false;
 					if(func.args.length != 1)
 					{
 						throw new XPathUnsupportedException("instance() function used with "+func.args.length+ " arguements. Expecting 1 arguement");
@@ -120,7 +122,6 @@ public class XPathPathExpr extends XPathExpression {
 				throw new XPathUnsupportedException("filter expression");
 			}
 			
-			parentsAllowed = false;
 			break;
 		default: throw new XPathUnsupportedException("filter expression");
 		}
@@ -192,12 +193,22 @@ public class XPathPathExpr extends XPathExpression {
 			{
 				throw new XPathTypeMismatchException("Instance referenced by " + genericRef + " does not exists");
 			}
+		} else {
+            //TODO: We should really stop passing 'm' around and start just getting the right instance from ec
+            //at a more central level
+            m = ec.getMainInstance();
+
+            if(m == null) {
+                    String refStr = ref == null ? "" : ref.toString(true);
+                    throw new XPathTypeMismatchException("Cannot evaluate the reference [" + refStr + "] in the current evaluation context. No default instance has been declared!");
+            }
 		}
-		//Otherwise we'll leave 'm' as set to the main instance 
 		
-		if (ref.isAbsolute() && m.getTemplatePath(ref) == null) {
-			throw new XPathTypeMismatchException("Node " + genericRef.toString() + " does not exist!");
-		}
+		// this makes no sense...
+//		if (ref.isAbsolute() && m.getTemplatePath(ref) == null) {
+//			Vector<TreeReference> nodesetRefs = new Vector<TreeReference>();
+//			return new XPathNodeset(nodesetRefs, m, ec);
+//		}
 		
 		Vector<TreeReference> nodesetRefs = ec.expandReference(ref);
 		
@@ -265,6 +276,8 @@ public class XPathPathExpr extends XPathExpression {
 			return val.getValue();
 		} else if (val instanceof BooleanData) {
 			return val.getValue();
+		} else if (val instanceof GeoPointData) {
+			return val.uncast().getString();
 		} else {
 			System.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
 			return val.getValue(); //is this a good idea?

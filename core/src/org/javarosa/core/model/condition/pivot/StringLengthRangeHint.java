@@ -11,12 +11,12 @@ import org.javarosa.core.model.data.StringData;
  */
 public class StringLengthRangeHint extends RangeHint<StringData> {
 
-	protected StringData castToValue(double value) {
-		String placeholder = "";
+	protected StringData castToValue(double value) throws UnpivotableExpressionException {
+		StringBuilder sb = new StringBuilder();
 		for(int i = 0 ; i < ((int)value) ; ++i) {
-			placeholder += "X";
+			sb.append("X");
 		}
-		return new StringData(placeholder);
+		return new StringData(sb.toString());
 	}
 
 	protected double unit() {

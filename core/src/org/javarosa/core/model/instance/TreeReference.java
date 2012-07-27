@@ -490,4 +490,90 @@ public class TreeReference implements Externalizable {
 			ExtUtil.write(out, new ExtWrapListPoly(predicates.get(i)));
 		}
 	}
+
+	/** Intersect this tree reference with another, returning a new tree reference
+	 *  which contains all of the common elements, starting with the root element.
+	 *  
+	 *  Note that relative references by their nature can't share steps, so intersecting
+	 *  any (or by any) relative ref will result in the root ref. Additionally, if the
+	 *  two references don't share any steps, the intersection will consist of the root
+	 *  reference.
+	 *  
+	 * @param b The tree reference to intersect
+	 * @return The tree reference containing the common basis of this ref and b
+	 */
+	public TreeReference intersect(TreeReference b) {
+		if(!this.isAbsolute() || !b.isAbsolute()) {
+			return TreeReference.rootRef();
+		}
+		if(this.equals(b)) { return this;}
+	
+	
+		TreeReference a;
+		//A should always be bigger if one ref is larger than the other
+		if(this.size() < b.size()) { a = b.clone() ; b = this.clone();}
+		else { a= this.clone(); b = b.clone();}
+		
+		//Now, trim the refs to the same length.
+		int diff = a.size() - b.size();
+		for(int i = 0; i < diff; ++i) {
+			a.removeLastLevel();
+		}
+		
+		int aSize = a.size();
+		//easy, but requires a lot of re-evaluation.
+		for(int i = 0 ; i <=  aSize; ++i) {
+			if(a.equals(b)) {
+				return a;
+			} else if(a.size() == 0) {
+				return TreeReference.rootRef();
+			} else {
+				if(!a.removeLastLevel() || !b.removeLastLevel()) {
+					//I don't think it should be possible for us to get here, so flip if we do
+					throw new RuntimeException("Dug too deply into TreeReference during intersection");
+				}
+			}
+		}
+		
+		//The only way to get here is if a's size is -1
+		throw new RuntimeException("Impossible state");
+	}
+	
+	/**
+	 * Returns the subreference of this reference up to the level specified.
+	 * 
+	 * Used to identify the reference context for a predicate at the same level
+	 * 
+	 * Must be an absolute reference, otherwise will throw IllegalArgumentException
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public TreeReference getSubReference(int level) {
+		if(!this.isAbsolute()) { throw new IllegalArgumentException("Cannot subreference a non-absolute ref"); }
+		
+		//Copy construct
+		TreeReference ret = new TreeReference();
+		ret.setRefLevel(this.refLevel);
+		for (int i = 0; i <= level; i++) {
+			ret.add(this.getName(i), this.getMultiplicity(i));
+		}
+		//copy predicates
+		for(Enumeration en = predicates.keys(); en.hasMoreElements(); )
+		{
+			Integer i = ((Integer)en.nextElement());
+			ret.addPredicate(i.intValue(), predicates.get(i));
+		}
+		//copy instances
+		if(instanceName != null)
+		{
+			ret.setInstanceName(instanceName);
+		}
+		if(instance != null)
+		{
+			ret.setInstance(instance);
+		}
+		return ret;
+
+	}
 }

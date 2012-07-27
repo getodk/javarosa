@@ -45,7 +45,11 @@ public class EvaluationContext {
 	
 	private Hashtable<String, FormInstance> formInstances;
 	
+	private TreeReference original;
+	private int currentContextPosition = -1;
+	
 	FormInstance instance;
+	int[] predicateEvaluationProgress;
 	
 	/** Copy Constructor **/
 	private EvaluationContext (EvaluationContext base) {
@@ -62,11 +66,19 @@ public class EvaluationContext {
 		this.isCheckAddChild = base.isCheckAddChild;
 		
 		this.outputTextForm = base.outputTextForm;
+		this.original = base.original;
+		
+		this.currentContextPosition = base.currentContextPosition;
 	}
 	
 	public EvaluationContext (EvaluationContext base, TreeReference context) {
 		this(base);
 		this.contextNode = context;
+	}
+	
+	public EvaluationContext (EvaluationContext base, Hashtable<String, FormInstance> formInstances, TreeReference context) {
+		this(base, context);
+		this.formInstances = formInstances;
 	}
 	
 	public EvaluationContext (FormInstance instance, Hashtable<String, FormInstance> formInstances, EvaluationContext base) {
@@ -88,11 +100,21 @@ public class EvaluationContext {
 	}
 	
 	public FormInstance getInstance(String id) {
-		return formInstances.containsKey(id) ? formInstances.get(id) : null;
+		return formInstances.containsKey(id) ? formInstances.get(id) : 
+			(instance != null && id.equals(instance.getName()) ? instance : null);
 	}
 	
 	public TreeReference getContextRef () {
 		return contextNode;
+	}
+	
+	public void setOriginalContext(TreeReference ref) {
+		this.original = ref;
+	}
+	
+	public TreeReference getOriginalContext() {
+		if (this.original == null) { return this.contextNode; }
+		else { return this.original; }
 	}
 	
 	public void addFunctionHandler (IFunctionHandler fh) {
@@ -173,13 +195,19 @@ public class EvaluationContext {
 			return null;
 		}
 		
-		TreeElement base = instance.getBase();
-		if(ref.getInstanceName() != null && formInstances.containsKey(ref.getInstanceName())) {
-			base = formInstances.get(ref.getInstanceName()).getBase();
+		FormInstance baseInstance;
+		if(ref.getInstanceName() != null ) {
+			baseInstance = getInstance(ref.getInstanceName());
+		} else {
+			baseInstance = instance;
 		}
 
+		if ( baseInstance == null ) {
+			throw new RuntimeException("Unable to expand reference " + ref.toString(true) + ", no appropriate instance in evaluation context");
+		}
+		
 		Vector<TreeReference> v = new Vector<TreeReference>();
-		expandReference(ref, base, v, includeTemplates);
+		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), v, includeTemplates);
 		return v;
 	}
 
@@ -189,84 +217,148 @@ public class EvaluationContext {
 	// templateRef: explicit path that refers to the current node
 	// refs: Vector to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef, TreeElement node, Vector<TreeReference> refs, boolean includeTemplates) {
-		int depth = node.getDepth();
+	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef, Vector<TreeReference> refs, boolean includeTemplates) {
+		int depth = workingRef.size();
 		Vector<XPathExpression> predicates = null;
 		if (depth == sourceRef.size()) {
-			refs.addElement(node.getRef());
+			refs.addElement(workingRef);
 		} else {
 			String name = sourceRef.getName(depth);
 			predicates = sourceRef.getPredicate(depth);
+			
+			if (predicates != null) {
+				Vector<XPathExpression> predCopy = new Vector<XPathExpression>();
+				for (XPathExpression xpe : predicates) {
+					predCopy.addElement(xpe);
+				}
+				predicates = predCopy;
+			}
 			//ETHERTON: Is this where we should test for predicates?
 			int mult = sourceRef.getMultiplicity(depth);
-			Vector<TreeElement> set = new Vector<TreeElement>();
+			Vector<TreeReference> set = new Vector<TreeReference>();
 			
-			if (node.getNumChildren() > 0) {
-				if (mult == TreeReference.INDEX_UNBOUND) {
-					int count = node.getChildMultiplicity(name);
-					for (int i = 0; i < count; i++) {
-						TreeElement child = node.getChild(name, i);
+			TreeElement node = instance.resolveReference(workingRef);
+			
+			{
+				if (node.getNumChildren() > 0) {
+					if (mult == TreeReference.INDEX_UNBOUND) {
+						int count = node.getChildMultiplicity(name);
+						for (int i = 0; i < count; i++) {
+							TreeElement child = node.getChild(name, i);
+							if (child != null) {
+								set.addElement(child.getRef());
+							} else {
+								throw new IllegalStateException(); // missing/non-sequential
+								// nodes
+							}
+						}
+						if (includeTemplates) {
+							TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
+							if (template != null) {
+								set.addElement(template.getRef());
+							}
+						}
+					} else if(mult != TreeReference.INDEX_ATTRIBUTE){
+						//TODO: Make this test mult >= 0?
+						//If the multiplicity is a simple integer, just get
+						//the appropriate child
+						TreeElement child = node.getChild(name, mult);
 						if (child != null) {
-							set.addElement(child);
-						} else {
-							throw new IllegalStateException(); // missing/non-sequential
-							// nodes
+							set.addElement(child.getRef());
 						}
 					}
-					if (includeTemplates) {
-						TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-						if (template != null) {
-							set.addElement(template);
-						}
-					}
-				} else if(mult != TreeReference.INDEX_ATTRIBUTE){
-					//TODO: Make this test mult >= 0?
-					//If the multiplicity is a simple integer, just get
-					//the appropriate child
-					TreeElement child = node.getChild(name, mult);
-					if (child != null) {
-						set.addElement(child);
-					}
+				}
+				
+				if(mult == TreeReference.INDEX_ATTRIBUTE) {
+					TreeElement attribute = node.getAttribute(null, name);
+					set.addElement(attribute.getRef());
 				}
 			}
 			
-			if(mult == TreeReference.INDEX_ATTRIBUTE) {
-				TreeElement attribute = node.getAttribute(null, name);
-				set.addElement(attribute);
+			if (predicates != null && predicateEvaluationProgress != null) {
+				predicateEvaluationProgress[1] += set.size();
 			}
 	
-			for (Enumeration e = set.elements(); e.hasMoreElements();) {
-				//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-				TreeElement treeElement = (TreeElement)e.nextElement();				
-				if(predicates != null)
-				{
-					TreeReference treeRef = treeElement.getRef();
-					boolean passedAll = true;
-					for(XPathExpression xpe : predicates)
-					{
+			if (predicates != null) {
+				boolean firstTime = true;
+				Vector<TreeReference> passed = new Vector<TreeReference>();
+				for (XPathExpression xpe : predicates) {
+					for ( int i = 0 ; i < set.size() ; ++i ) {
+						//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+						TreeReference treeRef = set.elementAt(i);				
+					
 						//test the predicate on the treeElement
-						EvaluationContext evalContext = new EvaluationContext(this, treeRef);
+						EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
 						Object o = xpe.eval(instance, evalContext);
 						if(o instanceof Boolean)
 						{
-							boolean passed = ((Boolean)o).booleanValue();
-							if(!passed)
-							{
-								passedAll = false;
-								break;
+							boolean testOutcome = ((Boolean)o).booleanValue();
+							if ( testOutcome ) {
+								passed.addElement(treeRef);
 							}
 						}
 					}
-					if(passedAll)
-					{
-						expandReference(sourceRef, treeElement, refs, includeTemplates);
+					firstTime = false;
+					set.clear();
+					set.addAll(passed);
+					passed.clear();
+
+					if(predicateEvaluationProgress != null) {
+						predicateEvaluationProgress[0]++;
 					}
 				}
-				else
-				{
-					expandReference(sourceRef, treeElement, refs, includeTemplates);
-				}
+			}
+			
+			for ( int i = 0 ; i < set.size() ; ++i ) {
+				TreeReference treeRef = set.elementAt(i);
+				expandReference(sourceRef, instance, treeRef, refs, includeTemplates);
 			}
 		}
 	}
+	
+    private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
+        EvaluationContext ec = new EvaluationContext(this, treeRef);
+        // broken: 
+        ec.currentContextPosition = currentContextPosition;
+        //If there was no original context position, we'll want to set the next original
+        //context to be this rescoping (which would be the backup original one).
+        if(this.original != null) {
+                ec.setOriginalContext(this.getOriginalContext());
+        } else {
+                //Check to see if we have a context, if not, the treeRef is the original declared
+                //nodeset.
+                if(TreeReference.rootRef().equals(this.getContextRef())) 
+                { 
+                        ec.setOriginalContext(treeRef);
+                } else {
+                        //If we do have a legit context, use it!
+                        ec.setOriginalContext(this.getContextRef());
+                }
+                
+        }
+        return ec;
+    }
+
+    public FormInstance getMainInstance() {
+            return instance;
+    }
+
+    public TreeElement resolveReference(TreeReference qualifiedRef) {
+            FormInstance instance = this.getMainInstance();
+            if(qualifiedRef.getInstanceName() != null) {
+                    instance = this.getInstance(qualifiedRef.getInstanceName());
+            }
+            return instance.resolveReference(qualifiedRef);
+    }
+    
+    public int getContextPosition() {
+            return currentContextPosition;
+    }
+
+    public void setPredicateProcessSet(int[] loadingDetails) {
+            if(loadingDetails != null && loadingDetails.length == 2) {
+                    predicateEvaluationProgress = loadingDetails;
+            }
+    }
+
 }

@@ -24,10 +24,13 @@ import java.util.Vector;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.CmpPivot;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
+import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathNodeset;
 
 public class XPathCmpExpr extends XPathBinaryOpExpr {
 	public static final int LT = 0;
@@ -102,6 +105,9 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		Object aval = a.pivot(model, evalContext, pivots, sentinal);
 		Object bval = b.pivot(model, evalContext, pivots, sentinal);
+		if(bval instanceof XPathNodeset) {
+			bval = ((XPathNodeset)bval).unpack();
+		}
 		
 		if(handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) { return null; }
 		
@@ -125,21 +131,25 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 					//These are probably the 
 					if(b instanceof Integer) {
 						val = new Double(((Integer) b).doubleValue());
-					}
-					if(b instanceof Long) {
+					} else if(b instanceof Long) {
 						val = new Double(((Long) b).doubleValue());
-					}
-					if(b instanceof Float) {
+					} else if(b instanceof Float) {
 						val = new Double(((Float) b).doubleValue());
-					}
-					if(b instanceof Short) {
+					} else if(b instanceof Short) {
 						val = new Double(((Short) b).shortValue());
-					}
-					if(b instanceof Byte) {
+					} else if(b instanceof Byte) {
 						val = new Double(((Byte) b).byteValue());
-					}
-					else {
-						throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
+					} else {
+						if(b instanceof String) {
+							try {
+								//TODO: Too expensive?
+								val = (Double)new DecimalData().cast(new UncastData((String)b)).getValue();
+							} catch(Exception e) {
+								throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
+							}
+						} else {
+							throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
+						}
 					}
 				}
 				

@@ -406,8 +406,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			if(repeat.getCountReference() != null) {
 				int currentMultiplicity = repeatIndex.getElementMultiplicity();
 				
+				TreeElement countNode = this.getMainInstance().resolveReference(repeat.getCountReference());
+				if(countNode == null) {
+					throw new RuntimeException("Could not locate the repeat count value expected at " + repeat.getCountReference().getReference().toString());
+				}
 				//get the total multiplicity possible
-				long fullcount = ((Integer)this.getMainInstance().getDataValue(repeat.getCountReference()).getValue()).intValue();
+				IAnswerData count = countNode.getValue();
+				long fullcount = count == null ? 0 : ((Integer)count.getValue()).intValue();
 				
 				if(fullcount <= currentMultiplicity) {
 					return false;
@@ -498,10 +503,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		if (existingIx >= 0) {
 			//one node may control access to many nodes; this means many nodes effectively have the same condition
 			//let's identify when conditions are the same, and store and calculate it only once
+			
+			//nov-2-2011: ctsims - We need to merge the context nodes together whenever we do this (finding the highest
+			//common ground between the two), otherwise we can end up failing to trigger when the ignored context
+			//exists and the used one doesn't
+			
+			Triggerable existingTriggerable = (Triggerable)triggerables.elementAt(existingIx);
+			
+			existingTriggerable.contextRef = existingTriggerable.contextRef.intersect(t.contextRef);
+			
+			return existingTriggerable;
 
 			//note, if the contextRef is unnecessarily deep, the condition will be evaluated more times than needed
 			//perhaps detect when 'identical' condition has a shorter contextRef, and use that one instead?
-			return (Triggerable)triggerables.elementAt(existingIx);
+			
 		} else {
 			triggerables.addElement(t);
 			triggerablesInOrder = false;
@@ -510,7 +525,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			for (int i = 0; i < triggers.size(); i++) {
 				TreeReference trigger = (TreeReference) triggers.elementAt(i);
 				if (!triggerIndex.containsKey(trigger)) {
-					triggerIndex.put(trigger, new Vector());
+					triggerIndex.put(trigger.clone(), new Vector());
 				}
 				Vector triggered = (Vector) triggerIndex.get(trigger);
 				if (!triggered.contains(t)) {
@@ -643,12 +658,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		// get conditions triggered by this node
 		Vector triggered = (Vector)triggerIndex.get(genericRef);
-		if (triggered == null)
+		if (triggered == null) {
 			return;
+		}
 
 		Vector triggeredCopy = new Vector();
-		for (int i = 0; i < triggered.size(); i++)
+		for (int i = 0; i < triggered.size(); i++) {
 			triggeredCopy.addElement(triggered.elementAt(i));
+		}
 		evaluateTriggerables(triggeredCopy, ref);
 	}
 
@@ -683,10 +700,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	
 	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef) {
 		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
-		Vector v = exprEvalContext.expandReference(contextRef);
+		Vector<TreeReference> v = exprEvalContext.expandReference(contextRef);
 		for (int i = 0; i < v.size(); i++) {
 			EvaluationContext ec = new EvaluationContext(exprEvalContext, (TreeReference)v.elementAt(i));
-			t.apply(mainInstance, ec, this);
+			t.apply(mainInstance, ec, v.elementAt(i), this);
 		}
 	}
 
@@ -862,6 +879,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 					IConditionExpr expr = (IConditionExpr) outputFragments.elementAt(ix);
 					EvaluationContext ec = new EvaluationContext(exprEvalContext, contextRef);
+					ec.setOriginalContext(contextRef);
 					ec.setVariables(variables);
 					String value = expr.evalReadable(this.getMainInstance(), ec);
 					args.put(argName, value);
@@ -1067,11 +1085,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
 		Vector vcond = (Vector) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
-		for (Enumeration e = vcond.elements(); e.hasMoreElements(); )
+		for (Enumeration e = vcond.elements(); e.hasMoreElements(); ) {
 			addTriggerable((Condition) e.nextElement());
+		}
 		Vector vcalc = (Vector) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
-		for (Enumeration e = vcalc.elements(); e.hasMoreElements();)
+		for (Enumeration e = vcalc.elements(); e.hasMoreElements();) {
 			addTriggerable((Recalculate) e.nextElement());
+		}
 		finalizeTriggerables();
 		
 		outputFragments = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);

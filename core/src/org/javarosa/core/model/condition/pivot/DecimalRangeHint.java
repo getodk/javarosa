@@ -11,7 +11,7 @@ import org.javarosa.core.model.data.DecimalData;
  */
 public class DecimalRangeHint extends RangeHint<DecimalData> {
 
-	protected DecimalData castToValue(double value) {
+	protected DecimalData castToValue(double value) throws UnpivotableExpressionException {
 		return new DecimalData(value);
 	}
 

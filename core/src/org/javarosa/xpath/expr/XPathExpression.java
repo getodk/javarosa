@@ -25,6 +25,10 @@ import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 public abstract class XPathExpression implements Externalizable {
+
+	public Object eval (EvaluationContext evalContext) {
+		return this.eval(evalContext.getMainInstance(), evalContext);
+	}
 	
 	public abstract Object eval (FormInstance model, EvaluationContext evalContext);
 	
