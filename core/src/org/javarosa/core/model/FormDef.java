@@ -958,7 +958,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			//go through all the questions. Well of course not all the questions are going to have answers
 			//to chose from if the user hasn't filled them out. So I'm just going to make a note of this
 			//and not throw an exception.
-			System.out.println("dynamic select question has no choices! [" + itemset.nodesetRef + "]. If this didn't occure durring saving an incomplete form, you've got a problem.");
+			System.out.println("Dynamic select question has no choices! [" + itemset.nodesetRef + "]. If this occurs while filling out a form (and not while saving an incomplete form), the filter condition may have eliminated all the choices. Is that what you intended?\n");
 			
 		}
 		
@@ -1193,8 +1193,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			int ix = ((Integer) indexes.elementAt(i)).intValue();
 			int mult = ((Integer) multiplicities.elementAt(i)).intValue();
 
+			//----begin unclear why this is here... side effects???
 			//TODO: ... No words. Just fix it.
-			TreeReference ref = (TreeReference)((XPathReference)((IFormElement)elements.elementAt(i)).getBind()).getReference();
+			IFormElement ife = (IFormElement) elements.elementAt(i);
+			XPathReference xpr = (ife != null) ? (XPathReference) ife.getBind() : null;
+			TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
+			//----end
 			if (!(elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat())) {
 				mult = -1;
 			}
