@@ -594,17 +594,20 @@ public class FormEntryModel {
 			}
 
 			if (descend) {
-				indexes.addElement(new Integer(0));
-				multiplicities.addElement(new Integer(0));
-				elements.addElement((i == -1 ? form : (IFormElement) elements.elementAt(i)).getChild(0));
-				
-				if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
-					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
-						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
+				IFormElement ife = (i == -1) ? null : (IFormElement) elements.elementAt(i);
+				if ((i == -1) || (ife != null && ife.getChildren() != null && ife.getChildren().size() > 0)) {
+					indexes.addElement(new Integer(0));
+					multiplicities.addElement(new Integer(0));
+					elements.addElement((i == -1 ? form : (IFormElement) elements.elementAt(i)).getChild(0));
+					
+					if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+						if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+							multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
+						}
 					}
+					
+					return;
 				}
-				
-				return;
 			}
 		}
 

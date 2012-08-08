@@ -579,8 +579,13 @@ public class XFormParser {
 	
 	protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
 		Vector usedAtts = new Vector();
-		QuestionDef question = parseControl(parent, e, controlUpload);
+		usedAtts.addElement("mediatype");
+		// get media type value
 		String mediaType = e.getAttributeValue(null, "mediatype");
+		// parse the control
+		QuestionDef question = parseControl(parent, e, controlUpload, usedAtts);
+		
+		// apply the media type value to the returned question def.
 		if ("image/*".equals(mediaType)) {
 			// NOTE: this could be further expanded. 
 			question.setControlType(Constants.CONTROL_IMAGE_CHOOSE);
@@ -589,19 +594,19 @@ public class XFormParser {
         } else if ("video/*".equals(mediaType)) {
             question.setControlType(Constants.CONTROL_VIDEO_CAPTURE);
         }
-		
-		usedAtts.addElement("mediatype");
-		
-		processAdditionalAttributes(question, e, usedAtts);
-		
         return question;
     }
 	
 	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType) {
+		
+		return parseControl (parent, e, controlType, null);
+	}
+	
+	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType, Vector additionalUsedAtts ) {
 		QuestionDef question = new QuestionDef();
 		question.setID(serialQuestionID++); //until we come up with a better scheme
-		
-		Vector usedAtts = new Vector();
+
+		Vector usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new Vector();
 		usedAtts.addElement(REF_ATTR);
 		usedAtts.addElement(BIND_ATTR);
 		usedAtts.addElement(APPEARANCE_ATTR);
@@ -1607,6 +1612,7 @@ public class XFormParser {
 		}
 		
 		Vector usedAtts = new Vector();
+		usedAtts.addElement("id");
 		usedAtts.addElement("version");
 		usedAtts.addElement("uiVersion");
 		
