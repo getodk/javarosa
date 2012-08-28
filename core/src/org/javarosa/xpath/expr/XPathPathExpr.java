@@ -149,10 +149,10 @@ public class XPathPathExpr extends XPathExpression {
 			}else if (step.axis == XPathStep.AXIS_CHILD) {
 				if (step.test == XPathStep.TEST_NAME) {
 					ref.add(step.name.toString(), TreeReference.INDEX_UNBOUND);
-					parentsAllowed = false;
+					parentsAllowed = true;
 				} else if(step.test == XPathStep.TEST_NAME_WILDCARD) {
 					ref.add(TreeReference.NAME_WILDCARD, TreeReference.INDEX_UNBOUND);
-					parentsAllowed = false;
+					parentsAllowed = true;
 				} else {
 					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				}
