@@ -357,7 +357,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		// update multiplicities of other child nodes
 		for (int i = 0; i < parentElement.getNumChildren(); i++) {
 			TreeElement child = parentElement.getChildAt(i);
-			if (child.getMult() > childMult) {
+			if (child.getName().equals(deleteElement.getName()) && child.getMult() > childMult) {
 				child.setMult(child.getMult() - 1);
 			}
 		}
