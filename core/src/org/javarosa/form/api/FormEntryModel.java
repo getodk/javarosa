@@ -25,6 +25,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -450,7 +451,10 @@ public class FormEntryModel {
             if (e instanceof GroupDef) {
                 GroupDef g = (GroupDef) e;
                 if (g.getRepeat() && g.getCountReference() != null) {
-                    IAnswerData count = getForm().getMainInstance().resolveReference(g.getCountReference()).getValue();
+                	// Lu Gram: repeat count XPath needs to be contextualized for nested repeat groups
+                	TreeReference countRef = FormInstance.unpackReference(g.getCountReference());
+                	TreeReference contextualized = countRef.contextualize(index.getReference());
+                    IAnswerData count = getForm().getMainInstance().resolveReference(contextualized).getValue();
                     if (count != null) {
                         long fullcount = ((Integer) count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);

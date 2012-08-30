@@ -406,7 +406,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			if(repeat.getCountReference() != null) {
 				int currentMultiplicity = repeatIndex.getElementMultiplicity();
 				
-				TreeElement countNode = this.getMainInstance().resolveReference(repeat.getCountReference());
+				// Lu Gram: the count XPath needs to be contextualized for nested repeat groups...
+				TreeReference countRef = FormInstance.unpackReference(repeat.getCountReference());
+				TreeElement countNode = this.getMainInstance().resolveReference(countRef.contextualize(repeatRef));
 				if(countNode == null) {
 					throw new RuntimeException("Could not locate the repeat count value expected at " + repeat.getCountReference().getReference().toString());
 				}
