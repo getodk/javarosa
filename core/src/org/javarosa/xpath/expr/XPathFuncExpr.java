@@ -86,7 +86,16 @@ public class XPathFuncExpr extends XPathExpression {
 			XPathFuncExpr x = (XPathFuncExpr)o;
 
 			//Shortcuts for very easily comprable values
-			if(!id.equals(x.id) || args.length != x.args.length) {
+			//We also only return "True" for methods we expect to return the same thing. This is not good
+			//practice in Java, since o.equals(o) will return false. We should evaluate that differently.
+			//Dec 8, 2011 - Added "uuid", since we should never assume one uuid equals another
+			//May 6, 2013 - Added "random", since two calls asking for a random
+			//Jun 4, 2013 - Added "now" and "today", since these could change during the course of a survey
+			if(!id.equals(x.id) || args.length != x.args.length ||
+				id.toString().equals("uuid") ||
+				id.toString().equals("random") ||
+				id.toString().equals("now") ||
+				id.toString().equals("today")) {
 				return false;
 			}
 
@@ -166,13 +175,17 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("string") && args.length == 1) {
 			return toString(argVals[0]);
 		} else if (name.equals("date") && args.length == 1) { //non-standard
-			return toDate(argVals[0]);
+			return toDate(argVals[0], false);
+		} else if (name.equals("date-time") && args.length == 1) { //non-standard
+			return toDate(argVals[0], true);
 		} else if (name.equals("not") && args.length == 1) {
 			return boolNot(argVals[0]);
 		} else if (name.equals("boolean-from-string") && args.length == 1) {
 			return boolStr(argVals[0]);
 		} else if (name.equals("format-date") && args.length == 2) {
-			return dateStr(argVals[0], argVals[1]);
+			return dateStr(argVals[0], argVals[1], false);
+		} else if (name.equals("format-date-time") && args.length == 2) {
+			return dateStr(argVals[0], argVals[1], true);
 		} else if ((name.equals("selected") || name.equals("is-selected")) && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
 		} else if (name.equals("count-selected") && args.length == 1) { //non-standard
@@ -333,7 +346,7 @@ public class XPathFuncExpr extends XPathExpression {
 						} else if (prototype[i] == String.class) {
 							typed[i] = toString(args[i]);
 						} else if (prototype[i] == Date.class) {
-							typed[i] = toDate(args[i]);
+							typed[i] = toDate(args[i], false);
 						}
 					} catch (XPathTypeMismatchException xptme) { /* swallow type mismatch exception */ }
 				}
@@ -549,7 +562,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param o
 	 * @return
 	 */
-	public static Object toDate (Object o) {
+	public static Object toDate (Object o, boolean preserveTime) {
 		o = unpack(o);
 
 		if (o instanceof Double) {
@@ -578,7 +591,11 @@ public class XPathFuncExpr extends XPathExpression {
 				return d;
 			}
 		} else if (o instanceof Date) {
-			return DateUtils.roundDate((Date)o);
+			if ( preserveTime ) {
+				return (Date) o;
+			} else {
+				return DateUtils.roundDate((Date)o);
+			}
 		} else {
 			throw new XPathTypeMismatchException("converting to date");
 		}
@@ -597,8 +614,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return Boolean.FALSE;
 	}
 
-	public static String dateStr (Object od, Object of) {
-		od = toDate(od);
+	public static String dateStr (Object od, Object of, boolean preserveTime) {
+		od = toDate(od, preserveTime);
 		if (od instanceof Date) {
 			return DateUtils.format((Date)od, toString(of));
 		} else {
