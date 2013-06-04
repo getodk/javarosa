@@ -195,7 +195,17 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("position") && (args.length == 0 || args.length == 1)) {
 			//TODO: Technically, only the 0 length argument is valid here.
 			if(args.length == 1) {
-				return position(((XPathNodeset)argVals[0]).getRefAt(0));
+				XPathNodeset nodes = (XPathNodeset)argVals[0];
+				if ( nodes.size() == 0 ) {
+					// Added to prevent an exception within ODK Validate.
+					// Will likely cause an error downstream when used in an XPath.
+					return new Double(1+TreeReference.INDEX_UNBOUND);
+				} else {
+					// This is weird -- we are returning the position of the first
+					// Nodeset element but there may be a list of elements. Unclear
+					// if or how this might manifest into a bug... .
+					return position(nodes.getRefAt(0));
+				}
 			} else {
 				if(evalContext.getContextPosition() != -1) {
 					return new Double(1+evalContext.getContextPosition());
