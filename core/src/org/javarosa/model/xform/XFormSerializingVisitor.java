@@ -58,15 +58,15 @@ import org.kxml2.kdom.Node;
 
 		/** The serializer to be used in constructing XML for AnswerData elements */
 		IAnswerDataSerializer serializer;
-		
+
 		/** The root of the xml document which should be included in the serialization **/
 		TreeReference rootRef;
-		
+
 		/** The schema to be used to serialize answer data */
 		FormDef schema;	//not used
-		
+
 		Vector dataPointers;
-		
+
 		private void init() {
 			theXmlDoc = null;
 			schema = null;
@@ -74,13 +74,13 @@ import org.kxml2.kdom.Node;
 		}
 
 		public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
-			
+
 			//LEGACY: Should remove
 			init();
 			this.schema = formDef;
 			return serializeInstance(model);
 		}
-		
+
 		public byte[] serializeInstance(FormInstance model) throws IOException {
 			return serializeInstance(model, new XPathReference("/"));
 		}
@@ -95,7 +95,7 @@ import org.kxml2.kdom.Node;
 			if(this.serializer == null) {
 				this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 			}
-			
+
 			model.accept(this);
 			if(theXmlDoc != null) {
 				return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
@@ -104,11 +104,11 @@ import org.kxml2.kdom.Node;
 				return null;
 			}
 		}
-		
+
 		public IDataPayload createSerializedPayload	(FormInstance model) throws IOException {
 			return createSerializedPayload(model, new XPathReference("/"));
 		}
-		
+
 		public IDataPayload createSerializedPayload	(FormInstance model, IDataReference ref) throws IOException {
 			init();
 			rootRef = model.unpackReference(ref);
@@ -128,7 +128,7 @@ import org.kxml2.kdom.Node;
 					IDataPointer pointer = (IDataPointer)en.nextElement();
 					payload.addPayload(new DataPointerPayload(pointer));
 				}
-				return payload; 
+				return payload;
 			}
 			else {
 				return null;
@@ -142,25 +142,25 @@ import org.kxml2.kdom.Node;
 		public void visit(FormInstance tree) {
 			theXmlDoc = new Document();
 			//TreeElement root = tree.getRoot();
-			
+
 			TreeElement root = tree.resolveReference(rootRef);
-			
-			//For some reason resolveReference won't ever return the root, so we'll 
+
+			//For some reason resolveReference won't ever return the root, so we'll
 			//catch that case and just start at the root.
 			if(root == null) {
 				root = tree.getRoot();
 			}
-			
+
 			for (int i = 0; i< root.getNumChildren(); i++){
 				TreeElement childAt = root.getChildAt(i);
 			}
-			
+
 			if (root != null) {
 				theXmlDoc.addChild(Node.ELEMENT, serializeNode(root));
 			}
-			
+
 			Element top = theXmlDoc.getElement(0);
-			
+
 			String[] prefixes = tree.getNamespacePrefixes();
 			for(int i = 0 ; i < prefixes.length; ++i ) {
 				top.setPrefix(prefixes[i], tree.getNamespaceURI(prefixes[i]));
@@ -177,19 +177,19 @@ import org.kxml2.kdom.Node;
 			//don't serialize template nodes or non-relevant nodes
 			if (!instanceNode.isRelevant() || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
 				return null;
-				
+
 			if (instanceNode.getValue() != null) {
-				Object serializedAnswer = serializer.serializeAnswerData(instanceNode.getValue(), instanceNode.dataType); 
+				Object serializedAnswer = serializer.serializeAnswerData(instanceNode.getValue(), instanceNode.dataType);
 
 				if (serializedAnswer instanceof Element) {
 					e = (Element)serializedAnswer;
 				} else if (serializedAnswer instanceof String) {
 					e = new Element();
-					e.addChild(Node.TEXT, (String)serializedAnswer);				
+					e.addChild(Node.TEXT, (String)serializedAnswer);
 				} else {
 					throw new RuntimeException("Can't handle serialized output for" + instanceNode.getValue().toString() + ", " + serializedAnswer);
 				}
-				
+
 				if(serializer.containsExternalData(instanceNode.getValue()).booleanValue()) {
 					IDataPointer[] pointer = serializer.retrieveExternalDataPointer(instanceNode.getValue());
 					for(int i = 0 ; i < pointer.length ; ++i) {
@@ -201,11 +201,10 @@ import org.kxml2.kdom.Node;
 				Vector childNames = new Vector();
 				for (int i = 0; i < instanceNode.getNumChildren(); i++) {
 					String childName = instanceNode.getChildAt(i).getName();
-					System.out.println("CHILDNAME: " + childName);
 					if (!childNames.contains(childName))
 						childNames.addElement(childName);
 				}
-				
+
 				for (int i = 0; i < childNames.size(); i++) {
 					String childName = (String)childNames.elementAt(i);
 					int mult = instanceNode.getChildMultiplicity(childName);
@@ -219,7 +218,7 @@ import org.kxml2.kdom.Node;
 			}
 
 			e.setName(instanceNode.getName());
-			
+
 			// add hard-coded attributes
 			for (int i = 0; i < instanceNode.getAttributeCount(); i++) {
 				String namespace = instanceNode.getAttributeNamespace(i);
@@ -238,7 +237,7 @@ import org.kxml2.kdom.Node;
 		public void setAnswerDataSerializer(IAnswerDataSerializer ads) {
 			this.serializer = ads;
 		}
-		
+
 		public IInstanceSerializingVisitor newInstance() {
 			XFormSerializingVisitor modelSerializer = new XFormSerializingVisitor();
 			modelSerializer.setAnswerDataSerializer(this.serializer);
