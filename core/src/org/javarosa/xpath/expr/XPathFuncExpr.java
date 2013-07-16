@@ -19,9 +19,11 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import me.regexp.RE;
@@ -160,41 +162,63 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 
 		//check built-in functions
-		if (name.equals("true") && args.length == 0) {
+		if (name.equals("true")) {
+			assertArgsCount( name, args, 0);
 			return Boolean.TRUE;
-		} else if (name.equals("false") && args.length == 0) {
+		} else if (name.equals("false")) {
+			assertArgsCount( name, args, 0);
 			return Boolean.FALSE;
-		} else if (name.equals("boolean") && args.length == 1) {
+		} else if (name.equals("boolean")) {
+			assertArgsCount( name, args, 1);
 			return toBoolean(argVals[0]);
-		} else if (name.equals("number") && args.length == 1) {
+		} else if (name.equals("number")) {
+			assertArgsCount( name, args, 1);
 			return toNumeric(argVals[0]);
-		} else if (name.equals("int") && args.length == 1) { //non-standard
+		} else if (name.equals("int")) { //non-standard
+			assertArgsCount( name, args, 1);
 			return toInt(argVals[0]);
-		} else if (name.equals("round") && args.length == 2) { // non-standard Excel-style round(value,decimal place)
+		} else if (name.equals("round")) { // non-standard Excel-style round(value,decimal place)
+			assertArgsCount( name, args, 2);
 			Double aval = toNumeric(argVals[0]);
 			Double bval = toInt(argVals[1]);
 			return round(aval, bval);
-		} else if (name.equals("string") && args.length == 1) {
+		} else if (name.equals("string")) {
+			assertArgsCount( name, args, 1);
 			return toString(argVals[0]);
-		} else if (name.equals("date") && args.length == 1) { //non-standard
+		} else if (name.equals("date")) { //non-standard
+			assertArgsCount( name, args, 1);
 			return toDate(argVals[0], false);
-		} else if (name.equals("date-time") && args.length == 1) { //non-standard
+		} else if (name.equals("date-time")) { //non-standard -- convert double/int/string to Date object
+			assertArgsCount( name, args, 1);
 			return toDate(argVals[0], true);
-		} else if (name.equals("not") && args.length == 1) {
+		} else if (name.equals("decimal-date-time")) { //non-standard -- convert string/date to decimal days off 1970-01-01T00:00:00.000-000
+			assertArgsCount( name, args, 1);
+			return toDecimalDateTime(argVals[0], true);
+		} else if (name.equals("decimal-time")) { //non-standard -- convert string/date to decimal days off 1970-01-01T00:00:00.000-000
+			assertArgsCount( name, args, 1);
+			return toDecimalDateTime(argVals[0], false);
+		} else if (name.equals("not")) {
+			assertArgsCount( name, args, 1);
 			return boolNot(argVals[0]);
-		} else if (name.equals("boolean-from-string") && args.length == 1) {
+		} else if (name.equals("boolean-from-string")) {
+			assertArgsCount( name, args, 1);
 			return boolStr(argVals[0]);
-		} else if (name.equals("format-date") && args.length == 2) {
+		} else if (name.equals("format-date")) {
+			assertArgsCount( name, args, 2);
 			return dateStr(argVals[0], argVals[1], false);
-		} else if (name.equals("format-date-time") && args.length == 2) {
+		} else if (name.equals("format-date-time")) { // non-standard
+			assertArgsCount( name, args, 2);
 			return dateStr(argVals[0], argVals[1], true);
-		} else if ((name.equals("selected") || name.equals("is-selected")) && args.length == 2) { //non-standard
+		} else if ((name.equals("selected") || name.equals("is-selected"))) { //non-standard
+			assertArgsCount( name, args, 2);
 			return multiSelected(argVals[0], argVals[1]);
-		} else if (name.equals("count-selected") && args.length == 1) { //non-standard
+		} else if (name.equals("count-selected")) { //non-standard
+			assertArgsCount( name, args, 1);
 			return countSelected(argVals[0]);
-		} else if (name.equals("selected-at") && args.length == 2) { //non-standard
+		} else if (name.equals("selected-at")) { //non-standard
+			assertArgsCount( name, args, 2);
             return selectedAt(argVals[0], argVals[1]);
-		} else if (name.equals("position") && (args.length == 0 || args.length == 1)) {
+		} else if (name.equals("position")) {
 			//TODO: Technically, only the 0 length argument is valid here.
 			if(args.length == 1) {
 				XPathNodeset nodes = (XPathNodeset)argVals[0];
@@ -208,15 +232,20 @@ public class XPathFuncExpr extends XPathExpression {
 					// if or how this might manifest into a bug... .
 					return position(nodes.getRefAt(0));
 				}
-			} else {
+			} else if(args.length == 0) {
 				if(evalContext.getContextPosition() != -1) {
 					return new Double(1+evalContext.getContextPosition());
 				}
 				return position(evalContext.getContextRef());
+			} else {
+				throw new XPathUnhandledException("function \'" + name +
+						"\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
 			}
-		} else if (name.equals("count") && args.length == 1) {
+		} else if (name.equals("count")) {
+			assertArgsCount( name, args, 1);
 			return count(argVals[0]);
-		} else if (name.equals("sum") && args.length == 1) {
+		} else if (name.equals("sum")) {
+			assertArgsCount( name, args, 1);
 			if (argVals[0] instanceof XPathNodeset) {
 				return sum(((XPathNodeset)argVals[0]).toArgList());
 			} else {
@@ -234,9 +263,11 @@ public class XPathFuncExpr extends XPathExpression {
             } else {
                     return min(argVals);
             }
-		} else if (name.equals("today") && args.length == 0) {
+		} else if (name.equals("today")) {
+			assertArgsCount( name, args, 0);
 			return DateUtils.roundDate(new Date());
-		} else if (name.equals("now") && args.length == 0) {
+		} else if (name.equals("now")) {
+			assertArgsCount( name, args, 0);
 			return new Date();
 		} else if (name.equals("concat")) {
 			if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
@@ -252,7 +283,8 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		} else if (name.equals("substr") && (args.length == 2 || args.length == 3)) {
 			return substring(argVals[0], argVals[1], args.length == 3 ? argVals[2] : null);
-		} else if (name.equals("string-length") && args.length == 1) {
+		} else if (name.equals("string-length")) {
+			assertArgsCount( name, args, 1);
 			return stringLength(argVals[0]);
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
 			if (args.length == 3 && argVals[2] instanceof XPathNodeset) {
@@ -271,11 +303,13 @@ public class XPathFuncExpr extends XPathExpression {
 			} else {
 				return checklistWeighted(argVals[0], argVals[1], subsetArgList(argVals, 2, 2), subsetArgList(argVals, 3, 2));
 			}
-		} else if (name.equals("regex") && args.length == 2) { //non-standard
+		} else if (name.equals("regex")) { //non-standard
+			assertArgsCount( name, args, 2);
 			return regex(argVals[0], argVals[1]);
 		} else if (name.equals("depend") && args.length >= 1) { //non-standard
 			return argVals[0];
-		} else if (name.equals("random") && args.length == 0) { //non-standard
+		} else if (name.equals("random")) { //non-standard
+			assertArgsCount( name, args, 0);
 			//calculated expressions may be recomputed w/o warning! use with caution!!
 			return new Double(MathUtils.getRand().nextDouble());
 		} else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
@@ -294,6 +328,13 @@ public class XPathFuncExpr extends XPathExpression {
 			} else {
 				throw new XPathUnhandledException("function \'" + name + "\'");
 			}
+		}
+	}
+
+	private static void assertArgsCount(String name, Object[] args, int count) {
+		if ( args.length != count ) {
+			throw new XPathUnhandledException("function \'" + name + "\' requires " +
+					count + " arguments. Only " + args.length + " provided.");
 		}
 	}
 
@@ -578,17 +619,34 @@ public class XPathFuncExpr extends XPathExpression {
 		o = unpack(o);
 
 		if (o instanceof Double) {
-			Double n = toInt(o);
+			if (preserveTime) {
+				Double n = (Double) o;
 
-			if (n.isNaN()) {
-				return n;
+				if (n.isNaN()) {
+					return n;
+				}
+
+				if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+					throw new XPathTypeMismatchException("converting out-of-range value to date");
+				}
+
+				long timeMillis = (long) (n * DateUtils.DAY_IN_MS);
+
+				Date d = new Date(timeMillis);
+				return d;
+			} else {
+				Double n = toInt(o);
+
+				if (n.isNaN()) {
+					return n;
+				}
+
+				if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+					throw new XPathTypeMismatchException("converting out-of-range value to date");
+				}
+
+				return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
 			}
-
-			if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
-				throw new XPathTypeMismatchException("converting out-of-range value to date");
-			}
-
-			return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
 		} else if (o instanceof String) {
 			String s = (String)o;
 
@@ -607,6 +665,58 @@ public class XPathFuncExpr extends XPathExpression {
 				return (Date) o;
 			} else {
 				return DateUtils.roundDate((Date)o);
+			}
+		} else {
+			throw new XPathTypeMismatchException("converting to date");
+		}
+	}
+
+	public static Object toDecimalDateTime (Object o, boolean keepDate) {
+		o = unpack(o);
+
+		if (o instanceof Double) {
+			Double n = (Double) o;
+
+			if (n.isNaN()) {
+				return n;
+			}
+
+			if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+				throw new XPathTypeMismatchException("converting out-of-range value to date");
+			}
+
+			if ( keepDate ) {
+				return n;
+			} else {
+				return n - Math.floor(n);
+			}
+		} else if (o instanceof String) {
+			String s = (String)o;
+
+			if (s.length() == 0) {
+				return s;
+			}
+
+			Date d = DateUtils.parseDateTime(s);
+			if (d == null) {
+				throw new XPathTypeMismatchException("converting to date");
+			} else {
+				if ( keepDate ) {
+					long milli = d.getTime();
+					Double v = ((double) milli) / DateUtils.DAY_IN_MS;
+					return v;
+				} else {
+					return DateUtils.decimalTimeOfLocalDay(d);
+				}
+			}
+		} else if (o instanceof Date) {
+			Date d = (Date) o;
+			if ( keepDate ) {
+				long milli = d.getTime();
+				Double v = ((double) milli) / DateUtils.DAY_IN_MS;
+				return v;
+			} else {
+				return DateUtils.decimalTimeOfLocalDay(d);
 			}
 		} else {
 			throw new XPathTypeMismatchException("converting to date");
