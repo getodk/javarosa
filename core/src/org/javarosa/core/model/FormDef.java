@@ -817,17 +817,31 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 							return "";
 						}
 
-						System.out.println("here!!");
+						// NOTE: this is highly suspect. We have no context against which to evaluate
+						// a dynamic selection list. This will generally cause that evaluation to break
+						// if any filtering is done, or, worst case, give unexpected results.
+						//
+						// We should hook into the existing code (FormEntryPrompt) for pulling
+						// display text for select choices. however, it's hard, because we don't really have
+						// any context to work with, and all the situations where that context would be used
+						// don't make sense for trying to reverse a select value back to a label in an unrelated
+						// expression
 
-						Vector<SelectChoice> choices = q.getChoices();
+						Vector<SelectChoice> choices;
+						ItemsetBinding itemset = q.getDynamicChoices();
+						if (itemset != null) {
+							if ( itemset.getChoices() == null ) {
+								// NOTE: this will return incorrect results if the list is filtered.
+								// fortunately, they are ignored by FormEntryPrompt
+								f.populateDynamicChoices(itemset, ref);
+							}
+							choices = itemset.getChoices();
+						} else { //static choices
+							choices = q.getChoices();
+						}
+
 						for (SelectChoice ch : choices) {
 							if (ch.getValue().equals(value)) {
-								//this is really not ideal. we should hook into the existing code (FormEntryPrompt) for pulling
-								//display text for select choices. however, it's hard, because we don't really have
-								//any context to work with, and all the situations where that context would be used
-								//don't make sense for trying to reverse a select value back to a label in an unrelated
-								//expression
-
 								String textID = ch.getTextID();
 								if (textID != null) {
 									return f.getLocalizer().getText(textID);
