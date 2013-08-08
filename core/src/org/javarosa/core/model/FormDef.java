@@ -839,14 +839,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						} else { //static choices
 							choices = q.getChoices();
 						}
-
-						for (SelectChoice ch : choices) {
-							if (ch.getValue().equals(value)) {
-								String textID = ch.getTextID();
-								if (textID != null) {
-									return f.getLocalizer().getText(textID);
-								} else {
-									return ch.getLabelInnerText();
+						if (choices != null) {
+							for (SelectChoice ch : choices) {
+								if (ch.getValue().equals(value)) {
+									String textID = ch.getTextID();
+									if (textID != null) {
+										return f.getLocalizer().getText(textID);
+									} else {
+										return ch.getLabelInnerText();
+									}
 								}
 							}
 						}
