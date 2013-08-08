@@ -34,6 +34,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -320,6 +321,13 @@ public class XPathFuncExpr extends XPathExpression {
 
 			int len = toInt(argVals[0]).intValue();
 			return PropertyUtils.genGUID(len);
+		} else if (name.equals("property")) { // non-standard
+			// return a property defined by the property manager.
+			// NOTE: Property should be immutable.
+			// i.e., does not work with 'start' or 'end' property.
+			assertArgsCount( name, args, 1);
+			String s = toString(argVals[0]);
+			return PropertyManager._().getSingularProperty(s);
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
