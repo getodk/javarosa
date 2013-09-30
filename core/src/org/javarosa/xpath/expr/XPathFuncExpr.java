@@ -328,6 +328,10 @@ public class XPathFuncExpr extends XPathExpression {
 			assertArgsCount( name, args, 1);
 			String s = toString(argVals[0]);
 			return PropertyManager._().getSingularProperty(s);
+		} else if (name.equals("pow") && (args.length == 2)) { //XPath 3.0
+			double a = toDouble(argVals[0]).doubleValue();
+			double b = toDouble(argVals[1]).doubleValue();
+			return Math.pow(a, b);
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
@@ -492,6 +496,14 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 
+    public static Double toDouble(Object o ){
+            if(o instanceof Date) {
+                    return DateUtils.fractionalDaysSinceEpoch((Date)o);
+            } else {
+                    return toNumeric(o);
+            }
+    }
+        
 	/**
 	 * convert a value to a number using xpath's type conversion rules (note that xpath itself makes
 	 * no distinction between integer and floating point numbers)
