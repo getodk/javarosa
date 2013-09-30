@@ -1,0 +1,76 @@
+polish.command.ok=OK
+polish.command.cancel=Terug
+polish.command.options=Opsies
+polish.command.exit=Gaan Uit
+polish.command.select=Kies
+polish.command.mark=Merk
+polish.command.unmark=Onmerk
+# for deleting a single char:
+polish.command.delete=Skrap
+# for deleting a complete TextField:
+polish.command.clear=Vee Uit
+# for hiding menus on BlackBerry devices:
+polish.command.hide=Hide
+# for showing a default title when no label
+# is defined in a TextField. This is only
+# used when no direct input mode is activated:
+polish.title.input=Voeg in
+# used for showing a screen for selecting symbols within TextFields:
+polish.command.entersymbol=Voeg simbool in
+# used by the HtmlBrowser for a links:
+polish.command.followlink=Gaan
+# used by the HtmlBrowser for submitting a form:
+polish.command.submit=Stuur
+# used by the RssBrowser for returning to the previous page:
+polish.command.back=Terug
+# RSS commands:
+polish.rss.command.select=Wys
+polish.rss.command.followlink=Gaan
+
+# used for predictive setup
+
+
+#Javarosa-specific
+menu.Save=Berg
+menu.Exit=Gaan Uit
+menu.Settings=Instellings
+menu.SaveAndExit=Berg en Gaan Uit
+menu.Next=Volgende
+menu.Back=Terug
+menu.ViewAnswers=Bekyk Antwoorde
+menu.SendNow=Stuur Nou
+menu.SendLater=Stuur Later (Berg)
+menu.SendToNewServer=Stuur na nuwe adres
+
+
+
+button.Next=VOLGENDE
+
+question.SendNow=Stuur data nou?
+
+view.sending.RequiredQuestion=Required question; You must answer
+
+
+
+
+form.login.username=Username:
+form.login.password=Password:
+form.login.login=Login
+
+activity.login.loginincorrect=Login verkeerd
+activity.login.tryagain=Probeer asb. weer
+activity.login.demomode.intro=You are starting in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
+
+form.user.name=Naam (ie: loginID):
+form.user.password=User Password:
+form.user.confirmpassword=Confirm Password:
+form.user.userid=User ID:
+form.user.giveadmin=Give this user admin rights?
+form.user.fillinboth =Please fill in both username and password
+
+activity.adduser.adduser=Add User
+activity.adduser.problem=Problem:
+activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
+activity.adduser.problem.emptyuser=Username and password must both be given
+activity.adduser.problem.mismatchingpasswords=Passwords don't match
+ 
