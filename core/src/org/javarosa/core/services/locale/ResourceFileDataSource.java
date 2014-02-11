@@ -19,15 +19,11 @@
  */
 package org.javarosa.core.services.locale;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.*;
 
 /**
  * @author Clayton Sims
@@ -61,7 +57,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.locale.LocaleDataSource#getLocalizedText()
 	 */
-	public OrderedHashtable getLocalizedText() {
+	public OrderedMap getLocalizedText() {
 		return loadLocaleResource(resourceURI);
 	}
 
@@ -85,10 +81,10 @@ public class ResourceFileDataSource implements LocaleDataSource {
 	 *
 	 * @return a dictionary of key/value locale pairs from a file in the resource directory 
 	 */
-	private OrderedHashtable loadLocaleResource(String resourceName) {
+	private OrderedMap loadLocaleResource(String resourceName) {
 		InputStream is = System.class.getResourceAsStream(resourceName);
 		// TODO: This might very well fail. Best way to handle?
-		OrderedHashtable locale = new OrderedHashtable();
+		OrderedMap locale = new OrderedMap();
 		int chunk = 100;
 		InputStreamReader isr;
 		try {
@@ -150,7 +146,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 		return locale;
 	}
 
-	private void parseAndAdd(OrderedHashtable locale, String line, int curline) {
+	private void parseAndAdd(OrderedMap locale, String line, int curline) {
 
 		//trim whitespace.
 		line = line.trim();

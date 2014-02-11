@@ -16,22 +16,14 @@
 
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.util.externalizable.*;
+import org.javarosa.xpath.expr.XPathExpression;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
-
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xpath.expr.XPathExpression;
 
 public class TreeReference implements Externalizable {
 	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
@@ -48,7 +40,7 @@ public class TreeReference implements Externalizable {
 	private Vector names; //Vector<String>
 	private Vector multiplicity; //Vector<Integer>
 	//private Vector<XPathExpression> predicates; //Vector<XPathExpression>
-	private Hashtable<Integer, Vector<XPathExpression>> predicates;
+	private HashMap<Integer, Vector<XPathExpression>> predicates;
 	private FormInstance instance = null;
 	private String instanceName = null;
 	
@@ -68,7 +60,7 @@ public class TreeReference implements Externalizable {
 	public TreeReference () {
 		names = new Vector(0);
 		multiplicity = new Vector(0);		
-		predicates = new Hashtable<Integer, Vector<XPathExpression>>();
+		predicates = new HashMap<Integer, Vector<XPathExpression>>();
 		instance = null; //null means the default instance
 		instanceName = null; //dido
 	}
@@ -166,10 +158,8 @@ public class TreeReference implements Externalizable {
 			newRef.add(this.getName(i), this.getMultiplicity(i));
 		}
 		//copy predicates
-		for(Enumeration en = predicates.keys(); en.hasMoreElements(); )
-		{
-			Integer i = ((Integer)en.nextElement());
-			newRef.addPredicate(i.intValue(), predicates.get(i));
+    for (Integer i : predicates.keySet()) {
+			newRef.addPredicate(i, predicates.get(i));
 		}
 		//copy instances
 		if(instanceName != null)
@@ -263,10 +253,8 @@ public class TreeReference implements Externalizable {
 					newRef.add(this.getName(i), this.getMultiplicity(i));
 				}
 				//copy predicates
-				for(Enumeration en = predicates.keys(); en.hasMoreElements(); )
-				{
-					Integer i = ((Integer)en.nextElement());
-					newRef.addPredicate(i.intValue(), predicates.get(i));
+        for (Integer i : predicates.keySet()) {
+					newRef.addPredicate(i, predicates.get(i));
 				}
 				return newRef;
 			}
@@ -344,7 +332,6 @@ public class TreeReference implements Externalizable {
 		
 	/**
 	 * clone and extend a reference by one level
-	 * @param ref
 	 * @param name
 	 * @param mult
 	 * @return
@@ -477,16 +464,12 @@ public class TreeReference implements Externalizable {
 		//put them back together again
 		Vector<Integer> vi = new Vector<Integer>();
 		//first the keys of the hash table
-		for(Enumeration en = predicates.keys(); en.hasMoreElements(); )
-		{
-			Integer in = ((Integer)en.nextElement());
+    for (Integer in : predicates.keySet()) {
 			vi.addElement(in);
 		}
 		ExtUtil.write(out, new ExtWrapListPoly(vi));
 		//next the data of the hash table
-		for(Enumeration en = predicates.keys(); en.hasMoreElements(); )
-		{
-			Integer i = ((Integer)en.nextElement());
+    for (Integer i : predicates.keySet()) {
 			ExtUtil.write(out, new ExtWrapListPoly(predicates.get(i)));
 		}
 	}
@@ -546,7 +529,7 @@ public class TreeReference implements Externalizable {
 	 * 
 	 * Must be an absolute reference, otherwise will throw IllegalArgumentException
 	 * 
-	 * @param i
+	 * @param level
 	 * @return
 	 */
 	public TreeReference getSubReference(int level) {
@@ -559,10 +542,8 @@ public class TreeReference implements Externalizable {
 			ret.add(this.getName(i), this.getMultiplicity(i));
 		}
 		//copy predicates
-		for(Enumeration en = predicates.keys(); en.hasMoreElements(); )
-		{
-			Integer i = ((Integer)en.nextElement());
-			ret.addPredicate(i.intValue(), predicates.get(i));
+    for (Integer i : predicates.keySet()) {
+			ret.addPredicate(i, predicates.get(i));
 		}
 		//copy instances
 		if(instanceName != null)

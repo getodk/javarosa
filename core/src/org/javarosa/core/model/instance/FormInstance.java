@@ -16,31 +16,23 @@
 
 package org.javarosa.core.model.instance;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IInstanceVisitor;
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.core.util.externalizable.*;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
 
 
 /**
@@ -72,7 +64,7 @@ public class FormInstance implements Persistable, Restorable {
 	public String formVersion;
 	public String uiVersion;
 	
-	private Hashtable namespaces = new Hashtable();
+	private HashMap<String, Object> namespaces = new HashMap<String, Object>();
 	
 
 	public FormInstance() {
@@ -97,8 +89,7 @@ public class FormInstance implements Persistable, Restorable {
 	/**
 	 * Sets the root element of this Model's tree
 	 * 
-	 * @param root
-	 *            The root of the tree for this data model.
+	 * @param topLevel The root of the tree for this data model.
 	 */
 	public void setRoot(TreeElement topLevel) {
 		root = new TreeElement();
@@ -515,7 +506,7 @@ public class FormInstance implements Persistable, Restorable {
 		schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
 		dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 		
-		namespaces = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+		namespaces = (HashMap)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 		setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
 
 	}
@@ -664,8 +655,8 @@ public class FormInstance implements Persistable, Restorable {
 	public String[] getNamespacePrefixes() {
 		String[] prefixes = new String[namespaces.size()];
 		int i = 0;
-		for(Enumeration en = namespaces.keys() ; en.hasMoreElements(); ) {
-			prefixes[i] = (String)en.nextElement();
+    for (String key : namespaces.keySet()) {
+			prefixes[i] = key;
 			++i;
 		}
 		return prefixes;
@@ -772,9 +763,8 @@ public class FormInstance implements Persistable, Restorable {
 		cloned.schema = this.schema;
 		cloned.formVersion = this.formVersion;
 		cloned.uiVersion = this.uiVersion;
-		cloned.namespaces = new Hashtable();
-		for (Enumeration e = this.namespaces.keys(); e.hasMoreElements(); ) {
-			Object key = e.nextElement();
+		cloned.namespaces = new HashMap<String, Object>();
+    for (String key : namespaces.keySet()) {
 			cloned.namespaces.put(key, this.namespaces.get(key));
 		}
 		

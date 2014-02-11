@@ -19,16 +19,16 @@
  */
 package org.javarosa.core.reference;
 
+import org.javarosa.core.services.locale.LocaleDataSource;
+import org.javarosa.core.services.locale.LocalizationUtils;
+import org.javarosa.core.util.OrderedMap;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.javarosa.core.services.locale.LocaleDataSource;
-import org.javarosa.core.services.locale.LocalizationUtils;
-import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * The ReferenceDataSource is a source of locale data which
@@ -52,7 +52,7 @@ public class ReferenceDataSource implements LocaleDataSource {
 	/**
 	 * Creates a new Data Source for Locale data with the given resource URI.
 	 * 
-	 * @param resourceURI a URI to the resource file from which data should be loaded
+	 * @param referenceURI a URI to the resource file from which data should be loaded
 	 * @throws NullPointerException if resourceURI is null
 	 */
 	public ReferenceDataSource(String referenceURI) {
@@ -65,7 +65,7 @@ public class ReferenceDataSource implements LocaleDataSource {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.locale.LocaleDataSource#getLocalizedText()
 	 */
-	public OrderedHashtable getLocalizedText() {
+	public OrderedMap<String, String> getLocalizedText() {
 		try {
 			InputStream is = ReferenceManager._().DeriveReference(referenceURI).getStream();
 			return LocalizationUtils.parseLocaleInput(is);

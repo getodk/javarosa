@@ -21,7 +21,7 @@ import java.util.Vector;
 
 /**
  * A Map is a data object that maintains a map from one set of data
- * objects to another. This data object is superior to a Hashtable
+ * objects to another. This data object is superior to a HashMap
  * in instances where O(1) lookups are not a priority, due to its
  * smaller memory footprint.
  * 

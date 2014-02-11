@@ -19,16 +19,16 @@
  */
 package org.javarosa.core.services.locale;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * @author Clayton Sims
@@ -36,13 +36,13 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class TableLocaleSource implements LocaleDataSource {
-	private OrderedHashtable localeData; /*{ String -> String } */
+	private OrderedMap<String, String> localeData; /*{ String -> String } */
 	
 	public TableLocaleSource() {
-		localeData = new OrderedHashtable();
+		localeData = new OrderedMap<String, String>();
 	}
 	
-	public TableLocaleSource(OrderedHashtable localeData) {
+	public TableLocaleSource(OrderedMap<String, String> localeData) {
 		this.localeData = localeData;
 	}
 	
@@ -88,13 +88,13 @@ public class TableLocaleSource implements LocaleDataSource {
 		return ExtUtil.equals(localeData, l.localeData);
 	}
 
-	public OrderedHashtable getLocalizedText() {
+	public OrderedMap<String, String> getLocalizedText() {
 		return localeData;
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		localeData = (OrderedHashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class, true), pf);
+		localeData = (OrderedMap)ExtUtil.read(in, new ExtWrapMap(String.class, String.class, true), pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

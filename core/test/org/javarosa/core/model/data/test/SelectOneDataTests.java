@@ -20,14 +20,13 @@ import j2meunit.framework.Test;
 import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
-
-import java.util.Vector;
-
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.OrderedMap;
+
+import java.util.Vector;
 
 public class SelectOneDataTests extends TestCase {
 	QuestionDef question;
@@ -46,7 +45,7 @@ public class SelectOneDataTests extends TestCase {
 		question = new QuestionDef();
 		question.setID(57);
 		
-		OrderedHashtable oh = new OrderedHashtable();
+		OrderedMap oh = new OrderedMap();
 		Vector v = new Vector();
 		for (int i = 0; i < 3; i++) {
 			question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false));
