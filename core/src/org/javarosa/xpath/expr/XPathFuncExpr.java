@@ -811,7 +811,12 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 
 			// process index (if valid)
-			int groupIdx = toInt(args[idxargi].eval(model, ec)).intValue();
+      Double groupIdxAsDouble = toInt(args[idxargi].eval(model, ec));
+      // Assume "1" as the default for invalid indexes.
+      if (groupIdxAsDouble.isNaN() || groupIdxAsDouble.isInfinite()) {
+        groupIdxAsDouble = 1d;
+      }
+      int groupIdx = groupIdxAsDouble.intValue();
 			if (groupIdx <= 0) {
 				// ignore invalid indexes (primarily happens during validation)
 			}
