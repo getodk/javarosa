@@ -797,7 +797,7 @@ public class XFormParser {
 			throw new XFormParseException("XForm Parse: <output> without 'ref' or 'value'",e);	
 		}
 		
-		XPathConditional expr = null;
+		XPathConditional expr;
 		try {
 			expr = new XPathConditional(xpath);
 		} catch (XPathSyntaxException xse) {
