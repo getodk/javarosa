@@ -30,6 +30,8 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
+import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
+import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -38,6 +40,7 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xform.parse.XFormParser;
 
 /**
  * An element of a FormInstance.
@@ -782,12 +785,16 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 			} else if (this.dataType == Constants.DATATYPE_TEXT
 					|| this.dataType == Constants.DATATYPE_NULL) {
 				this.setValue(value); // value is a StringData
-			} else {
-				String textVal = (String) value.getValue();
-				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, this.dataType, this.getRef(), f);
-				this.setValue(typedVal);
-			}
-		} else {
+      } else {
+        String textVal = (String) value.getValue();
+
+        IAnswerResolver answerResolver = XFormParser.getAnswerResolver();
+        if (answerResolver == null) {
+          answerResolver = new DefaultAnswerResolver();
+        }
+        this.setValue(answerResolver.resolveAnswer(textVal, this, f));
+      }
+    } else {
 			Vector names = new Vector();
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
