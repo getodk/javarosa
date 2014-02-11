@@ -209,7 +209,7 @@ public class XPathFuncExpr extends XPathExpression {
 			return dateStr(argVals[0], argVals[1], true);
 		} else if ((name.equals("selected") || name.equals("is-selected"))) { //non-standard
 			assertArgsCount( name, args, 2);
-			return multiSelected(argVals[0], argVals[1]);
+			return multiSelected(argVals[0], argVals[1], name);
 		} else if (name.equals("count-selected")) { //non-standard
 			assertArgsCount( name, args, 1);
 			return countSelected(argVals[0]);
@@ -833,11 +833,15 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param o2 choice to look for
 	 * @return
 	 */
-	public static Boolean multiSelected (Object o1, Object o2) {
-		String s1 = (String)unpack(o1);
-		String s2 = ((String)unpack(o2)).trim();
+	public static Boolean multiSelected (Object o1, Object o2, String functionName) {
+        Object indexObject = unpack(o2);
+        if (!(indexObject instanceof String)) {
+            throw new XPathTypeMismatchException("The second parameter to the " + functionName + "() function must be in quotes (like '1').");
+        }
+        String s1 = (String)unpack(o1);
+        String s2 = ((String) indexObject).trim();
 
-		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
+		return (" " + s1 + " ").contains(" " + s2 + " ");
 	}
 
 	/**
