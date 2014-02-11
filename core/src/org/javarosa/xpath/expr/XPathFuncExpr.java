@@ -1019,7 +1019,7 @@ public class XPathFuncExpr extends XPathExpression {
 			end = len + end;
 		}
 		end = Math.min(Math.max(0, end), len);
-		start = Math.min(Math.max(0, start), end);
+		start = Math.min(Math.max(0, start), len);
 
 		return (start <= end ? s.substring(start, end) : "");
 	}
