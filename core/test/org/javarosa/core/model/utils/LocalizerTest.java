@@ -20,17 +20,16 @@ import j2meunit.framework.Test;
 import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
-
-import java.util.Hashtable;
-
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.NoLocalizedTextException;
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
+
+import java.util.HashMap;
 
 public class LocalizerTest extends TestCase  {
 	public LocalizerTest(String name, TestMethod rTestMethod) {
@@ -137,7 +136,7 @@ public class LocalizerTest extends TestCase  {
 		if (!l.hasLocale(TEST_LOCALE)) {
 			fail("Localizer reports it does not contain newly added locale");
 		}
-		OrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
+		OrderedMap localeData = l.getLocaleData(TEST_LOCALE);
 		if (localeData == null || localeData.size() != 0) {
 			fail("Newly created locale not empty (or undefined)");
 		}
@@ -175,7 +174,7 @@ public class LocalizerTest extends TestCase  {
 		table.setLocaleMapping("textID", "text");
 		l.registerLocaleResource(TEST_LOCALE, table);
 		
-		OrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
+		OrderedMap localeData = l.getLocaleData(TEST_LOCALE);
 		
 		boolean result = l.addAvailableLocale(TEST_LOCALE);
 		if (result) {
@@ -850,7 +849,7 @@ public class LocalizerTest extends TestCase  {
 	public void testHashSub() {
 		final String F = "first";
 		final String S = "second";
-		Hashtable h = new Hashtable();
+		HashMap h = new HashMap();
 		h.put("fir", F);
 		h.put("also first", F);
 		h.put("sec", S);

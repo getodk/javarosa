@@ -3,17 +3,12 @@
  */
 package org.javarosa.core.model;
 
+import org.javarosa.core.util.externalizable.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Hashtable;
-
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
+import java.util.HashMap;
 
 /**
  * A Submission Profile is a class which is responsible for
@@ -29,13 +24,13 @@ public class SubmissionProfile implements Externalizable {
 	String method;
 	String action;
 	String mediaType;
-	Hashtable<String,String> attributeMap;
+	HashMap<String,String> attributeMap;
 
 	public SubmissionProfile() {
 
 	}
 
-	public SubmissionProfile(IDataReference ref, String method, String action, String mediatype, Hashtable<String,String> attributeMap) {
+	public SubmissionProfile(IDataReference ref, String method, String action, String mediatype, HashMap<String,String> attributeMap) {
 		this.method = method;
 		this.ref = ref;
 		this.action = action;
@@ -69,7 +64,7 @@ public class SubmissionProfile implements Externalizable {
 		method = ExtUtil.readString(in);
 		action = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		mediaType = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
-		attributeMap = (Hashtable<String, String>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+		attributeMap = (HashMap<String, String>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

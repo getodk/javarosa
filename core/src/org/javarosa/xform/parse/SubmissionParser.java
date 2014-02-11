@@ -4,11 +4,11 @@
 package org.javarosa.xform.parse;
 
 
-import java.util.Hashtable;
-
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.SubmissionProfile;
 import org.kxml2.kdom.Element;
+
+import java.util.HashMap;
 
 /**
  * A Submission Profile 
@@ -20,7 +20,7 @@ public class SubmissionParser {
 	
     public SubmissionProfile parseSubmission(String method, String action, IDataReference ref, Element element) {
         String mediatype = element.getAttributeValue(null,"mediatype");
-        Hashtable<String,String> attributeMap = new Hashtable<String,String>();
+        HashMap<String,String> attributeMap = new HashMap<String,String>();
         int nAttr = element.getAttributeCount();
         for ( int i = 0 ; i < nAttr ; ++i ) {
             String name = element.getAttributeName(i);

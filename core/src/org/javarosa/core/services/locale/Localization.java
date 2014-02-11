@@ -1,8 +1,8 @@
 package org.javarosa.core.services.locale;
 
-import java.util.Hashtable;
-
 import org.javarosa.core.reference.ReferenceDataSource;
+
+import java.util.HashMap;
 
 public class Localization {
 	private static Localizer globalLocalizer;
@@ -16,7 +16,7 @@ public class Localization {
 		return globalLocalizer.getText(key, args);
 	}
 	
-	public static String get(String key, Hashtable args) {
+	public static String get(String key, HashMap args) {
 		checkRep();
 		return globalLocalizer.getText(key, args);
 	}

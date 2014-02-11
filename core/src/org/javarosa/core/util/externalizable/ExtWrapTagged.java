@@ -19,16 +19,15 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 public class ExtWrapTagged extends ExternalizableWrapper {
 	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}; //must be same length as PrototypeFactory.CLASS_HASH_SIZE
 	
-	public static Hashtable WRAPPER_CODES;
+	public static HashMap<Class, Integer> WRAPPER_CODES;
 	
 	static {
-		WRAPPER_CODES = new Hashtable();
+		WRAPPER_CODES = new HashMap<Class, Integer>();
 		WRAPPER_CODES.put(ExtWrapNullable.class, new Integer(0x00));
 		WRAPPER_CODES.put(ExtWrapList.class, new Integer(0x20));
 		WRAPPER_CODES.put(ExtWrapListPoly.class, new Integer(0x21));
@@ -79,9 +78,9 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 			
 			//find wrapper indicated by code
 			ExternalizableWrapper type = null;
-			for (Enumeration e = WRAPPER_CODES.keys(); e.hasMoreElements(); ) {
-				Class t = (Class)e.nextElement();
-				if (((Integer)WRAPPER_CODES.get(t)).intValue() == wrapperCode) {
+      for (Object key : WRAPPER_CODES.keySet()) {
+				Class t = (Class)key;
+				if (WRAPPER_CODES.get(t) == wrapperCode) {
 					try {
 						type = (ExternalizableWrapper)PrototypeFactory.getInstance(t);
 					} catch (CannotCreateObjectException ccoe) {
@@ -108,7 +107,7 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 	public static void writeTag (DataOutputStream out, Object o) throws IOException {
 		if (o instanceof ExternalizableWrapper && !(o instanceof ExtWrapBase)) {
 			out.write(WRAPPER_TAG, 0, PrototypeFactory.CLASS_HASH_SIZE);
-			ExtUtil.writeNumeric(out, ((Integer)WRAPPER_CODES.get(o.getClass())).intValue());
+			ExtUtil.writeNumeric(out, WRAPPER_CODES.get(o.getClass()));
 			((ExternalizableWrapper)o).metaWriteExternal(out);
 		} else {
 			Class type = null;
