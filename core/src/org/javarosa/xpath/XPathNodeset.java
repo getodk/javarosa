@@ -1,11 +1,11 @@
 package org.javarosa.xpath;
 
-import java.util.Vector;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
+
+import java.util.Vector;
 
 public class XPathNodeset {
 
@@ -23,7 +23,7 @@ public class XPathNodeset {
 		if (size() == 0) {
 			return XPathPathExpr.unpackValue(null);
 		} else if (size() > 1) {
-			throw new XPathTypeMismatchException("nodeset has more than one node [" + nodeContents() + "]; cannot convert to value");
+			throw new XPathTypeMismatchException("This field is repeated: \n\n" + nodeContents() + "\n\nYou may need to use the indexed-repeat() function to specify which value you want.");
 		} else {
 			return getValAt(0);
 		}
@@ -59,13 +59,13 @@ public class XPathNodeset {
 	}
 	
 	private String nodeContents () {
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < nodes.size(); i++) {
-			sb.append(nodes.elementAt(i).toString());
-			if (i < nodes.size() - 1) {
-				sb.append(";");
-			}
-		}
-		return sb.toString();
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < nodes.size(); i++) {
+      sb.append(nodes.elementAt(i).toString());
+      if (i < nodes.size() - 1) {
+        sb.append("\n");
+      }
+    }
+    return sb.toString();
 	}
 }
