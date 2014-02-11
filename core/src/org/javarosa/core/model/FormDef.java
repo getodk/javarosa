@@ -692,7 +692,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				t.apply(mainInstance, ec, v.elementAt(i), this);
 			}
 		} catch (Exception e) {
-			throw new WrappedException("Error evaluating " + contextRef.toString(false) + ":\n" + e.getMessage(), e);
+			throw new WrappedException("Error evaluating variable '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
 		}
 	}
 
