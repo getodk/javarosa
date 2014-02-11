@@ -866,7 +866,7 @@ public class XPathFuncExpr extends XPathExpression {
         String selection = (String)unpack(o1);
         int index = toInt(o2).intValue();
         Vector stringVector = DateUtils.split(selection, " ", true);
-        if (index < 0 || stringVector.size() > index) {
+        if (stringVector.size() > index && index >= 0) {
             return (String) stringVector.elementAt(index);
         } else {
         	return ""; // empty string if outside of array
