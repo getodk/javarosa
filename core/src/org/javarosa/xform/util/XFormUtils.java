@@ -60,21 +60,22 @@ public class XFormUtils {
      * This method throws XFormParseException when the form has errors.
      */
 	public static FormDef getFormFromInputStream(InputStream is) {
-		InputStreamReader isr;
-		try {
-			isr = new InputStreamReader(is,"UTF-8");
-		} catch(UnsupportedEncodingException uee) {
-			System.out.println("UTF 8 encoding unavailable, trying default encoding");
-			isr = new InputStreamReader(is); 
-		}
-		
-		try {
-			return _factory.getXFormParser(isr).parse();
-		} finally {
-			try {
-				isr.close();
-			}
-			catch(IOException e) {
+    InputStreamReader isr = null;
+    try {
+      try {
+        isr = new InputStreamReader(is, "UTF-8");
+      } catch (UnsupportedEncodingException uee) {
+        System.out.println("UTF 8 encoding unavailable, trying default encoding");
+        isr = new InputStreamReader(is);
+      }
+
+      return _factory.getXFormParser(isr).parse();
+    } finally {
+      try {
+        if (isr != null) {
+          isr.close();
+        }
+      } catch(IOException e) {
 				System.err.println("IO Exception while closing stream.");
 				e.printStackTrace();
 			}
@@ -84,24 +85,37 @@ public class XFormUtils {
 	public static FormDef getFormFromSerializedResource(String resource) {
 		FormDef returnForm = null;
 		InputStream is = System.class.getResourceAsStream(resource);
-		try {
-			if(is != null) {
-				DataInputStream dis = new DataInputStream(is);
-				returnForm = (FormDef)ExtUtil.read(dis, FormDef.class);
-				dis.close();
-				is.close();
-			}else{
+    DataInputStream dis = null;
+    try {
+      if(is != null) {
+        dis = new DataInputStream(is);
+        returnForm = (FormDef)ExtUtil.read(dis, FormDef.class);
+			} else{
 				//#if debug.output==verbose
 				System.out.println("ResourceStream NULL");
 				//#endif
 			}
-		}
-		catch(IOException e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 		} catch (DeserializationException e) {
 			e.printStackTrace();
-		}
-		return returnForm;
+		} finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      if (dis != null) {
+        try {
+          dis.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return returnForm;
 	}
 	
 	
