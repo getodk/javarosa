@@ -16,22 +16,17 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.locale.Localizable;
+import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.util.externalizable.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
-
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.locale.Localizable;
-import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /** The definition of a group in a form or questionaire. 
  * 
@@ -39,7 +34,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class GroupDef implements IFormElement, Localizable {
-	private Vector children;	/** A list of questions on a group. */	
+	private Vector<IFormElement> children;	/** A list of questions on a group. */
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
@@ -60,7 +55,7 @@ public class GroupDef implements IFormElement, Localizable {
 	public String delHeader;
 	public String mainHeader;
 	
-	Vector observers;
+	Vector<FormElementStateListener> observers;
 	
 	public boolean noAddRemove = false;
 	public IDataReference count = null;
@@ -69,11 +64,11 @@ public class GroupDef implements IFormElement, Localizable {
 		this(Constants.NULL_ID, null, false);
 	}
 	
-	public GroupDef(int id, Vector children, boolean repeat) {
+	public GroupDef(int id, Vector<IFormElement> children, boolean repeat) {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
-		observers = new Vector();
+		observers = new Vector<FormElementStateListener>();
 	}
 	
 	public int getID () {
@@ -108,12 +103,12 @@ public class GroupDef implements IFormElement, Localizable {
 		return additionalAttributes;
 	}
 	
-	public Vector getChildren() {
+	public Vector<IFormElement> getChildren() {
 		return children;
 	}
 
-	public void setChildren (Vector children) {
-		this.children = (children == null ? new Vector() : children);
+	public void setChildren (Vector<IFormElement> children) {
+		this.children = (children == null ? new Vector<IFormElement>() : children);
 	}
 	
 	public void addChild (IFormElement fe) {
@@ -124,7 +119,7 @@ public class GroupDef implements IFormElement, Localizable {
 		if (children == null || i >= children.size()) {
 			return null;
 		} else {
-			return (IFormElement)children.elementAt(i);
+			return children.elementAt(i);
 		}
 	}
 	

@@ -177,7 +177,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	public IFormElement getChild(int i) {
 		if (i < this.children.size())
-			return (IFormElement) this.children.elementAt(i);
+			return this.children.elementAt(i);
 
 		throw new ArrayIndexOutOfBoundsException(
 				"FormDef: invalid child index: " + i + " only "
@@ -204,9 +204,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * @return
 	 */
 	public Vector explodeIndex(FormIndex index) {
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
+		Vector<Integer> indexes = new Vector<Integer>();
+		Vector<Integer> multiplicities = new Vector<Integer>();
+		Vector<IFormElement> elements = new Vector<IFormElement>();
 
 		collapseIndex(index, indexes, multiplicities, elements);
 		return elements;
@@ -219,9 +219,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * @return
 	 */
 	public TreeReference getChildInstanceRef(FormIndex index) {
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
+		Vector<Integer> indexes = new Vector<Integer>();
+		Vector<Integer> multiplicities = new Vector<Integer>();
+		Vector<IFormElement> elements = new Vector<IFormElement>();
 
 		collapseIndex(index, indexes, multiplicities, elements);
 		return getChildInstanceRef(elements, multiplicities);
@@ -306,9 +306,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * @return
 	 */
 	public FormIndex deleteRepeat(FormIndex index) {
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
+		Vector<Integer> indexes = new Vector<Integer>();
+		Vector<Integer> multiplicities = new Vector<Integer>();
+		Vector<IFormElement> elements = new Vector<IFormElement>();
 		collapseIndex(index, indexes, multiplicities, elements);
 
 		// loop backwards through the elements, removing objects from each
@@ -794,7 +794,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						String questionXpath = (String)args[1];
 						TreeReference ref = RestoreUtils.xfFact.ref(questionXpath);
 
-						QuestionDef q = f.findQuestionByRef(ref, f);
+						QuestionDef q = findQuestionByRef(ref, f);
 						if (q == null || (q.getControlType() != Constants.CONTROL_SELECT_ONE &&
 								          q.getControlType() != Constants.CONTROL_SELECT_MULTI)) {
 							return "";
@@ -918,7 +918,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
 				new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
-		FormInstance fi = null;
+		FormInstance fi;
 		if(itemset.nodesetRef.getInstanceName() != null) //We're not dealing with the default instance
 		{
 			fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
@@ -1033,7 +1033,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	/**
-	 * Iterate over the form's data bindings, and evaluate all post procesing
+	 * Iterate over the form's data bindings, and evaluate all post processing
 	 * calls.
 	 *
 	 * @return true if the instance was modified in any way. false otherwise.
@@ -1163,7 +1163,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		ExtUtil.write(dos, new ExtWrapMap(formInstances));
 	}
 
-	public void collapseIndex(FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {
+	public void collapseIndex(FormIndex index, Vector<Integer> indexes, Vector<Integer> multiplicities, Vector<IFormElement> elements) {
 		if (!index.isInForm()) {
 			return;
 		}
@@ -1173,33 +1173,33 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			int i = index.getLocalIndex();
 			element = element.getChild(i);
 
-			indexes.addElement(new Integer(i));
-			multiplicities.addElement(new Integer(index.getInstanceIndex() == -1 ? 0 : index.getInstanceIndex()));
+			indexes.addElement(i);
+			multiplicities.addElement(index.getInstanceIndex() == -1 ? 0 : index.getInstanceIndex());
 			elements.addElement(element);
 
 			index = index.getNextLevel();
 		}
 	}
 
-	public FormIndex buildIndex(Vector indexes, Vector multiplicities, Vector elements) {
+	public FormIndex buildIndex(Vector<Integer> indexes, Vector<Integer> multiplicities, Vector<IFormElement> elements) {
 		FormIndex cur = null;
-		Vector curMultiplicities = new Vector();
+		Vector<Integer> curMultiplicities = new Vector<Integer>();
 		for(int j = 0; j < multiplicities.size() ; ++j) {
 			curMultiplicities.addElement(multiplicities.elementAt(j));
 		}
 
-		Vector curElements = new Vector();
+		Vector<IFormElement> curElements = new Vector<IFormElement>();
 		for(int j = 0; j < elements.size() ; ++j) {
 			curElements.addElement(elements.elementAt(j));
 		}
 
 		for (int i = indexes.size() - 1; i >= 0; i--) {
-			int ix = ((Integer) indexes.elementAt(i)).intValue();
-			int mult = ((Integer) multiplicities.elementAt(i)).intValue();
+			int ix = indexes.elementAt(i);
+			int mult = multiplicities.elementAt(i);
 
 			//----begin unclear why this is here... side effects???
 			//TODO: ... No words. Just fix it.
-			IFormElement ife = (IFormElement) elements.elementAt(i);
+			IFormElement ife = elements.elementAt(i);
 			XPathReference xpr = (ife != null) ? (XPathReference) ife.getBind() : null;
 			TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
 			//----end
@@ -1242,9 +1242,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
 		int numRepetitions = getNumRepetitions(index);
 
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
+		Vector<Integer> indexes = new Vector<Integer>();
+		Vector<Integer> multiplicities = new Vector<Integer>();
+		Vector<IFormElement> elements = new Vector<IFormElement>();
 		collapseIndex(index, indexes, multiplicities, elements);
 
 		if (repIndex == -1) {
@@ -1255,7 +1255,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
-		multiplicities.setElementAt(new Integer(repIndex), multiplicities.size() - 1);
+		multiplicities.setElementAt(repIndex, multiplicities.size() - 1);
 
 		return buildIndex(indexes, multiplicities, elements);
 	}
@@ -1282,12 +1282,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		// NO. (Or at least not yet).
 	}
 
-	public Vector getChildren() {
+	public Vector<IFormElement> getChildren() {
 		return children;
 	}
 
 	public void setChildren(Vector<IFormElement> children) {
-		this.children = (children == null ? new Vector() : children);
+		this.children = (children == null ? new Vector<IFormElement>() : children);
 	}
 
 	public String getTitle() {
@@ -1318,11 +1318,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return localizer;
 	}
 
-	public Vector getOutputFragments() {
+	public Vector<IConditionExpr> getOutputFragments() {
 		return outputFragments;
 	}
 
-	public void setOutputFragments(Vector outputFragments) {
+	public void setOutputFragments(Vector<IConditionExpr> outputFragments) {
 		this.outputFragments = outputFragments;
 	}
 

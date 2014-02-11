@@ -16,22 +16,17 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.locale.Localizable;
+import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.util.externalizable.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
-
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.locale.Localizable;
-import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /** 
  * The definition of a Question to be presented to users when
@@ -226,11 +221,11 @@ public class QuestionDef implements IFormElement, Localizable {
     		alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
     	}
 	
-	public Vector getChildren () {
+	public Vector<IFormElement> getChildren () {
 		return null;
 	}
 	
-	public void setChildren (Vector v) {
+	public void setChildren (Vector<IFormElement> v) {
 		throw new IllegalStateException();
 	}
 	
