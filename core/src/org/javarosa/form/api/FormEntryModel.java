@@ -16,19 +16,15 @@
 
 package org.javarosa.form.api;
 
-import java.util.Enumeration;
-import java.util.Vector;
-
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.*;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * The data model used during form entry. Represents the current state of the
@@ -442,7 +438,7 @@ public class FormEntryModel {
      * the interface, it will merely use the xforms repeat hint to create new
      * nodes that are assumed to exist
      * 
-     * @param The index to be evaluated as to whether the underlying model is
+     * @param index The index to be evaluated as to whether the underlying model is
      *        hinted to exist
      */
     private void createModelIfNecessary(FormIndex index) {
@@ -460,14 +456,14 @@ public class FormEntryModel {
                         TreeReference ref = getForm().getChildInstanceRef(index);
                         TreeElement element = getForm().getMainInstance().resolveReference(ref);
                         if (element == null) {
-                            if (index.getInstanceIndex() < fullcount) {
-                            	
-                                try {
-									getForm().createNewRepeat(index);
-								} catch (InvalidReferenceException ire) {
-									ire.printStackTrace();
-									throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
-								}
+                            if (index.getTerminal().getInstanceIndex() < fullcount) {
+
+                              try {
+                                getForm().createNewRepeat(index);
+                              } catch (InvalidReferenceException ire) {
+                                ire.printStackTrace();
+                                throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
+                              }
                             }
                         }
                     }
