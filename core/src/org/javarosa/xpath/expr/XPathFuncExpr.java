@@ -250,13 +250,13 @@ public class XPathFuncExpr extends XPathExpression {
 				throw new XPathTypeMismatchException("not a nodeset");
 			}
 		} else if (name.equals("max")) {
-            if (argVals[0] instanceof XPathNodeset) {
+            if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
                     return max(((XPathNodeset)argVals[0]).toArgList());
             } else {
                     return max(argVals);
             }
 		}  else if (name.equals("min")) {
-            if (argVals[0] instanceof XPathNodeset) {
+            if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
                     return min(((XPathNodeset)argVals[0]).toArgList());
             } else {
                     return min(argVals);
@@ -894,7 +894,10 @@ public class XPathFuncExpr extends XPathExpression {
 	public static Double sum (Object argVals[]) {
 		double sum = 0.0;
 		for (int i = 0; i < argVals.length; i++) {
-			sum += toNumeric(argVals[i]).doubleValue();
+			Double dargVal=toNumeric(argVals[i]);
+			if (!dargVal.isNaN()) {
+				sum += dargVal.doubleValue();
+			}
 		}
 		return new Double(sum);
 	}
@@ -969,18 +972,28 @@ public class XPathFuncExpr extends XPathExpression {
      */
     private static Object max(Object[] argVals) {
         double max = Double.MIN_VALUE;
+        boolean returnNaN = true;
         for (int i = 0; i < argVals.length; i++) {
-                max = Math.max(max, toNumeric(argVals[i]).doubleValue());
+            Double dargVal = toNumeric(argVals[i]);
+            if (!dargVal.isNaN()) {
+                max = Math.max(max, dargVal.doubleValue());
+                returnNaN = false;
+            }
         }
-        return new Double(max);
+        return new Double(returnNaN ? Double.NaN : max);
     }
 
     private static Object min(Object[] argVals) {
         double min = Double.MAX_VALUE;
+        boolean returnNaN = true;
         for (int i = 0; i < argVals.length; i++) {
-                min = Math.min(min, toNumeric(argVals[i]).doubleValue());
+            Double dargVal = toNumeric(argVals[i]);
+            if (!dargVal.isNaN()) {
+                min = Math.min(min, dargVal.doubleValue());
+                returnNaN = false;
+            }
         }
-        return new Double(min);
+        return new Double(returnNaN ? Double.NaN : min);
     }
 
 	/**
