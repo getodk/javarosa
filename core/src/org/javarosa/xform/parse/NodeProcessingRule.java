@@ -16,7 +16,7 @@
 
 package org.javarosa.xform.parse;
 
-import java.util.*;
+import java.util.HashMap;
 
 //unused for now
 
@@ -24,13 +24,13 @@ public class NodeProcessingRule {
 	public String name;
 	public boolean allowUnknownChildren;
 	public boolean allowChildText;
-	public Hashtable childRules;
+	public HashMap childRules;
 	
 	public NodeProcessingRule (String name, boolean allowUnknownChildren, boolean allowChildText) {
 		this.name = name;
 		this.allowUnknownChildren = allowUnknownChildren;
 		this.allowChildText = allowChildText;
-		childRules = new Hashtable();
+		childRules = new HashMap();
 	}
 	
 	public void addChild (ChildProcessingRule cpr) {

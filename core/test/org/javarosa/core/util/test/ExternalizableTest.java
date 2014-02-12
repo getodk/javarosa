@@ -20,26 +20,12 @@ import j2meunit.framework.Test;
 import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
+import org.javarosa.core.util.OrderedMap;
+import org.javarosa.core.util.externalizable.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapBase;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableWrapper;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
+import java.util.*;
 
 public class ExternalizableTest extends TestCase {
 	public ExternalizableTest(String name, TestMethod rTestMethod) {
@@ -137,15 +123,15 @@ public class ExternalizableTest extends TestCase {
 			}
 			sb.append("]");
 			return sb.toString();
-		} else if (o instanceof Hashtable) {
+		} else if (o instanceof HashMap) {
 			StringBuffer sb = new StringBuffer();
-			sb.append((o instanceof OrderedHashtable ? "oH" : "H") + "[");
-			for (Enumeration e = ((Hashtable)o).keys(); e.hasMoreElements(); ) {
-				Object key = e.nextElement();
+			sb.append((o instanceof OrderedMap ? "oH" : "H") + "[");
+			for (Iterator e = ((HashMap)o).keySet().iterator(); e.hasNext(); ) {
+				Object key = e.next();
 				sb.append(printObj(key));
 				sb.append("=>");
-				sb.append(printObj(((Hashtable)o).get(key)));
-				if (e.hasMoreElements())
+				sb.append(printObj(((HashMap)o).get(key)));
+				if (e.hasNext())
 					sb.append(", ");
 			}
 			sb.append("]");
@@ -265,7 +251,7 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new ExtWrapListPoly(new Vector()), new ExtWrapListPoly());
 		
 		//hashtables
-		OrderedHashtable oh = new OrderedHashtable();
+		OrderedMap oh = new OrderedMap();
 		testExternalizable(new ExtWrapMap(oh), new ExtWrapMap(String.class, Integer.class, true));
 		testExternalizable(new ExtWrapMapPoly(oh), new ExtWrapMapPoly(Date.class, true));
 		testExternalizable(new ExtWrapTagged(new ExtWrapMap(oh)), new ExtWrapTagged());
@@ -276,7 +262,7 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new ExtWrapMap(oh), new ExtWrapMap(String.class, SampleExtz.class, true), pf);		
 		testExternalizable(new ExtWrapTagged(new ExtWrapMap(oh)), new ExtWrapTagged(), pf);		
 		
-		Hashtable h = new Hashtable();
+		HashMap h = new HashMap();
 		testExternalizable(new ExtWrapMap(h), new ExtWrapMap(String.class, Integer.class));
 		testExternalizable(new ExtWrapMapPoly(h), new ExtWrapMapPoly(Date.class));
 		testExternalizable(new ExtWrapTagged(new ExtWrapMap(h)), new ExtWrapTagged());
@@ -287,15 +273,15 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new ExtWrapMap(h), new ExtWrapMap(String.class, SampleExtz.class), pf);		
 		testExternalizable(new ExtWrapTagged(new ExtWrapMap(h)), new ExtWrapTagged(), pf);		
 		
-		Hashtable j = new Hashtable();
+		HashMap j = new HashMap();
 		j.put(new Integer(17), h);
 		j.put(new Integer(-3), h);
-		Hashtable k = new Hashtable();
+		HashMap k = new HashMap();
 		k.put("key", j);
 		testExternalizable(new ExtWrapMap(k, new ExtWrapMap(Integer.class, new ExtWrapMap(String.class, SampleExtz.class))),
 				new ExtWrapMap(String.class, new ExtWrapMap(Integer.class, new ExtWrapMap(String.class, SampleExtz.class))), pf);	//note: this example contains mixed hashtable types; would choke if we used a tagging wrapper
 		
-		OrderedHashtable m = new OrderedHashtable();
+		OrderedMap m = new OrderedMap();
 		m.put("a", "b");
 		m.put("b", new Integer(17));
 		m.put("c", new Short((short)-443));

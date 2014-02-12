@@ -1,9 +1,9 @@
 package org.javarosa.core.model.instance.utils;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.javarosa.core.model.instance.FormInstance;
+
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * Instance template manager that caches the template instances in memory. Useful for when deserializing
@@ -23,7 +23,7 @@ import org.javarosa.core.model.instance.FormInstance;
  */
 public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 
-	private Hashtable<Integer, FormInstance> templateCache;
+	private HashMap<Integer, FormInstance> templateCache;
 	private Vector<Integer> allowedFormTypes;
 	private boolean restrictFormTypes;
 	
@@ -38,7 +38,7 @@ public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 	 *     form types with addFormType(). if false, all form types will be handled and cached
 	 */
 	public CachingInstanceTemplateManager (boolean restrictFormTypes) {
-		this.templateCache = new Hashtable<Integer, FormInstance>();
+		this.templateCache = new HashMap<Integer, FormInstance>();
 		this.restrictFormTypes = restrictFormTypes;
 		this.allowedFormTypes = new Vector<Integer>();
 	}

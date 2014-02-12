@@ -16,18 +16,7 @@
 
 package org.javarosa.xpath.expr;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.TimeZone;
-import java.util.Vector;
-
 import me.regexp.RE;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -45,6 +34,14 @@ import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * Representation of an xpath function expression.
@@ -141,7 +138,7 @@ public class XPathFuncExpr extends XPathExpression {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 
-		Hashtable funcHandlers = evalContext.getFunctionHandlers();
+		HashMap funcHandlers = evalContext.getFunctionHandlers();
 
 		//TODO: Func handlers should be able to declare the desire for short circuiting as well
 		if(name.equals("if") && args.length == 3) {
@@ -248,7 +245,7 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("sum")) {
 			assertArgsCount( name, args, 1);
 			if (argVals[0] instanceof XPathNodeset) {
-				return sum(((XPathNodeset)argVals[0]).toArgList());
+				return sum(((XPathNodeset) argVals[0]).toArgList());
 			} else {
 				throw new XPathTypeMismatchException("not a nodeset");
 			}

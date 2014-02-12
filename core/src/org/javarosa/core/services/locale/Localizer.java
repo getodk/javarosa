@@ -16,24 +16,17 @@
 
 package org.javarosa.core.services.locale;
 
+import org.javarosa.core.util.NoLocalizedTextException;
+import org.javarosa.core.util.OrderedMap;
+import org.javarosa.core.util.UnregisteredLocaleException;
+import org.javarosa.core.util.externalizable.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
-
-import org.javarosa.core.util.NoLocalizedTextException;
-import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.UnregisteredLocaleException;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * The Localizer object maintains mappings for locale ID's and Object
@@ -44,9 +37,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class Localizer implements Externalizable {
-	private Vector locales; /* Vector<String> */
-	private OrderedHashtable localeResources; /* String -> Vector<LocaleDataSource> */
-	private OrderedHashtable currentLocaleData; /* Hashtable{ String -> String } */
+	private Vector<String> locales; /* Vector<String> */
+	private OrderedMap<String, Vector<LocaleDataSource>> localeResources; /* String -> Vector<LocaleDataSource> */
+	private OrderedMap<String, String> currentLocaleData; /* HashMap{ String -> String } */
 	private String defaultLocale;
 	private String currentLocale;
 	private boolean fallbackDefaultLocale;
@@ -69,9 +62,9 @@ public class Localizer implements Externalizable {
 	 * specified text form ('long', 'short', etc.). Note: form is specified by appending ';[form]' onto the text ID. 
 	 */
 	public Localizer (boolean fallbackDefaultLocale, boolean fallbackDefaultForm) {
-		localeResources = new OrderedHashtable();
-		currentLocaleData = new OrderedHashtable(); 
-		locales = new Vector();
+		localeResources = new OrderedMap<String, Vector<LocaleDataSource>>();
+		currentLocaleData = new OrderedMap<String, String>();
+		locales = new Vector<String>();
 		defaultLocale = null;
 		currentLocale = null;
 		observers = new Vector();
@@ -127,7 +120,7 @@ public class Localizer implements Externalizable {
 			return false;
 		} else {
 			locales.addElement(locale);
-			localeResources.put(locale, new Vector());
+			localeResources.put(locale, new Vector<LocaleDataSource>());
 			return true;
 		}
 	}
@@ -150,7 +143,7 @@ public class Localizer implements Externalizable {
 	 * @return Whether the locale is defined. False if null
 	 */
 	public boolean hasLocale (String locale) {
-		return (locale == null ? false : locales.contains(locale));
+		return locale != null && locales.contains(locale);
 	}
 	
 	/**
@@ -161,7 +154,7 @@ public class Localizer implements Externalizable {
 	 */
 	public String getNextLocale () {
 		return currentLocale == null ? defaultLocale
-									 : (String)locales.elementAt((locales.indexOf(currentLocale) + 1) % locales.size());
+									 : locales.elementAt((locales.indexOf(currentLocale) + 1) % locales.size());
 	}
 	
 	/* === MANAGING CURRENT AND DEFAULT LOCALES === */
@@ -251,10 +244,9 @@ public class Localizer implements Externalizable {
 	 * @param source A dictionary of key/value locale pairs that will be copied into 
 	 * destination 
 	 */
-	private void loadTable(OrderedHashtable destination, OrderedHashtable source) {
-		for(Enumeration en = source.keys(); en.hasMoreElements(); ) {
-			String key = (String)en.nextElement();
-			destination.put(key, (String)source.get(key));
+	private void loadTable(OrderedMap<String, String> destination, OrderedMap<String, String> source) {
+    for (String key : source.keySet()) {
+			destination.put(key, source.get(key));
 		}
 	}
 
@@ -275,9 +267,9 @@ public class Localizer implements Externalizable {
 		if(resource == null) {
 			throw new NullPointerException("Attempt to register a null data source in the localizer");
 		}
-		Vector resources = new Vector();
+		Vector<LocaleDataSource> resources = new Vector<LocaleDataSource>();
 		if(localeResources.containsKey(locale)) {
-			resources = (Vector)localeResources.get(locale);
+			resources = localeResources.get(locale);
 		}
 		resources.addElement(resource);
 		localeResources.put(locale, resources);
@@ -291,9 +283,9 @@ public class Localizer implements Externalizable {
 	 * Get the set of mappings for a locale.
 	 * 
 	 * @param locale Locale
-	 * @returns Hashtable representing text mappings for this locale. Returns null if locale not defined or null.
+	 * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
 	 */
-	public OrderedHashtable getLocaleData (String locale) {
+	public OrderedMap<String, String> getLocaleData (String locale) {
 		if(locale == null || !this.locales.contains(locale)) {
 			return null;
 		}
@@ -302,11 +294,11 @@ public class Localizer implements Externalizable {
 		//for any possible language. As such, we'll keep around a table with only the default locale keys to
 		//ensure that there are no localizations which are only present in another locale, which causes ugly
 		//and difficult to trace errors.
-		OrderedHashtable defaultLocaleKeys = new OrderedHashtable();
+		OrderedMap defaultLocaleKeys = new OrderedMap();
 		
 		//This table will be loaded with the default values first (when applicable), and then with any
 		//language specific translations overwriting the existing values.
-		OrderedHashtable data = new OrderedHashtable();
+		OrderedMap<String, String> data = new OrderedMap<String, String>();
 		
 		// If there's a default locale, we load all of its elements into memory first, then allow
 		// the current locale to overwrite any differences between the two.    
@@ -315,8 +307,8 @@ public class Localizer implements Externalizable {
 			for (int i = 0; i < defaultResources.size(); ++i) {
 				loadTable(data,((LocaleDataSource)defaultResources.elementAt(i)).getLocalizedText());
 			}
-			for(Enumeration en = data.keys(); en.hasMoreElements();) {
-				defaultLocaleKeys.put(en.nextElement(), Boolean.TRUE);
+      for (String key : data.keySet()) {
+				defaultLocaleKeys.put(key, Boolean.TRUE);
 			}
 		}
 		
@@ -331,8 +323,7 @@ public class Localizer implements Externalizable {
 		if(fallbackDefaultLocale && defaultLocale != null) {
 			String missingKeys = "";
 			int keysmissing = 0;
-			for(Enumeration en = data.keys(); en.hasMoreElements();) {
-				String key = (String)en.nextElement();
+      for (String key : data.keySet()) {
 				if(!defaultLocaleKeys.containsKey(key)) {
 					missingKeys += key + ",";
 					keysmissing++;
@@ -358,8 +349,8 @@ public class Localizer implements Externalizable {
 	 * @return Text mappings for locale.
 	 * @throws UnregisteredLocaleException If locale is not defined or null.
 	 */
-	public OrderedHashtable getLocaleMap (String locale) {
-		OrderedHashtable mapping = getLocaleData(locale);
+	public OrderedMap getLocaleMap (String locale) {
+		OrderedMap mapping = getLocaleData(locale);
 		if (mapping == null)
 			throw new UnregisteredLocaleException("Attempted to access an undefined locale.");
 		return mapping;
@@ -454,7 +445,7 @@ public class Localizer implements Externalizable {
 	 * @throws NullPointerException if textID is null
 	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
-	public String getText (String textID, Hashtable args) {
+	public String getText (String textID, HashMap args) {
 		String text = getText(textID, currentLocale);
 		if(text != null) {
 			text = processArguments(text, args);
@@ -604,7 +595,7 @@ public class Localizer implements Externalizable {
 		return args;
 	}
 	
-	public static String processArguments(String text, Hashtable args) {
+	public static String processArguments(String text, HashMap args) {
 		int i = text.indexOf("${");
 		while (i != -1) {
 			int j = text.indexOf("}", i);
@@ -673,7 +664,7 @@ public class Localizer implements Externalizable {
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		fallbackDefaultLocale = ExtUtil.readBool(dis);
 		fallbackDefaultForm = ExtUtil.readBool(dis);
-		localeResources = (OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapListPoly(), true),	pf);;
+		localeResources = (OrderedMap)ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapListPoly(), true),	pf);;
 		locales = (Vector)ExtUtil.read(dis, new ExtWrapList(String.class));
 		setDefaultLocale((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		String currentLocale = (String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf);
