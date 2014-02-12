@@ -16,13 +16,12 @@
 
 package org.javarosa.core.util.externalizable;
 
+import org.javarosa.core.util.OrderedMap;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import org.javarosa.core.util.OrderedHashtable;
+import java.util.HashMap;
 
 //map of objects where elements are multiple types, keys are still assumed to be of a single (non-polymorphic) type
 //if elements are compound types (i.e., need wrappers), they must be pre-wrapped before invoking this wrapper, because... come on now.
@@ -32,18 +31,18 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 	
 	/* serialization */
 	
-	public ExtWrapMapPoly (Hashtable val) {
+	public ExtWrapMapPoly (HashMap val) {
 		this(val, null);
 	}
 	
-	public ExtWrapMapPoly (Hashtable val, ExternalizableWrapper keyType) {
+	public ExtWrapMapPoly (HashMap val, ExternalizableWrapper keyType) {
 		if (val == null) {
 			throw new NullPointerException();
 		}
 		
 		this.val = val;
 		this.keyType = keyType;
-		this.ordered = (val instanceof OrderedHashtable);
+		this.ordered = (val instanceof OrderedMap);
 	}
 
 	/* deserialization */
@@ -74,11 +73,11 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 	}
 	
 	public ExternalizableWrapper clone (Object val) {
-		return new ExtWrapMapPoly((Hashtable)val, keyType);
+		return new ExtWrapMapPoly((HashMap)val, keyType);
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		Hashtable h = ordered ? new OrderedHashtable() : new Hashtable();
+		HashMap h = ordered ? new OrderedMap() : new HashMap();
 
 		long size = ExtUtil.readNumeric(in);
 		for (int i = 0; i < size; i++) {
@@ -91,11 +90,10 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Hashtable h = (Hashtable)val;
+		HashMap h = (HashMap)val;
 
 		ExtUtil.writeNumeric(out, h.size());
-		for (Enumeration e = h.keys(); e.hasMoreElements(); ) {
-			Object key = e.nextElement();
+    for (Object key : h.keySet()) {
 			Object elem = h.get(key);
 			
 			ExtUtil.write(out, keyType == null ? key : keyType.clone(key));
@@ -109,12 +107,12 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 	}
 
 	public void metaWriteExternal (DataOutputStream out) throws IOException {
-		Hashtable h = (Hashtable)val;
+		HashMap h = (HashMap)val;
 		Object keyTagObj;
 		
 		ExtUtil.writeBool(out, ordered);
 		
-		keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keys().nextElement()) : keyType);		
+		keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keySet().iterator().next()) : keyType);
 		ExtWrapTagged.writeTag(out, keyTagObj);
 	}
 }

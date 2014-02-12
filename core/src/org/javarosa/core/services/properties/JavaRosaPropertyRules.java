@@ -16,13 +16,14 @@
 
 package org.javarosa.core.services.properties;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
+
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * A set of rules governing the allowable properties for JavaRosa's
@@ -32,7 +33,7 @@ import org.javarosa.core.services.locale.Localizer;
  *
  */
 public class JavaRosaPropertyRules implements IPropertyRules {
-    Hashtable rules;
+    HashMap rules;
     
     Vector readOnlyProperties;
     
@@ -51,7 +52,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * Creates the JavaRosa set of property rules
      */
     public JavaRosaPropertyRules() {
-        rules = new Hashtable();
+        rules = new HashMap();
         readOnlyProperties = new Vector();
 
         //DeviceID Property
@@ -71,7 +72,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.properties.IPropertyRules#allowableValues(String)
+     *  @see org.javarosa.core.services.properties.IPropertyRules#allowableValues(String)
      */
     public Vector allowableValues(String propertyName) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
@@ -87,7 +88,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.properties.IPropertyRules#checkValueAllowed(String, String)
+     *  @see org.javarosa.core.services.properties.IPropertyRules#checkValueAllowed(String, String)
      */
     public boolean checkValueAllowed(String propertyName, String potentialValue) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
@@ -109,11 +110,11 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.properties.IPropertyRules#allowableProperties()
+     *  @see org.javarosa.core.services.properties.IPropertyRules#allowableProperties()
      */
     public Vector allowableProperties() {
         Vector propList = new Vector();
-        Enumeration iter = rules.keys();
+        Enumeration iter = Collections.enumeration(rules.keySet());
         while (iter.hasMoreElements()) {
             propList.addElement(iter.nextElement());
         }
@@ -121,10 +122,10 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.properties.IPropertyRules#checkPropertyAllowed)
+     *  @see org.javarosa.core.services.properties.IPropertyRules#checkPropertyAllowed)
      */
     public boolean checkPropertyAllowed(String propertyName) {
-        Enumeration iter = rules.keys();
+        Enumeration iter = Collections.enumeration(rules.keySet());
         while (iter.hasMoreElements()) {
             if(propertyName.equals(iter.nextElement())) {
                 return true;
@@ -134,7 +135,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     }
     
     /** (non-Javadoc)
-     *  @see org.javarosa.properties.IPropertyRules#checkPropertyUserReadOnly)
+     *  @see org.javarosa.core.services.properties.IPropertyRules#checkPropertyUserReadOnly)
      */
     public boolean checkPropertyUserReadOnly(String propertyName){
         return readOnlyProperties.contains(propertyName);
