@@ -26,6 +26,11 @@ j2mepolish.index.txt
 default.build
 devices/
 
+#IntelliJ
+relre:^.idea/.*$
+relre:.*\.iml$
+relre:atlassian-ide-plugin.xml$
+
 #OS and environment
 *~
 .DS_Store
