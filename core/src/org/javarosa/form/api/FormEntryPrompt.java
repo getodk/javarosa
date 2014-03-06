@@ -293,7 +293,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 		
 		try{
 			if (textID != null) {
-				helpText=localizer().getLocalizedText(textID);
+			    helpText=substituteStringArgs(localizer().getLocalizedText(textID));
 			} else {
 			    helpText=substituteStringArgs(((QuestionDef)element).getHelpInnerText());
 			}
