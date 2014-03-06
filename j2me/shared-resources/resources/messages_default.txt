@@ -1,0 +1,235 @@
+polish.command.ok=OK
+polish.command.cancel=Cancel
+polish.command.options=Options
+polish.command.exit=Exit
+polish.command.select=Select
+polish.command.mark=Mark
+polish.command.unmark=Unmark
+polish.date.select=Select Date
+# for deleting a single char:
+polish.command.delete=Delete
+# for deleting a complete TextField:
+polish.command.clear=Clear
+# for hiding menus on BlackBerry devices:
+polish.command.hide=Hide
+# for showing a default title when no label
+# is defined in a TextField. This is only
+# used when no direct input mode is activated:
+polish.title.input=Input
+# used for showing a screen for selecting symbols within TextFields:
+polish.command.entersymbol=Add Symbol
+# used by the HtmlBrowser for a links:
+polish.command.followlink=Go
+# used by the HtmlBrowser for submitting a form:
+polish.command.submit=Submit
+# used by the RssBrowser for returning to the previous page:
+polish.command.back=Back
+# RSS commands:
+polish.rss.command.select=Show
+polish.rss.command.followlink=Go
+
+
+
+#Javarosa-specific
+
+plussign=/add.png
+
+splashscreen=/splash.png
+
+menu.Save=Save
+menu.Exit=Exit
+menu.Settings=Settings
+menu.SaveAndExit=Save and Exit
+menu.Next=Next
+menu.Back=Back
+menu.ViewAnswers=View Answers
+menu.SendNow=Send Now
+menu.SendLater=Send Later (Save)
+menu.SendToNewServer=Send to new server
+menu.Login=Login
+menu.Demo=Demo
+menu.Capture=Capture
+menu.retry=Retry
+
+settings.language=Language
+
+
+
+
+button.Next=Done
+button.No=NO
+
+question.SendNow=Send data now?
+
+view.sending.RequiredQuestion=Required question. Please answer it to continue
+
+ 
+
+
+
+form.login.username=Username:
+form.login.password=Password:
+form.login.login=Login
+
+activity.login.tryagain=Please try again
+activity.login.demomode.intro=You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
+activity.login.loginincorrect=Login incorrect
+
+
+form.user.name=Name (ie: loginID):
+form.user.password=User Password:
+form.user.confirmpassword=Confirm Password:
+form.user.userid=User ID:
+form.user.giveadmin=Give this user admin rights?
+form.user.fillinboth =Please fill in both username and password
+
+activity.adduser.adduser=Add User
+activity.adduser.problem=Problem:
+activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
+activity.adduser.problem.emptyuser=Username and password must both be given
+activity.adduser.problem.mismatchingpasswords=Passwords don't match
+
+activity.locationcapture.capturelocation=Capture Location
+activity.locationcapture.capturelocationhint=Capture a GPS location
+activity.locationcapture.waitingforfix=Waiting for fix...
+activity.locationcapture.fixobtained=Fix obtained!
+activity.locationcapture.fixfailed=Location capture failed.
+activity.locationcapture.readyforcapture=Ready for location capture
+activity.locationcapture.Latitude=Latitude
+activity.locationcapture.Longitude=Longitude
+activity.locationcapture.Altitude=Altitude
+activity.locationcapture.Accuracy=Accuracy
+activity.locationcapture.capturelocationhint=Use a GPS to get location
+activity.locationcapture.LocationError=Location Error
+activity.locationcapture.GPSNotAvailable=GPS Not Available
+
+
+formview.repeat.addNew=Add new repeat?
+
+
+
+
+menu.ok=OK
+
+
+
+sending.view.done.title=Finished
+sending.view.done=Form Complete, thanks!
+sending.view.submit=Submit Form
+sending.view.now=Send Now
+sending.view.later=Send Later
+sending.view.when=Send Data Now
+
+sending.status.multi=Currently sending ${0} of ${1}. Successfully transmitted ${2} of ${3}.
+sending.status.title=Send Status
+sending.status.none=No Forms to Send
+sending.status.going=Sending in Progress
+
+sending.message.send=Send Message
+message.log=Log Messages
+message.details=Show Details
+message.send.unsent=Send Unsent
+message.delete=DeleteMessage
+
+debug.log=Debug Log
+
+sending.status.failures=Some Errors Occured, ${0} forms were unsent
+sending.status.long=Submission Taking too Long
+sending.status.success=Successfully Submitted
+sending.status.failed=Submission Failed
+sending.status.error=Submission Error Unknown
+
+
+
+date.today=Today
+date.yesterday=Yesterday
+date.twoago=${0} days ago
+date.tomorrow=Tomorrow
+date.nago=${0} days ago
+date.nfromnow=${0} days from today
+
+yes=Yes
+no=No
+
+
+
+user.registration.title=User Registration
+user.registration.attempt=Contacting Server to Register User...
+user.registration.failmessage=User registration couldn't be completed, server couldn't be contacted. Retry attempt?
+user.registration.success=User Succesfully Registered!
+user.registration.badresponse=User Registration Received, but Response Couldn't be Recognized. Continue?
+
+command.retry=Retry
+
+
+# -- Begin Entries on March 10, 2010 to complete localizations -- 
+
+command.ok=Ok
+command.back=Back
+command.select=Select
+command.cancel=Cancel
+
+#Chatterbox commands
+command.next=Next
+command.exit=Exit
+command.saveexit=Save and Exit
+command.save=Save
+command.language=Language
+
+entity.command.sort=Sort
+entity.find=Find: 
+entity.nomatch=No matches
+entity.detail.title=${0} Detail
+entity.sort.title=Sort by...
+
+
+loading.screen.message=Loading...
+loading.screen.title=Loading
+
+#Used by chatterbox dynamically for the "name" of the xform itext locale 
+
+case.name=Name
+case.id=ID
+case.date.opened=Date Opened
+case.status=Currently Open
+
+yes=Yes
+no=No
+date.unknown=unknown
+
+log.submit.url=Log Submit URL
+log.submit.never=Disable Auto-Send
+log.submit.short=Send Device Log
+log.submit.full=Send Full Diagnostic
+log.submit.nigthly=Nightly Log Format
+log.submit.weekly=Weekly Log Format
+log.submit.next.daily=Next Daily Log
+log.submit.next.weekly=Next Weekly Log
+
+user.create.header=New User
+
+sending.status.success=Successfully Submitted.
+
+user.entity.name=User
+user.entity.username=Username
+user.entity.type=Type
+user.entity.admin=Administrator
+user.entity.normal=Normal
+user.entity.demo=Demo
+user.entity.unknown=Unknown
+
+repeat.repitition=repetition
+repeat.message.single=Add ${0}?
+repeat.message.multiple=Add another ${0}?
+
+#List of two-letter->Language Mappings
+en=English
+pt=Portuguese
+es=Español
+sw=Kiswahili
+af=Afrikaans
+fra=French
+zh=Chinese
+
+#OQPS Messages
+formentry.invalid.input=Invalid Value ${0} Entered
