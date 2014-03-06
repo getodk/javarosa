@@ -3,14 +3,14 @@
  */
 package org.javarosa.core.services.storage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Hashtable;
-
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * @author ctsims
@@ -65,7 +65,7 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.IMetaData#getMetaData()
 	 */
-	public Hashtable getMetaData() {
+	public HashMap getMetaData() {
 		if(m != null) {return m.getMetaData();}
 		throw new RuntimeException("Attempt to index unindexible " + p.getClass().getName());
 	}

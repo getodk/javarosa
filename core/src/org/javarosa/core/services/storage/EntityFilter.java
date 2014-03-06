@@ -16,7 +16,7 @@
 
 package org.javarosa.core.services.storage;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 public abstract class EntityFilter<E> {
 	
@@ -33,7 +33,7 @@ public abstract class EntityFilter<E> {
 	 *         if PREFILTER_EXCLUDE, record will be excluded, matches() not called
 	 *         if PREFILTER_FILTER, matches() will be called and record will be included or excluded based on return value
 	 */
-	public int preFilter (int id, Hashtable<String, Object> metaData) {
+	public int preFilter (int id, HashMap<String, Object> metaData) {
 		return PREFILTER_FILTER;
 	}
 	

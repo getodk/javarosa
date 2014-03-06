@@ -16,16 +16,16 @@
 
 package org.javarosa.core.services.properties;
 
+import org.javarosa.core.services.storage.IMetaData;
+import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
-
-import org.javarosa.core.services.storage.IMetaData;
-import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * Property is an encapsulation of a record containing a property in the J2ME
@@ -111,8 +111,8 @@ public class Property implements Persistable, IMetaData {
     	return recordId;
     }
 
-	public Hashtable getMetaData() {
-		Hashtable metadata = new Hashtable();
+	public HashMap getMetaData() {
+		HashMap metadata = new HashMap();
 		String[] fields = getMetaDataFields();
 		for (int i = 0; i < fields.length; i++) {
 			metadata.put(fields[i], getMetaData(fields[i]));

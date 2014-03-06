@@ -16,11 +16,10 @@
 
 package org.javarosa.core.services.storage;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
+
+import java.util.HashMap;
 
 /**
  * Manages StorageProviders for JavaRosa, which maintain persistent
@@ -33,7 +32,7 @@ import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWr
  */
 public class StorageManager {
 	
-	private static Hashtable<String, IStorageUtility> storageRegistry = new Hashtable<String, IStorageUtility>();
+	private static HashMap<String, IStorageUtility> storageRegistry = new HashMap<String, IStorageUtility>();
 	private static IStorageFactory storageFactory;
 	
 	/**
@@ -102,24 +101,24 @@ public class StorageManager {
 	}
 	
 	public static void repairAll () {
-		for (Enumeration e = storageRegistry.elements(); e.hasMoreElements(); ) {
-			((IStorageUtility)e.nextElement()).repair();
-		}
+    for (IStorageUtility storageUtility : storageRegistry.values()) {
+      storageUtility.repair();
+    }
 	}
 	
 	public static String[] listRegisteredUtilities() {
 		String[] returnVal = new String[storageRegistry.size()];
 		int i = 0;
-		for (Enumeration e = storageRegistry.keys(); e.hasMoreElements(); ) {
-			returnVal[i] = (String)e.nextElement();
+    for (String key : storageRegistry.keySet()) {
+			returnVal[i] = key;
 			i++;
 		}
 		return returnVal;
 	}
 	
 	public static void halt() {
-		for (Enumeration e = storageRegistry.elements(); e.hasMoreElements(); ) {
-			((IStorageUtility)e.nextElement()).close();
-		}
+    for (IStorageUtility storageUtility : storageRegistry.values()) {
+      storageUtility.close();
+    }
 	}
 }

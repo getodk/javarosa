@@ -16,30 +16,8 @@
 
 package org.javarosa.xform.parse;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.DataBinding;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.ItemsetBinding;
-import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.SubmissionProfile;
-import org.javarosa.core.model.condition.Condition;
-import org.javarosa.core.model.condition.Constraint;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.Recalculate;
-import org.javarosa.core.model.condition.Triggerable;
+import org.javarosa.core.model.*;
+import org.javarosa.core.model.condition.*;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -50,7 +28,7 @@ import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
@@ -66,6 +44,10 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Vector;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -98,9 +80,9 @@ public class XFormParser {
 	private static final int CONTAINER_GROUP = 1;
 	private static final int CONTAINER_REPEAT = 2;
 	
-	private static Hashtable<String, IElementHandler> topLevelHandlers;
-	private static Hashtable<String, IElementHandler> groupLevelHandlers;
-	private static Hashtable<String, Integer> typeMappings;
+	private static HashMap<String, IElementHandler> topLevelHandlers;
+	private static HashMap<String, IElementHandler> groupLevelHandlers;
+	private static HashMap<String, Integer> typeMappings;
 	private static PrototypeFactoryDeprecated modelPrototypes;
 	private static Vector<SubmissionParser> submissionParsers;
 
@@ -112,7 +94,7 @@ public class XFormParser {
 	private Document _instDoc;
 	
 	private boolean modelFound;
-	private Hashtable<String, DataBinding> bindingsByID;
+	private HashMap<String, DataBinding> bindingsByID;
 	private Vector<DataBinding> bindings;
 	private Vector<TreeReference> repeats;
 	private Vector<ItemsetBinding> itemsets;
@@ -181,7 +163,7 @@ public class XFormParser {
 		IElementHandler upload = new IElementHandler () {
 			public void handle (XFormParser p, Element e, Object parent) { p.parseUpload((IFormElement)parent, e, Constants.CONTROL_UPLOAD); } };
 
-		groupLevelHandlers = new Hashtable<String, IElementHandler>();
+		groupLevelHandlers = new HashMap<String, IElementHandler>();
 		groupLevelHandlers.put("input", input);
 		groupLevelHandlers.put("secret",secret);
 		groupLevelHandlers.put(SELECT, select);
@@ -191,9 +173,8 @@ public class XFormParser {
 		groupLevelHandlers.put("trigger", trigger); //multi-purpose now; need to dig deeper
 		groupLevelHandlers.put(Constants.XFTAG_UPLOAD, upload);
 
-		topLevelHandlers = new Hashtable<String, IElementHandler>();
-		for (Enumeration en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
-			String key = (String)en.nextElement();
+		topLevelHandlers = new HashMap<String, IElementHandler>();
+    for (String key : groupLevelHandlers.keySet()) {
 			topLevelHandlers.put(key, groupLevelHandlers.get(key));
 		}
 		topLevelHandlers.put("model", model);
@@ -204,7 +185,7 @@ public class XFormParser {
 	}
 
 	private static void initTypeMappings () {
-		typeMappings = new Hashtable<String, Integer>();
+		typeMappings = new HashMap<String, Integer>();
 		typeMappings.put("string", new Integer(Constants.DATATYPE_TEXT));               //xsd:
 		typeMappings.put("integer", new Integer(Constants.DATATYPE_INTEGER));           //xsd:
 		typeMappings.put("long", new Integer(Constants.DATATYPE_LONG));                 //xsd:
@@ -235,7 +216,7 @@ public class XFormParser {
 	
 	private void initState () {
 		modelFound = false;
-		bindingsByID = new Hashtable<String, DataBinding>();
+		bindingsByID = new HashMap<String, DataBinding>();
 		bindings = new Vector<DataBinding>();
 		repeats = new Vector<TreeReference>();
 		itemsets = new Vector<ItemsetBinding>();
@@ -357,7 +338,7 @@ public class XFormParser {
 		
 	}
 
-	private void parseElement (Element e, Object parent, Hashtable<String, IElementHandler> handlers) { //,
+	private void parseElement (Element e, Object parent, HashMap<String, IElementHandler> handlers) { //,
 //			boolean allowUnknownElements, boolean allowText, boolean recurseUnknown) {
 		String name = e.getName();
 
@@ -1413,9 +1394,8 @@ public class XFormParser {
 			}
 		}
 		//Otherwise this sucks and we have to test the keys
-		OrderedHashtable table = _f.getLocalizer().getLocaleData(locale);
-		for(Enumeration keys = table.keys() ; keys.hasMoreElements() ;) {
-			String key = (String)keys.nextElement();
+		OrderedMap<String, String> table = _f.getLocalizer().getLocaleData(locale);
+    for (String key : table.keySet()) {
 			if(key.startsWith(textID + ";")) {
 				//A key is found, pull it out, add it to the list of guesses, and return positive
 				String textForm = key.substring(key.indexOf(";") + 1, key.length());
@@ -1652,8 +1632,8 @@ public class XFormParser {
 	
 	
 	
-	private static Hashtable<String, String> loadNamespaces(Element e, FormInstance tree) {
-		Hashtable<String, String> prefixes = new Hashtable<String, String>();
+	private static HashMap<String, String> loadNamespaces(Element e, FormInstance tree) {
+		HashMap<String, String> prefixes = new HashMap<String, String>();
 		for(int i = 0 ; i < e.getNamespaceCount(); ++i ) {
 			String uri = e.getNamespaceUri(i);
 			String prefix = e.getNamespacePrefix(i);
@@ -2315,7 +2295,7 @@ public class XFormParser {
 		}
 
 		if (hasElements) {
-			Hashtable<String, Integer> multiplicities = new Hashtable<String, Integer>(); //stores max multiplicity seen for a given node name thus far
+			HashMap<String, Integer> multiplicities = new HashMap<String, Integer>(); //stores max multiplicity seen for a given node name thus far
 			for (int i = 0; i < numChildren; i++) {
 				if (node.getType(i) == Node.ELEMENT) {
 					Element child = node.getElement(i);
@@ -2356,28 +2336,27 @@ public class XFormParser {
 	}
 	
 	private void checkDependencyCycles () {
-		Vector vertices = new Vector();
-		Vector edges = new Vector();
+		Vector<TreeReference> vertices = new Vector<TreeReference>();
+		Vector<TreeReference[]> edges = new Vector<TreeReference[]>();
 		
 		//build graph
-		for (Enumeration e = _f.triggerIndex.keys(); e.hasMoreElements(); ) {
-			TreeReference trigger = (TreeReference)e.nextElement();
+    for (TreeReference trigger : _f.triggerIndex.keySet()) {
 			if (!vertices.contains(trigger))
 				vertices.addElement(trigger);
 			
-			Vector triggered = (Vector)_f.triggerIndex.get(trigger);
-			Vector targets = new Vector();
+			Vector<Triggerable> triggered = _f.triggerIndex.get(trigger);
+			Vector<TreeReference> targets = new Vector<TreeReference>();
 			for (int i = 0; i < triggered.size(); i++) {
 				Triggerable t = (Triggerable)triggered.elementAt(i);
 				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+					TreeReference target = t.getTargets().elementAt(j);
 					if (!targets.contains(target))
 						targets.addElement(target);
 				}
 			}
 			
 			for (int i = 0; i < targets.size(); i++) {
-				TreeReference target = (TreeReference)targets.elementAt(i);
+				TreeReference target = targets.elementAt(i);
 				if (!vertices.contains(target))
 					vertices.addElement(target);
 				

@@ -16,17 +16,13 @@
 
 package org.javarosa.form.api;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormElementStateListener;
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.*;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.formmanager.view.IQuestionWidget;
+
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -258,7 +254,7 @@ public class FormEntryCaption implements FormElementStateListener {
 			}
 		}
 		
-		Hashtable<String, Object> vars = new Hashtable<String, Object>();
+		HashMap<String, Object> vars = new HashMap<String, Object>();
 		vars.put("name", title);
 		vars.put("n", new Integer(count));
 		return form.fillTemplateString(caption, index.getReference(), vars);
@@ -294,7 +290,7 @@ public class FormEntryCaption implements FormElementStateListener {
 				return title + " " + ix + "/" + count;
 			}
 	
-			Hashtable<String, Object> vars = new Hashtable<String, Object>();
+			HashMap<String, Object> vars = new HashMap<String, Object>();
 			vars.put("name", title);
 			vars.put("i", new Integer(ix));
 			vars.put("n", new Integer(count));

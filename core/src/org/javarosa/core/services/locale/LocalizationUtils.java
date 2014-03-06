@@ -3,11 +3,11 @@
  */
 package org.javarosa.core.services.locale;
 
+import org.javarosa.core.util.OrderedMap;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import org.javarosa.core.util.OrderedHashtable;
 
 /**
  * @author ctsims
@@ -15,14 +15,14 @@ import org.javarosa.core.util.OrderedHashtable;
  */
 public class LocalizationUtils {
 	/**
-	 * @param resourceName A path to a resource file provided in the current environment
+	 * @param is A path to a resource file provided in the current environment
 	 *
 	 * @return a dictionary of key/value locale pairs from a file in the resource directory 
 	 * @throws IOException 
 	 */
-	public static OrderedHashtable parseLocaleInput(InputStream is) throws IOException {
+	public static OrderedMap<String, String> parseLocaleInput(InputStream is) throws IOException {
 			// TODO: This might very well fail. Best way to handle?
-			OrderedHashtable locale = new OrderedHashtable();
+			OrderedMap<String, String> locale = new OrderedMap<String, String>();
 			int chunk = 100;
 			InputStreamReader isr;
 			isr = new InputStreamReader(is,"UTF-8");
@@ -68,7 +68,7 @@ public class LocalizationUtils {
 			return locale;
 		}
 
-		private static void parseAndAdd(OrderedHashtable locale, String line, int curline) {
+		private static void parseAndAdd(OrderedMap<String, String> locale, String line, int curline) {
 
 			//trim whitespace.
 			line = line.trim();

@@ -19,7 +19,7 @@
  */
 package org.javarosa.core.services.locale;
 
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
@@ -28,5 +28,6 @@ import org.javarosa.core.util.externalizable.Externalizable;
  *
  */
 public interface LocaleDataSource extends Externalizable {
-	public OrderedHashtable getLocalizedText();
+
+	public OrderedMap<String, String> getLocalizedText();
 }
