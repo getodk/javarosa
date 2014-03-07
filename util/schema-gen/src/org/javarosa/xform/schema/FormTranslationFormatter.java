@@ -33,12 +33,12 @@ import com.csvreader.CsvWriter;
  */
 public class FormTranslationFormatter {
 
-	public static StringBuffer dumpTranslationsIntoCSV(FormDef f) {
+	public static StringBuilder dumpTranslationsIntoCSV(FormDef f) {
 		//absorb errors.
-		return dumpTranslationsIntoCSV(f, new StringBuffer());
+		return dumpTranslationsIntoCSV(f, new StringBuilder());
 	}
 
-	public static StringBuffer dumpTranslationsIntoCSV(FormDef f, StringBuffer messages) {
+	public static StringBuilder dumpTranslationsIntoCSV(FormDef f, StringBuilder messages) {
 		f.getLocalizer().setToDefault();
 
 		HashMap<String,OrderedMap> localeData = new HashMap<String,OrderedMap>();
@@ -112,7 +112,7 @@ public class FormTranslationFormatter {
 		}
 
 		//output.append(writer.getBuffer());
-		return writer.getBuffer();
+		return new StringBuilder(writer.toString());
 	}
 
 	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output, String delimeter, String encoding, String printEncoding) {
@@ -257,7 +257,7 @@ public class FormTranslationFormatter {
 
 			doc.write(ser);
 
-			StringBuffer outputBuffer = new StringBuffer();
+			StringBuilder outputBuffer = new StringBuilder();
 			outputBuffer.append(writer);
 			PrintStream p = new PrintStream(output);
 			p.println(outputBuffer);

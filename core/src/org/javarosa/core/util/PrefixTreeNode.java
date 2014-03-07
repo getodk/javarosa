@@ -23,31 +23,31 @@ public class PrefixTreeNode {
 	public String prefix;
 	public boolean terminal;
 	public Vector children;
-	
+
 	public PrefixTreeNode (String prefix) {
 		this.prefix = prefix;
 		this.terminal = false;
 	}
-	
+
 	public void decompose (Vector v, String s) {
 		String stem = s + prefix;
-		
+
 		if (terminal)
 			v.addElement(stem);
-		
+
 		if (children != null) {
 			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
 				((PrefixTreeNode)e.nextElement()).decompose(v, stem);
 			}
-		}		
+		}
 	}
-	
+
 	public boolean equals (Object o) {
 		return (o instanceof PrefixTreeNode ? prefix.equals(((PrefixTreeNode)o).prefix) : false);
 	}
-	
+
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		sb.append(prefix);
 		if (terminal)

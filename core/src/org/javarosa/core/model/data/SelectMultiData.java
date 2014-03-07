@@ -33,25 +33,25 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 /**
  * A response to a question requesting a selection of
  * any number of items from a list.
- * 
+ *
  * @author Drew Roos
  *
  */
 public class SelectMultiData implements IAnswerData {
 	Vector vs; //vector of Selection
-	
+
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
 	 * Shouldn't be used otherwise.
 	 */
 	public SelectMultiData() {
-		
+
 	}
-	
+
 	public SelectMultiData (Vector vs) {
 		setValue(vs);
 	}
-	
+
 	public IAnswerData clone () {
 		Vector v = new Vector();
 		for (int i = 0; i < vs.size(); i++) {
@@ -59,7 +59,7 @@ public class SelectMultiData implements IAnswerData {
 		}
 		return new SelectMultiData(v);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
@@ -68,10 +68,10 @@ public class SelectMultiData implements IAnswerData {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
-		
+
 		vs = vectorCopy((Vector)o);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
@@ -79,7 +79,7 @@ public class SelectMultiData implements IAnswerData {
 	public Object getValue () {
 		return vectorCopy(vs);
 	}
-	
+
 	/**
 	 * @return A type checked vector containing all of the elements
 	 * contained in the vector input
@@ -103,14 +103,14 @@ public class SelectMultiData implements IAnswerData {
 	 */
 	public String getDisplayText () {
 		String str = "";
-		
+
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.elementAt(i);
 			str += s.getValue();
 			if (i < vs.size() - 1)
 				str += ", ";
 		}
-		
+
 		return str;
 	}
 	/* (non-Javadoc)
@@ -129,8 +129,8 @@ public class SelectMultiData implements IAnswerData {
 
 	public UncastData uncast() {
 		Enumeration en = vs.elements();
-		StringBuffer selectString = new StringBuffer();
-		
+		StringBuilder selectString = new StringBuilder();
+
 		while(en.hasMoreElements()) {
 			Selection selection = (Selection)en.nextElement();
 			if (selectString.length() > 0)
@@ -138,15 +138,15 @@ public class SelectMultiData implements IAnswerData {
 			selectString.append(selection.getValue());
 		}
 		//As Crazy, and stupid, as it sounds, this is the XForms specification
-		//for storing multiple selections.	
+		//for storing multiple selections.
 		return new UncastData(selectString.toString());
 	}
-	
+
 	public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
 		Vector v = new Vector();
-		
+
 		Vector<String> choices = DateUtils.split(data.value, " ", true);
-		for(String s : choices) { 
+		for(String s : choices) {
 			v.addElement(new Selection(s));
 		}
 		return new SelectMultiData(v);
