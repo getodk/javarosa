@@ -5,7 +5,7 @@ It consists of the core from the javarosa 1.0 codebase, modified with:
  -- numerous enhancements and contributions from SurveyCTO and others.
  -- j2me sub-projects removed
 
- The requires the following dependencies before it can be built:
+It requires the following dependencies before it can be built:
 
 Download: javarosa-dependencies-r3073.rar ( https://bitbucket.org/javarosa/javarosa/downloads )
  
