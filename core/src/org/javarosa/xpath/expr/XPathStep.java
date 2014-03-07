@@ -73,7 +73,7 @@ public class XPathStep implements Externalizable {
 	public String literal; //TEST_TYPE_PROCESSING_INSTRUCTION only
 
 	public XPathStep () { } //for deserialization
-	
+
 	public XPathStep (int axis, int test) {
 		this.axis = axis;
 		this.test = test;
@@ -89,15 +89,15 @@ public class XPathStep implements Externalizable {
 		this(axis, TEST_NAMESPACE_WILDCARD);
 		this.namespace = namespace;
 	}
-	
+
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
-		
+		StringBuilder sb = new StringBuilder();
+
 		sb.append("{step:");
 		sb.append(axisStr(axis));
 		sb.append(",");
 		sb.append(testStr());
-		
+
 		if (predicates.length > 0) {
 			sb.append(",{");
 			for (int i = 0; i < predicates.length; i++) {
@@ -108,10 +108,10 @@ public class XPathStep implements Externalizable {
 			sb.append("}");
 		}
 		sb.append("}");
-		
+
 		return sb.toString();
 	}
-	
+
 	public static String axisStr (int axis) {
 		switch (axis) {
 		case AXIS_CHILD: return "child";
@@ -130,7 +130,7 @@ public class XPathStep implements Externalizable {
 		default: return null;
 		}
 	}
-		
+
 	public String testStr () {
 		switch(test) {
 		case TEST_NAME: return name.toString();
@@ -143,55 +143,55 @@ public class XPathStep implements Externalizable {
 		default: return null;
 		}
 	}
-	
+
 	public boolean equals (Object o) {
 		if (o instanceof XPathStep) {
 			XPathStep x = (XPathStep)o;
-			
+
 			//shortcuts for faster evaluation
 			if(axis != x.axis && test != x.test || predicates.length != x.predicates.length) {
 				return false;
 			}
-			
+
 			switch (test) {
 			case TEST_NAME: if(!name.equals(x.name)) {return false;} break;
 			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
 			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
 			default: break;
 			}
-			
+
 			return ExtUtil.arrayEquals(predicates, x.predicates);
 		} else {
 			return false;
 		}
 	}
-	
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		axis = ExtUtil.readInt(in);
 		test = ExtUtil.readInt(in);
-		
+
 		switch (test) {
 		case TEST_NAME: name = (XPathQName)ExtUtil.read(in, XPathQName.class); break;
 		case TEST_NAMESPACE_WILDCARD: namespace = ExtUtil.readString(in); break;
 		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break;
-		}	
-		
+		}
+
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.elementAt(i);	
+			predicates[i] = (XPathExpression)v.elementAt(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, axis);
 		ExtUtil.writeNumeric(out, test);
-		
+
 		switch (test) {
 		case TEST_NAME: ExtUtil.write(out, name); break;
 		case TEST_NAMESPACE_WILDCARD: ExtUtil.writeString(out, namespace); break;
 		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
 		}
-		
+
 		Vector v = new Vector();
 		for (int i = 0; i < predicates.length; i++)
 			v.addElement(predicates[i]);

@@ -66,7 +66,7 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append("{func-expr:");
 		sb.append(id.toString());
@@ -500,7 +500,7 @@ public class XPathFuncExpr extends XPathExpression {
                     return toNumeric(o);
             }
     }
-        
+
 	/**
 	 * convert a value to a number using xpath's type conversion rules (note that xpath itself makes
 	 * no distinction between integer and floating point numbers)
@@ -1008,7 +1008,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 */
 	public static String join (Object oSep, Object[] argVals) {
 		String sep = toString(oSep);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < argVals.length; i++) {
 			sb.append(toString(argVals[i]));
