@@ -27,7 +27,9 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.GeoLineData;
 import org.javarosa.core.model.data.GeoPointData;
+import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -70,11 +72,11 @@ public class XPathPathExpr extends XPathExpression {
 		this(INIT_CONTEXT_EXPR, steps);
 		this.filtExpr = filtExpr;
 	}
-	
+
 	public TreeReference getReference () throws XPathUnsupportedException {
 		return getReference(false);
 	}
-	
+
 	/**
 	 * translate an xpath path reference into a TreeReference
 	 * TreeReferences only support a subset of true xpath paths; restrictions are:
@@ -121,12 +123,12 @@ public class XPathPathExpr extends XPathExpression {
 				//We only support expression root contexts for instance refs, everything else is an illegal filter
 				throw new XPathUnsupportedException("filter expression");
 			}
-			
+
 			break;
 		default: throw new XPathUnsupportedException("filter expression");
 		}
 		for (int i = 0; i < steps.length; i++) {
-			XPathStep step = steps[i];					
+			XPathStep step = steps[i];
 			if (step.axis == XPathStep.AXIS_SELF) {
 				if (step.test != XPathStep.TEST_TYPE_NODE) {
 					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
@@ -159,7 +161,7 @@ public class XPathPathExpr extends XPathExpression {
 			} else {
 				throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 			}
-			
+
 			if(step.predicates.length > 0) {
 				int refLevel = ref.getRefLevel();
 				Vector<XPathExpression> v = new Vector<XPathExpression>();
@@ -167,20 +169,20 @@ public class XPathPathExpr extends XPathExpression {
 				{
 					v.addElement(step.predicates[j]);
 				}
-				ref.addPredicate(i, v);		
+				ref.addPredicate(i, v);
 			}
-		}		
+		}
 		return ref;
 	}
 
-	public XPathNodeset eval (FormInstance m, EvaluationContext ec) {		
+	public XPathNodeset eval (FormInstance m, EvaluationContext ec) {
 		TreeReference genericRef = getReference();
 
 		TreeReference ref = genericRef.contextualize(ec.getContextRef());
-		
-		//We don't necessarily know the model we want to be working with until we've contextualized the 
+
+		//We don't necessarily know the model we want to be working with until we've contextualized the
 		//node
-		
+
 		//check if this nodeset refers to a non-main instance
 		if(ref.getInstanceName() != null && ref.isAbsolute())
 		{
@@ -203,15 +205,15 @@ public class XPathPathExpr extends XPathExpression {
                     throw new XPathTypeMismatchException("Cannot evaluate the reference [" + refStr + "] in the current evaluation context. No default instance has been declared!");
             }
 		}
-		
+
 		// this makes no sense...
 //		if (ref.isAbsolute() && m.getTemplatePath(ref) == null) {
 //			Vector<TreeReference> nodesetRefs = new Vector<TreeReference>();
 //			return new XPathNodeset(nodesetRefs, m, ec);
 //		}
-		
+
 		Vector<TreeReference> nodesetRefs = ec.expandReference(ref);
-		
+
 		//to fix conditions based on non-relevant data, filter the nodeset by relevancy
 		for (int i = 0; i < nodesetRefs.size(); i++) {
 			if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
@@ -219,11 +221,11 @@ public class XPathPathExpr extends XPathExpression {
 				i--;
 			}
 		}
-		
+
 		return new XPathNodeset(nodesetRefs, m, ec);
 	}
 
-//	
+//
 //	boolean nodeset = forceNodeset;
 //	if (!nodeset) {
 //		//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
@@ -250,11 +252,11 @@ public class XPathPathExpr extends XPathExpression {
 				//shouldn't happen -- only existent nodes should be in nodeset
 				throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 			}
-			
+
 			return unpackValue(node.isRelevant() ? node.getValue() : null);
 		}
 	}
-	
+
 	public static Object unpackValue (IAnswerData val) {
 		if (val == null) {
 			return "";
@@ -263,9 +265,9 @@ public class XPathPathExpr extends XPathExpression {
 		} else if (val instanceof IntegerData) {
 			return new Double(((Integer)val.getValue()).doubleValue());
 		} else if (val instanceof LongData) {
-			return new Double(((Long)val.getValue()).doubleValue());	
+			return new Double(((Long)val.getValue()).doubleValue());
 		} else if (val instanceof DecimalData) {
-			return val.getValue();			
+			return val.getValue();
 		} else if (val instanceof StringData) {
 			return val.getValue();
 		} else if (val instanceof SelectOneData) {
@@ -277,16 +279,23 @@ public class XPathPathExpr extends XPathExpression {
 		} else if (val instanceof BooleanData) {
 			return val.getValue();
 		} else if (val instanceof GeoPointData) {
-			return val.uncast().getString();
+			// we have no access fns that interact with double[4] arrays (the getValue() data type)...
+			return val.getDisplayText();
+		} else if (val instanceof GeoLineData) {
+			// we have no access fns that interact with GeoLine objects (the getValue() data type)...
+			return val.getDisplayText();
+		} else if (val instanceof GeoShapeData) {
+			// we have no access fns that interact with GeoShape objects (the getValue() data type)...
+			return val.getDisplayText();
 		} else {
 			System.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
 			return val.getValue(); //is this a good idea?
 		}
 	}
-	
+
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
-		
+		StringBuilder sb = new StringBuilder();
+
 		sb.append("{path-expr:");
 		switch (init_context) {
 		case INIT_CONTEXT_ROOT: sb.append("abs"); break;
@@ -300,31 +309,31 @@ public class XPathPathExpr extends XPathExpression {
 				sb.append(",");
 		}
 		sb.append("}}");
-		
+
 		return sb.toString();
 	}
 
 	public boolean equals (Object o) {
 		if (o instanceof XPathPathExpr) {
 			XPathPathExpr x = (XPathPathExpr)o;
-			
+
 			//Shortcuts for easily comparable values
 			if(init_context != x.init_context || steps.length != x.steps.length) {
 				return false;
 			}
-			
+
 			return ExtUtil.arrayEquals(steps, x.steps) && (init_context == INIT_CONTEXT_EXPR ? filtExpr.equals(x.filtExpr) : true);
 		} else {
 			return false;
 		}
 	}
-	
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		init_context = ExtUtil.readInt(in);
 		if (init_context == INIT_CONTEXT_EXPR) {
 			filtExpr = (XPathFilterExpr)ExtUtil.read(in, XPathFilterExpr.class, pf);
 		}
-		
+
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
 		steps = new XPathStep[v.size()];
 		for (int i = 0; i < steps.length; i++)
@@ -336,13 +345,13 @@ public class XPathPathExpr extends XPathExpression {
 		if (init_context == INIT_CONTEXT_EXPR) {
 			ExtUtil.write(out, filtExpr);
 		}
-		
+
 		Vector v = new Vector();
 		for (int i = 0; i < steps.length; i++)
 			v.addElement(steps[i]);
 		ExtUtil.write(out, new ExtWrapList(v));
 	}
-	
+
 	public static XPathPathExpr fromRef (TreeReference ref) {
 		XPathPathExpr path = new XPathPathExpr();
 		path.init_context = (ref.isAbsolute() ? INIT_CONTEXT_ROOT : INIT_CONTEXT_RELATIVE);
@@ -356,14 +365,14 @@ public class XPathPathExpr extends XPathExpression {
 		}
 		return path;
 	}
-	
+
 	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		TreeReference ref = this.getReference();
 		//Either concretely the sentinal, or "."
 		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {
 			return sentinal;
 		}
-		else { 
+		else {
 			return this.eval(model, evalContext);
 		}
 	}
