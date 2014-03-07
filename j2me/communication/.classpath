@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="**/bluetooth/|**/sms/trigger/" kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/wmapi.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
