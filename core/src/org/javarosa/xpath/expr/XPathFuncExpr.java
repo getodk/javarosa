@@ -16,7 +16,15 @@
 
 package org.javarosa.xpath.expr;
 
-import me.regexp.RE;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.regex.Pattern;
+
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -34,14 +42,6 @@ import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Vector;
 
 /**
  * Representation of an xpath function expression.
@@ -1106,8 +1106,7 @@ public class XPathFuncExpr extends XPathExpression {
 		String str = toString(o1);
 		String re = toString(o2);
 
-		RE regexp = new RE(re);
-		boolean result = regexp.match(str);
+		boolean result = Pattern.matches(re, str);
 		return new Boolean(result);
 	}
 
