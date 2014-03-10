@@ -20,7 +20,7 @@
 	</target>
 	
 	<target name="compile" depends="clean,extract-libs,init" description="compile the source">
-		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source" source="1.5" target="1.5"/>
+		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source" source="1.6" target="1.6"/>
 	</target>
 	
 	<target name="package" depends="compile" description="package binary into jar">
