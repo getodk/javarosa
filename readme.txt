@@ -17,7 +17,6 @@ Download: javarosa-dependencies-r3073.rar ( https://bitbucket.org/javarosa/javar
 	lib/bouncycastle-lw.jar
 	lib/j2meunit-javarosa.jar
 	lib/kxml2-2.3.0.jar
-	lib/regexp-me.jar
 	util/schema-gen/lib/xpp3-1.1.4.jar
 
 Go to http://bitbucket.org/javarosa/javarosa/wiki/GettingStarted to learn how to build JavaRosa.
