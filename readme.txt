@@ -9,12 +9,11 @@ It requires the following dependencies before it can be built:
 
 Download: javarosa-dependencies-r3073.rar ( https://bitbucket.org/javarosa/javarosa/downloads )
  
- This contains:
+ You will need **ONLY** these files:
  
 	j2me/buildfiles/tools/ant-contrib.jar
 	j2me/buildfiles/tools/javarosa-ant-libs.jar
 	j2me/buildfiles/tools/UmlGraph.jar
-	lib/bouncycastle-lw.jar
 	lib/j2meunit-javarosa.jar
 	lib/kxml2-2.3.0.jar
 	util/schema-gen/lib/xpp3-1.1.4.jar
