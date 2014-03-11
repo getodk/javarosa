@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils;
+package org.javarosa.core.model.utils.test;
 
 import j2meunit.framework.Test;
 import j2meunit.framework.TestCase;
@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
 
 public class DateUtilsTests extends TestCase {

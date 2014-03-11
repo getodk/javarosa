@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.*;
 import org.javarosa.xpath.expr.XPathExpression;
 
@@ -32,92 +33,103 @@ public class TreeReference implements Externalizable {
 	public static final int INDEX_ATTRIBUTE = -4;//multiplicity flag for an attribute
 	public static final int INDEX_REPEAT_JUNCTURE = -10;
 
+	//TODO: Roll these into RefLevel? Or more likely, take absolute
+	//ref out of refLevel
+	public static final int CONTEXT_ABSOLUTE = 0;
+	public static final int CONTEXT_INHERITED = 1;
+	public static final int CONTEXT_ORIGINAL = 2;
+	public static final int CONTEXT_INSTANCE = 4;
+
+
 	public static final int REF_ABSOLUTE = -1;
 
 	public static final String NAME_WILDCARD = "*";
 
 	private int refLevel; //0 = context node, 1 = parent, 2 = grandparent ...
-	private Vector names; //Vector<String>
-	private Vector multiplicity; //Vector<Integer>
-	//private Vector<XPathExpression> predicates; //Vector<XPathExpression>
-	private HashMap<Integer, Vector<XPathExpression>> predicates;
-	private FormInstance instance = null;
+	private int contextType;
 	private String instanceName = null;
+	private Vector<TreeReferenceLevel> data = null;
 
 
 	public static TreeReference rootRef () {
 		TreeReference root = new TreeReference();
 		root.refLevel = REF_ABSOLUTE;
+		root.contextType = CONTEXT_ABSOLUTE;
 		return root;
 	}
 
 	public static TreeReference selfRef () {
 		TreeReference self = new TreeReference();
 		self.refLevel = 0;
+		self.contextType = CONTEXT_INHERITED;
 		return self;
 	}
 
 	public TreeReference () {
-		names = new Vector(0);
-		multiplicity = new Vector(0);
-		predicates = new HashMap<Integer, Vector<XPathExpression>>();
-		instance = null; //null means the default instance
-		instanceName = null; //dido
+		instanceName = null; // null means the default instance
+		refLevel = 0;
+		contextType = CONTEXT_ABSOLUTE;
+		data = new Vector<TreeReferenceLevel>();
 	}
 
 	public String getInstanceName() {
 		return instanceName;
 	}
 
+	//TODO: This should be constructed I think
 	public void setInstanceName(String instanceName) {
+		if(instanceName == null) {
+			if(this.refLevel == REF_ABSOLUTE) {
+				this.contextType = CONTEXT_ABSOLUTE;
+			} else {
+				this.contextType = CONTEXT_INHERITED;
+			}
+		} else{
+			this.contextType = CONTEXT_INSTANCE;
+		}
 		this.instanceName = instanceName;
 	}
 
-	public FormInstance getInstance() {
-		return instance;
-	}
-
-	public void setInstance(FormInstance instance) {
-		this.instance = instance;
-	}
-
 	public int getMultiplicity(int index) {
-		return ((Integer)multiplicity.elementAt(index)).intValue();
+		return data.elementAt(index).getMultiplicity();
 	}
 
 	public String getName(int index) {
-		return (String)names.elementAt(index);
+		return data.elementAt(index).getName();
 	}
 
 	public int getMultLast () {
-		return ((Integer)multiplicity.lastElement()).intValue();
+		return data.lastElement().getMultiplicity();
 	}
 
 	public String getNameLast () {
-		return (String)names.lastElement();
+		return data.lastElement().getName();
 	}
 
 	public void setMultiplicity (int i, int mult) {
-		multiplicity.setElementAt(new Integer(mult), i);
+		data.setElementAt(data.elementAt(i).setMultiplicity(mult), i);
 	}
 
 	public int size () {
-		return names.size();
+		return data.size();
 	}
 
-	public void add (String name, int index) {
-		names.addElement(name);
-		multiplicity.addElement(new Integer(index));
+	private void add (TreeReferenceLevel level) {
+		data.addElement(level);
+	}
+
+	public void add (String name, int mult) {
+		add(new TreeReferenceLevel(name, mult).intern());
 	}
 
 	public void addPredicate(int key, Vector<XPathExpression> xpe)
 	{
-		predicates.put(new Integer(key), xpe);
+		data.setElementAt(data.elementAt(key).setPredicates(xpe), key);
 	}
 
 	public Vector<XPathExpression> getPredicate(int key)
 	{
-		return predicates.get(new Integer(key));
+		return data.elementAt(key).getPredicates();
 	}
 
 	public int getRefLevel () {
@@ -154,22 +166,18 @@ public class TreeReference implements Externalizable {
 	public TreeReference clone () {
 		TreeReference newRef = new TreeReference();
 		newRef.setRefLevel(this.refLevel);
-		for (int i = 0; i < this.size(); i++) {
-			newRef.add(this.getName(i), this.getMultiplicity(i));
+
+		for(TreeReferenceLevel l : data) {
+			newRef.add(l.shallowCopy());
 		}
-		//copy predicates
-    for (Integer i : predicates.keySet()) {
-			newRef.addPredicate(i, predicates.get(i));
-		}
+
+		//TODO: No more == null checks here, use context type
 		//copy instances
 		if(instanceName != null)
 		{
 			newRef.setInstanceName(instanceName);
 		}
-		if(instance != null)
-		{
-			newRef.setInstance(instance);
-		}
+		newRef.contextType = this.contextType;
 		return newRef;
 	}
 
@@ -187,8 +195,7 @@ public class TreeReference implements Externalizable {
 				return true;
 			}
 		} else {
-			names.removeElementAt(size - 1);
-			multiplicity.removeElementAt(size - 1);
+			data.removeElementAt(size -1);
 			return true;
 		}
 	}
@@ -221,8 +228,8 @@ public class TreeReference implements Externalizable {
 				}
 			}
 
-			for (int i = 0; i < names.size(); i++) {
-				newRef.add(this.getName(i), this.getMultiplicity(i));
+			for(TreeReferenceLevel l : data) {
+				newRef.add(l.shallowCopy());
 			}
 
 			return newRef;
@@ -236,6 +243,9 @@ public class TreeReference implements Externalizable {
 	//NOTE: this function still works even when contextRef contains INDEX_UNBOUND multiplicites... conditions depend on this behavior,
 	//  even though it's slightly icky
 	public TreeReference anchor (TreeReference contextRef) {
+		//TODO: Technically we should possibly be modifying context stuff here
+		//instead of in the xpath stuff;
+
 		if (isAbsolute()) {
 			return this.clone();
 		} else if (!contextRef.isAbsolute()) {
@@ -250,11 +260,7 @@ public class TreeReference implements Externalizable {
 					newRef.removeLastLevel();
 				}
 				for (int i = 0; i < size(); i++) {
-					newRef.add(this.getName(i), this.getMultiplicity(i));
-				}
-				//copy predicates
-        for (Integer i : predicates.keySet()) {
-					newRef.addPredicate(i, predicates.get(i));
+					newRef.add(data.elementAt(i).shallowCopy());
 				}
 				return newRef;
 			}
@@ -264,20 +270,46 @@ public class TreeReference implements Externalizable {
 	//TODO: merge anchor() and parent()
 
 	public TreeReference contextualize (TreeReference contextRef) {
+		//TODO: Technically we should possibly be modifying context stuff here
+		//instead of in the xpath stuff;
 		if (!contextRef.isAbsolute()){
 			return null;
 		}
-		TreeReference newRef = anchor(contextRef);
 
+		//If we're an absolute node, we should already know what our instance is, so
+		//we can't apply any further contextualizaiton unless the instances match
+		if(this.isAbsolute()) {
+			//If this refers to the main instance, but our context ref doesn't
+			if(this.getInstanceName() == null) {
+				if(contextRef.getInstanceName() != null) {
+					return this.clone();
+				}
+			}
+			//Or if this refers to another instance and the context ref doesn't refer to the
+			//same instance
+			else if(!this.getInstanceName().equals(contextRef.getInstanceName())) {
+				return this.clone();
+			}
+		}
+
+		TreeReference newRef = anchor(contextRef);
+		newRef.setContext(contextRef.getContext());
+
+		//apply multiplicites and fill in wildcards as necessary based on the context ref
 		for (int i = 0; i < contextRef.size() && i < newRef.size(); i++) {
 
 			//If the the contextRef can provide a definition for a wildcard, do so
 			if(TreeReference.NAME_WILDCARD.equals(newRef.getName(i)) && !TreeReference.NAME_WILDCARD.equals(contextRef.getName(i))) {
-				newRef.names.setElementAt(contextRef.getName(i), i);
+				newRef.data.setElementAt(newRef.data.elementAt(i).setName(contextRef.getName(i)), i);
 			}
 
 			if (contextRef.getName(i).equals(newRef.getName(i))) {
-				newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
+				//We can't actually merge nodes if the newRef has predicates or filters
+				//on this expression, since those reset any existing resolutions which
+				//may have been done.
+				if(newRef.getPredicate(i) == null) {
+					newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
+				}
 			} else {
 				break;
 			}
@@ -302,7 +334,11 @@ public class TreeReference implements Externalizable {
 	public TreeReference genericize () {
 		TreeReference genericRef = clone();
 		for (int i = 0; i < genericRef.size(); i++) {
-			genericRef.setMultiplicity(i, INDEX_UNBOUND);
+			//TODO: It's not super clear whether template refs should get
+			//genericized or not
+			if(genericRef.getMultiplicity(i) > -1 || genericRef.getMultiplicity(i) == INDEX_TEMPLATE) {
+				genericRef.setMultiplicity(i, INDEX_UNBOUND);
+			}
 		}
 		return genericRef;
 	}
@@ -310,6 +346,7 @@ public class TreeReference implements Externalizable {
 	//returns true if 'this' is parent of 'child'
 	//return true if 'this' equals 'child' only if properParent is false
 	public boolean isParentOf (TreeReference child, boolean properParent) {
+		//Instances and context types;
 		if (refLevel != child.refLevel)
 			return false;
 		if (child.size() < size() + (properParent ? 1 : 0))
@@ -356,6 +393,9 @@ public class TreeReference implements Externalizable {
 					int multA = this.getMultiplicity(i);
 					int multB = ref.getMultiplicity(i);
 
+					Vector<XPathExpression> predA = this.getPredicate(i);
+					Vector<XPathExpression> predB = ref.getPredicate(i);
+
 					if (!nameA.equals(nameB)) {
 						return false;
 					} else if (multA != multB) {
@@ -364,6 +404,15 @@ public class TreeReference implements Externalizable {
 						} else {
 							return false;
 						}
+					} else if(predA != null && predB != null) {
+						if(predA.size() != predB.size()) { return false;}
+						for(int j = 0 ; j < predA.size() ; ++j) {
+							if(!predA.elementAt(j).equals(predB.elementAt(j))) {
+								return false;
+							}
+						}
+					} else if((predA == null && predB != null) || (predA != null && predB == null)){
+						return false;
 					}
 				}
 				return true;
@@ -383,12 +432,22 @@ public class TreeReference implements Externalizable {
 			//is just returning the int value, I think, so
 			//this should potentially just be replaced by
 			//an int.
-			Integer mult = new Integer(getMultiplicity(i));
+			Integer mult = DataUtil.integer(getMultiplicity(i));
 			if (i == 0 && mult.intValue() == INDEX_UNBOUND)
-				mult = new Integer(0);
+				mult = DataUtil.integer(0);
 
 			hash ^= getName(i).hashCode();
 			hash ^= mult.hashCode();
+			Vector<XPathExpression> predicates = this.getPredicate(i);
+			if(predicates == null) {
+				continue;
+			}
+			int val = 0;
+			for(XPathExpression xpe : predicates) {
+				hash ^= val;
+				hash ^= xpe.hashCode();
+				++val;
+			}
 		}
 		return hash;
 	}
@@ -402,6 +461,8 @@ public class TreeReference implements Externalizable {
 		if(instanceName != null)
 		{
 			sb.append("instance("+instanceName+")");
+		} else if(contextType == CONTEXT_ORIGINAL) {
+			sb.append("current()");
 		}
 		if (isAbsolute()) {
 			sb.append("/");
@@ -424,7 +485,7 @@ public class TreeReference implements Externalizable {
 				case INDEX_TEMPLATE: sb.append("[@template]"); break;
 				case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
 				default:
-					if (i > 0 || mult != 0)
+					if ((i > 0 || mult != 0) && mult !=-4)
 						sb.append("[" + (mult + 1) + "]");
 					break;
 				}
@@ -439,38 +500,22 @@ public class TreeReference implements Externalizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		refLevel = ExtUtil.readInt(in);
-		names = (Vector)ExtUtil.read(in, new ExtWrapList(String.class), pf);
-		multiplicity = (Vector)ExtUtil.read(in, new ExtWrapList(Integer.class), pf);
 		instanceName = (String)ExtUtil.read(in, new ExtWrapNullable(String.class),pf);
-		instance = (FormInstance)ExtUtil.read(in, new ExtWrapNullable(FormInstance.class),pf);
-
-		//now since predicates are made up of 2 composite data types we have to carefully put it all back to gether again
-		Vector<Integer> vi = (Vector) ExtUtil.read(in, new ExtWrapListPoly(), pf);
-		for(Integer i : vi)
-		{
-			Vector<XPathExpression> vx = (Vector) ExtUtil.read(in, new ExtWrapListPoly(), pf);
-			predicates.put(i, vx);
+		contextType = ExtUtil.readInt(in);
+		int size = ExtUtil.readInt(in);
+		for(int i = 0 ; i < size; ++i) {
+			TreeReferenceLevel level = (TreeReferenceLevel)ExtUtil.read(in, TreeReferenceLevel.class);
+			this.add(level.intern());
 		}
-
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, refLevel);
-		ExtUtil.write(out, new ExtWrapList(names));
-		ExtUtil.write(out, new ExtWrapList(multiplicity));
 		ExtUtil.write(out, new ExtWrapNullable(instanceName));
-		ExtUtil.write(out, new ExtWrapNullable(instance));
-		//predicates are complicated because they're a complex data structure, so we have to split them up and then
-		//put them back together again
-		Vector<Integer> vi = new Vector<Integer>();
-		//first the keys of the hash table
-    for (Integer in : predicates.keySet()) {
-			vi.addElement(in);
-		}
-		ExtUtil.write(out, new ExtWrapListPoly(vi));
-		//next the data of the hash table
-    for (Integer i : predicates.keySet()) {
-			ExtUtil.write(out, new ExtWrapListPoly(predicates.get(i)));
+		ExtUtil.writeNumeric(out, contextType);
+		ExtUtil.writeNumeric(out, size());
+		for(TreeReferenceLevel l : data) {
+			ExtUtil.write(out, l);
 		}
 	}
 
@@ -522,6 +567,15 @@ public class TreeReference implements Externalizable {
 		throw new RuntimeException("Impossible state");
 	}
 
+	//TODO: This should be in construction
+	public void setContext(int context) {
+		this.contextType = context;
+	}
+
+	public int getContext() {
+		return this.contextType;
+	}
+
 	/**
 	 * Returns the subreference of this reference up to the level specified.
 	 *
@@ -537,24 +591,30 @@ public class TreeReference implements Externalizable {
 
 		//Copy construct
 		TreeReference ret = new TreeReference();
-		ret.setRefLevel(this.refLevel);
-		for (int i = 0; i <= level; i++) {
-			ret.add(this.getName(i), this.getMultiplicity(i));
-		}
-		//copy predicates
-    for (Integer i : predicates.keySet()) {
-			ret.addPredicate(i, predicates.get(i));
-		}
-		//copy instances
-		if(instanceName != null)
-		{
-			ret.setInstanceName(instanceName);
-		}
-		if(instance != null)
-		{
-			ret.setInstance(instance);
+		ret.refLevel = this.refLevel;
+		ret.contextType = this.contextType;
+		ret.instanceName = this.instanceName;
+		ret.data = new Vector<TreeReferenceLevel>();
+		for(int i = 0 ; i <= level ; ++i) {
+			ret.data.addElement(this.data.elementAt(i));
 		}
 		return ret;
+	}
 
+	public boolean hasPredicates() {
+		for(TreeReferenceLevel level : data) {
+			if(level.getPredicates() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public TreeReference removePredicates() {
+		TreeReference predicateless = clone();
+		for(int i = 0; i < predicateless.data.size(); ++i) {
+			predicateless.data.setElementAt(predicateless.data.elementAt(i).setPredicates(null), i	);
+		}
+		return predicateless;
 	}
 }

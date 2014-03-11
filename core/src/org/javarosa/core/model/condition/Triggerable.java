@@ -31,10 +31,42 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
+/**
+ * A triggerable represents an action that should be processed based
+ * on a value updating in a model. Trigerrables are comprised of two
+ * basic components: An expression to be evaluated, and a reference
+ * which represents where the resultant value will be stored.
+ *
+ * A triggerable will dispatch the action it's performing out to
+ * all relevant nodes referenced by the context against thes current
+ * models.
+ *
+ *
+ * @author ctsims
+ *
+ */
 public abstract class Triggerable implements Externalizable {
+	/**
+	 * The expression which will be evaluated to produce a result
+	 */
 	public IConditionExpr expr;
+
+	/**
+	 * References to all of the (non-contextualized) nodes which should be
+	 * updated by the result of this triggerable
+	 *
+	 */
 	public Vector<TreeReference> targets;
+
+	/**
+	 * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
+	 * common root of all of the targets being evaluated.
+	 */
 	public TreeReference contextRef;  //generic ref used to turn triggers into absolute references
+
+	/**
+	 * The first context provided to this triggerable before reducing to the common root.
+	 */
 	public TreeReference originalContextRef;
 
 	public Triggerable () {
@@ -79,12 +111,25 @@ public abstract class Triggerable implements Externalizable {
 	}
 
 	public void addTarget (TreeReference target) {
-		if (targets.indexOf(target) == -1)
+		if (targets.indexOf(target) == -1) {
 			targets.addElement(target);
+		}
 	}
 
 	public Vector<TreeReference> getTargets () {
 		return targets;
+	}
+
+	/**
+	 * This should return true if this triggerable's targets will implicity modify the
+	 * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
+	 * expressions which care about the value of this node's children should be triggered.
+	 *
+	 * @return True if this condition should trigger expressions whose targets include
+	 * nodes which are the children of this node's targets.
+	 */
+	public boolean isCascadingToChildren() {
+		return false;
 	}
 
 	public Vector<TreeReference> getTriggers () {
@@ -113,7 +158,10 @@ public abstract class Triggerable implements Externalizable {
 					Vector<TreeReference> v2 = (k == 0 ? Btriggers : Atriggers);
 
 					for (int i = 0; i < v1.size(); i++) {
-						if (v2.indexOf(v1.elementAt(i)) == -1) {
+						//csims@dimagi.com - 2012-04-17
+						//Added last condition here. We can't actually say whether two triggers
+						//are the same purely based on equality if they are relative.
+						if (!v1.elementAt(i).isAbsolute() || v2.indexOf(v1.elementAt(i)) == -1) {
 							return false;
 						}
 					}

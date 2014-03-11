@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -33,13 +35,13 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-/** The definition of a group in a form or questionaire. 
- * 
+/** The definition of a group in a form or questionaire.
+ *
  * @author Daniel Kayiwa
  *
  */
 public class GroupDef implements IFormElement, Localizable {
-	private Vector children;	/** A list of questions on a group. */	
+	private Vector children;	/** A list of questions on a group. */
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
@@ -48,7 +50,7 @@ public class GroupDef implements IFormElement, Localizable {
 	private String labelInnerText;
 	private String appearanceAttr;
 	private String textID;
-	
+
 	//custom phrasings for repeats
 	public String chooseCaption;
 	public String addCaption;
@@ -59,39 +61,39 @@ public class GroupDef implements IFormElement, Localizable {
 	public String entryHeader;
 	public String delHeader;
 	public String mainHeader;
-	
+
 	Vector observers;
-	
+
 	public boolean noAddRemove = false;
 	public IDataReference count = null;
-	
+
 	public GroupDef () {
 		this(Constants.NULL_ID, null, false);
 	}
-	
+
 	public GroupDef(int id, Vector children, boolean repeat) {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
 		observers = new Vector();
 	}
-	
+
 	public int getID () {
 		return id;
 	}
-	
+
 	public void setID (int id) {
 		this.id = id;
 	}
-	
+
 	public IDataReference getBind() {
 		return binding;
 	}
-	
+
 	public void setBind(IDataReference binding) {
 		this.binding = binding;
 	}
-	
+
 	public void setAdditionalAttribute(String namespace, String name, String value) {
 		TreeElement.setAttribute(null, additionalAttributes, namespace, name, value);
 	}
@@ -107,7 +109,7 @@ public class GroupDef implements IFormElement, Localizable {
 	public Vector<TreeElement> getAdditionalAttributes() {
 		return additionalAttributes;
 	}
-	
+
 	public Vector getChildren() {
 		return children;
 	}
@@ -115,11 +117,11 @@ public class GroupDef implements IFormElement, Localizable {
 	public void setChildren (Vector children) {
 		this.children = (children == null ? new Vector() : children);
 	}
-	
+
 	public void addChild (IFormElement fe) {
 		children.addElement(fe);
 	}
-	
+
 	public IFormElement getChild (int i) {
 		if (children == null || i >= children.size()) {
 			return null;
@@ -127,14 +129,14 @@ public class GroupDef implements IFormElement, Localizable {
 			return (IFormElement)children.elementAt(i);
 		}
 	}
-	
+
 	/**
 	 * @return true if this represents a <repeat> element
 	 */
 	public boolean getRepeat () {
 		return repeat;
 	}
-	
+
 	public void setRepeat (boolean repeat) {
 		this.repeat = repeat;
 	}
@@ -142,7 +144,7 @@ public class GroupDef implements IFormElement, Localizable {
 	public String getLabelInnerText() {
 		return labelInnerText;
 	}
-	
+
 	public void setLabelInnerText(String lit){
 		labelInnerText = lit;
 	}
@@ -151,21 +153,25 @@ public class GroupDef implements IFormElement, Localizable {
 	public String getAppearanceAttr () {
 		return appearanceAttr;
 	}
-	
+
 	public void setAppearanceAttr (String appearanceAttr) {
 		this.appearanceAttr = appearanceAttr;
-	}	
-        
+	}
+
     public void localeChanged(String locale, Localizer localizer) {
     	for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
     		((IFormElement)e.nextElement()).localeChanged(locale, localizer);
     	}
     }
-    
+
     public IDataReference getCountReference() {
     	return count;
     }
-	
+
+    public TreeReference getConextualizedCountReference(TreeReference context) {
+    	return FormInstance.unpackReference(count).contextualize(context);
+    }
+
 	public String toString() {
 		return "<group>";
 	}
@@ -191,10 +197,10 @@ public class GroupDef implements IFormElement, Localizable {
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setRepeat(ExtUtil.readBool(dis));
 		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
-		
+
 		noAddRemove = ExtUtil.readBool(dis);
 		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
-		
+
 		chooseCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 		addCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 		delCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
@@ -214,13 +220,13 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapTagged(getBind()));
 		ExtUtil.write(dos, new ExtWrapNullable(getTextID()));
-		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));	
+		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
 		ExtUtil.writeBool(dos, getRepeat());
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 
 		ExtUtil.writeBool(dos, noAddRemove);
 		ExtUtil.write(dos, new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
-		
+
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(chooseCaption));
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(addCaption));
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(delCaption));
@@ -230,20 +236,20 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(entryHeader));
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(delHeader));
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(mainHeader));
-		
+
 		ExtUtil.writeAttributes(dos, additionalAttributes);
 	}
-	
+
 	public void registerStateObserver (FormElementStateListener qsl) {
 		if (!observers.contains(qsl)) {
 			observers.addElement(qsl);
 		}
 	}
-	
+
 	public void unregisterStateObserver (FormElementStateListener qsl) {
 		observers.removeElement(qsl);
 	}
-	
+
 	public String getTextID() {
 		return textID;
 	}

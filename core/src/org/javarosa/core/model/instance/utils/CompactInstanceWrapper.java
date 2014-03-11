@@ -195,7 +195,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 				TreeReference childTemplRef = e.getRef().extendRef(childName, 0);
 				TreeElement childTempl = instance.getTemplatePath(childTemplRef);
 
-				boolean repeatable = childTempl.repeatable;
+				boolean repeatable = childTempl.isRepeatable();
 				int n = ExtUtil.readInt(in);
 
 				boolean relevant = (n > 0);
@@ -238,7 +238,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 				}
 			}
 		} else {
-			e.setValue((IAnswerData)ExtUtil.read(in, new ExtWrapAnswerData(e.dataType)));
+			e.setValue((IAnswerData)ExtUtil.read(in, new ExtWrapAnswerData(e.getDataType())));
 		}
 	}
 
@@ -272,7 +272,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 				}
 			}
 		} else {
-			ExtUtil.write(out, new ExtWrapAnswerData(e.dataType, e.getValue()));
+			ExtUtil.write(out, new ExtWrapAnswerData(e.getDataType(), e.getValue()));
 		}
 	}
 
@@ -451,6 +451,11 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		} else {
 			throw new RuntimeException();
 		}
+	}
+
+	public void clean() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**

@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2009 JavaRosa
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -40,10 +40,10 @@ public class FormEntryController {
     public static final int EVENT_REPEAT_JUNCTURE = 32;
 
     FormEntryModel model;
-    
+
     /**
      * Creates a new form entry controller for the model provided
-     * 
+     *
      * @param model
      */
     public FormEntryController(FormEntryModel model) {
@@ -58,7 +58,7 @@ public class FormEntryController {
 
     /**
      * Attempts to save answer at the current FormIndex into the datamodel.
-     * 
+     *
      * @param data
      * @return
      */
@@ -70,7 +70,7 @@ public class FormEntryController {
     /**
      * Attempts to save the answer at the specified FormIndex into the
      * datamodel.
-     * 
+     *
      * @param index
      * @param data
      * @return OK if save was successful, error if a constraint was violated.
@@ -82,15 +82,15 @@ public class FormEntryController {
         }
         TreeElement element = model.getTreeElement(index);
         boolean complexQuestion = q.isComplex();
-        
+
         boolean hasConstraints = false;
-        if (element.required && data == null) {
+        if (element.isRequired() && data == null) {
             return ANSWER_REQUIRED_BUT_EMPTY;
         } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
             return ANSWER_CONSTRAINT_VIOLATED;
         } else if (!complexQuestion) {
             commitAnswer(element, index, data);
-            return ANSWER_OK; 
+            return ANSWER_OK;
         } else if (complexQuestion && hasConstraints) {
             //TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
             throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
@@ -104,14 +104,14 @@ public class FormEntryController {
         	return ANSWER_OK;
         }
     }
-    
+
 
     /**
      * saveAnswer attempts to save the current answer into the data model
      * without doing any constraint checking. Only use this if you know what
      * you're doing. For normal form filling you should always use
      * answerQuestion or answerCurrentQuestion.
-     * 
+     *
      * @param index
      * @param data
      * @return true if saved successfully, false otherwise.
@@ -130,7 +130,7 @@ public class FormEntryController {
      * without doing any constraint checking. Only use this if you know what
      * you're doing. For normal form filling you should always use
      * answerQuestion().
-     * 
+     *
      * @param index
      * @param data
      * @return true if saved successfully, false otherwise.
@@ -142,7 +142,7 @@ public class FormEntryController {
 
     /**
      * commitAnswer actually saves the data into the datamodel.
-     * 
+     *
      * @param element
      * @param index
      * @param data
@@ -162,7 +162,7 @@ public class FormEntryController {
 
     /**
      * Navigates forward in the form.
-     * 
+     *
      * @return the next event that should be handled by a view.
      */
     public int stepToNextEvent() {
@@ -172,7 +172,7 @@ public class FormEntryController {
 
     /**
      * Navigates backward in the form.
-     * 
+     *
      * @return the next event that should be handled by a view.
      */
     public int stepToPreviousEvent() {
@@ -182,7 +182,7 @@ public class FormEntryController {
 
     /**
      * Moves the current FormIndex to the next/previous relevant position.
-     * 
+     *
      * @param forward
      * @return
      */
@@ -203,7 +203,7 @@ public class FormEntryController {
 
     /**
      * Jumps to a given FormIndex.
-     * 
+     *
      * @param index
      * @return EVENT for the specified Index.
      */
@@ -216,17 +216,17 @@ public class FormEntryController {
 		jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), n));
     	return model.getFormIndex();
     }
-    
+
     public FormIndex descendIntoNewRepeat () {
-		jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), -1));   				
+		jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), -1));
 		newRepeat(model.getFormIndex());
 		return model.getFormIndex();
     }
-    
+
     /**
      * Creates a new repeated instance of the group referenced by the specified
      * FormIndex.
-     * 
+     *
      * @param questionIndex
      */
     public void newRepeat(FormIndex questionIndex) {
@@ -241,7 +241,7 @@ public class FormEntryController {
     /**
      * Creates a new repeated instance of the group referenced by the current
      * FormIndex.
-     * 
+     *
      * @param questionIndex
      */
     public void newRepeat() {
@@ -252,7 +252,7 @@ public class FormEntryController {
     /**
      * Deletes a repeated instance of a group referenced by the specified
      * FormIndex.
-     * 
+     *
      * @param questionIndex
      * @return
      */
@@ -264,7 +264,7 @@ public class FormEntryController {
     /**
      * Deletes a repeated instance of a group referenced by the current
      * FormIndex.
-     * 
+     *
      * @param questionIndex
      * @return
      */
@@ -275,7 +275,7 @@ public class FormEntryController {
     public void deleteRepeat (int n) {
 		deleteRepeat(model.getForm().descendIntoRepeat(model.getFormIndex(), n));
     }
-    
+
     /**
      * Sets the current language.
      * @param language

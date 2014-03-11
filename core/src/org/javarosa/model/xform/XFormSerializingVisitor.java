@@ -67,6 +67,15 @@ import org.kxml2.kdom.Node;
 
 		Vector dataPointers;
 
+		boolean respectRelevance = true;
+
+		public XFormSerializingVisitor() {
+			this(true);
+		}
+		public XFormSerializingVisitor(boolean respectRelevance) {
+			this.respectRelevance = respectRelevance;
+		}
+
 		private void init() {
 			theXmlDoc = null;
 			schema = null;
@@ -98,7 +107,7 @@ import org.kxml2.kdom.Node;
 
 			model.accept(this);
 			if(theXmlDoc != null) {
-				return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
+				return XFormSerializer.getUtfBytes(theXmlDoc);
 			}
 			else {
 				return null;
@@ -117,12 +126,13 @@ import org.kxml2.kdom.Node;
 			}
 			model.accept(this);
 			if(theXmlDoc != null) {
-				byte[] form = XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
+				//TODO: Did this strip necessary data?
+				byte[] form = XFormSerializer.getUtfBytes(theXmlDoc);
 				if(dataPointers.size() == 0) {
 					return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_XML);
 				}
 				MultiMessagePayload payload = new MultiMessagePayload();
-				payload.addPayload(new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_XML));
+				payload.addPayload(new ByteArrayPayload(form, "xml_submission_file", IDataPayload.PAYLOAD_TYPE_XML));
 				Enumeration en = dataPointers.elements();
 				while(en.hasMoreElements()) {
 					IDataPointer pointer = (IDataPointer)en.nextElement();
@@ -175,11 +185,12 @@ import org.kxml2.kdom.Node;
 			Element e = new Element(); //don't set anything on this element yet, as it might get overwritten
 
 			//don't serialize template nodes or non-relevant nodes
-			if (!instanceNode.isRelevant() || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
+			if ((respectRelevance && !instanceNode.isRelevant()) || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE) {
 				return null;
+			}
 
 			if (instanceNode.getValue() != null) {
-				Object serializedAnswer = serializer.serializeAnswerData(instanceNode.getValue(), instanceNode.dataType);
+				Object serializedAnswer = serializer.serializeAnswerData(instanceNode.getValue(), instanceNode.getDataType());
 
 				if (serializedAnswer instanceof Element) {
 					e = (Element)serializedAnswer;
@@ -224,7 +235,14 @@ import org.kxml2.kdom.Node;
 				String namespace = instanceNode.getAttributeNamespace(i);
 				String name		 = instanceNode.getAttributeName(i);
 				String val		 = instanceNode.getAttributeValue(i);
+				// is it legal for getAttributeValue() to return null? playing it safe for now and assuming yes
+				if (val == null) {
+					val = "";
+				}
 				e.setAttribute(namespace, name, val);
+			}
+			if(instanceNode.getNamespace() != null) {
+				e.setNamespace(instanceNode.getNamespace());
 			}
 
 			return e;

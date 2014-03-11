@@ -6,24 +6,24 @@ import java.util.HashMap;
 
 public class Localization {
 	private static Localizer globalLocalizer;
-	
+
 	public static String get(String key){
 		return get(key, new String[]{});
 	}
-	
+
 	public static String get(String key, String[] args) {
 		checkRep();
 		return globalLocalizer.getText(key, args);
 	}
-	
+
 	public static String get(String key, HashMap args) {
 		checkRep();
 		return globalLocalizer.getText(key, args);
 	}
-	
+
 	public static void registerLanguageFile(String localeName, String resourceFileURI) {
-		init();
-		if(!globalLocalizer.hasLocale(localeName)){ 
+		init(false);
+		if(!globalLocalizer.hasLocale(localeName)){
 			globalLocalizer.addAvailableLocale(localeName);
 		}
 		globalLocalizer.registerLocaleResource(localeName, new ResourceFileDataSource(resourceFileURI));
@@ -31,10 +31,10 @@ public class Localization {
 			globalLocalizer.setDefaultLocale(localeName);
 		}
 	}
-	
+
 	public static void registerLanguageReference(String localeName, String referenceUri) {
-		init();
-		if(!globalLocalizer.hasLocale(localeName)){ 
+		init(false);
+		if(!globalLocalizer.hasLocale(localeName)){
 			globalLocalizer.addAvailableLocale(localeName);
 		}
 		globalLocalizer.registerLocaleResource(localeName, new ReferenceDataSource(referenceUri));
@@ -42,35 +42,41 @@ public class Localization {
 			globalLocalizer.setDefaultLocale(localeName);
 		}
 	}
-	
+
 	public static Localizer getGlobalLocalizerAdvanced() {
-		init();
+		init(false);
 		return globalLocalizer;
 	}
-	
+
 	public static void setLocale(String locale) {
 		checkRep();
 		globalLocalizer.setLocale(locale);
 	}
-	
+
 	public static void setDefaultLocale(String defaultLocale) {
 		checkRep();
 		globalLocalizer.setDefaultLocale(defaultLocale);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
-	private static void init() {
-		if(globalLocalizer == null) {
+	public static void init(boolean force) {
+		if(globalLocalizer == null || force) {
 			globalLocalizer = new Localizer(true,true);
 		}
 	}
+
+	public static void setLocalizationData(Localizer localizer) {
+		globalLocalizer = localizer;
+
+	}
+
 	/**
-	 *  
+	 *
 	 */
 	private static void checkRep() {
-		init();
+		init(false);
 		if(globalLocalizer.getAvailableLocales().length == 0) {
 			throw new LocaleTextException("There are no locales defined for the application. Please make sure to register locale text using the Locale.register() method");
 		}

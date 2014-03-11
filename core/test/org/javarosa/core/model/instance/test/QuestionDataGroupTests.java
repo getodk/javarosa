@@ -28,6 +28,7 @@ import java.io.IOException;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
@@ -37,21 +38,21 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class QuestionDataGroupTests extends TestCase {
 	private final String stringElementName = "String Data Element";
 	private final String groupName = "TestGroup";
-	
+
 	StringData stringData;
 	IntegerData integerData;
-	
-	IDataReference stringReference; 
-	
+
+	IDataReference stringReference;
+
 	IDataReference integerReference;
-	
+
 	TreeElement stringElement;
 	TreeElement intElement;
-	
+
 	TreeElement group;
-	
+
 	private static int NUM_TESTS = 9;
-	
+
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
 	 */
@@ -59,14 +60,14 @@ public class QuestionDataGroupTests extends TestCase {
 		super.setUp();
 		stringData = new StringData("Answer Value");
 		integerData = new IntegerData(4);
-		
+
 		stringReference = new IDataReference() {
 			String reference = "stringValue";
-			
+
 			public Object getReference() {
 				return reference;
 			}
-			
+
 			public void setReference(Object reference) {
 				this.reference = (String)reference;
 			}
@@ -74,8 +75,8 @@ public class QuestionDataGroupTests extends TestCase {
 			public boolean referenceMatches(IDataReference reference) {
 				return this.reference.equals(reference.getReference());
 			}
-		
-			
+
+
 			public IDataReference clone()  {
 				IDataReference newReference = null;
 				try {
@@ -94,14 +95,14 @@ public class QuestionDataGroupTests extends TestCase {
 			public void writeExternal(DataOutputStream out) throws IOException {};
 
 		};
-		
+
 		integerReference = new IDataReference() {
 			Integer intReference = new Integer(15);
-			
+
 			public Object getReference() {
 				return intReference;
 			}
-			
+
 			public void setReference(Object reference) {
 				this.intReference = (Integer)reference;
 			}
@@ -109,8 +110,8 @@ public class QuestionDataGroupTests extends TestCase {
 			public boolean referenceMatches(IDataReference reference) {
 				return this.intReference.equals(reference.getReference());
 			}
-		
-			
+
+
 			public IDataReference clone()  {
 				IDataReference newReference = null;
 				try {
@@ -129,16 +130,16 @@ public class QuestionDataGroupTests extends TestCase {
 			public void writeExternal(DataOutputStream out) throws IOException {};
 
 		};
-		
+
 		intElement  = new TreeElement("intElement");
 		intElement.setValue(integerData);
-		
+
 		stringElement = new TreeElement(stringElementName);
 		stringElement.setValue(stringData);
-		
+
 		group = new TreeElement(groupName);
 	}
-	
+
 	public QuestionDataGroupTests(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
 	}
@@ -149,7 +150,7 @@ public class QuestionDataGroupTests extends TestCase {
 
 	public QuestionDataGroupTests() {
 		super();
-	}	
+	}
 
 	public Test suite() {
 		TestSuite aSuite = new TestSuite();
@@ -168,7 +169,7 @@ public class QuestionDataGroupTests extends TestCase {
 	}
 	public void testMaster (int testID) {
 		//System.out.println("running " + testID);
-		
+
 		switch (testID) {
 			case 1: testIsLeaf(); break;
 			case 2: testGetName(); break;
@@ -178,7 +179,7 @@ public class QuestionDataGroupTests extends TestCase {
 			case 6: testAddTreeChild(); break;
 			case 7: testContains(); break;
 			case 8: testSuperclassMethods(); break;
-			
+
 		}
 	}
 
@@ -187,14 +188,14 @@ public class QuestionDataGroupTests extends TestCase {
 		group.addChild(stringElement);
 		assertTrue("A Group with children should not report being a leaf", !group.isLeaf());
 	}
-	
+
 	public void testGetName() {
 		String name = "TestGroup";
 		assertEquals("Question Data Group did not properly get its name", group.getName(), name);
 		group.addChild(stringElement);
 		assertEquals("Question Data Group's name was changed improperly", group.getName(), name);
 	}
-	
+
 	public void testSetName() {
 		String name = "TestGroup";
 		group = new TreeElement(name);
@@ -202,49 +203,49 @@ public class QuestionDataGroupTests extends TestCase {
 		group.setName(newName);
 		assertEquals("Question Data Group did not properly get its name", group.getName(), newName);
 	}
-	
+
 	private class MutableBoolean {
 		private boolean bool;
-		
+
 		public MutableBoolean(boolean bool) {
 			this.bool = bool;
 		}
-		
+
 		void setValue(boolean bool) {
 			this.bool = bool;
 		}
-		
+
 		boolean getValue() {
 			return bool;
 		}
 	}
-	
+
 	public void testAcceptsVisitor() {
 		final MutableBoolean visitorAccepted = new MutableBoolean(false);
 		final MutableBoolean dispatchedWrong = new MutableBoolean(false);
 		ITreeVisitor sampleVisitor = new ITreeVisitor() {
-			
+
 			public void visit(FormInstance tree) {
 				dispatchedWrong.setValue(true);
 
 			}
-			public void visit(TreeElement element) {
+			public void visit(AbstractTreeElement element) {
 				visitorAccepted.setValue(true);
 			}
 		};
-		
+
 		stringElement.accept(sampleVisitor);
 		assertTrue("The visitor's visit method was not called correctly by the QuestionDataElement",visitorAccepted.getValue());
-		
+
 		assertTrue("The visitor was dispatched incorrectly by the QuestionDataElement",!dispatchedWrong.getValue());
 	}
-	
+
 	private void testSuperclassMethods() {
 		//stringElement should not have a root at this point.
-		
+
 		//TODO: Implement tests for the 'attribute' system.
 	}
-	
+
 	private void testAddLeafChild() {
 
 
@@ -254,13 +255,13 @@ public class QuestionDataGroupTests extends TestCase {
 			group.addChild(stringElement);
 			group.getChildAt(0);
 			assertTrue("Added element was not in Question Data Group's children!",group.getChildAt(0).equals(stringElement));
-		} 
+		}
 		catch(RuntimeException e) {
 			if(!added) {
 				fail("Group did not report success adding a valid child");
 			}
 		}
-		
+
 		try {
 			TreeElement leafGroup = new TreeElement("leaf group");
 			group.addChild(leafGroup);
@@ -271,27 +272,27 @@ public class QuestionDataGroupTests extends TestCase {
 				fail("Group did not report success adding a valid child");
 			}
 			//threw = true;
-			
+
 		}
 	}
-	
+
 	private void testAddTreeChild() {
 		//TreeElement subTree = new TreeElement("subtree");
 		//TreeElement firstRootTree = new TreeElement("firstRoot");
 		//TreeElement secondRootTree = new TreeElement("secondRoot");
-		
+
 		TreeElement subElement = new TreeElement("SubElement");
 		subElement.addChild(stringElement);
 		subElement.addChild(intElement);
-		
+
 		//assertTrue("Group did not add valid subtree group as a child",subTree.addChild(subElement));
 		//assertTrue("Group does not properly contain subtree group as a child",subTree.contains(subElement));
-		
+
 		//Looks like these are not valid anymore after the last round of changes.
-		
+
 	}
-	
+
 	private void testContains() {
-		
+
 	}
 }

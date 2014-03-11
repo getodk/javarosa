@@ -18,6 +18,7 @@ package org.javarosa.core.util.externalizable;
 
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.OrderedMap;
 
 import java.io.*;
@@ -27,6 +28,8 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class ExtUtil {
+	public static boolean interning = true;
+	public static CacheTable<String> stringCache;
 	public static byte[] serialize (Object o) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -47,6 +50,12 @@ public class ExtUtil {
 			throw new DeserializationException("Unexpectedly reached end of stream when deserializing");
 		} catch (IOException e) {
 			throw new RuntimeException("Unknown IOException reading from ByteArrayInputStream; shouldn't happen!");
+		} finally {
+			try {
+				bais.close();
+			} catch (IOException e) {
+				//already closed. Don't sweat it
+			}
 		}
 	}
 
@@ -60,6 +69,12 @@ public class ExtUtil {
 			throw new DeserializationException("Unexpectedly reached end of stream when deserializing");
 		} catch (IOException e) {
 			throw new RuntimeException("Unknown IOException reading from ByteArrayInputStream; shouldn't happen!");
+		} finally {
+			try {
+				bais.close();
+			} catch (IOException e) {
+				//already closed. Don't sweat it
+			}
 		}
 	}
 
@@ -236,7 +251,8 @@ public class ExtUtil {
 	}
 
 	public static String readString (DataInputStream in) throws IOException {
-		return in.readUTF();
+		String s = in.readUTF();
+		return (interning && stringCache != null) ? stringCache.intern(s) : s;
 	}
 
 	public static Date readDate (DataInputStream in) throws	IOException {
@@ -461,4 +477,8 @@ public class ExtUtil {
         return read(new DataInputStream(new ByteArrayInputStream(data)), type, pf);
 	}
 	////
+
+	public static void attachCacheTable(CacheTable<String> stringCache) {
+		ExtUtil.stringCache = stringCache;
+	}
 }

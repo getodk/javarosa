@@ -663,9 +663,10 @@ public class DateUtils {
 		return dateDiff(getDate(1970, 1, 1), date);
 	}
 
-        public static Double fractionalDaysSinceEpoch(Date a) {
-                return new Double((a.getTime() - getDate(1970, 1, 1).getTime()) / (double)DAY_IN_MS);
-        }
+
+    public static Double fractionalDaysSinceEpoch(Date a) {
+        return new Double((a.getTime() - getDate(1970, 1, 1).getTime()) / (double)DAY_IN_MS);
+    }
 
 	/**
 	 * add n days to date d
@@ -700,8 +701,8 @@ public class DateUtils {
 	 * @return An array of strings contained in original which were
 	 * seperated by the delimeter
 	 */
-    public static Vector split (String str, String delimiter, boolean combineMultipleDelimiters) {
-    	Vector pieces = new Vector();
+    public static Vector<String> split (String str, String delimiter, boolean combineMultipleDelimiters) {
+    	Vector<String> pieces = new Vector<String>();
 
     	int index = str.indexOf(delimiter);
         while (index >= 0) {
@@ -778,4 +779,5 @@ public class DateUtils {
 			return true;
 		}
 	}
+
 }
