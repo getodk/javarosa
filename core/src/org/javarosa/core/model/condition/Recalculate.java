@@ -24,6 +24,9 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.GeoLineData;
+import org.javarosa.core.model.data.GeoPointData;
+import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -131,6 +134,12 @@ public class Recalculate extends Triggerable {
 			} else {
 				return new DecimalData(d);
 			}
+		} else if (dataType == Constants.DATATYPE_GEOPOINT) {
+			return new GeoPointData().cast(new UncastData(String.valueOf(val)));
+		} else if (dataType == Constants.DATATYPE_GEOLINE) {
+			return new GeoLineData().cast(new UncastData(String.valueOf(val)));
+		} else if (dataType == Constants.DATATYPE_GEOSHAPE) {
+			return new GeoShapeData().cast(new UncastData(String.valueOf(val)));
 		} else if (dataType == Constants.DATATYPE_CHOICE) {
 			return new SelectOneData().cast(new UncastData(String.valueOf(val)));
 		} else if (dataType == Constants.DATATYPE_CHOICE_LIST) {
