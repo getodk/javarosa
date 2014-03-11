@@ -22,8 +22,10 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -34,52 +36,55 @@ public class EvaluationContext {
 	private TreeReference contextNode; //unambiguous ref used as the anchor for relative paths
 	private HashMap<String, IFunctionHandler> functionHandlers;
 	private HashMap variables;
-	
+
 	public boolean isConstraint; //true if we are evaluating a constraint
 	public IAnswerData candidateValue; //if isConstraint, this is the value being validated
 	public boolean isCheckAddChild; //if isConstraint, true if we are checking the constraint of a parent node on how
 									//  many children it may have
-	
+
 	private String outputTextForm = null; //Responsible for informing itext what form is requested if relevant
-	
+
 	private HashMap<String, FormInstance> formInstances;
-	
+
 	private TreeReference original;
 	private int currentContextPosition = -1;
-	
+
 	FormInstance instance;
 	int[] predicateEvaluationProgress;
-	
+
 	/** Copy Constructor **/
 	private EvaluationContext (EvaluationContext base) {
 		//TODO: These should be deep, not shallow
 		this.functionHandlers = base.functionHandlers;
 		this.formInstances = base.formInstances;
 		this.variables = base.variables;
-		
+
 		this.contextNode = base.contextNode;
 		this.instance = base.instance;
-		
+
 		this.isConstraint = base.isConstraint;
 		this.candidateValue = base.candidateValue;
 		this.isCheckAddChild = base.isCheckAddChild;
-		
+
 		this.outputTextForm = base.outputTextForm;
 		this.original = base.original;
-		
+
+		//Hrm....... not sure about this one. this only happens after a rescoping,
+		//and is fixed on the context. Anything that changes the context should
+		//invalidate this
 		this.currentContextPosition = base.currentContextPosition;
 	}
-	
+
 	public EvaluationContext (EvaluationContext base, TreeReference context) {
 		this(base);
 		this.contextNode = context;
 	}
-	
+
 	public EvaluationContext (EvaluationContext base, HashMap<String, FormInstance> formInstances, TreeReference context) {
 		this(base, context);
 		this.formInstances = formInstances;
 	}
-	
+
 	public EvaluationContext (FormInstance instance, HashMap<String, FormInstance> formInstances, EvaluationContext base) {
 		this(base);
 		this.formInstances = formInstances;
@@ -89,55 +94,55 @@ public class EvaluationContext {
 	public EvaluationContext (FormInstance instance) {
 		this(instance, new HashMap<String, FormInstance>());
 	}
-	
+
 	public EvaluationContext (FormInstance instance, HashMap<String, FormInstance> formInstances) {
-		this.formInstances = formInstances; 
+		this.formInstances = formInstances;
 		this.instance = instance;
 		this.contextNode = TreeReference.rootRef();
 		functionHandlers = new HashMap<String, IFunctionHandler>();
 		variables = new HashMap();
 	}
-	
+
 	public FormInstance getInstance(String id) {
-		return formInstances.containsKey(id) ? formInstances.get(id) : 
+		return formInstances.containsKey(id) ? formInstances.get(id) :
 			(instance != null && id.equals(instance.getName()) ? instance : null);
 	}
-	
+
 	public TreeReference getContextRef () {
 		return contextNode;
 	}
-	
+
 	public void setOriginalContext(TreeReference ref) {
 		this.original = ref;
 	}
-	
+
 	public TreeReference getOriginalContext() {
 		if (this.original == null) { return this.contextNode; }
 		else { return this.original; }
 	}
-	
+
 	public void addFunctionHandler (IFunctionHandler fh) {
 		functionHandlers.put(fh.getName(), fh);
 	}
-	
+
 	public HashMap getFunctionHandlers () {
 		return functionHandlers;
 	}
-	
+
 	public void setOutputTextForm(String form) {
 		this.outputTextForm = form;
 	}
-	
+
 	public String getOutputTextForm() {
 		return outputTextForm;
 	}
-	
+
 	public void setVariables(HashMap<String, ?> variables) {
     for (String var : variables.keySet()) {
 			setVariable(var, variables.get(var));
 		}
 	}
-	
+
 	public void setVariable(String name, Object value) {
 		//No such thing as a null xpath variable. Empty
 		//values in XPath just get converted to ""
@@ -155,7 +160,7 @@ public class EvaluationContext {
 				variables.put(name, value);
 				return;
 		}
-		
+
 		//Some datatypes can be trivially converted to a first order
 		//xpath datatype
 		if(value instanceof Integer) {
@@ -166,17 +171,17 @@ public class EvaluationContext {
 			variables.put(name, new Double(((Float)value).doubleValue()));
 			return;
 		}
-		
+
 		//Otherwise we just hope for the best, I suppose? Should we log this?
 		else {
 			variables.put(name, value);
 		}
 	}
-	
+
 	public Object getVariable(String name) {
 		return variables.get(name);
 	}
-	
+
 	public Vector<TreeReference> expandReference(TreeReference ref) {
 		return expandReference(ref, false);
 	}
@@ -192,7 +197,7 @@ public class EvaluationContext {
 		if (!ref.isAbsolute()) {
 			return null;
 		}
-		
+
 		FormInstance baseInstance;
 		if(ref.getInstanceName() != null ) {
 			baseInstance = getInstance(ref.getInstanceName());
@@ -203,7 +208,7 @@ public class EvaluationContext {
 		if ( baseInstance == null ) {
 			throw new RuntimeException("Unable to expand reference " + ref.toString(true) + ", no appropriate instance in evaluation context");
 		}
-		
+
 		Vector<TreeReference> v = new Vector<TreeReference>();
 		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), v, includeTemplates);
 		return v;
@@ -212,18 +217,24 @@ public class EvaluationContext {
 	// recursive helper function for expandReference
 	// sourceRef: original path we're matching against
 	// node: current node that has matched the sourceRef thus far
-	// templateRef: explicit path that refers to the current node
+	// workingRef: explicit path that refers to the current node
 	// refs: Vector to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
 	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef, Vector<TreeReference> refs, boolean includeTemplates) {
 		int depth = workingRef.size();
 		Vector<XPathExpression> predicates = null;
+
+		//check to see if we've matched fully
 		if (depth == sourceRef.size()) {
+			//TODO: Do we need to clone these references?
 			refs.addElement(workingRef);
 		} else {
+			//Otherwise, need to get the next set of matching references
+
 			String name = sourceRef.getName(depth);
 			predicates = sourceRef.getPredicate(depth);
-			
+
+			//Copy predicates for batch fetch
 			if (predicates != null) {
 				Vector<XPathExpression> predCopy = new Vector<XPathExpression>();
 				for (XPathExpression xpe : predicates) {
@@ -234,9 +245,10 @@ public class EvaluationContext {
 			//ETHERTON: Is this where we should test for predicates?
 			int mult = sourceRef.getMultiplicity(depth);
 			Vector<TreeReference> set = new Vector<TreeReference>();
-			
+
 			TreeElement node = instance.resolveReference(workingRef);
-			
+			Vector<TreeReference> passingSet = new Vector<TreeReference>();
+
 			{
 				if (node.getNumChildren() > 0) {
 					if (mult == TreeReference.INDEX_UNBOUND) {
@@ -246,7 +258,7 @@ public class EvaluationContext {
 							if (child != null) {
 								set.addElement(child.getRef());
 							} else {
-								throw new IllegalStateException(); // missing/non-sequential
+								throw new IllegalStateException("Missing or non-sequntial nodes expanding a reference"); // missing/non-sequential
 								// nodes
 							}
 						}
@@ -266,25 +278,27 @@ public class EvaluationContext {
 						}
 					}
 				}
-				
+
 				if(mult == TreeReference.INDEX_ATTRIBUTE) {
 					TreeElement attribute = node.getAttribute(null, name);
-					set.addElement(attribute.getRef());
+					if (attribute != null) {
+						set.addElement(attribute.getRef());
+					}
 				}
 			}
-			
+
 			if (predicates != null && predicateEvaluationProgress != null) {
 				predicateEvaluationProgress[1] += set.size();
 			}
-	
+
 			if (predicates != null) {
 				boolean firstTime = true;
 				Vector<TreeReference> passed = new Vector<TreeReference>();
 				for (XPathExpression xpe : predicates) {
 					for ( int i = 0 ; i < set.size() ; ++i ) {
 						//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-						TreeReference treeRef = set.elementAt(i);				
-					
+						TreeReference treeRef = set.elementAt(i);
+
 						//test the predicate on the treeElement
 						EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
 						Object o = xpe.eval(instance, evalContext);
@@ -306,17 +320,17 @@ public class EvaluationContext {
 					}
 				}
 			}
-			
+
 			for ( int i = 0 ; i < set.size() ; ++i ) {
 				TreeReference treeRef = set.elementAt(i);
 				expandReference(sourceRef, instance, treeRef, refs, includeTemplates);
 			}
 		}
 	}
-	
+
     private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
         EvaluationContext ec = new EvaluationContext(this, treeRef);
-        // broken: 
+        // broken:
         ec.currentContextPosition = currentContextPosition;
         //If there was no original context position, we'll want to set the next original
         //context to be this rescoping (which would be the backup original one).
@@ -325,14 +339,14 @@ public class EvaluationContext {
         } else {
                 //Check to see if we have a context, if not, the treeRef is the original declared
                 //nodeset.
-                if(TreeReference.rootRef().equals(this.getContextRef())) 
-                { 
+                if(TreeReference.rootRef().equals(this.getContextRef()))
+                {
                         ec.setOriginalContext(treeRef);
                 } else {
                         //If we do have a legit context, use it!
                         ec.setOriginalContext(this.getContextRef());
                 }
-                
+
         }
         return ec;
     }
@@ -348,7 +362,7 @@ public class EvaluationContext {
             }
             return instance.resolveReference(qualifiedRef);
     }
-    
+
     public int getContextPosition() {
             return currentContextPosition;
     }
@@ -358,5 +372,4 @@ public class EvaluationContext {
                     predicateEvaluationProgress = loadingDetails;
             }
     }
-
 }

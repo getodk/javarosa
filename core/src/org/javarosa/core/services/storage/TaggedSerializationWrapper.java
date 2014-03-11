@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.javarosa.core.services.storage;
 
@@ -21,7 +21,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class TaggedSerializationWrapper implements SerializationWrapper {
 
 	Externalizable e;
-	
+
 	public TaggedSerializationWrapper() {
 	}
 
@@ -56,6 +56,10 @@ public class TaggedSerializationWrapper implements SerializationWrapper {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(e));
+	}
+
+	public void clean() {
+		e = null;
 	}
 
 }

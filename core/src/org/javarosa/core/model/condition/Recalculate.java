@@ -34,50 +34,56 @@ import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.XPathException;
 
 public class Recalculate extends Triggerable {
 	public Recalculate () {
 
 	}
-	
+
 	public Recalculate (IConditionExpr expr, TreeReference contextRef) {
 		super(expr, contextRef);
 	}
-	
+
 	public Recalculate (IConditionExpr expr, TreeReference target, TreeReference contextRef) {
 		super(expr, contextRef);
 		addTarget(target);
 	}
-	
+
 	public Object eval (FormInstance model, EvaluationContext ec) {
-		return expr.evalRaw(model, ec);
+		try {
+			return expr.evalRaw(model, ec);
+		} catch(XPathException e) {
+			e.setSource("calculate expression for " + contextRef.toString(true));
+			throw e;
+		}
 	}
-	
+
 	public void apply (TreeReference ref, Object result, FormInstance model, FormDef f) {
-		int dataType = f.getMainInstance().resolveReference(ref).dataType;
+		int dataType = f.getMainInstance().resolveReference(ref).getDataType();
 		f.setAnswer(wrapData(result, dataType), ref);
 	}
-		
+
 	public boolean canCascade () {
 		return true;
 	}
-	
+
 	public boolean equals (Object o) {
 		if (o instanceof Recalculate) {
 			Recalculate r = (Recalculate)o;
 			if (this == r)
 				return true;
-			
+
 			return super.equals(r);
 		} else {
 			return false;
-		}			
+		}
 	}
-	
+
 	//droos 1/29/10: we need to come up with a consistent rule for whether the resulting data is determined
 	//by the type of the instance node, or the type of the expression result. right now it's a mix and a mess
 	//note a caveat with going solely by instance node type is that untyped nodes default to string!
-	
+
 	//for now, these are the rules:
 	// if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; empty string = f, all other datatypes -> error)
 	// if numeric data, convert to int if node type is int OR data is an integer; else convert to double
@@ -86,20 +92,20 @@ public class Recalculate extends Triggerable {
 	/**
 	 * convert the data object returned by the xpath expression into an IAnswerData suitable for
 	 * storage in the FormInstance
-	 * 
+	 *
 	 */
 	public static IAnswerData wrapData (Object val, int dataType) {
 		if ((val instanceof String && ((String)val).length() == 0) ||
 			(val instanceof Double && ((Double)val).isNaN())) {
 			return null;
 		}
-		
+
 		if (Constants.DATATYPE_BOOLEAN == dataType || val instanceof Boolean) {
-			//ctsims: We should really be using the boolean datatype for real, it's 
+			//ctsims: We should really be using the boolean datatype for real, it's
 			//necessary for backend calculations and XSD compliance
-			
+
 			boolean b;
-			
+
 			if (val instanceof Boolean) {
 				b = ((Boolean)val).booleanValue();
 			} else if (val instanceof Double) {
@@ -116,7 +122,7 @@ public class Recalculate extends Triggerable {
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
 			long l = (long) d;
-			boolean isIntegral = Math.abs(d - l) < 1.0e-9;			
+			boolean isIntegral = Math.abs(d - l) < 1.0e-9;
 			if(Constants.DATATYPE_INTEGER == dataType ||
 					   (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
 				return new IntegerData((int)d);

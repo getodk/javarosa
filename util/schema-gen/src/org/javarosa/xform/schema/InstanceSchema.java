@@ -73,7 +73,7 @@ public class InstanceSchema {
 	private static Element schemizeInstance (TreeElement node) {
 		String name = node.getName();
 		boolean terminal = node.isLeaf();
-		boolean repeatable = node.repeatable;
+		boolean repeatable = node.isRepeatable();
 
 		if (repeatable && node.getMult() != TreeReference.INDEX_TEMPLATE) {
 			return null;
@@ -105,7 +105,7 @@ public class InstanceSchema {
 		} else {
 			String type;
 
-			switch (node.dataType) {
+			switch (node.getDataType()) {
 			case Constants.DATATYPE_NULL:
 			case Constants.DATATYPE_TEXT:
 				type = "string";
@@ -129,7 +129,7 @@ public class InstanceSchema {
 			case Constants.DATATYPE_GEOSHAPE: type = "jr:geoshape"; break;
 			default:
 				type = null;
-				System.err.println("unrecognized type [" + node.dataType + ";" + node.getName() + "]");
+				System.err.println("unrecognized type [" + node.getDataType() + ";" + node.getName() + "]");
 				break;
 			}
 

@@ -38,9 +38,9 @@ import org.kxml2.kdom.Node;
 /**
  * A modified version of Clayton's XFormSerializingVisitor that constructs
  * SMS's.
- * 
+ *
  * @author Munaf Sheikh, Cell-Life
- * 
+ *
  */
 public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
@@ -72,8 +72,8 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		this.schema = formDef;
 		return serializeInstance(model);
 	}
-	
-	
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeInstance(org.javarosa.core.model.instance.FormInstance)
@@ -100,7 +100,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 			return null;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#createSerializedPayload(org.javarosa.core.model.instance.FormInstance)
@@ -127,7 +127,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model
 	 * .DataModelTree)
@@ -145,7 +145,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		xmlns = (xmlns != null)? xmlns : " ";
 		delimeter = (delimeter != null ) ? delimeter : " ";
 		prefix = (prefix != null) ? prefix : " ";
-		
+
 		//Don't bother adding any delimiters, yet. Delimiters are
 		//added before tags/data
 		theSmsStr = prefix;
@@ -170,7 +170,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
 		if (instanceNode.getValue() != null) {
 			Object serializedAnswer = serializer.serializeAnswerData(
-					instanceNode.getValue(), instanceNode.dataType);
+					instanceNode.getValue(), instanceNode.getDataType());
 
 			if (serializedAnswer instanceof Element) {
 				// DON"T handle this.
@@ -211,7 +211,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seeorg.javarosa.core.model.utils.IInstanceSerializingVisitor#
 	 * setAnswerDataSerializer(org.javarosa.core.model.IAnswerDataSerializer)
 	 */

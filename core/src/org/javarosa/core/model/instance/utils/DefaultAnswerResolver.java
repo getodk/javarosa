@@ -34,6 +34,6 @@ public class DefaultAnswerResolver implements IAnswerResolver {
 
   @Override
   public IAnswerData resolveAnswer(String textVal, TreeElement treeElement, FormDef formDef) {
-      return RestoreUtils.xfFact.parseData(textVal, treeElement.dataType, treeElement.getRef(), formDef);
+      return RestoreUtils.xfFact.parseData(textVal, treeElement.getDataType(), treeElement.getRef(), formDef);
   }
 }

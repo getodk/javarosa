@@ -120,7 +120,7 @@ public class FormOverview {
 		FormEntryPrompt fep = femodel.getQuestionPrompt();
 		caption = fep.getLongText();
 
-		int type = instanceNode.dataType;
+		int type = instanceNode.getDataType();
 
 		if (q.getControlType() != Constants.CONTROL_TRIGGER) {
 			println(sb, indent, "Question: \"" + caption + "\"");
@@ -184,7 +184,7 @@ public class FormOverview {
 		} else if (property.equals("required")) {
 			action = Condition.ACTION_REQUIRE;
 			conditionHeader = "Conditionally Required";
-			absolute = instanceNode.required;
+			absolute = instanceNode.isRequired();
 			absoluteReportable = true;
 			absoluteHeader = "Required";
 		} else if (property.equals("readonly")) {
@@ -266,7 +266,7 @@ public class FormOverview {
 			if (node.getValue() != null) {
 				XFormAnswerDataSerializer xfads = new XFormAnswerDataSerializer();
 				if (xfads.canSerialize(node.getValue())) {
-					value = (String)xfads.serializeAnswerData(node.getValue(), node.dataType);
+					value = (String)xfads.serializeAnswerData(node.getValue(), node.getDataType());
 				} else {
 					value = "unknown data";
 				}

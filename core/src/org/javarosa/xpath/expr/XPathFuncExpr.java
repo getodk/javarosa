@@ -141,9 +141,11 @@ public class XPathFuncExpr extends XPathExpression {
 		HashMap funcHandlers = evalContext.getFunctionHandlers();
 
 		//TODO: Func handlers should be able to declare the desire for short circuiting as well
-		if(name.equals("if") && args.length == 3) {
+		if(name.equals("if")) {
+			assertArgsCount( name, args, 3);
 			return ifThenElse(model, evalContext, args, argVals);
-		} else if (name.equals("coalesce") && args.length == 2) {
+		} else if (name.equals("coalesce")) {
+			assertArgsCount( name, args, 2);
 			//Not sure if unpacking here is quiiite right, but it seems right
 			argVals[0] = XPathFuncExpr.unpack(args[0].eval(model, evalContext));
 			if(!isNull(argVals[0])) { return argVals[0]; }
@@ -151,8 +153,13 @@ public class XPathFuncExpr extends XPathExpression {
 				argVals[1] = args[1].eval(model, evalContext);
 				return argVals[1];
 			}
-		} else if (name.equals("indexed-repeat") && (args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
-			return indexedRepeat(model, evalContext, args, argVals);
+		} else if (name.equals("indexed-repeat")) {
+			if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
+				return indexedRepeat(model, evalContext, args, argVals);
+			} else {
+				throw new XPathUnhandledException("function \'" + name + "\' requires " +
+						"3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
+			}
 		}
 
 		for (int i = 0; i < args.length; i++) {

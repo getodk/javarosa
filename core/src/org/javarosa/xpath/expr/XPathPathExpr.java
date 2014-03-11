@@ -46,6 +46,8 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.javarosa.xpath.XPathException;
+import org.javarosa.xpath.XPathMissingInstanceException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -115,6 +117,9 @@ public class XPathPathExpr extends XPathExpression {
 					XPathStringLiteral strLit = (XPathStringLiteral)(func.args[0]);
 					//we've got a non-standard instance in play, watch out
 					ref.setInstanceName(strLit.s);
+				} else if(func.id.toString().equals("current")){
+					parentsAllowed = true;
+					ref.setContext(TreeReference.CONTEXT_ORIGINAL);
 				} else {
 					//We only support expression root contexts for instance refs, everything else is an illegal filter
 					throw new XPathUnsupportedException("filter expression");
@@ -178,7 +183,12 @@ public class XPathPathExpr extends XPathExpression {
 	public XPathNodeset eval (FormInstance m, EvaluationContext ec) {
 		TreeReference genericRef = getReference();
 
-		TreeReference ref = genericRef.contextualize(ec.getContextRef());
+		TreeReference ref;
+		if(genericRef.getContext() == TreeReference.CONTEXT_ORIGINAL) {
+			ref = genericRef.contextualize(ec.getOriginalContext());
+		} else {
+			ref = genericRef.contextualize(ec.getContextRef());
+		}
 
 		//We don't necessarily know the model we want to be working with until we've contextualized the
 		//node
@@ -190,10 +200,14 @@ public class XPathPathExpr extends XPathExpression {
 			if(nonMain != null)
 			{
 				m = nonMain;
+				if(m.getRoot() == null) {
+					//This instance is _declared_, but doesn't actually have any data in it.
+					throw new XPathMissingInstanceException(ref.getInstanceName(), "Instance referenced by " + ref.toString(true) + " has not been loaded");
+				}
 			}
 			else
 			{
-				throw new XPathTypeMismatchException("Instance referenced by " + genericRef + " does not exists");
+				throw new XPathMissingInstanceException(ref.getInstanceName(), "Instance referenced by " + ref.toString(true) + " does not exist");
 			}
 		} else {
             //TODO: We should really stop passing 'm' around and start just getting the right instance from ec
@@ -202,7 +216,7 @@ public class XPathPathExpr extends XPathExpression {
 
             if(m == null) {
                     String refStr = ref == null ? "" : ref.toString(true);
-                    throw new XPathTypeMismatchException("Cannot evaluate the reference [" + refStr + "] in the current evaluation context. No default instance has been declared!");
+    				throw new XPathException("Cannot evaluate the reference [" + refStr + "] in the current evaluation context. No default instance has been declared!");
             }
 		}
 
@@ -328,6 +342,53 @@ public class XPathPathExpr extends XPathExpression {
 		}
 	}
 
+	/**
+	 * Warning: this method has somewhat unclear semantics.
+	 *
+	 * "matches" follows roughly the same process as equals(), in that it goes
+	 * through the path step by step and compares whether each step can refer to the same node.
+	 * The only difference is that match() will allow for a named step to match a step who's name
+	 * is a wildcard.
+	 *
+	 * So
+	 * \/data\/path\/to
+	 * will "match"
+	 * \/data\/*\/to
+	 *
+	 * even though they are not equal.
+	 *
+	 * Matching is reflexive, consistent, and symmetric, but _not_ transitive.
+	 *
+	 * @param o
+	 * @return true if the expression is a path that matches this one
+	 */
+	public boolean matches(XPathExpression o) {
+		if (o instanceof XPathPathExpr) {
+			XPathPathExpr x = (XPathPathExpr)o;
+
+			//Shortcuts for easily comparable values
+			if(init_context != x.init_context || steps.length != x.steps.length) {
+				return false;
+			}
+
+			if (steps.length != x.steps.length) {
+				return false;
+			} else {
+				for (int i = 0; i < steps.length; i++) {
+					if (!steps[i].matches(x.steps[i])) {
+						return false;
+					}
+				}
+			}
+
+			// If all steps match, we still need to make sure we're in the same "context" if this
+			// is a normal expression.
+			return (init_context == INIT_CONTEXT_EXPR ? filtExpr.equals(x.filtExpr) : true);
+		} else {
+			return false;
+		}
+	}
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		init_context = ExtUtil.readInt(in);
 		if (init_context == INIT_CONTEXT_EXPR) {
@@ -337,7 +398,7 @@ public class XPathPathExpr extends XPathExpression {
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
 		steps = new XPathStep[v.size()];
 		for (int i = 0; i < steps.length; i++)
-			steps[i] = (XPathStep)v.elementAt(i);
+			steps[i] = ((XPathStep)v.elementAt(i)).intern();
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -358,9 +419,9 @@ public class XPathPathExpr extends XPathExpression {
 		path.steps = new XPathStep[ref.size()];
 		for (int i = 0; i < path.steps.length; i++) {
 			if (ref.getName(i).equals(TreeReference.NAME_WILDCARD)) {
-				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, XPathStep.TEST_NAME_WILDCARD);
+				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, XPathStep.TEST_NAME_WILDCARD).intern();
 			} else {
-				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, new XPathQName(ref.getName(i)));
+				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, new XPathQName(ref.getName(i))).intern();
 			}
 		}
 		return path;
@@ -373,6 +434,12 @@ public class XPathPathExpr extends XPathExpression {
 			return sentinal;
 		}
 		else {
+			//It's very, very hard to figure out how to pivot predicates. For now, just skip it
+			for(int i = 0 ; i < ref.size(); ++i) {
+				if(ref.getPredicate(i) != null && ref.getPredicate(i).size() > 0) {
+					throw new UnpivotableExpressionException("Can't pivot filtered treereferences. Ref: " + ref.toString(true) + " has predicates.");
+				}
+			}
 			return this.eval(model, evalContext);
 		}
 	}
