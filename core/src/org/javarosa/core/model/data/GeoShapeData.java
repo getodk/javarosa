@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.IExprDataType;
 
 
 /**
@@ -33,7 +34,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author mitchellsundt@gmail.com
  *
  */
-public class GeoShapeData implements IAnswerData {
+public class GeoShapeData implements IAnswerData, IExprDataType {
 
 	/**
 	 * The data value contained in a GeoShapeData object is a GeoShape
@@ -169,4 +170,34 @@ public class GeoShapeData implements IAnswerData {
 		}
 		return d;
 	}
+
+
+	@Override
+	public Boolean toBoolean() {
+		// return whether or not both Geopoints have been set
+		if ( points.size() == 0 ) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public Double toNumeric() {
+		if ( points.size() == 0 ) {
+			// we have no shape, so no accuracy...
+			return GeoPointData.NO_ACCURACY_VALUE;
+		}
+		// return the worst accuracy...
+		double maxValue = 0.0;
+		for ( GeoPointData p : points ) {
+			maxValue = Math.max(maxValue, p.toNumeric());
+		}
+		return maxValue;
+	}
+
+	@Override
+	public String toString() {
+		return getDisplayText();
+	}
+
 }
