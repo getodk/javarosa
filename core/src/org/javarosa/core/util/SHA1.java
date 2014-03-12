@@ -133,7 +133,7 @@ public class SHA1 {
 
           return new String(result);
     }
-    
+
     /*
      * Take a string and return the base64 representation of its SHA-1.
      */
@@ -195,20 +195,20 @@ public class SHA1 {
 
           // Convert 160 bit hash to base64
 
-        
+
           int[] words = {a,b,c,d,e};
-          String encoded = "";
-          
+          StringBuilder sb = new StringBuilder();
+
           for(int word : words) {
         	  String hexWord = Integer.toHexString(word);
         	  //Because to hexstring apparently doesn't pad?
         	  while(hexWord.length() < 8) {
         		  hexWord = "0" + hexWord;
         	  }
-        	  encoded += hexWord;
+        	  sb.append(hexWord);
           }
 
-          return encoded;
+          return sb.toString();
     }
 }
 

@@ -172,22 +172,22 @@ public class FormEntryPrompt extends FormEntryCaption {
         	if(data instanceof SelectOneData) {
         		text = this.getSelectItemText((Selection)data.getValue());
         	} else if(data  instanceof SelectMultiData) {
-        		String returnValue = "";
+        		StringBuilder b = new StringBuilder();
         		Vector<Selection> values = (Vector<Selection>)data.getValue();
         		for(Selection value : values) {
-        			returnValue += this.getSelectItemText(value) + " ";
+        			b.append(this.getSelectItemText(value)).append(" ");
         		}
-        		text = returnValue;
+        		text = b.toString();
         	} else {
         		text = data.getDisplayText();
         	}
 
         	if(getControlType() == Constants.CONTROL_SECRET) {
-				String obfuscated = "";
+				StringBuilder b = new StringBuilder();
 				for(int i =0 ; i < text.length() ; ++i ) {
-					obfuscated += "*";
+					b.append("*");
 				}
-				text = obfuscated;
+				text = b.toString();
         	}
         	return text;
         }
