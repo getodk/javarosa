@@ -95,7 +95,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
     	boolean first = true;
     	for ( GeoPointData p : points ) {
     		if ( !first ) {
-    			b.append(", ");
+    			b.append("; ");
     		}
     		first = false;
     		b.append(p.getDisplayText());
@@ -158,7 +158,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
 	}
 
 	public GeoShapeData cast(UncastData data) throws IllegalArgumentException {
-		String[] parts = data.value.split(",");
+		String[] parts = data.value.split(";");
 
 		// silly...
 		GeoPointData t = new GeoPointData();
