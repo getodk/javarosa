@@ -25,6 +25,7 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.IExprDataType;
 
 
 /**
@@ -40,10 +41,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author Yaw Anokwa
  *
  */
-public class GeoPointData implements IAnswerData {
+public class GeoPointData implements IAnswerData, IExprDataType {
 
 	public static final int REQUIRED_ARRAY_SIZE = 2;
 	public static final double MISSING_VALUE = 0.0;
+	// value to be reported if we never captured a datapoint
+	public static final double NO_ACCURACY_VALUE = 9999999.0;
 
     private double[] gp = new double[4];
     private int len = REQUIRED_ARRAY_SIZE;
@@ -162,4 +165,27 @@ public class GeoPointData implements IAnswerData {
 		}
 		return new GeoPointData(ret);
 	}
+
+	@Override
+	public Boolean toBoolean() {
+		// return whether or not the Geopoint has been set
+		return (gp[0] != 0.0 && gp[1] != 0.0 & gp[2] != 0.0);
+	}
+
+	@Override
+	public Double toNumeric() {
+		// return accuracy...
+		if ( !toBoolean() ) {
+			// we have no captured geopoint...
+			// bigger than the radius of the earth (meters)...
+			return NO_ACCURACY_VALUE;
+		}
+		return gp[3];
+	}
+
+	@Override
+	public String toString() {
+		return getDisplayText();
+	}
+
 }

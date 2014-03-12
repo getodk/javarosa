@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.IExprDataType;
 
 
 /**
@@ -31,7 +32,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author mitchellsundt@gmail.com
  *
  */
-public class GeoLineData implements IAnswerData {
+public class GeoLineData implements IAnswerData, IExprDataType {
 
 	/**
 	 * The data value contained in a GeoLineData object is a GeoLine
@@ -153,4 +154,23 @@ public class GeoLineData implements IAnswerData {
 
 		return d;
 	}
+
+
+	@Override
+	public Boolean toBoolean() {
+		// return whether both Geopoints have been set
+		return start.toBoolean() && end.toBoolean();
+	}
+
+	@Override
+	public Double toNumeric() {
+		// return the worst accuracy...
+		return Math.max(start.toNumeric(), end.toNumeric());
+	}
+
+	@Override
+	public String toString() {
+		return getDisplayText();
+	}
+
 }
