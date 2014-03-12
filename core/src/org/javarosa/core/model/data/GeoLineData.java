@@ -94,7 +94,7 @@ public class GeoLineData implements IAnswerData, IExprDataType {
     public String getDisplayText() {
     	StringBuilder b = new StringBuilder();
     	b.append(start.getDisplayText());
-    	b.append(", ");
+    	b.append("; ");
     	b.append(end.getDisplayText());
     	return b.toString();
     }
@@ -140,7 +140,7 @@ public class GeoLineData implements IAnswerData, IExprDataType {
 	}
 
 	public GeoLineData cast(UncastData data) throws IllegalArgumentException {
-		String[] parts = data.value.split(",");
+		String[] parts = data.value.split(";");
 
 		if ( parts.length != 2 ) throw new IllegalArgumentException("Expected comma-separated GeoPoints");
 
