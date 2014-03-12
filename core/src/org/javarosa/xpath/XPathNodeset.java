@@ -139,7 +139,7 @@ public class XPathNodeset {
 		return nodes.elementAt(i);
 	}
 
-	protected Object getValAt (int i) {
+	public Object getValAt (int i) {
 		return XPathPathExpr.getRefValue(instance, ec, getRefAt(i));
 	}
 

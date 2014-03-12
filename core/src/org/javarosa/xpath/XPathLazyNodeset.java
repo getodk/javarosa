@@ -133,7 +133,7 @@ public class XPathLazyNodeset extends XPathNodeset {
 		return super.getRefAt(i);
 	}
 
-	protected Object getValAt (int i) {
+	public Object getValAt (int i) {
 		performEvaluation();
 		return super.getValAt(i);
 	}
