@@ -34,27 +34,27 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class MultiPointerAnswerData implements IAnswerData {
 
 	private IDataPointer[] data;
-	
+
 	/**
 	 * NOTE: Only for serialization/deserialization
 	 */
 	public MultiPointerAnswerData() {
 		//Only for serialization/deserialization
 	}
-	
+
 	public MultiPointerAnswerData (IDataPointer[] values) {
 		data = values;
 	}
-	
+
 	public String getDisplayText() {
-		String toReturn = "";
+		StringBuilder b = new StringBuilder();
 		for (int i=0; i < data.length; i++) {
-			if (i != 0) { 
-				toReturn += ", ";
+			if (i != 0) {
+				b.append(", ");
 			}
-			toReturn += data[i].getDisplayText();
+			b.append(data[i].getDisplayText());
 		}
-		return toReturn;
+		return b.toString();
 	}
 
 	public Object getValue() {
@@ -71,7 +71,7 @@ public class MultiPointerAnswerData implements IAnswerData {
 	public IAnswerData clone () {
 		return null; //not cloneable
 	}
-	
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		int length = in.readInt();
@@ -89,16 +89,14 @@ public class MultiPointerAnswerData implements IAnswerData {
 	}
 
 	public UncastData uncast() {
-		String ret = "";
+		StringBuilder b = new StringBuilder();
 		for(IDataPointer datum : data) {
-			ret += datum.getDisplayText() + " ";
+			b.append(datum.getDisplayText());
+			b.append(" ");
 		}
-		if(ret.length() > 0) {
-			ret = ret.substring(0, ret.length() -1);
-		}
-		return new UncastData(ret);
+		return new UncastData(b.toString().trim());
 	}
-	
+
 	public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
 		return null;
 	}

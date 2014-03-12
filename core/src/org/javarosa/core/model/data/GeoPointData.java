@@ -95,11 +95,14 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
      */
     public String getDisplayText() {
-        String s = "";
+        StringBuilder b = new StringBuilder();
         for (int i = 0; i < len; i++) {
-            s += gp[i] + " ";
+            b.append(gp[i]);
+            if ( i != len - 1) {
+            	b.append(" ");
+            }
         }
-        return s.trim();
+        return b.toString();
 
     }
 

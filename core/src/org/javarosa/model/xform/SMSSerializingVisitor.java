@@ -47,7 +47,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 	private String theSmsStr = null; // sms string to be returned
 	private String nodeSet = null; // which nodeset the sms contents are in
 	private String xmlns = null;
-	private String delimeter = null;
+	private String delimiter = null;
 	private String prefix = null;
 	private String method = null;
 	private TreeReference rootRef;
@@ -139,11 +139,15 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		TreeElement root = tree.resolveReference(rootRef);
 
 		xmlns = root.getAttributeValue("", "xmlns");
-		delimeter = root.getAttributeValue("", "delimeter");
+		delimiter = root.getAttributeValue("", "delimiter");
+		if ( delimiter == null ) {
+			// for the spelling-impaired...
+			delimiter = root.getAttributeValue("", "delimeter");
+		}
 		prefix = root.getAttributeValue("", "prefix");
 
 		xmlns = (xmlns != null)? xmlns : " ";
-		delimeter = (delimeter != null ) ? delimeter : " ";
+		delimiter = (delimiter != null ) ? delimiter : " ";
 		prefix = (prefix != null) ? prefix : " ";
 
 		//Don't bother adding any delimiters, yet. Delimiters are
@@ -162,7 +166,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 	}
 
 	public String serializeNode(TreeElement instanceNode) {
-		String ae = "";
+		StringBuilder b = new StringBuilder();
 		// don't serialize template nodes or non-relevant nodes
 		if (!instanceNode.isRelevant()
 				|| instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
@@ -182,13 +186,14 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 				e.addChild(Node.TEXT, (String) serializedAnswer);
 
 				String tag = instanceNode.getAttributeValue("", "tag");
-				ae += ((tag != null) ? tag + delimeter : delimeter); // tag
-																		// might
-																		// be
-																		// null
+				if ( tag != null ) {
+					b.append(tag);
+				}
+				b.append(delimiter);
 
 				for (int k = 0; k < e.getChildCount(); k++) {
-					ae += e.getChild(k).toString() + delimeter;
+					b.append(e.getChild(k).toString());
+					b.append(delimiter);
 				}
 
 			} else {
@@ -206,7 +211,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 				}
 			}
 		}
-		return ae;
+		return b.toString();
 	}
 
 	/*

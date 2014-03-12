@@ -102,16 +102,16 @@ public class SelectMultiData implements IAnswerData {
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
 	public String getDisplayText () {
-		String str = "";
+		StringBuilder b = new StringBuilder();
 
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.elementAt(i);
-			str += s.getValue();
+			b.append(s.getValue());
 			if (i < vs.size() - 1)
-				str += ", ";
+				b.append(", ");
 		}
 
-		return str;
+		return b.toString();
 	}
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)

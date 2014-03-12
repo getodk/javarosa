@@ -55,12 +55,20 @@ public class FormIndex {
 
 	private TreeReference reference;
 
+	/**
+	 *
+	 * @return an index before the start of the form
+	 */
 	public static FormIndex createBeginningOfFormIndex() {
 		FormIndex begin = new FormIndex(-1, null);
 		begin.beginningOfForm = true;
 		return begin;
 	}
 
+	/**
+	 *
+	 * @return an index after the end of the form
+	 */
 	public static FormIndex createEndOfFormIndex() {
 		FormIndex end = new FormIndex(-1,null);
 		end.endOfForm = true;
@@ -144,6 +152,10 @@ public class FormIndex {
 		this.instanceIndex = instanceIndex;
 	}
 
+	/**
+	 *
+	 * @return true if the index is neither before the start or after the end of the form
+	 */
 	public boolean isInForm () {
 		return !beginningOfForm && !endOfForm;
 	}
@@ -207,10 +219,18 @@ public class FormIndex {
 		return nextLevel == null;
 	}
 
+	/**
+	 *
+	 * @return true if we are after the end of the form
+	 */
 	public boolean isEndOfFormIndex() {
 		return endOfForm;
 	}
 
+	/**
+	 *
+	 * @return true if we are before the start of the form
+	 */
 	public boolean isBeginningOfFormIndex() {
 		return beginningOfForm;
 	}
@@ -351,14 +371,17 @@ public class FormIndex {
 	}
 
 	public String toString() {
-		String ret = "";
+		StringBuilder b = new StringBuilder();
 		FormIndex ref = this;
 		while (ref != null) {
-			ret += ref.getLocalIndex();
-			ret += ref.getInstanceIndex()== -1? ", " : "_" + ref.getInstanceIndex() + ", ";
+			b.append(ref.getLocalIndex());
+			if ( ref.getInstanceIndex() != -1) {
+				b.append("_").append(ref.getInstanceIndex());
+			}
+			b.append(", ");
 			ref = ref.nextLevel;
 		}
-		return ret;
+		return b.toString();
 	}
 
 	/**
