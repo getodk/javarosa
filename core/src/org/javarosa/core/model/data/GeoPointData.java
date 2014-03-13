@@ -95,6 +95,10 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
      */
     public String getDisplayText() {
+    	if ( !toBoolean() ) {
+    		// it hasn't been set...
+    		return "";
+    	}
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < len; i++) {
             b.append(gp[i]);
