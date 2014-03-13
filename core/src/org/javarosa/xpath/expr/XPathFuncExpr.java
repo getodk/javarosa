@@ -146,11 +146,12 @@ public class XPathFuncExpr extends XPathExpression {
 			return ifThenElse(model, evalContext, args, argVals);
 		} else if (name.equals("coalesce")) {
 			assertArgsCount( name, args, 2);
-			//Not sure if unpacking here is quiiite right, but it seems right
-			argVals[0] = XPathFuncExpr.unpack(args[0].eval(model, evalContext));
-			if(!isNull(argVals[0])) { return argVals[0]; }
-			else {
-				argVals[1] = args[1].eval(model, evalContext);
+			argVals[0] = args[0].eval(model, evalContext);
+			if(!isNull(argVals[0])) {
+				return argVals[0];
+			} else {
+				// that was null, so try the other one...
+				argVals[1] =args[1].eval(model, evalContext);
 				return argVals[1];
 			}
 		} else if (name.equals("indexed-repeat")) {
@@ -451,7 +452,10 @@ public class XPathFuncExpr extends XPathExpression {
 	public static boolean isNull (Object o) {
 		if (o == null) {
 			return true; //true 'null' values aren't allowed in the xpath engine, but whatever
-		} else if (o instanceof String && ((String)o).length() == 0) {
+		}
+
+		o = unpack(o);
+		if (o instanceof String && ((String)o).length() == 0) {
 			return true;
 		} else if (o instanceof Double && ((Double)o).isNaN()) {
 			return true;
