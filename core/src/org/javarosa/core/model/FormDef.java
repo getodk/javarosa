@@ -956,11 +956,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 									//expression
 
 									String textID = ch.getTextID();
+									String templateStr;
 									if (textID != null) {
-										return f.getLocalizer().getText(textID);
+										templateStr = f.getLocalizer().getText(textID);
 									} else {
-										return ch.getLabelInnerText();
+										templateStr = ch.getLabelInnerText();
 									}
+									String label = fillTemplateString(templateStr, ref);
+									return label;
 								}
 							}
 						}
