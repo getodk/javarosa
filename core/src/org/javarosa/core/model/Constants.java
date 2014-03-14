@@ -63,8 +63,8 @@ public class Constants {
 	public static final int DATATYPE_BARCODE = 11; /** Question with barcode string answer. */
 	public static final int DATATYPE_BINARY = 12; /** Question with external binary answer. */
 	public static final int DATATYPE_LONG = 13; /** Question with external binary answer. */
-	public static final int DATATYPE_GEOLINE = 14; /** Question with GeoLine answer. */
-	public static final int DATATYPE_GEOSHAPE = 15; /** Question with GeoShape answer. */
+	public static final int DATATYPE_GEOSHAPE = 14; /** Question with GeoShape answer. */
+	public static final int DATATYPE_GEOTRACE = 15; /** Question with GeoTrace answer. */
 
 	public static final int CONTROL_UNTYPED = -1;
 	public static final int CONTROL_INPUT = 1;

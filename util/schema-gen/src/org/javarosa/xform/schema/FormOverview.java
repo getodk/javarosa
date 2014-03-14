@@ -322,8 +322,8 @@ public class FormOverview {
 		case Constants.DATATYPE_DATE_TIME: return "date with time";
 		case Constants.DATATYPE_TIME: return "time of day";
 		case Constants.DATATYPE_GEOPOINT: return "geopoint";
-		case Constants.DATATYPE_GEOLINE: return "geoline";
 		case Constants.DATATYPE_GEOSHAPE: return "geoshape";
+		case Constants.DATATYPE_GEOTRACE: return "geotrace";
 		case Constants.DATATYPE_CHOICE: return "single select";
 		case Constants.DATATYPE_CHOICE_LIST: return "multi select";
 		default: return "unrecognized type [" + type + "]";

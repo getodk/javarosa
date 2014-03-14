@@ -125,8 +125,8 @@ public class InstanceSchema {
 				}
 				break;
 			case Constants.DATATYPE_GEOPOINT: type = "jr:geopoint"; break;
-			case Constants.DATATYPE_GEOLINE: type = "jr:geoline"; break;
 			case Constants.DATATYPE_GEOSHAPE: type = "jr:geoshape"; break;
+			case Constants.DATATYPE_GEOTRACE: type = "jr:geotrace"; break;
 			default:
 				type = null;
 				System.err.println("unrecognized type [" + node.getDataType() + ";" + node.getName() + "]");

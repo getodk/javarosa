@@ -28,7 +28,7 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoLineData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -477,8 +477,8 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		case Constants.DATATYPE_CHOICE: return SelectOneData.class;
 		case Constants.DATATYPE_CHOICE_LIST: return SelectMultiData.class;
 		case Constants.DATATYPE_GEOPOINT: return GeoPointData.class;
-		case Constants.DATATYPE_GEOLINE: return GeoLineData.class;
 		case Constants.DATATYPE_GEOSHAPE: return GeoShapeData.class;
+		case Constants.DATATYPE_GEOTRACE: return GeoTraceData.class;
 		default: return null;
 		}
 	}

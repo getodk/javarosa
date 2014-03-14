@@ -221,8 +221,8 @@ public class XFormParser {
 		typeMappings.put(SELECTONE, new Integer(Constants.DATATYPE_CHOICE));	        //non-standard
 		typeMappings.put(SELECT, new Integer(Constants.DATATYPE_CHOICE_LIST));        //non-standard
 		typeMappings.put("geopoint", new Integer(Constants.DATATYPE_GEOPOINT));         //non-standard
-		typeMappings.put("geoline", new Integer(Constants.DATATYPE_GEOLINE));         //non-standard
 		typeMappings.put("geoshape", new Integer(Constants.DATATYPE_GEOSHAPE));         //non-standard
+		typeMappings.put("geotrace", new Integer(Constants.DATATYPE_GEOTRACE));         //non-standard
 		typeMappings.put("barcode", new Integer(Constants.DATATYPE_BARCODE));           //non-standard
         typeMappings.put("binary", new Integer(Constants.DATATYPE_BINARY));             //non-standard
 	}

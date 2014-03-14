@@ -26,7 +26,7 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoLineData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -151,20 +151,6 @@ public class XFormAnswerDataParser {
 				return null;
 			}
 
-		case Constants.DATATYPE_GEOLINE:
-			if ( trimmedText == null ) {
-				return new GeoLineData();
-			}
-
-			try {
-				UncastData uncast = new UncastData(trimmedText);
-				// silly...
-				GeoLineData gl = new GeoLineData();
-				return gl.cast(uncast);
-			} catch (Exception e) {
-				return null;
-			}
-
 		case Constants.DATATYPE_GEOSHAPE:
 			if ( trimmedText == null ) {
 				return new GeoShapeData();
@@ -175,6 +161,20 @@ public class XFormAnswerDataParser {
 				// silly...
 				GeoShapeData gs = new GeoShapeData();
 				return gs.cast(uncast);
+			} catch (Exception e) {
+				return null;
+			}
+
+		case Constants.DATATYPE_GEOTRACE:
+			if ( trimmedText == null ) {
+				return new GeoTraceData();
+			}
+
+			try {
+				UncastData uncast = new UncastData(trimmedText);
+				// silly...
+				GeoTraceData gl = new GeoTraceData();
+				return gl.cast(uncast);
 			} catch (Exception e) {
 				return null;
 			}

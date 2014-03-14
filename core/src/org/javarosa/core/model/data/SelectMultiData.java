@@ -28,7 +28,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 /**
  * A response to a question requesting a selection of
@@ -38,7 +37,7 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
  *
  */
 public class SelectMultiData implements IAnswerData {
-	Vector vs; //vector of Selection
+	Vector<Selection> vs; //vector of Selection
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -48,12 +47,12 @@ public class SelectMultiData implements IAnswerData {
 
 	}
 
-	public SelectMultiData (Vector vs) {
+	public SelectMultiData (Vector<Selection> vs) {
 		setValue(vs);
 	}
 
 	public IAnswerData clone () {
-		Vector v = new Vector();
+		Vector<Selection> v = new Vector<Selection>();
 		for (int i = 0; i < vs.size(); i++) {
 			v.addElement(((Selection)vs.elementAt(i)).clone());
 		}
@@ -69,7 +68,7 @@ public class SelectMultiData implements IAnswerData {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 
-		vs = vectorCopy((Vector)o);
+		vs = vectorCopy((Vector<Selection>)o);
 	}
 
 	/*
@@ -85,8 +84,8 @@ public class SelectMultiData implements IAnswerData {
 	 * contained in the vector input
 	 * TODO: move to utility class
 	 */
-	private Vector vectorCopy(Vector input) {
-		Vector output = new Vector();
+	private Vector<Selection> vectorCopy(Vector<Selection> input) {
+		Vector<Selection> output = new Vector<Selection>();
 		//validate type
 		for (int i = 0; i < input.size(); i++) {
 			Selection s = (Selection)input.elementAt(i);
@@ -116,8 +115,9 @@ public class SelectMultiData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
+	@SuppressWarnings("unchecked")
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		vs = (Vector)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
+		vs = (Vector<Selection>)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
 	}
 
 	/* (non-Javadoc)
@@ -128,7 +128,7 @@ public class SelectMultiData implements IAnswerData {
 	}
 
 	public UncastData uncast() {
-		Enumeration en = vs.elements();
+		Enumeration<Selection> en = vs.elements();
 		StringBuilder selectString = new StringBuilder();
 
 		while(en.hasMoreElements()) {
@@ -143,7 +143,7 @@ public class SelectMultiData implements IAnswerData {
 	}
 
 	public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
-		Vector v = new Vector();
+		Vector<Selection> v = new Vector<Selection>();
 
 		Vector<String> choices = DateUtils.split(data.value, " ", true);
 		for(String s : choices) {

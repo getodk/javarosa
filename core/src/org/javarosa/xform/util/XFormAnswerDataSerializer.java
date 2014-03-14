@@ -26,7 +26,7 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoLineData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -70,7 +70,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
 		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
 		    data instanceof MultiPointerAnswerData ||
-		    data instanceof GeoPointData || data instanceof GeoLineData || data instanceof GeoShapeData ||
+		    data instanceof GeoPointData || data instanceof GeoTraceData || data instanceof GeoShapeData ||
 		    data instanceof LongData || data instanceof DateTimeData || data instanceof UncastData) {
 			return true;
 		} else {
@@ -205,7 +205,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	    return data.getDisplayText();
      }
 
-	public Object serializeAnswerData(GeoLineData data) {
+	public Object serializeAnswerData(GeoTraceData data) {
 	    return data.getDisplayText();
      }
 
@@ -259,8 +259,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((MultiPointerAnswerData)data);
 		} else if (data instanceof GeoShapeData) {
             return serializeAnswerData((GeoShapeData)data);
-		} else if (data instanceof GeoLineData) {
-            return serializeAnswerData((GeoLineData)data);
+		} else if (data instanceof GeoTraceData) {
+            return serializeAnswerData((GeoTraceData)data);
 		} else if (data instanceof GeoPointData) {
             return serializeAnswerData((GeoPointData)data);
         } else if (data instanceof DateTimeData) {
