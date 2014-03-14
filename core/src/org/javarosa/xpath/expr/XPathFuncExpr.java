@@ -94,6 +94,7 @@ public class XPathFuncExpr extends XPathExpression {
 			if(!id.equals(x.id) || args.length != x.args.length ||
 				id.toString().equals("uuid") ||
 				id.toString().equals("random") ||
+				id.toString().equals("once") ||
 				id.toString().equals("now") ||
 				id.toString().equals("today")) {
 				return false;
@@ -318,7 +319,17 @@ public class XPathFuncExpr extends XPathExpression {
 			assertArgsCount( name, args, 0);
 			//calculated expressions may be recomputed w/o warning! use with caution!!
 			return new Double(MathUtils.getRand().nextDouble());
-		} else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
+        } else if (name.equals("once")) {
+            assertArgsCount( name, args, 1);
+            XPathPathExpr currentFieldPathExpr = XPathPathExpr.fromRef(evalContext.getContextRef());
+            Object currValue = currentFieldPathExpr.eval(model, evalContext).unpack();
+            if (currValue == null || toString(currValue).length() == 0) {
+                // this is the "once" case
+                return argVals[0];
+            } else {
+                return currValue;
+            }
+        } else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
 			//calculated expressions may be recomputed w/o warning! use with caution!!
 			if(args.length == 0) {
 				return PropertyUtils.genUUID();
@@ -513,6 +524,7 @@ public class XPathFuncExpr extends XPathExpression {
             } else {
                     return toNumeric(o);
             }
+
     }
 
 	/**
