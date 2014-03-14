@@ -27,7 +27,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoLineData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -295,11 +295,11 @@ public class XPathPathExpr extends XPathExpression {
 		} else if (val instanceof GeoPointData) {
 			// we have no access fns that interact with double[4] arrays (the getValue() data type)...
 			return val.getDisplayText();
-		} else if (val instanceof GeoLineData) {
-			// we have no access fns that interact with GeoLine objects (the getValue() data type)...
-			return val.getDisplayText();
 		} else if (val instanceof GeoShapeData) {
 			// we have no access fns that interact with GeoShape objects (the getValue() data type)...
+			return val.getDisplayText();
+		} else if (val instanceof GeoTraceData) {
+			// we have no access fns that interact with GeoTrace objects (the getValue() data type)...
 			return val.getDisplayText();
 		} else {
 			System.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());

@@ -61,10 +61,10 @@ public class AnswerDataFactory {
 				return new DecimalData();
 			case Constants.DATATYPE_GEOPOINT:
 				return new GeoPointData();
-			case Constants.DATATYPE_GEOLINE:
-				return new GeoLineData();
 			case Constants.DATATYPE_GEOSHAPE:
 				return new GeoShapeData();
+			case Constants.DATATYPE_GEOTRACE:
+				return new GeoTraceData();
 			case Constants.DATATYPE_INTEGER:
 				return new IntegerData();
 			case Constants.DATATYPE_LONG:

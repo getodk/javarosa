@@ -28,7 +28,7 @@ import org.javarosa.xpath.IExprDataType;
 
 
 /**
- * A response to a question requesting an GeoShape Value.
+ * A response to a question requesting an GeoTrace Value.
  * Consisting of a comma-separated ordered list of GeoPoint values.
  *
  * GeoTrace data is an open sequence of geo-locations.
@@ -37,22 +37,22 @@ import org.javarosa.xpath.IExprDataType;
  * @author mitchellsundt@gmail.com
  *
  */
-public class GeoShapeData implements IAnswerData, IExprDataType {
+public class GeoTraceData implements IAnswerData, IExprDataType {
 
 	/**
-	 * The data value contained in a GeoShapeData object is a GeoShape
+	 * The data value contained in a GeoTraceData object is a GeoTrace
 	 *
 	 * @author mitchellsundt@gmail.com
 	 *
 	 */
-	public static class GeoShape {
+	public static class GeoTrace {
 		public ArrayList<double[]> points;
 
-		public GeoShape() {
+		public GeoTrace() {
 			points = new ArrayList<double[]>();
 		}
 
-		public GeoShape(ArrayList<double[]> points) {
+		public GeoTrace(ArrayList<double[]> points) {
 			this.points = points;
 		}
 	};
@@ -64,7 +64,8 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
      * Empty Constructor, necessary for dynamic construction during
      * deserialization. Shouldn't be used otherwise.
      */
-    public GeoShapeData() {
+    public GeoTraceData() {
+
     }
 
     /**
@@ -72,20 +73,20 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
      *
      * @param data
      */
-    public GeoShapeData(GeoShapeData data) {
+    public GeoTraceData(GeoTraceData data) {
     	for ( GeoPointData p : data.points ) {
     		points.add(new GeoPointData(p));
     	}
     }
 
-    public GeoShapeData(GeoShape ashape) {
-    	for ( double[] da : ashape.points ) {
+    public GeoTraceData(GeoTrace atrace) {
+    	for ( double[] da : atrace.points ) {
     		points.add(new GeoPointData(da));
     	}
-    }
+   }
 
     public IAnswerData clone() {
-        return new GeoShapeData(this);
+        return new GeoTraceData(this);
     }
 
     /*
@@ -117,20 +118,21 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
     	for ( GeoPointData p : points ) {
     		pts.add((double[])p.getValue());
     	}
-    	GeoShape gs = new GeoShape(pts);
+    	GeoTrace gs = new GeoTrace(pts);
         return gs;
     }
+
 
     public void setValue(Object o) {
         if (o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
-        if ( !(o instanceof GeoShape) ) {
-        	GeoShapeData t = new GeoShapeData();
-        	GeoShapeData v = t.cast(new UncastData(o.toString()));
+        if ( !(o instanceof GeoTrace) ) {
+        	GeoTraceData t = new GeoTraceData();
+        	GeoTraceData v = t.cast(new UncastData(o.toString()));
         	o = v.getValue();
         }
-        GeoShape gs = (GeoShape) o;
+        GeoTrace gs = (GeoTrace) o;
         ArrayList<GeoPointData> temp = new ArrayList<GeoPointData>();
         for ( double[] da : gs.points ) {
         	temp.add(new GeoPointData(da));
@@ -165,13 +167,13 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
 		return new UncastData(getDisplayText());
 	}
 
-	public GeoShapeData cast(UncastData data) throws IllegalArgumentException {
+	public GeoTraceData cast(UncastData data) throws IllegalArgumentException {
 		String[] parts = data.value.split(";");
 
 		// silly...
 		GeoPointData t = new GeoPointData();
 
-		GeoShapeData d = new GeoShapeData();
+		GeoTraceData d = new GeoTraceData();
 		for ( String part : parts ) {
 			// allow for arbitrary surrounding whitespace
 			d.points.add(t.cast(new UncastData(part.trim())));
@@ -192,7 +194,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
 	@Override
 	public Double toNumeric() {
 		if ( points.size() == 0 ) {
-			// we have no shape, so no accuracy...
+			// we have no trace, so no accuracy...
 			return GeoPointData.NO_ACCURACY_VALUE;
 		}
 		// return the worst accuracy...
