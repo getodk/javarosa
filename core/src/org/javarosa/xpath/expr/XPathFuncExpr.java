@@ -326,6 +326,9 @@ public class XPathFuncExpr extends XPathExpression {
 
 			int len = toInt(argVals[0]).intValue();
 			return PropertyUtils.genGUID(len);
+		} else if (name.equals("version")) { //non-standard
+			assertArgsCount( name, args, 0);
+			return model.formVersion == null ? "" : model.formVersion;
 		} else if (name.equals("property")) { // non-standard
 			// return a property defined by the property manager.
 			// NOTE: Property should be immutable.
