@@ -549,15 +549,16 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			setMaskVar(MASK_RELEVANT, relevant);
 		}
 
-		if (isRelevant() != oldRelevancy) {
+		boolean newRelevant = isRelevant();
+		if (newRelevant != oldRelevancy) {
 			if(attributes != null) {
 				for(int i = 0 ; i < attributes.size(); ++i ) {
-					attributes.elementAt(i).setRelevant(isRelevant(), true);
+					attributes.elementAt(i).setRelevant(newRelevant, true);
 				}
 			}
 			if(children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					((TreeElement) children.elementAt(i)).setRelevant(isRelevant(),true);
+					((TreeElement) children.elementAt(i)).setRelevant(newRelevant,true);
 				}
 			}
 			alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
@@ -1133,11 +1134,15 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			if (elem.getName() != null) {
 				step = TreeReference.selfRef();
 				step.add(elem.getName(), elem.getMult());
-				step.setInstanceName(elem.getInstanceName());
 			} else {
 				step = TreeReference.rootRef();
 				//All TreeElements are part of a consistent tree, so the root should be in the same instance
-				step.setInstanceName(elem.getInstanceName());
+			}
+
+			step.setInstanceName(elem.getInstanceName());
+			if(elem.getInstanceName() != null) {
+				// it is a named instance; it should not inherit runtime context...
+				step.setContext(TreeReference.CONTEXT_INSTANCE);
 			}
 
 			ref = ref.parent(step);

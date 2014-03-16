@@ -32,6 +32,7 @@ public class XPathNodeset {
 	private Vector<TreeReference> nodes;
 	protected FormInstance instance;
 	protected EvaluationContext ec;
+	// these are purely for improved error messages
 	private String pathEvaluated;
 	private String originalPath;
 

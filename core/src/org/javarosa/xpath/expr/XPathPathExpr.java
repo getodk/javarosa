@@ -116,7 +116,14 @@ public class XPathPathExpr extends XPathExpression {
 					}
 					XPathStringLiteral strLit = (XPathStringLiteral)(func.args[0]);
 					//we've got a non-standard instance in play, watch out
-					ref.setInstanceName(strLit.s);
+					if(strLit.s == null) {
+						// absolute reference to the main instance
+						ref.setContext(TreeReference.CONTEXT_ABSOLUTE);
+						ref.setInstanceName(null);
+					} else{
+						ref.setContext(TreeReference.CONTEXT_INSTANCE);
+						ref.setInstanceName(strLit.s);
+					}
 				} else if(func.id.toString().equals("current")){
 					parentsAllowed = true;
 					ref.setContext(TreeReference.CONTEXT_ORIGINAL);
@@ -200,10 +207,6 @@ public class XPathPathExpr extends XPathExpression {
 			if(nonMain != null)
 			{
 				m = nonMain;
-				if(m.getRoot() == null) {
-					//This instance is _declared_, but doesn't actually have any data in it.
-					throw new XPathMissingInstanceException(ref.getInstanceName(), "Instance referenced by " + ref.toString(true) + " has not been loaded");
-				}
 			}
 			else
 			{
@@ -218,6 +221,12 @@ public class XPathPathExpr extends XPathExpression {
                     String refStr = ref == null ? "" : ref.toString(true);
     				throw new XPathException("Cannot evaluate the reference [" + refStr + "] in the current evaluation context. No default instance has been declared!");
             }
+		}
+
+		// regardless of the above, we want to ensure there is a definition
+		if(m.getRoot() == null) {
+			//This instance is _declared_, but doesn't actually have any data in it.
+			throw new XPathMissingInstanceException(ref.getInstanceName(), "Instance referenced by " + ref.toString(true) + " has not been loaded");
 		}
 
 		// this makes no sense...

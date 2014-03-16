@@ -31,11 +31,11 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 	private int recordid = -1;
 
 	/** The name for this data model */
-	protected String name;
+	private String name;
 	/** The ID of the form that this is a model for */
-	protected int formId;
+	private int formId;
 
-	protected String instanceid;
+	private String instanceid;
 
 	public DataInstance() {
 
@@ -58,6 +58,9 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 		return instanceid;
 	}
 
+	protected void setInstanceId(String instanceid) {
+		this.instanceid = instanceid;
+	}
 	/**
 	 * Whether the structure of this instance is only available at runtime.
 	 *
