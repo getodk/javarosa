@@ -397,7 +397,7 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 	}
 
 	public void initialize(InstanceInitializationFactory initializer, String instanceId) {
-		this.instanceid = instanceId;
+		setInstanceId(instanceId);
 		root.setInstanceName(instanceId);
 	}
 

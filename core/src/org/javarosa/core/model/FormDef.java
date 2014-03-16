@@ -526,9 +526,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			triggerables.addElement(t);
 			triggerablesInOrder = false;
 
-			Vector<TreeReference> triggers = t.getTriggers();
-			for (int i = 0; i < triggers.size(); i++) {
-				TreeReference trigger = triggers.elementAt(i);
+			Set<TreeReference> triggers = t.getTriggers();
+			for (TreeReference trigger : triggers) {
 				if (!triggerIndex.containsKey(trigger)) {
 					triggerIndex.put(trigger.clone(), new Vector<Triggerable>());
 				}

@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.condition;
 
+import java.util.Set;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -86,7 +87,7 @@ public interface IConditionExpr extends Externalizable {
 	 *
 	 * @return
 	 */
-	Vector<TreeReference> getTriggers (); /* vector of TreeReference */
+	Set<TreeReference> getTriggers (TreeReference contextRef); /* unordered set of TreeReference */
 
 	/**
 	 * Provide a list of Pivots around which this Condition Expression depends.

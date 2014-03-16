@@ -19,6 +19,8 @@ package org.javarosa.xpath;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import org.javarosa.core.log.FatalException;
@@ -94,13 +96,13 @@ public class XPathConditional implements IConditionExpr {
 		}
 	}
 
-	public Vector<TreeReference> getTriggers () {
-		Vector<TreeReference> triggers = new Vector<TreeReference>();
-		getTriggers(expr, triggers, null);
+	public Set<TreeReference> getTriggers (TreeReference contextRef) {
+		Set<TreeReference> triggers = new HashSet<TreeReference>();
+		getTriggers(expr, triggers, contextRef);
 		return triggers;
 	}
 
-	private static void getTriggers (XPathExpression x, Vector<TreeReference> v, TreeReference contextRef) {
+	private static void getTriggers (XPathExpression x, Set<TreeReference> v, TreeReference contextRef) {
 		if (x instanceof XPathPathExpr) {
 			TreeReference ref = ((XPathPathExpr)x).getReference();
 			TreeReference contextualized = ref;
@@ -112,9 +114,9 @@ public class XPathConditional implements IConditionExpr {
 			if(contextualized.hasPredicates()) {
 				contextualized = contextualized.removePredicates();
 			}
-			if (!v.contains(contextualized)) {
-				v.addElement(contextualized);
-			}
+
+			v.add(contextualized);
+
 			for(int i = 0; i < ref.size() ; i++) {
 				Vector<XPathExpression> predicates = ref.getPredicate(i);
 				if(predicates == null) {

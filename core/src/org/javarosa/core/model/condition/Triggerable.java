@@ -19,6 +19,8 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
@@ -30,6 +32,7 @@ import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathException;
 
 /**
  * A triggerable represents an action that should be processed based
@@ -132,11 +135,11 @@ public abstract class Triggerable implements Externalizable {
 		return false;
 	}
 
-	public Vector<TreeReference> getTriggers () {
-		Vector<TreeReference> relTriggers = expr.getTriggers();
-		Vector<TreeReference> absTriggers = new Vector<TreeReference>();
-		for (int i = 0; i < relTriggers.size(); i++) {
-			absTriggers.addElement(((TreeReference)relTriggers.elementAt(i)).anchor(originalContextRef));
+	public Set<TreeReference> getTriggers () {
+		Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
+		Set<TreeReference> absTriggers = new HashSet<TreeReference>();
+		for (TreeReference r : relTriggers ) {
+			absTriggers.add(r.anchor(originalContextRef));
 		}
 		return absTriggers;
 	}
@@ -148,25 +151,19 @@ public abstract class Triggerable implements Externalizable {
 				return true;
 
 			if (this.expr.equals(t.expr)) {
-				//check triggers
-				Vector<TreeReference> Atriggers = this.getTriggers();
-				Vector<TreeReference> Btriggers = t.getTriggers();
 
-				//order and quantity don't matter; all that matters is every trigger in A exists in B and vice versa
-				for (int k = 0; k < 2; k++) {
-					Vector<TreeReference> v1 = (k == 0 ? Atriggers : Btriggers);
-					Vector<TreeReference> v2 = (k == 0 ? Btriggers : Atriggers);
+				// The original logic did not make any sense --
+				// the
+				try {
+					// resolved triggers should match...
+					Set<TreeReference> Atriggers = this.getTriggers();
+					Set<TreeReference> Btriggers = t.getTriggers();
 
-					for (int i = 0; i < v1.size(); i++) {
-						//csims@dimagi.com - 2012-04-17
-						//Added last condition here. We can't actually say whether two triggers
-						//are the same purely based on equality if they are relative.
-						if (!v1.elementAt(i).isAbsolute() || v2.indexOf(v1.elementAt(i)) == -1) {
-							return false;
-						}
-					}
+					return (Atriggers.size() == Btriggers.size()) &&
+							Atriggers.containsAll(Btriggers);
+				} catch (XPathException e) {
+					return false;
 				}
-				return true;
 			} else {
 				return false;
 			}

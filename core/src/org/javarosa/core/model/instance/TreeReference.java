@@ -18,6 +18,7 @@ package org.javarosa.core.model.instance;
 
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.*;
+import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathExpression;
 
 import java.io.DataInputStream;
@@ -76,17 +77,7 @@ public class TreeReference implements Externalizable {
 		return instanceName;
 	}
 
-	//TODO: This should be constructed I think
 	public void setInstanceName(String instanceName) {
-		if(instanceName == null) {
-			if(this.refLevel == REF_ABSOLUTE) {
-				this.contextType = CONTEXT_ABSOLUTE;
-			} else {
-				this.contextType = CONTEXT_INHERITED;
-			}
-		} else{
-			this.contextType = CONTEXT_INSTANCE;
-		}
 		this.instanceName = instanceName;
 	}
 
@@ -147,7 +138,7 @@ public class TreeReference implements Externalizable {
 	}
 
 	public boolean isAbsolute () {
-		return refLevel == REF_ABSOLUTE;
+		return (refLevel == REF_ABSOLUTE);
 	}
 
 	//return true if this ref contains any unbound multiplicities... ie, there is ANY chance this ref
@@ -171,13 +162,9 @@ public class TreeReference implements Externalizable {
 			newRef.add(l.shallowCopy());
 		}
 
-		//TODO: No more == null checks here, use context type
 		//copy instances
-		if(instanceName != null)
-		{
-			newRef.setInstanceName(instanceName);
-		}
-		newRef.contextType = this.contextType;
+		newRef.setInstanceName(instanceName);
+		newRef.setContext(this.contextType);
 		return newRef;
 	}
 
@@ -242,19 +229,20 @@ public class TreeReference implements Externalizable {
 	//return null if context ref is not absolute, or we parent up past the root node
 	//NOTE: this function still works even when contextRef contains INDEX_UNBOUND multiplicites... conditions depend on this behavior,
 	//  even though it's slightly icky
-	public TreeReference anchor (TreeReference contextRef) {
+	public TreeReference anchor (TreeReference contextRef) throws XPathException {
 		//TODO: Technically we should possibly be modifying context stuff here
 		//instead of in the xpath stuff;
 
 		if (isAbsolute()) {
 			return this.clone();
 		} else if (!contextRef.isAbsolute()) {
-			return null;
+			throw new XPathException("Could not resolve " + this.toString(true));
 		} else {
 			TreeReference newRef = contextRef.clone();
 			int contextSize = contextRef.size();
 			if (refLevel > contextSize) {
-				return null; //tried to do '/..'
+				//tried to do '/..'
+				throw new XPathException("Could not resolve " + this.toString(true));
 			} else {
 				for (int i = 0; i < refLevel; i++) {
 					newRef.removeLastLevel();
@@ -276,23 +264,11 @@ public class TreeReference implements Externalizable {
 			return null;
 		}
 
-		//If we're an absolute node, we should already know what our instance is, so
-		//we can't apply any further contextualizaiton unless the instances match
-		if(this.isAbsolute()) {
-			//If this refers to the main instance, but our context ref doesn't
-			if(this.getInstanceName() == null) {
-				if(contextRef.getInstanceName() != null) {
-					return this.clone();
-				}
-			}
-			//Or if this refers to another instance and the context ref doesn't refer to the
-			//same instance
-			else if(!this.getInstanceName().equals(contextRef.getInstanceName())) {
-				return this.clone();
-			}
-		}
+		// I think contextualizing of absolute nodes still needs to be done.
+		// They may contain predicates that need to be contextualized.
 
 		TreeReference newRef = anchor(contextRef);
+		// unclear...
 		newRef.setContext(contextRef.getContext());
 
 		//apply multiplicites and fill in wildcards as necessary based on the context ref
@@ -336,9 +312,7 @@ public class TreeReference implements Externalizable {
 		for (int i = 0; i < genericRef.size(); i++) {
 			//TODO: It's not super clear whether template refs should get
 			//genericized or not
-			if(genericRef.getMultiplicity(i) > -1 || genericRef.getMultiplicity(i) == INDEX_TEMPLATE) {
-				genericRef.setMultiplicity(i, INDEX_UNBOUND);
-			}
+			genericRef.setMultiplicity(i, INDEX_UNBOUND);
 		}
 		return genericRef;
 	}
@@ -463,6 +437,8 @@ public class TreeReference implements Externalizable {
 			sb.append("instance("+instanceName+")");
 		} else if(contextType == CONTEXT_ORIGINAL) {
 			sb.append("current()");
+		} else if(contextType == CONTEXT_INHERITED) {
+			sb.append("inherited()");
 		}
 		if (isAbsolute()) {
 			sb.append("/");
