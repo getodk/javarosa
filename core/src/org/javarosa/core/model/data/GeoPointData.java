@@ -84,6 +84,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public IAnswerData clone() {
         return new GeoPointData(gp);
     }
@@ -94,6 +95,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      *
      * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
      */
+    @Override
     public String getDisplayText() {
     	if ( !toBoolean() ) {
     		// it hasn't been set...
@@ -116,6 +118,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      *
      * @see org.javarosa.core.model.data.IAnswerData#getValue()
      */
+    @Override
     public Object getValue() {
     	// clone()'ing to prevent some potential bad direct accesses
     	// when these values are returned by GeoLine or GeoShape objects.
@@ -123,6 +126,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public void setValue(Object o) {
         if (o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
@@ -131,6 +135,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException,
             DeserializationException {
         len = (int) ExtUtil.readNumeric(in);
@@ -144,6 +149,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeNumeric(out, len);
         for (int i = 0; i < len; i++) {
@@ -152,10 +158,12 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
 	public UncastData uncast() {
 		return new UncastData(getDisplayText());
 	}
 
+    @Override
 	public GeoPointData cast(UncastData data) throws IllegalArgumentException {
 		double[] ret = new double[4];
         // make sure that missing data is flagged as absent...
@@ -176,7 +184,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
 	@Override
 	public Boolean toBoolean() {
 		// return whether or not the Geopoint has been set
-		return (gp[0] != 0.0 && gp[1] != 0.0 & gp[2] != 0.0);
+		return (gp[0] != 0.0 || gp[1] != 0.0 || gp[2] != 0.0 || gp[3] != 0.0);
 	}
 
 	@Override
