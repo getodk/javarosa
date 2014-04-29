@@ -479,6 +479,7 @@ public class DateUtils {
 	 * @return new Date object with same date but time set to midnight (in current timezone)
 	 */
 	public static Date roundDate (Date d) {
+		if ( d == null ) return null;
 		DateFields f = getFields(d);
 		return getDate(f.year, f.month, f.day);
 	}
