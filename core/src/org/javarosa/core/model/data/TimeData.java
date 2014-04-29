@@ -29,34 +29,38 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class TimeData implements IAnswerData {
 	Date d;
-	
+
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
 	 * Shouldn't be used otherwise.
 	 */
 	public TimeData() {
 	}
-	
+
 	public TimeData (Date d) {
 		setValue(d);
 	}
-	
+
+    @Override
 	public IAnswerData clone () {
 		return new TimeData(new Date(d.getTime()));
 	}
-	
+
+    @Override
 	public void setValue (Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 		d = new Date(((Date)o).getTime());
-		
+
 	}
-	
+
+    @Override
 	public Object getValue () {
 		return new Date(d.getTime());
 	}
-	
+
+    @Override
 	public String getDisplayText () {
 		return DateUtils.formatTime(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 	}
@@ -64,6 +68,7 @@ public class TimeData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		setValue(ExtUtil.readDate(in));
 	}
@@ -71,20 +76,23 @@ public class TimeData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeDate(out, d);
 	}
 
+    @Override
 	public UncastData uncast() {
 		return new UncastData(DateUtils.formatTime(d, DateUtils.FORMAT_ISO8601));
 	}
-	
+
+    @Override
 	public TimeData cast(UncastData data) throws IllegalArgumentException {
 		Date ret = DateUtils.parseTime(data.value);
 		if(ret != null) {
 			return new TimeData(ret);
 		}
-		
+
 		throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Time");
 	}
 }

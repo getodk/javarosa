@@ -27,16 +27,16 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
- * Answer data representing a pointer object.  The pointer is a reference to some 
+ * Answer data representing a pointer object.  The pointer is a reference to some
  * other object that it knows how to get out of memory.
- * 
+ *
  * @author Cory Zue
  *
  */
 public class PointerAnswerData implements IAnswerData {
 
 	private IDataPointer data;
-	
+
 
 	/**
 	 * NOTE: Only for serialization/deserialization
@@ -44,23 +44,27 @@ public class PointerAnswerData implements IAnswerData {
 	public PointerAnswerData() {
 		//Only for serialization/deserialization
 	}
-	
+
 	public PointerAnswerData(IDataPointer data) {
 		this.data = data;
 	}
-		
+
+    @Override
 	public IAnswerData clone () {
 		return null; //not cloneable
 	}
-	
+
+    @Override
 	public String getDisplayText() {
 		return data.getDisplayText();
 	}
 
+    @Override
 	public Object getValue() {
 		return data;
 	}
 
+    @Override
 	public void setValue(Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
@@ -68,20 +72,24 @@ public class PointerAnswerData implements IAnswerData {
 		data = ((IDataPointer)o);
 	}
 
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		data = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
 	}
 
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(data));
 	}
 
+    @Override
 	public UncastData uncast() {
 		return new UncastData(data.getDisplayText());
 	}
-	
-	public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
+
+    @Override
+	public PointerAnswerData cast(UncastData data) throws IllegalArgumentException {
 		return null;
 	}
 }

@@ -51,6 +51,7 @@ public class SelectMultiData implements IAnswerData {
 		setValue(vs);
 	}
 
+    @Override
 	public IAnswerData clone () {
 		Vector<Selection> v = new Vector<Selection>();
 		for (int i = 0; i < vs.size(); i++) {
@@ -63,6 +64,7 @@ public class SelectMultiData implements IAnswerData {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
 	 */
+    @Override
 	public void setValue (Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
@@ -75,6 +77,7 @@ public class SelectMultiData implements IAnswerData {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
+    @Override
 	public Object getValue () {
 		return vectorCopy(vs);
 	}
@@ -100,6 +103,7 @@ public class SelectMultiData implements IAnswerData {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
+    @Override
 	public String getDisplayText () {
 		StringBuilder b = new StringBuilder();
 
@@ -116,6 +120,7 @@ public class SelectMultiData implements IAnswerData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	@SuppressWarnings("unchecked")
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		vs = (Vector<Selection>)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
 	}
@@ -123,10 +128,12 @@ public class SelectMultiData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapList(vs));
 	}
 
+    @Override
 	public UncastData uncast() {
 		Enumeration<Selection> en = vs.elements();
 		StringBuilder selectString = new StringBuilder();
@@ -142,6 +149,7 @@ public class SelectMultiData implements IAnswerData {
 		return new UncastData(selectString.toString());
 	}
 
+    @Override
 	public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
 		Vector<Selection> v = new Vector<Selection>();
 
