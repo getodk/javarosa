@@ -46,6 +46,7 @@ public class MultiPointerAnswerData implements IAnswerData {
 		data = values;
 	}
 
+    @Override
 	public String getDisplayText() {
 		StringBuilder b = new StringBuilder();
 		for (int i=0; i < data.length; i++) {
@@ -57,10 +58,12 @@ public class MultiPointerAnswerData implements IAnswerData {
 		return b.toString();
 	}
 
+    @Override
 	public Object getValue() {
 		return data;
 	}
 
+    @Override
 	public void setValue(Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
@@ -68,10 +71,12 @@ public class MultiPointerAnswerData implements IAnswerData {
 		data = (IDataPointer[]) o;
 	}
 
+    @Override
 	public IAnswerData clone () {
 		return null; //not cloneable
 	}
 
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		int length = in.readInt();
@@ -81,6 +86,7 @@ public class MultiPointerAnswerData implements IAnswerData {
 		}
 	}
 
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(data.length);
 		for(int i = 0; i < data.length ; ++i ) {
@@ -88,6 +94,7 @@ public class MultiPointerAnswerData implements IAnswerData {
 		}
 	}
 
+    @Override
 	public UncastData uncast() {
 		StringBuilder b = new StringBuilder();
 		for(IDataPointer datum : data) {
@@ -97,6 +104,7 @@ public class MultiPointerAnswerData implements IAnswerData {
 		return new UncastData(b.toString().trim());
 	}
 
+    @Override
 	public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
 		return null;
 	}

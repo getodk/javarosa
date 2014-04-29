@@ -85,6 +85,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     	}
    }
 
+    @Override
     public IAnswerData clone() {
         return new GeoTraceData(this);
     }
@@ -94,6 +95,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
      *
      * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
      */
+    @Override
     public String getDisplayText() {
     	StringBuilder b = new StringBuilder();
     	boolean first = true;
@@ -113,6 +115,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
      *
      * @see org.javarosa.core.model.data.IAnswerData#getValue()
      */
+    @Override
     public Object getValue() {
     	ArrayList<double[]> pts = new ArrayList<double[]>();
     	for ( GeoPointData p : points ) {
@@ -123,6 +126,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public void setValue(Object o) {
         if (o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
@@ -142,6 +146,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException,
             DeserializationException {
     	points.clear();
@@ -154,6 +159,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeNumeric(out, points.size());
         for ( int i = 0 ; i < points.size() ; ++i ) {
@@ -163,10 +169,12 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     }
 
 
+    @Override
 	public UncastData uncast() {
 		return new UncastData(getDisplayText());
 	}
 
+    @Override
 	public GeoTraceData cast(UncastData data) throws IllegalArgumentException {
 		String[] parts = data.value.split(";");
 

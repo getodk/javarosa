@@ -54,11 +54,13 @@ public class DateData implements IAnswerData {
 		}
 	}
 
+    @Override
 	public IAnswerData clone () {
 		init();
 		return new DateData(new Date(d.getTime()));
 	}
 
+    @Override
 	public void setValue (Object o) {
 		//Should not ever be possible to set this to a null value
 		if(o == null) {
@@ -68,11 +70,13 @@ public class DateData implements IAnswerData {
 		init = false;
 	}
 
+    @Override
 	public Object getValue () {
 		init();
 		return new Date(d.getTime());
 	}
 
+    @Override
 	public String getDisplayText () {
 		init();
 		return DateUtils.formatDate(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
@@ -81,6 +85,7 @@ public class DateData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		init();
 		setValue(ExtUtil.readDate(in));
@@ -89,16 +94,19 @@ public class DateData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		init();
 		ExtUtil.writeDate(out, d);
 	}
 
+    @Override
 	public UncastData uncast() {
 		init();
 		return new UncastData(DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601));
 	}
 
+    @Override
 	public DateData cast(UncastData data) throws IllegalArgumentException {
 		Date ret = DateUtils.parseDate(data.value);
 		if(ret != null) {
