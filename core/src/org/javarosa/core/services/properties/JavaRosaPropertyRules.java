@@ -23,28 +23,29 @@ import org.javarosa.core.services.locale.Localizer;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.Vector;
 
 /**
  * A set of rules governing the allowable properties for JavaRosa's
- * core funtionality. 
- * 
+ * core funtionality.
+ *
  * @author ctsims
  *
  */
 public class JavaRosaPropertyRules implements IPropertyRules {
     HashMap rules;
-    
+
     Vector readOnlyProperties;
-    
+
     public final static String DEVICE_ID_PROPERTY = "DeviceID";
     public final static String CURRENT_LOCALE = "cur_locale";
-    
+
     public final static String LOGS_ENABLED = "logenabled";
-    
+
     public final static String LOGS_ENABLED_YES = "Enabled";
     public final static String LOGS_ENABLED_NO = "Disabled";
-    
+
     /** The expected compliance version for the OpenRosa API set **/
     public final static String OPENROSA_API_LEVEL = "jr_openrosa_api";
 
@@ -56,19 +57,19 @@ public class JavaRosaPropertyRules implements IPropertyRules {
         readOnlyProperties = new Vector();
 
         //DeviceID Property
-        rules.put(DEVICE_ID_PROPERTY, new Vector());
-        Vector logs = new Vector();
+        rules.put(DEVICE_ID_PROPERTY, new Vector(1));
+        Vector logs = new Vector(2);
         logs.addElement(LOGS_ENABLED_NO);
         logs.addElement(LOGS_ENABLED_YES);
         rules.put(LOGS_ENABLED, logs);
-        
-        rules.put(CURRENT_LOCALE, new Vector());
-        
-        rules.put(OPENROSA_API_LEVEL, new Vector());
-        
+
+        rules.put(CURRENT_LOCALE, new Vector(1));
+
+        rules.put(OPENROSA_API_LEVEL, new Vector(1));
+
         readOnlyProperties.addElement(DEVICE_ID_PROPERTY);
         readOnlyProperties.addElement(OPENROSA_API_LEVEL);
-        
+
     }
 
     /** (non-Javadoc)
@@ -77,8 +78,8 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     public Vector allowableValues(String propertyName) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
     		Localizer l = Localization.getGlobalLocalizerAdvanced();
-    		Vector v = new Vector();
     		String[] locales = l.getAvailableLocales();
+    		Vector v = new Vector(locales.length);
     		for(int i = 0 ; i < locales.length ; ++i) {
     			v.addElement(locales[i]);
     		}
@@ -113,8 +114,9 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      *  @see org.javarosa.core.services.properties.IPropertyRules#allowableProperties()
      */
     public Vector allowableProperties() {
-        Vector propList = new Vector();
-        Enumeration iter = Collections.enumeration(rules.keySet());
+    	Set keys = rules.keySet();
+        Vector propList = new Vector(keys.size());
+        Enumeration iter = Collections.enumeration(keys);
         while (iter.hasMoreElements()) {
             propList.addElement(iter.nextElement());
         }
@@ -133,14 +135,14 @@ public class JavaRosaPropertyRules implements IPropertyRules {
         }
         return false;
     }
-    
+
     /** (non-Javadoc)
      *  @see org.javarosa.core.services.properties.IPropertyRules#checkPropertyUserReadOnly)
      */
     public boolean checkPropertyUserReadOnly(String propertyName){
         return readOnlyProperties.contains(propertyName);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
@@ -157,7 +159,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     	}
     	return propertyName;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
@@ -171,7 +173,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     	}
     	return value;
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)

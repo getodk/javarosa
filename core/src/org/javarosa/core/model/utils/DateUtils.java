@@ -703,9 +703,9 @@ public class DateUtils {
 	 * seperated by the delimeter
 	 */
     public static Vector<String> split (String str, String delimiter, boolean combineMultipleDelimiters) {
-    	Vector<String> pieces = new Vector<String>();
 
     	int index = str.indexOf(delimiter);
+    	Vector<String> pieces = new Vector<String>(index+1);
         while (index >= 0) {
             pieces.addElement(str.substring(0, index));
             str = str.substring(index + delimiter.length());

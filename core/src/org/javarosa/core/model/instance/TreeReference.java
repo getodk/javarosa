@@ -70,7 +70,7 @@ public class TreeReference implements Externalizable {
 		instanceName = null; // null means the default instance
 		refLevel = 0;
 		contextType = CONTEXT_ABSOLUTE;
-		data = new Vector<TreeReferenceLevel>();
+		data = new Vector<TreeReferenceLevel>(0);
 	}
 
 	public String getInstanceName() {
@@ -570,7 +570,7 @@ public class TreeReference implements Externalizable {
 		ret.refLevel = this.refLevel;
 		ret.contextType = this.contextType;
 		ret.instanceName = this.instanceName;
-		ret.data = new Vector<TreeReferenceLevel>();
+		ret.data = new Vector<TreeReferenceLevel>(level);
 		for(int i = 0 ; i <= level ; ++i) {
 			ret.data.addElement(this.data.elementAt(i));
 		}

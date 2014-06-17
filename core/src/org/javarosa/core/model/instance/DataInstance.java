@@ -113,7 +113,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 		if (!ref.isAbsolute())
 			return null;
 
-		Vector nodes = new Vector();
+		Vector nodes = new Vector(ref.size());
 		AbstractTreeElement<T> cur = getBase();
 		for (int i = 0; i < ref.size(); i++) {
 			String name = ref.getName(i);

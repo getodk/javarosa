@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.javarosa.core.util;
 
@@ -14,14 +14,14 @@ import java.util.Vector;
  */
 public class CacheTable<K> {
 	int totalAdditions = 0;
-	
+
 	private Hashtable<Integer, WeakReference> currentTable;
-	
-	private static Vector<WeakReference> caches = new Vector<WeakReference>();
-	
+
+	private static Vector<WeakReference> caches = new Vector<WeakReference>(1);
+
 	private static Thread cleaner = new Thread(new Runnable() {
 		public void run() {
-			Vector<Integer> toRemove = new Vector<Integer>();			
+			Vector<Integer> toRemove = new Vector<Integer>();
 			while(true) {
 				try {
 					toRemove.removeAllElements();
@@ -33,7 +33,7 @@ public class CacheTable<K> {
 							Hashtable<Integer, WeakReference> table = cache.currentTable;
 							for (Enumeration en = table.keys(); en.hasMoreElements();) {
 								Object key = en.nextElement();
-								
+
 								synchronized(cache) {
 									//See whether or not the cached reference has been cleared by the GC
 									if (((WeakReference) table.get(key)).get() == null) {
@@ -42,7 +42,7 @@ public class CacheTable<K> {
 									}
 								}
 							}
-							
+
 							synchronized(cache) {
 								//See if our current size is 25% the size of the largest size we've been
 								//and compact (clone to a new table) if so, since the table maintains the
@@ -50,7 +50,7 @@ public class CacheTable<K> {
 								//TODO: 50 is a super arbitrary upper bound
 								if(cache.totalAdditions > 50 && cache.totalAdditions - cache.currentTable.size() > (cache.currentTable.size() >> 2) ) {
 									Hashtable newTable = new Hashtable(cache.currentTable.size());
-									int oldMax = cache.totalAdditions; 
+									int oldMax = cache.totalAdditions;
 									for (Enumeration en = table.keys(); en.hasMoreElements();) {
 										Object key = en.nextElement();
 										newTable.put(key, cache.currentTable.get(key));
@@ -59,7 +59,7 @@ public class CacheTable<K> {
 									cache.totalAdditions = cache.currentTable.size();
 								}
 							}
-							
+
 						}
 					}
 					for (int id = toRemove.size() - 1; id >= 0; --id) {
@@ -78,7 +78,7 @@ public class CacheTable<K> {
 
 		}
 	});
-	
+
 	private static void registerCache(CacheTable table) {
 		caches.addElement(new WeakReference(table));
 		synchronized(cleaner) {
@@ -87,13 +87,13 @@ public class CacheTable<K> {
 			}
 		}
 	}
-	
+
 	public CacheTable() {
 		super();
 		currentTable = new Hashtable<Integer, WeakReference>();
 		registerCache(this);
 	}
-	
+
 	public K intern(K k) {
 		synchronized(this) {
 			int hash = k.hashCode();
@@ -110,7 +110,7 @@ public class CacheTable<K> {
 			return k;
 		}
 	}
-	
+
 
 	public K retrieve(int key) {
 		synchronized(this) {

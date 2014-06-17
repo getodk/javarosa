@@ -116,7 +116,7 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Vector v = new Vector();
+		Vector v = new Vector(args.length);
 		for (int i = 0; i < args.length; i++)
 			v.addElement(args[i]);
 

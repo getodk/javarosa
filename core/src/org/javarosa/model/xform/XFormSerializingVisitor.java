@@ -79,7 +79,7 @@ import org.kxml2.kdom.Node;
 		private void init() {
 			theXmlDoc = null;
 			schema = null;
-			dataPointers = new Vector();
+			dataPointers = new Vector(0);
 		}
 
 		public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
@@ -161,10 +161,6 @@ import org.kxml2.kdom.Node;
 				root = tree.getRoot();
 			}
 
-			for (int i = 0; i< root.getNumChildren(); i++){
-				TreeElement childAt = root.getChildAt(i);
-			}
-
 			if (root != null) {
 				theXmlDoc.addChild(Node.ELEMENT, serializeNode(root));
 			}
@@ -209,7 +205,7 @@ import org.kxml2.kdom.Node;
 				}
 			} else {
 				//make sure all children of the same tag name are written en bloc
-				Vector childNames = new Vector();
+				Vector childNames = new Vector(instanceNode.getNumChildren());
 				for (int i = 0; i < instanceNode.getNumChildren(); i++) {
 					String childName = instanceNode.getChildAt(i).getName();
 					if (!childNames.contains(childName))

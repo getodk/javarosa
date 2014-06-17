@@ -145,7 +145,7 @@ public class XFormParser {
 		initProcessingRules();
 		initTypeMappings();
 		modelPrototypes = new PrototypeFactoryDeprecated();
-		submissionParsers = new Vector<SubmissionParser>();
+		submissionParsers = new Vector<SubmissionParser>(1);
 	}
 
 	private static void initProcessingRules () {
@@ -242,13 +242,13 @@ public class XFormParser {
 		repeatTree = null;
 		defaultNamespace = null;
 
-		itextKnownForms = new Vector<String>();
+		itextKnownForms = new Vector<String>(4);
 		itextKnownForms.addElement("long");
 		itextKnownForms.addElement("short");
 		itextKnownForms.addElement("image");
 		itextKnownForms.addElement("audio");
 
-		namedActions = new Vector<String>();
+		namedActions = new Vector<String>(6);
 		namedActions.addElement("rebuild");
 		namedActions.addElement("recalculate");
 		namedActions.addElement("revalidate");
@@ -456,7 +456,7 @@ public class XFormParser {
 			"entryHeader",
 			"delHeader"
 		};
-		Vector<String> suppressWarning = new Vector<String>();
+		Vector<String> suppressWarning = new Vector<String>(suppressWarningArr.length);
 		for (int i = 0; i < suppressWarningArr.length; i++) {
 			suppressWarning.addElement(suppressWarningArr[i]);
 		}
@@ -1933,7 +1933,7 @@ public class XFormParser {
 	}
 
 	private Vector<TreeReference> getRepeatableRefs () {
-		Vector<TreeReference> refs = new Vector<TreeReference>();
+		Vector<TreeReference> refs = new Vector<TreeReference>(repeats.size());
 
 		for (int i = 0; i < repeats.size(); i++) {
 			refs.addElement((TreeReference)repeats.elementAt(i));
@@ -2590,7 +2590,7 @@ public class XFormParser {
 		boolean acyclic = true;
 		while (vertices.size() > 0) {
 			//determine leaf nodes
-			Vector leaves = new Vector();
+			Vector leaves = new Vector(vertices.size());
 			for (int i = 0; i < vertices.size(); i++) {
 				leaves.addElement(vertices.elementAt(i));
 			}

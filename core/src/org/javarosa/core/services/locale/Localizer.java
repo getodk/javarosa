@@ -68,10 +68,10 @@ public class Localizer implements Externalizable {
 		stringTree = new PrefixTree(10);
 		localeResources = new OrderedMap<String, Vector<LocaleDataSource>>();
 		currentLocaleData = new OrderedMap<String, PrefixTreeNode>();
-		locales = new Vector<String>();
+		locales = new Vector<String>(0);
 		defaultLocale = null;
 		currentLocale = null;
-		observers = new Vector();
+		observers = new Vector(0);
 		this.fallbackDefaultLocale = fallbackDefaultLocale;
 		this.fallbackDefaultForm = fallbackDefaultForm;
 	}
@@ -127,7 +127,7 @@ public class Localizer implements Externalizable {
 			return false;
 		} else {
 			locales.addElement(locale);
-			localeResources.put(locale, new Vector<LocaleDataSource>());
+			localeResources.put(locale, new Vector<LocaleDataSource>(1));
 			return true;
 		}
 	}
@@ -279,9 +279,11 @@ public class Localizer implements Externalizable {
 		if(resource == null) {
 			throw new NullPointerException("Attempt to register a null data source in the localizer");
 		}
-		Vector<LocaleDataSource> resources = new Vector<LocaleDataSource>();
+		Vector<LocaleDataSource> resources;
 		if(localeResources.containsKey(locale)) {
 			resources = localeResources.get(locale);
+		} else {
+			resources = new Vector<LocaleDataSource>(1);
 		}
 		resources.addElement(resource);
 		localeResources.put(locale, resources);
