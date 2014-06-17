@@ -209,7 +209,7 @@ public class EvaluationContext {
 			throw new RuntimeException("Unable to expand reference " + ref.toString(true) + ", no appropriate instance in evaluation context");
 		}
 
-		Vector<TreeReference> v = new Vector<TreeReference>();
+		Vector<TreeReference> v = new Vector<TreeReference>(1);
 		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), v, includeTemplates);
 		return v;
 	}
@@ -236,7 +236,7 @@ public class EvaluationContext {
 
 			//Copy predicates for batch fetch
 			if (predicates != null) {
-				Vector<XPathExpression> predCopy = new Vector<XPathExpression>();
+				Vector<XPathExpression> predCopy = new Vector<XPathExpression>(predicates.size());
 				for (XPathExpression xpe : predicates) {
 					predCopy.addElement(xpe);
 				}
@@ -244,17 +244,21 @@ public class EvaluationContext {
 			}
 			//ETHERTON: Is this where we should test for predicates?
 			int mult = sourceRef.getMultiplicity(depth);
-			Vector<TreeReference> set = new Vector<TreeReference>();
+			Vector<TreeReference> set = new Vector<TreeReference>(1);
 
 			TreeElement node = instance.resolveReference(workingRef);
-			Vector<TreeReference> passingSet = new Vector<TreeReference>();
+			Vector<TreeReference> passingSet = new Vector<TreeReference>(0);
 
 			{
 				if (node.getNumChildren() > 0) {
 					if (mult == TreeReference.INDEX_UNBOUND) {
-						int count = node.getChildMultiplicity(name);
+						Vector<TreeElement> childrenWithName = node.getChildrenWithName(name);
+						int count = childrenWithName.size();
 						for (int i = 0; i < count; i++) {
-							TreeElement child = node.getChild(name, i);
+							TreeElement child = childrenWithName.get(i);
+							if ( child.getMultiplicity() != i ) {
+								throw new IllegalStateException("Unexpected multiplicity mismatch");
+							}
 							if (child != null) {
 								set.addElement(child.getRef());
 							} else {
@@ -293,7 +297,7 @@ public class EvaluationContext {
 
 			if (predicates != null) {
 				boolean firstTime = true;
-				Vector<TreeReference> passed = new Vector<TreeReference>();
+				Vector<TreeReference> passed = new Vector<TreeReference>(set.size());
 				for (XPathExpression xpe : predicates) {
 					for ( int i = 0 ; i < set.size() ; ++i ) {
 						//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
