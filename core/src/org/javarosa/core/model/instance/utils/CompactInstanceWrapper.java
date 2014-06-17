@@ -181,7 +181,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		boolean isGroup = !templ.isLeaf();
 
 		if (isGroup) {
-			Vector childTypes = new Vector();
+			Vector childTypes = new Vector(templ.getNumChildren());
 			for (int i = 0; i < templ.getNumChildren(); i++) {
 				String childName = templ.getChildAt(i).getName();
 				if (!childTypes.contains(childName)) {
@@ -254,7 +254,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		boolean isGroup = !templ.isLeaf();
 
 		if (isGroup) {
-			Vector childTypesHandled = new Vector();
+			Vector childTypesHandled = new Vector(templ.getNumChildren());
 			for (int i = 0; i < templ.getNumChildren(); i++) {
 				String childName = templ.getChildAt(i).getName();
 				if (!childTypesHandled.contains(childName)) {
@@ -395,7 +395,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	 */
 	private Vector compactSelectMulti (SelectMultiData data) {
 		Vector val = (Vector)data.getValue();
-		Vector choices = new Vector();
+		Vector choices = new Vector(val.size());
 		for (int i = 0; i < val.size(); i++) {
 			choices.addElement(extractSelection((Selection)val.elementAt(i)));
 		}
@@ -413,7 +413,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	 * create a SelectMultiData from a vector of integers (index mode) or strings (value mode)
 	 */
 	private SelectMultiData getSelectMulti (Vector v) {
-		Vector choices = new Vector();
+		Vector choices = new Vector(v.size());
 		for (int i = 0; i < v.size(); i++) {
 			choices.addElement(makeSelection(v.elementAt(i)));
 		}

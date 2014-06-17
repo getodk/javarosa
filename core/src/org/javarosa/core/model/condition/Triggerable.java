@@ -80,7 +80,7 @@ public abstract class Triggerable implements Externalizable {
 		this.expr = expr;
 		this.contextRef = contextRef;
 		this.originalContextRef = contextRef;
-		this.targets = new Vector();
+		this.targets = new Vector(0);
 	}
 
 	protected abstract Object eval (FormInstance instance, EvaluationContext ec);

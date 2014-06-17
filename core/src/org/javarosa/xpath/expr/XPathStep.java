@@ -247,7 +247,7 @@ public class XPathStep implements Externalizable {
 		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
 		}
 
-		Vector v = new Vector();
+		Vector v = new Vector(predicates.length);
 		for (int i = 0; i < predicates.length; i++)
 			v.addElement(predicates[i]);
 		ExtUtil.write(out, new ExtWrapListPoly(v));

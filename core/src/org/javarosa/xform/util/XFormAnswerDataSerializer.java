@@ -59,7 +59,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 
 	public final static String DELIMITER = " ";
 
-	Vector additionalSerializers = new Vector();
+	Vector additionalSerializers = new Vector(1);
 
 	public void registerAnswerSerializer(IAnswerDataSerializer ads) {
 		additionalSerializers.addElement(ads);

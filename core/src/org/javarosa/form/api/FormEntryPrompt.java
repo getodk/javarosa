@@ -106,13 +106,15 @@ public class FormEntryPrompt extends FormEntryCaption {
     					preselectedValues.addElement(value);
 	    			}
 	    		} else {
-	    			Vector<Selection> sels = new Vector<Selection>();
+	    			Vector<Selection> sels;
 	    			IAnswerData data = mTreeElement.getValue();
 	    			if (data instanceof SelectMultiData) {
 	    				sels = (Vector<Selection>)data.getValue();
 	    			} else if (data instanceof SelectOneData) {
-	    				sels = new Vector<Selection>();
+	    				sels = new Vector<Selection>(1);
 	    				sels.addElement((Selection)data.getValue());
+	    			} else {
+	    				sels = new Vector<Selection>(0);
 	    			}
 	    			for (int i = 0; i < sels.size(); i++) {
 	    				preselectedValues.addElement(sels.elementAt(i).xmlValue);

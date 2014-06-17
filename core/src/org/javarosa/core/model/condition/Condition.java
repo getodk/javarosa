@@ -49,7 +49,7 @@ public class Condition extends Triggerable {
 	}
 
 	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
-		this(expr, trueAction, falseAction, contextRef, new Vector());
+		this(expr, trueAction, falseAction, contextRef, new Vector(0));
 	}
 
 	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, Vector targets) {

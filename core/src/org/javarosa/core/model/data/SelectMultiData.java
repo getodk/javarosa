@@ -53,7 +53,7 @@ public class SelectMultiData implements IAnswerData {
 
     @Override
 	public IAnswerData clone () {
-		Vector<Selection> v = new Vector<Selection>();
+		Vector<Selection> v = new Vector<Selection>(vs.size());
 		for (int i = 0; i < vs.size(); i++) {
 			v.addElement(((Selection)vs.elementAt(i)).clone());
 		}
@@ -88,7 +88,7 @@ public class SelectMultiData implements IAnswerData {
 	 * TODO: move to utility class
 	 */
 	private Vector<Selection> vectorCopy(Vector<Selection> input) {
-		Vector<Selection> output = new Vector<Selection>();
+		Vector<Selection> output = new Vector<Selection>(input.size());
 		//validate type
 		for (int i = 0; i < input.size(); i++) {
 			Selection s = (Selection)input.elementAt(i);
@@ -151,9 +151,10 @@ public class SelectMultiData implements IAnswerData {
 
     @Override
 	public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
-		Vector<Selection> v = new Vector<Selection>();
 
 		Vector<String> choices = DateUtils.split(data.value, " ", true);
+		Vector<Selection> v = new Vector<Selection>(choices.size());
+
 		for(String s : choices) {
 			v.addElement(new Selection(s));
 		}
