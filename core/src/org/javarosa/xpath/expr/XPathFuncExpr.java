@@ -16,7 +16,17 @@
 
 package org.javarosa.xpath.expr;
 
-import me.regexp.RE;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.regex.Pattern;
+
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -37,11 +47,6 @@ import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Representation of an xpath function expression.
@@ -66,7 +71,7 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append("{func-expr:");
 		sb.append(id.toString());
@@ -142,18 +147,26 @@ public class XPathFuncExpr extends XPathExpression {
 		HashMap funcHandlers = evalContext.getFunctionHandlers();
 
 		//TODO: Func handlers should be able to declare the desire for short circuiting as well
-		if(name.equals("if") && args.length == 3) {
+		if(name.equals("if")) {
+			assertArgsCount( name, args, 3);
 			return ifThenElse(model, evalContext, args, argVals);
-		} else if (name.equals("coalesce") && args.length == 2) {
-			//Not sure if unpacking here is quiiite right, but it seems right
-			argVals[0] = XPathFuncExpr.unpack(args[0].eval(model, evalContext));
-			if(!isNull(argVals[0])) { return argVals[0]; }
-			else {
-				argVals[1] = args[1].eval(model, evalContext);
+		} else if (name.equals("coalesce")) {
+			assertArgsCount( name, args, 2);
+			argVals[0] = args[0].eval(model, evalContext);
+			if(!isNull(argVals[0])) {
+				return argVals[0];
+			} else {
+				// that was null, so try the other one...
+				argVals[1] =args[1].eval(model, evalContext);
 				return argVals[1];
 			}
-		} else if (name.equals("indexed-repeat") && (args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
-			return indexedRepeat(model, evalContext, args, argVals);
+		} else if (name.equals("indexed-repeat")) {
+			if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
+				return indexedRepeat(model, evalContext, args, argVals);
+			} else {
+				throw new XPathUnhandledException("function \'" + name + "\' requires " +
+						"3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
+			}
 		}
 
 		for (int i = 0; i < args.length; i++) {
@@ -329,6 +342,9 @@ public class XPathFuncExpr extends XPathExpression {
 
 			int len = toInt(argVals[0]).intValue();
 			return PropertyUtils.genGUID(len);
+		} else if (name.equals("version")) { //non-standard
+			assertArgsCount( name, args, 0);
+			return model.formVersion == null ? "" : model.formVersion;
 		} else if (name.equals("property")) { // non-standard
 			// return a property defined by the property manager.
 			// NOTE: Property should be immutable.
@@ -477,7 +493,10 @@ public class XPathFuncExpr extends XPathExpression {
 	public static boolean isNull (Object o) {
 		if (o == null) {
 			return true; //true 'null' values aren't allowed in the xpath engine, but whatever
-		} else if (o instanceof String && ((String)o).length() == 0) {
+		}
+
+		o = unpack(o);
+		if (o instanceof String && ((String)o).length() == 0) {
 			return true;
 		} else if (o instanceof Double && ((Double)o).isNaN()) {
 			return true;
@@ -534,7 +553,7 @@ public class XPathFuncExpr extends XPathExpression {
             }
 
     }
-        
+
 	/**
 	 * convert a value to a number using xpath's type conversion rules (note that xpath itself makes
 	 * no distinction between integer and floating point numbers)
@@ -1042,7 +1061,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 */
 	public static String join (Object oSep, Object[] argVals) {
 		String sep = toString(oSep);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < argVals.length; i++) {
 			sb.append(toString(argVals[i]));
@@ -1140,8 +1159,7 @@ public class XPathFuncExpr extends XPathExpression {
 		String str = toString(o1);
 		String re = toString(o2);
 
-		RE regexp = new RE(re);
-		boolean result = regexp.match(str);
+		boolean result = Pattern.matches(re, str);
 		return new Boolean(result);
 	}
 

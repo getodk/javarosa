@@ -26,7 +26,9 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
+import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -44,36 +46,38 @@ import org.kxml2.kdom.Element;
 /**
  * The XFormAnswerDataSerializer takes in AnswerData objects, and provides
  * an XForms compliant (String or Element) representation of that AnswerData.
- * 
+ *
  * By default, this serializer can properly operate on StringData, DateData
  * SelectMultiData, and SelectOneData AnswerData objects. This list can be
  * extended by registering appropriate XForm serializing AnswerDataSerializers
  * with this class.
- * 
+ *
  * @author Clayton Sims
  *
  */
 public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
-	
+
 	public final static String DELIMITER = " ";
-	
+
 	Vector additionalSerializers = new Vector();
-	
+
 	public void registerAnswerSerializer(IAnswerDataSerializer ads) {
 		additionalSerializers.addElement(ads);
 	}
-	
+
 	public boolean canSerialize(IAnswerData data) {
 		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
 		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData || data instanceof LongData || data instanceof DateTimeData || data instanceof UncastData) {
+		    data instanceof MultiPointerAnswerData ||
+		    data instanceof GeoPointData || data instanceof GeoTraceData || data instanceof GeoShapeData ||
+		    data instanceof LongData || data instanceof DateTimeData || data instanceof UncastData) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A String which contains the given answer
@@ -81,8 +85,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(UncastData data) {
 		return data.getString();
 	}
-	
-	
+
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A String which contains the given answer
@@ -90,7 +94,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(StringData data) {
 		return (String)data.getValue();
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A String which contains a date in xsd:date
@@ -99,7 +103,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(DateData data) {
 		return DateUtils.formatDate((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A String which contains a date in xsd:date
@@ -108,7 +112,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(DateTimeData data) {
 		return DateUtils.formatDateTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A String which contains a date in xsd:time
@@ -117,10 +121,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(TimeData data) {
 		return DateUtils.formatTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
-	 * @return A String which contains a reference to the 
+	 * @return A String which contains a reference to the
 	 * data
 	 */
 	public Object serializeAnswerData(PointerAnswerData data) {
@@ -130,10 +134,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		IDataPointer pointer = (IDataPointer)data.getValue();
 		return pointer.getDisplayText();
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
-	 * @return A String which contains a reference to the 
+	 * @return A String which contains a reference to the
 	 * data
 	 */
 	public Object serializeAnswerData(MultiPointerAnswerData data) {
@@ -148,13 +152,13 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		for(int i = 0; i < pointers.length; ++i) {
 			Element datael = new Element();
 			datael.setName("data");
-			
+
 			datael.addChild(Element.TEXT, pointers[i].getDisplayText());
 			parent.addChild(Element.ELEMENT, datael);
 		}
 		return parent;
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A string containing the xforms compliant format
@@ -164,8 +168,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(SelectMultiData data) {
 		Vector selections = (Vector)data.getValue();
 		Enumeration en = selections.elements();
-		StringBuffer selectString = new StringBuffer();
-		
+		StringBuilder selectString = new StringBuilder();
+
 		while(en.hasMoreElements()) {
 			Selection selection = (Selection)en.nextElement();
 			if (selectString.length() > 0)
@@ -173,10 +177,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			selectString.append(selection.getValue());
 		}
 		//As Crazy, and stupid, as it sounds, this is the XForms specification
-		//for storing multiple selections.	
+		//for storing multiple selections.
 		return selectString.toString();
 	}
-	
+
 	/**
 	 * @param data The AnswerDataObject to be serialized
 	 * @return A String which contains the value of a selection
@@ -184,11 +188,11 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(SelectOneData data) {
 		return ((Selection)data.getValue()).getValue();
 	}
-	
+
 	public Object serializeAnswerData(IntegerData data) {
 		return ((Integer)data.getValue()).toString();
 	}
-	
+
 	public Object serializeAnswerData(LongData data) {
 		return ((Long)data.getValue()).toString();
 	}
@@ -196,11 +200,19 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(DecimalData data) {
 		return ((Double)data.getValue()).toString();
 	}
-	
-	public Object serializeAnswerData(GeoPointData data) { 
+
+	public Object serializeAnswerData(GeoPointData data) {
 	    return data.getDisplayText();
      }
-	
+
+	public Object serializeAnswerData(GeoTraceData data) {
+	    return data.getDisplayText();
+     }
+
+	public Object serializeAnswerData(GeoShapeData data) {
+	    return data.getDisplayText();
+     }
+
 	public Object serializeAnswerData(BooleanData data) {
 		if(((Boolean)data.getValue()).booleanValue()) {
 			return "1";
@@ -208,7 +220,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return "0";
 		}
 	}
-	
+
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
 		// First, we want to go through the additional serializers, as they should
 		// take priority to the default serializations
@@ -238,13 +250,17 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		} else if (data instanceof DecimalData) {
 			return serializeAnswerData((DecimalData)data);
 		} else if (data instanceof DateData) {
-			return serializeAnswerData((DateData)data);			
+			return serializeAnswerData((DateData)data);
 		} else if (data instanceof TimeData) {
-			return serializeAnswerData((TimeData)data);			
+			return serializeAnswerData((TimeData)data);
 		} else if (data instanceof PointerAnswerData) {
 			return serializeAnswerData((PointerAnswerData)data);
 		} else if (data instanceof MultiPointerAnswerData) {
-			return serializeAnswerData((MultiPointerAnswerData)data);			
+			return serializeAnswerData((MultiPointerAnswerData)data);
+		} else if (data instanceof GeoShapeData) {
+            return serializeAnswerData((GeoShapeData)data);
+		} else if (data instanceof GeoTraceData) {
+            return serializeAnswerData((GeoTraceData)data);
 		} else if (data instanceof GeoPointData) {
             return serializeAnswerData((GeoPointData)data);
         } else if (data instanceof DateTimeData) {
@@ -254,7 +270,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
         } else if (data instanceof UncastData) {
             return serializeAnswerData((UncastData)data);
         }
-		
+
 		return null;
 	}
 

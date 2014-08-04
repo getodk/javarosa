@@ -20,20 +20,22 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 public class PrefixTreeNode {
-	public String prefix;
-	public boolean terminal;
-	public Vector children;
+	private char[] prefix;
+	private boolean terminal;
+	private Vector<PrefixTreeNode> children;
+	private PrefixTreeNode parent;
 	
-	public PrefixTreeNode (String prefix) {
+	public PrefixTreeNode (char[] prefix) {
 		this.prefix = prefix;
 		this.terminal = false;
 	}
 	
-	public void decompose (Vector v, String s) {
-		String stem = s + prefix;
+	public void decompose (Vector<String> v, String s) {
+		String stem = s + new String(prefix);
 		
-		if (terminal)
+		if (terminal) {
 			v.addElement(stem);
+		}
 		
 		if (children != null) {
 			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
@@ -42,8 +44,17 @@ public class PrefixTreeNode {
 		}		
 	}
 	
+	public char[] getPrefix() {
+		return prefix;
+	}
+	
+	public Vector<PrefixTreeNode> getChildren() {
+		return children;
+	}
+	
 	public boolean equals (Object o) {
-		return (o instanceof PrefixTreeNode ? prefix.equals(((PrefixTreeNode)o).prefix) : false);
+		//uh... is this right?
+		return (o instanceof PrefixTreeNode ? prefix == ((PrefixTreeNode)o).prefix || ArrayUtilities.arraysEqual(prefix,0, ((PrefixTreeNode)o).prefix, 0) : false);
 	}
 	
 	public String toString () {
@@ -59,5 +70,62 @@ public class PrefixTreeNode {
 		}
 		sb.append("}");
 		return sb.toString();
+	}
+	
+	public String render() {
+		StringBuffer temp = new StringBuffer();
+		return render(temp);
+	}
+	
+	public String render(StringBuffer buffer) {
+		if(parent != null){
+			parent.render(buffer);
+		}
+		buffer.append(this.prefix);
+		return buffer.toString();
+	}
+	
+	public void seal() {
+		if (children != null) {
+			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
+				((PrefixTreeNode)e.nextElement()).seal();
+			}
+		}		
+		this.children = null;
+	}
+
+	public void addChild(PrefixTreeNode node) {
+		if(children == null) { 
+			children = new Vector<PrefixTreeNode>();
+		}
+		children.addElement(node);
+		node.parent = this;
+	}
+
+	public void setTerminal() {
+		//This node is now terminal (we can use this fact to clean things up)
+		terminal = true;
+	}
+
+	public PrefixTreeNode budChild(PrefixTreeNode node, char[] subPrefix, int subPrefixLen) {
+		//make a new child for the subprefix
+		PrefixTreeNode newChild = new PrefixTreeNode(subPrefix);
+		
+		//remove the child from our tree (we'll re-add it later)
+		this.children.removeElement(node);
+		node.parent = null;
+		
+		//cut out the middle part of the prefix (which is now this node's domain)
+		char[] old = node.prefix;
+		node.prefix = new char[old.length - subPrefixLen];
+		for(int i = 0 ; i < old.length - subPrefixLen; ++i) {
+			node.prefix[i] = old[subPrefixLen + i];
+		}
+				
+		//replace the old child with the new one, and put it in the proper order
+		this.addChild(newChild);
+		newChild.addChild(node);
+		
+		return newChild;
 	}
 }

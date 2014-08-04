@@ -245,7 +245,7 @@ public class DateUtils {
 	}
 
 	public static String format (DateFields f, String format) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < format.length(); i++) {
 			char c = format.charAt(i);
@@ -479,6 +479,7 @@ public class DateUtils {
 	 * @return new Date object with same date but time set to midnight (in current timezone)
 	 */
 	public static Date roundDate (Date d) {
+		if ( d == null ) return null;
 		DateFields f = getFields(d);
 		return getDate(f.year, f.month, f.day);
 	}
@@ -663,10 +664,11 @@ public class DateUtils {
 		return dateDiff(getDate(1970, 1, 1), date);
 	}
 
-        public static Double fractionalDaysSinceEpoch(Date a) {
-                return new Double((a.getTime() - getDate(1970, 1, 1).getTime()) / (double)DAY_IN_MS);
-        }
-        
+
+    public static Double fractionalDaysSinceEpoch(Date a) {
+        return new Double((a.getTime() - getDate(1970, 1, 1).getTime()) / (double)DAY_IN_MS);
+    }
+
 	/**
 	 * add n days to date d
 	 *
@@ -700,8 +702,8 @@ public class DateUtils {
 	 * @return An array of strings contained in original which were
 	 * seperated by the delimeter
 	 */
-    public static Vector split (String str, String delimiter, boolean combineMultipleDelimiters) {
-    	Vector pieces = new Vector();
+    public static Vector<String> split (String str, String delimiter, boolean combineMultipleDelimiters) {
+    	Vector<String> pieces = new Vector<String>();
 
     	int index = str.indexOf(delimiter);
         while (index >= 0) {
@@ -778,4 +780,5 @@ public class DateUtils {
 			return true;
 		}
 	}
+
 }

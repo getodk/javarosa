@@ -38,23 +38,25 @@ public class IntegerData implements IAnswerData {
 	 * Shouldn't be used otherwise.
 	 */
 	public IntegerData() {
-		
+
 	}
-	
+
 	public IntegerData(int n) {
 		this.n = n;
 	}
 	public IntegerData(Integer n) {
 		setValue(n);
 	}
-	
+
+    @Override
 	public IAnswerData clone () {
 		return new IntegerData(n);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
+    @Override
 	public String getDisplayText() {
 		return String.valueOf(n);
 	}
@@ -62,20 +64,23 @@ public class IntegerData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
+    @Override
 	public Object getValue() {
-		return new Integer(n); 
+		return Integer.valueOf(n);
 	}
-	
+
+    @Override
 	public void setValue(Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 		n = ((Integer)o).intValue();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		n = ExtUtil.readInt(in);
 	}
@@ -83,14 +88,17 @@ public class IntegerData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, n);
 	}
 
+    @Override
 	public UncastData uncast() {
-		return new UncastData(new Integer(n).toString());
+		return new UncastData(Integer.valueOf(n).toString());
 	}
-	
+
+    @Override
 	public IntegerData cast(UncastData data) throws IllegalArgumentException {
 		try {
 			return new IntegerData(Integer.parseInt(data.value));

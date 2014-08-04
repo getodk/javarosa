@@ -31,30 +31,31 @@ import java.util.Vector;
  * Property is an encapsulation of a record containing a property in the J2ME
  * RMS persistent storage system. It is responsible for serializing a name
  * value pair.
- * 
+ *
  * @author ctsims
  * @date Jan-20-2008
- * 
+ *
  */
 public class Property implements Persistable, IMetaData {
     public String name;
     public Vector value;
     public int recordId = -1;
-   
+
     /** (non-Javadoc)
      *  @see org.javarosa.core.util.externalizable.singlequestionscreen.storage.Externalizable#readExternal(DataInputStream)
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
-        String fullString = "";
-        
+        StringBuilder b = new StringBuilder();
+
         byte[] inputarray = new byte[in.available()];
         in.readFully(inputarray);
-        
+
         for(int i = 0; i < inputarray.length ; i++ ) {
             char c = (char)inputarray[i];
-            fullString = fullString + c;
+            b.append(c);
         }
-        int nameindex = fullString.indexOf(","); 
+        String fullString = b.toString();
+        int nameindex = fullString.indexOf(",");
         value = new Vector();
         if(nameindex == -1) {
     		//#if debug.output==verbose
@@ -92,21 +93,21 @@ public class Property implements Persistable, IMetaData {
         while(en.hasMoreElements()) {
             outputString += "," + (String)en.nextElement();
         }
-        
+
         for(int i = 0 ; i < outputString.length(); ++i) {
             out.writeByte((byte)outputString.charAt(i));
         }
         out.close();
 
     }
-    
+
     /** (non-Javadoc)
      *  @see org.javarosa.singlequestionscreen.storage.IDRecordable#setRecordId(int)
      */
     public void setID(int recordId) {
-        this.recordId = recordId; 
+        this.recordId = recordId;
     }
-    
+
     public int getID () {
     	return recordId;
     }

@@ -23,6 +23,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -34,6 +35,7 @@ import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.*;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xpath.XPathException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -59,6 +61,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	/** The display title of the form. */
 	private String name;
 
+	private Vector<XFormExtension> extensions;
 
 	/**
 	 * A unique external name that is used to identify the form between machines
@@ -91,6 +94,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	private HashMap<String, FormInstance> formInstances;
 	private FormInstance mainInstance = null;
 
+	private HashMap<String, Vector<Action>> eventListeners;
 
 	/**
 	 *
@@ -106,6 +110,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		outputFragments = new Vector<IConditionExpr>();
 		submissionProfiles = new HashMap<String, SubmissionProfile>();
 		formInstances = new HashMap<String, FormInstance>();
+		eventListeners = new HashMap<String, Vector<Action>>();
+		extensions = new Vector<XFormExtension>();
 	}
 
 
@@ -131,6 +137,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		if(!formInstances.containsKey(name)) {
 			return null;
 		}
+
 		return formInstances.get(name);
 	}
 
@@ -167,6 +174,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public FormInstance getInstance()
 	{
 		return getMainInstance();
+	}
+
+	public void fireEvent() {
+
 	}
 
 
@@ -251,7 +262,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			if (temp instanceof GroupDef && ((GroupDef) temp).getRepeat()) {
 				TreeReference repRef = FormInstance.unpackReference(temp.getBind());
 				if (repRef.isParentOf(ref, false)) {
-					int repMult = (Integer) multiplicities.elementAt(i);
+					int repMult = ((Integer) multiplicities.elementAt(i)).intValue();
 					ref.setMultiplicity(repRef.size() - 1, repMult);
 				} else {
 					return null; // question/repeat hierarchy is not consistent
@@ -356,6 +367,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		mainInstance.copyNode(template, destRef);
 
 		preloadInstance(mainInstance.resolveReference(destRef));
+
+		//2013-05-14 - ctsims - Events should get fired _before_ calculate stuff is fired, moved
+		//this above triggering triggerables
+		//Grab any actions listening to this event
+		Vector<Action> listeners = getEventListeners(Action.EVENT_JR_INSERT);
+		for(Action a : listeners) {
+			a.processAction(this, destRef);
+		}
+
 		triggerTriggerables(destRef); // trigger conditions that depend on the creation of this new node
 		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
 	}
@@ -506,9 +526,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			triggerables.addElement(t);
 			triggerablesInOrder = false;
 
-			Vector<TreeReference> triggers = t.getTriggers();
-			for (int i = 0; i < triggers.size(); i++) {
-				TreeReference trigger = triggers.elementAt(i);
+			Set<TreeReference> triggers = t.getTriggers();
+			for (TreeReference trigger : triggers) {
 				if (!triggerIndex.containsKey(trigger)) {
 					triggerIndex.put(trigger.clone(), new Vector<Triggerable>());
 				}
@@ -522,7 +541,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	public void finalizeTriggerables () {
+	/**
+	 * Finalize the DAG associated with the form's triggered conditions. This will create
+	 * the appropriate ordering and dependencies to ensure the conditions will be evaluated
+	 * in the appropriate orders.
+	 *
+	 * @throws IllegalStateException - If the trigger ordering contains an illegal cycle and the
+	 * triggers can't be laid out appropriately
+	 */
+	public void finalizeTriggerables () throws IllegalStateException {
 		//
 		//DAGify the triggerables based on dependencies and sort them so that
 		//trigbles come only after the trigbles they depend on
@@ -531,21 +558,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		Vector<Triggerable[]> partialOrdering = new Vector<Triggerable[]>();
 		for (int i = 0; i < triggerables.size(); i++) {
 			Triggerable t = triggerables.elementAt(i);
-			Vector<Triggerable> deps = new Vector<Triggerable>();
 
-			if (t.canCascade()) {
-				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = t.getTargets().elementAt(j);
-					Vector<Triggerable> triggered = triggerIndex.get(target);
-					if (triggered != null) {
-						for (int k = 0; k < triggered.size(); k++) {
-							Triggerable u = triggered.elementAt(k);
-							if (!deps.contains(u))
-								deps.addElement(u);
-						}
-					}
-				}
-			}
+			Vector<Triggerable> deps = new Vector<Triggerable>();
+			fillTriggeredElements(t, deps);
 
 			for (int j = 0; j < deps.size(); j++) {
 				Triggerable u = deps.elementAt(j);
@@ -572,7 +587,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 			//if no root nodes while graph still has nodes, graph has cycles
 			if (roots.size() == 0) {
-				throw new RuntimeException("Cannot create partial ordering of triggerables due to dependency cycle. Why wasn't this caught during parsing?");
+				String hints = "";
+				for(Triggerable t : vertices) {
+					for(TreeReference r : t.getTargets()) {
+						hints += "\n" + r.toString(true);
+					}
+				}
+				String message = "Cycle detected in form's relevant and calculation logic!";
+				if(!hints.equals("")) {
+					message += "\nThe following nodes are likely involved in the loop:" + hints;
+				}
+				throw new IllegalStateException(message);
 			}
 
 			//remove root nodes and edges originating from them
@@ -610,6 +635,56 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	}
 
+	/**
+	 * Get all of the elements which will need to be evaluated (in order) when the
+	 * triggerable is fired.
+	 * @param t
+	 */
+	public void fillTriggeredElements(Triggerable t, Vector<Triggerable> destination) {
+		if (t.canCascade()) {
+			for (int j = 0; j < t.getTargets().size(); j++) {
+				TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+				Vector<TreeReference> updatedNodes = new Vector<TreeReference>();
+				updatedNodes.addElement(target);
+
+				//For certain types of triggerables, the update will affect not only the target, but
+				//also the children of the target. In that case, we want to add all of those nodes
+				//to the list of updated elements as well.
+				if(t.isCascadingToChildren()) {
+					addChildrenOfReference(target, updatedNodes);
+				}
+
+				//Now go through each of these updated nodes (generally just 1 for a normal calculation,
+				//multiple nodes if there's a relevance cascade.
+				for(TreeReference ref : updatedNodes) {
+					//Check our index to see if that target is a Trigger for other conditions
+					//IE: if they are an element of a different calculation or relevancy calc
+
+					//We can't make this reference generic before now or we'll lose the target information,
+					//so we'll be more inclusive than needed and see if any of our triggers are keyed on
+					//the predicate-less path of this ref
+					Vector<Triggerable> triggered = (Vector<Triggerable>)triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
+
+					if (triggered != null) {
+						//If so, walk all of these triggerables that we found
+						for (int k = 0; k < triggered.size(); k++) {
+							Triggerable u = (Triggerable)triggered.elementAt(k);
+
+							//And add them to the queue if they aren't there already
+							if (!destination.contains(u))
+								destination.addElement(u);
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+
+
+
+
 	public void initializeTriggerables() {
 		initializeTriggerables(TreeReference.rootRef());
 	}
@@ -636,43 +711,56 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		evaluateTriggerables(applicable, rootRef);
 	}
 
-	// ref: unambiguous ref of node that just changed
+	/**
+	 * The entry point for the DAG cascade after a value is changed in the model.
+	 *
+	 * @param ref The full contextualized unambiguous reference of the value that was
+	 * changed.
+	 */
 	public void triggerTriggerables(TreeReference ref) {
-		// turn unambiguous ref into a generic ref
+
+		//turn unambiguous ref into a generic ref
+		//to identify what nodes should be triggered by this
+		//reference changing
 		TreeReference genericRef = ref.genericize();
 
-		// get conditions triggered by this node
+		//get triggerables which are activated by the generic reference
 		Vector<Triggerable> triggered = triggerIndex.get(genericRef);
 		if (triggered == null) {
 			return;
 		}
 
+		//Our vector doesn't have a shallow copy op, so make one
 		Vector<Triggerable> triggeredCopy = new Vector<Triggerable>();
 		for (int i = 0; i < triggered.size(); i++) {
 			triggeredCopy.addElement(triggered.elementAt(i));
 		}
+
+		//Evaluate all of the triggerables in our new vector
 		evaluateTriggerables(triggeredCopy, ref);
 	}
 
+	/**
+	 * Step 2 in evaluating DAG computation updates from a value being changed in
+	 * the instance. This step is responsible for taking the root set of directly
+	 * triggered conditions, identifying which conditions should further be triggered
+	 * due to their update, and then dispatching all of the evaluations.
+	 *
+	 * @param tv A vector of all of the trigerrables directly triggered by the
+	 * value changed
+	 * @param anchorRef The reference to original value that was updated
+	 */
 	private void evaluateTriggerables(Vector<Triggerable> tv, TreeReference anchorRef) {
 		//add all cascaded triggerables to queue
+
+		//Iterate through all of the currently known triggerables to be triggered
 		for (int i = 0; i < tv.size(); i++) {
 			Triggerable t = tv.elementAt(i);
-			if (t.canCascade()) {
-				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = t.getTargets().elementAt(j);
-					Vector<Triggerable> triggered = triggerIndex.get(target);
-					if (triggered != null) {
-						for (int k = 0; k < triggered.size(); k++) {
-							Triggerable u = triggered.elementAt(k);
-							if (!tv.contains(u))
-								tv.addElement(u);
-						}
-					}
-				}
-			}
+			fillTriggeredElements(t, tv);
 		}
 
+		//tv should now contain all of the triggerable components which are going to need to be addressed
+		//by this update.
 		//'triggerables' is topologically-ordered by dependencies, so evaluate the triggerables in 'tv'
 		//in the order they appear in 'triggerables'
 		for (int i = 0; i < triggerables.size(); i++) {
@@ -683,10 +771,24 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
+	/**
+	 * Step 3 in DAG cascade. evaluate the individual triggerable expressions against
+	 * the anchor (the value that changed which triggered recomputation)
+	 *
+	 * @param t The triggerable to be updated
+	 * @param anchorRef The reference to the value which was changed.
+	 */
 	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef) {
+
+		//Contextualize the reference used by the triggerable against the anchor
 		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
 		try {
+
+			//Now identify all of the fully qualified nodes which this triggerable
+			//updates. (Multiple nodes can be updated by the same trigger)
 			Vector<TreeReference> v = exprEvalContext.expandReference(contextRef);
+
+			//Go through each one and evaluate the trigger expresion
 			for (int i = 0; i < v.size(); i++) {
 				EvaluationContext ec = new EvaluationContext(exprEvalContext, v.elementAt(i));
 				t.apply(mainInstance, ec, v.elementAt(i), this);
@@ -696,12 +798,33 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
+	/**
+	 * This is a utility method to get all of the references of a node. It can be replaced
+	 * when we support dependent XPath Steps (IE: /path/to//)
+	 */
+	public void addChildrenOfReference(TreeReference original, Vector<TreeReference> toAdd) {
+		for(TreeReference ref : exprEvalContext.expandReference(original)) {
+			addChildrenOfElement(exprEvalContext.resolveReference(ref), toAdd);
+		}
+	}
+
+	//Recursive step of utility method
+	private void addChildrenOfElement(TreeElement el, Vector<TreeReference> toAdd) {
+		for(int i = 0 ; i < el.getNumChildren() ; ++i) {
+			TreeElement child = el.getChildAt(i);
+			toAdd.addElement(child.getRef().genericize());
+			addChildrenOfElement(child, toAdd);
+		}
+	}
+
 	public boolean evaluateConstraint(TreeReference ref, IAnswerData data) {
 		if (data == null){
 			return true;
 		}
+
 		TreeElement node = mainInstance.resolveReference(ref);
 		Constraint c = node.getConstraint();
+
 		if (c == null) {
 			return true;
 		}
@@ -825,12 +948,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						if (choices != null) {
 							for (SelectChoice ch : choices) {
 								if (ch.getValue().equals(value)) {
+									//this is really not ideal. we should hook into the existing code (FormEntryPrompt) for pulling
+									//display text for select choices. however, it's hard, because we don't really have
+									//any context to work with, and all the situations where that context would be used
+									//don't make sense for trying to reverse a select value back to a label in an unrelated
+									//expression
+
 									String textID = ch.getTextID();
+									String templateStr;
 									if (textID != null) {
-										return f.getLocalizer().getText(textID);
+										templateStr = f.getLocalizer().getText(textID);
 									} else {
-										return ch.getLabelInnerText();
+										templateStr = ch.getLabelInnerText();
 									}
+									String label = fillTemplateString(templateStr, ref);
+									return label;
 								}
 							}
 						}
@@ -924,12 +1056,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
 			if(fi == null)
 			{
-				System.out.println("Instance " + itemset.nodesetRef.getInstanceName() + " not found");
+				throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName() + " not found");
 			}
 		}
 		else
 		{
 			fi = getMainInstance();
+		}
+
+
+		if(matches == null){
+			throw new XPathException("Could not find references depended on by" + itemset.nodesetRef.getInstanceName() );
 		}
 
 		for (int i = 0; i < matches.size(); i++) {
@@ -1029,6 +1166,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public boolean postProcessInstance() {
+		dispatchFormEvent(Action.EVENT_XFORMS_REVALIDATE);
 		return postProcessInstance(mainInstance.getRoot());
 	}
 
@@ -1104,6 +1242,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		formInstances = (HashMap<String, FormInstance>)ExtUtil.read(dis, new ExtWrapMap(String.class, FormInstance.class));
 
+		eventListeners = (HashMap<String, Vector<Action>>)ExtUtil.read(dis,  new ExtWrapMap(String.class, new ExtWrapListPoly()), pf);
+
+		extensions = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+
 		setEvaluationContext(new EvaluationContext(null));
 	}
 
@@ -1114,7 +1256,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 *            true if the form is to be used for a new entry interaction,
 	 *            false if it is using an existing IDataModel
 	 */
-	public void initialize(boolean newInstance) {
+	public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
+		for(String instanceId : formInstances.keySet()) {
+			FormInstance instance = formInstances.get(instanceId);
+			instance.initialize(factory, instanceId);
+		}
 		if (newInstance) {// only preload new forms (we may have to revisit
 			// this)
 			preloadInstance(mainInstance.getRoot());
@@ -1122,6 +1268,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
 			getLocalizer().setToDefault();
+		}
+
+		//TODO: Hm, not 100% sure that this is right. Maybe we should be
+		//using a slightly different event for "First Load" which doesn't
+		//get fired again, but always fire this one?
+		if(newInstance) {
+			dispatchFormEvent(Action.EVENT_XFORMS_READY);
 		}
 
 		initializeTriggerables();
@@ -1161,6 +1314,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		//for support of multi-instance forms
 
 		ExtUtil.write(dos, new ExtWrapMap(formInstances));
+		ExtUtil.write(dos, new ExtWrapMap(eventListeners, new ExtWrapListPoly()));
+		ExtUtil.write(dos, new ExtWrapListPoly(extensions));
 	}
 
 	public void collapseIndex(FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {
@@ -1495,5 +1650,61 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public Vector<TreeElement> getAdditionalAttributes() {
 		// Not supported.
 		return new Vector<TreeElement>();
+	}
+	public Vector<Action> getEventListeners(String event) {
+		if(this.eventListeners.containsKey(event)) {
+			return eventListeners.get(event);
+		}
+		return new Vector<Action>();
+	}
+
+	public void registerEventListener(String event, Action action) {
+		Vector<Action> actions;
+
+		if(this.eventListeners.containsKey(event)) {
+			actions = eventListeners.get(event);
+		} else {
+			actions = new Vector<Action>();
+		}
+		actions.addElement(action);
+		this.eventListeners.put(event, actions);
+	}
+
+    public void dispatchFormEvent(String event) {
+    	for(Action action : getEventListeners(event)) {
+    		action.processAction(this, null);
+    	}
+    }
+
+    public <X extends XFormExtension> X getExtension(Class<X> extension) {
+    	for(XFormExtension ex : extensions) {
+    		if(ex.getClass().isAssignableFrom(extension)) {
+    			return (X)ex;
+    		}
+    	}
+    	X newEx;
+		try {
+			newEx = extension.newInstance();
+		} catch (InstantiationException e) {
+			throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
+		}
+    	extensions.addElement(newEx);
+    	return newEx;
+    }
+
+
+    /**
+     * Frees all of the components of this form which are no longer needed once it is completed.
+     *
+     * Once this is called, the form is no longer capable of functioning, but all data should be retained.
+     */
+	public void seal() {
+		triggerables = null;
+		triggerIndex = null;
+		conditionRepeatTargetIndex = null;
+		//We may need ths one, actually
+		exprEvalContext = null;
 	}
 }

@@ -31,7 +31,7 @@ public class XPathQName implements Externalizable {
 	public String name;
 
 	public XPathQName () { } //for deserialization
-	
+
 	public XPathQName (String qname) {
 		int sep = (qname == null ? -1 : qname.indexOf(":"));
 		if (sep == -1) {
@@ -43,6 +43,10 @@ public class XPathQName implements Externalizable {
 
 	public XPathQName (String namespace, String name) {
 		init(namespace, name);
+	}
+
+	public int hashCode() {
+		return name.hashCode() | (namespace == null ? 0 : namespace.hashCode());
 	}
 
 	private void init (String namespace, String name) {
@@ -58,7 +62,7 @@ public class XPathQName implements Externalizable {
 	public String toString () {
 		return (namespace == null ? name : namespace + ":" + name);
 	}
-	
+
 	public boolean equals (Object o) {
 		if (o instanceof XPathQName) {
 			XPathQName x = (XPathQName)o;
@@ -67,7 +71,7 @@ public class XPathQName implements Externalizable {
 			return false;
 		}
 	}
-	
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		namespace = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
 		name = ExtUtil.readString(in);

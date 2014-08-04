@@ -31,53 +31,53 @@ public class ExternalizableTest extends TestCase {
 	public ExternalizableTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
 	}
-	
+
 	public ExternalizableTest(String name) {
 		super(name);
 	}
-	
+
 	public ExternalizableTest() {
 		super();
-	}	
-	
+	}
+
 	public Test suite() {
 		TestSuite aSuite = new TestSuite();
-		
+
 		aSuite.addTest(new ExternalizableTest("Externalizable Test", new TestMethod() {
 			public void run (TestCase tc) {
 				((ExternalizableTest)tc).doTests();
 			}
 		}));
-			
+
 		return aSuite;
 	}
 
 	public static void testExternalizable (Object orig, Object template, PrototypeFactory pf, TestCase tc, String failMessage) {
 		if (failMessage == null)
 			failMessage = "Serialization Failure";
-		
+
 		byte[] bytes;
 		Object deser;
-		
+
 		print("");
 		print("Original: " + printObj(orig));
-		
+
 		try {
 			bytes = ExtUtil.serialize(orig);
-			
+
 			print("Serialized as:");
 			print(ExtUtil.printBytes(bytes));
-			
+
 			if (template instanceof Class) {
 				deser = ExtUtil.deserialize(bytes, (Class)template, pf);
 			} else if (template instanceof ExternalizableWrapper) {
-				deser = ExtUtil.read(new DataInputStream(new ByteArrayInputStream(bytes)), (ExternalizableWrapper)template, pf);				
+				deser = ExtUtil.read(new DataInputStream(new ByteArrayInputStream(bytes)), (ExternalizableWrapper)template, pf);
 			} else {
 				throw new ClassCastException();
 			}
-			
+
 			print("Reconstituted: " + printObj(deser));
-			
+
 			if (ExtUtil.equals(orig, deser)) {
 				print("SUCCESS");
 			} else {
@@ -94,27 +94,27 @@ public class ExternalizableTest extends TestCase {
 	public static void testExternalizable (Externalizable original, TestCase tc, PrototypeFactory pf) {
 		testExternalizable(original, tc, pf, "Serialization failure for " + original.getClass().getName());
 	}
-	
+
 	public static void testExternalizable (Externalizable original, TestCase tc, PrototypeFactory pf, String failMessage) {
 		testExternalizable(original, original.getClass(), pf, tc, failMessage);
 	}
-	
+
 	//for use inside this test suite
 	public void testExternalizable (Object orig, Object template) {
 		testExternalizable(orig, template, null);
-	}	
-	
+	}
+
 	public void testExternalizable (Object orig, Object template, PrototypeFactory pf) {
 		testExternalizable(orig, template, pf, this, null);
 	}
 
 	public static String printObj (Object o) {
 		o = ExtUtil.unwrap(o);
-		
+
 		if (o == null) {
 			return "(null)";
 		} else if (o instanceof Vector) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append("V[");
 			for (Enumeration e = ((Vector)o).elements(); e.hasMoreElements(); ) {
 				sb.append(printObj(e.nextElement()));
@@ -124,7 +124,7 @@ public class ExternalizableTest extends TestCase {
 			sb.append("]");
 			return sb.toString();
 		} else if (o instanceof HashMap) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append((o instanceof OrderedMap ? "oH" : "H") + "[");
 			for (Iterator e = ((HashMap)o).keySet().iterator(); e.hasNext(); ) {
 				Object key = e.next();
@@ -140,13 +140,13 @@ public class ExternalizableTest extends TestCase {
 			return "{" + o.getClass().getName() + ":" + o.toString() + "}";
 		}
 	}
-	
+
 	private static void print (String s) {
 		//#if javarosa.dev.serializationtest.verbose
 		System.out.println(s);
 		//#endif
 	}
-	
+
 	public void doTests () {
 		//base types (built-in + externalizable)
 		testExternalizable("string", String.class);
@@ -194,13 +194,13 @@ public class ExternalizableTest extends TestCase {
 		vs.addElement("alpha");
 		vs.addElement("beta");
 		vs.addElement("gamma");
-		testExternalizable(new ExtWrapList(vs), new ExtWrapList(String.class));	
+		testExternalizable(new ExtWrapList(vs), new ExtWrapList(String.class));
 
 		Vector w = new Vector();
 		w.addElement(new SampleExtz("where", "is"));
 		w.addElement(new SampleExtz("the", "beef"));
 		testExternalizable(new ExtWrapList(w), new ExtWrapList(SampleExtz.class));
-		
+
 		//nullable vectors; vectors of nullables (no practical use)
 		testExternalizable(new ExtWrapNullable(new ExtWrapList(v)), new ExtWrapNullable(new ExtWrapList(Integer.class)));
 		testExternalizable(new ExtWrapNullable((ExtWrapList)null), new ExtWrapNullable(new ExtWrapList(Integer.class)));
@@ -209,7 +209,7 @@ public class ExternalizableTest extends TestCase {
 		//empty vectors (base types)
 		testExternalizable(new ExtWrapList(new Vector()), new ExtWrapList(String.class));
 		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapBase(Integer.class)), new ExtWrapList(String.class)); //sub-types don't matter for empties
-		
+
 		//vectors of vectors (including empties)
 		Vector x = new Vector();
 		x.addElement(new Integer(-35));
@@ -236,7 +236,7 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new ExtWrapTagged(new ExtWrapNullable((String)null)), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(y, new ExtWrapList(Integer.class))), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(new Vector(), new ExtWrapList(Integer.class))), new ExtWrapTagged());
-		
+
 		//polymorphic vectors
 		Vector a = new Vector();
 		a.addElement(new Integer(47));
@@ -249,19 +249,19 @@ public class ExternalizableTest extends TestCase {
 		a.addElement(new ExtWrapList(y, new ExtWrapList(Integer.class))); //note: must manually wrap children in polymorphic lists
 		testExternalizable(new ExtWrapListPoly(a), new ExtWrapListPoly(), pf);
 		testExternalizable(new ExtWrapListPoly(new Vector()), new ExtWrapListPoly());
-		
+
 		//hashtables
 		OrderedMap oh = new OrderedMap();
-		testExternalizable(new ExtWrapMap(oh), new ExtWrapMap(String.class, Integer.class, true));
+		testExternalizable(new ExtWrapMap(oh), new ExtWrapMap(String.class, Integer.class, ExtWrapMap.TYPE_ORDERED));
 		testExternalizable(new ExtWrapMapPoly(oh), new ExtWrapMapPoly(Date.class, true));
 		testExternalizable(new ExtWrapTagged(new ExtWrapMap(oh)), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapMapPoly(oh)), new ExtWrapTagged());
 		oh.put("key1", new SampleExtz("a", "b"));
 		oh.put("key2", new SampleExtz("c", "d"));
 		oh.put("key3", new SampleExtz("e", "f"));
-		testExternalizable(new ExtWrapMap(oh), new ExtWrapMap(String.class, SampleExtz.class, true), pf);		
-		testExternalizable(new ExtWrapTagged(new ExtWrapMap(oh)), new ExtWrapTagged(), pf);		
-		
+		testExternalizable(new ExtWrapMap(oh), new ExtWrapMap(String.class, SampleExtz.class, ExtWrapMap.TYPE_ORDERED), pf);
+		testExternalizable(new ExtWrapTagged(new ExtWrapMap(oh)), new ExtWrapTagged(), pf);
+
 		HashMap h = new HashMap();
 		testExternalizable(new ExtWrapMap(h), new ExtWrapMap(String.class, Integer.class));
 		testExternalizable(new ExtWrapMapPoly(h), new ExtWrapMapPoly(Date.class));
@@ -270,9 +270,9 @@ public class ExternalizableTest extends TestCase {
 		h.put("key1", new SampleExtz("e", "f"));
 		h.put("key2", new SampleExtz("c", "d"));
 		h.put("key3", new SampleExtz("a", "b"));
-		testExternalizable(new ExtWrapMap(h), new ExtWrapMap(String.class, SampleExtz.class), pf);		
-		testExternalizable(new ExtWrapTagged(new ExtWrapMap(h)), new ExtWrapTagged(), pf);		
-		
+		testExternalizable(new ExtWrapMap(h), new ExtWrapMap(String.class, SampleExtz.class), pf);
+		testExternalizable(new ExtWrapTagged(new ExtWrapMap(h)), new ExtWrapTagged(), pf);
+
 		HashMap j = new HashMap();
 		j.put(new Integer(17), h);
 		j.put(new Integer(-3), h);
@@ -280,7 +280,7 @@ public class ExternalizableTest extends TestCase {
 		k.put("key", j);
 		testExternalizable(new ExtWrapMap(k, new ExtWrapMap(Integer.class, new ExtWrapMap(String.class, SampleExtz.class))),
 				new ExtWrapMap(String.class, new ExtWrapMap(Integer.class, new ExtWrapMap(String.class, SampleExtz.class))), pf);	//note: this example contains mixed hashtable types; would choke if we used a tagging wrapper
-		
+
 		OrderedMap m = new OrderedMap();
 		m.put("a", "b");
 		m.put("b", new Integer(17));

@@ -23,31 +23,31 @@ package org.javarosa.core.model;
  * @version ,
  */
 public class Constants {
-	
+
 	/** Empty strig representation */
 	public static final String EMPTY_STRING = "";
-	
+
 	/** Index for no selection */
 	public static final int NO_SELECTION = -1;
-	
+
 	/** ID not set to a value */
 	public static final int NULL_ID = -1;
-	
+
 	/** Connection type not specified */
 	public static final int CONNECTION_NONE = 0;
-	
+
 	/** Infrared connection */
 	public static final int CONNECTION_INFRARED = 1;
-	
+
 	/** Bluetooth connection */
 	public static final int CONNECTION_BLUETOOTH = 2;
-	
+
 	/** Data cable connection. Can be USB or Serial */
 	public static final int CONNECTION_CABLE = 3;
-	
+
 	/** Over The Air or HTTP Connection */
 	public static final int CONNECTION_OTA = 4;
-		
+
 	public static final int DATATYPE_UNSUPPORTED = -1;
 	public static final int DATATYPE_NULL = 0;  /* for nodes that have no data, or data type otherwise unknown */
 	public static final int DATATYPE_TEXT = 1;	/** Text question type. */
@@ -63,7 +63,9 @@ public class Constants {
 	public static final int DATATYPE_BARCODE = 11; /** Question with barcode string answer. */
 	public static final int DATATYPE_BINARY = 12; /** Question with external binary answer. */
 	public static final int DATATYPE_LONG = 13; /** Question with external binary answer. */
-	
+	public static final int DATATYPE_GEOSHAPE = 14; /** Question with GeoShape answer. */
+	public static final int DATATYPE_GEOTRACE = 15; /** Question with GeoTrace answer. */
+
 	public static final int CONTROL_UNTYPED = -1;
 	public static final int CONTROL_INPUT = 1;
 	public static final int CONTROL_SELECT_ONE = 2;
@@ -78,10 +80,10 @@ public class Constants {
 	public static final int CONTROL_LABEL = 11;
 	public static final int CONTROL_AUDIO_CAPTURE = 12;
 	public static final int CONTROL_VIDEO_CAPTURE = 13;
-	
-	/** constants for xform tags */ 
+
+	/** constants for xform tags */
 	public static final String XFTAG_UPLOAD = "upload";
 
-	
+
 }
 

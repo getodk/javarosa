@@ -27,6 +27,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
@@ -39,27 +40,32 @@ import org.kxml2.kdom.Element;
  */
 public class XFormUtils {
 	private static IXFormParserFactory _factory = new XFormParserFactory();
-	
+
 	public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
 		IXFormParserFactory oldFactory = _factory;
 		_factory = factory;
 		return oldFactory;
 	}
-	
+
 	public static FormDef getFormFromResource (String resource) {
 		InputStream is = System.class.getResourceAsStream(resource);
 		if (is == null) {
 			System.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
 			return null;
 		}
-		
+
 		return getFormFromInputStream(is);
+	}
+
+
+	public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException{
+		return _factory.getXFormParser(isr).parse();
 	}
 
 	/*
      * This method throws XFormParseException when the form has errors.
      */
-	public static FormDef getFormFromInputStream(InputStream is) {
+	public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -70,6 +76,8 @@ public class XFormUtils {
             }
 
             return _factory.getXFormParser(isr).parse();
+		} catch(IOException e) {
+			throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
             try {
                 if (isr != null) {
@@ -117,19 +125,19 @@ public class XFormUtils {
         }
         return returnForm;
     }
-	
-	
+
+
 	/////Parser Attribute warning stuff
-	
+
 	public static Vector getAttributeList(Element e){
 		Vector atts = new Vector();
 		for(int i=0;i<e.getAttributeCount();i++){
 			atts.addElement(e.getAttributeName(i));
 		}
-		
+
 		return atts;
 	}
-	
+
 	public static Vector getUnusedAttributes(Element e,Vector usedAtts){
 		Vector unusedAtts = getAttributeList(e);
 		for(int i=0;i<usedAtts.size();i++){
@@ -137,10 +145,10 @@ public class XFormUtils {
 				unusedAtts.removeElement(usedAtts.elementAt(i));
 			}
 		}
-		
+
 		return unusedAtts;
 	}
-	
+
 	public static String unusedAttWarning(Element e, Vector usedAtts){
 		String warning = "Warning: ";
 		Vector ua = getUnusedAttributes(e,usedAtts);
@@ -152,14 +160,14 @@ public class XFormUtils {
 		}
 		warning+="] ";
 		warning+="Location:\n"+XFormParser.getVagueLocation(e);
-		
+
 		return warning;
 	}
-	
+
 	public static boolean showUnusedAttributeWarning(Element e, Vector usedAtts){
 		return getUnusedAttributes(e,usedAtts).size()>0;
 	}
-	
+
 	/**
 	 * Is this element an Output tag?
 	 * @param e
@@ -169,5 +177,5 @@ public class XFormUtils {
 		if(e.getName().toLowerCase().equals("output")) return true;
 		else return false;
 	}
-	
+
 }

@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -51,6 +52,12 @@ public class XPathStep implements Externalizable {
 	public static final int TEST_TYPE_COMMENT = 5;
 	public static final int TEST_TYPE_PROCESSING_INSTRUCTION = 6;
 
+	private static CacheTable<XPathStep> refs;
+
+	public static void attachCacheTable(CacheTable<XPathStep> refs) {
+		XPathStep.refs = refs;
+	}
+
 	public static XPathStep ABBR_SELF () {
 		return new XPathStep(AXIS_SELF, TEST_TYPE_NODE);
 	}
@@ -73,7 +80,7 @@ public class XPathStep implements Externalizable {
 	public String literal; //TEST_TYPE_PROCESSING_INSTRUCTION only
 
 	public XPathStep () { } //for deserialization
-	
+
 	public XPathStep (int axis, int test) {
 		this.axis = axis;
 		this.test = test;
@@ -89,15 +96,15 @@ public class XPathStep implements Externalizable {
 		this(axis, TEST_NAMESPACE_WILDCARD);
 		this.namespace = namespace;
 	}
-	
+
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
-		
+		StringBuilder sb = new StringBuilder();
+
 		sb.append("{step:");
 		sb.append(axisStr(axis));
 		sb.append(",");
 		sb.append(testStr());
-		
+
 		if (predicates.length > 0) {
 			sb.append(",{");
 			for (int i = 0; i < predicates.length; i++) {
@@ -108,10 +115,10 @@ public class XPathStep implements Externalizable {
 			sb.append("}");
 		}
 		sb.append("}");
-		
+
 		return sb.toString();
 	}
-	
+
 	public static String axisStr (int axis) {
 		switch (axis) {
 		case AXIS_CHILD: return "child";
@@ -130,7 +137,7 @@ public class XPathStep implements Externalizable {
 		default: return null;
 		}
 	}
-		
+
 	public String testStr () {
 		switch(test) {
 		case TEST_NAME: return name.toString();
@@ -143,58 +150,115 @@ public class XPathStep implements Externalizable {
 		default: return null;
 		}
 	}
-	
+
 	public boolean equals (Object o) {
 		if (o instanceof XPathStep) {
 			XPathStep x = (XPathStep)o;
-			
+
 			//shortcuts for faster evaluation
-			if(axis != x.axis && test != x.test || predicates.length != x.predicates.length) {
+			if(axis != x.axis || test != x.test || predicates.length != x.predicates.length) {
 				return false;
 			}
-			
+
 			switch (test) {
 			case TEST_NAME: if(!name.equals(x.name)) {return false;} break;
 			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
 			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
 			default: break;
 			}
-			
+
 			return ExtUtil.arrayEquals(predicates, x.predicates);
 		} else {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * "matches" follows roughly the same process as equals(), in that it for a step it will
+	 * check whether two steps share the same properties (multiplicity, test, axis, etc).
+	 * The only difference is that match() will allow for a named step to match a step who's name
+	 * is a wildcard.
+	 *
+	 * So
+	 * \/path\/
+	 * will "match"
+	 * \/*\/
+	 *
+	 * even though they are not equal.
+	 *
+	 * Matching is reflexive, consistent, and symmetric, but _not_ transitive.
+
+	 * @param xPathStep
+	 * @return
+	 */
+	protected boolean matches(XPathStep o) {
+		if (o instanceof XPathStep) {
+			XPathStep x = (XPathStep)o;
+
+			//shortcuts for faster evaluation
+			if(axis != x.axis || (test != x.test && !((x.test == TEST_NAME && this.test == TEST_NAME_WILDCARD)||(this.test==TEST_NAME && x.test == TEST_NAME_WILDCARD))) || predicates.length != x.predicates.length) {
+				return false;
+			}
+
+			switch (test) {
+			case TEST_NAME: if(x.test != TEST_NAME_WILDCARD && !name.equals(x.name)) {return false;} break;
+			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
+			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
+			default: break;
+			}
+
+			return ExtUtil.arrayEquals(predicates, x.predicates);
+		} else {
+			return false;
+		}
+	}
+
+	public int hashCode() {
+		int code = this.axis ^ this.test ^ (this.name == null ? 0 : this.name.hashCode()) ^ (this.literal == null ? 0 : this.literal.hashCode()) ^ (this.namespace == null ? 0 : this.namespace.hashCode());
+		for(XPathExpression xpe : predicates) {
+			code ^= xpe.hashCode();
+		}
+		return code;
+	}
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		axis = ExtUtil.readInt(in);
 		test = ExtUtil.readInt(in);
-		
+
 		switch (test) {
 		case TEST_NAME: name = (XPathQName)ExtUtil.read(in, XPathQName.class); break;
 		case TEST_NAMESPACE_WILDCARD: namespace = ExtUtil.readString(in); break;
 		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break;
-		}	
-		
+		}
+
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.elementAt(i);	
+			predicates[i] = (XPathExpression)v.elementAt(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, axis);
 		ExtUtil.writeNumeric(out, test);
-		
+
 		switch (test) {
 		case TEST_NAME: ExtUtil.write(out, name); break;
 		case TEST_NAMESPACE_WILDCARD: ExtUtil.writeString(out, namespace); break;
 		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
 		}
-		
+
 		Vector v = new Vector();
 		for (int i = 0; i < predicates.length; i++)
 			v.addElement(predicates[i]);
 		ExtUtil.write(out, new ExtWrapListPoly(v));
+	}
+
+	public static boolean XPathStepInterningEnabled = true;
+	public XPathStep intern() {
+		if(!XPathStepInterningEnabled || refs == null) {
+			return this;
+		} else{
+			return refs.intern(this);
+		}
 	}
 }

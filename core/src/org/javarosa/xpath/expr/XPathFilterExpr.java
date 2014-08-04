@@ -34,22 +34,22 @@ import org.javarosa.xpath.XPathUnsupportedException;
 public class XPathFilterExpr extends XPathExpression {
 	public XPathExpression x;
 	public XPathExpression[] predicates;
-	
+
 	public XPathFilterExpr () { } //for deserialization
-	
+
 	public XPathFilterExpr (XPathExpression x, XPathExpression[] predicates) {
 		this.x = x;
 		this.predicates = predicates;
 	}
-	
+
 	public Object eval(FormInstance model, EvaluationContext evalContext) {
 		throw new XPathUnsupportedException("filter expression");
 	}
-		
+
 	public String toString () {
-		StringBuffer sb = new StringBuffer();
-		
-		sb.append("{filt-expr:");	
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{filt-expr:");
 		sb.append(x.toString());
 		sb.append(",{");
 		for (int i = 0; i < predicates.length; i++) {
@@ -58,10 +58,10 @@ public class XPathFilterExpr extends XPathExpression {
 				sb.append(",");
 		}
 		sb.append("}}");
-		
+
 		return sb.toString();
 	}
-	
+
 	public boolean equals (Object o) {
 		if (o instanceof XPathFilterExpr) {
 			XPathFilterExpr fe = (XPathFilterExpr)o;
@@ -72,20 +72,20 @@ public class XPathFilterExpr extends XPathExpression {
 			Vector b = new Vector();
 			for (int i = 0; i < fe.predicates.length; i++)
 				b.addElement(fe.predicates[i]);
-			
+
 			return x.equals(fe.x) && ExtUtil.vectorEquals(a, b);
 		} else {
 			return false;
 		}
 	}
-	
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		x = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
-		
+
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.elementAt(i);		
+			predicates[i] = (XPathExpression)v.elementAt(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -96,7 +96,7 @@ public class XPathFilterExpr extends XPathExpression {
 		ExtUtil.write(out, new ExtWrapTagged(x));
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
-	
+
 	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		throw new UnpivotableExpressionException();
 	}

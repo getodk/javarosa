@@ -29,29 +29,29 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A payload for a Pointer to some data.
- *  
+ *
  * @author Clayton Sims
- * @date Dec 29, 2008 
+ * @date Dec 29, 2008
  *
  */
 public class DataPointerPayload implements IDataPayload {
 	IDataPointer pointer;
-	
+
 	/**
 	 * Note: Only useful for serialization.
 	 */
 	public DataPointerPayload() {
 	}
-	
+
 	public DataPointerPayload(IDataPointer pointer) {
 		this.pointer = pointer;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#accept(org.javarosa.core.services.transport.IDataPayloadVisitor)
 	 */
-	public Object accept(IDataPayloadVisitor visitor) {
+	public <T> T accept(IDataPayloadVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 
@@ -63,7 +63,7 @@ public class DataPointerPayload implements IDataPayload {
 		//Unimplemented. This method will eventually leave the contract
 		return pointer.getLength();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadId()
@@ -76,7 +76,7 @@ public class DataPointerPayload implements IDataPayload {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadStream()
 	 */
-	public InputStream getPayloadStream() {
+	public InputStream getPayloadStream() throws IOException {
 		return pointer.getDataStream();
 	}
 
@@ -85,7 +85,18 @@ public class DataPointerPayload implements IDataPayload {
 	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadType()
 	 */
 	public int getPayloadType() {
-		//TODO: FIX so this isn't always the case
+		String display = pointer.getDisplayText();
+		if(display == null || display.lastIndexOf('.') == -1) {
+			//uhhhh....?
+			return IDataPayload.PAYLOAD_TYPE_TEXT;
+		}
+
+		String ext = display.substring(display.lastIndexOf('.') + 1);
+
+		if(ext.equals("jpg") || ext.equals("jpeg")) {
+			return IDataPayload.PAYLOAD_TYPE_JPG;
+		}
+
 		return IDataPayload.PAYLOAD_TYPE_JPG;
 	}
 
@@ -105,7 +116,7 @@ public class DataPointerPayload implements IDataPayload {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(pointer));
 	}
-	
+
 	public int getTransportId() {
 		return -1;
 	}
