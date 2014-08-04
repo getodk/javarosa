@@ -20,10 +20,13 @@ import me.regexp.RE;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
+import org.javarosa.core.model.data.GeoPointData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.util.GeoUtils;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -38,10 +41,7 @@ import org.javarosa.xpath.XPathUnhandledException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Representation of an xpath function expression.
@@ -340,7 +340,29 @@ public class XPathFuncExpr extends XPathExpression {
 			double a = toDouble(argVals[0]).doubleValue();
 			double b = toDouble(argVals[1]).doubleValue();
 			return Math.pow(a, b);
-		} else {
+		} else if (name.equals("enclosed-area")) {
+      assertArgsCount( name, args, 1);
+
+      Object argVal = argVals[0];
+      if (!(argVal instanceof XPathNodeset)) {
+        throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
+      }
+      Object[] argList = ((XPathNodeset) argVal).toArgList();
+      int repeatSize = argList.length;
+      if (repeatSize <= 2) {
+        return 0d;
+      }
+      List<GeoUtils.GPSCoordinates> gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
+      for (int i = 0 ; i < repeatSize; i++) {
+        try {
+          GeoPointData geoPointData = new GeoPointData().cast(new UncastData(toString(argList[i])));
+          gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
+        } catch (Exception e) {
+          throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[i]);
+        }
+      }
+      return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+    } else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
 			if (handler != null) {
