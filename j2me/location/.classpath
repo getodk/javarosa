@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/location.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>

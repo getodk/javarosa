@@ -28,7 +28,9 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
+import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -55,10 +57,10 @@ import org.javarosa.core.util.externalizable.ExternalizableWrapper;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
- * An alternate serialization format for FormInstances (saved form instances) that drastically reduces the 
+ * An alternate serialization format for FormInstances (saved form instances) that drastically reduces the
  * resultant record size by cutting out redundant information. Size savings are typically 90-95%. The trade-off is
  * that in order to deserialize, a template FormInstance (typically from the original FormDef) must be provided.
- * 
+ *
  * In general, the format is thus:
  * 1) write the fields from the FormInstance object (e.g., date saved), excluding those that never change for a given
  *    form type (e.g., schema).
@@ -70,7 +72,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *    multiple choice questions use a more compact format than normal.
  * 4a) in certain situations where the data differs from its prescribed data type (can happen as the result of 'calculate'
  *    expressions), flag the actual data type by hijacking the 'empty' flag above
- * 
+ *
  * @author Drew Roos
  *
  */
@@ -84,30 +86,30 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	                                             */
 
 	public static final int CHOICE_MODE = CHOICE_INDEX;
-	
+
 	private InstanceTemplateManager templateMgr;	/* instance template provider; provides templates needed for deserialization. */
 	private FormInstance instance;					/* underlying FormInstance to serialize/deserialize */
-	
+
 	public CompactInstanceWrapper () {
 		this(null);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param templateMgr template provider; if null, template is always fetched on-demand from RMS (slow!)
 	 */
 	public CompactInstanceWrapper (InstanceTemplateManager templateMgr) {
 		this.templateMgr = templateMgr;
 	}
-	
+
 	public Class baseType () {
 		return FormInstance.class;
 	}
-	
+
 	public void setData (Externalizable e) {
 		this.instance = (FormInstance)e;
 	}
-	
+
 	public Externalizable getData () {
 		return instance;
 	}
@@ -118,15 +120,15 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		int formID = ExtUtil.readInt(in);
 		instance = getTemplateInstance(formID).clone();
-		
+
 		instance.setID(ExtUtil.readInt(in));
 		instance.setDateSaved((Date)ExtUtil.read(in, new ExtWrapNullable(Date.class)));
 		//formID, name, schema, versions, and namespaces are all invariants of the template instance
-		
+
 		TreeElement root = instance.getRoot();
 		readTreeElement(root, in, pf);
 	}
-	
+
 	/**
 	 * serialize a compact instance
 	 */
@@ -134,14 +136,14 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		if (instance == null) {
 			throw new RuntimeException("instance has not yet been set via setData()");
 		}
-		
+
 		ExtUtil.writeNumeric(out, instance.getFormId());
 		ExtUtil.writeNumeric(out, instance.getID());
 		ExtUtil.write(out, new ExtWrapNullable(instance.getDateSaved()));
-				
+
 		writeTreeElement(out, instance.getRoot());
 	}
-	
+
 	private FormInstance getTemplateInstance (int formID) {
 		if (templateMgr != null) {
 			return templateMgr.getTemplateInstance(formID);
@@ -153,7 +155,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 			return template;
 		}
 	}
-	
+
 	/**
 	 * load a template instance fresh from the original FormDef, retrieved from RMS
 	 * @param formID
@@ -164,7 +166,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		FormDef f = (FormDef)forms.read(formID);
 		return (f != null ? f.getMainInstance() : null);
 	}
-	
+
 	/**
 	 * recursively read in a node of the instance, by filling out the template instance
 	 * @param e
@@ -177,36 +179,36 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	private void readTreeElement (TreeElement e, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		TreeElement templ = instance.getTemplatePath(e.getRef());
 		boolean isGroup = !templ.isLeaf();
-				
+
 		if (isGroup) {
 			Vector childTypes = new Vector();
 			for (int i = 0; i < templ.getNumChildren(); i++) {
-				String childName = templ.getChildAt(i).getName();				
+				String childName = templ.getChildAt(i).getName();
 				if (!childTypes.contains(childName)) {
 					childTypes.addElement(childName);
 				}
 			}
-			
+
 			for (int i = 0; i < childTypes.size(); i++) {
 				String childName = (String)childTypes.elementAt(i);
-					
+
 				TreeReference childTemplRef = e.getRef().extendRef(childName, 0);
 				TreeElement childTempl = instance.getTemplatePath(childTemplRef);
-				
-				boolean repeatable = childTempl.repeatable;
+
+				boolean repeatable = childTempl.isRepeatable();
 				int n = ExtUtil.readInt(in);
-				
+
 				boolean relevant = (n > 0);
 				if (!repeatable && n > 1) {
 					throw new DeserializationException("Detected repeated instances of a non-repeatable node");
 				}
-			
+
 				if (repeatable) {
 					int mult = e.getChildMultiplicity(childName);
 					for (int j = mult - 1; j >= 0; j--) {
 						e.removeChild(childName, j);
 					}
-					
+
 					for (int j = 0; j < n; j++) {
 						TreeReference dstRef = e.getRef().extendRef(childName, j);
 						try {
@@ -220,9 +222,9 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 							} else{
 								throw new DeserializationException("Invalid Reference while attemtping to deserialize! Reference: " + r.toString(true) + " | "+ ire.getMessage());
 							}
-							
+
 						}
-						
+
 						TreeElement child = e.getChild(childName, j);
 						child.setRelevant(true);
 						readTreeElement(child, in, pf);
@@ -236,7 +238,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 				}
 			}
 		} else {
-			e.setValue((IAnswerData)ExtUtil.read(in, new ExtWrapAnswerData(e.dataType)));
+			e.setValue((IAnswerData)ExtUtil.read(in, new ExtWrapAnswerData(e.getDataType())));
 		}
 	}
 
@@ -250,19 +252,19 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	private void writeTreeElement (DataOutputStream out, TreeElement e) throws IOException {
 		TreeElement templ = instance.getTemplatePath(e.getRef());
 		boolean isGroup = !templ.isLeaf();
-				
+
 		if (isGroup) {
 			Vector childTypesHandled = new Vector();
 			for (int i = 0; i < templ.getNumChildren(); i++) {
 				String childName = templ.getChildAt(i).getName();
 				if (!childTypesHandled.contains(childName)) {
 					childTypesHandled.addElement(childName);
-					
+
 					int mult = e.getChildMultiplicity(childName);
 					if (mult > 0 && !e.getChild(childName, 0).isRelevant()) {
 						mult = 0;
 					}
-					
+
 					ExtUtil.writeNumeric(out, mult);
 					for (int j = 0; j < mult; j++) {
 						writeTreeElement(out, e.getChild(childName, j));
@@ -270,7 +272,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 				}
 			}
 		} else {
-			ExtUtil.write(out, new ExtWrapAnswerData(e.dataType, e.getValue()));
+			ExtUtil.write(out, new ExtWrapAnswerData(e.getDataType(), e.getValue()));
 		}
 	}
 
@@ -279,22 +281,22 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	 *   * empty nodes
 	 *   * ultra-compact serialization of multiple-choice answers
 	 *   * tagging with extra type information when the template alone will not contain sufficient information
-	 * 
+	 *
 	 * @author Drew Roos
 	 *
 	 */
 	private class ExtWrapAnswerData extends ExternalizableWrapper {
 		int dataType;
-		
+
 		public ExtWrapAnswerData (int dataType, IAnswerData val) {
 			this.val = val;
 			this.dataType = dataType;
 		}
-		
+
 		public ExtWrapAnswerData (int dataType) {
 			this.dataType = dataType;
 		}
-		
+
 		public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 			byte flag = in.readByte();
 			if (flag == 0x00) {
@@ -317,9 +319,9 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					case 0x43: answerType = DateData.class; break;
 					case 0x44: answerType = BooleanData.class; break;
 					}
-					
+
 					val = (IAnswerData)ExtUtil.read(in, answerType);
-				}					
+				}
 			}
 		}
 
@@ -329,7 +331,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 			} else {
 				byte prefix = 0x01;
 				Externalizable serEntity;
-				
+
 				if (dataType < 0 || dataType >= 100) {
 					//custom data types
 					serEntity = new ExtWrapTagged(val);
@@ -339,7 +341,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					serEntity = new ExtWrapList(compactSelectMulti((SelectMultiData)val));
 				} else {
 					serEntity = (IAnswerData)val;
-					
+
 					//flag when data type differs from the default data type in the <bind> (can happen with 'calculate's)
 					if (val.getClass() != classForDataType(dataType)) {
 						if (val instanceof StringData) {
@@ -364,16 +366,16 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		}
 
 		public ExternalizableWrapper clone(Object val) {
-			throw new RuntimeException("not supported");				
+			throw new RuntimeException("not supported");
 		}
 
 		public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-			throw new RuntimeException("not supported");	
+			throw new RuntimeException("not supported");
 		}
 
 		public void metaWriteExternal(DataOutputStream out) throws IOException {
-			throw new RuntimeException("not supported");			
-		}		
+			throw new RuntimeException("not supported");
+		}
 	}
 
 	/**
@@ -385,7 +387,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		Selection val = (Selection)data.getValue();
 		return extractSelection(val);
 	}
-	
+
 	/**
 	 * reduce a SelectMultiData to a vector of integers (index mode) or strings (value mode)
 	 * @param data
@@ -406,7 +408,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	private SelectOneData getSelectOne (Object o) {
 		return new SelectOneData(makeSelection(o));
 	}
-	
+
 	/**
 	 * create a SelectMultiData from a vector of integers (index mode) or strings (value mode)
 	 */
@@ -417,7 +419,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		}
 		return new SelectMultiData(choices);
 	}
-	
+
 	/**
 	 * extract the value out of a Selection according to the current CHOICE_MODE
 	 * @param s
@@ -435,7 +437,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		default: throw new IllegalArgumentException();
 		}
 	}
-	
+
 	/**
 	 * build a Selection from an integer or string, according to the current CHOICE_MODE
 	 * @param o
@@ -450,7 +452,12 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 			throw new RuntimeException();
 		}
 	}
-	
+
+	public void clean() {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * map xforms data types to the Class that represents that data in a FormInstance
 	 * @param dataType
@@ -470,8 +477,10 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		case Constants.DATATYPE_CHOICE: return SelectOneData.class;
 		case Constants.DATATYPE_CHOICE_LIST: return SelectMultiData.class;
 		case Constants.DATATYPE_GEOPOINT: return GeoPointData.class;
+		case Constants.DATATYPE_GEOSHAPE: return GeoShapeData.class;
+		case Constants.DATATYPE_GEOTRACE: return GeoTraceData.class;
 		default: return null;
 		}
 	}
-	
+
 }

@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.javarosa.model.xform;
 
@@ -28,50 +28,53 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 /**
- * 
+ *
  */
 public class XPathReference implements IDataReference {
 	private TreeReference ref;
 	private String nodeset;
-	
+
 	public XPathReference () {
 
 	}
-	
+
 	public XPathReference (String nodeset) {
 		ref = getPathExpr(nodeset).getReference();
 		this.nodeset = nodeset;
 	}
-	
+
 	public static XPathPathExpr getPathExpr (String nodeset) {
 		XPathExpression path;
 		boolean validNonPathExpr = false;
-		
+
 		try {
 		path = XPathParseTool.parseXPath(nodeset);
 		if (!(path instanceof XPathPathExpr)) {
 			validNonPathExpr = true;
 			throw new XPathSyntaxException();
 		}
-		
+
 		} catch (XPathSyntaxException xse) {
 			//make these checked exceptions?
 			if (validNonPathExpr) {
-				throw new RuntimeException("Expected XPath path, got XPath expression: [" + nodeset + "]");
+				throw new XPathTypeMismatchException("Expected XPath path, got XPath expression: [" + nodeset + "]," + xse.getMessage());
 			} else {
-				throw new RuntimeException("Parse error in XPath path: [" + nodeset + "]");
+				xse.printStackTrace();
+				throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
 			}
 		}
 
 		return (XPathPathExpr)path;
 	}
-	
+
 	public XPathReference (XPathPathExpr path) {
 		ref = path.getReference();
 	}
@@ -79,15 +82,15 @@ public class XPathReference implements IDataReference {
 	public XPathReference (TreeReference ref) {
 		this.ref = ref;
 	}
-	
+
 	public Object getReference () {
 		return ref;
 	}
-	
+
 	public void setReference (Object o) {
 		//do nothing
 	}
-		
+
 	public boolean equals (Object o) {
 		if (o instanceof XPathReference) {
 			return ref.equals(((XPathReference)o).ref);
@@ -95,7 +98,7 @@ public class XPathReference implements IDataReference {
 			return false;
 		}
 	}
-	
+
 	public int hashCode () {
 		return ref.hashCode();
 	}

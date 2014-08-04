@@ -38,23 +38,25 @@ public class LongData implements IAnswerData {
 	 * Shouldn't be used otherwise.
 	 */
 	public LongData() {
-		
+
 	}
-	
+
 	public LongData(long n) {
 		this.n = n;
 	}
 	public LongData(Long n) {
 		setValue(n);
 	}
-	
+
+    @Override
 	public IAnswerData clone () {
 		return new LongData(n);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
+    @Override
 	public String getDisplayText() {
 		return String.valueOf(n);
 	}
@@ -62,20 +64,23 @@ public class LongData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
+    @Override
 	public Object getValue() {
-		return new Long(n); 
+		return new Long(n);
 	}
-	
+
+    @Override
 	public void setValue(Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 		n = ((Long)o).longValue();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
+    @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		n = ExtUtil.readNumeric(in);
 	}
@@ -83,14 +88,17 @@ public class LongData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
+    @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, n);
 	}
 
+    @Override
 	public UncastData uncast() {
 		return new UncastData(new Long(n).toString());
 	}
-	
+
+    @Override
 	public LongData cast(UncastData data) throws IllegalArgumentException {
 		try {
 			return new LongData(Long.parseLong(data.value));

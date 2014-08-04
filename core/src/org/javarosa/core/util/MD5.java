@@ -50,7 +50,7 @@ package org.javarosa.core.util;
  * should be named "MD5.so" and on Windows it should be named "MD5.dll". The
  * code will attempt to locate the library in the following locations in the
  * order given:
- * 
+ *
  * <ol>
  * <li>The path specified by the system property
  * "com.twmacinta.util.MD5.NATIVE_LIB_FILE" (be sure to include "MD5.so" or
@@ -61,7 +61,7 @@ package org.javarosa.core.util;
  * <li>Within the "lib/" directory.
  * <li>Within the current directory.
  * </ol>
- * 
+ *
  * <p>
  * If the library is not found, the code will fall back to the default (slower)
  * Java code.
@@ -84,16 +84,17 @@ package org.javarosa.core.util;
  * <p>
  * The second option is to call com.twmacinta.util.MD5.initNativeLibrary(true)
  * before any MD5 objects are constructed.
- * 
+ *
  * @author Santeri Paavolainen <sjpaavol@cc.helsinki.fi>
  * @author Timothy W Macinta (twm@alum.mit.edu) (optimizations and bug fixes)
  */
 
 public class MD5 {
-	private static final char[]	HEX_CHARS	= { 
-		'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' 
+	public static final int length = 16;
+	private static final char[]	HEX_CHARS	= {
+		'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'
 	};
-	
+
 	private MD5State	state;
 	private MD5State	finals;
 
@@ -329,7 +330,7 @@ public class MD5 {
 		state.state[1] += b;
 		state.state[2] += c;
 		state.state[3] += d;
-		
+
 		//ctsims - Dec 1. 2008
 		//This call doesn't play well with others, and doesn't have a reason to be here.
 		//It makes serialization super slow, so I took it out.
@@ -339,7 +340,7 @@ public class MD5 {
 	/**
 	 * Updates hash with the bytebuffer given (using at maximum length bytes
 	 * from that buffer)
-	 * 
+	 *
 	 * @param stat
 	 *            Which state is updated
 	 * @param buffer
@@ -388,7 +389,7 @@ public class MD5 {
 			}
 		}
 	}
-	
+
 	private static final byte[] encode( final int input[], final int len) {
 		int i, j;
 		byte out[];
@@ -407,10 +408,10 @@ public class MD5 {
 		finals = null;
 		update( data );
 	}
-	
+
 	/**
 	 * Updates hash with given array of bytes
-	 * 
+	 *
 	 * @param buffer
 	 *            Array of bytes to use for updating the hash
 	 */
@@ -425,12 +426,12 @@ public class MD5 {
             return;
         update( state, buffer, offset, length );
     }
-	
+
 	/**
 	 * Returns array of bytes (16 bytes) representing hash as of the current
 	 * state of this object. Note: getting a hash does not invalidate the hash
 	 * object, it only creates a copy of the real state which is finalized.
-	 * 
+	 *
 	 * @return Array of 16 bytes, the hash of all updated bytes
 	 */
 	public synchronized final byte[] doFinal() {
@@ -454,7 +455,7 @@ public class MD5 {
 
 	/**
 	 * Returns 32-character hex representation of this objects hash
-	 * 
+	 *
 	 * @return String of this object's hash
 	 */
 	public static final String toHex( final byte[] hash ) {
@@ -498,12 +499,12 @@ public class MD5 {
 	public static byte[] hash (byte[] data) {
 		return (new MD5(data)).doFinal();
 	}
-	
+
 	/**
 	 * Calculates and returns the hash of the contents of the given file.
 	 */
 	public final byte[] fingerprint(final byte[] data) {
-		update( data ); 
+		update( data );
 		return doFinal();
 	}
 

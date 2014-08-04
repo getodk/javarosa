@@ -15,11 +15,11 @@
 		<!-- exclude this until we've worked out issues with barcode apis -->
 		<exclude name="j2me/media/src/org/javarosa/barcode/**/*.java"/>
 		<exclude name="j2me/media/src/org/javarosa/view/**/Barcode*.java"/>
-		
+
 		<!-- don't want to put this in the jar for phones that don't suport location -->
 		<!-- We'll actually handle that with polish processors rather than manual exclusion -->
 		<!--exclude name="j2me/location/src/org/javarosa/location/**/*.java"/-->
-		
+
 		<!-- exclude the demo app code -->
 		<exclude name="j2me/javarosa-app/src/**/*.java"/>
 
@@ -27,7 +27,7 @@
 		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
 		<exclude name="j2me/communication/src/org/javarosa/communication/sms/trigger/**/*.java"/>
 
-		
+
 		<!-- Exclude BouncyCastle test sources -->
 		<exclude name="j2me/crypto/src/**/test/*.java"/>
 		<exclude name="j2me/crypto/src/**/examples/*.java"/>
@@ -35,10 +35,10 @@
 
 	<target name="package" depends="clean,init-libs,fetchPolishClassList">
 		<!-- first set source compliance. Java5 is correct, since we're postprocessing -->
-		<property name="ant.build.javac.compiler" value="1.5"/>
-		<property name="ant.build.javac.source" value="1.5"/>
-		<property name="ant.build.javac.target" value="1.5"/>
-		
+		<property name="ant.build.javac.compiler" value="1.6"/>
+		<property name="ant.build.javac.source" value="1.6"/>
+		<property name="ant.build.javac.target" value="1.6"/>
+
 		<path id="jr.classpath">
 			<fileset dir="${dir.lib}">
 				<include name="*.jar"/>
@@ -51,7 +51,7 @@
 			<path refid="jr.classpath"/>
 			<fileset dir="dist" includes="j2merosa-libraries.jar"/>
 		</path>
-		
+
 		<path id="jr.classpath.test">
 			<path refid="jr.compiled.classpath" />
 			<fileset dir="buildTest" includes="jr-resource-jar.jar"/>
@@ -60,12 +60,12 @@
 				<include name="buildTest/**"/>
 			</dirset>
 		</path>
-		
+
 		<!-- Get the resource files which'll be used -->
 		<fileset id="jr.resources" dir="${basedir}/../">
 			<include name="**/resources/*.txt"/>
 		</fileset>
-		
+
 		<mkdir dir="dist"/>
 		<mkdir dir="build"/>
 		<mkdir dir="build/src"/>
@@ -78,7 +78,7 @@
 
 		<!-- Now it's time to make the big file that lets Polish index the source code. This part's tricky,
 		so pay attention.
-		
+
 		First, create a fileset containing all of the source we've collected -->
 		<fileset id="dist.contents" dir="build/src/" includes="**/*.java"/>
 
@@ -100,7 +100,7 @@
 		<!-- This is where our magic polish source map goes -->
 		<mkdir dir="build/build/"/>
 
-		<!-- This echo dumps our filelist path from above into the file j2mepolish.index.text, and creates 
+		<!-- This echo dumps our filelist path from above into the file j2mepolish.index.text, and creates
 		the file itself -->
 		<echo file="build/build/j2mepolish.index.txt" append="false">${buildcontents}${line.separator}</echo>
 
@@ -122,16 +122,16 @@
 		<copy todir="build/resources/">
 		    <fileset dir="${dir.resources-shared}/resources/"/>
    		</copy>
-		
+
 		<exec executable="hg" outputproperty="jr-build-version">
 			<arg line="parents --template {node|short}"/>
-		</exec>		
+		</exec>
 		<echo message="jr-build-version=${jr-build-version}" file="build/javarosa.properties" />
-		
+
 		<!-- Schweet, now turn it into a 'jar' file! -->
 		<zip destfile="dist/j2merosa-libraries.jar" basedir="build"/>
 	</target>
-	
+
 	<target name="packageTestResources">
 		<mkdir dir="buildTest"/>
 		<mkdir dir="buildTest/tmp"/>
@@ -152,7 +152,7 @@
 			<src path="../../j2me"/>
 
 			<include name="**/test**/*.java"/>
-			
+
 			<exclude name="crypto/src/**/test/*.java"/>
 		</javac>
 	</target>
@@ -279,10 +279,10 @@
 			</finally>
 		</trycatch>
 	</target>
-	
+
 	<target name="init-libs">
 		<ant antfile="${dir.root}/core/build.xml" target="extract-libs" inheritAll="true" inheritRefs="false" />
-		
+
 		<taskdef name="for" classname="net.sf.antcontrib.logic.For" onerror="report" classpath="${dir.tools}/ant-contrib.jar" />
 		<taskdef name="if" classname="net.sf.antcontrib.logic.IfTask" onerror="report" classpath="${dir.tools}/ant-contrib.jar" />
 		<taskdef name="trycatch" classname="net.sf.antcontrib.logic.TryCatchTask" onerror="report" classpath="${dir.tools}/ant-contrib.jar" />

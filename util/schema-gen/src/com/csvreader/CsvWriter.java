@@ -1,7 +1,7 @@
 /*
  * Java CSV is a stream based library for reading and writing
  * CSV and other delimited data.
- *   
+ *
  * Copyright (C) Bruce Dunwiddie bruce@csvreader.com
  *
  * This library is free software; you can redistribute it and/or
@@ -64,7 +64,7 @@ public class CsvWriter {
 	/**
 	 * Creates a {@link com.csvreader.CsvWriter CsvWriter} object using a file
 	 * as the data destination.
-	 * 
+	 *
 	 * @param fileName
 	 *            The path to the file to output the data.
 	 * @param delimiter
@@ -91,7 +91,7 @@ public class CsvWriter {
 	 * Creates a {@link com.csvreader.CsvWriter CsvWriter} object using a file
 	 * as the data destination.&nbsp;Uses a comma as the column delimiter and
 	 * ISO-8859-1 as the {@link java.nio.charset.Charset Charset}.
-	 * 
+	 *
 	 * @param fileName
 	 *            The path to the file to output the data.
 	 */
@@ -102,7 +102,7 @@ public class CsvWriter {
 	/**
 	 * Creates a {@link com.csvreader.CsvWriter CsvWriter} object using a Writer
 	 * to write data to.
-	 * 
+	 *
 	 * @param outputStream
 	 *            The stream to write the column delimited data to.
 	 * @param delimiter
@@ -121,7 +121,7 @@ public class CsvWriter {
 	/**
 	 * Creates a {@link com.csvreader.CsvWriter CsvWriter} object using an
 	 * OutputStream to write data to.
-	 * 
+	 *
 	 * @param outputStream
 	 *            The stream to write the column delimited data to.
 	 * @param delimiter
@@ -136,7 +136,7 @@ public class CsvWriter {
 
 	/**
 	 * Gets the character being used as the column delimiter.
-	 * 
+	 *
 	 * @return The character being used as the column delimiter.
 	 */
 	public char getDelimiter() {
@@ -145,7 +145,7 @@ public class CsvWriter {
 
 	/**
 	 * Sets the character to use as the column delimiter.
-	 * 
+	 *
 	 * @param delimiter
 	 *            The character to use as the column delimiter.
 	 */
@@ -159,7 +159,7 @@ public class CsvWriter {
 
 	/**
 	 * Sets the character to use as the record delimiter.
-	 * 
+	 *
 	 * @param recordDelimiter
 	 *            The character to use as the record delimiter. Default is
 	 *            combination of standard end of line characters for Windows,
@@ -172,7 +172,7 @@ public class CsvWriter {
 
 	/**
 	 * Gets the character to use as a text qualifier in the data.
-	 * 
+	 *
 	 * @return The character to use as a text qualifier in the data.
 	 */
 	public char getTextQualifier() {
@@ -181,7 +181,7 @@ public class CsvWriter {
 
 	/**
 	 * Sets the character to use as a text qualifier in the data.
-	 * 
+	 *
 	 * @param textQualifier
 	 *            The character to use as a text qualifier in the data.
 	 */
@@ -191,7 +191,7 @@ public class CsvWriter {
 
 	/**
 	 * Whether text qualifiers will be used while writing data or not.
-	 * 
+	 *
 	 * @return Whether text qualifiers will be used while writing data or not.
 	 */
 	public boolean getUseTextQualifier() {
@@ -200,7 +200,7 @@ public class CsvWriter {
 
 	/**
 	 * Sets whether text qualifiers will be used while writing data or not.
-	 * 
+	 *
 	 * @param useTextQualifier
 	 *            Whether to use a text qualifier while writing data or not.
 	 */
@@ -227,7 +227,7 @@ public class CsvWriter {
 	/**
 	 * Whether fields will be surrounded by the text qualifier even if the
 	 * qualifier is not necessarily needed to escape this field.
-	 * 
+	 *
 	 * @return Whether fields will be forced to be qualified or not.
 	 */
 	public boolean getForceQualifier() {
@@ -238,7 +238,7 @@ public class CsvWriter {
 	 * Use this to force all fields to be surrounded by the text qualifier even
 	 * if the qualifier is not necessarily needed to escape this field. Default
 	 * is false.
-	 * 
+	 *
 	 * @param forceQualifier
 	 *            Whether to force the fields to be qualified or not.
 	 */
@@ -248,7 +248,7 @@ public class CsvWriter {
 
 	/**
 	 * Writes another column of data to this record.
-	 * 
+	 *
 	 * @param content
 	 *            The data for the new column.
 	 * @param preserveSpaces
@@ -364,7 +364,7 @@ public class CsvWriter {
 	/**
 	 * Writes another column of data to this record.&nbsp;Does not preserve
 	 * leading and trailing whitespace in this column of data.
-	 * 
+	 *
 	 * @param content
 	 *            The data for the new column.
 	 * @exception IOException
@@ -395,14 +395,14 @@ public class CsvWriter {
 
 	/**
 	 * Writes a new record using the passed in array of values.
-	 * 
+	 *
 	 * @param values
 	 *            Values to be written.
-	 * 
+	 *
 	 * @param preserveSpaces
 	 *            Whether to preserver leading and trailing spaces in columns
 	 *            while writing out to the record or not.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Thrown if an error occurs while writing data to the
 	 *             destination stream.
@@ -420,10 +420,10 @@ public class CsvWriter {
 
 	/**
 	 * Writes a new record using the passed in array of values.
-	 * 
+	 *
 	 * @param values
 	 *            Values to be written.
-	 * 
+	 *
 	 * @throws IOException
 	 *             Thrown if an error occurs while writing data to the
 	 *             destination stream.
@@ -434,7 +434,7 @@ public class CsvWriter {
 
 	/**
 	 * Ends the current record by sending the record delimiter.
-	 * 
+	 *
 	 * @exception IOException
 	 *                Thrown if an error occurs while writing data to the
 	 *                destination stream.
@@ -454,7 +454,7 @@ public class CsvWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void checkInit() throws IOException {
 		if (!initialized) {
@@ -487,7 +487,7 @@ public class CsvWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void close(boolean closing) {
 		if (!closed) {
@@ -510,7 +510,7 @@ public class CsvWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void checkClosed() throws IOException {
 		if (closed) {
@@ -520,7 +520,7 @@ public class CsvWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void finalize() {
 		close(false);
@@ -579,7 +579,7 @@ public class CsvWriter {
 		int found = original.indexOf(pattern);
 
 		if (found > -1) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			int start = 0;
 
 			while (found != -1) {

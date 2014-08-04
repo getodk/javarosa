@@ -43,48 +43,48 @@ public class XPathEvalTest extends TestCase {
 	public XPathEvalTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
 	}
-	
+
 	public XPathEvalTest(String name) {
 		super(name);
 	}
-	
+
 	public XPathEvalTest() {
 		super();
-	}	
-	
+	}
+
 	public Test suite() {
 		TestSuite aSuite = new TestSuite();
-		
+
 		aSuite.addTest(new XPathEvalTest("XPath Evaluation Test", new TestMethod() {
 			public void run (TestCase tc) {
 				((XPathEvalTest)tc).doTests();
 			}
 		}));
-		
+
 		return aSuite;
 	}
-		
+
 	private void testEval (String expr, FormInstance model, EvaluationContext ec, Object expected) {
 		//System.out.println("[" + expr + "]");
-		
+
 		XPathExpression xpe = null;
 		boolean exceptionExpected = (expected instanceof XPathException);
 		if (ec == null) {
 			ec = new EvaluationContext(model);
 		}
-		
+
 		try {
 			xpe = XPathParseTool.parseXPath(expr);
 		} catch (XPathSyntaxException xpse) { }
-		
+
 		if (xpe == null) {
 			fail("Null expression or syntax error");
 		}
-		
+
 		try {
 			Object result = xpe.eval(model, ec);
 			//System.out.println("out: " + result);
-			
+
 			if (exceptionExpected) {
 				fail("Expected exception, expression : " + expr);
 			} else if ((result instanceof Double && expected instanceof Double)) {
@@ -105,9 +105,9 @@ public class XPathEvalTest extends TestCase {
 
 	public void doTests () {
 		EvaluationContext ec = getFunctionHandlers();
-		
+
 		FormInstance instance = createTestInstance();
-		
+
 		/* unsupporteds */
 		testEval("/union | /expr", null, null, new XPathUnsupportedException());
 		testEval("/descendant::blah", null, null, new XPathUnsupportedException());
@@ -149,7 +149,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("boolean('false')", null, null, Boolean.TRUE);
 		testEval("boolean(date('2000-01-01'))", null, null, Boolean.TRUE);
 		testEval("boolean(convertible())", null, ec, Boolean.TRUE);
-		testEval("boolean(inconvertible())", null, ec, new XPathTypeMismatchException());		
+		testEval("boolean(inconvertible())", null, ec, new XPathTypeMismatchException());
 		testEval("number(true())", null, null, new Double(1.0));
 		testEval("number(false())", null, null, new Double(0.0));
 		testEval("number('100')", null, null, new Double(100.0));
@@ -181,7 +181,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("number(date('2008-09-05'))", null, null, new Double(14127.0));
 		testEval("number(date('1941-12-07'))", null, null, new Double(-10252.0));
 		testEval("number(convertible())", null, ec, new Double(5.0));
-		testEval("number(inconvertible())", null, ec, new XPathTypeMismatchException());		
+		testEval("number(inconvertible())", null, ec, new XPathTypeMismatchException());
 		testEval("string(true())", null, null, "true");
 		testEval("string(false())", null, null, "false");
 		testEval("string(number('NaN'))", null, null, "NaN");
@@ -285,7 +285,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("date('2008-09-08') - date('1983-10-06')" , null, null, new Double(9104.0));
 		testEval("true() and true()" , null, null, Boolean.TRUE);
 		testEval("true() and false()" , null, null, Boolean.FALSE);
-		testEval("false() and false()" , null, null, Boolean.FALSE);		
+		testEval("false() and false()" , null, null, Boolean.FALSE);
 		testEval("true() or true()" , null, null, Boolean.TRUE);
 		testEval("true() or false()" , null, null, Boolean.TRUE);
 		testEval("false() or false()" , null, null, Boolean.FALSE);
@@ -317,7 +317,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("false() and false() < true()" , null, null, Boolean.FALSE);
 		testEval("(false() and false()) < true()" , null, null, Boolean.TRUE);
 		testEval("6 < 7 - 4" , null, null, Boolean.FALSE);
-		testEval("(6 < 7) - 4" , null, null, new Double(-3.0));	
+		testEval("(6 < 7) - 4" , null, null, new Double(-3.0));
 		testEval("3 < 4 < 5" , null, null, Boolean.TRUE);
 		testEval("3 < (4 < 5)" , null, null, Boolean.FALSE);
 		testEval("true() = true()" , null, null, Boolean.TRUE);
@@ -333,7 +333,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("'abc' = 'def'" , null, null, Boolean.FALSE);
 		testEval("'abc' != 'abc'" , null, null, Boolean.FALSE);
 		testEval("'abc' != 'def'" , null, null, Boolean.TRUE);
-		testEval("'' = ''" , null, null, Boolean.TRUE);		
+		testEval("'' = ''" , null, null, Boolean.TRUE);
 		testEval("true() = 17" , null, null, Boolean.TRUE);
 		testEval("0 = false()" , null, null, Boolean.TRUE);
 		testEval("true() = 'true'" , null, null, Boolean.TRUE);
@@ -393,33 +393,33 @@ public class XPathEvalTest extends TestCase {
 		testEval("$var_string_five", null, varContext, "five");
 		testEval("$var_int_five", null, varContext, new Double(5.0));
 		testEval("$var_double_five", null, varContext, new Double(5.0));
-		
+
 		//Attribute XPath References
 		//testEval("/@blah", null, null, new XPathUnsupportedException());
 		//TODO: Need to test with model, probably in a different file
-		
-		
+
+
 		try {
 			testEval("null-proto()", null, ec, new XPathUnhandledException());
 			fail("Did not get expected null pointer");
 		} catch (NullPointerException npe) {
 			//expected
-		}		
-		
+		}
+
 		ec.addFunctionHandler(read);
 		ec.addFunctionHandler(write);
 
 		read.val = "testing-read";
 		testEval("read()", null, ec, "testing-read");
-		
+
 		testEval("write('testing-write')", null, ec, Boolean.TRUE);
 		if (!"testing-write".equals(write.val))
 			fail("Custom function handler did not successfully send data to external source");
-		
+
 		/* fetching from model */
 //		testEval("/", dm1, null, "");
 //		testEval("/non-existent", dm1, null, "");
-//		
+//
 //		addDataRef(dm1, "/data/test", null);
 //		addNodeRef(dm1, "/empty-group", false);
 //		testEval("/", dm1, null, "");
@@ -428,7 +428,7 @@ public class XPathEvalTest extends TestCase {
 //		testEval("/empty-group/undefined", dm1, null, "");
 //		testEval("/data/test", dm1, null, "");
 //		testEval("/data/test/too-deep", dm1, null, "");
-//		
+//
 //		addDataRef(dm1, "/data/string", new StringData("string"));
 //		addDataRef(dm1, "/data/int", new IntegerData(17));
 //		addDataRef(dm1, "/data/date", new DateData(DateUtils.getDate(2006, 6, 13)));
@@ -441,7 +441,7 @@ public class XPathEvalTest extends TestCase {
 //		addDataRef(dm1, "/data/select-one", sod);
 //		addDataRef(dm1, "/data/select-multi", new SelectMultiData(sv));
 //		addDataRef(dm1, "/data/custom", new CustomAnswerData());
-//				
+//
 //		testEval("/data/string", dm1, null, "string");
 //		testEval("/data/int", dm1, null, new Double(17.0));
 //		testEval("/data/date", dm1, null, DateUtils.getDate(2006, 6, 13));
@@ -459,18 +459,18 @@ public class XPathEvalTest extends TestCase {
 	private FormInstance newDataModel () {
 		return new FormInstance(new TreeElement());
 	}
-	
+
 	private void addDataRef (FormInstance dm, String ref, IAnswerData data) {
 		addNodeRef(dm, ref, true);
-		
+
 		if (data != null) {
 			dm.updateDataValue(new XPathReference(ref), data);
 		}
 	}
-	
+
 	private void addNodeRef (FormInstance dm, String ref, boolean terminal) {
 		Vector pieces = new Vector();
-		
+
 		//split ref by '/', assume first char is '/'
 		int i = 1;
 		while (i > 0) {
@@ -478,7 +478,7 @@ public class XPathEvalTest extends TestCase {
 			pieces.addElement(ref.substring(i, j == -1 ? ref.length() : j));
 			i = j + 1;
 		}
-		
+
 		TreeElement node = dm.getRoot();
 		for (int k = 0; k < pieces.size(); k++) {
 			// find if child exists
@@ -501,40 +501,40 @@ public class XPathEvalTest extends TestCase {
 				} else {
 					child = new TreeElement((String)pieces.elementAt(k));
 				}
-				
+
 				node.addChild(child);
 			}
-			
+
 			if (k < pieces.size() - 1) {
 				if (!child.isChildable()) {
 					throw new IllegalArgumentException();
-				}	
-				
+				}
+
 				node = child;
 			}
 		}
 	}
-	
+
 	private QuestionDef getSelectQuestion (boolean multi) {
 		QuestionDef q = new QuestionDef(1, "blah",
 				multi ? Constants.CONTROL_SELECT_MULTI : Constants.CONTROL_SELECT_ONE);
-		
+
 		q.addSelectItem("choice 1", "val1");
 		q.addSelectItem("choice 2", "val2");
 		q.addSelectItem("choice 3", "val3");
 		q.addSelectItem("choice 4", "val4");
-		
+
 		return q;
 	}
 	*/
-	
+
 	public FormInstance createTestInstance() {
 		TreeElement data = new TreeElement("data");
 		data.addChild(new TreeElement("path"));
 		FormInstance instance = new FormInstance(data);
 		return instance;
 	}
-	
+
 	private EvaluationContext getFunctionHandlers () {
 		EvaluationContext ec = new EvaluationContext(null);
 		final Class[][] allPrototypes = {
@@ -545,7 +545,7 @@ public class XPathEvalTest extends TestCase {
 				{Boolean.class},
 				{Boolean.class, Double.class, String.class, Date.class, CustomType.class}
 		};
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "testfunc"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -556,19 +556,19 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return Boolean.TRUE; }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler(){
 
 			public String getName() { return "regex";	}
-			public Object eval(Object[] args, EvaluationContext ec) { 
+			public Object eval(Object[] args, EvaluationContext ec) {
 				System.out.println("EVAL REGEX TESTS:");
 				for (int i = 0; i< args.length; i++){
 					System.out.println("REGEX ARGS: " +args[i].toString());
 				}
-				
-				
+
+
 				return new Boolean(true); // String.re  args[0].
-				
+
 			}
 			public Vector getPrototypes () {
 				Vector p = new Vector();
@@ -577,10 +577,10 @@ public class XPathEvalTest extends TestCase {
 			}
 			public boolean rawArgs() { return false; }
 			public boolean realTime() {	return false; }
-			
+
 		});
-		
-		
+
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "add"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -591,7 +591,7 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return new Double(((Double)args[0]).doubleValue() +  ((Double)args[1]).doubleValue()); }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "proto"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -605,7 +605,7 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return printArgs(args); }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "raw"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -616,7 +616,7 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return printArgs(args); }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "null-proto"; }
 			public Vector getPrototypes () { return null; }
@@ -624,20 +624,20 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return Boolean.FALSE; }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "concat"; }
 			public Vector getPrototypes () { return new Vector(); }
 			public boolean rawArgs () { return true; }
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < args.length; i++)
 					sb.append(XPathFuncExpr.toString(args[i]));
 				return sb.toString();
 			}
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "convertible"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -653,7 +653,7 @@ public class XPathEvalTest extends TestCase {
 				};
 			}
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "inconvertible"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -664,7 +664,7 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return new Object(); }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "get-custom"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -675,7 +675,7 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return ((Boolean)args[0]).booleanValue() ? new CustomSubType() : new CustomType(); }
 		});
-		
+
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "check-types"; }
 			public Vector getPrototypes () { Vector p = new Vector();
@@ -688,26 +688,26 @@ public class XPathEvalTest extends TestCase {
 				if (args.length != 5 || !(args[0] instanceof Boolean) || !(args[1] instanceof Double) ||
 						!(args[2] instanceof String) || !(args[3] instanceof Date) || !(args[4] instanceof CustomType))
 					fail("Types in custom function handler not converted properly/prototype not matched properly");
-				
+
 				return Boolean.TRUE;
 			}
 		});
 		return ec;
 	}
-	
+
 	private EvaluationContext getVariableContext() {
 		EvaluationContext ec = new EvaluationContext(null);
-		
+
 		ec.setVariable("var_float_five", new Float(5.0));
 		ec.setVariable("var_string_five", "five");
 		ec.setVariable("var_int_five", new Integer(5));
 		ec.setVariable("var_double_five", new Double(5.0));
-		
+
 		return ec;
 	}
-	
+
 	private String printArgs (Object[] oa) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("[");
 		for (int i = 0; i < oa.length; i++) {
 			String fullName = oa[i].getClass().getName();
@@ -721,15 +721,15 @@ public class XPathEvalTest extends TestCase {
 		sb.append("]");
 		return sb.toString();
 	}
-	
+
 	private class CustomType {
 		public String val () { return "custom"; }
 		public String toString() { return ""; }
 		public boolean equals (Object o) { return o instanceof CustomType; }
 	}
-	
+
 	private class CustomSubType extends CustomType {
-		public String val () { return "custom-sub"; }		
+		public String val () { return "custom-sub"; }
 	}
 	/* unused
 	private class CustomAnswerData implements IAnswerData {
@@ -748,7 +748,7 @@ public class XPathEvalTest extends TestCase {
 		public boolean rawArgs () { return false; }
 		public boolean realTime () { return false; }
 	}
-	
+
 	StatefulFunc read = new StatefulFunc () {
 		public String getName () { return "read"; }
 		public Vector getPrototypes () { Vector p = new Vector();
@@ -757,7 +757,7 @@ public class XPathEvalTest extends TestCase {
 		}
 		public Object eval (Object[] args, EvaluationContext ec) { return val; }
 	};
-	
+
 	StatefulFunc write = new StatefulFunc () {
 		public String getName () { return "write"; }
 		public Vector getPrototypes () { Vector p = new Vector();

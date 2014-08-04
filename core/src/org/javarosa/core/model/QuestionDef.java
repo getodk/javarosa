@@ -33,24 +33,24 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-/** 
+/**
  * The definition of a Question to be presented to users when
  * filling out a form.
- * 
+ *
  * QuestionDef requires that any IDataReferences that are used
  * are contained in the FormDefRMS's PrototypeFactoryDeprecated in order
  * to be properly deserialized. If they aren't, an exception
- * will be thrown at the time of deserialization. 
- * 
+ * will be thrown at the time of deserialization.
+ *
  * @author Daniel Kayiwa/Drew Roos
  *
  */
 public class QuestionDef implements IFormElement, Localizable {
 	private int id;
 	private IDataReference binding;	/** reference to a location in the model to store data in */
-	
+
 	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
-	private String appearanceAttr;	
+	private String appearanceAttr;
 	private String helpTextID;
 	private String labelInnerText;
 	private String helpText;
@@ -61,39 +61,39 @@ public class QuestionDef implements IFormElement, Localizable {
 
 	private Vector<SelectChoice> choices;
 	private ItemsetBinding dynamicChoices;
-	
+
 	Vector observers;
-	
+
 	public QuestionDef () {
 		this(Constants.NULL_ID, Constants.DATATYPE_TEXT);
 	}
-	
+
 	public QuestionDef (int id, int controlType) {
 		setID(id);
 		setControlType(controlType);
 		observers = new Vector();
 	}
-	
+
 	public int getID () {
 		return id;
 	}
-	
+
 	public void setID (int id) {
 		this.id = id;
 	}
-	
+
 	public IDataReference getBind() {
 		return binding;
 	}
-	
+
 	public void setBind(IDataReference binding) {
 		this.binding = binding;
 	}
-	
+
 	public int getControlType() {
 		return controlType;
 	}
-	
+
 	public void setControlType(int controlType) {
 		this.controlType = controlType;
 	}
@@ -101,10 +101,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	public String getAppearanceAttr () {
 		return appearanceAttr;
 	}
-	
+
 	public void setAppearanceAttr (String appearanceAttr) {
 		this.appearanceAttr = appearanceAttr;
-	}	
+	}
 
 	/**
 	 * Only if there is no localizable version of the &lthint&gt available should this method be used
@@ -119,8 +119,8 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setHelpText (String helpText) {
 		this.helpText = helpText;
 	}
-	
-	
+
+
 	public void setAdditionalAttribute(String namespace, String name, String value) {
 		TreeElement.setAttribute(null, additionalAttributes, namespace, name, value);
 	}
@@ -132,7 +132,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		}
 		return null;
 	}
-	
+
 	public Vector<TreeElement> getAdditionalAttributes() {
 		return additionalAttributes;
 	}
@@ -140,12 +140,12 @@ public class QuestionDef implements IFormElement, Localizable {
     public String getHelpTextID () {
         return helpTextID;
     }
-    
+
     public void setHelpTextID (String textID) {
         this.helpTextID = textID;
 
     }
-    
+
 
     public void addSelectChoice (SelectChoice choice) {
     	if (choices == null) {
@@ -154,36 +154,36 @@ public class QuestionDef implements IFormElement, Localizable {
     	choice.setIndex(choices.size());
     	choices.addElement(choice);
     }
-    
+
     public void removeSelectChoice(SelectChoice choice){
     	if(choices == null) {
     		choice.setIndex(0);
     		return;
     	}
-    	
+
     	if(choices.contains(choice)){
     		choices.removeElement(choice);
        	}
     }
-    
+
     public void removeAllSelectChoices(){
     	if(choices != null){
-    		choices.removeAllElements();		
+    		choices.removeAllElements();
     	}
     }
-    
+
     public Vector<SelectChoice> getChoices () {
     	return choices;
     }
-    
+
     public SelectChoice getChoice (int i) {
     	return choices.elementAt(i);
     }
-    
+
     public int getNumChoices () {
     	return (choices != null ? choices.size() : 0);
     }
-    
+
 	public SelectChoice getChoiceForValue (String value) {
 		for (int i = 0; i < getNumChoices(); i++) {
 			if (getChoice(i).getValue().equals(value)) {
@@ -192,25 +192,25 @@ public class QuestionDef implements IFormElement, Localizable {
 		}
 		return null;
 	}
-	
+
 	public ItemsetBinding getDynamicChoices () {
 		return dynamicChoices;
 	}
-	
+
 	public void setDynamicChoices (ItemsetBinding ib) {
 		if (ib != null) {
 			ib.setDestRef(this);
 		}
 		this.dynamicChoices = ib;
 	}
-	
+
 	/**
 	 * true if the answer to this question yields xml tree data, not a simple string value
 	 */
 	public boolean isComplex () {
 		return (dynamicChoices != null && dynamicChoices.copyMode);
 	}
-	
+
 	//Deprecated
     public void localeChanged(String locale, Localizer localizer) {
    	 	if (choices != null) {
@@ -218,30 +218,30 @@ public class QuestionDef implements IFormElement, Localizable {
     				choices.elementAt(i).localeChanged(null, localizer);
     			}
     		}
-    	
+
    	 	if (dynamicChoices != null) {
     			dynamicChoices.localeChanged(locale, localizer);
     		}
-    	
+
     		alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
     	}
-	
+
 	public Vector getChildren () {
 		return null;
 	}
-	
+
 	public void setChildren (Vector v) {
-		throw new IllegalStateException();
+		throw new IllegalStateException("Can't set children on question def");
 	}
-	
+
 	public void addChild (IFormElement fe) {
-		throw new IllegalStateException();
+		throw new IllegalStateException("Can't add children to question def");
 	}
-	
+
 	public IFormElement getChild (int i) {
 		return null;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
@@ -282,29 +282,29 @@ public class QuestionDef implements IFormElement, Localizable {
         ExtUtil.write(dos, new ExtWrapNullable(getHelpInnerText()));
 
 		ExtUtil.writeNumeric(dos, getControlType());
-		
+
 		ExtUtil.writeAttributes(dos, additionalAttributes);
-		
+
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
 		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
 	}
 
 	/* === MANAGING OBSERVERS === */
-	
+
 	public void registerStateObserver (FormElementStateListener qsl) {
 		if (!observers.contains(qsl)) {
 			observers.addElement(qsl);
 		}
 	}
-	
+
 	public void unregisterStateObserver (FormElementStateListener qsl) {
 		observers.removeElement(qsl);
 	}
-	
+
 	public void unregisterAll () {
 		observers.removeAllElements();
 	}
-	
+
 	public void alertStateObservers (int changeFlags) {
 		for (Enumeration e = observers.elements(); e.hasMoreElements(); )
 			((FormElementStateListener)e.nextElement()).formElementStateChanged(this, changeFlags);
@@ -325,7 +325,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	public String getLabelInnerText() {
 		return labelInnerText;
 	}
-	
+
     public void setHelpInnerText(String helpInnerText) {
         this.helpInnerText = helpInnerText;
     }
@@ -333,7 +333,7 @@ public class QuestionDef implements IFormElement, Localizable {
     public String getHelpInnerText() {
         return helpInnerText;
     }
-	
+
 	public String getTextID() {
 		return textID;
 	}

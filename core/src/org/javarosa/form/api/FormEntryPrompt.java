@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2009 JavaRosa
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -44,23 +44,23 @@ import org.javarosa.formmanager.view.IQuestionWidget;
 /**
  * This class gives you all the information you need to display a question when
  * your current FormIndex references a QuestionEvent.
- * 
+ *
  * @author Yaw Anokwa
  */
 public class FormEntryPrompt extends FormEntryCaption {
 
     TreeElement mTreeElement;
     boolean dynamicChoicesPopulated = false;
-    
+
     /**
      * This empty constructor exists for convenience of any supertypes of this prompt
      */
     protected FormEntryPrompt() {
     }
-    
+
     /**
 	 * Creates a FormEntryPrompt for the element at the given index in the form.
-	 * 
+	 *
 	 * @param form
 	 * @param index
 	 */
@@ -77,7 +77,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     public int getDataType() {
-        return mTreeElement.dataType;
+        return mTreeElement.getDataType();
     }
 
     // attributes available in the bind, instance and body
@@ -89,7 +89,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     //note: code overlap with FormDef.copyItemsetAnswer
     public IAnswerData getAnswerValue() {
     	QuestionDef q = getQuestion();
-    	
+
 		ItemsetBinding itemset = q.getDynamicChoices();
     	if (itemset != null) {
     		if (itemset.valueRef != null) {
@@ -118,9 +118,9 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    				preselectedValues.addElement(sels.elementAt(i).xmlValue);
 	    			}
 	    		}
-	    			    		  
+
     			//populate 'selection' with the corresponding choices (matching 'value') from the dynamic choiceset
-	    		Vector<Selection> selection = new Vector<Selection>();    		
+	    		Vector<Selection> selection = new Vector<Selection>();
 	    		for (int i = 0; i < preselectedValues.size(); i++) {
 	    			String value = preselectedValues.elementAt(i);
 	    			SelectChoice choice = null;
@@ -138,7 +138,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    				selection.addElement(choice.selection());
 	    			}
 	    		}
-	    		
+
 	    		//convert to IAnswerData
 	    		if (selection.size() == 0) {
 	    			return null;
@@ -156,38 +156,38 @@ public class FormEntryPrompt extends FormEntryCaption {
             return mTreeElement.getValue();
     	}
     }
-   
+
 
     public String getAnswerText() {
     	IAnswerData data = this.getAnswerValue();
-    	
+
         if (data == null)
             return null;
         else {
         	String text;
-        	
+
         	//csims@dimagi.com - Aug 11, 2010 - Added special logic to
         	//capture and display the appropriate value for selections
         	//and multi-selects.
         	if(data instanceof SelectOneData) {
         		text = this.getSelectItemText((Selection)data.getValue());
         	} else if(data  instanceof SelectMultiData) {
-        		String returnValue = "";
+        		StringBuilder b = new StringBuilder();
         		Vector<Selection> values = (Vector<Selection>)data.getValue();
         		for(Selection value : values) {
-        			returnValue += this.getSelectItemText(value) + " ";
+        			b.append(this.getSelectItemText(value)).append(" ");
         		}
-        		text = returnValue;
+        		text = b.toString();
         	} else {
         		text = data.getDisplayText();
         	}
-        	
+
         	if(getControlType() == Constants.CONTROL_SECRET) {
-				String obfuscated = "";
-				for(int i =0 ; i < text.length() ; ++i ) { 
-					obfuscated += "*";
+				StringBuilder b = new StringBuilder();
+				for(int i =0 ; i < text.length() ; ++i ) {
+					b.append("*");
 				}
-				text = obfuscated;
+				text = b.toString();
         	}
         	return text;
         }
@@ -196,11 +196,11 @@ public class FormEntryPrompt extends FormEntryCaption {
     public String getConstraintText() {
         return getConstraintText(null);
     }
-    
+
     public String getConstraintText(IAnswerData attemptedValue) {
         return getConstraintText(null, attemptedValue);
     }
-    
+
     public String getConstraintText(String textForm, IAnswerData attemptedValue) {
     	if (mTreeElement.getConstraint() == null) {
             return null;
@@ -208,7 +208,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         	EvaluationContext ec = new EvaluationContext(form.exprEvalContext, mTreeElement.getRef());
         	if(textForm != null) {
         		ec.setOutputTextForm(textForm);
-        	} 
+        	}
         	if(attemptedValue != null) {
         		ec.isConstraint = true;
         		ec.candidateValue = attemptedValue;
@@ -222,7 +222,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
     public Vector<SelectChoice> getSelectChoices() {
     	QuestionDef q = getQuestion();
-    	
+
 		ItemsetBinding itemset = q.getDynamicChoices();
     	if (itemset != null) {
     		if (!dynamicChoicesPopulated) {
@@ -242,23 +242,23 @@ public class FormEntryPrompt extends FormEntryCaption {
 			itemset.clearChoices();
 		}
     }
-    
 
-    
+
+
     public boolean isRequired() {
-        return mTreeElement.required;
+        return mTreeElement.isRequired();
     }
 
     public boolean isReadOnly() {
         return !mTreeElement.isEnabled();
     }
-    
+
     public QuestionDef getQuestion() {
     	return (QuestionDef)element;
     }
-    
+
     //==== observer pattern ====//
-    
+
 	public void register (IQuestionWidget viewWidget) {
 		super.register(viewWidget);
 		mTreeElement.registerStateObserver(this);
@@ -268,14 +268,14 @@ public class FormEntryPrompt extends FormEntryCaption {
 		mTreeElement.unregisterStateObserver(this);
 		super.unregister();
 	}
-		
+
 	public void formElementStateChanged(TreeElement instanceNode, int changeFlags) {
 		if (this.mTreeElement != instanceNode)
 			throw new IllegalStateException("Widget received event from foreign question");
 		if (viewWidget != null)
-			viewWidget.refreshWidget(changeFlags);		
+			viewWidget.refreshWidget(changeFlags);
 	}
-	
+
        /**
 	 * ONLY RELEVANT to Question elements!
 	 * Will throw runTimeException if this is called for anything that isn't a Question.
@@ -290,7 +290,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 		String textID = ((QuestionDef)element).getHelpTextID();
 		String helpText = ((QuestionDef)element).getHelpText();
 		String helpInnerText = ((QuestionDef)element).getHelpInnerText();
-		
+
 		try{
 			if (textID != null) {
 			    helpText=substituteStringArgs(localizer().getLocalizedText(textID));
@@ -305,13 +305,13 @@ public class FormEntryPrompt extends FormEntryCaption {
 			Logger.exception("FormEntryPrompt.getHelpText", e);
 			e.printStackTrace();
 		}
-		
+
 		return helpText;
 
 	}
 
 
-	
+
 	/**
 	 * Attempts to return the specified Item (from a select or 1select) text.
 	 * Will check for text in the following order:<br/>
@@ -326,58 +326,58 @@ public class FormEntryPrompt extends FormEntryCaption {
 		//throw tantrum if this method is called when it shouldn't be or sel==null
 		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
 		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
-		
+
 		//Just in case the selection hasn't had a chance to be initialized yet.
 		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
-		
+
 		//check for the null id case and return labelInnerText if it is so.
 		String tid = sel.choice.getTextID();
 		if(tid == null || tid == "") return substituteStringArgs(sel.choice.getLabelInnerText());
-		
+
 		//otherwise check for 'long' form of the textID, then for the default form and return
 		String returnText;
 		returnText = getIText(tid, "long");
 		if(returnText == null) returnText = getIText(tid,null);
-		
+
 		return substituteStringArgs(returnText);
 	}
-	
+
 	/**
 	 * @see getSelectItemText(Selection sel)
 	 */
 	public String getSelectChoiceText(SelectChoice selection){
 		return getSelectItemText(selection.selection());
 	}
-	
+
 	/**
-	 * This method is generally used to retrieve special forms for a 
+	 * This method is generally used to retrieve special forms for a
 	 * (select or 1select) item, e.g. "audio", "video", etc.
-	 * 
+	 *
 	 * @param sel - The Item whose text you're trying to retrieve.
-	 * @param form - Special text form of Item you're trying to retrieve. 
+	 * @param form - Special text form of Item you're trying to retrieve.
 	 * @return Special Form Text. <code>null</code> if no text for this element exists (with the specified special form).
 	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
 	 * @throws IllegalArgumentException if <code>sel == null</code>
 	 */
 	public String getSpecialFormSelectItemText(Selection sel,String form){
 		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument for Selection!");
-		
+
 		//Just in case the selection hasn't had a chance to be initialized yet.
 		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
-		
+
 		String textID = sel.choice.getTextID();
 		if(textID == null || textID.equals("")) return null;
-		
+
 		String returnText = getIText(textID, form);
-		
+
 		return substituteStringArgs(returnText);
-		
+
 	}
-	
+
 	public String getSpecialFormSelectChoiceText(SelectChoice sel,String form){
 		return getSpecialFormSelectItemText(sel.selection(),form);
 	}
-	
+
 	public void requestConstraintHint(ConstraintHint hint) throws UnpivotableExpressionException {
 		//NOTE: Technically there's some rep exposure, here. People could use this mechanism to expose the instance.
 		//We could hide it by dispatching hints through a final abstract class instead.
@@ -389,6 +389,6 @@ public class FormEntryPrompt extends FormEntryCaption {
 			throw new UnpivotableExpressionException();
 		}
 	}
-	
+
 }
 
