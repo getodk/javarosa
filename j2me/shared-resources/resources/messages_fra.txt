@@ -1,0 +1,236 @@
+polish.command.ok=OK
+polish.command.cancel=Annuler
+polish.command.options=Options
+polish.command.exit=Sortir
+polish.command.select=Sélectionnez
+polish.command.mark=Cocher
+polish.command.unmark=Décocher
+polish.date.select=Sélectionner une date
+# for deleting a single char:
+polish.command.delete=Supprimer
+# for deleting a complete TextField:
+polish.command.clear=Effacer
+# for hiding menus on BlackBerry devices:
+polish.command.hide=Masquer
+# for showing a default title when no label
+# is defined in a TextField. This is only
+# used when no direct input mode is activated:
+polish.title.input=Entrée
+# used for showing a screen for selecting symbols within TextFields:
+polish.command.entersymbol=Ajouter Symbole
+# used by the HtmlBrowser for a links:
+polish.command.followlink=Aller
+# used by the HtmlBrowser for submitting a form:
+polish.command.submit=Soumettre
+# used by the RssBrowser for returning to the previous page:
+polish.command.back=Retour
+# RSS commands:
+polish.rss.command.select=Montrer
+polish.rss.command.followlink=Aller
+
+# used for predictive setup
+
+
+#Javarosa-specific
+
+plussign=/add.png
+
+splashscreen=/splash.png
+
+
+menu.Save=Enregistrer
+menu.Exit=Sortir
+menu.Settings=Paramètres
+menu.SaveAndExit=Enregistrer et quitter
+menu.Next=Suivant
+menu.Back=Retour
+menu.ViewAnswers=Voir les réponses
+menu.SendNow=Envoyer maintenant
+menu.SendLater=Envoyer plus tard (sauvegarder)
+menu.SendToNewServer=Envoyer à un nouveau serveur
+menu.Login=Connectez-vous
+menu.Demo=Démo
+menu.Capture=Capturer
+menu.retry=Réessayer
+
+settings.language=Langue
+
+
+
+
+button.Next=Fait
+button.No=NON
+
+question.SendNow=Envoyer des données maintenant?
+
+view.sending.RequiredQuestion=Question requise; Vous devez répondre
+# inaenda in swahili
+
+ 
+
+
+
+form.login.username=Nom d'utilisateur:
+form.login.password=Mot de passe:
+form.login.login=Connectez-vous
+
+activity.login.loginincorrect=Connexion échouée
+activity.login.tryagain=S'il vous plaît réessayer
+activity.login.demomode.intro=Vous demarrez Commcare en mode Demo. Le mode démo est pour le test et la pratique uniquement! Connectez-vous avec votre compte d'utilisateur pour effectuer des visites de clients.
+
+
+form.user.name=Nom (ex: LoginID):
+form.user.password=Mot de passe de l'utilisateur:
+form.user.confirmpassword=Confirmer le mot de passe:
+form.user.userid=ID de l'utilisateur:
+form.user.giveadmin=Donner à cet utilisateur des droits d'administrateur?
+form.user.fillinboth =S'il vous plaît remplir à la fois nom d'utilisateur et le mot de passe
+
+activity.adduser.adduser=Ajouter un utilisateur
+activity.adduser.problem=Problème:
+activity.adduser.problem.nametaken=Nom d'utilisateur ${0} déjà utilisé. Veuillez choisir un autre
+activity.adduser.problem.emptyuser=Le nom d'utilisateur et le mot de passe doivent  tous les deux être donnés 
+activity.adduser.problem.mismatchingpasswords=Les mots de passe ne correspondent pas
+
+activity.locationcapture.capturelocation=Capture de lieu
+activity.locationcapture.capturelocationhint=Capture d'un emplacement GPS
+activity.locationcapture.waitingforfix=En attente de positionnement
+activity.locationcapture.fixobtained=Position obtenue!
+activity.locationcapture.fixfailed=Echec de capture de l'emplacement
+activity.locationcapture.readyforcapture=Prêt pour la capture d'emplacement
+activity.locationcapture.Latitude=Latitude
+activity.locationcapture.Longitude=Longitude
+activity.locationcapture.Altitude=Altitude
+activity.locationcapture.Accuracy=Précision
+activity.locationcapture.capturelocationhint=Utiliser un GPS pour obtenir l'emplacement
+
+
+formview.repeat.addNew=Ajouter de nouvelles repetitions?
+
+
+
+
+
+menu.ok=OK
+
+
+
+sending.view.done.title=Finished
+sending.view.done=formulaire complet, merci
+sending.view.submit=Soumettre le formulaire
+sending.view.now=Envoyer maintenant
+sending.view.later=Envoyer plus tard
+sending.view.when=Envoyer des données maintenant
+
+sending.status.multi=En cours d'envoi ${0} de ${1}. Transmis avec succès ${2} de ${3}.
+sending.status.title=Etat d'envoi
+sending.status.none=Pas de formulaires à envoyer
+sending.status.going=Envoi en cours
+
+sending.message.send=Envoyer un message
+message.log=Journal des Messages
+message.details=Afficher les détails
+message.send.unsent=Envoyer les éléments sauvegardés
+message.delete=Supprimer le message
+
+debug.log=Journal de débogage
+
+sending.status.failures=Des erreurs se sont produites, ${0} les formulaires n'ont pas été envoyés
+sending.status.long=La Soumission prend trop de temps
+sending.status.success=Soumis avec succès
+sending.status.failed=Echec de la soumission
+sending.status.error=Erreur inconnue de soumission
+
+
+
+date.today=Aujourd'hui
+date.yesterday=Hier
+date.twoago=Il ya ${0} jours
+date.tomorrow=Demain
+date.nago=Il ya ${0} jours
+date.nfromnow=${0} jours à partir d'aujourd'hui
+
+yes=Oui
+no=Non
+
+#added because the translations were out of sync. Should be cleaned up at some point.
+
+
+user.registration.title=Enregistrement de l'utilisateur
+user.registration.attempt=En Contact du server pour enregistrer l'utilisateur ...
+user.registration.failmessage=L'enregistrement de l'utilisateur n'a pu être terminée, le serveur n'a pu être contacté. Nouvelle tentative?
+user.registration.success=L'utilisateur a été enregistré avec succès!
+user.registration.badresponse=L'inscription de l'utilisateur est reçue, mais la réponse ne pouvait être reconnu. Continuer?
+
+command.retry=Réessayer
+
+
+# -- Begin Entries on March 10, 2010 to complete localizations -- 
+
+command.ok=OK
+command.back=Retour
+command.select=Sélectionner
+command.cancel=Annuler
+
+#Chatterbox commands
+command.next=Suivant
+command.exit=Sortir
+command.saveexit=Enregistrer et quitter
+command.save=Enregistrer
+command.language=Langue
+
+entity.command.sort=Trier
+entity.find=Trouver:
+entity.nomatch=Aucun resultat
+entity.detail.title=${0} Détails
+entity.sort.title=Trier par …
+
+
+loading.screen.message=Chargement en cours …
+loading.screen.title=Chargement en cours
+
+#Used by chatterbox dynamically for the "name" of the xform itext locale 
+
+case.name=Nom
+case.id=ID
+case.date.opened=Date d'ouverture
+case.status=Ouverture recente
+
+yes=Oui
+no=Non
+date.unknown=Inconnu
+
+log.submit.url=Connectez-vous à la soumission de l'URL
+log.submit.never=Auto Disable-Envoyer
+log.submit.short=Envoyer Connexion de Périphériques
+log.submit.full=Envoyer un diagnostic complet
+log.submit.nigthly=Format de journal par nuité  
+log.submit.weekly=Format de journal hebdomadaire
+log.submit.next.daily=Journal quotidien suivant
+log.submit.next.weekly=Journal hebdomadaire suivant 
+
+user.create.header=Nouvel utilisateur
+
+sending.status.success=Soumis avec succès. Aujourd'hui, nous avons reçu de vous, ${0} formulaires.
+
+user.entity.name=Utilisateur
+user.entity.username=Nom d'utilisateur
+user.entity.type=Type
+user.entity.admin=Administrateur
+user.entity.normal=Normal
+user.entity.demo=Demo
+user.entity.unknown=Inconnu
+
+repeat.repitition=Répétition
+repeat.message.single=Ajouter ${0}?
+repeat.message.multiple=Ajouter un autre ${0}?
+
+#List of two-letter->Language Mappings
+en=English
+pt=Portugaise
+es=Espagnole
+sw=Kiswahili
+af=Afrikaans
+
+#OQPS Messages
+formentry.invalid.input=Valeur invalide ${0} entrée

@@ -1,0 +1,19 @@
+#JRDemo specifics
+jrdemo.formlist.title=Available forms
+jrdemo.formlist.command.viewsaved=View Saved
+jrdemo.formlist.command.downloadforms=Download New Forms
+
+jrdemo.remoteformlist.title=Choose forms to download
+jrdemo.remoteformlist.command.downloadform=Download
+
+jrdemo.savedformlist.title=Saved Forms Data
+jrdemo.savedformlist.command.senddata=Send to server
+
+jrdemo.selectlanguage.title=First run: Select a language
+
+jrdemo.posturi=Form Submit URL
+jrdemo.formuri=Form Fetch Server
+jrdemo.downloading=Downloading
+jrdemo.fetching=Please Wait. Fetching Form...
+jrdemo.searching=Searching
+jrdemo.contacting=Please Wait. Contacting Server...
