@@ -357,7 +357,7 @@ public class XPathFuncExpr extends XPathExpression {
 			double a = toDouble(argVals[0]).doubleValue();
 			double b = toDouble(argVals[1]).doubleValue();
 			return Math.pow(a, b);
-		} else if (name.equals("enclosed-area")) {
+		} else if (name.equals("enclosed-area") || name.equals("area")) {
       assertArgsCount( name, args, 1);
 
       Object argVal = argVals[0];
