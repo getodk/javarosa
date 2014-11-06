@@ -1313,6 +1313,14 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		expireReferenceCache();
 	}
 
+  public void clearChildrenCaches() {
+    for (int i = 0; i < this.getNumChildren(); i++) {
+      TreeElement child = this.getChildAt(i);
+      child.clearCaches();
+      child.clearChildrenCaches();
+    }
+  }
+
 	public String getNamespace() {
 		return namespace;
 	}
