@@ -7,7 +7,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.xpath.expr.XPathExpression;
 
-public interface AbstractTreeElement<T extends AbstractTreeElement> {
+public interface AbstractTreeElement<T extends AbstractTreeElement<T>> {
 
 	public abstract boolean isLeaf();
 
@@ -18,14 +18,14 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	public abstract T getChild(String name, int multiplicity);
 
 	/**
-	 * 
+	 *
 	 * Get all the child nodes of this element, with specific name
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
 	public abstract Vector<T> getChildrenWithName(String name);
-	
+
 	public abstract boolean hasChildren();
 
 	public abstract int getNumChildren();
@@ -35,12 +35,12 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	public abstract boolean isRepeatable();
 
 	public abstract boolean isAttribute();
-			
+
 	public abstract int getChildMultiplicity(String name);
 
 	/**
 	 * Visitor pattern acceptance method.
-	 * 
+	 *
 	 * @param visitor
 	 *            The visitor traveling this tree
 	 */
@@ -53,7 +53,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
 	/**
 	 * get namespace of attribute at 'index' in the vector
-	 * 
+	 *
 	 * @param index
 	 * @return String
 	 */
@@ -61,7 +61,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
 	/**
 	 * get name of attribute at 'index' in the vector
-	 * 
+	 *
 	 * @param index
 	 * @return String
 	 */
@@ -69,7 +69,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
 	/**
 	 * get value of attribute at 'index' in the vector
-	 * 
+	 *
 	 * @param index
 	 * @return String
 	 */
@@ -78,10 +78,10 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	/**
 	 * Retrieves the TreeElement representing the attribute at
 	 * the provided namespace and name, or null if none exists.
-	 * 
+	 *
 	 * If 'null' is provided for the namespace, it will match the first
 	 * attribute with the matching name.
-	 * 
+	 *
 	 * @param index
 	 * @return TreeElement
 	 */
@@ -89,7 +89,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
 	/**
 	 * get value of attribute with namespace:name' in the vector
-	 * 
+	 *
 	 * @param index
 	 * @return String
 	 */
@@ -104,25 +104,25 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
 	public abstract int getMult();
 
-	//Support? 
-	public abstract AbstractTreeElement getParent();
+	//Support?
+	public abstract AbstractTreeElement<?> getParent();
 
 	public abstract IAnswerData getValue();
 
 	public abstract int getDataType();
-	
+
 	public abstract void clearCaches();
 
 	public abstract boolean isRelevant();
-	
+
 	public abstract String getNamespace();
-	
+
 	/**
 	 * TODO: Worst method name ever. Don't use this unless you know what's up.
-	 * 
+	 *
 	 * @param name
-	 * @param mult 
-	 * @param predicates possibly list of predicates to be evaluated. predicates will be removed from list if they are 
+	 * @param mult
+	 * @param predicates possibly list of predicates to be evaluated. predicates will be removed from list if they are
 	 * able to be evaluated
 	 * @param evalContext
 	 * @return

@@ -19,7 +19,10 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import org.javarosa.core.model.instance.TreeElement;
@@ -57,7 +60,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String textID; /* The id (ref) pointing to the localized values of (pic-URIs,audio-URIs,text) */
 	private String helpInnerText;
 
-	private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>(0);
+	private ArrayList<TreeElement> optAdditionalAttributes;
 
 	private Vector<SelectChoice> choices;
 	private ItemsetBinding dynamicChoices;
@@ -122,19 +125,26 @@ public class QuestionDef implements IFormElement, Localizable {
 
 
 	public void setAdditionalAttribute(String namespace, String name, String value) {
-		TreeElement.setAttribute(null, additionalAttributes, namespace, name, value);
+		if ( optAdditionalAttributes == null ) {
+			optAdditionalAttributes = new ArrayList<TreeElement>(1);
+		}
+		TreeElement.setAttribute(null, optAdditionalAttributes, namespace, name, value);
 	}
 
 	public String getAdditionalAttribute(String namespace, String name) {
-		TreeElement e = TreeElement.getAttribute(additionalAttributes, namespace, name);
+		TreeElement e = TreeElement.getAttribute(optAdditionalAttributes, namespace, name);
 		if ( e != null ) {
 			return e.getAttributeValue();
 		}
 		return null;
 	}
 
-	public Vector<TreeElement> getAdditionalAttributes() {
-		return additionalAttributes;
+	public List<TreeElement> getAdditionalAttributes() {
+		if ( optAdditionalAttributes == null ) {
+			return Collections.unmodifiableList(new ArrayList<TreeElement>(0));
+		} else {
+			return Collections.unmodifiableList(optAdditionalAttributes);
+		}
 	}
 
     public String getHelpTextID () {
@@ -226,11 +236,11 @@ public class QuestionDef implements IFormElement, Localizable {
     		alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
     	}
 
-	public Vector getChildren () {
+	public ArrayList<IFormElement> getChildren () {
 		return null;
 	}
 
-	public void setChildren (Vector v) {
+	public void setChildren (ArrayList<IFormElement> v) {
 		throw new IllegalStateException("Can't set children on question def");
 	}
 
@@ -258,7 +268,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
 		setControlType(ExtUtil.readInt(dis));
 
-		additionalAttributes = ExtUtil.readAttributes(dis, null);
+		optAdditionalAttributes = ExtUtil.readAttributes(dis, null);
 
 		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
 		for (int i = 0; i < getNumChoices(); i++) {
@@ -283,7 +293,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
 		ExtUtil.writeNumeric(dos, getControlType());
 
-		ExtUtil.writeAttributes(dos, additionalAttributes);
+		ExtUtil.writeAttributes(dos, optAdditionalAttributes);
 
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
 		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));

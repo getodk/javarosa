@@ -16,20 +16,27 @@
 
 package org.javarosa.core.util.externalizable;
 
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.services.PrototypeManager;
-import org.javarosa.core.util.CacheTable;
-import org.javarosa.core.util.OrderedMap;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.UTFDataFormatException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.ICacheTable;
+import org.javarosa.core.util.OrderedMap;
+
 public class ExtUtil {
 	public static boolean interning = true;
-	public static CacheTable<String> stringCache;
+	public static ICacheTable<String> stringCache;
 	public static byte[] serialize (Object o) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -160,7 +167,11 @@ public class ExtUtil {
 		}
 	}
 
-	public static void writeAttributes(DataOutputStream out, Vector<TreeElement> attributes) throws IOException {
+	public static void writeAttributes(DataOutputStream out, ArrayList<TreeElement> attributes) throws IOException {
+		if ( attributes == null ) {
+			ExtUtil.writeNumeric(out,0);
+			return;
+		}
 		ExtUtil.writeNumeric(out,  attributes.size());
 		for ( TreeElement e : attributes ) {
 			ExtUtil.write(out, e.getNamespace());
@@ -282,9 +293,12 @@ public class ExtUtil {
 		return ints;
 	}
 
-	public static Vector<TreeElement> readAttributes(DataInputStream in, TreeElement parent) throws IOException {
+	public static ArrayList<TreeElement> readAttributes(DataInputStream in, TreeElement parent) throws IOException {
 		int size = (int) ExtUtil.readNumeric(in);
-		Vector<TreeElement> attributes = new Vector<TreeElement>(size);
+		if ( size == 0 ) {
+			return null;
+		}
+		ArrayList<TreeElement> attributes = new ArrayList<TreeElement>(size);
 		for ( int i = 0 ; i < size; ++i ) {
 			String namespace = ExtUtil.readString(in);
 			String name = ExtUtil.readString(in);
@@ -292,7 +306,7 @@ public class ExtUtil {
 
 			TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
 			attr.setParent(parent);
-			attributes.addElement(attr);
+			attributes.add(attr);
 		}
 		return attributes;
 	}
@@ -490,7 +504,7 @@ public class ExtUtil {
 	}
 	////
 
-	public static void attachCacheTable(CacheTable<String> stringCache) {
+	public static void attachCacheTable(ICacheTable<String> stringCache) {
 		ExtUtil.stringCache = stringCache;
 	}
 }

@@ -16,6 +16,7 @@
 
 package org.javarosa.form.api;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
@@ -219,7 +220,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         }
     }
 
-    public Vector<TreeElement> getBindAttributes() {
+    public ArrayList<TreeElement> getBindAttributes() {
     	return mTreeElement.getBindAttributes();
     }
     public Vector<SelectChoice> getSelectChoices() {

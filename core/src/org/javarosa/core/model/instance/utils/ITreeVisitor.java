@@ -31,5 +31,5 @@ import org.javarosa.core.model.utils.IInstanceVisitor;
  */
 public interface ITreeVisitor extends IInstanceVisitor {
 	public void visit(FormInstance tree);
-	public void visit(AbstractTreeElement element);
+	public void visit(AbstractTreeElement<?> element);
 }

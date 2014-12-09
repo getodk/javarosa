@@ -19,6 +19,7 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.Condition;
@@ -65,7 +66,7 @@ public class DataBinding  implements Externalizable {
 	private String preloadParams;
 	public String constraintMessage;
 
-	private Vector<TreeElement> additionalAttrs = new Vector<TreeElement>(0);
+	private ArrayList<TreeElement> additionalAttrs = new ArrayList<TreeElement>(0);
 
 	public DataBinding () {
 		relevantAbsolute = true;
@@ -147,7 +148,7 @@ public class DataBinding  implements Externalizable {
 		TreeElement.setAttribute(null, additionalAttrs, namespace, name, value);
 	}
 
-	public Vector<TreeElement> getAdditionalAttributes() {
+	public ArrayList<TreeElement> getAdditionalAttributes() {
 		return additionalAttrs;
 	}
 

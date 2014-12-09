@@ -203,8 +203,8 @@ public class FormOverview {
 			// Clayton Sims - Jun 24, 2009 : Yeah, that change broke things.
 			// For now, we won't bother to print out anything that isn't
 			// a condition.
-			if(f.triggerables.elementAt(i) instanceof Condition) {
-			Condition c = (Condition)f.triggerables.elementAt(i);
+			if(f.triggerables.get(i) instanceof Condition) {
+			Condition c = (Condition)f.triggerables.get(i);
 
 			if (c.trueAction == action) {
 				for (int j = 0; j < c.targets.size() && expr == null; j++) {
