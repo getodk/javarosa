@@ -1,17 +1,15 @@
 /**
- * 
+ *
  */
 package org.javarosa.core.model.instance;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.Vector;
 
 import org.javarosa.core.util.ArrayUtilities;
-import org.javarosa.core.util.CacheTable;
-import org.javarosa.core.util.DataUtil;
+import org.javarosa.core.util.ICacheTable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -25,21 +23,21 @@ import org.javarosa.xpath.expr.XPathExpression;
  */
 public class TreeReferenceLevel implements Externalizable {
 	public static final int MULT_UNINIT = -16;
-	
+
 	private String name;
 	private int multiplicity = MULT_UNINIT;
 	private Vector<XPathExpression> predicates;
-	
-	private static CacheTable<TreeReferenceLevel> refs;
-	
-	public static void attachCacheTable(CacheTable<TreeReferenceLevel> refs) {
-		TreeReferenceLevel.refs = refs; 
+
+	private static ICacheTable<TreeReferenceLevel> refs;
+
+	public static void attachCacheTable(ICacheTable<TreeReferenceLevel> refs) {
+		TreeReferenceLevel.refs = refs;
 	}
 
 	public TreeReferenceLevel() {
 	}
-	
-	
+
+
 	public TreeReferenceLevel(String name, int multiplicity, Vector<XPathExpression> predicates) {
 		this.name = name;
 		this.multiplicity = multiplicity;
@@ -70,7 +68,7 @@ public class TreeReferenceLevel implements Externalizable {
 	public Vector<XPathExpression> getPredicates() {
 		return this.predicates;
 	}
-	
+
 	public TreeReferenceLevel shallowCopy() {
 		return new TreeReferenceLevel(name, multiplicity, ArrayUtilities.vectorCopy(predicates)).intern();
 	}
@@ -93,7 +91,7 @@ public class TreeReferenceLevel implements Externalizable {
 		ExtUtil.writeNumeric(out, multiplicity);
 		ExtUtil.write(out, new ExtWrapListPoly(ExtUtil.emptyIfNull(predicates)));
 	}
-	
+
 	public int hashCode() {
 		int predPart = 0;
 		if(predicates != null) {
@@ -101,10 +99,10 @@ public class TreeReferenceLevel implements Externalizable {
 				predPart ^= xpe.hashCode();
 			}
 		}
-		
-		return name.hashCode() ^ multiplicity ^ predPart; 
+
+		return name.hashCode() ^ multiplicity ^ predPart;
 	}
-	
+
 	public boolean equals(Object o) {
 		if(!(o instanceof TreeReferenceLevel)) {
 			return false;
@@ -114,7 +112,7 @@ public class TreeReferenceLevel implements Externalizable {
 		if(name == null && l.name != null) { return false;}
 		if(!name.equals(l.name)) { return false;}
 		if(predicates == null && l.predicates == null) { return true; }
-		
+
 		if((predicates == null && l.predicates != null) || (l.predicates == null && predicates != null)) { return false; }
 		if(predicates.size() != l.predicates.size()) { return false;}
 		for(int i = 0 ; i < predicates.size() ; ++i) {
@@ -122,7 +120,7 @@ public class TreeReferenceLevel implements Externalizable {
 		}
 		return true;
 	}
-	
+
 	public static boolean treeRefLevelInterningEnabled = true;
 	public TreeReferenceLevel intern() {
 		if(!treeRefLevelInterningEnabled || refs == null) {

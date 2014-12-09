@@ -8,7 +8,7 @@ package org.javarosa.core.model.instance;
  *
  */
 public class InstanceInitializationFactory {
-	public AbstractTreeElement generateRoot(DataInstance instance) {
+	public AbstractTreeElement<?> generateRoot(DataInstance<?> instance) {
 		return null;
 	}
 }

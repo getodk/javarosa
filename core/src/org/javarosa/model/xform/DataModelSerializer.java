@@ -59,9 +59,9 @@ import org.kxml2.io.KXmlSerializer;
 		 * (non-Javadoc)
 		 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
 		 */
-		public void serialize(DataInstance instance, TreeReference base) throws IOException {
+		public void serialize(DataInstance<?> instance, TreeReference base) throws IOException {
 			//TODO: Namespaces?
-			AbstractTreeElement root;
+			AbstractTreeElement<?> root;
 			if(base == null) {
 				root = instance.getRoot();
 			} else {
@@ -73,7 +73,7 @@ import org.kxml2.io.KXmlSerializer;
 
 			for (int i = 0; i< root.getNumChildren(); i++){
 				//write children
-				AbstractTreeElement childAt = root.getChildAt(i);
+				AbstractTreeElement<?> childAt = root.getChildAt(i);
 				serializeNode(childAt);
 			}
 
@@ -82,7 +82,7 @@ import org.kxml2.io.KXmlSerializer;
 			serializer.flush();
 		}
 
-		public void serializeNode (AbstractTreeElement instanceNode) throws IOException {
+		public void serializeNode (AbstractTreeElement<?> instanceNode) throws IOException {
 			//don't serialize template nodes or non-relevant nodes
 			if (!instanceNode.isRelevant() || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE) {
 				return;

@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.CacheTable;
+import org.javarosa.core.util.ICacheTable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -52,9 +52,9 @@ public class XPathStep implements Externalizable {
 	public static final int TEST_TYPE_COMMENT = 5;
 	public static final int TEST_TYPE_PROCESSING_INSTRUCTION = 6;
 
-	private static CacheTable<XPathStep> refs;
+	private static ICacheTable<XPathStep> refs;
 
-	public static void attachCacheTable(CacheTable<XPathStep> refs) {
+	public static void attachCacheTable(ICacheTable<XPathStep> refs) {
 		XPathStep.refs = refs;
 	}
 

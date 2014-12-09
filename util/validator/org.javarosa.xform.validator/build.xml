@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="javarosa-validator-gui" default="compile">
-	
+
 	<property name="base.dir" location="." />
 	<property name="root.dir" location="../../../" />
 	<property name="dir.lib.root" location="${root.dir}" />
@@ -9,24 +9,24 @@
 	<property name="build.debug" value="on" />
 	<property name="build.deprecation" value="on" />
 
-	<property name="compile.source" value="true" />	
-		
+	<property name="compile.source" value="true" />
+
 	<target name="init">
 		<tstamp/>
 		<tstamp>
 			<format property="YEAR" pattern="yyyy" />
 		</tstamp>
-			
+
 		<condition property="compile.from.source.true">
 			<equals arg1="${compile.source}" arg2="true" />
-		</condition>		
+		</condition>
 	</target>
-		
+
 	<target name="buildcore" if="compile.from.source.true">
 		<ant antfile="${root.dir}/core/build.xml" target="package" inheritAll="false" inheritRefs="false" />
 		<copy file="${root.dir}/core/dist/javarosa-libraries.jar" todir="${base.dir}/tools/" />
 	</target>
-	
+
 	<target name="buildClean" depends="clean,compile" />
 
 	<target name="clean">
@@ -38,7 +38,6 @@
 			<zipfileset dir="${build.dir}/classes" prefix="" />
 			<zipfileset src="${base.dir}/tools/javarosa-libraries.jar" />
 			<zipfileset src="${lib.dir}/kxml2-2.3.0.jar" />
-			<zipfileset src="${lib.dir}/regexp-me.jar" />
 			<zipfileset src="${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar" />
 			<fileset dir="${build.dir}/classes" />
 			<manifest>
@@ -48,7 +47,7 @@
 			</manifest>
 		</jar>
 	</target>
-	
+
 	<target name="javac" depends="init">
 		<mkdir dir="${build.dir}/classes"/>
 		<mkdir dir="${build.dir}/src"/>
@@ -57,15 +56,15 @@
 			<fileset dir="${root.dir}/util/schema-gen/src/"/>
 		</copy>
 
-		<javac 
+		<javac
 			srcdir="${build.dir}/src"
-			destdir="${build.dir}/classes" 
-			classpath="${base.dir}/tools/javarosa-libraries.jar:${lib.dir}/kxml2-2.3.0.jar:${lib.dir}/regexp-me.jar:${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar"
+			destdir="${build.dir}/classes"
+			classpath="${base.dir}/tools/javarosa-libraries.jar:${lib.dir}/kxml2-2.3.0.jar:${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar"
 			includeAntRuntime="false"
-			debug="${build.debug}" 
+			debug="${build.debug}"
 			deprecation="${build.deprecation}" />
 	</target>
-		
+
 	<target name="compile" depends="init, buildcore, jar" />
 
 </project>

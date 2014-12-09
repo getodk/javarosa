@@ -77,7 +77,7 @@ public class SetValueAction extends Action {
 			result = XPathFuncExpr.unpack(value.eval(model.getMainInstance(), context));
 		}
 
-		AbstractTreeElement node = context.resolveReference(qualifiedReference);
+		AbstractTreeElement<?> node = context.resolveReference(qualifiedReference);
 		if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
 		int dataType = node.getDataType();
 		IAnswerData val = Recalculate.wrapData(result, dataType);

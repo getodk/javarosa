@@ -19,7 +19,9 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 import org.javarosa.core.model.instance.FormInstance;
@@ -41,11 +43,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class GroupDef implements IFormElement, Localizable {
-	private Vector children;	/** A list of questions on a group. */
+	private ArrayList<IFormElement> children;	/** A list of questions on a group. */
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
-    private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>(0);
+    private ArrayList<TreeElement> optAdditionalAttributes;
 
 	private String labelInnerText;
 	private String appearanceAttr;
@@ -71,7 +73,7 @@ public class GroupDef implements IFormElement, Localizable {
 		this(Constants.NULL_ID, null, false);
 	}
 
-	public GroupDef(int id, Vector children, boolean repeat) {
+	public GroupDef(int id, ArrayList<IFormElement> children, boolean repeat) {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
@@ -95,38 +97,44 @@ public class GroupDef implements IFormElement, Localizable {
 	}
 
 	public void setAdditionalAttribute(String namespace, String name, String value) {
-		TreeElement.setAttribute(null, additionalAttributes, namespace, name, value);
+		if ( optAdditionalAttributes == null ) {
+			optAdditionalAttributes = new ArrayList<TreeElement>(1);
+		}
+		TreeElement.setAttribute(null, optAdditionalAttributes, namespace, name, value);
 	}
 
 	public String getAdditionalAttribute(String namespace, String name) {
-		TreeElement e = TreeElement.getAttribute(additionalAttributes, namespace, name);
+		TreeElement e = TreeElement.getAttribute(optAdditionalAttributes, namespace, name);
 		if ( e != null ) {
 			return e.getAttributeValue();
 		}
 		return null;
 	}
 
-	public Vector<TreeElement> getAdditionalAttributes() {
-		return additionalAttributes;
+	public List<TreeElement> getAdditionalAttributes() {
+		if ( optAdditionalAttributes == null ) {
+			return Collections.unmodifiableList(new ArrayList<TreeElement>(0));
+		}
+		return Collections.unmodifiableList(optAdditionalAttributes);
 	}
 
-	public Vector getChildren() {
+	public ArrayList<IFormElement> getChildren() {
 		return children;
 	}
 
-	public void setChildren (Vector children) {
-		this.children = (children == null ? new Vector(0) : children);
+	public void setChildren (ArrayList<IFormElement> children) {
+		this.children = (children == null ? new ArrayList<IFormElement>(0) : children);
 	}
 
 	public void addChild (IFormElement fe) {
-		children.addElement(fe);
+		children.add(fe);
 	}
 
 	public IFormElement getChild (int i) {
 		if (children == null || i >= children.size()) {
 			return null;
 		} else {
-			return (IFormElement)children.elementAt(i);
+			return (IFormElement)children.get(i);
 		}
 	}
 
@@ -159,8 +167,8 @@ public class GroupDef implements IFormElement, Localizable {
 	}
 
     public void localeChanged(String locale, Localizer localizer) {
-    	for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
-    		((IFormElement)e.nextElement()).localeChanged(locale, localizer);
+    	for ( IFormElement child : children ) {
+    		child.localeChanged(locale, localizer);
     	}
     }
 
@@ -181,9 +189,8 @@ public class GroupDef implements IFormElement, Localizable {
 	 */
 	public int getDeepChildCount() {
 		int total = 0;
-		Enumeration e = children.elements();
-		while(e.hasMoreElements()) {
-			total += ((IFormElement)e.nextElement()).getDeepChildCount();
+		for ( IFormElement child : children ) {
+			total += child.getDeepChildCount();
 		}
 		return total;
 	}
@@ -196,7 +203,8 @@ public class GroupDef implements IFormElement, Localizable {
 		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setRepeat(ExtUtil.readBool(dis));
-		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+		Vector<IFormElement> vChildren = (Vector<IFormElement>)ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+		children = new ArrayList<IFormElement>(vChildren);
 
 		noAddRemove = ExtUtil.readBool(dis);
 		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
@@ -211,7 +219,7 @@ public class GroupDef implements IFormElement, Localizable {
 		delHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 		mainHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 
-		additionalAttributes = ExtUtil.readAttributes(dis, null);
+		optAdditionalAttributes = ExtUtil.readAttributes(dis, null);
 	}
 
 	/** Write the group definition object to the supplied stream. */
@@ -222,7 +230,8 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.write(dos, new ExtWrapNullable(getTextID()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
 		ExtUtil.writeBool(dos, getRepeat());
-		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
+		Vector<IFormElement> vChildren =  new Vector<IFormElement>(getChildren());
+		ExtUtil.write(dos, new ExtWrapListPoly(vChildren));
 
 		ExtUtil.writeBool(dos, noAddRemove);
 		ExtUtil.write(dos, new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
@@ -237,7 +246,7 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(delHeader));
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(mainHeader));
 
-		ExtUtil.writeAttributes(dos, additionalAttributes);
+		ExtUtil.writeAttributes(dos, optAdditionalAttributes);
 	}
 
 	public void registerStateObserver (FormElementStateListener qsl) {

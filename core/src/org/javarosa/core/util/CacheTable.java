@@ -12,7 +12,7 @@ import java.util.Vector;
  * @author ctsims
  *
  */
-public class CacheTable<K> {
+public class CacheTable<K> implements ICacheTable<K> {
 	int totalAdditions = 0;
 
 	private Hashtable<Integer, WeakReference> currentTable;
@@ -94,6 +94,12 @@ public class CacheTable<K> {
 		registerCache(this);
 	}
 
+	public void reset() {
+		synchronized(this) {
+			currentTable.clear();
+		}
+	}
+
 	public K intern(K k) {
 		synchronized(this) {
 			int hash = k.hashCode();
@@ -112,7 +118,7 @@ public class CacheTable<K> {
 	}
 
 
-	public K retrieve(int key) {
+	private K retrieve(int key) {
 		synchronized(this) {
 			if(!currentTable.containsKey(DataUtil.integer(key))) { return null; }
 			K retVal = (K)currentTable.get(DataUtil.integer(key)).get();
@@ -121,7 +127,7 @@ public class CacheTable<K> {
 		}
 	}
 
-	public void register(int key, K item) {
+	private void register(int key, K item) {
 		synchronized(this) {
 			currentTable.put(DataUtil.integer(key), new WeakReference(item));
 			totalAdditions++;

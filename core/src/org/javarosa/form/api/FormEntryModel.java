@@ -23,6 +23,7 @@ import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -768,10 +769,10 @@ public class FormEntryModel {
 			}
 		}
 
-    	Vector<IFormElement> children = parent.getChildren();
+    	ArrayList<IFormElement> children = parent.getChildren();
     	if(children == null) { return false; }
-    	for(Enumeration en = children.elements() ; en.hasMoreElements() ;) {
-    		if(containsRepeatGuesses((IFormElement)en.nextElement())) {return true;}
+    	for ( IFormElement child : children ) {
+    		if(containsRepeatGuesses(child)) {return true;}
     	}
     	return false;
 	}

@@ -16,9 +16,33 @@
 
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Stack;
+import java.util.Vector;
+
+import org.javarosa.core.model.Action;
+import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataBinding;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.condition.*;
+import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.Constraint;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -29,7 +53,7 @@ import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
-import org.javarosa.core.util.CacheTable;
+import org.javarosa.core.util.ICacheTable;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.PrefixTreeNode;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -50,11 +74,6 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.*;
-import java.util.HashMap;
-import java.util.Stack;
-import java.util.Vector;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -265,7 +284,7 @@ public class XFormParser {
 
 	XFormParserReporter reporter = new XFormParserReporter();
 
-	CacheTable<String> stringCache;
+	ICacheTable<String> stringCache;
 
 	public XFormParser(Reader reader) {
 		_reader = reader;
@@ -313,7 +332,7 @@ public class XFormParser {
 		return getXMLDocument(reader, null);
 	}
 
-	public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache) throws IOException  {
+	public static Document getXMLDocument(Reader reader, ICacheTable<String> stringCache) throws IOException  {
 		Document doc = new Document();
 
 		try{
@@ -1377,7 +1396,7 @@ public class XFormParser {
 
 			if (group != null) {
 				if (!group.getRepeat() && group.getChildren().size() == 1) {
-					IFormElement grandchild = (IFormElement)group.getChildren().elementAt(0);
+					IFormElement grandchild = (IFormElement)group.getChildren().get(0);
 					GroupDef repeat = null;
 					if (grandchild instanceof GroupDef)
 						repeat = (GroupDef)grandchild;
@@ -1397,7 +1416,7 @@ public class XFormParser {
 						//don't merge binding; repeat will always already have one
 
 						//replace group with repeat
-						fe.getChildren().setElementAt(repeat, i);
+						fe.getChildren().set(i, repeat);
 						group = repeat;
 					}
 				}
@@ -2261,7 +2280,7 @@ public class XFormParser {
 			return;
 
 		for (int i = 0; i < fe.getChildren().size(); i++) {
-			IFormElement child = fe.getChildren().elementAt(i);
+			IFormElement child = fe.getChildren().get(i);
 			IDataReference ref = null;
 			String type = null;
 
@@ -2297,7 +2316,7 @@ public class XFormParser {
 			return;
 
 		for (int i = 0; i < fe.getChildren().size(); i++) {
-			IFormElement child = fe.getChildren().elementAt(i);
+			IFormElement child = fe.getChildren().get(i);
 			boolean isRepeat = (child instanceof GroupDef && ((GroupDef)child).getRepeat());
 
 			//get bindings of current node and nearest enclosing repeat
@@ -2565,10 +2584,10 @@ public class XFormParser {
 			if (!vertices.contains(trigger))
 				vertices.addElement(trigger);
 
-			Vector<Triggerable> triggered = _f.triggerIndex.get(trigger);
+			ArrayList<Triggerable> triggered = _f.triggerIndex.get(trigger);
 			Vector<TreeReference> targets = new Vector<TreeReference>();
 			for (int i = 0; i < triggered.size(); i++) {
-				Triggerable t = (Triggerable)triggered.elementAt(i);
+				Triggerable t = (Triggerable)triggered.get(i);
 				for (int j = 0; j < t.getTargets().size(); j++) {
 					TreeReference target = t.getTargets().elementAt(j);
 					if (!targets.contains(target))
@@ -2817,7 +2836,7 @@ public class XFormParser {
 		return elementString;
 	}
 
-	public void setStringCache(CacheTable<String> stringCache) {
+	public void setStringCache(ICacheTable<String> stringCache) {
 		this.stringCache = stringCache;
 	}
 }
