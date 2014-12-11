@@ -35,15 +35,15 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 /**
  * A data binding is an object that represents how a
  * data element is to be used in a form entry interaction.
- * 
+ *
  * It contains a reference to where the data should be retreived
  * and stored, as well as the preload parameters, and the
  * conditional logic for the question.
- * 
+ *
  * The class relies on any Data References that are used
  * in a form to be registered with the FormDefRMSUtility's
  * prototype factory in order to properly deserialize.
- * 
+ *
  * @author Drew Roos
  *
  */
@@ -51,7 +51,7 @@ public class DataBinding  implements Externalizable {
 	private String id;
 	private IDataReference ref;
 	private int dataType;
-	
+
 	public Condition relevancyCondition;
 	public boolean relevantAbsolute;
 	public Condition requiredCondition;
@@ -60,26 +60,26 @@ public class DataBinding  implements Externalizable {
 	public boolean readonlyAbsolute;
 	public IConditionExpr constraint;
 	public Recalculate calculate;
-	
+
 	private String preload;
 	private String preloadParams;
 	public String constraintMessage;
-	
-	private Vector<TreeElement> additionalAttrs = new Vector<TreeElement>();
-	 
+
+	private Vector<TreeElement> additionalAttrs = new Vector<TreeElement>(0);
+
 	public DataBinding () {
 		relevantAbsolute = true;
 		requiredAbsolute = false;
 		readonlyAbsolute = false;
 	}
-	
+
 	/**
 	 * @return The data reference
 	 */
 	public IDataReference getReference() {
 		return ref;
 	}
-	
+
 	/**
 	 * @param ref the reference to set
 	 */
@@ -142,7 +142,7 @@ public class DataBinding  implements Externalizable {
 	public void setPreloadParams(String preloadParams) {
 		this.preloadParams = preloadParams;
 	}
-	
+
 	public void setAdditionalAttribute(String namespace, String name, String value) {
 		TreeElement.setAttribute(null, additionalAttrs, namespace, name, value);
 	}
@@ -160,8 +160,8 @@ public class DataBinding  implements Externalizable {
 		setPreload((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
 		setPreloadParams((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
 		ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged());
-		
-		//don't bother reading relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway		
+
+		//don't bother reading relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
 	}
 
 	/* (non-Javadoc)
@@ -176,6 +176,6 @@ public class DataBinding  implements Externalizable {
 
 		//don't bother writing relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
 	}
-	
-	
+
+
 }

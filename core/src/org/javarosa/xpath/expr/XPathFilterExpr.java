@@ -66,10 +66,10 @@ public class XPathFilterExpr extends XPathExpression {
 		if (o instanceof XPathFilterExpr) {
 			XPathFilterExpr fe = (XPathFilterExpr)o;
 
-			Vector a = new Vector();
+			Vector a = new Vector(predicates.length);
 			for (int i = 0; i < predicates.length; i++)
 				a.addElement(predicates[i]);
-			Vector b = new Vector();
+			Vector b = new Vector(fe.predicates.length);
 			for (int i = 0; i < fe.predicates.length; i++)
 				b.addElement(fe.predicates[i]);
 
@@ -89,7 +89,7 @@ public class XPathFilterExpr extends XPathExpression {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Vector v = new Vector();
+		Vector v = new Vector(predicates.length);
 		for (int i = 0; i < predicates.length; i++)
 			v.addElement(predicates[i]);
 

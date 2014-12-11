@@ -185,9 +185,9 @@ public class XFormAnswerDataParser {
 	}
 
 	private static Vector getSelections (String text, QuestionDef q) {
-		Vector v = new Vector();
 
 		Vector choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
+		Vector v = new Vector(choices.size()); // assume they are all still valid...
 		for (int i = 0; i < choices.size(); i++) {
 			Selection s = getSelection((String)choices.elementAt(i), q);
 			if (s != null)

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.javarosa.core.services.storage.util;
 
@@ -26,26 +26,26 @@ import org.javarosa.core.util.externalizable.Externalizable;
  *
  */
 public class DummyIndexedStorageUtility<T extends Persistable> implements IStorageUtilityIndexed<T> {
-	
+
 	private Hashtable<String, Hashtable<Object, Vector<Integer>>> meta;
-	
+
 	private Hashtable<Integer, T> data;
-	
+
 	int curCount;
-	
+
 	public DummyIndexedStorageUtility() {
 		meta = new Hashtable<String, Hashtable<Object, Vector<Integer>>>();
 		data = new Hashtable<Integer, T>();
 		curCount = 0;
 	}
-	
+
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.IStorageUtilityIndexed#getIDsForValue(java.lang.String, java.lang.Object)
 	 */
 	public Vector getIDsForValue(String fieldName, Object value) {
 		if(meta.get(fieldName) == null || meta.get(fieldName).get(value) == null) {
-			return new Vector<Integer>();
+			return new Vector<Integer>(0);
 		}
 		return meta.get(fieldName).get(value);
 	}
@@ -54,20 +54,20 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	 * @see org.javarosa.core.services.storage.IStorageUtilityIndexed#getRecordForValue(java.lang.String, java.lang.Object)
 	 */
 	public T getRecordForValue(String fieldName, Object value) throws NoSuchElementException, InvalidIndexException {
-		
+
 		if(meta.get(fieldName) == null) {
 			throw new NoSuchElementException("No record matching meta index " + fieldName + " with value " + value);
 		}
-		
+
 		Vector<Integer> matches = meta.get(fieldName).get(value);
-		
+
 		if(matches == null || matches.size() == 0) {
 			throw new NoSuchElementException("No record matching meta index " + fieldName + " with value " + value);
 		}
 		if(matches.size() > 1) {
 			throw new InvalidIndexException("Multiple records matching meta index " + fieldName + " with value " + value, fieldName);
 		}
-		
+
 		return data.get(matches.elementAt(0));
 	}
 
@@ -76,12 +76,12 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	 */
 	public int add(T e) throws StorageFullException {
 		data.put(DataUtil.integer(curCount),e);
-		
+
 		//This is not a legit pair of operations;
 		curCount++;
-		
+
 		syncMeta();
-		
+
 		return curCount - 1;
 	}
 
@@ -171,7 +171,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	 * @see org.javarosa.core.services.storage.IStorageUtility#readBytes(int)
 	 */
 	public byte[] readBytes(int id) {
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();		
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			data.get(DataUtil.integer(id)).writeExternal(new DataOutputStream(stream));
 			return stream.toByteArray();
@@ -185,7 +185,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	 */
 	public void remove(int id) {
 		data.remove(DataUtil.integer(id));
-		
+
 		syncMeta();
 	}
 
@@ -201,7 +201,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	 */
 	public void removeAll() {
 		data.clear();
-		
+
 		meta.clear();
 	}
 
@@ -223,12 +223,12 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 				removed.addElement(i);
 			}
 		}
-		for(Integer i : removed) { 
+		for(Integer i : removed) {
 			data.remove(i);
 		}
-		
+
 		syncMeta();
-		
+
 		return removed;
 	}
 
@@ -242,7 +242,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.IStorageUtility#repair()
 	 */
-	public void repair() { 
+	public void repair() {
 		//Unecessary!
 	}
 
@@ -266,13 +266,13 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 			this.add((T)p);
 		}
 	}
-	
+
 	private void syncMeta() {
 		meta.clear();
 		for(Enumeration en = data.keys(); en.hasMoreElements() ; ) {
 			Integer i = (Integer)en.nextElement();
 			Externalizable e = (Externalizable)data.get(i);
-			
+
 			if( e instanceof IMetaData ) {
 
 				IMetaData m = (IMetaData)e;
@@ -288,13 +288,13 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 				}
 				for(Enumeration keys = meta.keys() ; keys.hasMoreElements();) {
 					String key = (String)keys.nextElement();
-					
+
 					Object value = m.getMetaData(key);
-					
+
 					Hashtable<Object,Vector<Integer>> records = meta.get(key);
-					
+
 					if(!records.containsKey(value)) {
-						records.put(value, new Vector<Integer>());
+						records.put(value, new Vector<Integer>(1));
 					}
 					Vector<Integer> indices = records.get(value);
 					if(!indices.contains(i)) {
@@ -311,7 +311,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	}
 
 
-	Vector<String> dynamicIndices = new Vector<String>();
+	Vector<String> dynamicIndices = new Vector<String>(0);
 	public void registerIndex(String filterIndex) {
 		dynamicIndices.addElement(filterIndex);
 	}

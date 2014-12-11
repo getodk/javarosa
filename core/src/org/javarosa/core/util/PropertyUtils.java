@@ -27,7 +27,7 @@ public class PropertyUtils {
 	public static String initializeProperty(String propName, String defaultValue) {
 		Vector propVal = PropertyManager._().getProperty(propName);
 		if (propVal == null || propVal.size() == 0) {
-			propVal = new Vector();
+			propVal = new Vector(1);
 			propVal.addElement(defaultValue);
 			PropertyManager._().setProperty(propName, propVal);
 			//#if debug.output==verbose

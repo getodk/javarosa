@@ -57,7 +57,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String textID; /* The id (ref) pointing to the localized values of (pic-URIs,audio-URIs,text) */
 	private String helpInnerText;
 
-	private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>();
+	private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>(0);
 
 	private Vector<SelectChoice> choices;
 	private ItemsetBinding dynamicChoices;
@@ -71,7 +71,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	public QuestionDef (int id, int controlType) {
 		setID(id);
 		setControlType(controlType);
-		observers = new Vector();
+		observers = new Vector(0);
 	}
 
 	public int getID () {
@@ -149,7 +149,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
     public void addSelectChoice (SelectChoice choice) {
     	if (choices == null) {
-    		choices = new Vector<SelectChoice>();
+    		choices = new Vector<SelectChoice>(1);
     	}
     	choice.setIndex(choices.size());
     	choices.addElement(choice);

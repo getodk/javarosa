@@ -39,7 +39,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class MultiMessagePayload implements IDataPayload {
 	/** IDataPayload **/
-	Vector payloads = new Vector();
+	Vector payloads = new Vector(1);
 
 	/**
 	 * Note: Only useful for serialization.

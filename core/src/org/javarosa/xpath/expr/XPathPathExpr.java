@@ -176,7 +176,7 @@ public class XPathPathExpr extends XPathExpression {
 
 			if(step.predicates.length > 0) {
 				int refLevel = ref.getRefLevel();
-				Vector<XPathExpression> v = new Vector<XPathExpression>();
+				Vector<XPathExpression> v = new Vector<XPathExpression>(step.predicates.length);
 				for(int j = 0; j < step.predicates.length; j++)
 				{
 					v.addElement(step.predicates[j]);
@@ -416,7 +416,7 @@ public class XPathPathExpr extends XPathExpression {
 			ExtUtil.write(out, filtExpr);
 		}
 
-		Vector v = new Vector();
+		Vector v = new Vector(steps.length);
 		for (int i = 0; i < steps.length; i++)
 			v.addElement(steps[i]);
 		ExtUtil.write(out, new ExtWrapList(v));
