@@ -63,7 +63,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 	private void init() {
 		theSmsStr = null;
 		schema = null;
-		dataPointers = new Vector();
+		dataPointers = new Vector(0);
 		theSmsStr = "";
 	}
 

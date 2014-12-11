@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.javarosa.core.util;
 
@@ -28,31 +28,31 @@ import java.util.Vector;
  * MultiInputStream allows for concatenating multiple
  * input streams together to be read serially in the
  * order that they were added.
- * 
+ *
  * A MultiInputStream must have all of its component
  * streams added to it before it can be read from. Once
  * the stream is ready, it should be prepare()d before
  * the first read.
- * 
+ *
  * @author Clayton Sims
- * @date Dec 18, 2008 
+ * @date Dec 18, 2008
  *
  */
 public class MultiInputStream extends InputStream {
 
 	/** InputStream **/
-	Vector streams = new Vector();
-	
+	Vector streams = new Vector(1);
+
 	int currentStream = -1;
-	
+
 	public void addStream(InputStream stream) {
 		streams.addElement(stream);
 	}
-	
+
 	/**
 	 * Finalize the stream and allow it to be read
 	 * from.
-	 * 
+	 *
 	 * @return True if the stream is ready to be read
 	 * from. False if the stream couldn't be prepared
 	 * because it was empty.
@@ -66,7 +66,7 @@ public class MultiInputStream extends InputStream {
 		}
 		return true;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.io.InputStream#read()
 	 */
@@ -76,21 +76,21 @@ public class MultiInputStream extends InputStream {
 		}
 		InputStream cur = ((InputStream)streams.elementAt(currentStream));
 		int next = cur.read();
-		
+
 		if(next != -1 ) {
 			return next;
 		}
-		
+
 		//Otherwise, end of Stream
-		
-		//Loop through the available streams until we read something that isn't 
+
+		//Loop through the available streams until we read something that isn't
 		//an end of stream
 		while(next == -1 && currentStream + 1 < streams.size()) {
 			currentStream++;
 			cur = ((InputStream)streams.elementAt(currentStream));
 			next = cur.read();
 		}
-		
+
 		//Will be either a valid value or -1 if we've run out of streams.
 		return next;
 	}

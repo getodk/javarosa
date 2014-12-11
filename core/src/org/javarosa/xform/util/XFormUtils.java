@@ -130,7 +130,7 @@ public class XFormUtils {
 	/////Parser Attribute warning stuff
 
 	public static Vector getAttributeList(Element e){
-		Vector atts = new Vector();
+		Vector atts = new Vector(e.getAttributeCount());
 		for(int i=0;i<e.getAttributeCount();i++){
 			atts.addElement(e.getAttributeName(i));
 		}

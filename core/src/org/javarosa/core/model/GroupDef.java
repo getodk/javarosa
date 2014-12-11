@@ -45,7 +45,7 @@ public class GroupDef implements IFormElement, Localizable {
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
-    private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>();
+    private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>(0);
 
 	private String labelInnerText;
 	private String appearanceAttr;
@@ -75,7 +75,7 @@ public class GroupDef implements IFormElement, Localizable {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
-		observers = new Vector();
+		observers = new Vector(0);
 	}
 
 	public int getID () {
@@ -115,7 +115,7 @@ public class GroupDef implements IFormElement, Localizable {
 	}
 
 	public void setChildren (Vector children) {
-		this.children = (children == null ? new Vector() : children);
+		this.children = (children == null ? new Vector(0) : children);
 	}
 
 	public void addChild (IFormElement fe) {

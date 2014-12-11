@@ -31,7 +31,7 @@ import org.javarosa.core.services.storage.StorageManager;
  * from persistent storage.
  *
  * Which properties are allowed, and what they can be set to, can be specified by an implementation of
- * the IPropertyRules interface, any number of which can be registered with a property manager. All 
+ * the IPropertyRules interface, any number of which can be registered with a property manager. All
  * property rules are inclusive, and can only increase the number of potential properties or property
  * values.
  *
@@ -39,52 +39,52 @@ import org.javarosa.core.services.storage.StorageManager;
  *
  */
 public class PropertyManager implements IPropertyManager {
-	
+
 	///// manage global property manager /////
-	
+
     private static IPropertyManager instance; //a global instance of the property manager
 
     public static void setPropertyManager (IPropertyManager pm) {
     	instance = pm;
     }
-    
+
     public static void initDefaultPropertyManager () {
-		StorageManager.registerStorage(PropertyManager.STORAGE_KEY, Property.class);			
+		StorageManager.registerStorage(PropertyManager.STORAGE_KEY, Property.class);
    		setPropertyManager(new PropertyManager());
     }
-    	
+
     public static IPropertyManager _ () {
    		if (instance == null) {
    			initDefaultPropertyManager();
    		}
   		return instance;
     }
-    
+
     //////////////////////////////////////////
-    
+
 	/**
 	 * The name for the Persistent storage utility name
 	 */
     public static final String STORAGE_KEY = "PROPERTY";
-    
+
     /**
-     * The list of rules 
+     * The list of rules
      */
     private Vector rulesList;
-    
+
     /**
      * The persistent storage utility
      */
     private IStorageUtilityIndexed properties;
-    
+
     /**
      * Constructor for this PropertyManager
      */
     public PropertyManager() {
     	this.properties = (IStorageUtilityIndexed)StorageManager.getStorage(STORAGE_KEY);
-    	rulesList = new Vector();
+    	rulesList = new Vector(0);
     }
-    
+
     /**
      * Retrieves the singular property specified, as long as it exists in one of the current rulesets
      *
@@ -108,7 +108,7 @@ public class PropertyManager implements IPropertyManager {
         return retVal;
     }
 
-    
+
     /**
      * Retrieves the property specified, as long as it exists in one of the current rulesets
      *
@@ -137,11 +137,11 @@ public class PropertyManager implements IPropertyManager {
      * @param propertyValue The value that the property will be set to
      */
     public void setProperty(String propertyName, String propertyValue) {
-        Vector wrapper = new Vector();
+        Vector wrapper = new Vector(1);
         wrapper.addElement(propertyValue);
         setProperty(propertyName, wrapper);
     }
-    
+
     /**
      * Sets the given property to the given vector value, if both are allowed by any existing ruleset
      * @param propertyName The property to be set
@@ -163,7 +163,7 @@ public class PropertyManager implements IPropertyManager {
                 // RL - checkPropertyAllowed is implicit in checkValueAllowed
                 if (!checkValueAllowed(propertyName, (String)en.nextElement())) {
                     valid = false;
-                } 
+                }
             }
             if(valid) {
                 writeValue(propertyName, propertyValue);
@@ -177,7 +177,7 @@ public class PropertyManager implements IPropertyManager {
         }
 
     }
-    
+
     private boolean vectorEquals(Vector v1, Vector v2) {
     	if(v1.size() != v2.size()) {
     		return false;
@@ -204,18 +204,18 @@ public class PropertyManager implements IPropertyManager {
      * Sets the rules that should be used by this PropertyManager, removing any other
      * existing rules sets.
      *
-     * @param rules The rules to be used. 
+     * @param rules The rules to be used.
      */
     public void setRules(IPropertyRules rules) {
         this.rulesList.removeAllElements();
         this.rulesList.addElement(rules);
     }
-    
+
     /**
      * Adds a set of rules to be used by this PropertyManager.
      * Note that rules sets are inclusive, they add new possible
      * values, never remove possible values.
-     * 
+     *
      * @param rules The set of rules to be added to the permitted list
      */
     public void addRules(IPropertyRules rules) {
@@ -223,10 +223,10 @@ public class PropertyManager implements IPropertyManager {
     		this.rulesList.addElement(rules);
     	}
     }
-    
+
     /**
      * Checks that a property is permitted to exist by any of the existing rules sets
-     * 
+     *
      * @param propertyName The name of the property to be set
      * @return true if the property is permitted to store values. false otherwise
      */
@@ -246,10 +246,10 @@ public class PropertyManager implements IPropertyManager {
     		return allowed;
     	}
     }
-    
+
     /**
      * Checks that a property is allowed to store a certain value.
-     * 
+     *
      * @param propertyName The name of the property to be set
      * @param propertyValue The value to be stored in the given property
      * @return true if the property given is allowed to be stored. false otherwise.
@@ -272,18 +272,18 @@ public class PropertyManager implements IPropertyManager {
 			return allowed;
 		}
 	}
-    
+
     /**
      * Identifies the property rules set that the property belongs to, and notifies
      * it about the property change.
-     * 
-     * @param property The property that has been changed 
+     *
+     * @param property The property that has been changed
      */
     private void notifyChanges(String property) {
-    	if(rulesList.size() ==0 ) { 
+    	if(rulesList.size() ==0 ) {
     		return;
-    	} 
-    	
+    	}
+
     	boolean notified = false;
     	Enumeration rules = rulesList.elements();
     	while(rules.hasMoreElements() && !notified) {
@@ -292,7 +292,7 @@ public class PropertyManager implements IPropertyManager {
     			therules.handlePropertyChanges(property);
     		}
     	}
-    	
+
     }
 
     public Vector getValue (String name) {
@@ -303,7 +303,7 @@ public class PropertyManager implements IPropertyManager {
     		return null;
     	}
     }
-    
+
     public void writeValue(String propertyName, Vector value) {
         Property theProp = new Property();
         theProp.name = propertyName;
@@ -313,12 +313,12 @@ public class PropertyManager implements IPropertyManager {
         if (IDs.size() == 1) {
         	theProp.setID(((Integer)IDs.elementAt(0)).intValue());
         }
-        
+
         try {
         	properties.write(theProp);
         } catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [properties]"); //TODO: handle this
         }
     }
-    
+
 }

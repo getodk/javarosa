@@ -284,7 +284,7 @@ public class ExtUtil {
 
 	public static Vector<TreeElement> readAttributes(DataInputStream in, TreeElement parent) throws IOException {
 		int size = (int) ExtUtil.readNumeric(in);
-		Vector<TreeElement> attributes = new Vector<TreeElement>();
+		Vector<TreeElement> attributes = new Vector<TreeElement>(size);
 		for ( int i = 0 ; i < size; ++i ) {
 			String namespace = ExtUtil.readString(in);
 			String name = ExtUtil.readString(in);
@@ -356,7 +356,7 @@ public class ExtUtil {
 	}
 
 	public static Vector emptyIfNull (Vector v) {
-		return v == null ? new Vector() : v;
+		return v == null ? new Vector(0) : v;
 	}
 
 	public static HashMap emptyIfNull (HashMap h) {
@@ -368,6 +368,9 @@ public class ExtUtil {
 	}
 
 	public static boolean equals (Object a, Object b) {
+		if ( a == b ) {
+			return true;
+		}
 		a = unwrap(a);
 		b = unwrap(b);
 
@@ -383,6 +386,9 @@ public class ExtUtil {
 	}
 
 	public static boolean vectorEquals (Vector a, Vector b) {
+		if ( a == b ) {
+			return true;
+		}
 		if (a.size() != b.size()) {
 			return false;
 		} else {
@@ -397,6 +403,9 @@ public class ExtUtil {
 	}
 
 	public static boolean arrayEquals (Object[] a, Object[] b) {
+		if ( a == b ) {
+			return true;
+		}
 		if (a.length != b.length) {
 			return false;
 		} else {
@@ -411,6 +420,9 @@ public class ExtUtil {
 	}
 
 	public static boolean hashMapEquals(HashMap a, HashMap b) {
+		if ( a == b ) {
+			return true;
+		}
 		if (a.size() != b.size()) {
 			return false;
 		} else if (a instanceof OrderedMap != b instanceof OrderedMap) {
