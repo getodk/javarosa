@@ -111,7 +111,7 @@ public class FormDefTest extends TestCase {
 			QuestionDef q = fpi.getCurrentQuestion();
 			if(q==null || q.getTextID() == null || q.getTextID() == "")continue;
 			if(q.getTextID().equals("constraint-test")){
-				int response = fec.answerQuestion(ans);
+				int response = fec.answerQuestion(ans, false, false);
 				if(response == fec.ANSWER_CONSTRAINT_VIOLATED){
 					fail("Answer Constraint test failed.");
 				}else if(response == fec.ANSWER_OK){

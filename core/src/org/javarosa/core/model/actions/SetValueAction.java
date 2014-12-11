@@ -82,7 +82,7 @@ public class SetValueAction extends Action {
 		int dataType = node.getDataType();
 		IAnswerData val = Recalculate.wrapData(result, dataType);
 
-		model.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference);
+		model.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference, true, true);
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

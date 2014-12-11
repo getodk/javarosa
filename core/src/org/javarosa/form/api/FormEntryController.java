@@ -62,8 +62,8 @@ public class FormEntryController {
      * @param data
      * @return
      */
-    public int answerQuestion(IAnswerData data) {
-        return answerQuestion(model.getFormIndex(), data);
+    public int answerQuestion(IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+        return answerQuestion(model.getFormIndex(), data, trustPreviousValue, cascadeToGroupChildren);
     }
 
 
@@ -75,7 +75,7 @@ public class FormEntryController {
      * @param data
      * @return OK if save was successful, error if a constraint was violated.
      */
-    public int answerQuestion(FormIndex index, IAnswerData data) {
+    public int answerQuestion(FormIndex index, IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
     	QuestionDef q = model.getQuestionPrompt(index).getQuestion();
         if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
@@ -89,14 +89,14 @@ public class FormEntryController {
         } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
             return ANSWER_CONSTRAINT_VIOLATED;
         } else if (!complexQuestion) {
-            commitAnswer(element, index, data);
+            commitAnswer(element, index, data, trustPreviousValue, cascadeToGroupChildren);
             return ANSWER_OK;
         } else if (complexQuestion && hasConstraints) {
             //TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
             throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
         } else {
         	try {
-				model.getForm().copyItemsetAnswer(q, element, data);
+				model.getForm().copyItemsetAnswer(q, element, data, cascadeToGroupChildren);
 			} catch (InvalidReferenceException ire) {
 				ire.printStackTrace();
 				throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
@@ -116,12 +116,12 @@ public class FormEntryController {
      * @param data
      * @return true if saved successfully, false otherwise.
      */
-    public boolean saveAnswer(FormIndex index, IAnswerData data) {
+    public boolean saveAnswer(FormIndex index, IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
         if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
         }
         TreeElement element = model.getTreeElement(index);
-        return commitAnswer(element, index, data);
+        return commitAnswer(element, index, data, trustPreviousValue, cascadeToGroupChildren);
     }
 
 
@@ -131,12 +131,11 @@ public class FormEntryController {
      * you're doing. For normal form filling you should always use
      * answerQuestion().
      *
-     * @param index
      * @param data
      * @return true if saved successfully, false otherwise.
      */
-    public boolean saveAnswer(IAnswerData data) {
-        return saveAnswer(model.getFormIndex(), data);
+    public boolean saveAnswer(IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+        return saveAnswer(model.getFormIndex(), data, trustPreviousValue, cascadeToGroupChildren);
     }
 
 
@@ -148,11 +147,11 @@ public class FormEntryController {
      * @param data
      * @return true if saved successfully, false otherwise
      */
-    private boolean commitAnswer(TreeElement element, FormIndex index, IAnswerData data) {
+    private boolean commitAnswer(TreeElement element, FormIndex index, IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
         if (data != null || element.getValue() != null) {
             // we should check if the data to be saved is already the same as
             // the data in the model, but we can't (no IAnswerData.equals())
-            model.getForm().setValue(data, index.getReference(), element);
+            model.getForm().setValue(data, index.getReference(), element, trustPreviousValue, cascadeToGroupChildren);
             return true;
         } else {
             return false;
@@ -242,7 +241,6 @@ public class FormEntryController {
      * Creates a new repeated instance of the group referenced by the current
      * FormIndex.
      *
-     * @param questionIndex
      */
     public void newRepeat() {
         newRepeat(model.getFormIndex());
@@ -265,7 +263,6 @@ public class FormEntryController {
      * Deletes a repeated instance of a group referenced by the current
      * FormIndex.
      *
-     * @param questionIndex
      * @return
      */
     public FormIndex deleteRepeat() {
