@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2009 JavaRosa
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -35,6 +35,7 @@ import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.*;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
 
 import java.io.DataInputStream;
@@ -290,15 +291,52 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		throw new RuntimeException("method not implemented");
 	}
 
-	public void setValue(IAnswerData data, TreeReference ref) {
-		setValue(data, ref, mainInstance.resolveReference(ref));
+	public void setValue(IAnswerData data, TreeReference ref, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+		setValue(data, ref, mainInstance.resolveReference(ref), trustPreviousValue, cascadeToGroupChildren);
 	}
 
-	public void setValue(IAnswerData data, TreeReference ref, TreeElement node) {
-		setAnswer(data, node);
-		triggerTriggerables(ref);
-		//TODO: pre-populate fix-count repeats here?
-	}
+  public void setValue(IAnswerData data, TreeReference ref, TreeElement node, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+    // SCTO-2286 : Do not act if the data haven't changed.
+    // Use the serialized form of the data to avoid type conversions and errors from those.
+    IAnswerData oldValue = node.getValue();
+    IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
+    if (!trustPreviousValue || !objectEquals(answerDataSerializer.serializeAnswerData(oldValue), answerDataSerializer.serializeAnswerData(data))) {
+      setAnswer(data, node);
+      triggerTriggerables(ref, cascadeToGroupChildren);
+    }
+    //TODO: pre-populate fix-count repeats here?
+  }
+
+  /**
+   * Copied from commons-lang 2.6: For reviewing purposes only.
+   *
+   * <p>Compares two objects for equality, where either one or both
+   * objects may be <code>null</code>.</p>
+   *
+   * <pre>
+   * ObjectUtils.equals(null, null)                  = true
+   * ObjectUtils.equals(null, "")                    = false
+   * ObjectUtils.equals("", null)                    = false
+   * ObjectUtils.equals("", "")                      = true
+   * ObjectUtils.equals(Boolean.TRUE, null)          = false
+   * ObjectUtils.equals(Boolean.TRUE, "true")        = false
+   * ObjectUtils.equals(Boolean.TRUE, Boolean.TRUE)  = true
+   * ObjectUtils.equals(Boolean.TRUE, Boolean.FALSE) = false
+   * </pre>
+   *
+   * @param object1  the first object, may be <code>null</code>
+   * @param object2  the second object, may be <code>null</code>
+   * @return <code>true</code> if the values of both objects are the same
+   */
+  public static boolean objectEquals(Object object1, Object object2) {
+    if (object1 == object2) {
+      return true;
+    }
+    if ((object1 == null) || (object2 == null)) {
+      return false;
+    }
+    return object1.equals(object2);
+  }
 
 	public void setAnswer(IAnswerData data, TreeReference ref) {
 		setAnswer(data, mainInstance.resolveReference(ref));
@@ -359,7 +397,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
-		triggerTriggerables(deleteRef);
+		triggerTriggerables(deleteRef, true);
 		return newIndex;
 	}
 
@@ -379,8 +417,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			a.processAction(this, destRef);
 		}
 
-		triggerTriggerables(destRef); // trigger conditions that depend on the creation of this new node
-		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
+		triggerTriggerables(destRef, true); // trigger conditions that depend on the creation of this new node
+		initializeTriggerables(destRef, true); // initialize conditions for the node (and sub-nodes)
 	}
 
 	public boolean isRepeatRelevant (TreeReference repeatRef) {
@@ -438,7 +476,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return true;
 	}
 
-	public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) throws InvalidReferenceException{
+	public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data, boolean cascadeToGroupChildren) throws InvalidReferenceException{
 		ItemsetBinding itemset = q.getDynamicChoices();
 		TreeReference targetRef = targetNode.getRef();
 		TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
@@ -495,8 +533,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
-		triggerTriggerables(destRef); // trigger conditions that depend on the creation of these new nodes
-		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
+		triggerTriggerables(destRef, cascadeToGroupChildren); // trigger conditions that depend on the creation of these new nodes
+		initializeTriggerables(destRef, cascadeToGroupChildren); // initialize conditions for the node (and sub-nodes)
 		  //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
 	}
 
@@ -563,7 +601,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			Triggerable t = triggerables.elementAt(i);
 
 			Vector<Triggerable> deps = new Vector<Triggerable>();
-			fillTriggeredElements(t, deps);
+			fillTriggeredElements(t, deps, false);
 
 			for (int j = 0; j < deps.size(); j++) {
 				Triggerable u = deps.elementAt(j);
@@ -638,15 +676,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	}
 
-	/**
-	 * Get all of the elements which will need to be evaluated (in order) when the
-	 * triggerable is fired.
-	 * @param t
-	 */
-	public void fillTriggeredElements(Triggerable t, Vector<Triggerable> destination) {
-		if (t.canCascade()) {
+    /**
+     * Get all of the elements which will need to be evaluated (in order) when the
+     * triggerable t is fired.
+     *
+     * @param t                                                 the parent triggerable
+     * @param destination                                       where to store the triggerables
+     * @param cascadeToChildrenOfGroupsWithRelevanceExpressions if true, then the slow code will execute, if false, then old/fast code will execute that
+     *                                                          suffers from https://code.google.com/p/opendatakit/issues/detail?id=888
+     */
+    public void fillTriggeredElements(Triggerable t, Vector<Triggerable> destination, boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+		if (cascadeToChildrenOfGroupsWithRelevanceExpressions && t.canCascade()) {
 			for (int j = 0; j < t.getTargets().size(); j++) {
-				TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+				TreeReference target = t.getTargets().elementAt(j);
 				Vector<TreeReference> updatedNodes = new Vector<TreeReference>();
 				updatedNodes.addElement(target);
 
@@ -666,12 +708,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 					//We can't make this reference generic before now or we'll lose the target information,
 					//so we'll be more inclusive than needed and see if any of our triggers are keyed on
 					//the predicate-less path of this ref
-					Vector<Triggerable> triggered = (Vector<Triggerable>)triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
+					Vector<Triggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
 
 					if (triggered != null) {
 						//If so, walk all of these triggerables that we found
 						for (int k = 0; k < triggered.size(); k++) {
-							Triggerable u = (Triggerable)triggered.elementAt(k);
+							Triggerable u = triggered.elementAt(k);
 
 							//And add them to the queue if they aren't there already
 							if (!destination.contains(u))
@@ -679,9 +721,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						}
 					}
 				}
-
 			}
-		}
+		} else if (t.canCascade()) {
+      for (int j = 0; j < t.getTargets().size(); j++) {
+        TreeReference target = t.getTargets().elementAt(j);
+        Vector<Triggerable> triggered = triggerIndex.get(target);
+        if (triggered != null) {
+          for (int k = 0; k < triggered.size(); k++) {
+            Triggerable u = triggered.elementAt(k);
+            if (!destination.contains(u))
+              destination.addElement(u);
+          }
+        }
+      }
+    }
 	}
 
 
@@ -689,14 +742,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 
 	public void initializeTriggerables() {
-		initializeTriggerables(TreeReference.rootRef());
+		initializeTriggerables(TreeReference.rootRef(), false);
 	}
 
 	/**
 	 * Walks the current set of conditions, and evaluates each of them with the
 	 * current context.
 	 */
-	private void initializeTriggerables(TreeReference rootRef) {
+	private void initializeTriggerables(TreeReference rootRef, boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
 		TreeReference genericRoot = rootRef.genericize();
 
 		Vector<Triggerable> applicable = new Vector<Triggerable>();
@@ -711,7 +764,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
-		evaluateTriggerables(applicable, rootRef);
+		evaluateTriggerables(applicable, rootRef, cascadeToChildrenOfGroupsWithRelevanceExpressions);
 	}
 
 	/**
@@ -720,7 +773,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * @param ref The full contextualized unambiguous reference of the value that was
 	 * changed.
 	 */
-	public void triggerTriggerables(TreeReference ref) {
+	public void triggerTriggerables(TreeReference ref, boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
 
 		//turn unambiguous ref into a generic ref
 		//to identify what nodes should be triggered by this
@@ -740,7 +793,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 
 		//Evaluate all of the triggerables in our new vector
-		evaluateTriggerables(triggeredCopy, ref);
+		evaluateTriggerables(triggeredCopy, ref, cascadeToChildrenOfGroupsWithRelevanceExpressions);
 	}
 
 	/**
@@ -753,13 +806,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * value changed
 	 * @param anchorRef The reference to original value that was updated
 	 */
-	private void evaluateTriggerables(Vector<Triggerable> tv, TreeReference anchorRef) {
+	private void evaluateTriggerables(Vector<Triggerable> tv, TreeReference anchorRef, boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
 		//add all cascaded triggerables to queue
 
 		//Iterate through all of the currently known triggerables to be triggered
 		for (int i = 0; i < tv.size(); i++) {
 			Triggerable t = tv.elementAt(i);
-			fillTriggeredElements(t, tv);
+			fillTriggeredElements(t, tv, cascadeToChildrenOfGroupsWithRelevanceExpressions);
 		}
 
 		//tv should now contain all of the triggerable components which are going to need to be addressed
