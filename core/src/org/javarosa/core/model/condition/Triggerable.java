@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,6 +64,16 @@ public abstract class Triggerable implements Externalizable {
         if ( cmp != 0 ) {
           return cmp;
         }
+        
+        // bias toward cascading targets....
+        if ( lhs.isCascadingToChildren() ) {
+          if (!rhs.isCascadingToChildren() ) {
+            return -1;
+          }
+        } else if ( rhs.isCascadingToChildren() ) {
+          return 1;
+        }
+        
         int lhsHash = lhs.hashCode();
         int rhsHash = rhs.hashCode();
         return (lhsHash < rhsHash) ? -1 : ((lhsHash == rhsHash) ? 0 : 1);
@@ -78,7 +89,7 @@ public abstract class Triggerable implements Externalizable {
 	 * updated by the result of this triggerable
 	 *
 	 */
-	private Vector<TreeReference> targets;
+	private ArrayList<TreeReference> targets;
 
 	/**
 	 * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
@@ -97,7 +108,7 @@ public abstract class Triggerable implements Externalizable {
 
 	}
 
-   public Triggerable (IConditionExpr expr, TreeReference contextRef, Vector targets) {
+   public Triggerable (IConditionExpr expr, TreeReference contextRef, ArrayList<TreeReference> targets) {
      this.expr = expr;
      this.contextRef = contextRef;
      this.originalContextRef = contextRef;
@@ -105,7 +116,7 @@ public abstract class Triggerable implements Externalizable {
    }
 
    public Triggerable (IConditionExpr expr, TreeReference contextRef) {
-     this(expr, contextRef, new Vector(0));
+     this(expr, contextRef, new ArrayList<TreeReference>(0));
    }
 
 	protected abstract Object eval (FormInstance instance, EvaluationContext ec);
@@ -129,8 +140,8 @@ public abstract class Triggerable implements Externalizable {
 		Object result = eval(instance, ec);
 
 		for (int i = 0; i < targets.size(); i++) {
-			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(ec.getContextRef());
-			Vector v = ec.expandReference(targetRef);
+			TreeReference targetRef = ((TreeReference)targets.get(i)).contextualize(ec.getContextRef());
+			Vector<TreeReference> v = ec.expandReference(targetRef);
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.elementAt(j);
 				apply(affectedRef, result, instance, f);
@@ -140,11 +151,11 @@ public abstract class Triggerable implements Externalizable {
 
 	public void addTarget (TreeReference target) {
 		if (targets.indexOf(target) == -1) {
-			targets.addElement(target);
+			targets.add(target);
 		}
 	}
 
-	public Vector<TreeReference> getTargets () {
+	public ArrayList<TreeReference> getTargets () {
 		return targets;
 	}
 
@@ -233,20 +244,22 @@ public abstract class Triggerable implements Externalizable {
 		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		originalContextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		targets = (Vector<TreeReference>)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
+		Vector<TreeReference> tlist = (Vector<TreeReference>)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf); 
+		targets = new ArrayList<TreeReference>(tlist); 
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(expr));
 		ExtUtil.write(out, contextRef);
 		ExtUtil.write(out, originalContextRef);
-		ExtUtil.write(out, new ExtWrapList(targets));
+		Vector<TreeReference> tlist = new Vector<TreeReference>(targets);
+		ExtUtil.write(out, new ExtWrapList(tlist));
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < targets.size(); i++) {
-			sb.append(((TreeReference)targets.elementAt(i)).toString());
+			sb.append(((TreeReference)targets.get(i)).toString());
 			if (i < targets.size() - 1)
 				sb.append(",");
 		}
