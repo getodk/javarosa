@@ -39,7 +39,14 @@ import org.javarosa.xpath.XPathException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -518,8 +525,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 			Triggerable existingTriggerable = triggerables.elementAt(existingIx);
 
-			existingTriggerable.contextRef = existingTriggerable.contextRef.intersect(t.contextRef);
-
+			existingTriggerable.changeContextRefToIntersectWithTriggerable(t);
+			
 			return existingTriggerable;
 
 			//note, if the contextRef is unnecessarily deep, the condition will be evaluated more times than needed
@@ -563,8 +570,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			Triggerable t = triggerables.elementAt(i);
 
 			Vector<Triggerable> deps = new Vector<Triggerable>();
-			fillTriggeredElements(t, deps);
+			fillTriggeredElements(t, deps, true);
 
+			// remove any self-reference if we have one...
+			deps.remove(t);
+			
 			for (int j = 0; j < deps.size(); j++) {
 				Triggerable u = deps.elementAt(j);
 				Triggerable[] edge = {t, u};
@@ -577,7 +587,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			vertices.addElement(triggerables.elementAt(i));
 		triggerables.removeAllElements();
 
+		int waveCount = -1;
 		while (vertices.size() > 0) {
+		   ++waveCount;
 			//determine root nodes
 			Vector<Triggerable> roots = new Vector<Triggerable>();
 			for (int i = 0; i < vertices.size(); i++) {
@@ -603,9 +615,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				throw new IllegalStateException(message);
 			}
 
+			// order the root nodes - mainly for clean textual diffs when printing
+			// When this code is rewritten to use HashSet, this will become 
+			// important.
+			Collections.sort(roots, Triggerable.triggerablesRootOrdering);
+
 			//remove root nodes and edges originating from them
 			for (int i = 0; i < roots.size(); i++) {
 				Triggerable root = roots.elementAt(i);
+				root.setWaveCount(waveCount);
 				triggerables.addElement(root);
 				vertices.removeElement(root);
 			}
@@ -636,14 +654,45 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
+//		printTriggerables();
 	}
 
+	/**
+	 * For debugging - note that path assumes Android device
+	 */
+	void printTriggerables() {
+	  OutputStreamWriter w = null;
+	  try {
+      w = new OutputStreamWriter(new FileOutputStream(new File("/sdcard/odk/trigger.log")), "UTF-8");
+      for (int i = 0; i < triggerables.size(); i++) {
+        Triggerable t = triggerables.get(i);
+        w.write(Integer.toString(i) + ": ");
+        t.print(w);
+      }
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if ( w != null ) {
+        try {
+          w.flush();
+          w.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+	}
+	
 	/**
 	 * Get all of the elements which will need to be evaluated (in order) when the
 	 * triggerable is fired.
 	 * @param t
 	 */
-	public void fillTriggeredElements(Triggerable t, Vector<Triggerable> destination) {
+	public void fillTriggeredElements(Triggerable t, Vector<Triggerable> destination, boolean expandRepeatables) {
 		if (t.canCascade()) {
 			for (int j = 0; j < t.getTargets().size(); j++) {
 				TreeReference target = (TreeReference)t.getTargets().elementAt(j);
@@ -654,7 +703,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				//also the children of the target. In that case, we want to add all of those nodes
 				//to the list of updated elements as well.
 				if(t.isCascadingToChildren()) {
-					addChildrenOfReference(target, updatedNodes);
+					addChildrenOfReference(target, updatedNodes, expandRepeatables);
 				}
 
 				//Now go through each of these updated nodes (generally just 1 for a normal calculation,
@@ -759,7 +808,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		//Iterate through all of the currently known triggerables to be triggered
 		for (int i = 0; i < tv.size(); i++) {
 			Triggerable t = tv.elementAt(i);
-			fillTriggeredElements(t, tv);
+			fillTriggeredElements(t, tv, false);
 		}
 
 		//tv should now contain all of the triggerable components which are going to need to be addressed
@@ -784,7 +833,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef) {
 
 		//Contextualize the reference used by the triggerable against the anchor
-		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
+		TreeReference contextRef = t.contextualizeContextRef(anchorRef);
 		try {
 
 			//Now identify all of the fully qualified nodes which this triggerable
@@ -805,10 +854,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * This is a utility method to get all of the references of a node. It can be replaced
 	 * when we support dependent XPath Steps (IE: /path/to//)
 	 */
-	public void addChildrenOfReference(TreeReference original, Vector<TreeReference> toAdd) {
-		for(TreeReference ref : exprEvalContext.expandReference(original)) {
+	public void addChildrenOfReference(TreeReference original, Vector<TreeReference> toAdd, boolean expandRepeatables) {
+	  TreeElement repeatTemplate = expandRepeatables ? mainInstance.getTemplatePath(original) : null;
+	  if (repeatTemplate != null) {
+	    for (int i = 0 ; i < repeatTemplate.getNumChildren() ; ++i ) {
+	      TreeElement child = repeatTemplate.getChildAt(i);
+         toAdd.addElement(child.getRef().genericize());
+         addChildrenOfElement(child, toAdd);
+	    }
+	  } else {
+		 for(TreeReference ref : exprEvalContext.expandReference(original)) {
 			addChildrenOfElement(exprEvalContext.resolveReference(ref), toAdd);
-		}
+		 }
+	  }
 	}
 
 	//Recursive step of utility method

@@ -53,19 +53,13 @@ public class Condition extends Triggerable {
 	}
 
 	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, Vector targets) {
-		super(expr, contextRef);
+		super(expr, contextRef, targets);
 		this.trueAction = trueAction;
 		this.falseAction = falseAction;
-		this.targets = targets;
 	}
 
 	public Object eval (FormInstance model, EvaluationContext evalContext) {
-		try {
-			return new Boolean(expr.eval(model, evalContext));
-		} catch(XPathException e) {
-			e.setSource("Relevant expression for " + contextRef.toString(true));
-			throw e;
-		}
+		return evalPredicate(model, evalContext);
 	}
 
 	public boolean evalBool (FormInstance model, EvaluationContext evalContext) {

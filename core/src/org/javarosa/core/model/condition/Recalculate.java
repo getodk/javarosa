@@ -54,12 +54,7 @@ public class Recalculate extends Triggerable {
 	}
 
 	public Object eval (FormInstance model, EvaluationContext ec) {
-		try {
-			return expr.evalRaw(model, ec);
-		} catch(XPathException e) {
-			e.setSource("calculate expression for " + contextRef.toString(true));
-			throw e;
-		}
+	  return evalRaw(model, ec);
 	}
 
 	public void apply (TreeReference ref, Object result, FormInstance model, FormDef f) {

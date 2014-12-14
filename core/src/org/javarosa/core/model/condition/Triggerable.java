@@ -19,6 +19,8 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -49,39 +51,62 @@ import org.javarosa.xpath.XPathException;
  *
  */
 public abstract class Triggerable implements Externalizable {
+   public static final Comparator<Triggerable> triggerablesRootOrdering = new Comparator<Triggerable>() {
+      @Override
+      public int compare(Triggerable lhs, Triggerable rhs) {
+        int cmp;
+        cmp = lhs.contextRef.toString(false).compareTo(rhs.contextRef.toString(false));
+        if ( cmp != 0 ) {
+          return cmp;
+        }
+        cmp = lhs.originalContextRef.toString(false).compareTo(rhs.originalContextRef.toString(false));
+        if ( cmp != 0 ) {
+          return cmp;
+        }
+        int lhsHash = lhs.hashCode();
+        int rhsHash = rhs.hashCode();
+        return (lhsHash < rhsHash) ? -1 : ((lhsHash == rhsHash) ? 0 : 1);
+      }
+   };
 	/**
 	 * The expression which will be evaluated to produce a result
 	 */
-	public IConditionExpr expr;
+	private IConditionExpr expr;
 
 	/**
 	 * References to all of the (non-contextualized) nodes which should be
 	 * updated by the result of this triggerable
 	 *
 	 */
-	public Vector<TreeReference> targets;
+	private Vector<TreeReference> targets;
 
 	/**
 	 * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
 	 * common root of all of the targets being evaluated.
 	 */
-	public TreeReference contextRef;  //generic ref used to turn triggers into absolute references
+	private TreeReference contextRef;  //generic ref used to turn triggers into absolute references
 
 	/**
 	 * The first context provided to this triggerable before reducing to the common root.
 	 */
-	public TreeReference originalContextRef;
+   private TreeReference originalContextRef;
 
+   private int waveCount = 0;
+   
 	public Triggerable () {
 
 	}
 
-	public Triggerable (IConditionExpr expr, TreeReference contextRef) {
-		this.expr = expr;
-		this.contextRef = contextRef;
-		this.originalContextRef = contextRef;
-		this.targets = new Vector(0);
-	}
+   public Triggerable (IConditionExpr expr, TreeReference contextRef, Vector targets) {
+     this.expr = expr;
+     this.contextRef = contextRef;
+     this.originalContextRef = contextRef;
+     this.targets = targets;
+   }
+
+   public Triggerable (IConditionExpr expr, TreeReference contextRef) {
+     this(expr, contextRef, new Vector(0));
+   }
 
 	protected abstract Object eval (FormInstance instance, EvaluationContext ec);
 
@@ -123,6 +148,10 @@ public abstract class Triggerable implements Externalizable {
 		return targets;
 	}
 
+	public void setWaveCount(int waveCount) {
+	  this.waveCount = waveCount;
+	}
+	
 	/**
 	 * This should return true if this triggerable's targets will implicity modify the
 	 * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
@@ -142,6 +171,34 @@ public abstract class Triggerable implements Externalizable {
 			absTriggers.add(r.anchor(originalContextRef));
 		}
 		return absTriggers;
+	}
+
+	Boolean evalPredicate(FormInstance model, EvaluationContext evalContext) {
+		try {
+			return new Boolean(expr.eval(model, evalContext));
+		} catch (XPathException e) {
+			e.setSource("Relevant expression for " + contextRef.toString(true));
+			throw e;
+		}
+	}
+
+	Object evalRaw(FormInstance model, EvaluationContext evalContext) {
+		try {
+			return expr.evalRaw(model, evalContext);
+		} catch (XPathException e) {
+			e.setSource("calculate expression for " + contextRef.toString(true));
+			throw e;
+		}
+	}
+
+	public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
+		contextRef = contextRef.intersect(t.contextRef);
+	}
+
+	public TreeReference contextualizeContextRef(TreeReference anchorRef) {
+		// Contextualize the reference used by the triggerable against
+		// the anchor
+		return contextRef.contextualize(anchorRef);
 	}
 
 	public boolean equals (Object o) {
@@ -194,5 +251,24 @@ public abstract class Triggerable implements Externalizable {
 				sb.append(",");
 		}
 		return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
+	}
+
+	public void print(OutputStreamWriter w) throws IOException {
+		w.write("   waveCount: " + Integer.toString(waveCount) + "\n");
+		w.write("   isCascading: "
+				+ (isCascadingToChildren() ? "true" : "false") + "\n");
+		w.write("   expr: " + expr.toString() + "\n");
+		w.write("   contextRef: "
+				+ ((contextRef != null) ? contextRef.toString(true) : "null")
+				+ "\n");
+		w.write("   originalContextRef: "
+				+ ((originalContextRef != null) ? originalContextRef
+						.toString(true) : "null") + "\n");
+		int j;
+		for (j = 0; j < getTargets().size(); ++j) {
+			TreeReference r = getTargets().get(j);
+			w.write("   targets[" + Integer.toString(j) + "] :"
+					+ r.toString(true) + "\n");
+		}
 	}
 }
