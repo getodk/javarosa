@@ -17,6 +17,7 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.*;
+import org.javarosa.core.model.FormDef.QuickTriggerable;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.condition.*;
 import org.javarosa.core.model.instance.FormInstance;
@@ -52,7 +53,9 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -2557,46 +2560,45 @@ public class XFormParser {
 	}
 
 	private void checkDependencyCycles () {
-		Vector<TreeReference> vertices = new Vector<TreeReference>();
-		Vector<TreeReference[]> edges = new Vector<TreeReference[]>();
+		HashSet<TreeReference> vertices = new HashSet<TreeReference>();
+		ArrayList<TreeReference[]> edges = new ArrayList<TreeReference[]>();
 
 		//build graph
-    for (TreeReference trigger : _f.triggerIndex.keySet()) {
+      ArrayList<TreeReference> targets = new ArrayList<TreeReference>();
+      for (TreeReference trigger : _f.triggerIndex.keySet()) {
 			if (!vertices.contains(trigger))
-				vertices.addElement(trigger);
-
-			Vector<Triggerable> triggered = _f.triggerIndex.get(trigger);
-			Vector<TreeReference> targets = new Vector<TreeReference>();
-			for (int i = 0; i < triggered.size(); i++) {
-				Triggerable t = (Triggerable)triggered.elementAt(i);
+				vertices.add(trigger);
+			HashSet<QuickTriggerable> triggered = _f.triggerIndex.get(trigger);
+			targets.clear();
+			for (QuickTriggerable qt : triggered ) {
+				Triggerable t = qt.t;
 				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = t.getTargets().elementAt(j);
+					TreeReference target = t.getTargets().get(j);
 					if (!targets.contains(target))
-						targets.addElement(target);
+						targets.add(target);
 				}
 			}
 
 			for (int i = 0; i < targets.size(); i++) {
-				TreeReference target = targets.elementAt(i);
+				TreeReference target = targets.get(i);
 				if (!vertices.contains(target))
-					vertices.addElement(target);
+					vertices.add(target);
 
 				TreeReference[] edge = {trigger, target};
-				edges.addElement(edge);
+				edges.add(edge);
 			}
 		}
 
 		//find cycles
 		boolean acyclic = true;
+      HashSet<TreeReference> leaves = new HashSet<TreeReference>(vertices.size());
 		while (vertices.size() > 0) {
 			//determine leaf nodes
-			Vector leaves = new Vector(vertices.size());
-			for (int i = 0; i < vertices.size(); i++) {
-				leaves.addElement(vertices.elementAt(i));
-			}
+		   leaves.clear();
+ 		   leaves.addAll(vertices);
 			for (int i = 0; i < edges.size(); i++) {
-				TreeReference[] edge = (TreeReference[])edges.elementAt(i);
-				leaves.removeElement(edge[0]);
+				TreeReference[] edge = (TreeReference[])edges.get(i);
+				leaves.remove(edge[0]);
 			}
 
 			//if no leaf nodes while graph still has nodes, graph has cycles
@@ -2606,14 +2608,13 @@ public class XFormParser {
 			}
 
 			//remove leaf nodes and edges pointing to them
-			for (int i = 0; i < leaves.size(); i++) {
-				TreeReference leaf = (TreeReference)leaves.elementAt(i);
-				vertices.removeElement(leaf);
+			for (TreeReference leaf : leaves ) {
+				vertices.remove(leaf);
 			}
 			for (int i = edges.size() - 1; i >= 0; i--) {
-				TreeReference[] edge = (TreeReference[])edges.elementAt(i);
+				TreeReference[] edge = (TreeReference[])edges.get(i);
 				if (leaves.contains(edge[1]))
-					edges.removeElementAt(i);
+					edges.remove(i);
 			}
 		}
 
@@ -2621,7 +2622,7 @@ public class XFormParser {
 			StringBuilder b = new StringBuilder();
 			b.append("XPath Dependency Cycle:\n");
 			for (int i = 0; i < edges.size(); i++) {
-				TreeReference[] edge = (TreeReference[])edges.elementAt(i);
+				TreeReference[] edge = edges.get(i);
 				b.append(edge[0].toString()).append(" => ").append(edge[1].toString()).append("\n");
 			}
 			reporter.error(b.toString());
