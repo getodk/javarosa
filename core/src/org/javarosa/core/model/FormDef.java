@@ -860,21 +860,31 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	    for (int i = 0 ; i < repeatTemplate.getNumChildren() ; ++i ) {
 	      TreeElement child = repeatTemplate.getChildAt(i);
          toAdd.addElement(child.getRef().genericize());
-         addChildrenOfElement(child, toAdd);
+         addChildrenOfElement(child, toAdd, expandRepeatables);
 	    }
 	  } else {
-		 for(TreeReference ref : exprEvalContext.expandReference(original)) {
-			addChildrenOfElement(exprEvalContext.resolveReference(ref), toAdd);
+		  Vector<TreeReference> refSet = exprEvalContext.expandReference(original);
+		 for(TreeReference ref : refSet) {
+			addChildrenOfElement(exprEvalContext.resolveReference(ref), toAdd, expandRepeatables);
 		 }
 	  }
 	}
 
 	//Recursive step of utility method
-	private void addChildrenOfElement(TreeElement el, Vector<TreeReference> toAdd) {
-		for(int i = 0 ; i < el.getNumChildren() ; ++i) {
-			TreeElement child = el.getChildAt(i);
-			toAdd.addElement(child.getRef().genericize());
-			addChildrenOfElement(child, toAdd);
+	private void addChildrenOfElement(TreeElement el, Vector<TreeReference> toAdd, boolean expandRepeatables) {
+		TreeElement repeatTemplate =  expandRepeatables ? mainInstance.getTemplatePath(el.getRef()) : null;
+		if ( repeatTemplate != null ) {
+			for(int i = 0 ; i < repeatTemplate.getNumChildren() ; ++i) {
+				TreeElement child = repeatTemplate.getChildAt(i);
+				toAdd.addElement(child.getRef().genericize());
+				addChildrenOfElement(child, toAdd, expandRepeatables);
+			}				
+		} else {
+			for(int i = 0 ; i < el.getNumChildren() ; ++i) {
+				TreeElement child = el.getChildAt(i);
+				toAdd.addElement(child.getRef().genericize());
+				addChildrenOfElement(child, toAdd, expandRepeatables);
+			}
 		}
 	}
 
