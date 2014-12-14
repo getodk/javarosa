@@ -1,0 +1,239 @@
+import java_cup.runtime.*;
+import java.util.*;
+import org.javarosa.xpath.expr.*;
+
+/* DON'T EDIT THIS FILE UNLESS YOU KNOW WHAT YOU'RE DOING */
+
+/* this file isn't actually used, as the generated parser used too much memory,
+ * however, our custom light-weight parser is based off it, and it is left here
+ * for reference
+ */
+
+/* TODO:
+ * need to catch syntax errors
+ * need to explore directives that make compiled code smaller
+ */
+
+action code {:
+	//v == null is an error
+	private XPathExpression[] getExprArr (Vector v) {
+		XPathExpression[] arr = new XPathExpression[v.size()];
+		v.copyInto(arr);
+		return arr;
+	}
+
+	//v == null is an error
+	private XPathStep[] getStepArr (Vector v) {
+		XPathStep[] arr = new XPathStep[v.size()];
+		v.copyInto(arr);
+		return arr;
+	}
+
+	private Vector Vappend (Vector v, Object elem) {
+		if (v == null)
+			v = new Vector();
+		v.addElement(elem);
+		return v;
+	}
+
+	//v == null is error
+	private Vector Vprepend (Vector v, Object elem) {
+		v.insertElementAt(elem, 0);
+		return v;
+	}
+
+	class vectorWrapper {
+		Object o;
+		Vector v;
+
+		public vectorWrapper (Object o) {
+			this.o = o;
+			v = new Vector();
+		}
+
+		public XPathStep unwrapStep () {
+			XPathStep step = (XPathStep)o;
+			step.predicates = getExprArr(v);
+			return step;
+		}
+
+		public XPathPathExpr unwrapPathExpr (Vector steps) {
+			return new XPathPathExpr((XPathExpression)o, getExprArr(v), getStepArr(steps));
+		}
+	}
+
+	class tempNodeTest {
+		public int test;
+		public XPathQName qname;
+		public String str;
+
+		public tempNodeTest (int test) {
+			this.test = test;
+		}
+
+		public tempNodeTest (int test, XPathQName qname) {
+			this(test);
+			this.qname = qname;
+		}
+
+		public tempNodeTest (int test, String str) {
+			this(test);
+			this.str = str;
+		}
+
+		public XPathStep generateStep (int axis) {
+			XPathStep step;
+
+			switch (test) {
+			case XPathStep.TEST_NAME:		step = new XPathStep(axis, qname); break;
+			case XPathStep.TEST_NAMESPACE_WILDCARD:	step = new XPathStep(axis, str); break;
+			default:				step = new XPathStep(axis, test);
+				if (test == XPathStep.TEST_TYPE_PROCESSING_INSTRUCTION)
+					step.literal = str;
+				break;
+			}
+	
+			return step;
+		}
+	}
+
+	private int validateAxisName (String axisName) {
+		int axis = -1;
+
+		if      (axisName.equals("child"))              axis = XPathStep.AXIS_CHILD;
+		else if (axisName.equals("descendant"))         axis = XPathStep.AXIS_DESCENDANT;
+		else if (axisName.equals("parent"))             axis = XPathStep.AXIS_PARENT;
+		else if (axisName.equals("ancestor"))           axis = XPathStep.AXIS_ANCESTOR;
+		else if (axisName.equals("following-sibling"))  axis = XPathStep.AXIS_FOLLOWING_SIBLING;
+		else if (axisName.equals("preceding-sibling"))  axis = XPathStep.AXIS_PRECEDING_SIBLING;
+		else if (axisName.equals("following"))          axis = XPathStep.AXIS_FOLLOWING;
+		else if (axisName.equals("preceding"))          axis = XPathStep.AXIS_PRECEDING;
+		else if (axisName.equals("attribute"))          axis = XPathStep.AXIS_ATTRIBUTE;
+		else if (axisName.equals("namespace"))          axis = XPathStep.AXIS_NAMESPACE;
+		else if (axisName.equals("self"))               axis = XPathStep.AXIS_SELF;
+		else if (axisName.equals("descendant-or-self")) axis = XPathStep.AXIS_DESCENDANT_OR_SELF;
+		else if (axisName.equals("ancestor-or-self"))   axis = XPathStep.AXIS_ANCESTOR_OR_SELF;
+		else throw new RuntimeException("parse error: axis"); //TODO: make this a more appropriate exception
+
+		return axis;
+	}
+:}
+
+terminal OR, AND, EQ, NEQ, LT, LTE, GT, GTE, PLUS, MINUS, MULT, DIV, MOD, UNION, SLASH, DBL_SLASH, WILDCARD;
+terminal LBRACK, RBRACK, LPAREN, RPAREN, DOT, DBL_DOT, AT, DBL_COLON, COMMA, UMINUS;
+terminal NODETYPE_NODE, NODETYPE_TEXT, NODETYPE_COMMENT, NODETYPE_PROCINSTR;
+
+terminal XPathQName QNAME, VAR;
+terminal String NSWILDCARD, STR;
+terminal Double NUM;
+
+non terminal XPathExpression expr, base_expr, literal, predicate;
+non terminal XPathOpExpr op_expr;
+non terminal XPathFuncExpr func_call;
+non terminal XPathPathExpr path_expr, loc_path;
+non terminal XPathStep step, step_body;
+non terminal Vector arg_list, rel_loc_path;
+non terminal vectorWrapper step_unabbr, filter_expr; 
+non terminal tempNodeTest node_test;
+non terminal Integer axis_specifier;
+
+precedence right OR;
+precedence right AND;
+precedence left EQ, NEQ;
+precedence left LT, LTE, GT, GTE;
+precedence left PLUS, MINUS;
+precedence left MULT, DIV, MOD;
+precedence nonassoc UMINUS;
+precedence left UNION;
+
+expr	::=	base_expr:be					{: RESULT = be; :}
+	|	op_expr:oe					{: RESULT = oe; :}
+	|	path_expr:pe					{: RESULT = pe; :}
+	;
+
+base_expr	::=	LPAREN expr:e RPAREN			{: RESULT = e; :}
+		|	func_call:fc				{: RESULT = fc; :}
+		|	VAR:v					{: RESULT = new XPathVariableReference(v); :}
+		|	literal:l				{: RESULT = l; :}
+		;
+
+op_expr	::=	expr:a OR expr:b				{: RESULT = new XPathBoolExpr(XPathBoolExpr.OR, a, b); :}
+	|	expr:a AND expr:b				{: RESULT = new XPathBoolExpr(XPathBoolExpr.AND, a, b); :}
+	|	expr:a EQ expr:b				{: RESULT = new XPathEqExpr(true, a, b); :}
+	|	expr:a NEQ expr:b				{: RESULT = new XPathEqExpr(false, a, b); :}
+	|	expr:a LT expr:b				{: RESULT = new XPathCmpExpr(XPathCmpExpr.LT, a, b); :}
+	|	expr:a LTE expr:b				{: RESULT = new XPathCmpExpr(XPathCmpExpr.LTE, a, b); :}
+	|	expr:a GT expr:b				{: RESULT = new XPathCmpExpr(XPathCmpExpr.GT, a, b); :}
+	|	expr:a GTE expr:b				{: RESULT = new XPathCmpExpr(XPathCmpExpr.GTE, a, b); :}
+	|	expr:a PLUS expr:b				{: RESULT = new XPathArithExpr(XPathArithExpr.ADD, a, b); :}
+	|	expr:a MINUS expr:b				{: RESULT = new XPathArithExpr(XPathArithExpr.SUBTRACT, a, b); :}
+	|	expr:a MULT expr:b				{: RESULT = new XPathArithExpr(XPathArithExpr.MULTIPLY, a, b); :}
+	|	expr:a DIV expr:b				{: RESULT = new XPathArithExpr(XPathArithExpr.DIVIDE, a, b); :}
+	|	expr:a MOD expr:b				{: RESULT = new XPathArithExpr(XPathArithExpr.MODULO, a, b); :}
+	|	MINUS expr:a					{: RESULT = new XPathNumNegExpr(a); :}
+		  %prec UMINUS
+	|	expr:a UNION expr:b				{: RESULT = new XPathUnionExpr(a, b); :}
+	;
+
+func_call	::=	QNAME:q LPAREN arg_list:al RPAREN	{: RESULT = new XPathFuncExpr(q, getExprArr(al)); :}
+		|	QNAME:q LPAREN RPAREN			{: RESULT = new XPathFuncExpr(q, null); :}
+		;
+
+arg_list	::=	arg_list:al COMMA expr:e		{: RESULT = Vappend(al, e); :}
+		|	expr:e					{: RESULT = Vappend(null, e); :}
+		;
+
+path_expr	::=	loc_path:lp					{: RESULT = lp; :}
+	/*	|	filter_expr:fe								{: RESULT = fe.unwrapPathExpr(new Vector(); :}  */
+		|	filter_expr:fe SLASH rel_loc_path:rlp		{: RESULT = fe.unwrapPathExpr(rlp); :}
+		|	filter_expr:fe DBL_SLASH rel_loc_path:rlp	{: RESULT = fe.unwrapPathExpr(Vprepend(rlp, XPathStep.ABBR_DESCENDANTS())); :}
+		;
+
+filter_expr	::=	filter_expr:fe predicate:p		{: Vappend(fe.v, p); RESULT = fe; :}
+		|	base_expr:be				{: RESULT = new vectorWrapper(be); :}
+		;
+
+predicate	::=	LBRACK expr:e RBRACK			{: RESULT = e; :}
+		;
+
+loc_path	::=	rel_loc_path:rlp			{: RESULT = new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, getStepArr(rlp)); :}
+		|	SLASH rel_loc_path:rlp			{: RESULT = new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_ROOT, getStepArr(rlp)); :}
+		|	DBL_SLASH rel_loc_path:rlp		{: RESULT = new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_ROOT,
+											      getStepArr(Vprepend(rlp, XPathStep.ABBR_DESCENDANTS()))); :}
+		|	SLASH					{: RESULT = new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_ROOT, new XPathStep[0]); :}
+		;
+
+rel_loc_path	::=	step:s					{: RESULT = Vappend(null, s); :}
+		|	rel_loc_path:rlp SLASH step:s		{: RESULT = Vappend(rlp, s); :}
+		|	rel_loc_path:rlp DBL_SLASH step:s	{: RESULT = Vappend(Vappend(rlp, XPathStep.ABBR_DESCENDANTS()), s); :}
+		;
+
+step	::=	step_unabbr:s					{: RESULT = s.unwrapStep(); :}
+	|	DOT						{: RESULT = XPathStep.ABBR_SELF(); :}
+	|	DBL_DOT						{: RESULT = XPathStep.ABBR_PARENT(); :}
+	;
+
+step_unabbr	::=	step_unabbr:s predicate:p		{: Vappend(s.v, p); RESULT = s; :}
+		|	step_body:sb				{: RESULT = new vectorWrapper(sb); :}
+		;
+
+step_body	::=	node_test:nt				{: RESULT = nt.generateStep(XPathStep.AXIS_CHILD); :}
+		|	axis_specifier:a node_test:nt		{: RESULT = nt.generateStep(a.intValue()); :}
+		;
+
+axis_specifier	::=	QNAME:q DBL_COLON			{: RESULT = new Integer(validateAxisName(q.toString())); :}
+		|	AT					{: RESULT = new Integer(XPathStep.AXIS_ATTRIBUTE); :}
+		;
+
+node_test	::=	QNAME:q					{: RESULT = new tempNodeTest(XPathStep.TEST_NAME, q); :}
+		|	WILDCARD				{: RESULT = new tempNodeTest(XPathStep.TEST_NAME_WILDCARD); :}
+		|	NSWILDCARD:nwc				{: RESULT = new tempNodeTest(XPathStep.TEST_NAMESPACE_WILDCARD, nwc); :}
+		|	NODETYPE_NODE LPAREN RPAREN		{: RESULT = new tempNodeTest(XPathStep.TEST_TYPE_NODE); :}
+		|	NODETYPE_TEXT LPAREN RPAREN		{: RESULT = new tempNodeTest(XPathStep.TEST_TYPE_TEXT); :}
+		|	NODETYPE_COMMENT LPAREN RPAREN		{: RESULT = new tempNodeTest(XPathStep.TEST_TYPE_COMMENT); :}
+		|	NODETYPE_PROCINSTR LPAREN STR:s RPAREN	{: RESULT = new tempNodeTest(XPathStep.TEST_TYPE_PROCESSING_INSTRUCTION, s); :}
+		;
+
+literal	::=	STR:s						{: RESULT = new XPathStringLiteral(s); :}
+	|	NUM:n						{: RESULT = new XPathNumericLiteral(n); :}
+	;
