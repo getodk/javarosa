@@ -31,7 +31,7 @@ import org.javarosa.core.model.Action;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormDef.EvalImplementation;
+import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.FormDef.QuickTriggerable;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
@@ -311,7 +311,7 @@ public class XFormParser {
 		this.reporter = reporter;
 	}
 
-	public FormDef parse(EvalImplementation mode) throws IOException {
+	public FormDef parse(EvalBehavior mode) throws IOException {
 		if (_f == null) {
 			System.out.println("Parsing form...");
 
@@ -426,7 +426,7 @@ public class XFormParser {
 		return doc;
 	}
 
-	private void parseDoc(EvalImplementation mode) {
+	private void parseDoc(EvalBehavior mode) {
 		_f = new FormDef(mode);
 
 		initState();

@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormDef.EvalImplementation;
+import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
@@ -48,7 +48,7 @@ public class XFormUtils {
 		return oldFactory;
 	}
 
-	public static FormDef getFormFromResource (String resource, EvalImplementation mode) {
+	public static FormDef getFormFromResource (String resource, EvalBehavior mode) {
 		InputStream is = System.class.getResourceAsStream(resource);
 		if (is == null) {
 			System.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
@@ -59,14 +59,14 @@ public class XFormUtils {
 	}
 
 
-	public static FormDef getFormRaw(InputStreamReader isr, EvalImplementation mode) throws XFormParseException, IOException{
+	public static FormDef getFormRaw(InputStreamReader isr, EvalBehavior mode) throws XFormParseException, IOException{
 		return _factory.getXFormParser(isr).parse(mode);
 	}
 
 	/*
      * This method throws XFormParseException when the form has errors.
      */
-	public static FormDef getFormFromInputStream(InputStream is, EvalImplementation mode) throws XFormParseException {
+	public static FormDef getFormFromInputStream(InputStream is, EvalBehavior mode) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {

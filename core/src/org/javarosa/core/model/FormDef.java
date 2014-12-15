@@ -79,11 +79,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static final String STORAGE_KEY = "FORMDEF";
    public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
-   public enum EvalImplementation {
+   public enum EvalBehavior {
       Legacy, April_2014, Legacy_April_Hybrid_2014, Aggressive_2014
    };
 
-   public static final EvalImplementation latestImplementationMode = EvalImplementation.April_2014;
+   public static final EvalBehavior latestImplementationMode = EvalBehavior.Aggressive_2014;
+
+   // used by FormDef() constructor
+   private static EvalBehavior defaultMode = latestImplementationMode;
+   
+   // call this to change the mode used for evaluations.
+   public static final void setEvalBehavior(EvalBehavior mode) {
+      defaultMode = mode;
+   }
 
    public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
 
@@ -129,7 +137,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
    }
 
-   private EvalImplementation mode = latestImplementationMode;
+   private EvalBehavior mode = latestImplementationMode;
 
    private Vector<IFormElement> children;// <IFormElement>
    /** A collection of group definitions. */
@@ -182,10 +190,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    private HashMap<String, Vector<Action>> eventListeners;
 
+   public FormDef() {
+      this(defaultMode);
+   }
+   
    /**
 	 *
 	 */
-   public FormDef(EvalImplementation mode) {
+   public FormDef(EvalBehavior mode) {
       setID(-1);
       setChildren(null);
       this.mode = mode;
@@ -379,8 +391,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-      if (mode == EvalImplementation.Legacy ||
-          mode == EvalImplementation.April_2014) {
+      if (mode == EvalBehavior.Legacy ||
+          mode == EvalBehavior.April_2014) {
          setAnswer(data, node);
          triggerTriggerables(ref, cascadeToGroupChildren);
       } else {
@@ -873,8 +885,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          Set<QuickTriggerable> newDestinationSet, boolean expandRepeatables,
          boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
       if (qt.t.canCascade()) {
-         if (mode == EvalImplementation.Legacy
-               || (mode == EvalImplementation.Legacy_April_Hybrid_2014 && !cascadeToChildrenOfGroupsWithRelevanceExpressions)) {
+         if (mode == EvalBehavior.Legacy
+               || (mode == EvalBehavior.Legacy_April_Hybrid_2014 && !cascadeToChildrenOfGroupsWithRelevanceExpressions)) {
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                TreeReference target = qt.t.getTargets().get(j);
                HashSet<QuickTriggerable> triggered = triggerIndex.get(target);
@@ -1018,11 +1030,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       for (; !refSet.isEmpty();) {
          Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
          for (QuickTriggerable qt : refSet) {
-            if (mode == EvalImplementation.Legacy || mode == EvalImplementation.April_2014
-                  || mode == EvalImplementation.Legacy_April_Hybrid_2014) {
+            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014
+                  || mode == EvalBehavior.Legacy_April_Hybrid_2014) {
                fillTriggeredElements(qt, tv, newSet, false,
                      cascadeToChildrenOfGroupsWithRelevanceExpressions);
-            } else if (mode == EvalImplementation.Aggressive_2014) {
+            } else if (mode == EvalBehavior.Aggressive_2014) {
                // leverage the saved DAG edges.
                // This may over-fill the set of triggerables.
                // but should be faster than recomputing the edges.
