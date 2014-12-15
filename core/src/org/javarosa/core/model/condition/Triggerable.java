@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormDef.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -104,6 +105,16 @@ public abstract class Triggerable implements Externalizable {
 
    private int waveCount = 0;
    
+   private HashSet<QuickTriggerable> immediateCascades = null;
+   
+   public void setImmediateCascades(HashSet<QuickTriggerable> cascades) {
+     immediateCascades = new HashSet<QuickTriggerable>(cascades);
+   }
+   
+   public HashSet<QuickTriggerable> getImmediateCascades() {
+     return immediateCascades;
+   }
+   
 	public Triggerable () {
 
 	}
@@ -149,6 +160,10 @@ public abstract class Triggerable implements Externalizable {
 		}
 	}
 
+	public IConditionExpr getExpr() {
+		return expr;
+	}
+	
 	public void addTarget (TreeReference target) {
 		if (targets.indexOf(target) == -1) {
 			targets.add(target);

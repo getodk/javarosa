@@ -16,10 +16,36 @@
 
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Stack;
+import java.util.Vector;
+
+import org.javarosa.core.model.Action;
+import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataBinding;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormDef.EvalImplementation;
 import org.javarosa.core.model.FormDef.QuickTriggerable;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.condition.*;
+import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.Constraint;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -51,13 +77,6 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
-import java.util.Vector;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -292,7 +311,7 @@ public class XFormParser {
 		this.reporter = reporter;
 	}
 
-	public FormDef parse() throws IOException {
+	public FormDef parse(EvalImplementation mode) throws IOException {
 		if (_f == null) {
 			System.out.println("Parsing form...");
 
@@ -300,7 +319,7 @@ public class XFormParser {
 				_xmldoc = getXMLDocument(_reader, stringCache);
 			}
 
-			parseDoc();
+			parseDoc(mode);
 
 			//load in a custom xml instance, if applicable
 			if (_instReader != null) {
@@ -407,8 +426,8 @@ public class XFormParser {
 		return doc;
 	}
 
-	private void parseDoc() {
-		_f = new FormDef();
+	private void parseDoc(EvalImplementation mode) {
+		_f = new FormDef(mode);
 
 		initState();
 		defaultNamespace = _xmldoc.getRootElement().getNamespaceUri(null);

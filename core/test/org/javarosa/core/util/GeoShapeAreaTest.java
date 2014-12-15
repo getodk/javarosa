@@ -56,7 +56,7 @@ public class GeoShapeAreaTest extends TestCase {
 
   public void testGeoShapeSupportForEnclosedArea() throws Exception {
     // Read the form definition
-    FormDef formDef = XFormUtils.getFormFromInputStream(getClass().getResourceAsStream("org/javarosa/core/util/area.xml"));
+    FormDef formDef = XFormUtils.getFormFromInputStream(getClass().getResourceAsStream("org/javarosa/core/util/area.xml"), FormDef.latestImplementationMode);
 
     // trigger all calculations
     formDef.initialize(true, new InstanceInitializationFactory());

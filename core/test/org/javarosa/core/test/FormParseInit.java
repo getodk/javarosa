@@ -103,7 +103,7 @@ public class FormParseInit {
 		}
 		
 		// Parse the form
-		xform = XFormUtils.getFormFromInputStream(is);
+		xform = XFormUtils.getFormFromInputStream(is, FormDef.latestImplementationMode);
 		
 		femodel = new FormEntryModel(xform);
 		fec = new FormEntryController(femodel);

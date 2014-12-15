@@ -22,6 +22,7 @@ package org.javarosa.xform.validator;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.util.XFormUtils;
 
 
@@ -52,7 +53,7 @@ public class MainClass {
 			return;
 		}
 		
-		XFormUtils.getFormFromInputStream(is);
+		XFormUtils.getFormFromInputStream(is, FormDef.latestImplementationMode);
 	}
 
 }

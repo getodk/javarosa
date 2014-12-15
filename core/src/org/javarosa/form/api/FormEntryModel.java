@@ -16,15 +16,19 @@
 
 package org.javarosa.form.api;
 
-import org.javarosa.core.model.*;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-
-import java.util.Enumeration;
-import java.util.Vector;
 
 /**
  * The data model used during form entry. Represents the current state of the

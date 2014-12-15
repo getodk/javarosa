@@ -117,7 +117,7 @@ public class Harness {
 			}
 			System.exit(0);
 		}
-		FormDef f = XFormUtils.getFormFromInputStream(System.in);
+		FormDef f = XFormUtils.getFormFromInputStream(System.in, FormDef.latestImplementationMode);
 		System.setOut(sysOut);
 		
 		if (mode == MODE_SCHEMA) {			
