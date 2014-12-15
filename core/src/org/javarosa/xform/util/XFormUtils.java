@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormDef.EvalImplementation;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
@@ -47,25 +48,25 @@ public class XFormUtils {
 		return oldFactory;
 	}
 
-	public static FormDef getFormFromResource (String resource) {
+	public static FormDef getFormFromResource (String resource, EvalImplementation mode) {
 		InputStream is = System.class.getResourceAsStream(resource);
 		if (is == null) {
 			System.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
 			return null;
 		}
 
-		return getFormFromInputStream(is);
+		return getFormFromInputStream(is, mode);
 	}
 
 
-	public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException{
-		return _factory.getXFormParser(isr).parse();
+	public static FormDef getFormRaw(InputStreamReader isr, EvalImplementation mode) throws XFormParseException, IOException{
+		return _factory.getXFormParser(isr).parse(mode);
 	}
 
 	/*
      * This method throws XFormParseException when the form has errors.
      */
-	public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
+	public static FormDef getFormFromInputStream(InputStream is, EvalImplementation mode) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -75,7 +76,7 @@ public class XFormUtils {
                 isr = new InputStreamReader(is);
             }
 
-            return _factory.getXFormParser(isr).parse();
+            return _factory.getXFormParser(isr).parse(mode);
 		} catch(IOException e) {
 			throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {

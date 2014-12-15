@@ -34,7 +34,6 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathConditional;
 
@@ -195,28 +194,7 @@ public class FormOverview {
 			absoluteHeader = "Read-only";
 		}
 
-		IConditionExpr expr = null;
-
-		for (int i = 0; i < f.triggerables.size() && expr == null; i++) {
-			// Clayton Sims - Jun 1, 2009 : Not sure how legitimate this
-			// cast is. It might work now, but break later.
-			// Clayton Sims - Jun 24, 2009 : Yeah, that change broke things.
-			// For now, we won't bother to print out anything that isn't
-			// a condition.
-			if(f.triggerables.elementAt(i) instanceof Condition) {
-			Condition c = (Condition)f.triggerables.elementAt(i);
-
-			if (c.trueAction == action) {
-				for (int j = 0; j < c.targets.size() && expr == null; j++) {
-					TreeReference target = (TreeReference)c.targets.elementAt(j);
-
-					if (instanceNode == getInstanceNode(f.getInstance(), new XPathReference(target))) {
-						expr = c.expr;
-					}
-				}
-			}
-			}
-		}
+		IConditionExpr expr = f.getConditionExpressionForTrueAction(instanceNode, action);
 
 		String line = null;
 		if (expr != null) {

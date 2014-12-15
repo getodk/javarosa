@@ -42,7 +42,7 @@ public class FormInstanceValidator {
 	FormEntryController controller;
 	
 	public FormInstanceValidator(InputStream formInput, InputStream instanceInput) throws Exception {
-		theForm = XFormUtils.getFormFromInputStream(formInput);
+		theForm = XFormUtils.getFormFromInputStream(formInput, FormDef.latestImplementationMode);
 		
 		savedModel = XFormParser.restoreDataModel(instanceInput, null);
         TreeElement templateRoot = theForm.getInstance().getRoot().deepCopy(true);
@@ -105,7 +105,7 @@ public class FormInstanceValidator {
 			
 			answerValue = cast(answerValue, prompt.getDataType());
 			
-			int result = controller.answerQuestion(index, answerValue);
+			int result = controller.answerQuestion(index, answerValue, false, true);
 			switch(result) {
 			case FormEntryController.ANSWER_OK:
 				break;

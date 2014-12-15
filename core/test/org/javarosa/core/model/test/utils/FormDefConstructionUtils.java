@@ -17,6 +17,7 @@
 package org.javarosa.core.model.test.utils;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormDef.EvalImplementation;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.QuestionDef;
 
@@ -29,7 +30,7 @@ import org.javarosa.core.model.QuestionDef;
 public class FormDefConstructionUtils {
 	
 	public static FormDef createSimpleGroupReference() {
-		FormDef theform = new FormDef();
+		FormDef theform = new FormDef(FormDef.latestImplementationMode);
 		
 		QuestionDef question1 = new QuestionDef();
 		GroupDef group1 = new GroupDef();
