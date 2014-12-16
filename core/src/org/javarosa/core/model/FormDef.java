@@ -80,8 +80,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
    public enum EvalBehavior {
-      Legacy, April_2014, Legacy_April_Hybrid_2014, Aggressive_2014
-   };
+      Legacy, April_2014, Aggressive_2014
+   }
 
    public static final EvalBehavior latestImplementationMode = EvalBehavior.Aggressive_2014;
 
@@ -391,8 +391,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-      if (mode == EvalBehavior.Legacy ||
-          mode == EvalBehavior.April_2014) {
+      if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
          setAnswer(data, node);
          triggerTriggerables(ref, cascadeToGroupChildren);
       } else {
@@ -752,7 +751,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       for (QuickTriggerable qt : vertices) {
          deps.clear();
          newDestinationSet.clear();
-         fillTriggeredElements(qt, deps, newDestinationSet, true, true);
+         fillTriggeredElements(qt, deps, newDestinationSet, true);
 
          // remove any self-reference if we have one...
          deps.remove(qt);
@@ -873,20 +872,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * Get all of the elements which will need to be evaluated (in order) when
     * the triggerable is fired.
     * 
-    * @param t
-    * @param destination
+    * @param qt
+    * @param destinationSet
     *           where to store the triggerables
-    * @param cascadeToChildrenOfGroupsWithRelevanceExpressions
+    * @param cascadeToGroupChildren
     *           if true, then the slow code will execute, if false, then
     *           old/fast code will execute that suffers from
     *           https://code.google.com/p/opendatakit/issues/detail?id=888
     */
-   public void fillTriggeredElements(QuickTriggerable qt, Set<QuickTriggerable> destinationSet,
-         Set<QuickTriggerable> newDestinationSet, boolean expandRepeatables,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   public void fillTriggeredElements(QuickTriggerable qt,
+                                     Set<QuickTriggerable> destinationSet,
+                                     Set<QuickTriggerable> newDestinationSet,
+                                     boolean cascadeToGroupChildren) {
       if (qt.t.canCascade()) {
-         if (mode == EvalBehavior.Legacy
-               || (mode == EvalBehavior.Legacy_April_Hybrid_2014 && !cascadeToChildrenOfGroupsWithRelevanceExpressions)) {
+         if (mode == EvalBehavior.Legacy || (mode == EvalBehavior.Aggressive_2014 && !cascadeToGroupChildren)) {
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                TreeReference target = qt.t.getTargets().get(j);
                HashSet<QuickTriggerable> triggered = triggerIndex.get(target);
@@ -900,6 +899,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                }
             }
          } else {
+            boolean expandRepeatables = mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014;
+
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                TreeReference target = (TreeReference) qt.t.getTargets().get(j);
                Set<TreeReference> updatedNodes = new HashSet<TreeReference>();
@@ -1030,10 +1031,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       for (; !refSet.isEmpty();) {
          Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
          for (QuickTriggerable qt : refSet) {
-            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014
-                  || mode == EvalBehavior.Legacy_April_Hybrid_2014) {
-               fillTriggeredElements(qt, tv, newSet, false,
-                     cascadeToChildrenOfGroupsWithRelevanceExpressions);
+            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
+               fillTriggeredElements(qt, tv, newSet,
+                       cascadeToChildrenOfGroupsWithRelevanceExpressions);
             } else if (mode == EvalBehavior.Aggressive_2014) {
                // leverage the saved DAG edges.
                // This may over-fill the set of triggerables.
