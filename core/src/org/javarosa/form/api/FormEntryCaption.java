@@ -21,8 +21,9 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.formmanager.view.IQuestionWidget;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -301,16 +302,16 @@ public class FormEntryCaption implements FormElementStateListener {
 		}
 	}
 
-	public Vector<String> getRepetitionsText () {
+	public List<String> getRepetitionsText () {
 		GroupDef g = (GroupDef)element;
 		if (!g.getRepeat()) {
 			throw new RuntimeException("not a repeat");
 		}
 
 		int numRepetitions = getNumRepetitions();
-		Vector<String> reps = new Vector<String>(numRepetitions);
+      List<String> reps = new ArrayList<String>(numRepetitions);
 		for (int i = 0; i < numRepetitions; i++) {
-			reps.addElement(getRepetitionText("choose", form.descendIntoRepeat(index, i), false));
+			reps.add(getRepetitionText("choose", form.descendIntoRepeat(index, i), false));
 		}
 		return reps;
 	}

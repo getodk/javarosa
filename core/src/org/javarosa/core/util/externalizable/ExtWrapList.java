@@ -19,7 +19,8 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 
 //list of objects of single (non-polymorphic) type
@@ -29,11 +30,11 @@ public class ExtWrapList extends ExternalizableWrapper {
 
 	/* serialization */
 
-	public ExtWrapList (Vector val) {
+	public ExtWrapList (List val) {
 		this(val, null);
 	}
 
-	public ExtWrapList (Vector val, ExternalizableWrapper type) {
+	public ExtWrapList (List val, ExternalizableWrapper type) {
 		if (val == null) {
 			throw new NullPointerException();
 		}
@@ -68,15 +69,15 @@ public class ExtWrapList extends ExternalizableWrapper {
 	}
 
 	public ExternalizableWrapper clone (Object val) {
-		return new ExtWrapList((Vector)val, type);
+		return new ExtWrapList((List)val, type);
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		if(!sealed) {
 			long size = ExtUtil.readNumeric(in);
-			Vector v = new Vector((int) size);
+         List v = new ArrayList((int) size);
 			for (int i = 0; i < size; i++) {
-				v.addElement(ExtUtil.read(in, type, pf));
+				v.add(ExtUtil.read(in, type, pf));
 			}
 			val = v;
 		} else {
@@ -90,11 +91,11 @@ public class ExtWrapList extends ExternalizableWrapper {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Vector v = (Vector)val;
+      List v = (List)val;
 
 		ExtUtil.writeNumeric(out, v.size());
 		for (int i = 0; i < v.size(); i++) {
-			ExtUtil.write(out, type == null ? v.elementAt(i) : type.clone(v.elementAt(i)));
+			ExtUtil.write(out, type == null ? v.get(i) : type.clone(v.get(i)));
 		}
 	}
 
@@ -103,14 +104,14 @@ public class ExtWrapList extends ExternalizableWrapper {
 	}
 
 	public void metaWriteExternal (DataOutputStream out) throws IOException {
-		Vector v = (Vector)val;
+      List v = (List)val;
 		Object tagObj;
 
 		if (type == null) {
 			if (v.size() == 0) {
 				tagObj = new Object();
 			} else {
-				tagObj = v.elementAt(0);
+				tagObj = v.get(0);
 			}
 		} else {
 			tagObj = type;

@@ -16,6 +16,8 @@
 
 package org.javarosa.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -91,6 +93,15 @@ public class ArrayUtilities {
 		}
 		return b;
 	}
+
+   public static <E> List<E> listCopy(List<E> a) {
+      if(a == null ) { return null; }
+      List<E> b = new ArrayList<E>(a.size());
+      for(E e : a) {
+         b.add(e);
+      }
+      return b;
+   }
 
 	public static <E> E[] copyIntoArray(Vector<E> v, E[] a) {
 		int i = 0;

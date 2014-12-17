@@ -25,7 +25,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TreeReference implements Externalizable {
 	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
@@ -49,7 +50,7 @@ public class TreeReference implements Externalizable {
 	private int refLevel; //0 = context node, 1 = parent, 2 = grandparent ...
 	private int contextType;
 	private String instanceName = null;
-	private Vector<TreeReferenceLevel> data = null;
+	private List<TreeReferenceLevel> data = null;
 
 
 	public static TreeReference rootRef () {
@@ -70,7 +71,7 @@ public class TreeReference implements Externalizable {
 		instanceName = null; // null means the default instance
 		refLevel = 0;
 		contextType = CONTEXT_ABSOLUTE;
-		data = new Vector<TreeReferenceLevel>(0);
+		data = new ArrayList<TreeReferenceLevel>(0);
 	}
 
 	public String getInstanceName() {
@@ -82,23 +83,23 @@ public class TreeReference implements Externalizable {
 	}
 
 	public int getMultiplicity(int index) {
-		return data.elementAt(index).getMultiplicity();
+		return data.get(index).getMultiplicity();
 	}
 
 	public String getName(int index) {
-		return data.elementAt(index).getName();
+		return data.get(index).getName();
 	}
 
 	public int getMultLast () {
-		return data.lastElement().getMultiplicity();
+		return data.get(data.size() - 1).getMultiplicity();
 	}
 
 	public String getNameLast () {
-		return data.lastElement().getName();
+		return data.get(data.size() -1 ).getName();
 	}
 
 	public void setMultiplicity (int i, int mult) {
-		data.setElementAt(data.elementAt(i).setMultiplicity(mult), i);
+		data.set(i, data.get(i).setMultiplicity(mult));
 	}
 
 	public int size () {
@@ -106,21 +107,21 @@ public class TreeReference implements Externalizable {
 	}
 
 	private void add (TreeReferenceLevel level) {
-		data.addElement(level);
+		data.add(level);
 	}
 
 	public void add (String name, int mult) {
 		add(new TreeReferenceLevel(name, mult).intern());
 	}
 
-	public void addPredicate(int key, Vector<XPathExpression> xpe)
+	public void addPredicate(int key, List<XPathExpression> xpe)
 	{
-		data.setElementAt(data.elementAt(key).setPredicates(xpe), key);
+		data.set(key, data.get(key).setPredicates(xpe));
 	}
 
-	public Vector<XPathExpression> getPredicate(int key)
+	public List<XPathExpression> getPredicate(int key)
 	{
-		return data.elementAt(key).getPredicates();
+		return data.get(key).getPredicates();
 	}
 
 	public int getRefLevel () {
@@ -182,7 +183,7 @@ public class TreeReference implements Externalizable {
 				return true;
 			}
 		} else {
-			data.removeElementAt(size -1);
+			data.remove(size - 1);
 			return true;
 		}
 	}
@@ -248,7 +249,7 @@ public class TreeReference implements Externalizable {
 					newRef.removeLastLevel();
 				}
 				for (int i = 0; i < size(); i++) {
-					newRef.add(data.elementAt(i).shallowCopy());
+					newRef.add(data.get(i).shallowCopy());
 				}
 				return newRef;
 			}
@@ -276,7 +277,7 @@ public class TreeReference implements Externalizable {
 
 			//If the the contextRef can provide a definition for a wildcard, do so
 			if(TreeReference.NAME_WILDCARD.equals(newRef.getName(i)) && !TreeReference.NAME_WILDCARD.equals(contextRef.getName(i))) {
-				newRef.data.setElementAt(newRef.data.elementAt(i).setName(contextRef.getName(i)), i);
+				newRef.data.set(i, newRef.data.get(i).setName(contextRef.getName(i)));
 			}
 
 			if (contextRef.getName(i).equals(newRef.getName(i))) {
@@ -367,8 +368,8 @@ public class TreeReference implements Externalizable {
 					int multA = this.getMultiplicity(i);
 					int multB = ref.getMultiplicity(i);
 
-					Vector<XPathExpression> predA = this.getPredicate(i);
-					Vector<XPathExpression> predB = ref.getPredicate(i);
+               List<XPathExpression> predA = this.getPredicate(i);
+               List<XPathExpression> predB = ref.getPredicate(i);
 
 					if (!nameA.equals(nameB)) {
 						return false;
@@ -381,7 +382,7 @@ public class TreeReference implements Externalizable {
 					} else if(predA != null && predB != null) {
 						if(predA.size() != predB.size()) { return false;}
 						for(int j = 0 ; j < predA.size() ; ++j) {
-							if(!predA.elementAt(j).equals(predB.elementAt(j))) {
+							if(!predA.get(j).equals(predB.get(j))) {
 								return false;
 							}
 						}
@@ -412,7 +413,7 @@ public class TreeReference implements Externalizable {
 
 			hash ^= getName(i).hashCode();
 			hash ^= mult.hashCode();
-			Vector<XPathExpression> predicates = this.getPredicate(i);
+         List<XPathExpression> predicates = this.getPredicate(i);
 			if(predicates == null) {
 				continue;
 			}
@@ -570,9 +571,9 @@ public class TreeReference implements Externalizable {
 		ret.refLevel = this.refLevel;
 		ret.contextType = this.contextType;
 		ret.instanceName = this.instanceName;
-		ret.data = new Vector<TreeReferenceLevel>(level);
+		ret.data = new ArrayList<TreeReferenceLevel>(level);
 		for(int i = 0 ; i <= level ; ++i) {
-			ret.data.addElement(this.data.elementAt(i));
+			ret.data.add(this.data.get(i));
 		}
 		return ret;
 	}
@@ -589,7 +590,7 @@ public class TreeReference implements Externalizable {
 	public TreeReference removePredicates() {
 		TreeReference predicateless = clone();
 		for(int i = 0; i < predicateless.data.size(); ++i) {
-			predicateless.data.setElementAt(predicateless.data.elementAt(i).setPredicates(null), i	);
+			predicateless.data.set(i, predicateless.data.get(i).setPredicates(null));
 		}
 		return predicateless;
 	}

@@ -18,7 +18,8 @@ package org.javarosa.xform.util;
 
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.IAnswerDataSerializer;
@@ -59,10 +60,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 
 	public final static String DELIMITER = " ";
 
-	Vector additionalSerializers = new Vector(1);
+   List<IAnswerDataSerializer> additionalSerializers = new ArrayList<IAnswerDataSerializer>(1);
 
 	public void registerAnswerSerializer(IAnswerDataSerializer ads) {
-		additionalSerializers.addElement(ads);
+		additionalSerializers.add(ads);
 	}
 
 	public boolean canSerialize(IAnswerData data) {
@@ -166,12 +167,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 * separated by space characters.
 	 */
 	public Object serializeAnswerData(SelectMultiData data) {
-		Vector selections = (Vector)data.getValue();
-		Enumeration en = selections.elements();
+      List<Selection> selections = (List<Selection>)data.getValue();
 		StringBuilder selectString = new StringBuilder();
 
-		while(en.hasMoreElements()) {
-			Selection selection = (Selection)en.nextElement();
+      for (Selection selection : selections) {
 			if (selectString.length() > 0)
 				selectString.append(DELIMITER);
 			selectString.append(selection.getValue());
@@ -224,9 +223,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
 		// First, we want to go through the additional serializers, as they should
 		// take priority to the default serializations
-		Enumeration en = additionalSerializers.elements();
-		while(en.hasMoreElements()) {
-			IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
+      for (IAnswerDataSerializer serializer : additionalSerializers) {
 			if(serializer.canSerialize(data)) {
 				return serializer.serializeAnswerData(data, dataType);
 			}
@@ -281,9 +278,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Boolean containsExternalData(IAnswerData data) {
 		//First check for registered serializers to identify whether
 		//they override this one.
-		Enumeration en = additionalSerializers.elements();
-		while(en.hasMoreElements()) {
-			IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
+      for (IAnswerDataSerializer serializer : additionalSerializers) {
 			Boolean contains = serializer.containsExternalData(data);
 			if(contains != null) {
 				return contains;
@@ -297,9 +292,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	}
 
 	public IDataPointer[] retrieveExternalDataPointer(IAnswerData data) {
-		Enumeration en = additionalSerializers.elements();
-		while(en.hasMoreElements()) {
-			IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
+      for (IAnswerDataSerializer serializer : additionalSerializers) {
 			Boolean contains = serializer.containsExternalData(data);
 			if(contains != null) {
 				return serializer.retrieveExternalDataPointer(data);

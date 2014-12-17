@@ -1,6 +1,6 @@
 package org.javarosa.core.model.instance;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
@@ -24,7 +24,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	 * @param name
 	 * @return
 	 */
-	public abstract Vector<T> getChildrenWithName(String name);
+	public abstract List<T> getChildrenWithName(String name);
 	
 	public abstract boolean hasChildren();
 
@@ -82,7 +82,6 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	 * If 'null' is provided for the namespace, it will match the first
 	 * attribute with the matching name.
 	 * 
-	 * @param index
 	 * @return TreeElement
 	 */
 	public abstract T getAttribute(String namespace, String name);
@@ -90,7 +89,6 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	/**
 	 * get value of attribute with namespace:name' in the vector
 	 * 
-	 * @param index
 	 * @return String
 	 */
 	public abstract String getAttributeValue(String namespace, String name);
@@ -127,5 +125,5 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	 * @param evalContext
 	 * @return
 	 */
-	public abstract Vector<TreeReference> tryBatchChildFetch(String name, int mult, Vector<XPathExpression> predicates, EvaluationContext evalContext);
+	public abstract List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates, EvaluationContext evalContext);
 }

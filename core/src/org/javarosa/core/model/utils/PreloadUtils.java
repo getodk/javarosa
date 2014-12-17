@@ -20,7 +20,7 @@
 package org.javarosa.core.model.utils;
 
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
@@ -60,8 +60,8 @@ public class PreloadUtils {
 			return new LongData((Long)o);
 		} else if (o instanceof Double) {
 			return new DecimalData((Double)o);
-		} else if(o instanceof Vector) {
-			return new SelectMultiData((Vector)o);
+		} else if(o instanceof List) {
+			return new SelectMultiData((List)o);
 		} else if(o instanceof IAnswerData) {
 			return (IAnswerData)o;
 		}

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -114,17 +113,17 @@ public class XPathFuncExpr extends XPathExpression {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		id = (XPathQName)ExtUtil.read(in, XPathQName.class);
-		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
 		args = new XPathExpression[v.size()];
 		for (int i = 0; i < args.length; i++)
-			args[i] = (XPathExpression)v.elementAt(i);
+			args[i] = (XPathExpression)v.get(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Vector v = new Vector(args.length);
+      List v = new ArrayList(args.length);
 		for (int i = 0; i < args.length; i++)
-			v.addElement(args[i]);
+			v.add(args[i]);
 
 		ExtUtil.write(out, id);
 		ExtUtil.write(out, new ExtWrapListPoly(v));
@@ -434,12 +433,11 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @return
 	 */
 	private static Object evalCustomFunction (IFunctionHandler handler, Object[] args, EvaluationContext ec) {
-		Vector prototypes = handler.getPrototypes();
-		Enumeration e = prototypes.elements();
+      List<Class[]> prototypes = handler.getPrototypes();
 		Object[] typedArgs = null;
 
-		while (typedArgs == null && e.hasMoreElements()) {
-			typedArgs = matchPrototype(args, (Class[])e.nextElement());
+		while (typedArgs == null && prototypes.size() > 0) {
+			typedArgs = matchPrototype(args, prototypes.get(0));
 		}
 
 		if (typedArgs != null) {
@@ -944,9 +942,9 @@ public class XPathFuncExpr extends XPathExpression {
     public static String selectedAt (Object o1, Object o2) {
         String selection = (String)unpack(o1);
         int index = toInt(o2).intValue();
-        Vector stringVector = DateUtils.split(selection, " ", true);
+       List stringVector = DateUtils.split(selection, " ", true);
         if (stringVector.size() > index && index >= 0) {
-            return (String) stringVector.elementAt(index);
+            return (String) stringVector.get(index);
         } else {
         	return ""; // empty string if outside of array
         }
@@ -1224,7 +1222,7 @@ public class XPathFuncExpr extends XPathExpression {
 	/**
 	 *
 	 */
-	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		String name = id.toString();
 
 		//for now we'll assume that all that functions do is return the composition of their components

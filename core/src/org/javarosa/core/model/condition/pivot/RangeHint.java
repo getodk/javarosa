@@ -3,7 +3,8 @@
  */
 package org.javarosa.core.model.condition.pivot;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
@@ -28,14 +29,14 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 
 	public void init(EvaluationContext c, IConditionExpr conditional, FormInstance instance) throws UnpivotableExpressionException {
 
-		Vector<Object> pivots = conditional.pivot(instance, c);
+      List<Object> pivots = conditional.pivot(instance, c);
 
-		Vector<CmpPivot> internalPivots = new Vector<CmpPivot>(pivots.size());
+      List<CmpPivot> internalPivots = new ArrayList<CmpPivot>(pivots.size());
 		for(Object p : pivots) {
 			if(!(p instanceof CmpPivot)) {
 				throw new UnpivotableExpressionException();
 			}
-			internalPivots.addElement((CmpPivot)p);
+			internalPivots.add((CmpPivot)p);
 		}
 
 		if(internalPivots.size() > 2) {

@@ -19,7 +19,8 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 
 //list of objects of multiple types
@@ -27,7 +28,7 @@ import java.util.Vector;
 public class ExtWrapListPoly extends ExternalizableWrapper {
 	/* serializaiton */
 
-	public ExtWrapListPoly (Vector val) {
+	public ExtWrapListPoly (List val) {
 		if (val == null) {
 			throw new NullPointerException();
 		}
@@ -42,26 +43,26 @@ public class ExtWrapListPoly extends ExternalizableWrapper {
 	}
 
 	public ExternalizableWrapper clone (Object val) {
-		return new ExtWrapListPoly((Vector)val);
+		return new ExtWrapListPoly((List)val);
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 
 		long size = ExtUtil.readNumeric(in);
-		Vector v = new Vector((int) size);
+      List v = new ArrayList((int) size);
 		for (int i = 0; i < size; i++) {
-			v.addElement(ExtUtil.read(in, new ExtWrapTagged(), pf));
+			v.add(ExtUtil.read(in, new ExtWrapTagged(), pf));
 		}
 
 		val = v;
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Vector v = (Vector)val;
+      List v = (List)val;
 
 		ExtUtil.writeNumeric(out, v.size());
 		for (int i = 0; i < v.size(); i++) {
-			ExtUtil.write(out, new ExtWrapTagged(v.elementAt(i)));
+			ExtUtil.write(out, new ExtWrapTagged(v.get(i)));
 		}
 	}
 

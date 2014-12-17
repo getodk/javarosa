@@ -25,7 +25,8 @@ import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExtUtil {
 	public static boolean interning = true;
@@ -160,7 +161,7 @@ public class ExtUtil {
 		}
 	}
 
-	public static void writeAttributes(DataOutputStream out, Vector<TreeElement> attributes) throws IOException {
+	public static void writeAttributes(DataOutputStream out, List<TreeElement> attributes) throws IOException {
 		ExtUtil.writeNumeric(out,  attributes.size());
 		for ( TreeElement e : attributes ) {
 			ExtUtil.write(out, e.getNamespace());
@@ -282,9 +283,9 @@ public class ExtUtil {
 		return ints;
 	}
 
-	public static Vector<TreeElement> readAttributes(DataInputStream in, TreeElement parent) throws IOException {
+	public static List<TreeElement> readAttributes(DataInputStream in, TreeElement parent) throws IOException {
 		int size = (int) ExtUtil.readNumeric(in);
-		Vector<TreeElement> attributes = new Vector<TreeElement>(size);
+      List<TreeElement> attributes = new ArrayList<TreeElement>(size);
 		for ( int i = 0 ; i < size; ++i ) {
 			String namespace = ExtUtil.readString(in);
 			String name = ExtUtil.readString(in);
@@ -292,7 +293,7 @@ public class ExtUtil {
 
 			TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
 			attr.setParent(parent);
-			attributes.addElement(attr);
+			attributes.add(attr);
 		}
 		return attributes;
 	}
@@ -339,7 +340,7 @@ public class ExtUtil {
 		return (s == null ? null : (s.length() == 0 ? null : s));
 	}
 
-	public static Vector nullIfEmpty (Vector v) {
+	public static List nullIfEmpty (List v) {
 		return (v == null ? null : (v.size() == 0 ? null : v));
 	}
 
@@ -355,8 +356,8 @@ public class ExtUtil {
 		return s == null ? "" : s;
 	}
 
-	public static Vector emptyIfNull (Vector v) {
-		return v == null ? new Vector(0) : v;
+	public static List emptyIfNull (List v) {
+		return v == null ? new ArrayList(0) : v;
 	}
 
 	public static HashMap emptyIfNull (HashMap h) {
@@ -376,8 +377,8 @@ public class ExtUtil {
 
 		if (a == null) {
 			return b == null;
-		} else if (a instanceof Vector) {
-			return (b instanceof Vector && vectorEquals((Vector)a, (Vector)b));
+		} else if (a instanceof List) {
+			return (b instanceof List && vectorEquals((List)a, (List)b));
 		} else if (a instanceof HashMap) {
 			return (b instanceof HashMap && hashMapEquals((HashMap) a, (HashMap) b));
 		} else {
@@ -385,7 +386,7 @@ public class ExtUtil {
 		}
 	}
 
-	public static boolean vectorEquals (Vector a, Vector b) {
+	public static boolean vectorEquals (List a, List b) {
 		if ( a == b ) {
 			return true;
 		}
@@ -393,7 +394,7 @@ public class ExtUtil {
 			return false;
 		} else {
 			for (int i = 0; i < a.size(); i++) {
-				if (!equals(a.elementAt(i), b.elementAt(i))) {
+				if (!equals(a.get(i), b.get(i))) {
 					return false;
 				}
 			}

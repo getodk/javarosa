@@ -19,7 +19,8 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -231,10 +232,10 @@ public class XPathStep implements Externalizable {
 		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break;
 		}
 
-		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.elementAt(i);
+			predicates[i] = (XPathExpression)v.get(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -247,9 +248,9 @@ public class XPathStep implements Externalizable {
 		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
 		}
 
-		Vector v = new Vector(predicates.length);
+      List v = new ArrayList(predicates.length);
 		for (int i = 0; i < predicates.length; i++)
-			v.addElement(predicates[i]);
+			v.add(predicates[i]);
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 

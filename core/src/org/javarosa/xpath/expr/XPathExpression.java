@@ -16,7 +16,8 @@
 
 package org.javarosa.xpath.expr;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -32,9 +33,9 @@ public abstract class XPathExpression implements Externalizable {
 
 	public abstract Object eval (FormInstance model, EvaluationContext evalContext);
 
-	public final Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+	public final List<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
 		try {
-			Vector<Object> pivots = new Vector<Object>();
+         List<Object> pivots = new ArrayList<Object>();
 			this.pivot(model, evalContext, pivots, evalContext.getContextRef());
 			return pivots;
 		} catch(UnpivotableExpressionException uee) {
@@ -61,7 +62,7 @@ public abstract class XPathExpression implements Externalizable {
 	 *          any other value - The result of the expression if no pivots are detected
 	 * @throws UnpivotableExpressionException If the expression is too complex to pivot
 	 */
-	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		return eval(model,evalContext);
 	}
 

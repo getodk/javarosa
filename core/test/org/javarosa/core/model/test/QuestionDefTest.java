@@ -21,7 +21,7 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormElementStateListener;
@@ -169,7 +169,7 @@ public class QuestionDefTest extends TestCase {
 		}
 
 		try {
-			q.setChildren(new Vector());
+			q.setChildren(new ArrayList<IFormElement>());
 			fail("Set a question's children without exception");
 		} catch (IllegalStateException ise) {
 			//expected

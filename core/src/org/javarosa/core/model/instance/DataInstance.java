@@ -3,17 +3,15 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xpath.expr.XPathExpression;
 
 /**
  * A data instance represents a tree structure of abstract tree
@@ -109,11 +107,11 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 		return (node == getBase() ? null : result); // never return a reference to '/'
 	}
 
-	public Vector explodeReference(TreeReference ref) {
+	public List<AbstractTreeElement<T>> explodeReference(TreeReference ref) {
 		if (!ref.isAbsolute())
 			return null;
 
-		Vector nodes = new Vector(ref.size());
+      List<AbstractTreeElement<T>> nodes = new ArrayList<AbstractTreeElement<T>>(ref.size());
 		AbstractTreeElement<T> cur = getBase();
 		for (int i = 0; i < ref.size(); i++) {
 			String name = ref.getName(i);
@@ -124,7 +122,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 				//This is not the attribute we're testing
 				if(cur != getBase()) {
 					//Add the current node
-					nodes.addElement(cur);
+					nodes.add(cur);
 				}
 				cur = cur.getAttribute(null, name);
 			}
@@ -141,7 +139,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 				}
 
 				if (cur != getBase()) {
-					nodes.addElement(cur);
+					nodes.add(cur);
 				}
 
 				cur = cur.getChild(name, mult);
