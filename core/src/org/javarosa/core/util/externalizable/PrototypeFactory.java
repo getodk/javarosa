@@ -17,6 +17,7 @@
 package org.javarosa.core.util.externalizable;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import org.javarosa.core.util.MD5;
@@ -50,10 +51,10 @@ public class PrototypeFactory {
 		addDefaultClasses();
 
 		if (classNames != null) {
-			Vector vClasses = classNames.getStrings();
+			List<String> vClasses = classNames.getStrings();
 
 			for (int i = 0; i < vClasses.size(); i++) {
-				String name = (String)vClasses.elementAt(i);
+				String name = (String)vClasses.get(i);
 				try {
 					addClass(Class.forName(name));
 				} catch (ClassNotFoundException cnfe) {

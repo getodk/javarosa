@@ -16,8 +16,9 @@
 
 package org.javarosa.xform.util;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
@@ -105,8 +106,8 @@ public class XFormAnswerDataParser {
 
 		case Constants.DATATYPE_CHOICE:
 
-			Vector selections = getSelections(text, q);
-			return (selections.size() == 0 ? null : new SelectOneData((Selection)selections.elementAt(0)));
+         List selections = getSelections(text, q);
+			return (selections.size() == 0 ? null : new SelectOneData((Selection)selections.get(0)));
 
 		case Constants.DATATYPE_CHOICE_LIST:
 
@@ -184,14 +185,14 @@ public class XFormAnswerDataParser {
 		}
 	}
 
-	private static Vector getSelections (String text, QuestionDef q) {
+	private static List getSelections (String text, QuestionDef q) {
 
-		Vector choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
-		Vector v = new Vector(choices.size()); // assume they are all still valid...
+      List choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
+      List v = new ArrayList(choices.size()); // assume they are all still valid...
 		for (int i = 0; i < choices.size(); i++) {
-			Selection s = getSelection((String)choices.elementAt(i), q);
+			Selection s = getSelection((String)choices.get(i), q);
 			if (s != null)
-				v.addElement(s);
+				v.add(s);
 		}
 
 		return v;

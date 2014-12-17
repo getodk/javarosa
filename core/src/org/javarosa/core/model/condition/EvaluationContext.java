@@ -27,7 +27,8 @@ import org.javarosa.xpath.expr.XPathFuncExpr;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /* a collection of objects that affect the evaluation of an expression, like function handlers
  * and (not supported) variable bindings
@@ -182,7 +183,7 @@ public class EvaluationContext {
 		return variables.get(name);
 	}
 
-	public Vector<TreeReference> expandReference(TreeReference ref) {
+	public List<TreeReference> expandReference(TreeReference ref) {
 		return expandReference(ref, false);
 	}
 
@@ -193,7 +194,7 @@ public class EvaluationContext {
 	// return null if ref is relative, otherwise return vector of refs (but vector will be empty is no refs match)
 	// '/' returns {'/'}
 	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
-	public Vector<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
+	public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
 		if (!ref.isAbsolute()) {
 			return null;
 		}
@@ -209,7 +210,7 @@ public class EvaluationContext {
 			throw new RuntimeException("Unable to expand reference " + ref.toString(true) + ", no appropriate instance in evaluation context");
 		}
 
-		Vector<TreeReference> v = new Vector<TreeReference>(1);
+      List<TreeReference> v = new ArrayList<TreeReference>(1);
 		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), v, includeTemplates);
 		return v;
 	}
@@ -220,14 +221,14 @@ public class EvaluationContext {
 	// workingRef: explicit path that refers to the current node
 	// refs: Vector to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef, Vector<TreeReference> refs, boolean includeTemplates) {
+	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates) {
 		int depth = workingRef.size();
-		Vector<XPathExpression> predicates = null;
+      List<XPathExpression> predicates = null;
 
 		//check to see if we've matched fully
 		if (depth == sourceRef.size()) {
 			//TODO: Do we need to clone these references?
-			refs.addElement(workingRef);
+			refs.add(workingRef);
 		} else {
 			//Otherwise, need to get the next set of matching references
 
@@ -236,23 +237,23 @@ public class EvaluationContext {
 
 			//Copy predicates for batch fetch
 			if (predicates != null) {
-				Vector<XPathExpression> predCopy = new Vector<XPathExpression>(predicates.size());
+            List<XPathExpression> predCopy = new ArrayList<XPathExpression>(predicates.size());
 				for (XPathExpression xpe : predicates) {
-					predCopy.addElement(xpe);
+					predCopy.add(xpe);
 				}
 				predicates = predCopy;
 			}
 			//ETHERTON: Is this where we should test for predicates?
 			int mult = sourceRef.getMultiplicity(depth);
-			Vector<TreeReference> set = new Vector<TreeReference>(1);
+         List<TreeReference> set = new ArrayList<TreeReference>(1);
 
 			TreeElement node = instance.resolveReference(workingRef);
-			Vector<TreeReference> passingSet = new Vector<TreeReference>(0);
+         List<TreeReference> passingSet = new ArrayList<TreeReference>(0);
 
 			{
 				if (node.getNumChildren() > 0) {
 					if (mult == TreeReference.INDEX_UNBOUND) {
-						Vector<TreeElement> childrenWithName = node.getChildrenWithName(name);
+                  List<TreeElement> childrenWithName = node.getChildrenWithName(name);
 						int count = childrenWithName.size();
 						for (int i = 0; i < count; i++) {
 							TreeElement child = childrenWithName.get(i);
@@ -260,7 +261,7 @@ public class EvaluationContext {
 								throw new IllegalStateException("Unexpected multiplicity mismatch");
 							}
 							if (child != null) {
-								set.addElement(child.getRef());
+								set.add(child.getRef());
 							} else {
 								throw new IllegalStateException("Missing or non-sequntial nodes expanding a reference"); // missing/non-sequential
 								// nodes
@@ -269,7 +270,7 @@ public class EvaluationContext {
 						if (includeTemplates) {
 							TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
 							if (template != null) {
-								set.addElement(template.getRef());
+								set.add(template.getRef());
 							}
 						}
 					} else if(mult != TreeReference.INDEX_ATTRIBUTE){
@@ -278,7 +279,7 @@ public class EvaluationContext {
 						//the appropriate child
 						TreeElement child = node.getChild(name, mult);
 						if (child != null) {
-							set.addElement(child.getRef());
+							set.add(child.getRef());
 						}
 					}
 				}
@@ -286,7 +287,7 @@ public class EvaluationContext {
 				if(mult == TreeReference.INDEX_ATTRIBUTE) {
 					TreeElement attribute = node.getAttribute(null, name);
 					if (attribute != null) {
-						set.addElement(attribute.getRef());
+						set.add(attribute.getRef());
 					}
 				}
 			}
@@ -297,11 +298,11 @@ public class EvaluationContext {
 
 			if (predicates != null) {
 				boolean firstTime = true;
-				Vector<TreeReference> passed = new Vector<TreeReference>(set.size());
+            List<TreeReference> passed = new ArrayList<TreeReference>(set.size());
 				for (XPathExpression xpe : predicates) {
 					for ( int i = 0 ; i < set.size() ; ++i ) {
 						//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-						TreeReference treeRef = set.elementAt(i);
+						TreeReference treeRef = set.get(i);
 
 						//test the predicate on the treeElement
 						EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
@@ -310,7 +311,7 @@ public class EvaluationContext {
 						{
 							boolean testOutcome = ((Boolean)o).booleanValue();
 							if ( testOutcome ) {
-								passed.addElement(treeRef);
+								passed.add(treeRef);
 							}
 						}
 					}
@@ -326,7 +327,7 @@ public class EvaluationContext {
 			}
 
 			for ( int i = 0 ; i < set.size() ; ++i ) {
-				TreeReference treeRef = set.elementAt(i);
+				TreeReference treeRef = set.get(i);
 				expandReference(sourceRef, instance, treeRef, refs, includeTemplates);
 			}
 		}

@@ -1,6 +1,6 @@
 package org.javarosa.xpath;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.FormInstance;
@@ -50,12 +50,12 @@ public class XPathLazyNodeset extends XPathNodeset {
 			if(evaluated.booleanValue()) {
 				return;
 			}
-			Vector<TreeReference> nodes = ec.expandReference(unExpandedRef);
+         List<TreeReference> nodes = ec.expandReference(unExpandedRef);
 
 			//to fix conditions based on non-relevant data, filter the nodeset by relevancy
 			for (int i = 0; i < nodes.size(); i++) {
-				if (!instance.resolveReference((TreeReference)nodes.elementAt(i)).isRelevant()) {
-					nodes.removeElementAt(i);
+				if (!instance.resolveReference((TreeReference)nodes.get(i)).isRelevant()) {
+					nodes.remove(i);
 					i--;
 				}
 			}
@@ -118,7 +118,7 @@ public class XPathLazyNodeset extends XPathNodeset {
 		return super.toArgList();
 	}
 
-	protected Vector<TreeReference> getReferences() {
+	protected List<TreeReference> getReferences() {
 		performEvaluation();
 		return super.getReferences();
 	}

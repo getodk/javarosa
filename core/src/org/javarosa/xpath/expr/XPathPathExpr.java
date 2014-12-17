@@ -19,7 +19,8 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -176,10 +177,10 @@ public class XPathPathExpr extends XPathExpression {
 
 			if(step.predicates.length > 0) {
 				int refLevel = ref.getRefLevel();
-				Vector<XPathExpression> v = new Vector<XPathExpression>(step.predicates.length);
+            List<XPathExpression> v = new ArrayList<XPathExpression>(step.predicates.length);
 				for(int j = 0; j < step.predicates.length; j++)
 				{
-					v.addElement(step.predicates[j]);
+					v.add(step.predicates[j]);
 				}
 				ref.addPredicate(i, v);
 			}
@@ -235,12 +236,12 @@ public class XPathPathExpr extends XPathExpression {
 //			return new XPathNodeset(nodesetRefs, m, ec);
 //		}
 
-		Vector<TreeReference> nodesetRefs = ec.expandReference(ref);
+      List<TreeReference> nodesetRefs = ec.expandReference(ref);
 
 		//to fix conditions based on non-relevant data, filter the nodeset by relevancy
 		for (int i = 0; i < nodesetRefs.size(); i++) {
-			if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
-				nodesetRefs.removeElementAt(i);
+			if (!m.resolveReference((TreeReference)nodesetRefs.get(i)).isRelevant()) {
+				nodesetRefs.remove(i);
 				i--;
 			}
 		}
@@ -404,10 +405,10 @@ public class XPathPathExpr extends XPathExpression {
 			filtExpr = (XPathFilterExpr)ExtUtil.read(in, XPathFilterExpr.class, pf);
 		}
 
-		Vector v = (Vector)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
+      List v = (List)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
 		steps = new XPathStep[v.size()];
 		for (int i = 0; i < steps.length; i++)
-			steps[i] = ((XPathStep)v.elementAt(i)).intern();
+			steps[i] = ((XPathStep)v.get(i)).intern();
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -416,9 +417,9 @@ public class XPathPathExpr extends XPathExpression {
 			ExtUtil.write(out, filtExpr);
 		}
 
-		Vector v = new Vector(steps.length);
+      List v = new ArrayList(steps.length);
 		for (int i = 0; i < steps.length; i++)
-			v.addElement(steps[i]);
+			v.add(steps[i]);
 		ExtUtil.write(out, new ExtWrapList(v));
 	}
 
@@ -436,7 +437,7 @@ public class XPathPathExpr extends XPathExpression {
 		return path;
 	}
 
-	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		TreeReference ref = this.getReference();
 		//Either concretely the sentinal, or "."
 		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {

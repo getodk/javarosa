@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormDef.EvalBehavior;
@@ -130,33 +131,33 @@ public class XFormUtils {
 
 	/////Parser Attribute warning stuff
 
-	public static Vector getAttributeList(Element e){
-		Vector atts = new Vector(e.getAttributeCount());
+	public static List<String> getAttributeList(Element e){
+		List<String> atts = new ArrayList<String>(e.getAttributeCount());
 		for(int i=0;i<e.getAttributeCount();i++){
-			atts.addElement(e.getAttributeName(i));
+			atts.add(e.getAttributeName(i));
 		}
 
 		return atts;
 	}
 
-	public static Vector getUnusedAttributes(Element e,Vector usedAtts){
-		Vector unusedAtts = getAttributeList(e);
+	public static List getUnusedAttributes(Element e,List usedAtts){
+      List unusedAtts = getAttributeList(e);
 		for(int i=0;i<usedAtts.size();i++){
-			if(unusedAtts.contains(usedAtts.elementAt(i))){
-				unusedAtts.removeElement(usedAtts.elementAt(i));
+			if(unusedAtts.contains(usedAtts.get(i))){
+				unusedAtts.remove(usedAtts.get(i));
 			}
 		}
 
 		return unusedAtts;
 	}
 
-	public static String unusedAttWarning(Element e, Vector usedAtts){
+	public static String unusedAttWarning(Element e, List<String> usedAtts){
 		String warning = "Warning: ";
-		Vector ua = getUnusedAttributes(e,usedAtts);
+      List ua = getUnusedAttributes(e,usedAtts);
 		warning+=ua.size()+" Unrecognized attributes found in Element ["+e.getName()+"] and will be ignored: ";
 		warning+="[";
 		for(int i=0;i<ua.size();i++){
-			warning+=ua.elementAt(i);
+			warning+=ua.get(i);
 			if(i!=ua.size()-1) warning+=",";
 		}
 		warning+="] ";
@@ -165,7 +166,7 @@ public class XFormUtils {
 		return warning;
 	}
 
-	public static boolean showUnusedAttributeWarning(Element e, Vector usedAtts){
+	public static boolean showUnusedAttributeWarning(Element e, List usedAtts){
 		return getUnusedAttributes(e,usedAtts).size()>0;
 	}
 

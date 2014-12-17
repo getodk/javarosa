@@ -19,7 +19,7 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -171,7 +171,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
         	ret[i] = MISSING_VALUE;
         }
 
-		Vector<String> choices = DateUtils.split(data.value, " ", true);
+      List<String> choices = DateUtils.split(data.value, " ", true);
 		int i = 0;
 		for(String s : choices) {
 			double d = Double.parseDouble(s);

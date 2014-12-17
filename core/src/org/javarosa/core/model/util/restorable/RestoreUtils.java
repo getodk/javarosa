@@ -17,7 +17,7 @@
 package org.javarosa.core.model.util.restorable;
 
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -187,9 +187,9 @@ public class RestoreUtils {
 	public static void applyDataType (FormInstance dm, String path, TreeReference parent, int dataType) {
 		TreeReference ref = childRef(path, parent);
 
-		Vector v = new EvaluationContext(dm).expandReference(ref);
+		List<TreeReference> v = new EvaluationContext(dm).expandReference(ref);
 		for (int i = 0; i < v.size(); i++) {
-			TreeElement e = dm.resolveReference((TreeReference)v.elementAt(i));
+			TreeElement e = dm.resolveReference((TreeReference)v.get(i));
 			e.setDataType(dataType);
 		}
 	}
@@ -273,10 +273,10 @@ public class RestoreUtils {
 
 		String childName = ((Restorable)PrototypeFactory.getInstance(type)).getRestorableType();
 		TreeElement e = dm.resolveReference(absRef(path, dm));
-		Vector children = e.getChildrenWithName(childName);
+		List<TreeElement> children = e.getChildrenWithName(childName);
 
 		for (int i = 0; i < children.size(); i++) {
-			FormInstance child = subDataModel((TreeElement)children.elementAt(i));
+			FormInstance child = subDataModel((TreeElement)children.get(i));
 
 			Restorable inst = (Restorable)PrototypeFactory.getInstance(type);
 

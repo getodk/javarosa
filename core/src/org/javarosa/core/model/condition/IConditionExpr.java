@@ -17,7 +17,7 @@
 package org.javarosa.core.model.condition;
 
 import java.util.Set;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
@@ -78,7 +78,7 @@ public interface IConditionExpr extends Externalizable {
 	 * @param evalContext
 	 * @return
 	 */
-	Vector<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext);
+   List<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext);
 
 	/**
 	 * Provides a list of all of the references that this expression's value depends upon
@@ -100,5 +100,5 @@ public interface IConditionExpr extends Externalizable {
 	 * @return
 	 * @throws UnpivotableExpressionException
 	 */
-	Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException;
+   List<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException;
 }

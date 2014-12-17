@@ -3,7 +3,8 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
@@ -43,13 +44,13 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
 	private TreeReference destRef; //ref that identifies the repeated nodes resulting from this itemset
 								   //not serialized -- set by QuestionDef.setDynamicChoices()
-	private Vector<SelectChoice> choices; //dynamic choices -- not serialized, obviously
+	private List<SelectChoice> choices; //dynamic choices -- not serialized, obviously
 	
-	public Vector<SelectChoice> getChoices () {
+	public List<SelectChoice> getChoices () {
 		return choices;
 	}
 	
-	public void setChoices (Vector<SelectChoice> choices, Localizer localizer) {
+	public void setChoices (List<SelectChoice> choices, Localizer localizer) {
 		if (this.choices != null) {
 			System.out.println("warning: previous choices not cleared out");
 			clearChoices();
@@ -72,7 +73,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public void localeChanged(String locale, Localizer localizer) {
 		if (choices != null) {
 			for (int i = 0; i < choices.size(); i++) {
-				choices.elementAt(i).localeChanged(locale, localizer);
+				choices.get(i).localeChanged(locale, localizer);
 			}
 		}
 	}

@@ -20,7 +20,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
@@ -37,7 +38,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class SelectMultiData implements IAnswerData {
-	Vector<Selection> vs; //vector of Selection
+   List<Selection> vs; //vector of Selection
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -47,15 +48,15 @@ public class SelectMultiData implements IAnswerData {
 
 	}
 
-	public SelectMultiData (Vector<Selection> vs) {
+	public SelectMultiData (List<Selection> vs) {
 		setValue(vs);
 	}
 
     @Override
 	public IAnswerData clone () {
-		Vector<Selection> v = new Vector<Selection>(vs.size());
+       List<Selection> v = new ArrayList<Selection>(vs.size());
 		for (int i = 0; i < vs.size(); i++) {
-			v.addElement(((Selection)vs.elementAt(i)).clone());
+			v.add(vs.get(i).clone());
 		}
 		return new SelectMultiData(v);
 	}
@@ -70,7 +71,7 @@ public class SelectMultiData implements IAnswerData {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 
-		vs = vectorCopy((Vector<Selection>)o);
+		vs = vectorCopy((List<Selection>)o);
 	}
 
 	/*
@@ -87,12 +88,12 @@ public class SelectMultiData implements IAnswerData {
 	 * contained in the vector input
 	 * TODO: move to utility class
 	 */
-	private Vector<Selection> vectorCopy(Vector<Selection> input) {
-		Vector<Selection> output = new Vector<Selection>(input.size());
+	private List<Selection> vectorCopy(List<Selection> input) {
+      List<Selection> output = new ArrayList<Selection>(input.size());
 		//validate type
 		for (int i = 0; i < input.size(); i++) {
-			Selection s = (Selection)input.elementAt(i);
-			output.addElement(s);
+			Selection s = input.get(i);
+			output.add(s);
 		}
 		return output;
 	}
@@ -108,7 +109,7 @@ public class SelectMultiData implements IAnswerData {
 		StringBuilder b = new StringBuilder();
 
 		for (int i = 0; i < vs.size(); i++) {
-			Selection s = (Selection)vs.elementAt(i);
+			Selection s = (Selection)vs.get(i);
 			b.append(s.getValue());
 			if (i < vs.size() - 1)
 				b.append(", ");
@@ -122,7 +123,7 @@ public class SelectMultiData implements IAnswerData {
 	@SuppressWarnings("unchecked")
     @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		vs = (Vector<Selection>)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
+		vs = (List<Selection>)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
 	}
 
 	/* (non-Javadoc)
@@ -135,15 +136,13 @@ public class SelectMultiData implements IAnswerData {
 
     @Override
 	public UncastData uncast() {
-		Enumeration<Selection> en = vs.elements();
 		StringBuilder selectString = new StringBuilder();
 
-		while(en.hasMoreElements()) {
-			Selection selection = (Selection)en.nextElement();
-			if (selectString.length() > 0)
-				selectString.append(" ");
-			selectString.append(selection.getValue());
-		}
+       for (Selection selection : vs) {
+          if (selectString.length() > 0)
+             selectString.append(" ");
+          selectString.append(selection.getValue());
+       }
 		//As Crazy, and stupid, as it sounds, this is the XForms specification
 		//for storing multiple selections.
 		return new UncastData(selectString.toString());
@@ -152,11 +151,11 @@ public class SelectMultiData implements IAnswerData {
     @Override
 	public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
 
-		Vector<String> choices = DateUtils.split(data.value, " ", true);
-		Vector<Selection> v = new Vector<Selection>(choices.size());
+       List<String> choices = DateUtils.split(data.value, " ", true);
+       List<Selection> v = new ArrayList<Selection>(choices.size());
 
 		for(String s : choices) {
-			v.addElement(new Selection(s));
+			v.add(new Selection(s));
 		}
 		return new SelectMultiData(v);
 	}
