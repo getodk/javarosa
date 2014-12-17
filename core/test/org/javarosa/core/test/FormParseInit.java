@@ -5,13 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Vector;
 
 import org.javarosa.core.form.api.test.TextFormTests;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.*;
 import org.javarosa.core.model.test.FormDefTest;
 import org.javarosa.core.model.test.QuestionDefTest;
 import org.javarosa.core.services.locale.Localizer;
@@ -103,7 +101,7 @@ public class FormParseInit {
 		}
 		
 		// Parse the form
-		xform = XFormUtils.getFormFromInputStream(is, FormDef.latestImplementationMode);
+		xform = XFormUtils.getFormFromInputStream(is);
 		
 		femodel = new FormEntryModel(xform);
 		fec = new FormEntryController(femodel);
@@ -189,7 +187,7 @@ public class FormParseInit {
 			
 			if(fep.getFormElement() instanceof QuestionDef){
 				stuff+="\t[Type:QuestionDef, ";
-				Vector s = ((QuestionDef)fep.getFormElement()).getChoices();
+				List<SelectChoice> s = ((QuestionDef)fep.getFormElement()).getChoices();
 				stuff+="ContainsChoices: "+ ((s != null && s.size() > 0) ? "true " : "false" ) +", ";
 				if(s != null && s.size() > 0) choiceFlag = true;
 			}else if(fep.getFormElement() instanceof FormDef){

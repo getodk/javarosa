@@ -80,14 +80,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
    public enum EvalBehavior {
-      Legacy, April_2014, Aggressive_2014
+      Latest_fastest,
+      Latest_safest,
+      April_2014,
+      Legacy
    }
 
-   public static final EvalBehavior latestImplementationMode = EvalBehavior.Aggressive_2014;
+   public static final EvalBehavior recommendedMode = EvalBehavior.Latest_fastest;
 
    // used by FormDef() constructor
-   private static EvalBehavior defaultMode = latestImplementationMode;
-   
+   private static EvalBehavior defaultMode = recommendedMode;
+
    // call this to change the mode used for evaluations.
    public static final void setEvalBehavior(EvalBehavior mode) {
       defaultMode = mode;
@@ -137,7 +140,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
    }
 
-   private EvalBehavior mode = latestImplementationMode;
+   private EvalBehavior mode = recommendedMode;
 
    private List<IFormElement> children;// <IFormElement>
    /** A collection of group definitions. */
@@ -885,7 +888,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                                      Set<QuickTriggerable> newDestinationSet,
                                      boolean cascadeToGroupChildren) {
       if (qt.t.canCascade()) {
-         if (mode == EvalBehavior.Legacy || (mode == EvalBehavior.Aggressive_2014 && !cascadeToGroupChildren)) {
+         if (mode == EvalBehavior.Legacy || (mode == EvalBehavior.Latest_fastest && !cascadeToGroupChildren)) {
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                TreeReference target = qt.t.getTargets().get(j);
                HashSet<QuickTriggerable> triggered = triggerIndex.get(target);
@@ -1031,10 +1034,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       for (; !refSet.isEmpty();) {
          Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
          for (QuickTriggerable qt : refSet) {
-            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
-               fillTriggeredElements(qt, tv, newSet,
-                       cascadeToChildrenOfGroupsWithRelevanceExpressions);
-            } else if (mode == EvalBehavior.Aggressive_2014) {
+            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014 || mode == EvalBehavior.Latest_fastest) {
+               fillTriggeredElements(qt, tv, newSet, cascadeToChildrenOfGroupsWithRelevanceExpressions);
+            } else if (mode == EvalBehavior.Latest_safest) {
                // leverage the saved DAG edges.
                // This may over-fill the set of triggerables.
                // but should be faster than recomputing the edges.
