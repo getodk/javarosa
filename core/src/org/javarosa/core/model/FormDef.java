@@ -396,7 +396,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
       if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
          setAnswer(data, node);
-         triggerTriggerables(ref, cascadeToGroupChildren);
+         Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
+         publishSummary(node.getName() + " got a value by force", qts);
       } else {
          // SCTO-2286 : Do not act if the data haven't changed.
          // Use the serialized form of the data to avoid type conversions and
@@ -407,7 +408,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                || !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
                      answerDataSerializer.serializeAnswerData(data))) {
             setAnswer(data, node);
-            triggerTriggerables(ref, cascadeToGroupChildren);
+            Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
+            publishSummary(node.getName() + " got a value conditionally", qts);
          }
       }
       // TODO: pre-populate fix-count repeats here?
@@ -508,7 +510,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      triggerTriggerables(deleteRef, true);
+      Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(deleteRef, true, new HashSet<QuickTriggerable>(0));
+      publishSummary("Deleted " + index.getReference().toString(true), alreadyEvaluated);
+
+      if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
+         evaluateChildrenTriggerables(deleteElement, true, alreadyEvaluated);
+      }
+
       return newIndex;
    }
 
@@ -518,7 +526,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       mainInstance.copyNode(template, destRef);
 
-      preloadInstance(mainInstance.resolveReference(destRef));
+      TreeElement newNode = mainInstance.resolveReference(destRef);
+      preloadInstance(newNode);
 
       // 2013-05-14 - ctsims - Events should get fired _before_ calculate stuff
       // is fired, moved
@@ -529,10 +538,28 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          a.processAction(this, destRef);
       }
 
-      triggerTriggerables(destRef, true); // trigger conditions that depend on
-                                          // the creation of this new node
-      initializeTriggerables(destRef, true); // initialize conditions for the
-                                             // node (and sub-nodes)
+      Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, true, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of this new node
+      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 1)", qtSet1);
+
+      Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, true);// initialize conditions for the node (and sub-nodes)
+      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 2)", qtSet2);
+
+      if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
+         Set<QuickTriggerable> alreadyEvaluated = new HashSet<QuickTriggerable>(qtSet1);
+         alreadyEvaluated.addAll(qtSet2);
+
+         evaluateChildrenTriggerables(newNode, true, alreadyEvaluated);
+      }
+   }
+
+   private void evaluateChildrenTriggerables(TreeElement newNode, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
+      //iterate into the group children and evaluate any triggerables that depend one them, if they are not already calculated.
+      int numChildren = newNode.getNumChildren();
+      for (int i = 0; i < numChildren; i++) {
+         TreeReference anchorRef = newNode.getChildAt(i).getRef();
+         Set<QuickTriggerable> childTriggerables = triggerTriggerables(anchorRef, cascadeToGroupChildren, alreadyEvaluated);
+         publishSummary("Node created/deleted: " + anchorRef.toString(true), childTriggerables);
+      }
    }
 
    public boolean isRepeatRelevant(TreeReference repeatRef) {
@@ -656,17 +683,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      triggerTriggerables(destRef, cascadeToGroupChildren); // trigger
-                                                            // conditions that
-                                                            // depend on the
-                                                            // creation of these
-                                                            // new nodes
-      initializeTriggerables(destRef, cascadeToGroupChildren); // initialize
-                                                               // conditions for
-                                                               // the node (and
-                                                               // sub-nodes)
-      // not 100% sure this will work since destRef is ambiguous as the last
-      // step, but i think it's supposed to work
+      Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of these new nodes
+      publishSummary("Copied itemset answer for " + targetRef.toString(true) + " (phase 1)", qtSet1);
+
+      Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, cascadeToGroupChildren);// initialize conditions for the node (and sub-nodes)
+      publishSummary("Copied itemset answer for " + targetRef.toString(true) + " (phase 2)", qtSet2);
+      //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
    }
 
    public QuickTriggerable findTriggerable(Triggerable t) {
@@ -958,16 +980,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
    }
 
-   public void initializeTriggerables() {
-      initializeTriggerables(TreeReference.rootRef(), false);
+   public Set<QuickTriggerable> initializeTriggerables() {
+      return initializeTriggerables(TreeReference.rootRef(), false);
    }
 
    /**
     * Walks the current set of conditions, and evaluates each of them with the
     * current context.
     */
-   private void initializeTriggerables(TreeReference rootRef,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   private Set<QuickTriggerable> initializeTriggerables(TreeReference rootRef,
+                                                        boolean cascadeToGroupChildren) {
       TreeReference genericRoot = rootRef.genericize();
 
       Set<QuickTriggerable> applicable = new HashSet<QuickTriggerable>();
@@ -982,7 +1004,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      evaluateTriggerables(applicable, rootRef, cascadeToChildrenOfGroupsWithRelevanceExpressions);
+      return evaluateTriggerables(applicable, rootRef, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
    }
 
    /**
@@ -992,8 +1014,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           The full contextualized unambiguous reference of the value that
     *           was changed.
     */
-   public void triggerTriggerables(TreeReference ref,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   public Set<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
 
       // turn unambiguous ref into a generic ref
       // to identify what nodes should be triggered by this
@@ -1003,13 +1024,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // get triggerables which are activated by the generic reference
       HashSet<QuickTriggerable> triggered = triggerIndex.get(genericRef);
       if (triggered == null) {
-         return;
+         return alreadyEvaluated;
       }
 
       Set<QuickTriggerable> triggeredCopy = new HashSet<QuickTriggerable>(triggered);
 
       // Evaluate all of the triggerables in our new vector
-      evaluateTriggerables(triggeredCopy, ref, cascadeToChildrenOfGroupsWithRelevanceExpressions);
+      return evaluateTriggerables(triggeredCopy, ref, cascadeToGroupChildren, alreadyEvaluated);
    }
 
    /**
@@ -1018,15 +1039,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * triggered conditions, identifying which conditions should further be
     * triggered due to their update, and then dispatching all of the
     * evaluations.
-    *
-    * @param tv
+    *  @param tv
     *           A vector of all of the trigerrables directly triggered by the
     *           value changed
     * @param anchorRef
-    *           The reference to original value that was updated
     */
-   private void evaluateTriggerables(Set<QuickTriggerable> tv, TreeReference anchorRef,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   private Set<QuickTriggerable> evaluateTriggerables(Set<QuickTriggerable> tv, TreeReference anchorRef,
+                                                      boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
       // add all cascaded triggerables to queue
 
       // Iterate through all of the currently known triggerables to be triggered
@@ -1035,7 +1054,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
          for (QuickTriggerable qt : refSet) {
             if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014 || mode == EvalBehavior.Latest_fastest) {
-               fillTriggeredElements(qt, tv, newSet, cascadeToChildrenOfGroupsWithRelevanceExpressions);
+               fillTriggeredElements(qt, tv, newSet, cascadeToGroupChildren);
             } else if (mode == EvalBehavior.Latest_safest) {
                // leverage the saved DAG edges.
                // This may over-fill the set of triggerables.
@@ -1059,12 +1078,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // 'triggerables' is topologically-ordered by dependencies, so evaluate
       // the triggerables in 'tv'
       // in the order they appear in 'triggerables'
+      Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
+
       for (int i = 0; i < triggerablesDAG.size(); i++) {
          QuickTriggerable qt = triggerablesDAG.get(i);
-         if (tv.contains(qt)) {
+         if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
             evaluateTriggerable(qt, anchorRef);
+
+            fired.add(qt);
          }
       }
+
+      return fired;
    }
 
    /**
@@ -1652,7 +1677,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          dispatchFormEvent(Action.EVENT_XFORMS_READY);
       }
 
-      initializeTriggerables();
+      Set<QuickTriggerable> quickTriggerables = initializeTriggerables();
+      publishSummary("Form initialized", quickTriggerables);
+   }
+
+   private void publishSummary(String lead, Set<QuickTriggerable> quickTriggerables) {
+      System.out.println(lead + ": " + quickTriggerables.size() + " triggerables were fired.");
    }
 
    /**
