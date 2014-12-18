@@ -21,7 +21,7 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.util.PrefixTree;
 
@@ -52,9 +52,9 @@ public class PrefixTreeTest extends TestCase  {
 		t.addString(s);
 		System.out.println(t.toString());
 		
-		Vector v = t.getStrings();
+		List<String> v = t.getStrings();
 		for (int i = 0; i < v.size(); i++) {
-			System.out.println((String)v.elementAt(i));
+			System.out.println((String)v.get(i));
 		}
 	}
 	

@@ -19,7 +19,8 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -66,12 +67,12 @@ public class XPathFilterExpr extends XPathExpression {
 		if (o instanceof XPathFilterExpr) {
 			XPathFilterExpr fe = (XPathFilterExpr)o;
 
-			Vector a = new Vector(predicates.length);
+         List a = new ArrayList(predicates.length);
 			for (int i = 0; i < predicates.length; i++)
-				a.addElement(predicates[i]);
-			Vector b = new Vector(fe.predicates.length);
+				a.add(predicates[i]);
+         List b = new ArrayList(fe.predicates.length);
 			for (int i = 0; i < fe.predicates.length; i++)
-				b.addElement(fe.predicates[i]);
+				b.add(fe.predicates[i]);
 
 			return x.equals(fe.x) && ExtUtil.vectorEquals(a, b);
 		} else {
@@ -81,23 +82,23 @@ public class XPathFilterExpr extends XPathExpression {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		x = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.elementAt(i);
+			predicates[i] = (XPathExpression)v.get(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		Vector v = new Vector(predicates.length);
+      List v = new ArrayList(predicates.length);
 		for (int i = 0; i < predicates.length; i++)
-			v.addElement(predicates[i]);
+			v.add(predicates[i]);
 
 		ExtUtil.write(out, new ExtWrapTagged(x));
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 
-	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		throw new UnpivotableExpressionException();
 	}
 }

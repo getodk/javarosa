@@ -21,8 +21,9 @@ package org.javarosa.core.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * MultiInputStream allows for concatenating multiple
@@ -41,12 +42,12 @@ import java.util.Vector;
 public class MultiInputStream extends InputStream {
 
 	/** InputStream **/
-	Vector streams = new Vector(1);
+   List<InputStream> streams = new ArrayList<InputStream>(1);
 
 	int currentStream = -1;
 
 	public void addStream(InputStream stream) {
-		streams.addElement(stream);
+		streams.add(stream);
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class MultiInputStream extends InputStream {
 		if(currentStream == -1) {
 			throw new IOException("Cannot read from unprepared MultiInputStream!");
 		}
-		InputStream cur = ((InputStream)streams.elementAt(currentStream));
+		InputStream cur = streams.get(currentStream);
 		int next = cur.read();
 
 		if(next != -1 ) {
@@ -87,7 +88,7 @@ public class MultiInputStream extends InputStream {
 		//an end of stream
 		while(next == -1 && currentStream + 1 < streams.size()) {
 			currentStream++;
-			cur = ((InputStream)streams.elementAt(currentStream));
+			cur = ((InputStream)streams.get(currentStream));
 			next = cur.read();
 		}
 
@@ -102,7 +103,7 @@ public class MultiInputStream extends InputStream {
 		if(currentStream == -1) {
 			throw new IOException("Cannot read from unprepared MultiInputStream!");
 		}
-		return ((InputStream)streams.elementAt(currentStream)).available();
+		return streams.get(currentStream).available();
 	}
 
 	/* (non-Javadoc)
@@ -112,10 +113,9 @@ public class MultiInputStream extends InputStream {
 		if(currentStream == -1) {
 			throw new IOException("Cannot read from unprepared MultiInputStream!");
 		}
-		Enumeration en = streams.elements();
-		while(en.hasMoreElements()) {
-			((InputStream)en.nextElement()).close();
-		}
+      for (InputStream stream : streams) {
+         stream.close();
+      }
 	}
 
 }

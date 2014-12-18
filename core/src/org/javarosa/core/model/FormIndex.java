@@ -16,7 +16,8 @@
 
 package org.javarosa.core.model;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.instance.TreeReference;
 
@@ -460,18 +461,18 @@ public class FormIndex {
 	public void assignRefs(FormDef f) {
 		FormIndex cur = this;
 
-		Vector<Integer> indexes = new Vector<Integer>();
-		Vector<Integer> multiplicities = new Vector<Integer>();
-		Vector<IFormElement> elements = new Vector<IFormElement>();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 		f.collapseIndex(this, indexes, multiplicities, elements);
 
-		Vector<Integer> curMults = new Vector<Integer>();
-		Vector<IFormElement> curElems = new Vector<IFormElement>();
+      List<Integer> curMults = new ArrayList<Integer>();
+      List<IFormElement> curElems = new ArrayList<IFormElement>();
 
 		int i = 0;
 		while (cur != null) {
-			curMults.addElement(multiplicities.elementAt(i));
-			curElems.addElement(elements.elementAt(i));
+			curMults.add(multiplicities.get(i));
+			curElems.add(elements.get(i));
 
 			TreeReference ref = f.getChildInstanceRef(curElems, curMults);
 			cur.reference = ref;

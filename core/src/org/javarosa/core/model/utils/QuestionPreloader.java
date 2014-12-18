@@ -17,7 +17,7 @@
 package org.javarosa.core.model.utils;
 
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
@@ -195,10 +195,10 @@ public class QuestionPreloader {
 		if (preloadParams.equals("today")) {
 			d = new Date();
 		} else if (preloadParams.substring(0, 11).equals("prevperiod-")) {
-			Vector v = DateUtils.split(preloadParams.substring(11), "-", false);
+         List<String> v = DateUtils.split(preloadParams.substring(11), "-", false);
 			String[] params = new String[v.size()];
 			for (int i = 0; i < params.length; i++)
-				params[i] = (String)v.elementAt(i);
+				params[i] = (String)v.get(i);
 			
 			try {
 				String type = params[0];

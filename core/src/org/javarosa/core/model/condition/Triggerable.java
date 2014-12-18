@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormDef.QuickTriggerable;
@@ -152,9 +152,9 @@ public abstract class Triggerable implements Externalizable {
 
 		for (int i = 0; i < targets.size(); i++) {
 			TreeReference targetRef = ((TreeReference)targets.get(i)).contextualize(ec.getContextRef());
-			Vector<TreeReference> v = ec.expandReference(targetRef);
+         List<TreeReference> v = ec.expandReference(targetRef);
 			for (int j = 0; j < v.size(); j++) {
-				TreeReference affectedRef = (TreeReference)v.elementAt(j);
+				TreeReference affectedRef = (TreeReference)v.get(j);
 				apply(affectedRef, result, instance, f);
 			}
 		}
@@ -259,7 +259,7 @@ public abstract class Triggerable implements Externalizable {
 		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		originalContextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		Vector<TreeReference> tlist = (Vector<TreeReference>)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf); 
+      List<TreeReference> tlist = (List<TreeReference>)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
 		targets = new ArrayList<TreeReference>(tlist); 
 	}
 
@@ -267,7 +267,7 @@ public abstract class Triggerable implements Externalizable {
 		ExtUtil.write(out, new ExtWrapTagged(expr));
 		ExtUtil.write(out, contextRef);
 		ExtUtil.write(out, originalContextRef);
-		Vector<TreeReference> tlist = new Vector<TreeReference>(targets);
+      List<TreeReference> tlist = new ArrayList<TreeReference>(targets);
 		ExtUtil.write(out, new ExtWrapList(tlist));
 	}
 

@@ -3,8 +3,6 @@
  */
 package org.javarosa.core.util;
 
-import java.util.Vector;
-
 /**
  * @author ctsims
  *

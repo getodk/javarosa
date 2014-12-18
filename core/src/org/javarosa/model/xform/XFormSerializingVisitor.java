@@ -20,8 +20,8 @@ package org.javarosa.model.xform;
 
 
 	import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Vector;
+   import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
@@ -65,7 +65,7 @@ import org.kxml2.kdom.Node;
 		/** The schema to be used to serialize answer data */
 		FormDef schema;	//not used
 
-		Vector dataPointers;
+      List<IDataPointer> dataPointers;
 
 		boolean respectRelevance = true;
 
@@ -79,7 +79,7 @@ import org.kxml2.kdom.Node;
 		private void init() {
 			theXmlDoc = null;
 			schema = null;
-			dataPointers = new Vector(0);
+			dataPointers = new ArrayList<IDataPointer>(0);
 		}
 
 		public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
@@ -133,9 +133,7 @@ import org.kxml2.kdom.Node;
 				}
 				MultiMessagePayload payload = new MultiMessagePayload();
 				payload.addPayload(new ByteArrayPayload(form, "xml_submission_file", IDataPayload.PAYLOAD_TYPE_XML));
-				Enumeration en = dataPointers.elements();
-				while(en.hasMoreElements()) {
-					IDataPointer pointer = (IDataPointer)en.nextElement();
+            for (IDataPointer pointer : dataPointers) {
 					payload.addPayload(new DataPointerPayload(pointer));
 				}
 				return payload;
@@ -200,20 +198,20 @@ import org.kxml2.kdom.Node;
 				if(serializer.containsExternalData(instanceNode.getValue()).booleanValue()) {
 					IDataPointer[] pointer = serializer.retrieveExternalDataPointer(instanceNode.getValue());
 					for(int i = 0 ; i < pointer.length ; ++i) {
-						dataPointers.addElement(pointer[i]);
+						dataPointers.add(pointer[i]);
 					}
 				}
 			} else {
 				//make sure all children of the same tag name are written en bloc
-				Vector childNames = new Vector(instanceNode.getNumChildren());
+				List<String> childNames = new ArrayList<String>(instanceNode.getNumChildren());
 				for (int i = 0; i < instanceNode.getNumChildren(); i++) {
 					String childName = instanceNode.getChildAt(i).getName();
 					if (!childNames.contains(childName))
-						childNames.addElement(childName);
+						childNames.add(childName);
 				}
 
 				for (int i = 0; i < childNames.size(); i++) {
-					String childName = (String)childNames.elementAt(i);
+					String childName = (String)childNames.get(i);
 					int mult = instanceNode.getChildMultiplicity(childName);
 					for (int j = 0; j < mult; j++) {
 						Element child = serializeNode(instanceNode.getChild(childName, j));

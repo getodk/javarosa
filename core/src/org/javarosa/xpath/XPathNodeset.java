@@ -5,7 +5,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Represents a set of XPath nodes returned from a path or other operation which acts on multiple
@@ -29,7 +29,7 @@ import java.util.Vector;
  */
 public class XPathNodeset {
 
-	private Vector<TreeReference> nodes;
+	private List<TreeReference> nodes;
 	protected FormInstance instance;
 	protected EvaluationContext ec;
 	// these are purely for improved error messages
@@ -59,7 +59,7 @@ public class XPathNodeset {
 	 * @param instance
 	 * @param ec
 	 */
-	public XPathNodeset (Vector<TreeReference> nodes, FormInstance instance, EvaluationContext ec) {
+	public XPathNodeset (List<TreeReference> nodes, FormInstance instance, EvaluationContext ec) {
 		if(nodes == null) { throw new NullPointerException("Node list cannot be null when constructing a nodeset"); }
 		this.nodes = nodes;
 		this.instance = instance;
@@ -76,11 +76,11 @@ public class XPathNodeset {
 		return nodeset;
 	}
 
-	protected void setReferences(Vector<TreeReference> nodes) {
+	protected void setReferences(List<TreeReference> nodes) {
 		this.nodes = nodes;
 	}
 
-	protected Vector<TreeReference> getReferences() {
+	protected List<TreeReference> getReferences() {
 		return this.nodes;
 	}
 
@@ -137,7 +137,7 @@ public class XPathNodeset {
 			throw getInvalidNodesetException();
 		}
 
-		return nodes.elementAt(i);
+		return nodes.get(i);
 	}
 
 	public Object getValAt (int i) {
@@ -159,7 +159,7 @@ public class XPathNodeset {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < nodes.size(); i++) {
-			sb.append(nodes.elementAt(i).toString());
+			sb.append(nodes.get(i).toString());
 			if (i < nodes.size() - 1) {
                 sb.append(";");
 			}

@@ -23,8 +23,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.util.MultiInputStream;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -39,7 +39,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class MultiMessagePayload implements IDataPayload {
 	/** IDataPayload **/
-	Vector payloads = new Vector(1);
+   List<IDataPayload> payloads = new ArrayList<IDataPayload>(1);
 
 	/**
 	 * Note: Only useful for serialization.
@@ -55,13 +55,13 @@ public class MultiMessagePayload implements IDataPayload {
 	 * after all previously added payloads.
 	 */
 	public void addPayload(IDataPayload payload) {
-		payloads.addElement(payload);
+		payloads.add(payload);
 	}
 
 	/**
 	 *  @return A vector object containing each IDataPayload in this payload.
 	 */
-	public Vector getPayloads() {
+	public List<IDataPayload> getPayloads() {
 		return payloads;
 	}
 
@@ -71,11 +71,9 @@ public class MultiMessagePayload implements IDataPayload {
 	 */
 	public InputStream getPayloadStream() throws IOException {
 		MultiInputStream bigStream = new MultiInputStream();
-		Enumeration en = payloads.elements();
-		while(en.hasMoreElements()) {
-			IDataPayload payload = (IDataPayload)en.nextElement();
-			bigStream.addStream(payload.getPayloadStream());
-		}
+      for (IDataPayload payload : payloads) {
+         bigStream.addStream(payload.getPayloadStream());
+      }
 		bigStream.prepare();
 		return bigStream;
 	}
@@ -86,7 +84,7 @@ public class MultiMessagePayload implements IDataPayload {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		payloads = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+		payloads = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 	}
 
 	/*
@@ -115,11 +113,9 @@ public class MultiMessagePayload implements IDataPayload {
 
 	public long getLength() {
 		int len = 0;
-		Enumeration en = payloads.elements();
-		while(en.hasMoreElements()) {
-			IDataPayload payload = (IDataPayload)en.nextElement();
-			len += payload.getLength();
-		}
+      for (IDataPayload payload : payloads) {
+         len += payload.getLength();
+      }
 		return len;
 	}
 }

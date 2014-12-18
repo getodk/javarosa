@@ -16,8 +16,9 @@
 
 package org.javarosa.core.util;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 
 public class PrefixTree {
 	//Sometimes the string optimizations here are basically useless
@@ -86,8 +87,8 @@ public class PrefixTree {
 
 			//TODO: This would be way faster if we sorted upon insertion....
 			if (current.getChildren() != null) {
-				for (Enumeration e = current.getChildren().elements(); e.hasMoreElements(); ) {
-					node = (PrefixTreeNode)e.nextElement();
+            for (PrefixTreeNode prefixTreeNode : current.getChildren()) {
+               node = prefixTreeNode;
 
 					char[] prefix = node.getPrefix();
 					//if(prefix.equals(s)) {
@@ -156,11 +157,11 @@ public class PrefixTree {
 		return current;
 	}
 
-	public Vector<String> getStrings () {
+	public List<String> getStrings () {
 		if(finalized) {
 			throw new RuntimeException("Can't get the strings from a finalized Prefix Tree");
 		}
-		Vector<String> v = new Vector<String>(1);
+      List<String> v = new ArrayList<String>(1);
 		root.decompose(v, "");
 		return v;
 	}
