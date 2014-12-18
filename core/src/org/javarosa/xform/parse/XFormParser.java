@@ -16,16 +16,12 @@
 
 package org.javarosa.xform.parse;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
+import org.javarosa.core.model.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.Constants;
@@ -33,19 +29,8 @@ import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.FormDef.QuickTriggerable;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.ItemsetBinding;
-import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.condition.Condition;
-import org.javarosa.core.model.condition.Constraint;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.Recalculate;
-import org.javarosa.core.model.condition.Triggerable;
+import org.javarosa.core.model.condition.*;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -77,6 +62,9 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.*;
+import java.util.*;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -113,7 +101,7 @@ public class XFormParser {
 	private static HashMap<String, IElementHandler> groupLevelHandlers;
 	private static HashMap<String, Integer> typeMappings;
 	private static PrototypeFactoryDeprecated modelPrototypes;
-	private static Vector<SubmissionParser> submissionParsers;
+	private static List<SubmissionParser> submissionParsers;
 
 	private Reader _reader;
 	private Document _xmldoc;
@@ -124,18 +112,18 @@ public class XFormParser {
 
 	private boolean modelFound;
 	private HashMap<String, DataBinding> bindingsByID;
-	private Vector<DataBinding> bindings;
-	private Vector<TreeReference> actionTargets;
-	private Vector<TreeReference> repeats;
-	private Vector<ItemsetBinding> itemsets;
-	private Vector<TreeReference> selectOnes;
-	private Vector<TreeReference> selectMultis;
+	private List<DataBinding> bindings;
+	private List<TreeReference> actionTargets;
+	private List<TreeReference> repeats;
+	private List<ItemsetBinding> itemsets;
+	private List<TreeReference> selectOnes;
+	private List<TreeReference> selectMultis;
 	private Element mainInstanceNode; //top-level data node of the instance; saved off so it can be processed after the <bind>s
-	private Vector<Element> instanceNodes;
-	private Vector<String> instanceNodeIdStrs;
+	private List<Element> instanceNodes;
+	private List<String> instanceNodeIdStrs;
 	private String defaultNamespace;
-	private Vector<String> itextKnownForms;
-	private Vector<String> namedActions;
+	private List<String> itextKnownForms;
+	private List<String> namedActions;
 	private HashMap<String, IElementHandler> structuredActions;
 
 
@@ -167,7 +155,7 @@ public class XFormParser {
 		initProcessingRules();
 		initTypeMappings();
 		modelPrototypes = new PrototypeFactoryDeprecated();
-		submissionParsers = new Vector<SubmissionParser>(1);
+		submissionParsers = new ArrayList<SubmissionParser>(1);
 	}
 
 	private static void initProcessingRules () {
@@ -252,31 +240,31 @@ public class XFormParser {
 	private void initState () {
 		modelFound = false;
 		bindingsByID = new HashMap<String, DataBinding>();
-		bindings = new Vector<DataBinding>();
-		actionTargets = new Vector<TreeReference>();
-		repeats = new Vector<TreeReference>();
-		itemsets = new Vector<ItemsetBinding>();
-		selectOnes = new Vector<TreeReference>();
-		selectMultis = new Vector<TreeReference>();
+		bindings = new ArrayList<DataBinding>();
+		actionTargets = new ArrayList<TreeReference>();
+		repeats = new ArrayList<TreeReference>();
+		itemsets = new ArrayList<ItemsetBinding>();
+		selectOnes = new ArrayList<TreeReference>();
+		selectMultis = new ArrayList<TreeReference>();
 		mainInstanceNode = null;
-		instanceNodes = new Vector<Element>();
-		instanceNodeIdStrs = new Vector<String>();
+		instanceNodes = new ArrayList<Element>();
+		instanceNodeIdStrs = new ArrayList<String>();
 		repeatTree = null;
 		defaultNamespace = null;
 
-		itextKnownForms = new Vector<String>(4);
-		itextKnownForms.addElement("long");
-		itextKnownForms.addElement("short");
-		itextKnownForms.addElement("image");
-		itextKnownForms.addElement("audio");
+		itextKnownForms = new ArrayList<String>(4);
+		itextKnownForms.add("long");
+		itextKnownForms.add("short");
+		itextKnownForms.add("image");
+		itextKnownForms.add("audio");
 
-		namedActions = new Vector<String>(6);
-		namedActions.addElement("rebuild");
-		namedActions.addElement("recalculate");
-		namedActions.addElement("revalidate");
-		namedActions.addElement("refresh");
-		namedActions.addElement("setfocus");
-		namedActions.addElement("reset");
+		namedActions = new ArrayList<String>(6);
+		namedActions.add("rebuild");
+		namedActions.add("recalculate");
+		namedActions.add("revalidate");
+		namedActions.add("refresh");
+		namedActions.add("setfocus");
+		namedActions.add("reset");
 
 
 		structuredActions = new HashMap<String, IElementHandler>();
@@ -311,7 +299,7 @@ public class XFormParser {
 		this.reporter = reporter;
 	}
 
-	public FormDef parse(EvalBehavior mode) throws IOException {
+	public FormDef parse() throws IOException {
 		if (_f == null) {
 			System.out.println("Parsing form...");
 
@@ -319,7 +307,7 @@ public class XFormParser {
 				_xmldoc = getXMLDocument(_reader, stringCache);
 			}
 
-			parseDoc(mode);
+			parseDoc();
 
 			//load in a custom xml instance, if applicable
 			if (_instReader != null) {
@@ -393,7 +381,7 @@ public class XFormParser {
 					toRemove[i] = true;
 				} else {
 					if(type ==Element.ELEMENT) {
-						q.addElement(e.getElement(i));
+						q.add(e.getElement(i));
 					}
 					String accumulatedString = accumulate.trim();
 					if(accumulatedString.length() != 0) {
@@ -426,8 +414,8 @@ public class XFormParser {
 		return doc;
 	}
 
-	private void parseDoc(EvalBehavior mode) {
-		_f = new FormDef(mode);
+	private void parseDoc() {
+		_f = new FormDef();
 
 		initState();
 		defaultNamespace = _xmldoc.getRootElement().getNamespaceUri(null);
@@ -442,7 +430,7 @@ public class XFormParser {
 		{
 			for(int i = 1; i < instanceNodes.size(); i++)
 			{
-				Element e = instanceNodes.elementAt(i);
+				Element e = instanceNodes.get(i);
 				FormInstance fi = parseInstance(e, false);
 				loadInstanceData(e, fi.getRoot(), _f);
 				_f.addNonMainInstance(fi);
@@ -478,9 +466,9 @@ public class XFormParser {
 			"entryHeader",
 			"delHeader"
 		};
-		Vector<String> suppressWarning = new Vector<String>(suppressWarningArr.length);
+      List<String> suppressWarning = new ArrayList<String>(suppressWarningArr.length);
 		for (int i = 0; i < suppressWarningArr.length; i++) {
-			suppressWarning.addElement(suppressWarningArr[i]);
+			suppressWarning.add(suppressWarningArr[i]);
 		}
 
 		IElementHandler eh = handlers.get(name);
@@ -501,7 +489,7 @@ public class XFormParser {
 	}
 
 	private void parseTitle (Element e) {
-		Vector usedAtts = new Vector(); //no attributes parsed in title.
+      List usedAtts = new ArrayList(); //no attributes parsed in title.
 		String title = getXMLText(e, true);
 		System.out.println("Title: \"" + title + "\"");
 		_f.setTitle(title);
@@ -520,7 +508,7 @@ public class XFormParser {
 	}
 
 	private void parseMeta (Element e) {
-		Vector<String> usedAtts = new Vector<String>();
+      List<String> usedAtts = new ArrayList<String>();
 		int attributes = e.getAttributeCount();
 		for(int i = 0 ; i < attributes ; ++i) {
 			String name = e.getAttributeName(i);
@@ -531,7 +519,7 @@ public class XFormParser {
 		}
 
 
-		usedAtts.addElement("name");
+		usedAtts.add("name");
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
 			reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(e, usedAtts), getVagueLocation(e));
 		}
@@ -539,8 +527,8 @@ public class XFormParser {
 
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
 	private void parseModel (Element e) {
-		Vector<String> usedAtts = new Vector<String>(); //no attributes parsed in title.
-		Vector<Element> delayedParseElements = new Vector<Element>();
+      List<String> usedAtts = new ArrayList<String>(); //no attributes parsed in title.
+      List<Element> delayedParseElements = new ArrayList<Element>();
 
 		if (modelFound) {
 			reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
@@ -568,9 +556,9 @@ public class XFormParser {
 			} else if (BIND_ATTR.equals(childName)) { //<instance> must come before <bind>s
 				parseBind(child);
 			} else if("submission".equals(childName)) {
-				delayedParseElements.addElement(child);
+				delayedParseElements.add(child);
 			} else if(namedActions.contains(childName) || (childName != null && structuredActions.containsKey(childName))) {
-				delayedParseElements.addElement(child);
+				delayedParseElements.add(child);
 			} else { //invalid model content
 				if (type == Node.ELEMENT) {
 					throw new XFormParseException("Unrecognized top-level tag [" + childName + "] found within <model>",child);
@@ -645,7 +633,7 @@ public class XFormParser {
 		Action action;
 		TreeReference treeref = FormInstance.unpackReference(dataRef);
 
-		actionTargets.addElement(treeref);
+		actionTargets.add(treeref);
 		if(valueRef == null) {
 			if(e.getChildCount() == 0 || !e.isText(0)) {
 				throw new XFormParseException("No 'value' attribute and no inner value set in <setvalue> associated with: " + treeref, e);
@@ -739,14 +727,14 @@ public class XFormParser {
 			mainInstanceNode = instanceNode;
 		}
 
-		instanceNodes.addElement(instanceNode);
-		instanceNodeIdStrs.addElement(instanceId);
+		instanceNodes.add(instanceNode);
+		instanceNodeIdStrs.add(instanceId);
 
 
 
 	}
 
-	protected void processAdditionalAttributes(QuestionDef question, Element e, Vector usedAtts) {
+	protected void processAdditionalAttributes(QuestionDef question, Element e, List usedAtts) {
 		// save all the unused attributes verbatim...
 		for(int i=0;i<e.getAttributeCount();i++){
 			String name = e.getAttributeName(i);
@@ -760,8 +748,8 @@ public class XFormParser {
 	}
 
 	protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
-		Vector usedAtts = new Vector();
-		usedAtts.addElement("mediatype");
+      List usedAtts = new ArrayList();
+		usedAtts.add("mediatype");
 		// get media type value
 		String mediaType = e.getAttributeValue(null, "mediatype");
 		// parse the control
@@ -784,14 +772,14 @@ public class XFormParser {
 		return parseControl (parent, e, controlType, null);
 	}
 
-	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType, Vector additionalUsedAtts ) {
+	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType, List additionalUsedAtts ) {
 		QuestionDef question = new QuestionDef();
 		question.setID(serialQuestionID++); //until we come up with a better scheme
 
-		Vector usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new Vector();
-		usedAtts.addElement(REF_ATTR);
-		usedAtts.addElement(BIND_ATTR);
-		usedAtts.addElement(APPEARANCE_ATTR);
+      List usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new ArrayList();
+		usedAtts.add(REF_ATTR);
+		usedAtts.add(BIND_ATTR);
+		usedAtts.add(APPEARANCE_ATTR);
 
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
@@ -828,9 +816,9 @@ public class XFormParser {
 			question.setBind(dataRef);
 
 			if (controlType == Constants.CONTROL_SELECT_ONE) {
-				selectOnes.addElement((TreeReference)dataRef.getReference());
+				selectOnes.add((TreeReference) dataRef.getReference());
 			} else if (controlType == Constants.CONTROL_SELECT_MULTI) {
-				selectMultis.addElement((TreeReference)dataRef.getReference());
+				selectMultis.add((TreeReference) dataRef.getReference());
 			}
 		}
 
@@ -872,8 +860,8 @@ public class XFormParser {
 		String label = getLabel(e);
 		String ref = e.getAttributeValue("", REF_ATTR);
 
-		Vector usedAtts = new Vector();
-		usedAtts.addElement(REF_ATTR);
+      List usedAtts = new ArrayList();
+		usedAtts.add(REF_ATTR);
 
 		if (ref != null) {
 			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
@@ -898,8 +886,8 @@ public class XFormParser {
 		if (g.getRepeat())
 			return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
 
-		Vector usedAtts = new Vector();
-		usedAtts.addElement(REF_ATTR);
+      List usedAtts = new ArrayList();
+		usedAtts.add(REF_ATTR);
 
 
 		String label = getLabel(e);
@@ -980,9 +968,9 @@ public class XFormParser {
 	}
 
 	private String parseOutput (Element e) {
-		Vector<String> usedAtts = new Vector<String>();
-		usedAtts.addElement(REF_ATTR);
-		usedAtts.addElement(VALUE);
+      List<String> usedAtts = new ArrayList<String>();
+		usedAtts.add(REF_ATTR);
+		usedAtts.add(VALUE);
 
 		String xpath = e.getAttributeValue(null, REF_ATTR);
 		if (xpath == null) {
@@ -1005,7 +993,7 @@ public class XFormParser {
 			index = _f.getOutputFragments().indexOf(expr);
 		} else {
 			index = _f.getOutputFragments().size();
-			_f.getOutputFragments().addElement(expr);
+			_f.getOutputFragments().add(expr);
 		}
 
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
@@ -1016,8 +1004,8 @@ public class XFormParser {
 	}
 
 	private void parseHint (QuestionDef q, Element e) {
-		Vector usedAtts = new Vector();
-		usedAtts.addElement(REF_ATTR);
+      List usedAtts = new ArrayList();
+		usedAtts.add(REF_ATTR);
 		String hint = getXMLText(e, true);
 		String hintInnerText = getLabel(e);
 		String ref = e.getAttributeValue("", REF_ATTR);
@@ -1045,11 +1033,11 @@ public class XFormParser {
 		final int MAX_VALUE_LEN = 32;
 
 		//catalogue of used attributes in this method/element
-		Vector usedAtts = new Vector();
-		Vector labelUA = new Vector();
-		Vector valueUA = new Vector();
-		labelUA.addElement(REF_ATTR);
-		valueUA.addElement(FORM_ATTR);
+      List usedAtts = new ArrayList();
+      List labelUA = new ArrayList();
+      List valueUA = new ArrayList();
+		labelUA.add(REF_ATTR);
+		valueUA.add(FORM_ATTR);
 
 		String labelInnerText = null;
 		String textRef = null;
@@ -1134,15 +1122,15 @@ public class XFormParser {
 
 		////////////////USED FOR PARSER WARNING OUTPUT ONLY
 		//catalogue of used attributes in this method/element
-		Vector usedAtts = new Vector();
-		Vector labelUA = new Vector(); //for child with name 'label'
-		Vector valueUA = new Vector(); //for child with name 'value'
-		Vector copyUA = new Vector(); //for child with name 'copy'
-		usedAtts.addElement(NODESET_ATTR);
-		labelUA.addElement(REF_ATTR);
-		valueUA.addElement(REF_ATTR);
-		valueUA.addElement(FORM_ATTR);
-		copyUA.addElement(REF_ATTR);
+      List usedAtts = new ArrayList();
+      List labelUA = new ArrayList(); //for child with name 'label'
+      List valueUA = new ArrayList(); //for child with name 'value'
+      List copyUA = new ArrayList(); //for child with name 'copy'
+		usedAtts.add(NODESET_ATTR);
+		labelUA.add(REF_ATTR);
+		valueUA.add(REF_ATTR);
+		valueUA.add(FORM_ATTR);
+		copyUA.add(REF_ATTR);
 		////////////////////////////////////////////////////
 
 		String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
@@ -1228,7 +1216,7 @@ public class XFormParser {
 		}
 
 		q.setDynamicChoices(itemset);
-		itemsets.addElement(itemset);
+		itemsets.add(itemset);
 
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
@@ -1243,13 +1231,13 @@ public class XFormParser {
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
 
-		Vector usedAtts = new Vector();
-		usedAtts.addElement(REF_ATTR);
-		usedAtts.addElement(NODESET_ATTR);
-		usedAtts.addElement(BIND_ATTR);
-		usedAtts.addElement(APPEARANCE_ATTR);
-		usedAtts.addElement("count");
-		usedAtts.addElement("noAddRemove");
+      List usedAtts = new ArrayList();
+		usedAtts.add(REF_ATTR);
+		usedAtts.add(NODESET_ATTR);
+		usedAtts.add(BIND_ATTR);
+		usedAtts.add(APPEARANCE_ATTR);
+		usedAtts.add("count");
+		usedAtts.add("noAddRemove");
 
 		if (groupType == CONTAINER_REPEAT) {
 			group.setRepeat(true);
@@ -1287,7 +1275,7 @@ public class XFormParser {
 		group.setBind(dataRef);
 
 		if (group.getRepeat()) {
-			repeats.addElement((TreeReference)dataRef.getReference());
+			repeats.add((TreeReference) dataRef.getReference());
 
 			String countRef = e.getAttributeValue(NAMESPACE_JAVAROSA, "count");
 			if (countRef != null) {
@@ -1399,7 +1387,7 @@ public class XFormParser {
 
 			if (group != null) {
 				if (!group.getRepeat() && group.getChildren().size() == 1) {
-					IFormElement grandchild = (IFormElement)group.getChildren().elementAt(0);
+					IFormElement grandchild = (IFormElement)group.getChildren().get(0);
 					GroupDef repeat = null;
 					if (grandchild instanceof GroupDef)
 						repeat = (GroupDef)grandchild;
@@ -1419,7 +1407,7 @@ public class XFormParser {
 						//don't merge binding; repeat will always already have one
 
 						//replace group with repeat
-						fe.getChildren().setElementAt(repeat, i);
+						fe.getChildren().set(i, repeat);
 						group = repeat;
 					}
 				}
@@ -1434,7 +1422,7 @@ public class XFormParser {
 		_f.setLocalizer(l);
 		l.registerLocalizable(_f);
 
-		Vector usedAtts = new Vector(); //used for warning message
+      ArrayList usedAtts = new ArrayList(); //used for warning message
 
 		for (int i = 0; i < itext.getChildCount(); i++) {
 			Element trans = itext.getElement(i);
@@ -1458,9 +1446,9 @@ public class XFormParser {
 
 	private void parseTranslation (Localizer l, Element trans) {
 		/////for warning message
-		Vector usedAtts = new Vector();
-		usedAtts.addElement("lang");
-		usedAtts.addElement("default");
+      List usedAtts = new ArrayList();
+		usedAtts.add("lang");
+		usedAtts.add("default");
 		/////////////////////////
 
 		String lang = trans.getAttributeValue("", "lang");
@@ -1512,12 +1500,12 @@ public class XFormParser {
 		String id = text.getAttributeValue("", ID_ATTR);
 
 		//used for parser warnings...
-		Vector usedAtts = new Vector();
-		Vector childUsedAtts = new Vector();
-		usedAtts.addElement(ID_ATTR);
-		usedAtts.addElement(FORM_ATTR);
-		childUsedAtts.addElement(FORM_ATTR);
-		childUsedAtts.addElement(ID_ATTR);
+      List usedAtts = new ArrayList();
+      List childUsedAtts = new ArrayList();
+		usedAtts.add(ID_ATTR);
+		usedAtts.add(FORM_ATTR);
+		childUsedAtts.add(FORM_ATTR);
+		childUsedAtts.add(ID_ATTR);
 		//////////
 
 		if (id == null || id.length() == 0) {
@@ -1604,7 +1592,7 @@ public class XFormParser {
 				//TODO: Clean up being able to get here
 				if(!itextKnownForms.contains(textForm)) {
 					System.out.println("adding unexpected special itext form: " + textForm + " to list of expected forms");
-					itextKnownForms.addElement(textForm);
+					itextKnownForms.add(textForm);
 				}
 				return true;
 			}
@@ -1612,18 +1600,18 @@ public class XFormParser {
 		return false;
 	}
 
-	protected DataBinding processStandardBindAttributes( Vector usedAtts, Element e) {
-		usedAtts.addElement(ID_ATTR);
-		usedAtts.addElement(NODESET_ATTR);
-		usedAtts.addElement("type");
-		usedAtts.addElement("relevant");
-		usedAtts.addElement("required");
-		usedAtts.addElement("readonly");
-		usedAtts.addElement("constraint");
-		usedAtts.addElement("constraintMsg");
-		usedAtts.addElement("calculate");
-		usedAtts.addElement("preload");
-		usedAtts.addElement("preloadParams");
+	protected DataBinding processStandardBindAttributes( List usedAtts, Element e) {
+		usedAtts.add(ID_ATTR);
+		usedAtts.add(NODESET_ATTR);
+		usedAtts.add("type");
+		usedAtts.add("relevant");
+		usedAtts.add("required");
+		usedAtts.add("readonly");
+		usedAtts.add("constraint");
+		usedAtts.add("constraintMsg");
+		usedAtts.add("calculate");
+		usedAtts.add("preload");
+		usedAtts.add("preloadParams");
 
 		DataBinding binding  = new DataBinding();
 
@@ -1720,7 +1708,7 @@ public class XFormParser {
 	}
 
 	protected void parseBind (Element e) {
-		Vector usedAtts = new Vector();
+      List usedAtts = new ArrayList();
 
 		DataBinding binding = processStandardBindAttributes( usedAtts, e);
 
@@ -1777,7 +1765,7 @@ public class XFormParser {
 	}
 
 	protected void addBinding (DataBinding binding) {
-		bindings.addElement(binding);
+		bindings.add(binding);
 
 		if (binding.getId() != null) {
 			if (bindingsByID.put(binding.getId(), binding) != null) {
@@ -1806,7 +1794,7 @@ public class XFormParser {
 	}
 
 	private FormInstance parseInstance (Element e, boolean isMainInstance) {
-		String name = instanceNodeIdStrs.elementAt(instanceNodes.indexOf(e));
+		String name = instanceNodeIdStrs.get(instanceNodes.indexOf(e));
 
 		TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace());
 		FormInstance instanceModel = new FormInstance(root);
@@ -1819,11 +1807,11 @@ public class XFormParser {
 			instanceModel.setName(name);
 		}
 
-		Vector usedAtts = new Vector();
-		usedAtts.addElement("id");
-		usedAtts.addElement("version");
-		usedAtts.addElement("uiVersion");
-		usedAtts.addElement("name");
+      List usedAtts = new ArrayList();
+		usedAtts.add("id");
+		usedAtts.add("version");
+		usedAtts.add("uiVersion");
+		usedAtts.add("name");
 
 		String schema = e.getNamespace();
 		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
@@ -1954,15 +1942,15 @@ public class XFormParser {
 		return element;
 	}
 
-	private Vector<TreeReference> getRepeatableRefs () {
-		Vector<TreeReference> refs = new Vector<TreeReference>(repeats.size());
+	private List<TreeReference> getRepeatableRefs () {
+      List<TreeReference> refs = new ArrayList<TreeReference>(repeats.size());
 
 		for (int i = 0; i < repeats.size(); i++) {
-			refs.addElement((TreeReference)repeats.elementAt(i));
+			refs.add((TreeReference) repeats.get(i));
 		}
 
 		for (int i = 0; i < itemsets.size(); i++) {
-			ItemsetBinding itemset = (ItemsetBinding)itemsets.elementAt(i);
+			ItemsetBinding itemset = (ItemsetBinding)itemsets.get(i);
 			TreeReference srcRef = itemset.nodesetRef;
 			if (!refs.contains(srcRef)) {
 				//CTS: Being an itemset root is not sufficient to mark
@@ -1983,14 +1971,14 @@ public class XFormParser {
 					nonstatic = false;
 				}
 				if(nonstatic) {
-					refs.addElement(srcRef);
+					refs.add(srcRef);
 				}
 			}
 
 			if (itemset.copyMode) {
 				TreeReference destRef = itemset.getDestRef();
 				if (!refs.contains(destRef)) {
-					refs.addElement(destRef);
+					refs.add(destRef);
 				}
 			}
 		}
@@ -2014,12 +2002,12 @@ public class XFormParser {
 
 	//flag all nodes identified by repeat bindings as repeatable
 	private void flagRepeatables (FormInstance instance) {
-		Vector<TreeReference> refs = getRepeatableRefs();
+      List<TreeReference> refs = getRepeatableRefs();
 		for (int i = 0; i < refs.size(); i++) {
-			TreeReference ref = refs.elementAt(i);
-			Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+			TreeReference ref = refs.get(i);
+         List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
 			for (int j = 0; j < nodes.size(); j++) {
-				TreeReference nref = nodes.elementAt(j);
+				TreeReference nref = nodes.get(j);
 				TreeElement node = instance.resolveReference(nref);
 				if (node != null) { // catch '/'
 					node.setRepeatable(true);
@@ -2031,7 +2019,7 @@ public class XFormParser {
 	private void processTemplates (FormInstance instance) {
 		repeatTree = buildRepeatTree(getRepeatableRefs(), instance.getRoot().getName());
 
-		Vector<TreeReference> missingTemplates = new Vector<TreeReference>();
+      List<TreeReference> missingTemplates = new ArrayList<TreeReference>();
 		checkRepeatsForTemplate(instance, repeatTree, missingTemplates);
 
 		removeInvalidTemplates(instance, repeatTree);
@@ -2042,11 +2030,11 @@ public class XFormParser {
 	//result is a FormInstance collapsed where all indexes are 0, and repeatable nodes are flagged as such
 	//return null if no repeats
 	//ignores (invalid) repeats that bind outside the top-level instance data node
-	private static FormInstance buildRepeatTree (Vector<TreeReference> repeatRefs, String topLevelName) {
+	private static FormInstance buildRepeatTree (List<TreeReference> repeatRefs, String topLevelName) {
 		TreeElement root = new TreeElement(null, 0);
 
 		for (int i = 0; i < repeatRefs.size(); i++) {
-			TreeReference repeatRef = repeatRefs.elementAt(i);
+			TreeReference repeatRef = repeatRefs.get(i);
 			//check and see if this references a repeat from a non-main instance, if so, skip it
 			if(repeatRef.getInstanceName() != null)
 			{
@@ -2078,13 +2066,13 @@ public class XFormParser {
 	}
 
 	//checks which repeat bindings have explicit template nodes; returns a vector of the bindings that do not
-	private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, Vector<TreeReference> missingTemplates) {
+	private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
 		if (repeatTree != null)
 			checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
 	}
 
 	//helper function for checkRepeatsForTemplate
-	private static void checkRepeatsForTemplate (TreeElement repeatTreeNode, TreeReference ref, FormInstance instance, Vector<TreeReference> missing) {
+	private static void checkRepeatsForTemplate (TreeElement repeatTreeNode, TreeReference ref, FormInstance instance, List<TreeReference> missing) {
 		String name = repeatTreeNode.getName();
 		int mult = (repeatTreeNode.isRepeatable() ? TreeReference.INDEX_TEMPLATE : 0);
 		ref = ref.extendRef(name, mult);
@@ -2092,7 +2080,7 @@ public class XFormParser {
 		if (repeatTreeNode.isRepeatable()) {
 			TreeElement template = instance.resolveReference(ref);
 			if (template == null) {
-				missing.addElement(ref);
+				missing.add(ref);
 			}
 		}
 
@@ -2139,11 +2127,11 @@ public class XFormParser {
 	}
 
 	//if repeatables have no template node, duplicate first as template
-	private void createMissingTemplates (FormInstance instance, Vector<TreeReference> missingTemplates) {
+	private void createMissingTemplates (FormInstance instance, List<TreeReference> missingTemplates) {
 		//it is VERY important that the missing template refs are listed in depth-first or breadth-first order... namely, that
 		//every ref is listed after a ref that could be its parent. checkRepeatsForTemplate currently behaves this way
 		for (int i = 0; i < missingTemplates.size(); i++) {
-			TreeReference templRef = missingTemplates.elementAt(i);
+			TreeReference templRef = missingTemplates.get(i);
 			TreeReference firstMatch;
 
 			//make template ref generic and choose first matching node
@@ -2151,12 +2139,12 @@ public class XFormParser {
 			for (int j = 0; j < ref.size(); j++) {
 				ref.setMultiplicity(j, TreeReference.INDEX_UNBOUND);
 			}
-			Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref);
+         List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref);
 			if (nodes.size() == 0) {
 				//binding error; not a single node matches the repeat binding; will be reported later
 				continue;
 			} else {
-				firstMatch = nodes.elementAt(0);
+				firstMatch = nodes.get(0);
 			}
 
 			try {
@@ -2198,13 +2186,13 @@ public class XFormParser {
 
 	//check repeat sets for homogeneity
 	private void checkHomogeneity (FormInstance instance) {
-		Vector<TreeReference> refs = getRepeatableRefs();
+      List<TreeReference> refs = getRepeatableRefs();
 		for (int i = 0; i < refs.size(); i++) {
-			TreeReference ref = refs.elementAt(i);
+			TreeReference ref = refs.get(i);
 			TreeElement template = null;
-			Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref);
+         List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref);
 			for (int j = 0; j < nodes.size(); j++) {
-				TreeReference nref = nodes.elementAt(j);
+				TreeReference nref = nodes.get(j);
 				TreeElement node = instance.resolveReference(nref);
 				if (node == null) //don't crash on '/'... invalid repeat binding will be caught later
 					continue;
@@ -2222,15 +2210,15 @@ public class XFormParser {
 	private void verifyBindings (FormInstance instance) {
 		//check <bind>s (can't bind to '/', bound nodes actually exist)
 		for (int i = 0; i < bindings.size(); i++) {
-			DataBinding bind = bindings.elementAt(i);
+			DataBinding bind = bindings.get(i);
 			TreeReference ref = FormInstance.unpackReference(bind.getReference());
 
 			if (ref.size() == 0) {
 				System.out.println("Cannot bind to '/'; ignoring bind...");
-				bindings.removeElementAt(i);
+				bindings.remove(i);
 				i--;
 			} else {
-				Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+            List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
 				if (nodes.size() == 0) {
 					reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "<bind> defined for a node that doesn't exist [" + ref.toString() + "]. The node's name was probably changed and the bind should be updated. ", null);
 				}
@@ -2238,9 +2226,9 @@ public class XFormParser {
 		}
 
 		//check <repeat>s (can't bind to '/' or '/data')
-		Vector<TreeReference> refs = getRepeatableRefs();
+      List<TreeReference> refs = getRepeatableRefs();
 		for (int i = 0; i < refs.size(); i++) {
-			TreeReference ref = refs.elementAt(i);
+			TreeReference ref = refs.get(i);
 
 			if (ref.size() <= 1) {
 				throw new XFormParseException("Cannot bind repeat to '/' or '/" + mainInstanceNode.getName() + "'");
@@ -2248,12 +2236,12 @@ public class XFormParser {
 		}
 
 		//check control/group/repeat bindings (bound nodes exist, question can't bind to '/')
-		Vector<String> bindErrors = new Vector<String>();
+      List<String> bindErrors = new ArrayList<String>();
 		verifyControlBindings(_f, instance, bindErrors);
 		if (bindErrors.size() > 0) {
 		    String errorMsg = "";
 		    for (int i = 0; i < bindErrors.size(); i++) {
-		        errorMsg += bindErrors.elementAt(i) + "\n";
+		        errorMsg += bindErrors.get(i) + "\n";
 		    }
 		    throw new XFormParseException(errorMsg);
 		}
@@ -2270,20 +2258,20 @@ public class XFormParser {
 	private void verifyActions (FormInstance instance) {
 		//check the target of actions which are manipulating real values
 		for (int i = 0; i < actionTargets.size(); i++) {
-			TreeReference target = actionTargets.elementAt(i);
-			Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(target, true);
+			TreeReference target = actionTargets.get(i);
+         List<TreeReference> nodes = new EvaluationContext(instance).expandReference(target, true);
 			if (nodes.size() == 0) {
 				throw new XFormParseException("Invalid Action - Targets non-existent node: " + target.toString(true));
 			}
 		}
 	}
 
-	private void verifyControlBindings (IFormElement fe, FormInstance instance, Vector<String> errors) { //throws XmlPullParserException {
+	private void verifyControlBindings (IFormElement fe, FormInstance instance, List<String> errors) { //throws XmlPullParserException {
 		if (fe.getChildren() == null)
 			return;
 
 		for (int i = 0; i < fe.getChildren().size(); i++) {
-			IFormElement child = fe.getChildren().elementAt(i);
+			IFormElement child = fe.getChildren().get(i);
 			IDataReference ref = null;
 			String type = null;
 
@@ -2300,11 +2288,11 @@ public class XFormParser {
 				//group can bind to '/'; repeat can't, but that's checked above
 				reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Cannot bind control to '/'",null);
 			} else {
-				Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(tref, true);
+            List<TreeReference> nodes = new EvaluationContext(instance).expandReference(tref, true);
 				if (nodes.size() == 0) {
 					String error = type+ " bound to non-existent node: [" + tref.toString() + "]";
 					reporter.error(error);
-					errors.addElement(error);
+					errors.add(error);
 				}
 				//we can't check whether questions map to the right kind of node ('data' node vs. 'sub-tree' node) as that depends
 				//on the question's data type, which we don't know yet
@@ -2319,7 +2307,7 @@ public class XFormParser {
 			return;
 
 		for (int i = 0; i < fe.getChildren().size(); i++) {
-			IFormElement child = fe.getChildren().elementAt(i);
+			IFormElement child = fe.getChildren().get(i);
 			boolean isRepeat = (child instanceof GroupDef && ((GroupDef)child).getRepeat());
 
 			//get bindings of current node and nearest enclosing repeat
@@ -2337,14 +2325,14 @@ public class XFormParser {
 
 			//check that, in the instance, current node is not within the scope of any closer repeat binding
 			//build a list of all the node's instance ancestors
-			Vector<TreeElement> repeatAncestry = new Vector<TreeElement>();
+			List<TreeElement> repeatAncestry = new ArrayList<TreeElement>();
 			TreeElement repeatNode = (repeatTree == null ? null : repeatTree.getRoot());
 			if (repeatNode != null) {
-				repeatAncestry.addElement(repeatNode);
+				repeatAncestry.add(repeatNode);
 				for (int j = 1; j < childBind.size(); j++) {
 					repeatNode = repeatNode.getChild(childBind.getName(j), 0);
 					if (repeatNode != null) {
-						repeatAncestry.addElement(repeatNode);
+						repeatAncestry.add(repeatNode);
 					} else {
 						break;
 					}
@@ -2352,7 +2340,7 @@ public class XFormParser {
 			}
 			//check that no nodes between the parent repeat and the target are repeatable
 			for (int k = repeatBind.size(); k < childBind.size(); k++) {
-				TreeElement rChild = (k < repeatAncestry.size() ? repeatAncestry.elementAt(k) : null);
+				TreeElement rChild = (k < repeatAncestry.size() ? repeatAncestry.get(k) : null);
 				boolean repeatable = (rChild == null ? false : rChild.isRepeatable());
 				if (repeatable && !(k == childBind.size() - 1 && isRepeat)) {
 					//catch <repeat nodeset="/a/b"><input ref="/a/b/c/d" /></repeat>...<repeat nodeset="/a/b/c">...</repeat>:
@@ -2367,7 +2355,7 @@ public class XFormParser {
 
 	private void verifyItemsetBindings (FormInstance instance) {
 		for (int i = 0; i < itemsets.size(); i++) {
-			ItemsetBinding itemset = itemsets.elementAt(i);
+			ItemsetBinding itemset = itemsets.get(i);
 
 			//check proper parent/child relationship
 			if (!itemset.nodesetRef.isParentOf(itemset.labelRef, false)) {
@@ -2413,7 +2401,7 @@ public class XFormParser {
 
 	private void verifyItemsetSrcDstCompatibility (FormInstance instance) {
 		for (int i = 0; i < itemsets.size(); i++) {
-			ItemsetBinding itemset = itemsets.elementAt(i);
+			ItemsetBinding itemset = itemsets.get(i);
 
 			boolean destRepeatable = (instance.getTemplate(itemset.getDestRef()) != null);
 			if (itemset.copyMode) {
@@ -2444,15 +2432,15 @@ public class XFormParser {
 
 	private void applyInstanceProperties (FormInstance instance) {
 		for (int i = 0; i < bindings.size(); i++) {
-			DataBinding bind = bindings.elementAt(i);
+			DataBinding bind = bindings.get(i);
 			TreeReference ref = FormInstance.unpackReference(bind.getReference());
-			Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+         List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
 
 			if (nodes.size() > 0) {
 				attachBindGeneral(bind);
 			}
 			for (int j = 0; j < nodes.size(); j++) {
-				TreeReference nref = nodes.elementAt(j);
+				TreeReference nref = nodes.get(j);
 				attachBind(instance.resolveReference(nref), bind);
 			}
 		}
@@ -2503,14 +2491,14 @@ public class XFormParser {
 	//(e.g., a select question bound to a 'text' type node)
 	private void applyControlProperties (FormInstance instance) {
 		for (int h = 0; h < 2; h++) {
-			Vector<TreeReference> selectRefs = (h == 0 ? selectOnes : selectMultis);
+         List<TreeReference> selectRefs = (h == 0 ? selectOnes : selectMultis);
 			int type = (h == 0 ? Constants.DATATYPE_CHOICE : Constants.DATATYPE_CHOICE_LIST);
 
 			for (int i = 0; i < selectRefs.size(); i++) {
-				TreeReference ref = selectRefs.elementAt(i);
-				Vector<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+				TreeReference ref = selectRefs.get(i);
+            List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
 				for (int j = 0; j < nodes.size(); j++) {
-					TreeElement node = instance.resolveReference(nodes.elementAt(j));
+					TreeElement node = instance.resolveReference(nodes.get(j));
 					if (node.getDataType() == Constants.DATATYPE_CHOICE || node.getDataType() == Constants.DATATYPE_CHOICE_LIST) {
 						//do nothing
 					} else if (node.getDataType() == Constants.DATATYPE_NULL || node.getDataType() == Constants.DATATYPE_TEXT) {

@@ -7,7 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.util.ArrayUtilities;
 import org.javarosa.core.util.CacheTable;
@@ -28,7 +28,7 @@ public class TreeReferenceLevel implements Externalizable {
 	
 	private String name;
 	private int multiplicity = MULT_UNINIT;
-	private Vector<XPathExpression> predicates;
+	private List<XPathExpression> predicates;
 	
 	private static CacheTable<TreeReferenceLevel> refs;
 	
@@ -40,7 +40,7 @@ public class TreeReferenceLevel implements Externalizable {
 	}
 	
 	
-	public TreeReferenceLevel(String name, int multiplicity, Vector<XPathExpression> predicates) {
+	public TreeReferenceLevel(String name, int multiplicity, List<XPathExpression> predicates) {
 		this.name = name;
 		this.multiplicity = multiplicity;
 		this.predicates = predicates;
@@ -63,16 +63,16 @@ public class TreeReferenceLevel implements Externalizable {
 		return new TreeReferenceLevel(name, mult, predicates).intern();
 	}
 
-	public TreeReferenceLevel setPredicates(Vector<XPathExpression> xpe) {
+	public TreeReferenceLevel setPredicates(List<XPathExpression> xpe) {
 		return new TreeReferenceLevel(name, multiplicity, xpe).intern();
 	}
 
-	public Vector<XPathExpression> getPredicates() {
+	public List<XPathExpression> getPredicates() {
 		return this.predicates;
 	}
 	
 	public TreeReferenceLevel shallowCopy() {
-		return new TreeReferenceLevel(name, multiplicity, ArrayUtilities.vectorCopy(predicates)).intern();
+		return new TreeReferenceLevel(name, multiplicity, ArrayUtilities.listCopy(predicates)).intern();
 	}
 
 
@@ -84,7 +84,7 @@ public class TreeReferenceLevel implements Externalizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		multiplicity = ExtUtil.readInt(in);
-		predicates = ExtUtil.nullIfEmpty((Vector<XPathExpression>)ExtUtil.read(in,new ExtWrapListPoly()));
+		predicates = ExtUtil.nullIfEmpty((List<XPathExpression>)ExtUtil.read(in,new ExtWrapListPoly()));
 	}
 
 
@@ -118,7 +118,7 @@ public class TreeReferenceLevel implements Externalizable {
 		if((predicates == null && l.predicates != null) || (l.predicates == null && predicates != null)) { return false; }
 		if(predicates.size() != l.predicates.size()) { return false;}
 		for(int i = 0 ; i < predicates.size() ; ++i) {
-			if(!predicates.elementAt(i).equals(l.predicates.elementAt(i))) { return false; }
+			if(!predicates.get(i).equals(l.predicates.get(i))) { return false; }
 		}
 		return true;
 	}

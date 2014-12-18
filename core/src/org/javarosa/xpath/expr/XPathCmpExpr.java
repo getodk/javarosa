@@ -19,7 +19,7 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.CmpPivot;
@@ -102,7 +102,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 	}
 	
 
-	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		Object aval = a.pivot(model, evalContext, pivots, sentinal);
 		Object bval = b.pivot(model, evalContext, pivots, sentinal);
 		if(bval instanceof XPathNodeset) {
@@ -114,7 +114,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		return this.eval(model, evalContext);
 	}
 	
-	private boolean handled(Object a, Object b, Object sentinal, Vector<Object> pivots) throws UnpivotableExpressionException {
+	private boolean handled(Object a, Object b, Object sentinal, List<Object> pivots) throws UnpivotableExpressionException {
 		if(sentinal == a) {
 			if(b == null) {
 				//Can't pivot on an expression which is derived from pivoted expressions
@@ -154,7 +154,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 				}
 				
 				
-				pivots.addElement(new CmpPivot(val.doubleValue(), op));
+				pivots.add(new CmpPivot(val.doubleValue(), op));
 				return true;
 			}
 		} 

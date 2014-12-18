@@ -6,7 +6,8 @@ package org.javarosa.core.model.actions;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.FormDef;
@@ -20,7 +21,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class ActionWrapper extends Action {
 
-	Vector<Action> listOfActions = new Vector<Action>(0);
+   List<Action> listOfActions = new ArrayList<Action>(0);
 
 	public ActionWrapper() {
 		super("action");

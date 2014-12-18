@@ -19,8 +19,9 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -41,11 +42,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class GroupDef implements IFormElement, Localizable {
-	private Vector children;	/** A list of questions on a group. */
+	private List<IFormElement> children;	/** A list of questions on a group. */
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
-    private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>(0);
+    private List<TreeElement> additionalAttributes = new ArrayList<TreeElement>(0);
 
 	private String labelInnerText;
 	private String appearanceAttr;
@@ -62,7 +63,7 @@ public class GroupDef implements IFormElement, Localizable {
 	public String delHeader;
 	public String mainHeader;
 
-	Vector observers;
+	List<FormElementStateListener> observers;
 
 	public boolean noAddRemove = false;
 	public IDataReference count = null;
@@ -71,11 +72,11 @@ public class GroupDef implements IFormElement, Localizable {
 		this(Constants.NULL_ID, null, false);
 	}
 
-	public GroupDef(int id, Vector children, boolean repeat) {
+	public GroupDef(int id, List<IFormElement> children, boolean repeat) {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
-		observers = new Vector(0);
+		observers = new ArrayList<FormElementStateListener>(0);
 	}
 
 	public int getID () {
@@ -106,27 +107,27 @@ public class GroupDef implements IFormElement, Localizable {
 		return null;
 	}
 
-	public Vector<TreeElement> getAdditionalAttributes() {
+	public List<TreeElement> getAdditionalAttributes() {
 		return additionalAttributes;
 	}
 
-	public Vector getChildren() {
+	public List<IFormElement> getChildren() {
 		return children;
 	}
 
-	public void setChildren (Vector children) {
-		this.children = (children == null ? new Vector(0) : children);
+	public void setChildren (List<IFormElement> children) {
+		this.children = (children == null ? new ArrayList<IFormElement>(0) : children);
 	}
 
 	public void addChild (IFormElement fe) {
-		children.addElement(fe);
+		children.add(fe);
 	}
 
 	public IFormElement getChild (int i) {
 		if (children == null || i >= children.size()) {
 			return null;
 		} else {
-			return (IFormElement)children.elementAt(i);
+			return (IFormElement)children.get(i);
 		}
 	}
 
@@ -159,9 +160,9 @@ public class GroupDef implements IFormElement, Localizable {
 	}
 
     public void localeChanged(String locale, Localizer localizer) {
-    	for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
-    		((IFormElement)e.nextElement()).localeChanged(locale, localizer);
-    	}
+       for (IFormElement child : children) {
+          child.localeChanged(locale, localizer);
+       }
     }
 
     public IDataReference getCountReference() {
@@ -181,10 +182,9 @@ public class GroupDef implements IFormElement, Localizable {
 	 */
 	public int getDeepChildCount() {
 		int total = 0;
-		Enumeration e = children.elements();
-		while(e.hasMoreElements()) {
-			total += ((IFormElement)e.nextElement()).getDeepChildCount();
-		}
+      for (IFormElement child : children) {
+         total += child.getDeepChildCount();
+      }
 		return total;
 	}
 
@@ -196,7 +196,7 @@ public class GroupDef implements IFormElement, Localizable {
 		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setRepeat(ExtUtil.readBool(dis));
-		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+		setChildren((List)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
 		noAddRemove = ExtUtil.readBool(dis);
 		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
@@ -242,12 +242,12 @@ public class GroupDef implements IFormElement, Localizable {
 
 	public void registerStateObserver (FormElementStateListener qsl) {
 		if (!observers.contains(qsl)) {
-			observers.addElement(qsl);
+			observers.add(qsl);
 		}
 	}
 
 	public void unregisterStateObserver (FormElementStateListener qsl) {
-		observers.removeElement(qsl);
+		observers.remove(qsl);
 	}
 
 	public String getTextID() {

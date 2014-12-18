@@ -19,7 +19,8 @@ package org.javarosa.core.model.utils;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
@@ -335,14 +336,14 @@ public class DateUtils {
 	}
 
 	private static boolean parseDate (String dateStr, DateFields f) {
-		Vector pieces = split(dateStr, "-", false);
+      List<String> pieces = split(dateStr, "-", false);
 		if (pieces.size() != 3)
 			return false;
 
 		try {
-			f.year = Integer.parseInt((String)pieces.elementAt(0));
-			f.month = Integer.parseInt((String)pieces.elementAt(1));
-			f.day = Integer.parseInt((String)pieces.elementAt(2));
+			f.year = Integer.parseInt((String)pieces.get(0));
+			f.month = Integer.parseInt((String)pieces.get(1));
+			f.day = Integer.parseInt((String)pieces.get(2));
 		} catch (NumberFormatException nfe) {
 			return false;
 		}
@@ -365,7 +366,7 @@ public class DateUtils {
 		} else if(timeStr.indexOf("+") != -1 || timeStr.indexOf("-") != -1) {
 			timeOffset = new DateFields();
 
-			Vector<String> pieces = split(timeStr, "+", false);
+         List<String> pieces = split(timeStr, "+", false);
 
 			//We're going to add the Offset straight up to get UTC
 			//so we need to invert the sign on the offset string
@@ -378,14 +379,14 @@ public class DateUtils {
 				offsetSign = 1;
 			}
 
-			timeStr = pieces.elementAt(0);
+			timeStr = pieces.get(0);
 
-			String offset = pieces.elementAt(1);
+			String offset = pieces.get(1);
 			String hours = offset;
 			if(offset.indexOf(":") != -1) {
-				Vector<String> tzPieces = split(offset, ":", false);
-				hours = tzPieces.elementAt(0);
-				int mins = Integer.parseInt(tzPieces.elementAt(1));
+            List<String> tzPieces = split(offset, ":", false);
+				hours = tzPieces.get(0);
+				int mins = Integer.parseInt(tzPieces.get(1));
 				timeOffset.minute = mins * offsetSign;
 			}
 			timeOffset.hour = Integer.parseInt(hours) * offsetSign;
@@ -434,16 +435,16 @@ public class DateUtils {
 	 * @return
 	 */
 	private static boolean parseRawTime (String timeStr, DateFields f) {
-		Vector pieces = split(timeStr, ":", false);
+      List<String> pieces = split(timeStr, ":", false);
 		if (pieces.size() != 2 && pieces.size() != 3)
 			return false;
 
 		try {
-			f.hour = Integer.parseInt((String)pieces.elementAt(0));
-			f.minute = Integer.parseInt((String)pieces.elementAt(1));
+			f.hour = Integer.parseInt((String)pieces.get(0));
+			f.minute = Integer.parseInt((String)pieces.get(1));
 
 			if (pieces.size() == 3) {
-				String secStr = (String)pieces.elementAt(2);
+				String secStr = (String)pieces.get(2);
 				int i;
 				for (i = 0; i < secStr.length(); i++) {
 					char c = secStr.charAt(i);
@@ -697,26 +698,26 @@ public class DateUtils {
 
 	/**
 	 * Tokenizes a string based on the given delimiter string
-	 * @param original The string to be split
+	 * @param str The string to be split
 	 * @param delimiter The delimeter to be used
 	 * @return An array of strings contained in original which were
 	 * seperated by the delimeter
 	 */
-    public static Vector<String> split (String str, String delimiter, boolean combineMultipleDelimiters) {
+    public static List<String> split (String str, String delimiter, boolean combineMultipleDelimiters) {
 
     	int index = str.indexOf(delimiter);
-    	Vector<String> pieces = new Vector<String>(index+1);
+    	List<String> pieces = new ArrayList<String>(index+1);
         while (index >= 0) {
-            pieces.addElement(str.substring(0, index));
+            pieces.add(str.substring(0, index));
             str = str.substring(index + delimiter.length());
             index = str.indexOf(delimiter);
         }
-        pieces.addElement(str);
+        pieces.add(str);
 
         if (combineMultipleDelimiters) {
         	for (int i = 0; i < pieces.size(); i++) {
-        		if (((String)pieces.elementAt(i)).length() == 0) {
-        			pieces.removeElementAt(i);
+        		if (((String)pieces.get(i)).length() == 0) {
+        			pieces.remove(i);
         			i--;
         		}
         	}

@@ -16,7 +16,7 @@
 
 package org.javarosa.core.model.condition;
 
-import java.util.Vector;
+import java.util.List;
 
 public interface IFunctionHandler {
 	/**
@@ -29,7 +29,7 @@ public interface IFunctionHandler {
 	 *         an array of Class, corresponding to the types of the expected
 	 *         arguments. The first matching prototype is used.
 	 */
-	Vector getPrototypes();
+   List<Class[]> getPrototypes();
 
 	/**
 	 * @return true if this handler should be fed the raw argument list if no

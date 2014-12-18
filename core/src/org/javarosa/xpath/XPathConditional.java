@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.log.FatalException;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -88,7 +88,7 @@ public class XPathConditional implements IConditionExpr {
 		return XPathFuncExpr.toString(evalRaw(model, evalContext));
 	}
 
-	public Vector<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext) {
+	public List<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext) {
 		if (expr instanceof XPathPathExpr) {
 			return ((XPathPathExpr)expr).eval(model, evalContext).getReferences();
 		} else {
@@ -118,7 +118,7 @@ public class XPathConditional implements IConditionExpr {
 			v.add(contextualized);
 
 			for(int i = 0; i < ref.size() ; i++) {
-				Vector<XPathExpression> predicates = ref.getPredicate(i);
+            List<XPathExpression> predicates = ref.getPredicate(i);
 				if(predicates == null) {
 					continue;
 				}
@@ -166,7 +166,7 @@ public class XPathConditional implements IConditionExpr {
 		return "xpath[" + expr.toString() + "]";
 	}
 
-	public Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+	public List<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
 		return expr.pivot(model, evalContext);
 	}
 }

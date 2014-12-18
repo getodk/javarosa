@@ -19,8 +19,10 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
@@ -57,12 +59,12 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String textID; /* The id (ref) pointing to the localized values of (pic-URIs,audio-URIs,text) */
 	private String helpInnerText;
 
-	private Vector<TreeElement> additionalAttributes = new Vector<TreeElement>(0);
+	private List<TreeElement> additionalAttributes = new ArrayList<TreeElement>(0);
 
-	private Vector<SelectChoice> choices;
+	private List<SelectChoice> choices;
 	private ItemsetBinding dynamicChoices;
 
-	Vector observers;
+   List<FormElementStateListener> observers;
 
 	public QuestionDef () {
 		this(Constants.NULL_ID, Constants.DATATYPE_TEXT);
@@ -71,7 +73,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	public QuestionDef (int id, int controlType) {
 		setID(id);
 		setControlType(controlType);
-		observers = new Vector(0);
+		observers = new ArrayList<FormElementStateListener>(0);
 	}
 
 	public int getID () {
@@ -133,7 +135,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		return null;
 	}
 
-	public Vector<TreeElement> getAdditionalAttributes() {
+	public List<TreeElement> getAdditionalAttributes() {
 		return additionalAttributes;
 	}
 
@@ -149,10 +151,10 @@ public class QuestionDef implements IFormElement, Localizable {
 
     public void addSelectChoice (SelectChoice choice) {
     	if (choices == null) {
-    		choices = new Vector<SelectChoice>(1);
+    		choices = new ArrayList<SelectChoice>(1);
     	}
     	choice.setIndex(choices.size());
-    	choices.addElement(choice);
+    	choices.add(choice);
     }
 
     public void removeSelectChoice(SelectChoice choice){
@@ -162,22 +164,22 @@ public class QuestionDef implements IFormElement, Localizable {
     	}
 
     	if(choices.contains(choice)){
-    		choices.removeElement(choice);
+    		choices.remove(choice);
        	}
     }
 
     public void removeAllSelectChoices(){
     	if(choices != null){
-    		choices.removeAllElements();
+    		choices.clear();
     	}
     }
 
-    public Vector<SelectChoice> getChoices () {
+    public List<SelectChoice> getChoices () {
     	return choices;
     }
 
     public SelectChoice getChoice (int i) {
-    	return choices.elementAt(i);
+    	return choices.get(i);
     }
 
     public int getNumChoices () {
@@ -215,7 +217,7 @@ public class QuestionDef implements IFormElement, Localizable {
     public void localeChanged(String locale, Localizer localizer) {
    	 	if (choices != null) {
     			for (int i = 0; i < choices.size(); i++) {
-    				choices.elementAt(i).localeChanged(null, localizer);
+    				choices.get(i).localeChanged(null, localizer);
     			}
     		}
 
@@ -226,11 +228,11 @@ public class QuestionDef implements IFormElement, Localizable {
     		alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
     	}
 
-	public Vector getChildren () {
+	public List<IFormElement> getChildren () {
 		return null;
 	}
 
-	public void setChildren (Vector v) {
+	public void setChildren (List<IFormElement> v) {
 		throw new IllegalStateException("Can't set children on question def");
 	}
 
@@ -260,9 +262,9 @@ public class QuestionDef implements IFormElement, Localizable {
 
 		additionalAttributes = ExtUtil.readAttributes(dis, null);
 
-		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
+		choices = ExtUtil.nullIfEmpty((List)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
 		for (int i = 0; i < getNumChoices(); i++) {
-			choices.elementAt(i).setIndex(i);
+			choices.get(i).setIndex(i);
 		}
 		setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
 	}
@@ -293,21 +295,22 @@ public class QuestionDef implements IFormElement, Localizable {
 
 	public void registerStateObserver (FormElementStateListener qsl) {
 		if (!observers.contains(qsl)) {
-			observers.addElement(qsl);
+			observers.add(qsl);
 		}
 	}
 
 	public void unregisterStateObserver (FormElementStateListener qsl) {
-		observers.removeElement(qsl);
+		observers.remove(qsl);
 	}
 
 	public void unregisterAll () {
-		observers.removeAllElements();
+		observers.clear();
 	}
 
 	public void alertStateObservers (int changeFlags) {
-		for (Enumeration e = observers.elements(); e.hasMoreElements(); )
-			((FormElementStateListener)e.nextElement()).formElementStateChanged(this, changeFlags);
+      for (FormElementStateListener observer : observers) {
+         observer.formElementStateChanged(this, changeFlags);
+      }
 	}
 
 	/*

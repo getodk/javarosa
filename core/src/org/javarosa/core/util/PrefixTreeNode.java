@@ -16,13 +16,14 @@
 
 package org.javarosa.core.util;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 
 public class PrefixTreeNode {
 	private char[] prefix;
 	private boolean terminal;
-	private Vector<PrefixTreeNode> children;
+	private List<PrefixTreeNode> children;
 	private PrefixTreeNode parent;
 
 	public PrefixTreeNode (char[] prefix) {
@@ -30,17 +31,17 @@ public class PrefixTreeNode {
 		this.terminal = false;
 	}
 
-	public void decompose (Vector<String> v, String s) {
+	public void decompose (List<String> v, String s) {
 		String stem = s + new String(prefix);
 
 		if (terminal) {
-			v.addElement(stem);
+			v.add(stem);
 		}
 
 		if (children != null) {
-			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
-				((PrefixTreeNode)e.nextElement()).decompose(v, stem);
-			}
+         for (PrefixTreeNode child : children) {
+            child.decompose(v, stem);
+         }
 		}
 	}
 
@@ -48,7 +49,7 @@ public class PrefixTreeNode {
 		return prefix;
 	}
 
-	public Vector<PrefixTreeNode> getChildren() {
+	public List<PrefixTreeNode> getChildren() {
 		return children;
 	}
 
@@ -64,9 +65,9 @@ public class PrefixTreeNode {
 		if (terminal)
 			sb.append("*");
 		if (children != null) {
-			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
-				sb.append(((PrefixTreeNode)e.nextElement()).toString());
-			}
+         for (PrefixTreeNode child : children) {
+            sb.append(child.toString());
+         }
 		}
 		sb.append("}");
 		return sb.toString();
@@ -87,18 +88,18 @@ public class PrefixTreeNode {
 
 	public void seal() {
 		if (children != null) {
-			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
-				((PrefixTreeNode)e.nextElement()).seal();
-			}
+         for (PrefixTreeNode child : children) {
+            child.seal();
+         }
 		}
 		this.children = null;
 	}
 
 	public void addChild(PrefixTreeNode node) {
 		if(children == null) {
-			children = new Vector<PrefixTreeNode>(1);
+			children = new ArrayList<PrefixTreeNode>(1);
 		}
-		children.addElement(node);
+		children.add(node);
 		node.parent = this;
 	}
 
@@ -112,7 +113,7 @@ public class PrefixTreeNode {
 		PrefixTreeNode newChild = new PrefixTreeNode(subPrefix);
 
 		//remove the child from our tree (we'll re-add it later)
-		this.children.removeElement(node);
+		this.children.remove(node);
 		node.parent = null;
 
 		//cut out the middle part of the prefix (which is now this node's domain)

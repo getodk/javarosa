@@ -16,7 +16,8 @@
 
 package org.javarosa.form.api;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -93,41 +94,41 @@ public class FormEntryPrompt extends FormEntryCaption {
 		ItemsetBinding itemset = q.getDynamicChoices();
     	if (itemset != null) {
     		if (itemset.valueRef != null) {
-	    		Vector<SelectChoice> choices = getSelectChoices();
-	    		Vector<String> preselectedValues = new Vector<String>();
+            List<SelectChoice> choices = getSelectChoices();
+            List<String> preselectedValues = new ArrayList<String>();
 
 	    		//determine which selections are already present in the answer
 	    		if (itemset.copyMode) {
 	    			TreeReference destRef = itemset.getDestRef().contextualize(mTreeElement.getRef());
-	    			Vector<TreeReference> subNodes = form.getEvaluationContext().expandReference(destRef);
+               List<TreeReference> subNodes = form.getEvaluationContext().expandReference(destRef);
 	    			for (int i = 0; i < subNodes.size(); i++) {
-	    				TreeElement node = form.getMainInstance().resolveReference(subNodes.elementAt(i));
+	    				TreeElement node = form.getMainInstance().resolveReference(subNodes.get(i));
     					String value = itemset.getRelativeValue().evalReadable(form.getMainInstance(), new EvaluationContext(form.getEvaluationContext(), node.getRef()));
-    					preselectedValues.addElement(value);
+    					preselectedValues.add(value);
 	    			}
 	    		} else {
-	    			Vector<Selection> sels;
+               List<Selection> sels;
 	    			IAnswerData data = mTreeElement.getValue();
 	    			if (data instanceof SelectMultiData) {
-	    				sels = (Vector<Selection>)data.getValue();
+	    				sels = (List<Selection>)data.getValue();
 	    			} else if (data instanceof SelectOneData) {
-	    				sels = new Vector<Selection>(1);
-	    				sels.addElement((Selection)data.getValue());
+	    				sels = new ArrayList<Selection>(1);
+	    				sels.add((Selection)data.getValue());
 	    			} else {
-	    				sels = new Vector<Selection>(0);
+	    				sels = new ArrayList<Selection>(0);
 	    			}
 	    			for (int i = 0; i < sels.size(); i++) {
-	    				preselectedValues.addElement(sels.elementAt(i).xmlValue);
+	    				preselectedValues.add(sels.get(i).xmlValue);
 	    			}
 	    		}
 
     			//populate 'selection' with the corresponding choices (matching 'value') from the dynamic choiceset
-	    		Vector<Selection> selection = new Vector<Selection>();
+            List<Selection> selection = new ArrayList<Selection>();
 	    		for (int i = 0; i < preselectedValues.size(); i++) {
-	    			String value = preselectedValues.elementAt(i);
+	    			String value = preselectedValues.get(i);
 	    			SelectChoice choice = null;
 	    			for (int j = 0; j < choices.size(); j++) {
-	    				SelectChoice ch = choices.elementAt(j);
+	    				SelectChoice ch = choices.get(j);
 	    				if (value.equals(ch.getValue())) {
 	    					choice = ch;
 	    					break;
@@ -137,7 +138,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    			//will no longer be an option this go around
 	    			if(choice != null)
 	    			{
-	    				selection.addElement(choice.selection());
+	    				selection.add(choice.selection());
 	    			}
 	    		}
 
@@ -147,7 +148,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    		} else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
 	    			return new SelectMultiData(selection);
 	    		} else if (q.getControlType() == Constants.CONTROL_SELECT_ONE) {
-	    			return new SelectOneData(selection.elementAt(0)); //do something if more than one selected?
+	    			return new SelectOneData(selection.get(0)); //do something if more than one selected?
 	    		} else {
 	    			throw new RuntimeException("can't happen");
 	    		}
@@ -175,7 +176,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         		text = this.getSelectItemText((Selection)data.getValue());
         	} else if(data  instanceof SelectMultiData) {
         		StringBuilder b = new StringBuilder();
-        		Vector<Selection> values = (Vector<Selection>)data.getValue();
+            List<Selection> values = (List<Selection>)data.getValue();
         		for(Selection value : values) {
         			b.append(this.getSelectItemText(value)).append(" ");
         		}
@@ -219,10 +220,10 @@ public class FormEntryPrompt extends FormEntryCaption {
         }
     }
 
-    public Vector<TreeElement> getBindAttributes() {
+    public List<TreeElement> getBindAttributes() {
     	return mTreeElement.getBindAttributes();
     }
-    public Vector<SelectChoice> getSelectChoices() {
+    public List<SelectChoice> getSelectChoices() {
     	QuestionDef q = getQuestion();
 
 		ItemsetBinding itemset = q.getDynamicChoices();

@@ -18,13 +18,14 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
@@ -73,9 +74,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 	private IAnswerData value;
 
-	private Vector observers;
-	private Vector<TreeElement> attributes;
-	private Vector children = new Vector(0);
+	private List<FormElementStateListener> observers;
+	private List<TreeElement> attributes;
+	private List<TreeElement> children = new ArrayList<TreeElement>(0);
 
 	/* model properties */
 	protected int dataType = Constants.DATATYPE_NULL; //TODO
@@ -83,7 +84,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	private Constraint constraint = null;
 	private String preloadHandler = null;
 	private String preloadParams = null;
-	private Vector<TreeElement> bindAttributes = new Vector<TreeElement>(0);
+	private List<TreeElement> bindAttributes = new ArrayList<TreeElement>(0);
 
 	//private boolean required = false;// TODO
 	//protected boolean repeatable;
@@ -123,7 +124,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		this.name = name;
 		this.multiplicity = multiplicity;
 		this.parent = null;
-		attributes = new Vector<TreeElement>(0);
+		attributes = new ArrayList<TreeElement>(0);
 	}
 
 	/**
@@ -160,7 +161,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @param name
 	 * @return TreeElement
 	 */
-	public static TreeElement getAttribute(Vector<TreeElement> attributes, String namespace, String name) {
+	public static TreeElement getAttribute(List<TreeElement> attributes, String namespace, String name) {
 		for (TreeElement attribute : attributes) {
 			if(attribute.getName().equals(name) && (namespace == null || namespace.equals(attribute.namespace))) {
 				return attribute;
@@ -169,12 +170,12 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		return null;
 	}
 
-	public static void setAttribute(TreeElement parent, Vector<TreeElement> attrs, String namespace, String name, String value) {
+	public static void setAttribute(TreeElement parent, List<TreeElement> attrs, String namespace, String name, String value) {
 
 		TreeElement attribut = getAttribute(attrs, namespace, name);
 		if ( attribut != null ) {
 			if (value == null) {
-				attrs.removeElement(attribut);
+				attrs.remove(attribut);
 			} else {
 				attribut.setValue(new UncastData(value));
 			}
@@ -188,7 +189,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
 		attr.setParent(parent);
 
-		attrs.addElement(attr);
+		attrs.add(attr);
 	}
 
 	/* (non-Javadoc)
@@ -246,10 +247,10 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			if(multiplicity == TreeReference.INDEX_TEMPLATE || this.children.size() < multiplicity + 1) {
 				return null;
 			}
-			return (TreeElement) this.children.elementAt(multiplicity); //droos: i'm suspicious of this
+			return (TreeElement) this.children.get(multiplicity); //droos: i'm suspicious of this
 		} else {
 			for (int i = 0; i < this.children.size(); i++) {
-				TreeElement child = (TreeElement) this.children.elementAt(i);
+				TreeElement child = (TreeElement) this.children.get(i);
 				if (name.equals(child.getName()) && child.getMult() == multiplicity) {
 					return child;
 				}
@@ -268,19 +269,19 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 *
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildrenWithName(java.lang.String)
 	 */
-	public Vector<TreeElement> getChildrenWithName(String name) {
+	public List<TreeElement> getChildrenWithName(String name) {
 		return getChildrenWithName(name, false);
 	}
 
-	private Vector<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
-		if(children == null) { return new Vector<TreeElement>(0);}
+	private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
+		if(children == null) { return new ArrayList<TreeElement>(0);}
 
-		Vector<TreeElement> v = new Vector<TreeElement>();
+      List<TreeElement> v = new ArrayList<TreeElement>();
 		for (int i = 0; i < this.children.size(); i++) {
-			TreeElement child = (TreeElement) this.children.elementAt(i);
+			TreeElement child = (TreeElement) this.children.get(i);
 			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
 					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-				v.addElement(child);
+				v.add(child);
 		}
 
 		return v;
@@ -304,7 +305,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildAt(int)
 	 */
 	public TreeElement getChildAt (int i) {
-		return (TreeElement)children.elementAt(i);
+		return (TreeElement)children.get(i);
 	}
 
 	/* (non-Javadoc)
@@ -353,7 +354,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				throw new RuntimeException("Attempted to add duplicate child!");
 			}
 		}
-		if(children == null) { children = new Vector(0);}
+		if(children == null) { children = new ArrayList<TreeElement>(0);}
 
 		// try to keep things in order
 		int i = children.size();
@@ -367,7 +368,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			if (anchor != null)
 				i = children.indexOf(anchor) + 1;
 		}
-		children.insertElementAt(child, i);
+		children.add(i, child);
 		child.setParent(this);
 
 		child.setRelevant(isRelevant(), true);
@@ -380,7 +381,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 */
 	public void removeChild(TreeElement child) {
 		if(children == null) { return;}
-		children.removeElement(child);
+		children.remove(child);
 	}
 
 	/* (non-Javadoc)
@@ -404,9 +405,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#removeChildren(java.lang.String, boolean)
 	 */
 	public void removeChildren(String name, boolean includeTemplate) {
-		Vector v = getChildrenWithName(name, includeTemplate);
+		List<TreeElement> v = getChildrenWithName(name, includeTemplate);
 		for (int i = 0; i < v.size(); i++) {
-			removeChild((TreeElement) v.elementAt(i));
+			removeChild((TreeElement) v.get(i));
 		}
 	}
 
@@ -414,7 +415,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#removeChildAt(int)
 	 */
 	public void removeChildAt(int i) {
-		children.removeElementAt(i);
+		children.remove(i);
 
 	}
 
@@ -446,9 +447,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		newNode.namespace = namespace;
 		newNode.bindAttributes = bindAttributes;
 
-		newNode.attributes = new Vector<TreeElement>(attributes.size());
+		newNode.attributes = new ArrayList<TreeElement>(attributes.size());
 		for (int i = 0; i < attributes.size(); i++) {
-			TreeElement attr = (TreeElement) attributes.elementAt(i);
+			TreeElement attr = (TreeElement) attributes.get(i);
 			newNode.setAttribute(attr.getNamespace(), attr.getName(), attr.getAttributeValue());
 		}
 
@@ -467,9 +468,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		TreeElement newNode = shallowCopy();
 
 		if(children != null) {
-			newNode.children = new Vector(children.size());
+			newNode.children = new ArrayList<TreeElement>(children.size());
 			for (int i = 0; i < children.size(); i++) {
-				TreeElement child = (TreeElement) children.elementAt(i);
+				TreeElement child = (TreeElement) children.get(i);
 				if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
 					newNode.addChild(child.deepCopy(includeTemplates));
 				}
@@ -553,26 +554,26 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		if (newRelevant != oldRelevancy) {
 			if(attributes != null) {
 				for(int i = 0 ; i < attributes.size(); ++i ) {
-					attributes.elementAt(i).setRelevant(newRelevant, true);
+					attributes.get(i).setRelevant(newRelevant, true);
 				}
 			}
 			if(children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					((TreeElement) children.elementAt(i)).setRelevant(newRelevant,true);
+					((TreeElement) children.get(i)).setRelevant(newRelevant,true);
 				}
 			}
 			alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
 		}
 	}
 
-	public void setBindAttributes(Vector<TreeElement> bindAttributes ) {
+	public void setBindAttributes(List<TreeElement> bindAttributes ) {
 		// create new tree elements for all the bind definitions...
 		for ( TreeElement ref : bindAttributes ) {
 			setBindAttribute(ref.getNamespace(), ref.getName(), ref.getAttributeValue());
 		}
 	}
 
-	public Vector<TreeElement> getBindAttributes() {
+	public List<TreeElement> getBindAttributes() {
 		return bindAttributes;
 	}
 
@@ -583,7 +584,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * If 'null' is provided for the namespace, it will match the first
 	 * attribute with the matching name.
 	 *
-	 * @param index
 	 * @return TreeElement
 	 */
 	public TreeElement getBindAttribute(String namespace, String name) {
@@ -593,7 +593,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	/**
 	 * get value of the bind attribute with namespace:name' in the vector
 	 *
-	 * @param index
 	 * @return String
 	 */
 	public String getBindAttributeValue(String namespace, String name) {
@@ -626,7 +625,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		if (isEnabled() != oldEnabled) {
 			if(children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					((TreeElement) children.elementAt(i)).setEnabled(isEnabled(),
+					((TreeElement) children.get(i)).setEnabled(isEnabled(),
 							true);
 				}
 			}
@@ -641,10 +640,10 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 */
 	public void registerStateObserver(FormElementStateListener qsl) {
 		if (observers == null)
-			observers = new Vector(1);
+			observers = new ArrayList<FormElementStateListener>(1);
 
 		if (!observers.contains(qsl)) {
-			observers.addElement(qsl);
+			observers.add(qsl);
 		}
 	}
 
@@ -653,7 +652,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 */
 	public void unregisterStateObserver(FormElementStateListener qsl) {
 		if (observers != null) {
-			observers.removeElement(qsl);
+			observers.remove(qsl);
 			if (observers.isEmpty())
 				observers = null;
 		}
@@ -671,9 +670,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 */
 	public void alertStateObservers(int changeFlags) {
 		if (observers != null) {
-			for (Enumeration e = observers.elements(); e.hasMoreElements();)
-				((FormElementStateListener) e.nextElement())
-						.formElementStateChanged(this, changeFlags);
+         for (FormElementStateListener observer : observers) {
+            observer.formElementStateChanged(this, changeFlags);
+         }
 		}
 	}
 
@@ -690,11 +689,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		visitor.visit(this);
 
 		if(children == null) { return;}
-		Enumeration en = children.elements();
-		while (en.hasMoreElements()) {
-			((TreeElement) en.nextElement()).accept(visitor);
-		}
-
+      for (TreeElement child : children) {
+         child.accept(visitor);
+      }
 	}
 
 	/* ==== Attributes ==== */
@@ -715,7 +712,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getAttributeNamespace(int)
 	 */
 	public String getAttributeNamespace(int index) {
-		return attributes.elementAt(index).namespace;
+		return attributes.get(index).namespace;
 	}
 
 	/* (non-Javadoc)
@@ -726,7 +723,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getAttributeName(int)
 	 */
 	public String getAttributeName(int index) {
-		return attributes.elementAt(index).name;
+		return attributes.get(index).name;
 	}
 
 	/* (non-Javadoc)
@@ -737,7 +734,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getAttributeValue(int)
 	 */
 	public String getAttributeValue(int index) {
-		return getAttributeValue(attributes.elementAt(index));
+		return getAttributeValue(attributes.get(index));
 	}
 
 	/**
@@ -847,7 +844,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		} else {
 			// 2.
 			int numChildren = (int) ExtUtil.readNumeric(in);
-			children = new Vector(numChildren);
+			children = new ArrayList<TreeElement>(numChildren);
 			// 3.
 			for (int i = 0; i < numChildren; ++i) {
 				boolean normal = ExtUtil.readBool(in);
@@ -862,7 +859,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					child = (TreeElement) ExtUtil.read(in, new ExtWrapTagged(), pf);
 				}
 				child.setParent(this);
-				children.addElement(child);
+				children.add(child);
 			}
 		}
 
@@ -917,9 +914,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			// 2.
 			ExtUtil.writeNumeric(out, children.size());
 			// 3.
-			Enumeration en = children.elements();
-			while (en.hasMoreElements()) {
-				TreeElement child = (TreeElement) en.nextElement();
+         for (TreeElement child : children) {
 				if (child.getClass() == TreeElement.class) {
 					// 3.1
 					ExtUtil.writeBool(out, true);
@@ -973,11 +968,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                 this.setValue(answerResolver.resolveAnswer(textVal, this, f));
             }
         } else {
-            Vector names = new Vector(this.getNumChildren());
+            List<String> names = new ArrayList<String>(this.getNumChildren());
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
 				if (!names.contains(child.getName())) {
-					names.addElement(child.getName());
+					names.add(child.getName());
 				}
 			}
 
@@ -997,7 +992,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				String expectedName = (String) names.elementAt(i);
+				String expectedName = (String) names.get(i);
 
 				if (!child.getName().equals(expectedName)) {
 					TreeElement child2 = null;
@@ -1014,23 +1009,23 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					}
 
 					this.removeChildAt(j);
-					if(children == null) { children = new Vector(); }
-					this.children.insertElementAt(child2, i);
+					if(children == null) { children = new ArrayList<TreeElement>(); }
+					this.children.add(i, child2);
 				}
 			}
 			// java i hate you so much
 
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				Vector newChildren = incoming.getChildrenWithName(child.getName());
+				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName());
 
 				if (child.getMaskVar(MASK_REPEATABLE)) {
 				    for (int k = 0; k < newChildren.size(); k++) {
 				        TreeElement newChild = child.deepCopy(true);
 				        newChild.setMult(k);
-						if(children == null) { children = new Vector(); }
-				        this.children.insertElementAt(newChild, i + k + 1);
-				        newChild.populate((TreeElement)newChildren.elementAt(k), f);
+						if(children == null) { children = new ArrayList<TreeElement>(); }
+				        this.children.add(i + k + 1, newChild);
+				        newChild.populate((TreeElement)newChildren.get(k), f);
 				    }
 				    i += newChildren.size();
 				} else {
@@ -1038,7 +1033,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					if (newChildren.size() == 0) {
 						child.setRelevant(false);
 					} else {
-						child.populate((TreeElement)newChildren.elementAt(0), f);
+						child.populate((TreeElement)newChildren.get(0), f);
 					}
 				}
 			}
@@ -1081,20 +1076,20 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		} else {
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				Vector newChildren = incoming.getChildrenWithName(child.getName());
+				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName());
 
 				if (child.getMaskVar(MASK_REPEATABLE)) {
 				    for (int k = 0; k < newChildren.size(); k++) {
 				    	TreeElement template = f.getMainInstance().getTemplate(child.getRef());
 				        TreeElement newChild = template.deepCopy(false);
 				        newChild.setMult(k);
-				        if(children == null) { children = new Vector(); }
-				        this.children.insertElementAt(newChild, i + k + 1);
-				        newChild.populateTemplate((TreeElement)newChildren.elementAt(k), f);
+				        if(children == null) { children = new ArrayList<TreeElement>(); }
+				        this.children.add(i + k + 1, newChild);
+				        newChild.populateTemplate((TreeElement)newChildren.get(k), f);
 				    }
 				    i += newChildren.size();
 				} else {
-					child.populateTemplate((TreeElement)newChildren.elementAt(0), f);
+					child.populateTemplate((TreeElement)newChildren.get(0), f);
 				}
 			}
 		}
@@ -1329,20 +1324,20 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		this.namespace = namespace;
 	}
 
-	public Vector<TreeReference> tryBatchChildFetch(String name, int mult, Vector<XPathExpression> predicates, EvaluationContext evalContext) {
+	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates, EvaluationContext evalContext) {
 		//Only do for predicates
 		if(mult != TreeReference.INDEX_UNBOUND || predicates == null) { return null; }
 
-		Vector<Integer> toRemove = new Vector<Integer>();
-		Vector<TreeReference> selectedChildren = null;
+      List<Integer> toRemove = new ArrayList<Integer>();
+      List<TreeReference> selectedChildren = null;
 
 		//Lazy init these until we've determined that our predicate is hintable
 		HashMap<XPathPathExpr, String> indices=  null;
-		Vector<TreeElement> kids = null;
+      List<TreeElement> kids = null;
 
 		predicate:
 		for(int i = 0 ; i < predicates.size() ; ++i) {
-			XPathExpression xpe = predicates.elementAt(i);
+			XPathExpression xpe = predicates.get(i);
 			//what we want here is a static evaluation of the expression to see if it consists of evaluating
 			//something we index with something static.
 			if(xpe instanceof XPathEqExpr) {
@@ -1362,7 +1357,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 						if(kids.size() == 0 ) { return null; }
 
 						//Anything that we're going to use across elements should be on all of them
-						TreeElement kid = kids.elementAt(0);
+						TreeElement kid = kids.get(0);
 						for(int j = 0 ; j < kid.getAttributeCount(); ++j) {
 							String attribute = kid.getAttributeName(j);
 							indices.put(XPathReference.getPathExpr("@" + attribute), attribute);
@@ -1374,17 +1369,17 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 							String attributeName = indices.get(expr);
 
 							for(int kidI = 0 ; kidI < kids.size() ; ++kidI) {
-								if(kids.elementAt(kidI).getAttributeValue(null, attributeName).equals(((XPathStringLiteral)right).s)) {
+								if(kids.get(kidI).getAttributeValue(null, attributeName).equals(((XPathStringLiteral)right).s)) {
 									if(selectedChildren == null) {
-										selectedChildren = new Vector<TreeReference>();
+										selectedChildren = new ArrayList<TreeReference>();
 									}
-									selectedChildren.addElement(kids.elementAt(kidI).getRef());
+									selectedChildren.add(kids.get(kidI).getRef());
 								}
 							}
 
 
 							//Note that this predicate is evaluated and doesn't need to be evaluated in the future.
-							toRemove.addElement(DataUtil.integer(i));
+							toRemove.add(DataUtil.integer(i));
 							continue predicate;
 						}
 					}
@@ -1400,7 +1395,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 		//otherwise, remove all of the predicates we've already evaluated
 		for(int i = toRemove.size() - 1; i >= 0 ; i--)  {
-			predicates.removeElementAt(toRemove.elementAt(i).intValue());
+			predicates.remove(toRemove.get(i).intValue());
 		}
 
 		return selectedChildren;

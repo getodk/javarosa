@@ -16,7 +16,7 @@
 
 package org.javarosa.core.model;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -60,7 +60,7 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * might have. Null if the element is not able to have child
 	 * elements.
 	 */
-	Vector<IFormElement> getChildren ();
+   List<IFormElement> getChildren ();
 	
 	/** 
 	 * @param v the children of this element, if it is capable of having
@@ -68,7 +68,7 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * @throws IllegalStateException if the element is incapable of
 	 * having children.
 	 */
-	void setChildren (Vector<IFormElement> v);
+	void setChildren (List<IFormElement> v);
 	
 	/**
 	 * @param fe The child element to be added
@@ -140,6 +140,6 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * 
 	 * @return
 	 */
-	public Vector<TreeElement> getAdditionalAttributes();	
+	public List<TreeElement> getAdditionalAttributes();
 
 }

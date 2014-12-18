@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.condition.Condition;
@@ -80,14 +80,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
    public enum EvalBehavior {
-      Legacy, April_2014, Legacy_April_Hybrid_2014, Aggressive_2014
-   };
+      Latest_fastest,
+      Latest_safest,
+      April_2014,
+      Legacy
+   }
 
-   public static final EvalBehavior latestImplementationMode = EvalBehavior.Aggressive_2014;
+   public static final EvalBehavior recommendedMode = EvalBehavior.Latest_fastest;
 
    // used by FormDef() constructor
-   private static EvalBehavior defaultMode = latestImplementationMode;
-   
+   private static EvalBehavior defaultMode = recommendedMode;
+
    // call this to change the mode used for evaluations.
    public static final void setEvalBehavior(EvalBehavior mode) {
       defaultMode = mode;
@@ -137,9 +140,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
    }
 
-   private EvalBehavior mode = latestImplementationMode;
+   private EvalBehavior mode = recommendedMode;
 
-   private Vector<IFormElement> children;// <IFormElement>
+   private List<IFormElement> children;// <IFormElement>
    /** A collection of group definitions. */
    private int id;
    /** The numeric unique identifier of the form definition on the local device */
@@ -147,7 +150,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /** The display title of the form. */
    private String name;
 
-   private Vector<XFormExtension> extensions;
+   private List<XFormExtension> extensions;
 
    /**
     * A unique external name that is used to identify the form between machines
@@ -163,7 +166,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                                         // topologically (DON'T DELETE ME EVEN
                                         // THOUGH I'M UNUSED)
 
-   private Vector<IConditionExpr> outputFragments; // <IConditionExpr> contents
+   private List<IConditionExpr> outputFragments; // <IConditionExpr> contents
                                                    // of <output>
    // tags that serve as parameterized
    // arguments to captions
@@ -188,7 +191,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    private HashMap<String, FormInstance> formInstances;
    private FormInstance mainInstance = null;
 
-   private HashMap<String, Vector<Action>> eventListeners;
+   private HashMap<String, List<Action>> eventListeners;
 
    public FormDef() {
       this(defaultMode);
@@ -206,11 +209,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       triggerIndex = new HashMap<TreeReference, HashSet<QuickTriggerable>>();
       // This is kind of a wreck...
       setEvaluationContext(new EvaluationContext(null));
-      outputFragments = new Vector<IConditionExpr>();
+      outputFragments = new ArrayList<IConditionExpr>();
       submissionProfiles = new HashMap<String, SubmissionProfile>();
       formInstances = new HashMap<String, FormInstance>();
-      eventListeners = new HashMap<String, Vector<Action>>();
-      extensions = new Vector<XFormExtension>();
+      eventListeners = new HashMap<String, List<Action>>();
+      extensions = new ArrayList<XFormExtension>();
    }
 
    /**
@@ -276,12 +279,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    // ---------- child elements
    public void addChild(IFormElement fe) {
-      this.children.addElement(fe);
+      this.children.add(fe);
    }
 
    public IFormElement getChild(int i) {
       if (i < this.children.size())
-         return (IFormElement) this.children.elementAt(i);
+         return (IFormElement) this.children.get(i);
 
       throw new ArrayIndexOutOfBoundsException("FormDef: invalid child index: " + i + " only "
             + children.size() + " children");
@@ -306,10 +309,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @param index
     * @return
     */
-   public Vector explodeIndex(FormIndex index) {
-      Vector indexes = new Vector();
-      Vector multiplicities = new Vector();
-      Vector elements = new Vector();
+   public List<IFormElement> explodeIndex(FormIndex index) {
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 
       collapseIndex(index, indexes, multiplicities, elements);
       return elements;
@@ -322,9 +325,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public TreeReference getChildInstanceRef(FormIndex index) {
-      Vector indexes = new Vector();
-      Vector multiplicities = new Vector();
-      Vector elements = new Vector();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 
       collapseIndex(index, indexes, multiplicities, elements);
       return getChildInstanceRef(elements, multiplicities);
@@ -335,13 +338,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @param multiplicities
     * @return
     */
-   public TreeReference getChildInstanceRef(Vector elements, Vector multiplicities) {
+   public TreeReference getChildInstanceRef(List<IFormElement> elements, List<Integer> multiplicities) {
       if (elements.size() == 0)
          return null;
 
       // get reference for target element
       TreeReference ref = FormInstance.unpackReference(
-            ((IFormElement) elements.lastElement()).getBind()).clone();
+            ((IFormElement) elements.get(elements.size() - 1)).getBind()).clone();
       for (int i = 0; i < ref.size(); i++) {
          // There has to be a better way to encapsulate this
          if (ref.getMultiplicity(i) != TreeReference.INDEX_ATTRIBUTE) {
@@ -351,11 +354,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       // fill in multiplicities for repeats along the way
       for (int i = 0; i < elements.size(); i++) {
-         IFormElement temp = (IFormElement) elements.elementAt(i);
+         IFormElement temp = (IFormElement) elements.get(i);
          if (temp instanceof GroupDef && ((GroupDef) temp).getRepeat()) {
             TreeReference repRef = FormInstance.unpackReference(temp.getBind());
             if (repRef.isParentOf(ref, false)) {
-               int repMult = ((Integer) multiplicities.elementAt(i)).intValue();
+               int repMult = (Integer) multiplicities.get(i);
                ref.setMultiplicity(repRef.size() - 1, repMult);
             } else {
                return null; // question/repeat hierarchy is not consistent
@@ -391,10 +394,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-      if (mode == EvalBehavior.Legacy ||
-          mode == EvalBehavior.April_2014) {
+      if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
          setAnswer(data, node);
-         triggerTriggerables(ref, cascadeToGroupChildren);
+         Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
+         publishSummary(node.getName() + " got a value by force", qts);
       } else {
          // SCTO-2286 : Do not act if the data haven't changed.
          // Use the serialized form of the data to avoid type conversions and
@@ -405,7 +408,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                || !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
                      answerDataSerializer.serializeAnswerData(data))) {
             setAnswer(data, node);
-            triggerTriggerables(ref, cascadeToGroupChildren);
+            Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
+            publishSummary(node.getName() + " got a value conditionally", qts);
          }
       }
       // TODO: pre-populate fix-count repeats here?
@@ -463,22 +467,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public FormIndex deleteRepeat(FormIndex index) {
-      Vector indexes = new Vector();
-      Vector multiplicities = new Vector();
-      Vector elements = new Vector();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
       collapseIndex(index, indexes, multiplicities, elements);
 
       // loop backwards through the elements, removing objects from each
       // vector, until we find a repeat
       // TODO: should probably check to make sure size > 0
       for (int i = elements.size() - 1; i >= 0; i--) {
-         IFormElement e = (IFormElement) elements.elementAt(i);
+         IFormElement e = (IFormElement) elements.get(i);
          if (e instanceof GroupDef && ((GroupDef) e).getRepeat()) {
             break;
          } else {
-            indexes.removeElementAt(i);
-            multiplicities.removeElementAt(i);
-            elements.removeElementAt(i);
+            indexes.remove(i);
+            multiplicities.remove(i);
+            elements.remove(i);
          }
       }
 
@@ -506,7 +510,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      triggerTriggerables(deleteRef, true);
+      Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(deleteRef, true, new HashSet<QuickTriggerable>(0));
+      publishSummary("Deleted " + index.getReference().toString(true), alreadyEvaluated);
+
+      if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
+         evaluateChildrenTriggerables(deleteElement, true, alreadyEvaluated);
+      }
+
       return newIndex;
    }
 
@@ -516,21 +526,40 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       mainInstance.copyNode(template, destRef);
 
-      preloadInstance(mainInstance.resolveReference(destRef));
+      TreeElement newNode = mainInstance.resolveReference(destRef);
+      preloadInstance(newNode);
 
       // 2013-05-14 - ctsims - Events should get fired _before_ calculate stuff
       // is fired, moved
       // this above triggering triggerables
       // Grab any actions listening to this event
-      Vector<Action> listeners = getEventListeners(Action.EVENT_JR_INSERT);
+      List<Action> listeners = getEventListeners(Action.EVENT_JR_INSERT);
       for (Action a : listeners) {
          a.processAction(this, destRef);
       }
 
-      triggerTriggerables(destRef, true); // trigger conditions that depend on
-                                          // the creation of this new node
-      initializeTriggerables(destRef, true); // initialize conditions for the
-                                             // node (and sub-nodes)
+      Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, true, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of this new node
+      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 1)", qtSet1);
+
+      Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, true);// initialize conditions for the node (and sub-nodes)
+      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 2)", qtSet2);
+
+      if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
+         Set<QuickTriggerable> alreadyEvaluated = new HashSet<QuickTriggerable>(qtSet1);
+         alreadyEvaluated.addAll(qtSet2);
+
+         evaluateChildrenTriggerables(newNode, true, alreadyEvaluated);
+      }
+   }
+
+   private void evaluateChildrenTriggerables(TreeElement newNode, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
+      //iterate into the group children and evaluate any triggerables that depend one them, if they are not already calculated.
+      int numChildren = newNode.getNumChildren();
+      for (int i = 0; i < numChildren; i++) {
+         TreeReference anchorRef = newNode.getChildAt(i).getRef();
+         Set<QuickTriggerable> childTriggerables = triggerTriggerables(anchorRef, cascadeToGroupChildren, alreadyEvaluated);
+         publishSummary("Node created/deleted: " + anchorRef.toString(true), childTriggerables);
+      }
    }
 
    public boolean isRepeatRelevant(TreeReference repeatRef) {
@@ -600,25 +629,25 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       TreeReference targetRef = targetNode.getRef();
       TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
 
-      Vector<Selection> selections = null;
-      Vector<String> selectedValues = new Vector<String>();
+      List<Selection> selections = null;
+      List<String> selectedValues = new ArrayList<String>();
       if (data instanceof SelectMultiData) {
-         selections = (Vector<Selection>) data.getValue();
+         selections = (List<Selection>) data.getValue();
       } else if (data instanceof SelectOneData) {
-         selections = new Vector<Selection>();
-         selections.addElement((Selection) data.getValue());
+         selections = new ArrayList<Selection>(1);
+         selections.add((Selection) data.getValue());
       }
       if (itemset.valueRef != null) {
          for (int i = 0; i < selections.size(); i++) {
-            selectedValues.addElement(selections.elementAt(i).choice.getValue());
+            selectedValues.add(selections.get(i).choice.getValue());
          }
       }
 
       // delete existing dest nodes that are not in the answer selection
       HashMap<String, TreeElement> existingValues = new HashMap<String, TreeElement>();
-      Vector<TreeReference> existingNodes = exprEvalContext.expandReference(destRef);
+      List<TreeReference> existingNodes = exprEvalContext.expandReference(destRef);
       for (int i = 0; i < existingNodes.size(); i++) {
-         TreeElement node = getMainInstance().resolveReference(existingNodes.elementAt(i));
+         TreeElement node = getMainInstance().resolveReference(existingNodes.get(i));
 
          if (itemset.valueRef != null) {
             String value = itemset.getRelativeValue().evalReadable(this.getMainInstance(),
@@ -635,7 +664,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       // copy in nodes for new answer; preserve ordering in answer
       for (int i = 0; i < selections.size(); i++) {
-         Selection s = selections.elementAt(i);
+         Selection s = selections.get(i);
          SelectChoice ch = s.choice;
 
          TreeElement cachedNode = null;
@@ -654,17 +683,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      triggerTriggerables(destRef, cascadeToGroupChildren); // trigger
-                                                            // conditions that
-                                                            // depend on the
-                                                            // creation of these
-                                                            // new nodes
-      initializeTriggerables(destRef, cascadeToGroupChildren); // initialize
-                                                               // conditions for
-                                                               // the node (and
-                                                               // sub-nodes)
-      // not 100% sure this will work since destRef is ambiguous as the last
-      // step, but i think it's supposed to work
+      Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of these new nodes
+      publishSummary("Copied itemset answer for " + targetRef.toString(true) + " (phase 1)", qtSet1);
+
+      Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, cascadeToGroupChildren);// initialize conditions for the node (and sub-nodes)
+      publishSummary("Copied itemset answer for " + targetRef.toString(true) + " (phase 2)", qtSet2);
+      //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
    }
 
    public QuickTriggerable findTriggerable(Triggerable t) {
@@ -752,7 +776,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       for (QuickTriggerable qt : vertices) {
          deps.clear();
          newDestinationSet.clear();
-         fillTriggeredElements(qt, deps, newDestinationSet, true, true);
+         fillTriggeredElements(qt, deps, newDestinationSet, true);
 
          // remove any self-reference if we have one...
          deps.remove(qt);
@@ -873,20 +897,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * Get all of the elements which will need to be evaluated (in order) when
     * the triggerable is fired.
     * 
-    * @param t
-    * @param destination
+    * @param qt
+    * @param destinationSet
     *           where to store the triggerables
-    * @param cascadeToChildrenOfGroupsWithRelevanceExpressions
+    * @param cascadeToGroupChildren
     *           if true, then the slow code will execute, if false, then
     *           old/fast code will execute that suffers from
     *           https://code.google.com/p/opendatakit/issues/detail?id=888
     */
-   public void fillTriggeredElements(QuickTriggerable qt, Set<QuickTriggerable> destinationSet,
-         Set<QuickTriggerable> newDestinationSet, boolean expandRepeatables,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   public void fillTriggeredElements(QuickTriggerable qt,
+                                     Set<QuickTriggerable> destinationSet,
+                                     Set<QuickTriggerable> newDestinationSet,
+                                     boolean cascadeToGroupChildren) {
       if (qt.t.canCascade()) {
-         if (mode == EvalBehavior.Legacy
-               || (mode == EvalBehavior.Legacy_April_Hybrid_2014 && !cascadeToChildrenOfGroupsWithRelevanceExpressions)) {
+         if (mode == EvalBehavior.Legacy || (mode == EvalBehavior.Latest_fastest && !cascadeToGroupChildren)) {
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                TreeReference target = qt.t.getTargets().get(j);
                HashSet<QuickTriggerable> triggered = triggerIndex.get(target);
@@ -900,6 +924,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                }
             }
          } else {
+            boolean expandRepeatables = mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014;
+
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                TreeReference target = (TreeReference) qt.t.getTargets().get(j);
                Set<TreeReference> updatedNodes = new HashSet<TreeReference>();
@@ -954,16 +980,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
    }
 
-   public void initializeTriggerables() {
-      initializeTriggerables(TreeReference.rootRef(), false);
+   public Set<QuickTriggerable> initializeTriggerables() {
+      return initializeTriggerables(TreeReference.rootRef(), false);
    }
 
    /**
     * Walks the current set of conditions, and evaluates each of them with the
     * current context.
     */
-   private void initializeTriggerables(TreeReference rootRef,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   private Set<QuickTriggerable> initializeTriggerables(TreeReference rootRef,
+                                                        boolean cascadeToGroupChildren) {
       TreeReference genericRoot = rootRef.genericize();
 
       Set<QuickTriggerable> applicable = new HashSet<QuickTriggerable>();
@@ -978,7 +1004,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      evaluateTriggerables(applicable, rootRef, cascadeToChildrenOfGroupsWithRelevanceExpressions);
+      return evaluateTriggerables(applicable, rootRef, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
    }
 
    /**
@@ -988,8 +1014,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           The full contextualized unambiguous reference of the value that
     *           was changed.
     */
-   public void triggerTriggerables(TreeReference ref,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   public Set<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
 
       // turn unambiguous ref into a generic ref
       // to identify what nodes should be triggered by this
@@ -999,13 +1024,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // get triggerables which are activated by the generic reference
       HashSet<QuickTriggerable> triggered = triggerIndex.get(genericRef);
       if (triggered == null) {
-         return;
+         return alreadyEvaluated;
       }
 
       Set<QuickTriggerable> triggeredCopy = new HashSet<QuickTriggerable>(triggered);
 
       // Evaluate all of the triggerables in our new vector
-      evaluateTriggerables(triggeredCopy, ref, cascadeToChildrenOfGroupsWithRelevanceExpressions);
+      return evaluateTriggerables(triggeredCopy, ref, cascadeToGroupChildren, alreadyEvaluated);
    }
 
    /**
@@ -1014,15 +1039,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * triggered conditions, identifying which conditions should further be
     * triggered due to their update, and then dispatching all of the
     * evaluations.
-    *
-    * @param tv
+    *  @param tv
     *           A vector of all of the trigerrables directly triggered by the
     *           value changed
     * @param anchorRef
-    *           The reference to original value that was updated
     */
-   private void evaluateTriggerables(Set<QuickTriggerable> tv, TreeReference anchorRef,
-         boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   private Set<QuickTriggerable> evaluateTriggerables(Set<QuickTriggerable> tv, TreeReference anchorRef,
+                                                      boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
       // add all cascaded triggerables to queue
 
       // Iterate through all of the currently known triggerables to be triggered
@@ -1030,11 +1053,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       for (; !refSet.isEmpty();) {
          Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
          for (QuickTriggerable qt : refSet) {
-            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014
-                  || mode == EvalBehavior.Legacy_April_Hybrid_2014) {
-               fillTriggeredElements(qt, tv, newSet, false,
-                     cascadeToChildrenOfGroupsWithRelevanceExpressions);
-            } else if (mode == EvalBehavior.Aggressive_2014) {
+            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014 || mode == EvalBehavior.Latest_fastest) {
+               fillTriggeredElements(qt, tv, newSet, cascadeToGroupChildren);
+            } else if (mode == EvalBehavior.Latest_safest) {
                // leverage the saved DAG edges.
                // This may over-fill the set of triggerables.
                // but should be faster than recomputing the edges.
@@ -1057,19 +1078,25 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // 'triggerables' is topologically-ordered by dependencies, so evaluate
       // the triggerables in 'tv'
       // in the order they appear in 'triggerables'
+      Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
+
       for (int i = 0; i < triggerablesDAG.size(); i++) {
          QuickTriggerable qt = triggerablesDAG.get(i);
-         if (tv.contains(qt)) {
+         if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
             evaluateTriggerable(qt, anchorRef);
+
+            fired.add(qt);
          }
       }
+
+      return fired;
    }
 
    /**
     * Step 3 in DAG cascade. evaluate the individual triggerable expressions
     * against the anchor (the value that changed which triggered recomputation)
     *
-    * @param t
+    * @param qt
     *           The triggerable to be updated
     * @param anchorRef
     *           The reference to the value which was changed.
@@ -1082,12 +1109,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
          // Now identify all of the fully qualified nodes which this triggerable
          // updates. (Multiple nodes can be updated by the same trigger)
-         Vector<TreeReference> v = exprEvalContext.expandReference(contextRef);
+         List<TreeReference> v = exprEvalContext.expandReference(contextRef);
 
          // Go through each one and evaluate the trigger expresion
          for (int i = 0; i < v.size(); i++) {
-            EvaluationContext ec = new EvaluationContext(exprEvalContext, v.elementAt(i));
-            qt.t.apply(mainInstance, ec, v.elementAt(i), this);
+            EvaluationContext ec = new EvaluationContext(exprEvalContext, v.get(i));
+            qt.t.apply(mainInstance, ec, v.get(i), this);
          }
       } catch (Exception e) {
          throw new WrappedException("Error evaluating field '" + contextRef.getNameLast() + "': "
@@ -1112,7 +1139,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             addChildrenOfElement(child, toAdd, expandRepeatables);
          }
       } else {
-         Vector<TreeReference> refSet = exprEvalContext.expandReference(original);
+         List<TreeReference> refSet = exprEvalContext.expandReference(original);
          for (TreeReference ref : refSet) {
             addChildrenOfElement(exprEvalContext.resolveReference(ref), toAdd, expandRepeatables);
          }
@@ -1198,10 +1225,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                }
             }
 
-            public Vector getPrototypes() {
+            public List<Class[]> getPrototypes() {
                Class[] proto = { String.class };
-               Vector v = new Vector();
-               v.addElement(proto);
+               List<Class[]> v = new ArrayList<Class[]>(1);
+               v.add(proto);
                return v;
             }
 
@@ -1268,7 +1295,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                   // to a label in an unrelated
                   // expression
 
-                  Vector<SelectChoice> choices;
+                  List<SelectChoice> choices;
                   ItemsetBinding itemset = q.getDynamicChoices();
                   if (itemset != null) {
                      if (itemset.getChoices() == null) {
@@ -1313,10 +1340,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                }
             }
 
-            public Vector getPrototypes() {
+            public List<Class[]> getPrototypes() {
                Class[] proto = { String.class, String.class };
-               Vector v = new Vector();
-               v.addElement(proto);
+               List<Class[]> v = new ArrayList<Class[]>(1);
+               v.add(proto);
                return v;
             }
 
@@ -1340,10 +1367,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       HashMap args = new HashMap();
 
       int depth = 0;
-      Vector outstandingArgs = Localizer.getArgs(template);
+      List<String> outstandingArgs = Localizer.getArgs(template);
       while (outstandingArgs.size() > 0) {
          for (int i = 0; i < outstandingArgs.size(); i++) {
-            String argName = (String) outstandingArgs.elementAt(i);
+            String argName = outstandingArgs.get(i);
             if (!args.containsKey(argName)) {
                int ix = -1;
                try {
@@ -1355,7 +1382,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                if (ix < 0 || ix >= outputFragments.size())
                   continue;
 
-               IConditionExpr expr = outputFragments.elementAt(ix);
+               IConditionExpr expr = outputFragments.get(ix);
                EvaluationContext ec = new EvaluationContext(exprEvalContext, contextRef);
                ec.setOriginalContext(contextRef);
                ec.setVariables(variables);
@@ -1390,9 +1417,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           used to determine the values to be chosen from.
     */
    public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
-      Vector<SelectChoice> choices = new Vector<SelectChoice>();
+      List<SelectChoice> choices = new ArrayList<SelectChoice>();
 
-      Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
+      List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
             new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
       FormInstance fi = null;
@@ -1415,7 +1442,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
 
       for (int i = 0; i < matches.size(); i++) {
-         TreeReference item = matches.elementAt(i);
+         TreeReference item = matches.get(i);
 
          // String label =
          // itemset.labelExpr.evalReadable(this.getMainInstance(), new
@@ -1442,7 +1469,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          if (itemset.copyMode)
             choice.copyNode = copyNode;
 
-         choices.addElement(choice);
+         choices.add(choice);
       }
 
       if (choices.size() == 0) {
@@ -1489,8 +1516,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * org.javarosa.core.model.utils.Localizer)
     */
    public void localeChanged(String locale, Localizer localizer) {
-      for (Enumeration e = children.elements(); e.hasMoreElements();) {
-         ((IFormElement) e.nextElement()).localeChanged(locale, localizer);
+      for (IFormElement child : children) {
+         child.localeChanged(locale, localizer);
       }
    }
 
@@ -1591,22 +1618,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       setID(ExtUtil.readInt(dis));
       setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
       setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-      setChildren((Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+      setChildren((List) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
       setInstance((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
 
       setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
-      Vector vcond = (Vector) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
-      for (Enumeration e = vcond.elements(); e.hasMoreElements();) {
-         addTriggerable((Condition) e.nextElement());
+      List<Condition> vcond = (List<Condition>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
+      for (Condition condition : vcond) {
+         addTriggerable(condition);
       }
-      Vector vcalc = (Vector) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
-      for (Enumeration e = vcalc.elements(); e.hasMoreElements();) {
-         addTriggerable((Recalculate) e.nextElement());
+      List<Recalculate> vcalc = (List<Recalculate>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
+      for (Recalculate recalculate : vcalc) {
+         addTriggerable(recalculate);
       }
       finalizeTriggerables();
 
-      outputFragments = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+      outputFragments = (List) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
       submissionProfiles = (HashMap<String, SubmissionProfile>) ExtUtil.read(dis, new ExtWrapMap(
             String.class, SubmissionProfile.class));
@@ -1614,10 +1641,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       formInstances = (HashMap<String, FormInstance>) ExtUtil.read(dis, new ExtWrapMap(
             String.class, FormInstance.class));
 
-      eventListeners = (HashMap<String, Vector<Action>>) ExtUtil.read(dis, new ExtWrapMap(
+      eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
             String.class, new ExtWrapListPoly()), pf);
 
-      extensions = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+      extensions = (List) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
       setEvaluationContext(new EvaluationContext(null));
    }
@@ -1650,7 +1677,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          dispatchFormEvent(Action.EVENT_XFORMS_READY);
       }
 
-      initializeTriggerables();
+      Set<QuickTriggerable> quickTriggerables = initializeTriggerables();
+      publishSummary("Form initialized", quickTriggerables);
+   }
+
+   private void publishSummary(String lead, Set<QuickTriggerable> quickTriggerables) {
+      System.out.println(lead + ": " + quickTriggerables.size() + " triggerables were fired.");
    }
 
    /**
@@ -1668,14 +1700,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       ExtUtil.write(dos, getMainInstance());
       ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
-      Vector conditions = new Vector();
-      Vector recalcs = new Vector();
+      List<Condition> conditions = new ArrayList<Condition>();
+      List<Recalculate> recalcs = new ArrayList<Recalculate>();
       for (QuickTriggerable qt : triggerablesDAG) {
          Triggerable t = qt.t;
          if (t instanceof Condition) {
-            conditions.addElement(t);
+            conditions.add((Condition) t);
          } else if (t instanceof Recalculate) {
-            recalcs.addElement(t);
+            recalcs.add((Recalculate) t);
          }
       }
       ExtUtil.write(dos, new ExtWrapList(conditions));
@@ -1691,7 +1723,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       ExtUtil.write(dos, new ExtWrapListPoly(extensions));
    }
 
-   public void collapseIndex(FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {
+   public void collapseIndex(FormIndex index, List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
       if (!index.isInForm()) {
          return;
       }
@@ -1701,53 +1733,53 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          int i = index.getLocalIndex();
          element = element.getChild(i);
 
-         indexes.addElement(new Integer(i));
-         multiplicities.addElement(new Integer(index.getInstanceIndex() == -1 ? 0 : index
-               .getInstanceIndex()));
-         elements.addElement(element);
+         indexes.add(new Integer(i));
+         multiplicities.add(new Integer(index.getInstanceIndex() == -1 ? 0 : index
+                 .getInstanceIndex()));
+         elements.add(element);
 
          index = index.getNextLevel();
       }
    }
 
-   public FormIndex buildIndex(Vector indexes, Vector multiplicities, Vector elements) {
+   public FormIndex buildIndex(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
       FormIndex cur = null;
-      Vector curMultiplicities = new Vector();
+      List<Integer> curMultiplicities = new ArrayList<Integer>();
       for (int j = 0; j < multiplicities.size(); ++j) {
-         curMultiplicities.addElement(multiplicities.elementAt(j));
+         curMultiplicities.add(multiplicities.get(j));
       }
 
-      Vector curElements = new Vector();
+      List<IFormElement> curElements = new ArrayList<IFormElement>();
       for (int j = 0; j < elements.size(); ++j) {
-         curElements.addElement(elements.elementAt(j));
+         curElements.add(elements.get(j));
       }
 
       for (int i = indexes.size() - 1; i >= 0; i--) {
-         int ix = ((Integer) indexes.elementAt(i)).intValue();
-         int mult = ((Integer) multiplicities.elementAt(i)).intValue();
+         int ix = (Integer) indexes.get(i);
+         int mult = (Integer) multiplicities.get(i);
 
          // ----begin unclear why this is here... side effects???
          // TODO: ... No words. Just fix it.
-         IFormElement ife = (IFormElement) elements.elementAt(i);
+         IFormElement ife = (IFormElement) elements.get(i);
          XPathReference xpr = (ife != null) ? (XPathReference) ife.getBind() : null;
          TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
          // ----end
-         if (!(elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i))
+         if (!(elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i))
                .getRepeat())) {
             mult = -1;
          }
 
          cur = new FormIndex(cur, ix, mult, getChildInstanceRef(curElements, curMultiplicities));
-         curMultiplicities.removeElementAt(curMultiplicities.size() - 1);
-         curElements.removeElementAt(curElements.size() - 1);
+         curMultiplicities.remove(curMultiplicities.size() - 1);
+         curElements.remove(curElements.size() - 1);
       }
       return cur;
    }
 
    public int getNumRepetitions(FormIndex index) {
-      Vector indexes = new Vector();
-      Vector multiplicities = new Vector();
-      Vector elements = new Vector();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 
       if (!index.isInForm()) {
          throw new RuntimeException("not an in-form index");
@@ -1755,8 +1787,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       collapseIndex(index, indexes, multiplicities, elements);
 
-      if (!(elements.lastElement() instanceof GroupDef)
-            || !((GroupDef) elements.lastElement()).getRepeat()) {
+      if (!(elements.get(elements.size() - 1) instanceof GroupDef)
+            || !((GroupDef) elements.get(elements.size() - 1)).getRepeat()) {
          throw new RuntimeException("current element not a repeat");
       }
 
@@ -1772,9 +1804,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
       int numRepetitions = getNumRepetitions(index);
 
-      Vector indexes = new Vector();
-      Vector multiplicities = new Vector();
-      Vector elements = new Vector();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
       collapseIndex(index, indexes, multiplicities, elements);
 
       if (repIndex == -1) {
@@ -1785,7 +1817,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      multiplicities.setElementAt(new Integer(repIndex), multiplicities.size() - 1);
+      multiplicities.set(multiplicities.size() - 1, new Integer(repIndex));
 
       return buildIndex(indexes, multiplicities, elements);
    }
@@ -1797,9 +1829,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     */
    public int getDeepChildCount() {
       int total = 0;
-      Enumeration e = children.elements();
-      while (e.hasMoreElements()) {
-         total += ((IFormElement) e.nextElement()).getDeepChildCount();
+      for (IFormElement child : children) {
+         total += child.getDeepChildCount();
       }
       return total;
    }
@@ -1812,12 +1843,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // NO. (Or at least not yet).
    }
 
-   public Vector getChildren() {
+   public List<IFormElement> getChildren() {
       return children;
    }
 
-   public void setChildren(Vector<IFormElement> children) {
-      this.children = (children == null ? new Vector() : children);
+   public void setChildren(List<IFormElement> children) {
+      this.children = (children == null ? new ArrayList<IFormElement>() : children);
    }
 
    public String getTitle() {
@@ -1848,11 +1879,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       return localizer;
    }
 
-   public Vector getOutputFragments() {
+   public List<IConditionExpr> getOutputFragments() {
       return outputFragments;
    }
 
-   public void setOutputFragments(Vector outputFragments) {
+   public void setOutputFragments(List<IConditionExpr> outputFragments) {
       this.outputFragments = outputFragments;
    }
 
@@ -1904,12 +1935,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
 
       IAnswerData val = node.getValue();
-      Vector selections = null;
+      List<Selection> selections = null;
       if (val instanceof SelectOneData) {
-         selections = new Vector();
-         selections.addElement(val.getValue());
+         selections = new ArrayList<Selection>();
+         selections.add((Selection) val.getValue());
       } else if (val instanceof SelectMultiData) {
-         selections = (Vector) val.getValue();
+         selections = (List<Selection>) val.getValue();
       }
 
       if (selections != null) {
@@ -1932,7 +1963,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
 
          for (int i = 0; i < selections.size(); i++) {
-            Selection s = (Selection) selections.elementAt(i);
+            Selection s = (Selection) selections.get(i);
             s.attachChoice(q);
          }
       }
@@ -2025,27 +2056,27 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    @Override
-   public Vector<TreeElement> getAdditionalAttributes() {
+   public List<TreeElement> getAdditionalAttributes() {
       // Not supported.
-      return new Vector<TreeElement>();
+      return Collections.emptyList();
    }
 
-   public Vector<Action> getEventListeners(String event) {
+   public List<Action> getEventListeners(String event) {
       if (this.eventListeners.containsKey(event)) {
          return eventListeners.get(event);
       }
-      return new Vector<Action>();
+      return new ArrayList<Action>();
    }
 
    public void registerEventListener(String event, Action action) {
-      Vector<Action> actions;
+      List<Action> actions;
 
       if (this.eventListeners.containsKey(event)) {
          actions = eventListeners.get(event);
       } else {
-         actions = new Vector<Action>();
+         actions = new ArrayList<Action>(1);
       }
-      actions.addElement(action);
+      actions.add(action);
       this.eventListeners.put(event, actions);
    }
 
@@ -2069,7 +2100,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       } catch (IllegalAccessException e) {
          throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
       }
-      extensions.addElement(newEx);
+      extensions.add(newEx);
       return newEx;
    }
 
