@@ -17,7 +17,7 @@
 package org.javarosa.xform.schema;
 
 import java.util.Hashtable;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -25,7 +25,6 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.kxml2.kdom.Document;
@@ -150,7 +149,7 @@ public class InstanceSchema {
 			if (controlType == Constants.CONTROL_SELECT_ONE || controlType == Constants.CONTROL_SELECT_MULTI) {
 				String choiceTypeName = getChoiceTypeName(ref);
 
-				Vector<SelectChoice> choices;
+				List<SelectChoice> choices;
 				//Figure out the choices involved if they are complex
 				ItemsetBinding itemset = q.getDynamicChoices();
 		    	if (itemset != null) {
@@ -181,7 +180,7 @@ public class InstanceSchema {
 		return ref.toString(false).replace('/', '_');
 	}
 
-	private static void writeChoices (Element e, String typeName, Vector<SelectChoice> choices) {
+	private static void writeChoices (Element e, String typeName, List<SelectChoice> choices) {
 		Element st = new Element();
 		st.setName("simpleType");
 		st.setAttribute(null, "name", typeName);
@@ -193,7 +192,7 @@ public class InstanceSchema {
 		st.addChild(Node.ELEMENT, restr);
 
 		for (int i = 0; i < choices.size(); i++) {
-			String value = choices.elementAt(i).getValue();
+			String value = choices.get(i).getValue();
 
 			Element choice = new Element();
 			choice.setName("enumeration");

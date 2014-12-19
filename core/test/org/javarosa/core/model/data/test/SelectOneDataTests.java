@@ -16,10 +16,10 @@
 
 package org.javarosa.core.model.data.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectOneData;
@@ -40,7 +40,7 @@ public class SelectOneDataTests extends TestCase {
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		
 		question = new QuestionDef();
@@ -57,42 +57,32 @@ public class SelectOneDataTests extends TestCase {
 		two = new Selection("Selection2");
 		two.attachChoice(question);
 	}
-	
-	public SelectOneDataTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public SelectOneDataTests(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public SelectOneDataTests() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new SelectOneDataTests("SelectOneData Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((SelectOneDataTests)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new SelectOneDataTests(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
 		switch (testID) {
-		case 1: testGetData(); break;
-		case 2: testSetData(); break;
-		case 3: testNullData(); break;
+		case 1: return "testGetData";
+		case 2: return "testSetData";
+		case 3: return "testNullData";
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 	
 	public void testGetData() {

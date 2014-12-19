@@ -16,10 +16,9 @@
 
 package org.javarosa.xpath.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -209,33 +208,26 @@ public class XPathParseTest extends TestCase {
 		pf = ExtUtil.defaultPrototypes();
 	}
 	
-	public XPathParseTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
-	
 	public XPathParseTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 	
-	public XPathParseTest() {
-		super();
-	}	
-	
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
+		aSuite.addTest(new XPathParseTest("doTests"));
 		
+		return aSuite;
+	}
+	
+	public void doTests() {
 		for (int i = 0; i < parseTestCases.length; i++) {
 			final String expr = parseTestCases[i][0];
 			final String expected = parseTestCases[i][1];
 			
-			aSuite.addTest(new XPathParseTest("XPath Parsing Test [" + expr + "]", new TestMethod() {
-				public void run (TestCase tc) {
-					((XPathParseTest)tc).testParse(expr, expected);
-				}
-			}));
+			System.out.print("XPath Parsing Test [" + expr + "]");
+			testParse(expr, expected);
 		}
-		
-		return aSuite;
 	}
 	
 	private void testXPathValid (String expr, String expected) {

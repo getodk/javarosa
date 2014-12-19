@@ -16,10 +16,15 @@
 
 package org.javarosa.core.util;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
@@ -32,31 +37,26 @@ import org.javarosa.xform.util.XFormUtils;
  */
 public class GeoShapeAreaTest extends TestCase {
 
-  public GeoShapeAreaTest(String name, TestMethod rTestMethod) {
-    super(name, rTestMethod);
+  public GeoShapeAreaTest(String name) {
+    super(name);
+	System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
   }
 
-  public Test suite() {
+  public static Test suite() {
     TestSuite aSuite = new TestSuite();
 
-    aSuite.addTest(new GeoUtilsTest("GeoShapeArea Test", new TestMethod() {
-      public void run (TestCase tc) {
-        try {
-          ((GeoShapeAreaTest)tc).testGeoShapeSupportForEnclosedArea();
-        } catch (Exception e) {
-          e.printStackTrace();
-
-          fail(e.getMessage());
-        }
-      }
-    }));
+    aSuite.addTest(new GeoShapeAreaTest("testGeoShapeSupportForEnclosedArea"));
 
     return aSuite;
   }
 
   public void testGeoShapeSupportForEnclosedArea() throws Exception {
     // Read the form definition
-    FormDef formDef = XFormUtils.getFormFromInputStream(getClass().getResourceAsStream("org/javarosa/core/util/area.xml"));
+	String FORM_NAME = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
+	InputStream is = null;
+	FormDef formDef = null;
+	is = new FileInputStream(new File(FORM_NAME));
+    formDef = XFormUtils.getFormFromInputStream(is);
 
     // trigger all calculations
     formDef.initialize(true, new InstanceInitializationFactory());

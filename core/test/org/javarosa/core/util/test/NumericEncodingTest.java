@@ -16,36 +16,25 @@
 
 package org.javarosa.core.util.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.javarosa.core.util.externalizable.ExtWrapIntEncoding;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingSmall;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingUniform;
 
 public class NumericEncodingTest extends TestCase  {
-	public NumericEncodingTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public NumericEncodingTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public NumericEncodingTest() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
-		aSuite.addTest((new NumericEncodingTest("Encoding Test Suite", new TestMethod() {
-			public void run(TestCase tc) {
-				((NumericEncodingTest)tc).testIntEncodingUniform();
-				((NumericEncodingTest)tc).testIntEncodingSmall();
-			}
-		})));
+		aSuite.addTest(new NumericEncodingTest("testIntEncodingUniform"));
+		aSuite.addTest(new NumericEncodingTest("testIntEncodingSmall"));
 		return aSuite;
 	}
 

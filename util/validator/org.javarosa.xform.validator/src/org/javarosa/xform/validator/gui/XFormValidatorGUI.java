@@ -499,7 +499,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		writeProperties();
 
 		// Test!
-		FormDef xform = XFormUtils.getFormFromInputStream(is, FormDef.latestImplementationMode);
+		FormDef xform = XFormUtils.getFormFromInputStream(is);
 		
 		if( xform == null ) {
 			updateStatus("XForm failed validation, see text area for details.");
@@ -817,7 +817,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		FileInputStream in;
 		try {
 			in = new FileInputStream(newForm);
-			FormDef f = XFormUtils.getFormFromInputStream(in, FormDef.latestImplementationMode);
+			FormDef f = XFormUtils.getFormFromInputStream(in);
 			addToTextArea(FormOverview.overview(f, this.languages.getSelectedItem()));
 			addToTextArea("\n\n==================================\nForm Summary Complete\n==================================\n");
 			updateStatus("Summary Completed");
@@ -1316,7 +1316,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		try {
 			languages.removeAll();
 			FileInputStream in = new FileInputStream(newForm);
-			FormDef f = XFormUtils.getFormFromInputStream(in, FormDef.latestImplementationMode);
+			FormDef f = XFormUtils.getFormFromInputStream(in);
 			if (f.getLocalizer() != null) {
 				String[] locales = f.getLocalizer().getAvailableLocales();
 				for (int i = 0; i < locales.length; ++i) {

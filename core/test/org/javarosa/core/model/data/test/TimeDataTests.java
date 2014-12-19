@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.data.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.Date;
 
@@ -31,51 +30,38 @@ public class TimeDataTests extends TestCase {
 	
 	private static int NUM_TESTS = 3;
 	
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		
 		now = new Date();
 		minusOneHour = new Date(new Date().getTime() - (1000*60));
 	}
-	
-	public TimeDataTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public TimeDataTests(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public TimeDataTests() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new TimeDataTests("TimeData Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((TimeDataTests)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new TimeDataTests(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
 		switch (testID) {
-		case 1: testGetData(); break;
-		case 2: testSetData(); break;
-		case 3: testNullData(); break;
+		case 1: return "testGetData";
+		case 2: return "testSetData";
+		case 3: return "testNullData";
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 	
 	public void testGetData() {

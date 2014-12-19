@@ -3,20 +3,18 @@ package org.javarosa.core.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Vector;
 
+import org.javarosa.core.PathConst;
 import org.javarosa.core.form.api.test.TextFormTests;
-import org.javarosa.core.model.*;
-import org.javarosa.core.model.test.FormDefTest;
-import org.javarosa.core.model.test.QuestionDefTest;
-import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.util.XFormUtils;
 
 /* TODO
@@ -39,7 +37,7 @@ import org.javarosa.xform.util.XFormUtils;
 
 
 public class FormParseInit {
-	private String FORM_NAME = new String("C:\\eclipse_workspaces/javarosa/javarosa/j2me/buildfiles/test/resources/ImageSelectTester.xhtml");
+	private String FORM_NAME = (new File(PathConst.getTestResourcePath(), "ImageSelectTester.xhtml")).getAbsolutePath();
 	private FormDef xform;
 	private FormEntryController fec;
 	private FormEntryModel femodel;
@@ -58,34 +56,6 @@ public class FormParseInit {
 	public void setFormToParse(String uri){
 		FORM_NAME = uri;
 		this.init();
-	}
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-//		FormParseInit t = new FormParseInit();
-		
-//		System.out.println("Form Summary");
-//		System.out.println(t.printStuff());
-//		
-//		System.out.println("Stepping through questions...");
-//		
-//		t.fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-//		do{
-//			QuestionDef q = t.getCurrentQuestion();
-//			if(q!=null)	System.out.println("Question Text ID is: "+q.getTextID());
-//		}while(t.fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
-//		for(int i=0;i<QuestionDefTest.NUM_TESTS+1;i++){
-//			new QuestionDefTest().doTest(i);
-//		}
-
-		
-		for(int i=0;i<TextFormTests.NUM_TESTS;i++){
-			new TextFormTests().doTest(i);
-		}
-		
 	}
 	
 	public void init(){

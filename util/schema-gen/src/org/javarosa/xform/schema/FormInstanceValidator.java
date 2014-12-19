@@ -4,7 +4,7 @@
 package org.javarosa.xform.schema;
 
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -42,7 +42,7 @@ public class FormInstanceValidator {
 	FormEntryController controller;
 	
 	public FormInstanceValidator(InputStream formInput, InputStream instanceInput) throws Exception {
-		theForm = XFormUtils.getFormFromInputStream(formInput, FormDef.latestImplementationMode);
+		theForm = XFormUtils.getFormFromInputStream(formInput);
 		
 		savedModel = XFormParser.restoreDataModel(instanceInput, null);
         TreeElement templateRoot = theForm.getInstance().getRoot().deepCopy(true);
@@ -121,7 +121,7 @@ public class FormInstanceValidator {
 			}
 			
 			//One more thing to evalute: multi/single select values are in the valid range.
-			Vector<SelectChoice> choices = prompt.getSelectChoices();
+			List<SelectChoice> choices = prompt.getSelectChoices();
 			if(choices ==null) {
 				//Not the right kind of question!
 				return;
@@ -138,7 +138,7 @@ public class FormInstanceValidator {
 			//Check for one or multi
 			if (prompt.getControlType() == Constants.CONTROL_SELECT_MULTI) {
 				SelectMultiData data = new SelectMultiData().cast(answerValue.uncast());
-				Vector<Selection> values = (Vector<Selection>)data.getValue();
+				List<Selection> values = (List<Selection>)data.getValue();
 				for(Selection selection : values) {
 					if(!(validChoice(selection.xmlValue, choices))) {
 						System.out.println("Selection contains an invalid value [" + selection.xmlValue + "] at node " + ref.toString(true));
@@ -156,7 +156,7 @@ public class FormInstanceValidator {
 		}
 	}
 	
-	public boolean validChoice(String choice, Vector<SelectChoice> choices) {
+	public boolean validChoice(String choice, List<SelectChoice> choices) {
 		for(SelectChoice c : choices) {
 			if(c.getValue().equals(choice)) {return true;}
 		}
