@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.FormIndex;
@@ -46,22 +45,12 @@ public class FormDefTest extends TestCase {
 	FormEntryPrompt fep = null;
 	FormParseInit fpi = null;
 	
-	public FormDefTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-		initStuff();
-	}
-	
 	public FormDefTest(String name) {
 		super(name);
-		initStuff();
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 	
-	public FormDefTest() {
-		super();
-		initStuff();
-	}	
-	
-	public void initStuff(){
+	public void setUp(){
 		fpi = new FormParseInit();
 		q = fpi.getFirstQuestionDef();
 		fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());
@@ -74,16 +63,12 @@ public class FormDefTest extends TestCase {
 		pf = ExtUtil.defaultPrototypes();
 	}
 		
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 		
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new FormDefTest("FormDef Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((FormDefTest)tc).doTest(testID);
-				}
-			}));
+			aSuite.addTest(new FormDefTest(doTest(testID)));
 		}
 			
 		return aSuite;
@@ -94,10 +79,12 @@ public class FormDefTest extends TestCase {
 	}
 	
 	public final static int NUM_TESTS = 1;
-	public void doTest (int i) {
+	
+	public static String doTest (int i) {
 		switch (i) {
-		case 1: testAnswerConstraint();break;
+		case 1: return "testAnswerConstraint";
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 	
 	

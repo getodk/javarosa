@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.instance.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,10 +50,7 @@ public class QuestionDataElementTests extends TestCase{
 
 	private static int NUM_TESTS = 7;
 
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		stringData = new StringData("Answer Value");
 		integerData = new IntegerData(4);
@@ -137,46 +133,36 @@ public class QuestionDataElementTests extends TestCase{
 
 	}
 
-	public QuestionDataElementTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
-
 	public QuestionDataElementTests(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public QuestionDataElementTests() {
-		super();
-	}
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new QuestionDataElementTests("QuestionDataElement Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((QuestionDataElementTests)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new QuestionDataElementTests(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
 		switch (testID) {
-			case 1: testIsLeaf(); break;
-			case 2: testGetName(); break;
-			case 3: testSetName(); break;
-			case 4: testGetValue(); break;
-			case 5: testSetValue(); break;
-			case 6: testAcceptsVisitor(); break;
-			case 7: testSuperclassMethods(); break;
+			case 1: return "testIsLeaf";
+			case 2: return "testGetName";
+			case 3: return "testSetName";
+			case 4: return "testGetValue";
+			case 5: return "testSetValue";
+			case 6: return "testAcceptsVisitor";
+			case 7: return "testSuperclassMethods";
 
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 
 	public void testIsLeaf() {
@@ -249,7 +235,7 @@ public class QuestionDataElementTests extends TestCase{
 		assertTrue("The visitor was dispatched incorrectly by the QuestionDataElement",!dispatchedWrong.getValue());
 	}
 
-	private void testSuperclassMethods() {
+	public void testSuperclassMethods() {
 		//stringElement should not have a root at this point.
 
 		//TODO: Implement tests for the 'attribute' system.

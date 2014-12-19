@@ -1,9 +1,8 @@
 package org.javarosa.core.form.api.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
@@ -35,25 +34,12 @@ public class TextFormTests extends TestCase {
 	}
 
 
-
-
-
-	public TextFormTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-		initStuff();
-	}
-
 	public TextFormTests(String name) {
 		super(name);
-		initStuff();
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public TextFormTests() {
-		super();
-		initStuff();
-	}
-
-	public void initStuff(){
+	public void setUp(){
 		fpi = new FormParseInit();
 		q = fpi.getFirstQuestionDef();
 		fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());
@@ -61,16 +47,12 @@ public class TextFormTests extends TestCase {
 
 
 
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 		System.out.println("Running TextFormTests...");
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new QuestionDefTest("QuestionDef Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((QuestionDefTest)tc).doTest(testID);
-				}
-			}));
+			aSuite.addTest(new TextFormTests(doTest(testID)));
 		}
 
 		return aSuite;
@@ -79,17 +61,18 @@ public class TextFormTests extends TestCase {
 
 
 	public final static int NUM_TESTS = 8;
-	public void doTest (int i) {
+	public static String doTest (int i) {
 		switch (i) {
-		case 1: testConstructors(); break;
-		case 2: testPromptsNoLocalizer(); break;
-		case 3: testPromptIDsNoLocalizer(); break;
-		case 4: testPromptsWithLocalizer(); break;
-		case 5: testSelectChoicesNoLocalizer(); break;
-		case 6: testSelectChoiceIDsNoLocalizer(); break;
-		case 7: testNonLocalizedText(); break;
-		case 8: testTextForms(); break;
+		case 1: return "testConstructors";
+		case 2: return "testPromptsNoLocalizer";
+		case 3: return "testPromptIDsNoLocalizer";
+		case 4: return "testPromptsWithLocalizer";
+		case 5: return "testSelectChoicesNoLocalizer";
+		case 6: return "testSelectChoiceIDsNoLocalizer";
+		case 7: return "testNonLocalizedText";
+		case 8: return "testTextForms";
 		}
+		throw new IllegalStateException("unexpected index");
 	}
 
 	public void testConstructors () {
@@ -126,6 +109,7 @@ public class TextFormTests extends TestCase {
 		while(state != FormEntryController.EVENT_QUESTION){
 			state = fec.stepToNextEvent();
 		}
+		fep = fec.getModel().getQuestionPrompt();
 
 		if(!fep.getLongText().equals("Patient ID")) fail("getLongText() not returning correct value");
 		if(!fep.getShortText().equals("ID")) fail("getShortText() not returning correct value");
@@ -136,8 +120,11 @@ public class TextFormTests extends TestCase {
 			state = fec.stepToNextEvent();
 		}
 
+		fep = fec.getModel().getQuestionPrompt();
+		if(!fep.getShortText().equals("Name")) fail("getShortText() not returning correct value");
 		if(!fep.getLongText().equals("Full Name")) fail("getLongText() not falling back to default text form correctly");
-		if(!fep.getSpecialFormQuestionText("long").equals(null)) fail("getSpecialFormQuestionText() returning incorrect value");
+		String v = fep.getSpecialFormQuestionText("long");
+		if(fep.getSpecialFormQuestionText("long") != null) fail("getSpecialFormQuestionText() returning incorrect value");
 
 	}
 
@@ -177,8 +164,8 @@ public class TextFormTests extends TestCase {
 
 
 		//clean up
-		q.removeSelectChoice(q.getChoices().elementAt(0));
-		q.removeSelectChoice(q.getChoices().elementAt(0));
+		q.removeSelectChoice(q.getChoices().get(0));
+		q.removeSelectChoice(q.getChoices().get(0));
 	}
 
 	public void testSelectChoicesNoLocalizer () {

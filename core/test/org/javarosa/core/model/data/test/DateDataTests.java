@@ -16,69 +16,55 @@
 
 package org.javarosa.core.model.data.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.Date;
 
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.utils.DateUtils;
 
-public class DateDataTests extends TestCase{
+public class DateDataTests extends TestCase {
 	
 	Date today;
 	Date notToday;
 	
 	private static int NUM_TESTS = 4;
 	
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		
 		today = DateUtils.roundDate(new Date());
 		notToday = DateUtils.roundDate(new Date(today.getTime() - today.getTime()/2));
 	}
-	
-	public DateDataTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public DateDataTests(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public DateDataTests() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new DateDataTests("DateData Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((DateDataTests)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new DateDataTests(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
 		switch (testID) {
-		case 1: testGetData(); break;
-		case 2: testSetData(); break;
-		case 3: testDisplay(); break;
-		case 4: testNullData(); break;
+		case 1: return "testGetData";
+		case 2: return "testSetData";
+		case 3: return "testDisplay";
+		case 4: return "testNullData";
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 	
 	public void testGetData() {

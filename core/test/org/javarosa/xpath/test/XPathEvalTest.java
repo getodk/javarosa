@@ -16,10 +16,9 @@
 
 package org.javarosa.xpath.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.Date;
 import java.util.Vector;
@@ -40,26 +39,16 @@ import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class XPathEvalTest extends TestCase {
-	public XPathEvalTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public XPathEvalTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public XPathEvalTest() {
-		super();
-	}
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
-		aSuite.addTest(new XPathEvalTest("XPath Evaluation Test", new TestMethod() {
-			public void run (TestCase tc) {
-				((XPathEvalTest)tc).doTests();
-			}
-		}));
+		aSuite.addTest(new XPathEvalTest("doTests"));
 
 		return aSuite;
 	}
@@ -109,6 +98,7 @@ public class XPathEvalTest extends TestCase {
 		FormInstance instance = createTestInstance();
 
 		/* unsupporteds */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "unsupporteds" + "...");
 		testEval("/union | /expr", null, null, new XPathUnsupportedException());
 		testEval("/descendant::blah", null, null, new XPathUnsupportedException());
 		testEval("/cant//support", null, null, new XPathUnsupportedException());
@@ -117,6 +107,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("(filter-expr)[5]", instance, null, new XPathUnsupportedException());
 		testEval("(filter-expr)/data", instance, null, new XPathUnsupportedException());
 		/* numeric literals */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "numeric literals" + "...");
 		testEval("5", null, null, new Double(5.0));
 		testEval("555555.555", null, null, new Double(555555.555));
 		testEval(".000555", null, null, new Double(0.000555));
@@ -126,11 +117,13 @@ public class XPathEvalTest extends TestCase {
 		testEval("1230000000000000000000", null, null, new Double(1.23e21));
 		testEval("0.00000000000000000123", null, null, new Double(1.23e-18));
 		/* string literals */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "string literals" + "...");
 		testEval("''", null, null, "");
 		testEval("'\"'", null, null, "\"");
 		testEval("\"test string\"", null, null, "test string");
 		testEval("'   '", null, null, "   ");
 		/* base type conversion functions */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "type conversions" + "...");
 		testEval("true()", null, null, Boolean.TRUE);
 		testEval("false()", null, null, Boolean.FALSE);
 		testEval("boolean(true())", null, null, Boolean.TRUE);
@@ -202,6 +195,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("string(date('1989-11-09'))", null, null, "1989-11-09");
 		testEval("string(convertible())", null, ec, "hi");
 		testEval("string(inconvertible())", null, ec, new XPathTypeMismatchException());
+
+		System.out.println("Running " + this.getClass().getName() + " test: " + "substr functions" + "...");
 		testEval("substr('hello',0)", null, null, "hello");
 		testEval("substr('hello',0,5)", null, null, "hello");
 		testEval("substr('hello',1)", null, null, "ello");
@@ -209,6 +204,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("substr('hello',1,4)", null, null, "ell");
 		testEval("substr('hello',-2)", null, null, "lo");
 		testEval("substr('hello',0,-1)", null, null, "hell");
+
+		System.out.println("Running " + this.getClass().getName() + " test: " + "date functions" + "...");
 		testEval("date('2000-01-01')", null, null, DateUtils.getDate(2000, 1, 1));
 		testEval("date('1945-04-26')", null, null, DateUtils.getDate(1945, 4, 26));
 		testEval("date('1996-02-29')", null, null, DateUtils.getDate(1996, 2, 29));
@@ -229,6 +226,7 @@ public class XPathEvalTest extends TestCase {
 		//		dates cannot reliably be compared/used across time zones (an issue with the code)
 		//		any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
 		/* other built-in functions */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "boolean functions" + "...");
 		testEval("not(true())", null, null, Boolean.FALSE);
 		testEval("not(false())", null, null, Boolean.TRUE);
 		testEval("not('')", null, null, Boolean.TRUE);
@@ -255,6 +253,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("selected('apple', 'ovoid')", null, null, Boolean.FALSE);
 		testEval("selected('', 'apple')", null, null, Boolean.FALSE);
 		/* operators */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "math operators" + "...");
 		testEval("5.5 + 5.5" , null, null, new Double(11.0));
 		testEval("0 + 0" , null, null, new Double(0.0));
 		testEval("6.1 - 7.8" , null, null, new Double(-1.7));
@@ -281,6 +280,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("5 mod 0" , null, null, new Double(Double.NaN));
 		testEval("5 * (6 + 7)" , null, null, new Double(65.0));
 		testEval("'123' * '456'" , null, null, new Double(56088.0));
+		System.out.println("Running " + this.getClass().getName() + " test: " + "strange operators" + "...");
 		testEval("true() + 8" , null, null, new Double(9.0));
 		testEval("date('2008-09-08') - date('1983-10-06')" , null, null, new Double(9104.0));
 		testEval("true() and true()" , null, null, Boolean.TRUE);
@@ -309,6 +309,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("5 >= 5" , null, null, Boolean.TRUE);
 		testEval("6 >= 5" , null, null, Boolean.TRUE);
 		testEval("-3 > -6" , null, null, Boolean.TRUE);
+		System.out.println("Running " + this.getClass().getName() + " test: " + "odd comparisons" + "...");
 		testEval("true() > 0.9999" , null, null, Boolean.TRUE);
 		testEval("'-17' > '-172'" , null, null, Boolean.TRUE); //no string comparison: converted to number
 		testEval("'abc' < 'abcd'" , null, null, Boolean.FALSE); //no string comparison: converted to NaN
@@ -346,6 +347,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("(false() and true()) != true()" , null, null, Boolean.TRUE);
 		testEval("-3 < 3 = 6 >= 6" , null, null, Boolean.TRUE);
 		/* functions, including custom function handlers */
+		System.out.println("Running " + this.getClass().getName() + " test: " + "other custom stuff" + "...");
 		testEval("true(5)", null, null, new XPathUnhandledException());
 		testEval("number()", null, null, new XPathUnhandledException());
 		testEval("string('too', 'many', 'args')", null, null, new XPathUnhandledException());
@@ -353,6 +355,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("testfunc()", null, ec, Boolean.TRUE);
 		testEval("add(3, 5)", null, ec, new Double(8.0));
 		testEval("add('17', '-14')", null, ec, new Double(3.0));
+		System.out.println("Running " + this.getClass().getName() + " test: " + "proto" + "...");
 		testEval("proto()", null, ec, new XPathTypeMismatchException());
 		testEval("proto(5, 5)", null, ec, "[Double:5.0,Double:5.0]");
 		testEval("proto(6)", null, ec, "[Double:6.0]");
@@ -363,17 +366,20 @@ public class XPathEvalTest extends TestCase {
 		testEval("proto(false(), false(), false())", null, ec, "[Double:0.0,String:false,Boolean:false]");
 		testEval("proto(1.1, 'asdf', inconvertible())", null, ec, new XPathTypeMismatchException());
 		testEval("proto(1.1, 'asdf', true(), 16)", null, ec, new XPathTypeMismatchException());
+		System.out.println("Running " + this.getClass().getName() + " test: " + "raw" + "...");
 		testEval("raw()", null, ec, "[]");
 		testEval("raw(5, 5)", null, ec, "[Double:5.0,Double:5.0]");
 		testEval("raw('7', '7')", null, ec, "[String:7,String:7]");
 		testEval("raw('1.1', 'asdf', 17)", null, ec, "[Double:1.1,String:asdf,Boolean:true]"); //convertible to prototype
 		testEval("raw(get-custom(false()), get-custom(true()))", null, ec, "[CustomType:,CustomSubType:]");
+		System.out.println("Running " + this.getClass().getName() + " test: " + "concat" + "...");
 		testEval("concat()", null, ec, "");
 		testEval("concat('a')", null, ec, "a");
 		testEval("concat('a','b','')", null, ec, "ab");
 		testEval("concat('ab','cde','','fgh',1,false(),'ijklmnop')", null, ec, "abcdefgh1falseijklmnop");
 		testEval("check-types(55, '55', false(), '1999-09-09', get-custom(false()))", null, ec, Boolean.TRUE);
 		testEval("check-types(55, '55', false(), '1999-09-09', get-custom(true()))", null, ec, Boolean.TRUE);
+		System.out.println("Running " + this.getClass().getName() + " test: " + "regex" + "...");
 		testEval("regex('12345','[0-9]+')", null, ec, Boolean.TRUE);
 		testEval("pow(2, 2)", null, null, new Double(4.0));
 		testEval("pow(2, 0)", null, null, new Double(1.0));
@@ -388,6 +394,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("pow(4, 0.5)", null, null, new Double(2.0));
 		testEval("pow(16, 0.25)", null, null, new Double(2.0));
 		//Variables
+		System.out.println("Running " + this.getClass().getName() + " test: " + "variable refs" + "...");
 		EvaluationContext varContext = getVariableContext();
 		testEval("$var_float_five", null, varContext, new Double(5.0));
 		testEval("$var_string_five", null, varContext, "five");
