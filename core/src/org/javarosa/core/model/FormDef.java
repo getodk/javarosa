@@ -692,17 +692,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	  dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext(), unorderedTriggerables, triggerIndex);
    }
 
-
-   public void initializeTriggerables() {
-      initializeTriggerables(TreeReference.rootRef(), false);
-   }
-
    /**
     * Walks the current set of conditions, and evaluates each of them with the
     * current context.
     */
-   private void initializeTriggerables(TreeReference rootRef,
-         boolean cascadeToGroupChildren) {
+   private void initializeTriggerables(TreeReference rootRef, boolean cascadeToGroupChildren) {
 	   
 	 dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, cascadeToGroupChildren);
    }
@@ -1229,7 +1223,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          dispatchFormEvent(Action.EVENT_XFORMS_READY);
       }
 
-      initializeTriggerables();
+      initializeTriggerables(TreeReference.rootRef(), false);
    }
 
    private void publishSummary(String lead, Set<QuickTriggerable> quickTriggerables) {
