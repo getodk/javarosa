@@ -18,21 +18,15 @@ package org.javarosa.core.model;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.List;
 
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.condition.Condition;
@@ -80,67 +74,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
    public enum EvalBehavior {
-      Latest_fastest,
-      Latest_safest,
-      April_2014,
-      Legacy
-   }
+      Legacy, 
+      April_2014, 
+      Safe_2014,
+      Fast_2014
+   };
 
-   public static final EvalBehavior recommendedMode = EvalBehavior.Latest_fastest;
+   public static final EvalBehavior recommendedMode = EvalBehavior.Fast_2014;
 
    // used by FormDef() constructor
    private static EvalBehavior defaultMode = recommendedMode;
-
+   
    // call this to change the mode used for evaluations.
    public static final void setEvalBehavior(EvalBehavior mode) {
       defaultMode = mode;
    }
-
-   public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
-
-      @Override
-      public int compare(QuickTriggerable lhs, QuickTriggerable rhs) {
-         Triggerable lhst = lhs.t;
-         Triggerable rhst = rhs.t;
-         int cmp = Triggerable.triggerablesRootOrdering.compare(lhst, rhst);
-         return cmp;
-      }
-   };
-
-   /**
-    * Triggerable implementations have a deep equals() comparison operator. Once
-    * the DAG is built, we only need a shallow compare since we are not creating
-    * any new Triggerable objects.
-    * 
-    * This class serves that purpose.
-    * 
-    * @author mitchellsundt@gmail.com
-    *
-    */
-   public static final class QuickTriggerable {
-
-      public final Triggerable t;
-
-      @Override
-      public final int hashCode() {
-         return System.identityHashCode(t);
-      }
-
-      @Override
-      public final boolean equals(Object obj) {
-         if (obj instanceof QuickTriggerable) {
-            QuickTriggerable other = (QuickTriggerable) obj;
-            return other.t == t;
-         }
-         return false;
-      }
-
-      QuickTriggerable(Triggerable t) {
-         this.t = t;
-      }
-   }
-
-   private EvalBehavior mode = recommendedMode;
 
    private List<IFormElement> children;// <IFormElement>
    /** A collection of group definitions. */
@@ -156,29 +104,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * A unique external name that is used to identify the form between machines
     */
    private Localizer localizer;
-   private ArrayList<QuickTriggerable> triggerablesDAG; // this list is
-                                                        // topologically
-                                                        // ordered, meaning for
-                                                        // any tA and tB in
-   // the list, where tA comes before tB, evaluating tA cannot depend on any
-   // result from evaluating tB
-   private boolean triggerablesInOrder; // true if triggerables has been ordered
-                                        // topologically (DON'T DELETE ME EVEN
-                                        // THOUGH I'M UNUSED)
+   private ArrayList<QuickTriggerable> unorderedTriggerables;
 
    private List<IConditionExpr> outputFragments; // <IConditionExpr> contents
                                                    // of <output>
    // tags that serve as parameterized
    // arguments to captions
 
-   public HashMap<TreeReference, HashSet<QuickTriggerable>> triggerIndex; // <TreeReference,
-                                                                          // Vector<Triggerable>>
-   private HashMap<TreeReference, QuickTriggerable> conditionRepeatTargetIndex; // <TreeReference,
-                                                                                // Condition>;
-   // associates repeatable
-   // nodes with the Condition
-   // that determines their
-   // relevancy
+   public HashMap<TreeReference, HashSet<QuickTriggerable>> triggerIndex;
+   
+   private IDag dagImpl;
+   
    public EvaluationContext exprEvalContext;
 
    private QuestionPreloader preloader = new QuestionPreloader();
@@ -203,9 +139,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public FormDef(EvalBehavior mode) {
       setID(-1);
       setChildren(null);
-      this.mode = mode;
-      triggerablesDAG = new ArrayList<QuickTriggerable>();
-      triggerablesInOrder = true;
+      switch ( mode ) {
+      case Legacy:
+    	  dagImpl = new LegacyDagImpl();
+    	  break;
+      case April_2014:
+    	  dagImpl = new April2014DagImpl();
+    	  break;
+      case Safe_2014:
+    	  dagImpl = new Safe2014DagImpl();
+    	  break;
+      case Fast_2014:
+    	  dagImpl = new Fast2014DagImpl();
+    	  break;
+      default:
+      }
+      unorderedTriggerables = new ArrayList<QuickTriggerable>();
       triggerIndex = new HashMap<TreeReference, HashSet<QuickTriggerable>>();
       // This is kind of a wreck...
       setEvaluationContext(new EvaluationContext(null));
@@ -217,7 +166,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    /**
-    * Getters and setters for the vectors tha
+    * Getters and setters for the lists
     */
    public void addNonMainInstance(FormInstance instance) {
       formInstances.put(instance.getName(), instance);
@@ -310,9 +259,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public List<IFormElement> explodeIndex(FormIndex index) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+	   List<Integer> indexes = new ArrayList<Integer>();
+	   List<Integer> multiplicities = new ArrayList<Integer>();
+	   List<IFormElement> elements = new ArrayList<IFormElement>();
 
       collapseIndex(index, indexes, multiplicities, elements);
       return elements;
@@ -325,9 +274,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public TreeReference getChildInstanceRef(FormIndex index) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+	   List<Integer> indexes = new ArrayList<Integer>();
+	   List<Integer> multiplicities = new ArrayList<Integer>();
+	   List<IFormElement> elements = new ArrayList<IFormElement>();
 
       collapseIndex(index, indexes, multiplicities, elements);
       return getChildInstanceRef(elements, multiplicities);
@@ -342,9 +291,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       if (elements.size() == 0)
          return null;
 
+      IFormElement element = elements.get(elements.size()-1);
       // get reference for target element
       TreeReference ref = FormInstance.unpackReference(
-            ((IFormElement) elements.get(elements.size() - 1)).getBind()).clone();
+            element.getBind()).clone();
       for (int i = 0; i < ref.size(); i++) {
          // There has to be a better way to encapsulate this
          if (ref.getMultiplicity(i) != TreeReference.INDEX_ATTRIBUTE) {
@@ -354,11 +304,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       // fill in multiplicities for repeats along the way
       for (int i = 0; i < elements.size(); i++) {
-         IFormElement temp = (IFormElement) elements.get(i);
+         IFormElement temp = elements.get(i);
          if (temp instanceof GroupDef && ((GroupDef) temp).getRepeat()) {
             TreeReference repRef = FormInstance.unpackReference(temp.getBind());
             if (repRef.isParentOf(ref, false)) {
-               int repMult = (Integer) multiplicities.get(i);
+               int repMult = multiplicities.get(i);
                ref.setMultiplicity(repRef.size() - 1, repMult);
             } else {
                return null; // question/repeat hierarchy is not consistent
@@ -394,10 +344,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-      if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
+      if (dagImpl.getEvalBehavior() == EvalBehavior.Legacy ||
+          dagImpl.getEvalBehavior() == EvalBehavior.April_2014) {
          setAnswer(data, node);
-         Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
-         publishSummary(node.getName() + " got a value by force", qts);
+         triggerTriggerables(ref, cascadeToGroupChildren);
       } else {
          // SCTO-2286 : Do not act if the data haven't changed.
          // Use the serialized form of the data to avoid type conversions and
@@ -408,8 +358,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                || !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
                      answerDataSerializer.serializeAnswerData(data))) {
             setAnswer(data, node);
-            Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
-            publishSummary(node.getName() + " got a value conditionally", qts);
+            triggerTriggerables(ref, cascadeToGroupChildren);
          }
       }
       // TODO: pre-populate fix-count repeats here?
@@ -467,16 +416,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public FormIndex deleteRepeat(FormIndex index) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+	  List<Integer> indexes = new ArrayList<Integer>();
+	  List<Integer> multiplicities = new ArrayList<Integer>();
+	  List<IFormElement> elements = new ArrayList<IFormElement>();
       collapseIndex(index, indexes, multiplicities, elements);
 
       // loop backwards through the elements, removing objects from each
       // vector, until we find a repeat
       // TODO: should probably check to make sure size > 0
       for (int i = elements.size() - 1; i >= 0; i--) {
-         IFormElement e = (IFormElement) elements.get(i);
+         IFormElement e = elements.get(i);
          if (e instanceof GroupDef && ((GroupDef) e).getRepeat()) {
             break;
          } else {
@@ -510,12 +459,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(deleteRef, true, new HashSet<QuickTriggerable>(0));
-      publishSummary("Deleted " + index.getReference().toString(true), alreadyEvaluated);
-
-      if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
-         evaluateChildrenTriggerables(deleteElement, true, alreadyEvaluated);
-      }
+      dagImpl.deleteRepeatGroup(getMainInstance(), getEvaluationContext(), deleteRef, parentElement, deleteElement);
 
       return newIndex;
    }
@@ -538,34 +482,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          a.processAction(this, destRef);
       }
 
-      Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, true, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of this new node
-      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 1)", qtSet1);
-
-      Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, true);// initialize conditions for the node (and sub-nodes)
-      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 2)", qtSet2);
-
-      if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
-         Set<QuickTriggerable> alreadyEvaluated = new HashSet<QuickTriggerable>(qtSet1);
-         alreadyEvaluated.addAll(qtSet2);
-
-         evaluateChildrenTriggerables(newNode, true, alreadyEvaluated);
-      }
-   }
-
-   private void evaluateChildrenTriggerables(TreeElement newNode, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
-      //iterate into the group children and evaluate any triggerables that depend one them, if they are not already calculated.
-      int numChildren = newNode.getNumChildren();
-      for (int i = 0; i < numChildren; i++) {
-         TreeReference anchorRef = newNode.getChildAt(i).getRef();
-         Set<QuickTriggerable> childTriggerables = triggerTriggerables(anchorRef, cascadeToGroupChildren, alreadyEvaluated);
-         publishSummary("Node created/deleted: " + anchorRef.toString(true), childTriggerables);
-      }
+      TreeReference parentRef = destRef.getParentRef();
+      TreeElement parentElement = mainInstance.resolveReference(parentRef);
+      dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), destRef, parentElement, newNode);
    }
 
    public boolean isRepeatRelevant(TreeReference repeatRef) {
       boolean relev = true;
 
-      QuickTriggerable qc = conditionRepeatTargetIndex.get(repeatRef.genericize());
+      QuickTriggerable qc = dagImpl.getTriggerableForRepeatGroup(repeatRef.genericize());
       if (qc != null) {
          Condition c = (Condition) qc.t;
          relev = c.evalBool(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
@@ -630,17 +555,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
 
       List<Selection> selections = null;
-      List<String> selectedValues = new ArrayList<String>();
       if (data instanceof SelectMultiData) {
          selections = (List<Selection>) data.getValue();
       } else if (data instanceof SelectOneData) {
          selections = new ArrayList<Selection>(1);
          selections.add((Selection) data.getValue());
       }
+      List<String> selectedValues;
       if (itemset.valueRef != null) {
+         selectedValues = new ArrayList<String>(selections.size());
          for (int i = 0; i < selections.size(); i++) {
             selectedValues.add(selections.get(i).choice.getValue());
          }
+      } else {
+    	  selectedValues = new ArrayList<String>(0);
       }
 
       // delete existing dest nodes that are not in the answer selection
@@ -682,17 +610,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             getMainInstance().copyItemsetNode(ch.copyNode, destRef, this);
          }
       }
-
-      Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of these new nodes
-      publishSummary("Copied itemset answer for " + targetRef.toString(true) + " (phase 1)", qtSet1);
-
-      Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, cascadeToGroupChildren);// initialize conditions for the node (and sub-nodes)
-      publishSummary("Copied itemset answer for " + targetRef.toString(true) + " (phase 2)", qtSet2);
-      //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
+      dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode, cascadeToGroupChildren);
    }
 
    public QuickTriggerable findTriggerable(Triggerable t) {
-      for (QuickTriggerable qt : triggerablesDAG) {
+      for (QuickTriggerable qt : unorderedTriggerables) {
          if (t.equals(qt.t)) {
             return qt;
          }
@@ -723,7 +645,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          Triggerable existingTriggerable = qt.t;
 
          existingTriggerable.changeContextRefToIntersectWithTriggerable(t);
-         triggerablesInOrder = false;
+         dagImpl = null;
 
          return existingTriggerable;
 
@@ -734,8 +656,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       } else {
          qt = new QuickTriggerable(t);
-         triggerablesDAG.add(qt);
-         triggerablesInOrder = false;
+         unorderedTriggerables.add(qt);
+         dagImpl = null;
 
          Set<TreeReference> triggers = t.getTriggers();
          for (TreeReference trigger : triggers) {
@@ -767,244 +689,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // DAGify the triggerables based on dependencies and sort them so that
       // triggerables come only after the triggerables they depend on
       //
-
-      ArrayList<QuickTriggerable> vertices = new ArrayList<QuickTriggerable>(triggerablesDAG);
-      triggerablesDAG.clear();
-      ArrayList<QuickTriggerable[]> partialOrdering = new ArrayList<QuickTriggerable[]>();
-      HashSet<QuickTriggerable> deps = new HashSet<QuickTriggerable>();
-      HashSet<QuickTriggerable> newDestinationSet = new HashSet<QuickTriggerable>();
-      for (QuickTriggerable qt : vertices) {
-         deps.clear();
-         newDestinationSet.clear();
-         fillTriggeredElements(qt, deps, newDestinationSet, true);
-
-         // remove any self-reference if we have one...
-         deps.remove(qt);
-         for (QuickTriggerable qu : deps) {
-            QuickTriggerable[] edge = { qt, qu };
-            partialOrdering.add(edge);
-         }
-
-         // save for aggressive 2014 behavior
-         qt.t.setImmediateCascades(deps);
-      }
-
-      ArrayList<QuickTriggerable> orderedRoots = new ArrayList<QuickTriggerable>();
-      HashSet<QuickTriggerable> roots = new HashSet<QuickTriggerable>(vertices.size());
-      int waveCount = -1;
-      while (vertices.size() > 0) {
-         ++waveCount;
-         // determine root nodes
-         roots.clear();
-         roots.addAll(vertices);
-         for (int i = 0; i < partialOrdering.size(); i++) {
-            QuickTriggerable[] edge = partialOrdering.get(i);
-            roots.remove(edge[1]);
-         }
-
-         // if no root nodes while graph still has nodes, graph has cycles
-         if (roots.size() == 0) {
-            String hints = "";
-            for (QuickTriggerable qt : vertices) {
-               for (TreeReference r : qt.t.getTargets()) {
-                  hints += "\n" + r.toString(true);
-               }
-            }
-            String message = "Cycle detected in form's relevant and calculation logic!";
-            if (!hints.equals("")) {
-               message += "\nThe following nodes are likely involved in the loop:" + hints;
-            }
-            throw new IllegalStateException(message);
-         }
-
-         // order the root nodes - mainly for clean textual diffs when printing
-         // When this code is rewritten to use HashSet, this will become
-         // important.
-         orderedRoots.clear();
-         orderedRoots.addAll(roots);
-         Collections.sort(orderedRoots, quickTriggerablesRootOrdering);
-
-         // remove root nodes and edges originating from them
-         // add them to the triggerablesDAG.
-         for (int i = 0; i < orderedRoots.size(); i++) {
-            QuickTriggerable root = orderedRoots.get(i);
-            root.t.setWaveCount(waveCount);
-            triggerablesDAG.add(root);
-            vertices.remove(root);
-         }
-         for (int i = partialOrdering.size() - 1; i >= 0; i--) {
-            QuickTriggerable[] edge = partialOrdering.get(i);
-            if (roots.contains(edge[0]))
-               partialOrdering.remove(i);
-         }
-      }
-
-      triggerablesInOrder = true;
-
-      //
-      // build the condition index for repeatable nodes
-      //
-
-      conditionRepeatTargetIndex = new HashMap<TreeReference, QuickTriggerable>();
-      for (int i = 0; i < triggerablesDAG.size(); i++) {
-         QuickTriggerable qt = triggerablesDAG.get(i);
-         if (qt.t instanceof Condition) {
-            ArrayList<TreeReference> targets = qt.t.getTargets();
-            for (int j = 0; j < targets.size(); j++) {
-               TreeReference target = (TreeReference) targets.get(j);
-               if (mainInstance.getTemplate(target) != null) {
-                  conditionRepeatTargetIndex.put(target, qt);
-               }
-            }
-         }
-      }
-
-//      printTriggerables();
+	  dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext(), unorderedTriggerables, triggerIndex);
    }
 
-   /**
-    * For debugging - note that path assumes Android device
-    */
-   void printTriggerables() {
-      OutputStreamWriter w = null;
-      try {
-         w = new OutputStreamWriter(new FileOutputStream(new File("/sdcard/odk/trigger.log")),
-               "UTF-8");
-         for (int i = 0; i < triggerablesDAG.size(); i++) {
-            QuickTriggerable qt = triggerablesDAG.get(i);
-            w.write(Integer.toString(i) + ": ");
-            qt.t.print(w);
-         }
-      } catch (UnsupportedEncodingException e) {
-         e.printStackTrace();
-      } catch (FileNotFoundException e) {
-         e.printStackTrace();
-      } catch (IOException e) {
-         e.printStackTrace();
-      } finally {
-         if (w != null) {
-            try {
-               w.flush();
-               w.close();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-         }
-      }
-   }
 
-   /**
-    * Get all of the elements which will need to be evaluated (in order) when
-    * the triggerable is fired.
-    * 
-    * @param qt
-    * @param destinationSet
-    *           where to store the triggerables
-    * @param cascadeToGroupChildren
-    *           if true, then the slow code will execute, if false, then
-    *           old/fast code will execute that suffers from
-    *           https://code.google.com/p/opendatakit/issues/detail?id=888
-    */
-   public void fillTriggeredElements(QuickTriggerable qt,
-                                     Set<QuickTriggerable> destinationSet,
-                                     Set<QuickTriggerable> newDestinationSet,
-                                     boolean cascadeToGroupChildren) {
-      if (qt.t.canCascade()) {
-         if (mode == EvalBehavior.Legacy || (mode == EvalBehavior.Latest_fastest && !cascadeToGroupChildren)) {
-            for (int j = 0; j < qt.t.getTargets().size(); j++) {
-               TreeReference target = qt.t.getTargets().get(j);
-               HashSet<QuickTriggerable> triggered = triggerIndex.get(target);
-               if (triggered != null) {
-                  for (QuickTriggerable qu : triggered) {
-                     if (!destinationSet.contains(qu)) {
-                        destinationSet.add(qu);
-                        newDestinationSet.add(qu);
-                     }
-                  }
-               }
-            }
-         } else {
-            boolean expandRepeatables = mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014;
-
-            for (int j = 0; j < qt.t.getTargets().size(); j++) {
-               TreeReference target = (TreeReference) qt.t.getTargets().get(j);
-               Set<TreeReference> updatedNodes = new HashSet<TreeReference>();
-               updatedNodes.add(target);
-
-               // For certain types of triggerables, the update will affect not
-               // only
-               // the target, but
-               // also the children of the target. In that case, we want to add
-               // all
-               // of those nodes
-               // to the list of updated elements as well.
-               if (qt.t.isCascadingToChildren()) {
-                  addChildrenOfReference(target, updatedNodes, expandRepeatables);
-               }
-
-               // Now go through each of these updated nodes (generally just 1
-               // for a
-               // normal calculation,
-               // multiple nodes if there's a relevance cascade.
-               for (TreeReference ref : updatedNodes) {
-                  // Check our index to see if that target is a Trigger for
-                  // other
-                  // conditions
-                  // IE: if they are an element of a different calculation or
-                  // relevancy calc
-
-                  // We can't make this reference generic before now or we'll
-                  // lose the
-                  // target information,
-                  // so we'll be more inclusive than needed and see if any of
-                  // our
-                  // triggers are keyed on
-                  // the predicate-less path of this ref
-                  HashSet<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref
-                        .removePredicates() : ref);
-
-                  if (triggered != null) {
-                     // If so, walk all of these triggerables that we found
-                     for (QuickTriggerable qu : triggered) {
-                        // And add them to the queue if they aren't there
-                        // already
-                        if (!destinationSet.contains(qu)) {
-                           destinationSet.add(qu);
-                           newDestinationSet.add(qu);
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   public Set<QuickTriggerable> initializeTriggerables() {
-      return initializeTriggerables(TreeReference.rootRef(), false);
+   public void initializeTriggerables() {
+      initializeTriggerables(TreeReference.rootRef(), false);
    }
 
    /**
     * Walks the current set of conditions, and evaluates each of them with the
     * current context.
     */
-   private Set<QuickTriggerable> initializeTriggerables(TreeReference rootRef,
-                                                        boolean cascadeToGroupChildren) {
-      TreeReference genericRoot = rootRef.genericize();
-
-      Set<QuickTriggerable> applicable = new HashSet<QuickTriggerable>();
-      for (int i = 0; i < triggerablesDAG.size(); i++) {
-         QuickTriggerable qt = triggerablesDAG.get(i);
-         for (int j = 0; j < qt.t.getTargets().size(); j++) {
-            TreeReference target = qt.t.getTargets().get(j);
-            if (genericRoot.isParentOf(target, false)) {
-               applicable.add(qt);
-               break;
-            }
-         }
-      }
-
-      return evaluateTriggerables(applicable, rootRef, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
+   private void initializeTriggerables(TreeReference rootRef,
+         boolean cascadeToGroupChildren) {
+	   
+	 dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, cascadeToGroupChildren);
    }
 
    /**
@@ -1014,156 +714,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           The full contextualized unambiguous reference of the value that
     *           was changed.
     */
-   public Set<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
-
-      // turn unambiguous ref into a generic ref
-      // to identify what nodes should be triggered by this
-      // reference changing
-      TreeReference genericRef = ref.genericize();
-
-      // get triggerables which are activated by the generic reference
-      HashSet<QuickTriggerable> triggered = triggerIndex.get(genericRef);
-      if (triggered == null) {
-         return alreadyEvaluated;
-      }
-
-      Set<QuickTriggerable> triggeredCopy = new HashSet<QuickTriggerable>(triggered);
-
-      // Evaluate all of the triggerables in our new vector
-      return evaluateTriggerables(triggeredCopy, ref, cascadeToGroupChildren, alreadyEvaluated);
-   }
-
-   /**
-    * Step 2 in evaluating DAG computation updates from a value being changed in
-    * the instance. This step is responsible for taking the root set of directly
-    * triggered conditions, identifying which conditions should further be
-    * triggered due to their update, and then dispatching all of the
-    * evaluations.
-    *  @param tv
-    *           A vector of all of the trigerrables directly triggered by the
-    *           value changed
-    * @param anchorRef
-    */
-   private Set<QuickTriggerable> evaluateTriggerables(Set<QuickTriggerable> tv, TreeReference anchorRef,
-                                                      boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
-      // add all cascaded triggerables to queue
-
-      // Iterate through all of the currently known triggerables to be triggered
-      Set<QuickTriggerable> refSet = new HashSet<QuickTriggerable>(tv);
-      for (; !refSet.isEmpty();) {
-         Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
-         for (QuickTriggerable qt : refSet) {
-            if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014 || mode == EvalBehavior.Latest_fastest) {
-               fillTriggeredElements(qt, tv, newSet, cascadeToGroupChildren);
-            } else if (mode == EvalBehavior.Latest_safest) {
-               // leverage the saved DAG edges.
-               // This may over-fill the set of triggerables.
-               // but should be faster than recomputing the edges.
-               // with value-change optimizations, this should be
-               // much faster.
-               for (QuickTriggerable qu : qt.t.getImmediateCascades()) {
-                  if (!tv.contains(qu)) {
-                     tv.add(qu);
-                     newSet.add(qu);
-                  }
-               }
-            }
-         }
-         refSet = newSet;
-      }
-
-      // tv should now contain all of the triggerable components which are going
-      // to need to be addressed
-      // by this update.
-      // 'triggerables' is topologically-ordered by dependencies, so evaluate
-      // the triggerables in 'tv'
-      // in the order they appear in 'triggerables'
-      Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
-
-      for (int i = 0; i < triggerablesDAG.size(); i++) {
-         QuickTriggerable qt = triggerablesDAG.get(i);
-         if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-            evaluateTriggerable(qt, anchorRef);
-
-            fired.add(qt);
-         }
-      }
-
-      return fired;
-   }
-
-   /**
-    * Step 3 in DAG cascade. evaluate the individual triggerable expressions
-    * against the anchor (the value that changed which triggered recomputation)
-    *
-    * @param qt
-    *           The triggerable to be updated
-    * @param anchorRef
-    *           The reference to the value which was changed.
-    */
-   private void evaluateTriggerable(QuickTriggerable qt, TreeReference anchorRef) {
-
-      // Contextualize the reference used by the triggerable against the anchor
-      TreeReference contextRef = qt.t.contextualizeContextRef(anchorRef);
-      try {
-
-         // Now identify all of the fully qualified nodes which this triggerable
-         // updates. (Multiple nodes can be updated by the same trigger)
-         List<TreeReference> v = exprEvalContext.expandReference(contextRef);
-
-         // Go through each one and evaluate the trigger expresion
-         for (int i = 0; i < v.size(); i++) {
-            EvaluationContext ec = new EvaluationContext(exprEvalContext, v.get(i));
-            qt.t.apply(mainInstance, ec, v.get(i), this);
-         }
-      } catch (Exception e) {
-         throw new WrappedException("Error evaluating field '" + contextRef.getNameLast() + "': "
-               + e.getMessage(), e);
-      }
-   }
-
-   /**
-    * This is a utility method to get all of the references of a node. It can be
-    * replaced when we support dependent XPath Steps (IE: /path/to//)
-    */
-   public void addChildrenOfReference(TreeReference original, Set<TreeReference> toAdd,
-         boolean expandRepeatables) {
-      // original has already been added to the 'toAdd' list.
-
-      TreeElement repeatTemplate = expandRepeatables ? mainInstance.getTemplatePath(original)
-            : null;
-      if (repeatTemplate != null) {
-         for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-            TreeElement child = repeatTemplate.getChildAt(i);
-            toAdd.add(child.getRef().genericize());
-            addChildrenOfElement(child, toAdd, expandRepeatables);
-         }
-      } else {
-         List<TreeReference> refSet = exprEvalContext.expandReference(original);
-         for (TreeReference ref : refSet) {
-            addChildrenOfElement(exprEvalContext.resolveReference(ref), toAdd, expandRepeatables);
-         }
-      }
-   }
-
-   // Recursive step of utility method
-   private void addChildrenOfElement(TreeElement el, Set<TreeReference> toAdd,
-         boolean expandRepeatables) {
-      TreeElement repeatTemplate = expandRepeatables ? mainInstance.getTemplatePath(el.getRef())
-            : null;
-      if (repeatTemplate != null) {
-         for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-            TreeElement child = repeatTemplate.getChildAt(i);
-            toAdd.add(child.getRef().genericize());
-            addChildrenOfElement(child, toAdd, expandRepeatables);
-         }
-      } else {
-         for (int i = 0; i < el.getNumChildren(); ++i) {
-            TreeElement child = el.getChildAt(i);
-            toAdd.add(child.getRef().genericize());
-            addChildrenOfElement(child, toAdd, expandRepeatables);
-         }
-      }
+   public void triggerTriggerables(TreeReference ref, boolean cascadeToGroupChildren) {
+	  dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, cascadeToGroupChildren);
    }
 
    public boolean evaluateConstraint(TreeReference ref, IAnswerData data) {
@@ -1417,7 +969,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           used to determine the values to be chosen from.
     */
    public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
-      List<SelectChoice> choices = new ArrayList<SelectChoice>();
+	   List<SelectChoice> choices = new ArrayList<SelectChoice>();
 
       List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
             new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
@@ -1516,7 +1068,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * org.javarosa.core.model.utils.Localizer)
     */
    public void localeChanged(String locale, Localizer localizer) {
-      for (IFormElement child : children) {
+	  for (IFormElement child : children) {
          child.localeChanged(locale, localizer);
       }
    }
@@ -1633,7 +1185,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
       finalizeTriggerables();
 
-      outputFragments = (List) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+      outputFragments = (List<IConditionExpr>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
       submissionProfiles = (HashMap<String, SubmissionProfile>) ExtUtil.read(dis, new ExtWrapMap(
             String.class, SubmissionProfile.class));
@@ -1644,7 +1196,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
             String.class, new ExtWrapListPoly()), pf);
 
-      extensions = (List) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+      extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
       setEvaluationContext(new EvaluationContext(null));
    }
@@ -1677,8 +1229,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          dispatchFormEvent(Action.EVENT_XFORMS_READY);
       }
 
-      Set<QuickTriggerable> quickTriggerables = initializeTriggerables();
-      publishSummary("Form initialized", quickTriggerables);
+      initializeTriggerables();
    }
 
    private void publishSummary(String lead, Set<QuickTriggerable> quickTriggerables) {
@@ -1702,7 +1253,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       List<Condition> conditions = new ArrayList<Condition>();
       List<Recalculate> recalcs = new ArrayList<Recalculate>();
-      for (QuickTriggerable qt : triggerablesDAG) {
+      for (QuickTriggerable qt : unorderedTriggerables) {
          Triggerable t = qt.t;
          if (t instanceof Condition) {
             conditions.add((Condition) t);
@@ -1735,7 +1286,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
          indexes.add(new Integer(i));
          multiplicities.add(new Integer(index.getInstanceIndex() == -1 ? 0 : index
-                 .getInstanceIndex()));
+               .getInstanceIndex()));
          elements.add(element);
 
          index = index.getNextLevel();
@@ -1755,12 +1306,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
 
       for (int i = indexes.size() - 1; i >= 0; i--) {
-         int ix = (Integer) indexes.get(i);
-         int mult = (Integer) multiplicities.get(i);
+         int ix = indexes.get(i);
+         int mult = multiplicities.get(i);
 
          // ----begin unclear why this is here... side effects???
          // TODO: ... No words. Just fix it.
-         IFormElement ife = (IFormElement) elements.get(i);
+         IFormElement ife = elements.get(i);
          XPathReference xpr = (ife != null) ? (XPathReference) ife.getBind() : null;
          TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
          // ----end
@@ -1777,9 +1328,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public int getNumRepetitions(FormIndex index) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+	  List<Integer> indexes = new ArrayList<Integer>();
+	  List<Integer> multiplicities = new ArrayList<Integer>();
+	  List<IFormElement> elements = new ArrayList<IFormElement>();
 
       if (!index.isInForm()) {
          throw new RuntimeException("not an in-form index");
@@ -1830,7 +1381,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public int getDeepChildCount() {
       int total = 0;
       for (IFormElement child : children) {
-         total += child.getDeepChildCount();
+    	  total += child.getDeepChildCount();
       }
       return total;
    }
@@ -1963,7 +1514,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
 
          for (int i = 0; i < selections.size(); i++) {
-            Selection s = (Selection) selections.get(i);
+            Selection s = selections.get(i);
             s.attachChoice(q);
          }
       }
@@ -2112,9 +1663,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * data should be retained.
     */
    public void seal() {
-      triggerablesDAG = null;
+      unorderedTriggerables = null;
       triggerIndex = null;
-      conditionRepeatTargetIndex = null;
+      dagImpl = null;
       // We may need ths one, actually
       exprEvalContext = null;
    }
@@ -2127,32 +1678,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
 	public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, int action) {
-		IConditionExpr expr = null;
-		for (int i = 0; i < triggerablesDAG.size() && expr == null; i++) {
-			// Clayton Sims - Jun 1, 2009 : Not sure how legitimate this
-			// cast is. It might work now, but break later.
-			// Clayton Sims - Jun 24, 2009 : Yeah, that change broke things.
-			// For now, we won't bother to print out anything that isn't
-			// a condition.
-			QuickTriggerable qt = triggerablesDAG.get(i);
-			if (qt.t instanceof Condition) {
-				Condition c = (Condition) qt.t;
-
-				if (c.trueAction == action) {
-					ArrayList<TreeReference> targets = c.getTargets();
-					for (int j = 0; j < targets.size() && expr == null; j++) {
-						TreeReference target = targets.get(j);
-
-						TreeReference tr = (TreeReference) (new XPathReference(
-								target)).getReference();
-						TreeElement element = getInstance().getTemplatePath(tr);
-						if (instanceNode == element) {
-							expr = c.getExpr();
-						}
-					}
-				}
-			}
-		}
-		return expr;
+		return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action); 
 	}
 }

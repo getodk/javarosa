@@ -23,11 +23,10 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormDef.QuickTriggerable;
+import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -132,7 +131,7 @@ public abstract class Triggerable implements Externalizable {
 
 	protected abstract Object eval (FormInstance instance, EvaluationContext ec);
 
-	protected abstract void apply (TreeReference ref, Object result, FormInstance instance, FormDef f);
+	protected abstract void apply (TreeReference ref, Object result, FormInstance mainInstance);
 
 	public abstract boolean canCascade ();
 
@@ -142,20 +141,20 @@ public abstract class Triggerable implements Externalizable {
 	 * @param evalContext
 	 * @param f
 	 */
-	public final void apply (FormInstance instance, EvaluationContext parentContext, TreeReference context, FormDef f) {
+	public final void apply (FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
 		//The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
 		//for the actual expressions, so we need genericize that ref against the current context
 		TreeReference ungenericised = originalContextRef.contextualize(context);
 		EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
 
-		Object result = eval(instance, ec);
+		Object result = eval(mainInstance, ec);
 
 		for (int i = 0; i < targets.size(); i++) {
 			TreeReference targetRef = ((TreeReference)targets.get(i)).contextualize(ec.getContextRef());
          List<TreeReference> v = ec.expandReference(targetRef);
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.get(j);
-				apply(affectedRef, result, instance, f);
+				apply(affectedRef, result, mainInstance);
 			}
 		}
 	}

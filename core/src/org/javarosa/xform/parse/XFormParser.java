@@ -17,6 +17,7 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
@@ -28,7 +29,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormDef.EvalBehavior;
-import org.javarosa.core.model.FormDef.QuickTriggerable;
+import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.condition.*;
 import org.javarosa.core.model.instance.FormInstance;
