@@ -64,23 +64,82 @@ public abstract class IDag {
 	 */
 	public abstract EvalBehavior getEvalBehavior();
 
+	/**
+	 * Used to obtain the triggerable that impacts the relevancy of the repeat group.
+	 * 
+	 * @param ref
+	 * @return
+	 */
 	public abstract QuickTriggerable getTriggerableForRepeatGroup(TreeReference ref);
 
+	/**
+	 * Fire a triggereable.
+	 * 
+	 * @param mainInstance
+	 * @param evalContext
+	 * @param ref
+	 * @param cascadeToGroupChildren
+	 */
 	public abstract void triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, 
 			TreeReference ref, boolean cascadeToGroupChildren);
 
+	/**
+	 * Take whatever action is required when deleting a repeat group.
+	 * 
+	 * @param mainInstance
+	 * @param evalContext
+	 * @param ref
+	 * @param parentElement
+	 * @param deletedElement
+	 */
 	public abstract void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref,
 			TreeElement parentElement, TreeElement deletedElement);
 
+	/**
+	 * Take whatever action is required when creating a repeat group.
+	 * 
+	 * @param mainInstance
+	 * @param evalContext
+	 * @param ref
+	 * @param parentElement
+	 * @param createdElement
+	 */
 	public abstract void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref,
 			TreeElement parentElement, TreeElement createdElement);
 
+	/**
+	 * Take actions related to changes of select-one and select-multiple itemsets.
+	 * 
+	 * @param mainInstance
+	 * @param evalContext
+	 * @param ref
+	 * @param copyToElement
+	 * @param cascadeToGroupChildren
+	 */
 	public abstract void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref,
 			TreeElement copyToElement, boolean cascadeToGroupChildren);
 
+	/**
+	 * Initialize the triggerableDAG array and the triggerIndex array.
+	 * 
+	 * @param mainInstance
+	 * @param evalContext
+	 * @param unorderedTriggereables
+	 * @param triggerIndex
+	 * @throws IllegalStateException
+	 */
 	public abstract void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, 
 			ArrayList<QuickTriggerable> unorderedTriggereables, HashMap<TreeReference, HashSet<QuickTriggerable>> triggerIndex) throws IllegalStateException;
 
+	/**
+	 * Invoked externally when a new mainInstance is loaded (initial sweep of calculates).
+	 * Invoked internally when creating repeat groups and copying itemsets(?).
+	 * 
+	 * @param mainInstance
+	 * @param evalContext
+	 * @param rootRef
+	 * @param cascadeToGroupChildren
+	 */
 	public abstract void initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, 
 			TreeReference rootRef, boolean cascadeToGroupChildren);
 
