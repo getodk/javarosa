@@ -111,7 +111,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    // tags that serve as parameterized
    // arguments to captions
 
-   public HashMap<TreeReference, HashSet<QuickTriggerable>> triggerIndex;
+   public HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex;
    
    private IDag dagImpl;
    
@@ -155,7 +155,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       default:
       }
       unorderedTriggerables = new ArrayList<QuickTriggerable>();
-      triggerIndex = new HashMap<TreeReference, HashSet<QuickTriggerable>>();
+      triggerIndex = new HashMap<TreeReference, ArrayList<QuickTriggerable>>();
       // This is kind of a wreck...
       setEvaluationContext(new EvaluationContext(null));
       outputFragments = new ArrayList<IConditionExpr>();
@@ -345,7 +345,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
       if (dagImpl.getEvalBehavior() == EvalBehavior.Legacy ||
-          dagImpl.getEvalBehavior() == EvalBehavior.April_2014) {
+          dagImpl.getEvalBehavior() == EvalBehavior.April_2014 ||
+          dagImpl.getEvalBehavior() == EvalBehavior.Safe_2014) {
          setAnswer(data, node);
          triggerTriggerables(ref, cascadeToGroupChildren);
       } else {
@@ -661,9 +662,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
          Set<TreeReference> triggers = t.getTriggers();
          for (TreeReference trigger : triggers) {
-            HashSet<QuickTriggerable> triggered = triggerIndex.get(trigger);
+            ArrayList<QuickTriggerable> triggered = triggerIndex.get(trigger);
             if (triggered == null) {
-               triggered = new HashSet<QuickTriggerable>();
+               triggered = new ArrayList<QuickTriggerable>();
                triggerIndex.put(trigger.clone(), triggered);
             }
             if (!triggered.contains(qt)) {

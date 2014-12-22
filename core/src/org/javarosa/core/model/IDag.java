@@ -24,7 +24,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
@@ -43,20 +42,12 @@ import org.javarosa.model.xform.XPathReference;
  *
  */
 public abstract class IDag {
-	
-	// <TreeReference, Condition>;
-	// associates repeatable nodes with the Condition that determines their relevancy
-	protected HashMap<TreeReference, QuickTriggerable> conditionRepeatTargetIndex;
-	
+
 	// this list is topologically ordered, meaning for any tA and tB in
 	// the list, where tA comes before tB, evaluating tA cannot depend on any
 	// result from evaluating tB
 	protected ArrayList<QuickTriggerable> triggerablesDAG;
 
-	// Maps a tree reference to the set of triggerables that need to be
-	// processed when the value at this reference changes.
-	protected HashMap<TreeReference, HashSet<QuickTriggerable>> triggerIndex;
-	
 	/**
 	 * The EvalBehavior that the implementation provides.
 	 * 
@@ -65,12 +56,14 @@ public abstract class IDag {
 	public abstract EvalBehavior getEvalBehavior();
 
 	/**
-	 * Used to obtain the triggerable that impacts the relevancy of the repeat group.
+	 * Used to obtain the triggerable that impacts the relevancy of the repeat
+	 * group.
 	 * 
 	 * @param ref
 	 * @return
 	 */
-	public abstract QuickTriggerable getTriggerableForRepeatGroup(TreeReference ref);
+	public abstract QuickTriggerable getTriggerableForRepeatGroup(
+			TreeReference ref);
 
 	/**
 	 * Fire a triggereable.
@@ -80,8 +73,9 @@ public abstract class IDag {
 	 * @param ref
 	 * @param cascadeToGroupChildren
 	 */
-	public abstract void triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, 
-			TreeReference ref, boolean cascadeToGroupChildren);
+	public abstract void triggerTriggerables(FormInstance mainInstance,
+			EvaluationContext evalContext, TreeReference ref,
+			boolean cascadeToGroupChildren);
 
 	/**
 	 * Take whatever action is required when deleting a repeat group.
@@ -92,7 +86,8 @@ public abstract class IDag {
 	 * @param parentElement
 	 * @param deletedElement
 	 */
-	public abstract void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref,
+	public abstract void deleteRepeatGroup(FormInstance mainInstance,
+			EvaluationContext evalContext, TreeReference ref,
 			TreeElement parentElement, TreeElement deletedElement);
 
 	/**
@@ -104,11 +99,13 @@ public abstract class IDag {
 	 * @param parentElement
 	 * @param createdElement
 	 */
-	public abstract void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref,
+	public abstract void createRepeatGroup(FormInstance mainInstance,
+			EvaluationContext evalContext, TreeReference ref,
 			TreeElement parentElement, TreeElement createdElement);
 
 	/**
-	 * Take actions related to changes of select-one and select-multiple itemsets.
+	 * Take actions related to changes of select-one and select-multiple
+	 * itemsets.
 	 * 
 	 * @param mainInstance
 	 * @param evalContext
@@ -116,7 +113,8 @@ public abstract class IDag {
 	 * @param copyToElement
 	 * @param cascadeToGroupChildren
 	 */
-	public abstract void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref,
+	public abstract void copyItemsetAnswer(FormInstance mainInstance,
+			EvaluationContext evalContext, TreeReference ref,
 			TreeElement copyToElement, boolean cascadeToGroupChildren);
 
 	/**
@@ -128,20 +126,31 @@ public abstract class IDag {
 	 * @param triggerIndex
 	 * @throws IllegalStateException
 	 */
-	public abstract void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, 
-			ArrayList<QuickTriggerable> unorderedTriggereables, HashMap<TreeReference, HashSet<QuickTriggerable>> triggerIndex) throws IllegalStateException;
+	public abstract void finalizeTriggerables(FormInstance mainInstance,
+			EvaluationContext evalContext,
+			ArrayList<QuickTriggerable> unorderedTriggereables,
+			HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex)
+			throws IllegalStateException;
 
 	/**
-	 * Invoked externally when a new mainInstance is loaded (initial sweep of calculates).
-	 * Invoked internally when creating repeat groups and copying itemsets(?).
+	 * Invoked externally when a new mainInstance is loaded (initial sweep of
+	 * calculates). Invoked internally when creating repeat groups and copying
+	 * itemsets(?).
 	 * 
 	 * @param mainInstance
 	 * @param evalContext
 	 * @param rootRef
 	 * @param cascadeToGroupChildren
 	 */
-	public abstract void initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, 
-			TreeReference rootRef, boolean cascadeToGroupChildren);
+	public abstract void initializeTriggerables(FormInstance mainInstance,
+			EvaluationContext evalContext, TreeReference rootRef,
+			boolean cascadeToGroupChildren);
+
+	protected void publishSummary(String lead,
+			Set<QuickTriggerable> quickTriggerables) {
+		System.out.println(lead + ": " + quickTriggerables.size()
+				+ " triggerables were fired.");
+	}
 
 	/**
 	 * For debugging - note that path assumes Android device
@@ -181,8 +190,8 @@ public abstract class IDag {
 	 * @param action
 	 * @return
 	 */
-	public IConditionExpr getConditionExpressionForTrueAction(FormInstance mainInstance,
-			TreeElement instanceNode, int action) {
+	public IConditionExpr getConditionExpressionForTrueAction(
+			FormInstance mainInstance, TreeElement instanceNode, int action) {
 		IConditionExpr expr = null;
 		for (int i = 0; i < triggerablesDAG.size() && expr == null; i++) {
 			// Clayton Sims - Jun 1, 2009 : Not sure how legitimate this
