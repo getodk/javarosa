@@ -394,7 +394,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-      if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014) {
+      if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014 || mode == EvalBehavior.Latest_safest) {
          setAnswer(data, node);
          Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
          publishSummary(node.getName() + " got a value by force", qts);
