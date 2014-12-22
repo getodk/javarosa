@@ -1,0 +1,19 @@
+﻿
+
+form.login.username=Usuario:
+form.login.password=Contraseña:
+		
+	
+
+polish.command.options=Opciones
+polish.command.exit=Salir
+polish.command.clear=Borrar
+menu.Back=Atras
+menu.Exit=Salir
+
+repeat.repitition=dosis
+repeat.message.single=Busca ${0}?
+repeat.message.multiple=Busca otra ${0}?
+
+yes=Sí
+no=No
