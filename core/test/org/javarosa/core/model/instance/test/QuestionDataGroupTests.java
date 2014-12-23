@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.instance.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -51,12 +50,9 @@ public class QuestionDataGroupTests extends TestCase {
 
 	TreeElement group;
 
-	private static int NUM_TESTS = 9;
+	private static int NUM_TESTS = 8;
 
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		stringData = new StringData("Answer Value");
 		integerData = new IntegerData(4);
@@ -140,47 +136,37 @@ public class QuestionDataGroupTests extends TestCase {
 		group = new TreeElement(groupName);
 	}
 
-	public QuestionDataGroupTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
-
 	public QuestionDataGroupTests(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public QuestionDataGroupTests() {
-		super();
-	}
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new QuestionDataGroupTests("QuestionDataGroup Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((QuestionDataGroupTests)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new QuestionDataGroupTests(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
 		switch (testID) {
-			case 1: testIsLeaf(); break;
-			case 2: testGetName(); break;
-			case 3: testSetName(); break;
-			case 4: testAcceptsVisitor(); break;
-			case 5: testAddLeafChild(); break;
-			case 6: testAddTreeChild(); break;
-			case 7: testContains(); break;
-			case 8: testSuperclassMethods(); break;
+			case 1: return "testIsLeaf";
+			case 2: return "testGetName";
+			case 3: return "testSetName";
+			case 4: return "testAcceptsVisitor";
+			case 5: return "testAddLeafChild";
+			case 6: return "testAddTreeChild";
+			case 7: return "testContains";
+			case 8: return "testSuperclassMethods";
 
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 
 	public void testIsLeaf() {
@@ -240,13 +226,13 @@ public class QuestionDataGroupTests extends TestCase {
 		assertTrue("The visitor was dispatched incorrectly by the QuestionDataElement",!dispatchedWrong.getValue());
 	}
 
-	private void testSuperclassMethods() {
+	public void testSuperclassMethods() {
 		//stringElement should not have a root at this point.
 
 		//TODO: Implement tests for the 'attribute' system.
 	}
 
-	private void testAddLeafChild() {
+	public void testAddLeafChild() {
 
 
 		//boolean threw = false;
@@ -276,7 +262,7 @@ public class QuestionDataGroupTests extends TestCase {
 		}
 	}
 
-	private void testAddTreeChild() {
+	public void testAddTreeChild() {
 		//TreeElement subTree = new TreeElement("subtree");
 		//TreeElement firstRootTree = new TreeElement("firstRoot");
 		//TreeElement secondRootTree = new TreeElement("secondRoot");
@@ -292,7 +278,7 @@ public class QuestionDataGroupTests extends TestCase {
 
 	}
 
-	private void testContains() {
+	public void testContains() {
 
 	}
 }

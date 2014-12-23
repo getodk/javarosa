@@ -53,7 +53,7 @@ public class MainClass {
 			return;
 		}
 		
-		XFormUtils.getFormFromInputStream(is, FormDef.latestImplementationMode);
+		XFormUtils.getFormFromInputStream(is);
 	}
 
 }

@@ -16,10 +16,10 @@
 
 package org.javarosa.core.util.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.externalizable.*;
 
@@ -28,123 +28,18 @@ import java.io.DataInputStream;
 import java.util.*;
 
 public class ExternalizableTest extends TestCase {
-	public ExternalizableTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public ExternalizableTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public ExternalizableTest() {
-		super();
-	}
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
-		aSuite.addTest(new ExternalizableTest("Externalizable Test", new TestMethod() {
-			public void run (TestCase tc) {
-				((ExternalizableTest)tc).doTests();
-			}
-		}));
+		aSuite.addTest(new ExternalizableTest("doTests"));
 
 		return aSuite;
-	}
-
-	public static void testExternalizable (Object orig, Object template, PrototypeFactory pf, TestCase tc, String failMessage) {
-		if (failMessage == null)
-			failMessage = "Serialization Failure";
-
-		byte[] bytes;
-		Object deser;
-
-		print("");
-		print("Original: " + printObj(orig));
-
-		try {
-			bytes = ExtUtil.serialize(orig);
-
-			print("Serialized as:");
-			print(ExtUtil.printBytes(bytes));
-
-			if (template instanceof Class) {
-				deser = ExtUtil.deserialize(bytes, (Class)template, pf);
-			} else if (template instanceof ExternalizableWrapper) {
-				deser = ExtUtil.read(new DataInputStream(new ByteArrayInputStream(bytes)), (ExternalizableWrapper)template, pf);
-			} else {
-				throw new ClassCastException();
-			}
-
-			print("Reconstituted: " + printObj(deser));
-
-			if (ExtUtil.equals(orig, deser)) {
-				print("SUCCESS");
-			} else {
-				print("FAILURE");
-				tc.fail(failMessage + ": Objects do not match");
-			}
-			print("---------------------------------------------");
-		} catch (Exception e) {
-			tc.fail(failMessage + ": Exception! " + e.getClass().getName() + " " + e.getMessage());
-		}
-	}
-
-	//for outside test suites to call
-	public static void testExternalizable (Externalizable original, TestCase tc, PrototypeFactory pf) {
-		testExternalizable(original, tc, pf, "Serialization failure for " + original.getClass().getName());
-	}
-
-	public static void testExternalizable (Externalizable original, TestCase tc, PrototypeFactory pf, String failMessage) {
-		testExternalizable(original, original.getClass(), pf, tc, failMessage);
-	}
-
-	//for use inside this test suite
-	public void testExternalizable (Object orig, Object template) {
-		testExternalizable(orig, template, null);
-	}
-
-	public void testExternalizable (Object orig, Object template, PrototypeFactory pf) {
-		testExternalizable(orig, template, pf, this, null);
-	}
-
-	public static String printObj (Object o) {
-		o = ExtUtil.unwrap(o);
-
-		if (o == null) {
-			return "(null)";
-		} else if (o instanceof Vector) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("V[");
-			for (Enumeration e = ((Vector)o).elements(); e.hasMoreElements(); ) {
-				sb.append(printObj(e.nextElement()));
-				if (e.hasMoreElements())
-					sb.append(", ");
-			}
-			sb.append("]");
-			return sb.toString();
-		} else if (o instanceof HashMap) {
-			StringBuilder sb = new StringBuilder();
-			sb.append((o instanceof OrderedMap ? "oH" : "H") + "[");
-			for (Iterator e = ((HashMap)o).keySet().iterator(); e.hasNext(); ) {
-				Object key = e.next();
-				sb.append(printObj(key));
-				sb.append("=>");
-				sb.append(printObj(((HashMap)o).get(key)));
-				if (e.hasNext())
-					sb.append(", ");
-			}
-			sb.append("]");
-			return sb.toString();
-		} else {
-			return "{" + o.getClass().getName() + ":" + o.toString() + "}";
-		}
-	}
-
-	private static void print (String s) {
-		//#if javarosa.dev.serializationtest.verbose
-		System.out.println(s);
-		//#endif
 	}
 
 	public void doTests () {
@@ -288,5 +183,100 @@ public class ExternalizableTest extends TestCase {
 		m.put("d", new SampleExtz("boris", "yeltsin"));
 		m.put("e", new ExtWrapList(vs));
 		testExternalizable(new ExtWrapMapPoly(m), new ExtWrapMapPoly(String.class, true), pf);
+	}
+
+	public static void testExternalizable (Object orig, Object template, PrototypeFactory pf, TestCase tc, String failMessage) {
+		if (failMessage == null)
+			failMessage = "Serialization Failure";
+
+		byte[] bytes;
+		Object deser;
+
+		print("");
+		print("Original: " + printObj(orig));
+
+		try {
+			bytes = ExtUtil.serialize(orig);
+
+			print("Serialized as:");
+			print(ExtUtil.printBytes(bytes));
+
+			if (template instanceof Class) {
+				deser = ExtUtil.deserialize(bytes, (Class)template, pf);
+			} else if (template instanceof ExternalizableWrapper) {
+				deser = ExtUtil.read(new DataInputStream(new ByteArrayInputStream(bytes)), (ExternalizableWrapper)template, pf);
+			} else {
+				throw new ClassCastException();
+			}
+
+			print("Reconstituted: " + printObj(deser));
+
+			if (ExtUtil.equals(orig, deser)) {
+				print("SUCCESS");
+			} else {
+				print("FAILURE");
+				tc.fail(failMessage + ": Objects do not match");
+			}
+			print("---------------------------------------------");
+		} catch (Exception e) {
+			tc.fail(failMessage + ": Exception! " + e.getClass().getName() + " " + e.getMessage());
+		}
+	}
+
+	//for outside test suites to call
+	public static void testExternalizable (Externalizable original, TestCase tc, PrototypeFactory pf) {
+		testExternalizable(original, tc, pf, "Serialization failure for " + original.getClass().getName());
+	}
+
+	public static void testExternalizable (Externalizable original, TestCase tc, PrototypeFactory pf, String failMessage) {
+		testExternalizable(original, original.getClass(), pf, tc, failMessage);
+	}
+
+	//for use inside this test suite
+	public void testExternalizable (Object orig, Object template) {
+		testExternalizable(orig, template, null);
+	}
+
+	public void testExternalizable (Object orig, Object template, PrototypeFactory pf) {
+		testExternalizable(orig, template, pf, this, null);
+	}
+
+	public static String printObj (Object o) {
+		o = ExtUtil.unwrap(o);
+
+		if (o == null) {
+			return "(null)";
+		} else if (o instanceof Vector) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("V[");
+			for (Enumeration e = ((Vector)o).elements(); e.hasMoreElements(); ) {
+				sb.append(printObj(e.nextElement()));
+				if (e.hasMoreElements())
+					sb.append(", ");
+			}
+			sb.append("]");
+			return sb.toString();
+		} else if (o instanceof HashMap) {
+			StringBuilder sb = new StringBuilder();
+			sb.append((o instanceof OrderedMap ? "oH" : "H") + "[");
+			for (Iterator e = ((HashMap)o).keySet().iterator(); e.hasNext(); ) {
+				Object key = e.next();
+				sb.append(printObj(key));
+				sb.append("=>");
+				sb.append(printObj(((HashMap)o).get(key)));
+				if (e.hasNext())
+					sb.append(", ");
+			}
+			sb.append("]");
+			return sb.toString();
+		} else {
+			return "{" + o.getClass().getName() + ":" + o.toString() + "}";
+		}
+	}
+
+	private static void print (String s) {
+		//#if javarosa.dev.serializationtest.verbose
+		System.out.println(s);
+		//#endif
 	}
 }

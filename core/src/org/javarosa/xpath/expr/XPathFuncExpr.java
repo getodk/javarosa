@@ -436,8 +436,9 @@ public class XPathFuncExpr extends XPathExpression {
       List<Class[]> prototypes = handler.getPrototypes();
 		Object[] typedArgs = null;
 
-		while (typedArgs == null && prototypes.size() > 0) {
-			typedArgs = matchPrototype(args, prototypes.get(0));
+		int i = 0;
+		while (typedArgs == null && prototypes.size() > i) {
+			typedArgs = matchPrototype(args, prototypes.get(i++));
 		}
 
 		if (typedArgs != null) {

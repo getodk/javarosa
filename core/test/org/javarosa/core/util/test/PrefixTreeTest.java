@@ -16,46 +16,25 @@
 
 package org.javarosa.core.util.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.List;
 
 import org.javarosa.core.util.PrefixTree;
 
 public class PrefixTreeTest extends TestCase  {
-	public PrefixTreeTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public PrefixTreeTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public PrefixTreeTest() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
-		aSuite.addTest((new PrefixTreeTest("Prefix Tree Test Suite", new TestMethod() {
-			public void run(TestCase tc) {
-				((PrefixTreeTest)tc).doTests();
-			}
-		})));
+		aSuite.addTest(new PrefixTreeTest("doTests"));
 		return aSuite;
-	}
-
-	public void add (PrefixTree t, String s) {
-		t.addString(s);
-		System.out.println(t.toString());
-		
-		List<String> v = t.getStrings();
-		for (int i = 0; i < v.size(); i++) {
-			System.out.println((String)v.get(i));
-		}
 	}
 	
 	public void doTests() {
@@ -72,5 +51,15 @@ public class PrefixTreeTest extends TestCase  {
 		add(t, "abcdexyz");
 		add(t, "abcppppp");
 		
+	}
+
+	public void add (PrefixTree t, String s) {
+		t.addString(s);
+		System.out.println(t.toString());
+		
+		List<String> v = t.getStrings();
+		for (int i = 0; i < v.size(); i++) {
+			System.out.println((String)v.get(i));
+		}
 	}
 }

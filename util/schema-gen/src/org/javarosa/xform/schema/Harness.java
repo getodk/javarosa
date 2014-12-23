@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
@@ -117,7 +114,7 @@ public class Harness {
 			}
 			System.exit(0);
 		}
-		FormDef f = XFormUtils.getFormFromInputStream(System.in, FormDef.latestImplementationMode);
+		FormDef f = XFormUtils.getFormFromInputStream(System.in);
 		System.setOut(sysOut);
 		
 		if (mode == MODE_SCHEMA) {			
