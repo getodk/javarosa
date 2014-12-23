@@ -2066,7 +2066,7 @@ public class XFormParser {
 			return new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MUTLIPLICITY));
 	}
 
-	//checks which repeat bindings have explicit template nodes; returns a vector of the bindings that do not
+	//checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not
 	private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
 		if (repeatTree != null)
 			checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
@@ -2576,7 +2576,7 @@ public class XFormParser {
       for (TreeReference trigger : _f.triggerIndex.keySet()) {
 			if (!vertices.contains(trigger))
 				vertices.add(trigger);
-			HashSet<QuickTriggerable> triggered = _f.triggerIndex.get(trigger);
+			ArrayList<QuickTriggerable> triggered = _f.triggerIndex.get(trigger);
 			targets.clear();
 			for (QuickTriggerable qt : triggered ) {
 				Triggerable t = qt.t;

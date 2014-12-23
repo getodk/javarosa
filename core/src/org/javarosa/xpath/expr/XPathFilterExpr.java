@@ -74,7 +74,7 @@ public class XPathFilterExpr extends XPathExpression {
 			for (int i = 0; i < fe.predicates.length; i++)
 				b.add(fe.predicates[i]);
 
-			return x.equals(fe.x) && ExtUtil.vectorEquals(a, b);
+			return x.equals(fe.x) && ExtUtil.listEquals(a, b);
 		} else {
 			return false;
 		}

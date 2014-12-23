@@ -357,7 +357,7 @@ public class Fast2014DagImpl extends IDag {
 	 * evaluations.
 	 * 
 	 * @param tv
-	 *            A vector of all of the trigerrables directly triggered by the
+	 *            A set of all of the trigerrables directly triggered by the
 	 *            value changed
 	 * @param anchorRef
 	 */
@@ -559,7 +559,7 @@ public class Fast2014DagImpl extends IDag {
 		Set<QuickTriggerable> triggeredCopy = new HashSet<QuickTriggerable>(
 				triggered);
 
-		// Evaluate all of the triggerables in our new vector
+		// Evaluate all of the triggerables in our new set
 		return evaluateTriggerables(mainInstance, evalContext, triggeredCopy,
 				ref, cascadeToGroupChildren, alreadyEvaluated);
 	}

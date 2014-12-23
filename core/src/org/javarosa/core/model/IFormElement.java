@@ -56,7 +56,7 @@ public interface IFormElement extends Localizable, Externalizable {
 	
 	
 	/**
-	 * @return A vector containing any children that this element
+	 * @return A List containing any children that this element
 	 * might have. Null if the element is not able to have child
 	 * elements.
 	 */

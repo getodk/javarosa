@@ -1,9 +1,9 @@
 package org.javarosa.core.model.instance.utils;
 
-import org.javarosa.core.model.instance.FormInstance;
-
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
+
+import org.javarosa.core.model.instance.FormInstance;
 
 /**
  * Instance template manager that caches the template instances in memory. Useful for when deserializing
@@ -24,7 +24,7 @@ import java.util.Vector;
 public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 
 	private HashMap<Integer, FormInstance> templateCache;
-	private Vector<Integer> allowedFormTypes;
+	private ArrayList<Integer> allowedFormTypes;
 	private boolean restrictFormTypes;
 
 	public CachingInstanceTemplateManager () {
@@ -40,7 +40,7 @@ public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 	public CachingInstanceTemplateManager (boolean restrictFormTypes) {
 		this.templateCache = new HashMap<Integer, FormInstance>();
 		this.restrictFormTypes = restrictFormTypes;
-		this.allowedFormTypes = new Vector<Integer>(0);
+		this.allowedFormTypes = new ArrayList<Integer>(0);
 	}
 
 	/**
@@ -55,8 +55,8 @@ public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 	 * @param formID
 	 */
 	public void addFormType (int formID) {
-		if (!allowedFormTypes.contains(new Integer(formID))) {
-			allowedFormTypes.addElement(new Integer(formID));
+		if (!allowedFormTypes.contains(Integer.valueOf(formID))) {
+			allowedFormTypes.add(Integer.valueOf(formID));
 		}
 	}
 
@@ -64,7 +64,7 @@ public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 	 * Empty the list of allowed form types
 	 */
 	public void resetFormTypes () {
-		allowedFormTypes.removeAllElements();
+		allowedFormTypes.clear();
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 	 * fresh and caches it otherwise. If form types are restricted and the given form type is not allowed, throw an error
 	 */
 	public FormInstance getTemplateInstance (int formID) {
-		if (restrictFormTypes && !allowedFormTypes.contains(new Integer(formID))) {
+		if (restrictFormTypes && !allowedFormTypes.contains(Integer.valueOf(formID))) {
 			throw new RuntimeException ("form ID [" + formID + "] is not an allowed form type!");
 		}
 

@@ -105,7 +105,7 @@ public class FormEntryModel {
         // This came from chatterbox, and is unclear how correct it is,
         // commented out for now.
         // DELETEME: If things work fine
-        // Vector defs = form.explodeIndex(index);
+        // List defs = form.explodeIndex(index);
         // IFormElement last = (defs.size() == 0 ? null : (IFormElement)
         // defs.lastElement());
         IFormElement element = form.getChild(index);
