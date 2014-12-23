@@ -247,10 +247,10 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			if(multiplicity == TreeReference.INDEX_TEMPLATE || this.children.size() < multiplicity + 1) {
 				return null;
 			}
-			return (TreeElement) this.children.get(multiplicity); //droos: i'm suspicious of this
+			return this.children.get(multiplicity); //droos: i'm suspicious of this
 		} else {
 			for (int i = 0; i < this.children.size(); i++) {
-				TreeElement child = (TreeElement) this.children.get(i);
+				TreeElement child = this.children.get(i);
 				if (name.equals(child.getName()) && child.getMult() == multiplicity) {
 					return child;
 				}
@@ -278,7 +278,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
       List<TreeElement> v = new ArrayList<TreeElement>();
 		for (int i = 0; i < this.children.size(); i++) {
-			TreeElement child = (TreeElement) this.children.get(i);
+			TreeElement child = this.children.get(i);
 			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
 					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
 				v.add(child);
@@ -305,7 +305,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildAt(int)
 	 */
 	public TreeElement getChildAt (int i) {
-		return (TreeElement)children.get(i);
+		return children.get(i);
 	}
 
 	/* (non-Javadoc)
@@ -407,7 +407,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	public void removeChildren(String name, boolean includeTemplate) {
 		List<TreeElement> v = getChildrenWithName(name, includeTemplate);
 		for (int i = 0; i < v.size(); i++) {
-			removeChild((TreeElement) v.get(i));
+			removeChild(v.get(i));
 		}
 	}
 
@@ -449,7 +449,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 		newNode.attributes = new ArrayList<TreeElement>(attributes.size());
 		for (int i = 0; i < attributes.size(); i++) {
-			TreeElement attr = (TreeElement) attributes.get(i);
+			TreeElement attr = attributes.get(i);
 			newNode.setAttribute(attr.getNamespace(), attr.getName(), attr.getAttributeValue());
 		}
 
@@ -470,7 +470,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		if(children != null) {
 			newNode.children = new ArrayList<TreeElement>(children.size());
 			for (int i = 0; i < children.size(); i++) {
-				TreeElement child = (TreeElement) children.get(i);
+				TreeElement child = children.get(i);
 				if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
 					newNode.addChild(child.deepCopy(includeTemplates));
 				}
@@ -559,7 +559,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			}
 			if(children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					((TreeElement) children.get(i)).setRelevant(newRelevant,true);
+					(children.get(i)).setRelevant(newRelevant,true);
 				}
 			}
 			alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
@@ -625,7 +625,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		if (isEnabled() != oldEnabled) {
 			if(children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					((TreeElement) children.get(i)).setEnabled(isEnabled(),
+					children.get(i).setEnabled(isEnabled(),
 							true);
 				}
 			}
@@ -1025,7 +1025,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				        newChild.setMult(k);
 						if(children == null) { children = new ArrayList<TreeElement>(); }
 				        this.children.add(i + k + 1, newChild);
-				        newChild.populate((TreeElement)newChildren.get(k), f);
+				        newChild.populate(newChildren.get(k), f);
 				    }
 				    i += newChildren.size();
 				} else {
@@ -1033,7 +1033,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					if (newChildren.size() == 0) {
 						child.setRelevant(false);
 					} else {
-						child.populate((TreeElement)newChildren.get(0), f);
+						child.populate(newChildren.get(0), f);
 					}
 				}
 			}
@@ -1085,11 +1085,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				        newChild.setMult(k);
 				        if(children == null) { children = new ArrayList<TreeElement>(); }
 				        this.children.add(i + k + 1, newChild);
-				        newChild.populateTemplate((TreeElement)newChildren.get(k), f);
+				        newChild.populateTemplate(newChildren.get(k), f);
 				    }
 				    i += newChildren.size();
 				} else {
-					child.populateTemplate((TreeElement)newChildren.get(0), f);
+					child.populateTemplate(newChildren.get(0), f);
 				}
 			}
 		}

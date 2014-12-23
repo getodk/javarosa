@@ -221,8 +221,8 @@ step_body	::=	node_test:nt				{: RESULT = nt.generateStep(XPathStep.AXIS_CHILD);
 		|	axis_specifier:a node_test:nt		{: RESULT = nt.generateStep(a.intValue()); :}
 		;
 
-axis_specifier	::=	QNAME:q DBL_COLON			{: RESULT = new Integer(validateAxisName(q.toString())); :}
-		|	AT					{: RESULT = new Integer(XPathStep.AXIS_ATTRIBUTE); :}
+axis_specifier	::=	QNAME:q DBL_COLON			{: RESULT = Integer.valueOf(validateAxisName(q.toString())); :}
+		|	AT					{: RESULT = Integer.valueOf(XPathStep.AXIS_ATTRIBUTE); :}
 		;
 
 node_test	::=	QNAME:q					{: RESULT = new tempNodeTest(XPathStep.TEST_NAME, q); :}

@@ -232,7 +232,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public IFormElement getChild(int i) {
       if (i < this.children.size())
-         return (IFormElement) this.children.get(i);
+         return this.children.get(i);
 
       throw new ArrayIndexOutOfBoundsException("FormDef: invalid child index: " + i + " only "
             + children.size() + " children");
@@ -1279,8 +1279,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          int i = index.getLocalIndex();
          element = element.getChild(i);
 
-         indexes.add(new Integer(i));
-         multiplicities.add(new Integer(index.getInstanceIndex() == -1 ? 0 : index
+         indexes.add(Integer.valueOf(i));
+         multiplicities.add(Integer.valueOf(index.getInstanceIndex() == -1 ? 0 : index
                .getInstanceIndex()));
          elements.add(element);
 
@@ -1363,7 +1363,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          }
       }
 
-      multiplicities.set(multiplicities.size() - 1, new Integer(repIndex));
+      multiplicities.set(multiplicities.size() - 1, Integer.valueOf(repIndex));
 
       return buildIndex(indexes, multiplicities, elements);
    }
