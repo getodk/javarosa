@@ -65,6 +65,9 @@ import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
+import org.javarosa.debug.Event;
+import org.javarosa.debug.EventNotifier;
+import org.javarosa.debug.EventNotifierSilent;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
@@ -91,10 +94,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    // used by FormDef() constructor
    private static EvalBehavior defaultMode = recommendedMode;
+   private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
 
    // call this to change the mode used for evaluations.
    public static final void setEvalBehavior(EvalBehavior mode) {
       defaultMode = mode;
+   }
+
+   public static void setDefaultEventNotifier(EventNotifier eventNotifier) {
+      defaultEventNotifier = eventNotifier;
    }
 
    public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
@@ -121,10 +129,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static final class QuickTriggerable {
 
       public final Triggerable t;
+      private Integer hashCode = null;
 
       @Override
       public final int hashCode() {
-         return System.identityHashCode(t);
+         if (hashCode == null) {
+            hashCode = System.identityHashCode(t);
+         }
+         return hashCode;
       }
 
       @Override
@@ -194,14 +206,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    private HashMap<String, List<Action>> eventListeners;
 
+   private EventNotifier eventNotifier;
+
    public FormDef() {
-      this(defaultMode);
+      this(defaultMode, defaultEventNotifier);
    }
    
    /**
 	 *
 	 */
-   public FormDef(EvalBehavior mode) {
+   public FormDef(EvalBehavior mode, EventNotifier eventNotifier) {
       setID(-1);
       setChildren(null);
       this.mode = mode;
@@ -215,6 +229,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       formInstances = new HashMap<String, FormInstance>();
       eventListeners = new HashMap<String, List<Action>>();
       extensions = new ArrayList<XFormExtension>();
+
+      this.eventNotifier = eventNotifier;
+   }
+
+   public EventNotifier getEventNotifier() {
+      return eventNotifier;
+   }
+
+   public void setEventNotifier(EventNotifier eventNotifier) {
+      this.eventNotifier = eventNotifier;
    }
 
    /**
@@ -396,9 +420,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
          boolean trustPreviousValue, boolean cascadeToGroupChildren) {
       if (mode == EvalBehavior.Legacy || mode == EvalBehavior.April_2014 || mode == EvalBehavior.Latest_safest) {
+         getEventNotifier().publishEvent(new Event("New answer", new EvaluationResult(ref, data)));
          setAnswer(data, node);
          Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
-         publishSummary(node.getName() + " got a value by force", qts);
+         publishSummary("New value by force", ref, qts);
       } else {
          // SCTO-2286 : Do not act if the data haven't changed.
          // Use the serialized form of the data to avoid type conversions and
@@ -408,9 +433,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          if (!trustPreviousValue
                || !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
                      answerDataSerializer.serializeAnswerData(data))) {
+            getEventNotifier().publishEvent(new Event("New answer", new EvaluationResult(ref, data)));
             setAnswer(data, node);
             Set<QuickTriggerable> qts = triggerTriggerables(ref, cascadeToGroupChildren, new HashSet<QuickTriggerable>(0));
-            publishSummary(node.getName() + " got a value conditionally", qts);
+            publishSummary("New value conditionally", ref, qts);
          }
       }
       // TODO: pre-populate fix-count repeats here?
@@ -512,10 +538,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
 
       Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(deleteRef, true, new HashSet<QuickTriggerable>(0));
-      publishSummary("Deleted " + index.getReference().toString(true), alreadyEvaluated);
+      publishSummary("Deleted", index.getReference(), alreadyEvaluated);
 
       if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
-         evaluateChildrenTriggerables(deleteElement, true, alreadyEvaluated);
+         evaluateChildrenTriggerables(deleteElement, false, true, alreadyEvaluated);
       }
 
       return newIndex;
@@ -540,26 +566,26 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       }
 
       Set<QuickTriggerable> qtSet1 = triggerTriggerables(destRef, true, new HashSet<QuickTriggerable>(0));// trigger conditions that depend on the creation of this new node
-      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 1)", qtSet1);
+      publishSummary("Created (phase 1)", destRef, qtSet1);
 
       Set<QuickTriggerable> qtSet2 = initializeTriggerables(destRef, true);// initialize conditions for the node (and sub-nodes)
-      publishSummary("Created new repeat " + destRef.toString(true) + "(phase 2)", qtSet2);
+      publishSummary("Created (phase 2)", destRef, qtSet2);
 
       if (mode != EvalBehavior.Legacy && mode != EvalBehavior.April_2014) {
          Set<QuickTriggerable> alreadyEvaluated = new HashSet<QuickTriggerable>(qtSet1);
          alreadyEvaluated.addAll(qtSet2);
 
-         evaluateChildrenTriggerables(newNode, true, alreadyEvaluated);
+         evaluateChildrenTriggerables(newNode, true, true, alreadyEvaluated);
       }
    }
 
-   private void evaluateChildrenTriggerables(TreeElement newNode, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
+   private void evaluateChildrenTriggerables(TreeElement newNode, boolean createdOrDeleted, boolean cascadeToGroupChildren, Set<QuickTriggerable> alreadyEvaluated) {
       //iterate into the group children and evaluate any triggerables that depend one them, if they are not already calculated.
       int numChildren = newNode.getNumChildren();
       for (int i = 0; i < numChildren; i++) {
          TreeReference anchorRef = newNode.getChildAt(i).getRef();
          Set<QuickTriggerable> childTriggerables = triggerTriggerables(anchorRef, cascadeToGroupChildren, alreadyEvaluated);
-         publishSummary("Node created/deleted: " + anchorRef.toString(true), childTriggerables);
+         publishSummary((createdOrDeleted ? "Created" : "Deleted"), anchorRef, childTriggerables);
       }
    }
 
@@ -1139,6 +1165,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             evaluationResults.addAll(qt.t.apply(mainInstance, ec, qualified, this));
          }
 
+         boolean fired = evaluationResults.size() > 0;
+         if (fired) {
+            getEventNotifier().publishEvent(new Event(qt.t.getClass().getSimpleName(), evaluationResults));
+         }
+
          return evaluationResults;
       } catch (Exception e) {
          throw new WrappedException("Error evaluating field '" + contextRef.getNameLast() + "': "
@@ -1205,7 +1236,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       ec.isConstraint = true;
       ec.candidateValue = data;
 
-      return c.constraint.eval(mainInstance, ec);
+      boolean result = c.constraint.eval(mainInstance, ec);
+
+      getEventNotifier().publishEvent(new Event("Constraint", new EvaluationResult(ref, new Boolean(result))));
+
+      return result;
    }
 
    /**
@@ -1441,10 +1476,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           used to determine the values to be chosen from.
     */
    public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
+      getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
+
       List<SelectChoice> choices = new ArrayList<SelectChoice>();
 
       List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
-            new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
+              new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
       FormInstance fi = null;
       if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
@@ -1706,7 +1743,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    private void publishSummary(String lead, Set<QuickTriggerable> quickTriggerables) {
-      System.out.println(lead + ": " + quickTriggerables.size() + " triggerables were fired.");
+      publishSummary(lead, null, quickTriggerables);
+   }
+
+   private void publishSummary(String lead, TreeReference ref, Set<QuickTriggerable> quickTriggerables) {
+      getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
    }
 
    /**
