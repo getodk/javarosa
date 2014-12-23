@@ -150,10 +150,10 @@ public abstract class Triggerable implements Externalizable {
 		Object result = eval(mainInstance, ec);
 
 		for (int i = 0; i < targets.size(); i++) {
-			TreeReference targetRef = ((TreeReference)targets.get(i)).contextualize(ec.getContextRef());
+			TreeReference targetRef = targets.get(i).contextualize(ec.getContextRef());
          List<TreeReference> v = ec.expandReference(targetRef);
 			for (int j = 0; j < v.size(); j++) {
-				TreeReference affectedRef = (TreeReference)v.get(j);
+				TreeReference affectedRef = v.get(j);
 				apply(affectedRef, result, mainInstance);
 			}
 		}
@@ -273,7 +273,7 @@ public abstract class Triggerable implements Externalizable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < targets.size(); i++) {
-			sb.append(((TreeReference)targets.get(i)).toString());
+			sb.append(targets.get(i).toString());
 			if (i < targets.size() - 1)
 				sb.append(",");
 		}

@@ -252,7 +252,7 @@ public class Fast2014DagImpl extends IDag {
 			if (qt.t instanceof Condition) {
 				ArrayList<TreeReference> targets = qt.t.getTargets();
 				for (int j = 0; j < targets.size(); j++) {
-					TreeReference target = (TreeReference) targets.get(j);
+					TreeReference target = targets.get(j);
 					if (mainInstance.getTemplate(target) != null) {
 						conditionRepeatTargetIndex.put(target, qt);
 					}
@@ -299,8 +299,7 @@ public class Fast2014DagImpl extends IDag {
 				boolean expandRepeatables = true;
 
 				for (int j = 0; j < qt.t.getTargets().size(); j++) {
-					TreeReference target = (TreeReference) qt.t.getTargets()
-							.get(j);
+					TreeReference target = qt.t.getTargets().get(j);
 					Set<TreeReference> updatedNodes = new HashSet<TreeReference>();
 					updatedNodes.add(target);
 

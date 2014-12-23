@@ -29,10 +29,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 //maintain an array of integers in sorted order. no duplicates allowed.
 public class SortedIntSet implements Externalizable {
-	Vector v;
+	Vector<Integer> v;
 
 	public SortedIntSet () {
-		v = new Vector(0);
+		v = new Vector<Integer>(0);
 	}
 
 	//add new value; return index inserted at if value was not already present, -1 if it was
@@ -41,7 +41,7 @@ public class SortedIntSet implements Externalizable {
 		if (i != -1 && get(i) == n) {
 			return -1;
 		} else {
-			v.insertElementAt(new Integer(n), i + 1);
+			v.insertElementAt(Integer.valueOf(n), i + 1);
 			return i + 1;
 		}
 	}
@@ -56,7 +56,7 @@ public class SortedIntSet implements Externalizable {
 
 	//return value at index
 	public int get (int i) {
-		return ((Integer)v.elementAt(i)).intValue();
+		return v.elementAt(i).intValue();
 	}
 
 	//return whether value is present
@@ -97,7 +97,7 @@ public class SortedIntSet implements Externalizable {
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		v = (Vector)ExtUtil.read(in, new ExtWrapList(Integer.class));
+		v = (Vector<Integer>)ExtUtil.read(in, new ExtWrapList(Integer.class));
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

@@ -193,7 +193,7 @@ public class DateUtils {
 	}
 
 	private static String formatDateColloquial (DateFields f) {
-		String year = new Integer(f.year).toString();
+		String year = Integer.valueOf(f.year).toString();
 
 		//Normal Date
 		if(year.length() == 4) {

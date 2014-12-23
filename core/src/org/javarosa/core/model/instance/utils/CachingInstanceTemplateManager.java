@@ -76,13 +76,13 @@ public class CachingInstanceTemplateManager implements InstanceTemplateManager {
 			throw new RuntimeException ("form ID [" + formID + "] is not an allowed form type!");
 		}
 
-		FormInstance template = templateCache.get(new Integer(formID));
+		FormInstance template = templateCache.get(Integer.valueOf(formID));
 		if (template == null) {
 			template = CompactInstanceWrapper.loadTemplateInstance(formID);
 			if (template == null) {
 				throw new RuntimeException("no formdef found for form id [" + formID + "]");
 			}
-			templateCache.put(new Integer(formID), template);
+			templateCache.put(Integer.valueOf(formID), template);
 		}
 		return template;
 	}

@@ -18,10 +18,10 @@ public class DataUtil {
 		if(iarray == null) {
 			iarray = new Integer[high - low];
 			for(int i = 0; i < iarray.length; ++i) {
-				iarray[i] = new Integer(i + low);
+				iarray[i] = Integer.valueOf(i + low);
 			}
 		}
-		return ivalue < high && ivalue >= low ? iarray[ivalue + offset] : new Integer(ivalue);
+		return ivalue < high && ivalue >= low ? iarray[ivalue + offset] : Integer.valueOf(ivalue);
 	}
 
 }

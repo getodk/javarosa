@@ -184,7 +184,7 @@ public class ExtUtil {
 		} else if (type == Short.class) {
 			return new Short(readShort(in));
 		} else if (type == Integer.class) {
-			return new Integer(readInt(in));
+			return Integer.valueOf(readInt(in));
 		} else if (type == Long.class) {
 			return new Long(readNumeric(in));
 		} else if (type == Character.class) {

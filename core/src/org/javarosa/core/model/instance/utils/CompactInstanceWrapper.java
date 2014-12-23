@@ -433,7 +433,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 			if (s.index == -1) {
 				throw new RuntimeException("trying to serialize in choice-index mode but selections do not have indexes set!");
 			}
-			return new Integer(s.index);
+			return Integer.valueOf(s.index);
 		default: throw new IllegalArgumentException();
 		}
 	}
