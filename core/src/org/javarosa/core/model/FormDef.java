@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -157,7 +156,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       unorderedTriggerables = new ArrayList<QuickTriggerable>();
       triggerIndex = new HashMap<TreeReference, ArrayList<QuickTriggerable>>();
       // This is kind of a wreck...
-      setEvaluationContext(new EvaluationContext(null));
+      resetEvaluationContext();
       outputFragments = new ArrayList<IConditionExpr>();
       submissionProfiles = new HashMap<String, SubmissionProfile>();
       formInstances = new HashMap<String, FormInstance>();
@@ -170,7 +169,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     */
    public void addNonMainInstance(FormInstance instance) {
       formInstances.put(instance.getName(), instance);
-      this.setEvaluationContext(new EvaluationContext(null));
+      resetEvaluationContext();
    }
 
    /**
@@ -205,7 +204,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public void setInstance(FormInstance fi) {
       mainInstance = fi;
       fi.setFormId(getID());
-      this.setEvaluationContext(new EvaluationContext(null));
+      resetEvaluationContext();
       attachControlsToInstanceData();
    }
 
@@ -735,7 +734,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @param ec
     *           The new Evaluation Context
     */
-   public void setEvaluationContext(EvaluationContext ec) {
+   private void resetEvaluationContext() {
+	  EvaluationContext ec = new EvaluationContext(null);
       ec = new EvaluationContext(mainInstance, formInstances, ec);
       initEvalContext(ec);
       this.exprEvalContext = ec;
@@ -1193,7 +1193,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
-      setEvaluationContext(new EvaluationContext(null));
+      resetEvaluationContext();
    }
 
    /**
