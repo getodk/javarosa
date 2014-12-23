@@ -16,10 +16,9 @@
 
 package org.javarosa.xform.util.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.Date;
 
@@ -60,10 +59,7 @@ public class XFormAnswerDataSerializerTest extends TestCase {
 	
 	private static int NUM_TESTS = 5;
 	
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		stringData = new StringData(stringDataValue);
 		stringElement.setValue(stringData);
@@ -79,41 +75,32 @@ public class XFormAnswerDataSerializerTest extends TestCase {
 		
 		serializer = new XFormAnswerDataSerializer();
 	}
-	public XFormAnswerDataSerializerTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public XFormAnswerDataSerializerTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public XFormAnswerDataSerializerTest() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new XFormAnswerDataSerializerTest("XFormAnswerDataSerializer Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((XFormAnswerDataSerializerTest)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new XFormAnswerDataSerializerTest(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		switch (testID) {
-			case 1: testString(); break;
-			case 2: testInteger(); break;
-			case 3: testDate(); break;
-			case 4: testTime(); break;
-			case 5: testSelect(); break;
+			case 1: return "testString";
+			case 2: return "testInteger";
+			case 3: return "testDate";
+			case 4: return "testTime";
+			case 5: return "testSelect";
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 	
 	public void testString() {

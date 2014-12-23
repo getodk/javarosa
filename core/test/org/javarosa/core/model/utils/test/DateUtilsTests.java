@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.utils.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -35,20 +34,12 @@ public class DateUtilsTests extends TestCase {
 	Date currentTime;
 	Date minusOneHour;
 	
-	
-	public DateUtilsTests(String name, TestMethod rTestMethod){
-		super(name, rTestMethod);
-	}
-	
 	public DateUtilsTests(String name){
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 	
-	public DateUtilsTests(){
-		super();
-	}
-
-	protected void setUp() throws Exception{
+	public void setUp() throws Exception{
 		super.setUp();
 		
 		currentTime = new Date();
@@ -56,34 +47,31 @@ public class DateUtilsTests extends TestCase {
 		
 	}
 	
-	public Test suite(){
+	public static Test suite(){
 		
 		TestSuite dateSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			dateSuite.addTest(new DateUtilsTests("DateUtilData Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((DateUtilsTests)tc).testMaster(testID);
-				}
-			}));
+			dateSuite.addTest(new DateUtilsTests(testMaster(testID)));
 		}
 
 		return dateSuite;
 		
 	}
 
-	public void testMaster(int testID) {
+	public static String testMaster(int testID) {
 		
 	
 		switch (testID) {
-		case 1: testGetXMLStringValueFormat(); break;
-		case 2: testSetDates(); break;
-		case 3: testNullDates(); break;
-		case 4: testTimeParses(); break;
-		case 5: testParity(); break;
+		case 1: return "testGetXMLStringValueFormat";
+		case 2: return "testSetDates";
+		case 3: return "testNullDates";
+		case 4: return "testTimeParses";
+		case 5: return "testParity";
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 	
 	/**
@@ -91,7 +79,7 @@ public class DateUtilsTests extends TestCase {
 	 * by the getXMLStringValue function are in
 	 * the proper XML compliant format.
 	 */
-	private void testGetXMLStringValueFormat() {
+	public void testGetXMLStringValueFormat() {
 		String currentDate = DateUtils.getXMLStringValue(currentTime);
 		assertEquals("The date string was not of the proper length", currentDate.length(),"YYYY-MM-DD".length());
 		assertEquals("The date string does not have proper year formatting", currentDate.indexOf("-"),"YYYY-".indexOf("-"));
@@ -112,17 +100,17 @@ public class DateUtilsTests extends TestCase {
 		}
 	}
 
-	private void testNullDates() {
+	public void testNullDates() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	private void testSetDates() {
+	public void testSetDates() {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	private void testTimeParses() {
+	public void testTimeParses() {
 		//This is all kind of tricky. We need to assume J2ME level compliance, so
 		//dates won't every be assumed to have an intrinsic timezone, they'll be
 		//assumed to be in the phone's default timezone
@@ -208,7 +196,7 @@ public class DateUtilsTests extends TestCase {
 		return -d.getTime();
 	}
 	
-	private void testParity() {
+	public void testParity() {
 		testCycle(new Date(1300139579000l));
 		testCycle(new Date(0));
 		

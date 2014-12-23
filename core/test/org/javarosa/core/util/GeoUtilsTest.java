@@ -16,10 +16,9 @@
 
 package org.javarosa.core.util;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,32 +26,19 @@ import java.util.List;
 
 public class GeoUtilsTest extends TestCase {
 
-  public GeoUtilsTest(String name, TestMethod rTestMethod) {
-    super(name, rTestMethod);
+  public GeoUtilsTest(String name) {
+    super(name);
+	System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
   }
 
-  public Test suite() {
+  public static Test suite() {
     TestSuite aSuite = new TestSuite();
 
-    aSuite.addTest(new GeoUtilsTest("GeoUtils Test", new TestMethod() {
-      public void run (TestCase tc) {
-        ((GeoUtilsTest)tc).doTests();
-      }
-    }));
+    aSuite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_1st_Route"));
+    aSuite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_2nd_Route"));
+    aSuite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_3rd_Route"));
 
     return aSuite;
-  }
-
-  private void doTests() {
-    try {
-      testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_1st_Route();
-      testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_2nd_Route();
-      testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_3rd_Route();
-    } catch (Exception e) {
-      e.printStackTrace();
-
-      fail(e.getMessage());
-    }
   }
 
   /**

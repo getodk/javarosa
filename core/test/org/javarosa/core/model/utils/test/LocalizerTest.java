@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.utils.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.HashMap;
 
@@ -34,72 +33,64 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
 
 public class LocalizerTest extends TestCase  {
-	public LocalizerTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
 
 	public LocalizerTest(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public LocalizerTest() {
-		super();
-	}
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new LocalizerTest("Localizer Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((LocalizerTest)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new LocalizerTest(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
 
-	public final int NUM_TESTS = 31;
-	public void testMaster (int testID) {
+	public static final int NUM_TESTS = 31;
+	
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
 		switch (testID) {
-		case 1: testEmpty(); break;
-		case 2: testAddLocale(); break;
-		case 3: testAddLocaleWithData(); break;
-		case 4: testAddExistingLocale(); break;
-		case 5: testSetCurrentLocaleExists(); break;
-		case 6: testSetCurrentLocaleNotExists(); break;
-		case 7: testUnsetCurrentLocale(); break;
-		case 8: testSetDefaultLocaleExists(); break;
-		case 9: testSetDefaultLocaleNotExists(); break;
-		case 10: testUnsetDefaultLocale(); break;
-		case 11: testSetToDefault(); break;
-		case 12: testSetToDefaultNoDefault(); break;
-		case 13: testDestroyLocale(); break;
-		case 14: testDestroyLocaleNotExist(); break;
-		case 15: testDestroyCurrentLocale(); break;
-		case 16: testDestroyDefaultLocale(); break;
-		case 17: testAvailableLocales(); break;
-		case 18: testGetNextLocale(); break;
-		case 19: testGetLocaleMap(); break;
-		case 20: testGetLocaleMapNotExist(); break;
-		case 21: testTextMapping(); break;
-		case 22: testTextMappingOverwrite(); break;
-		case 23: testGetText(); break;
-		case 24: testGetTextNoCurrentLocale(); break;
-		case 25: testLocalizationObservers(); break;
-		case 26: testLocalizationObserverUpdateOnRegister(); break;
-		case 27: testNullArgs(); break;
-		case 28: testSerialization(); break;
-		case 29: testLinearSub(); break;
-		case 30: testHashSub(); break;
-		case 31: testFallbacks(); break;
+		case 1: return "testEmpty";
+		case 2: return "testAddLocale";
+		case 3: return "testAddLocaleWithData";
+		case 4: return "testAddExistingLocale";
+		case 5: return "testSetCurrentLocaleExists";
+		case 6: return "testSetCurrentLocaleNotExists";
+		case 7: return "testUnsetCurrentLocale";
+		case 8: return "testSetDefaultLocaleExists";
+		case 9: return "testSetDefaultLocaleNotExists";
+		case 10: return "testUnsetDefaultLocale";
+		case 11: return "testSetToDefault";
+		case 12: return "testSetToDefaultNoDefault";
+		case 13: return "testDestroyLocale";
+		case 14: return "testDestroyLocaleNotExist";
+		case 15: return "testDestroyCurrentLocale";
+		case 16: return "testDestroyDefaultLocale";
+		case 17: return "testAvailableLocales";
+		case 18: return "testGetNextLocale";
+		case 19: return "testGetLocaleMap";
+		case 20: return "testGetLocaleMapNotExist";
+		case 21: return "testTextMapping";
+		case 22: return "testTextMappingOverwrite";
+		case 23: return "testGetText";
+		case 24: return "testGetTextNoCurrentLocale";
+		case 25: return "testLocalizationObservers";
+		case 26: return "testLocalizationObserverUpdateOnRegister";
+		case 27: return "testNullArgs";
+		case 28: return "testSerialization";
+		case 29: return "testLinearSub";
+		case 30: return "testHashSub";
+		case 31: return "testFallbacks";
 
 		}
+		throw new IllegalStateException("Unexpected index");
 	}
 
 	private void testSerialize (Localizer l, String msg) {
@@ -916,7 +907,7 @@ public class LocalizerTest extends TestCase  {
 	}
 
 
-	private void testFallbacks() {
+	public void testFallbacks() {
 		Localizer localizer =  new Localizer(true,true);
 
 		localizer.addAvailableLocale("one");

@@ -16,10 +16,9 @@
 
 package org.javarosa.core.model.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import java.util.ArrayList;
 
@@ -51,22 +50,12 @@ public class QuestionDefTest extends TestCase {
 	FormEntryPrompt fep = null;
 	FormParseInit fpi = null;
 	
-	public QuestionDefTest(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-		initStuff();
+	public QuestionDefTest(String testName) {
+		super(testName);
+		System.out.println("Running " + this.getClass().getName() + " test: " + testName + "...");
 	}
-	
-	public QuestionDefTest(String name) {
-		super(name);
-		initStuff();
-	}
-	
-	public QuestionDefTest() {
-		super();
-		initStuff();
-	}	
-	
-	public void initStuff(){
+
+	public void setUp(){
 		fpi = new FormParseInit();
 		q = fpi.getFirstQuestionDef();
 		fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());
@@ -79,16 +68,12 @@ public class QuestionDefTest extends TestCase {
 		pf = ExtUtil.defaultPrototypes();
 	}
 		
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 		System.out.println("Running QuestionDefTest tests...");
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new QuestionDefTest("QuestionDef Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((QuestionDefTest)tc).doTest(testID);
-				}
-			}));
+			aSuite.addTest(new QuestionDefTest(doTest(testID)));
 		}
 			
 		return aSuite;
@@ -99,14 +84,15 @@ public class QuestionDefTest extends TestCase {
 	}
 	
 	public final static int NUM_TESTS = 5;
-	public void doTest (int i) {
+	public static String doTest (int i) {
 		switch (i) {
-		case 1: testConstructors(); break;
-		case 2: testAccessorsModifiers(); break;
-		case 3: testChild(); break;
-		case 4: testFlagObservers(); break;
-		case 5: testReferences(); break;
+		case 1: return "testConstructors";
+		case 2: return "testAccessorsModifiers";
+		case 3: return "testChild";
+		case 4: return "testFlagObservers";
+		case 5: return "testReferences";
 		}
+		throw new IllegalStateException("unexpected index value");
 	}
 	
 	public void testConstructors () {

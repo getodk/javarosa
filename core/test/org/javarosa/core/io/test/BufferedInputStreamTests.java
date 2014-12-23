@@ -16,14 +16,14 @@
 
 package org.javarosa.core.io.test;
 
-import j2meunit.framework.Test;
-import j2meunit.framework.TestCase;
-import j2meunit.framework.TestMethod;
-import j2meunit.framework.TestSuite;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Random;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.javarosa.core.io.BufferedInputStream;
 import org.javarosa.core.util.ArrayUtilities;
@@ -38,10 +38,7 @@ public class BufferedInputStreamTests extends TestCase{
 	
 	private static int NUM_TESTS = 2;
 	
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		
 		Random r = new Random();
@@ -53,49 +50,40 @@ public class BufferedInputStreamTests extends TestCase{
 		}
 	}
 	
-	public BufferedInputStreamTests(String name, TestMethod rTestMethod) {
-		super(name, rTestMethod);
-	}
-
 	public BufferedInputStreamTests(String name) {
 		super(name);
+		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
 	}
 
-	public BufferedInputStreamTests() {
-		super();
-	}	
-
-	public Test suite() {
+	public static Test suite() {
 		TestSuite aSuite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new BufferedInputStreamTests("DateData Test " + i, new TestMethod() {
-				public void run (TestCase tc) {
-					((BufferedInputStreamTests)tc).testMaster(testID);
-				}
-			}));
+			aSuite.addTest(new BufferedInputStreamTests(testMaster(testID)));
 		}
 
 		return aSuite;
 	}
-	public void testMaster (int testID) {
+	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
 		switch (testID) {
-		case 1: testBuffered(); break;
-		case 2: testIndividual(); break;
+		case 1: return "testBuffered";
+		case 2: return "testIndividual";
 		}
+		throw new IllegalStateException("unexpected index");
 	}
 	
-	private void testBuffered() {
+	public void testBuffered() {
 		//TODO: Test on this axis too?
 		byte[] testBuffer = new byte[256];
 		
 		for(byte[] bytes : arraysToTest) {
+			BufferedInputStream bis = null;
 			try {
-				BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
+				bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				
 				boolean done = false; 
@@ -110,20 +98,30 @@ public class BufferedInputStreamTests extends TestCase{
 				
 				
 				if(!ArrayUtilities.arraysEqual(bytes, baos.toByteArray())) {
-					this.fail("Bulk BufferedInputStream read failed at size " + bytes.length);
+					fail("Bulk BufferedInputStream read failed at size " + bytes.length);
 				}
 			} catch(Exception e) {
-				this.fail("Exception while testing bulk read for " + bytes.length + " size: " + e.getMessage());
+				fail("Exception while testing bulk read for " + bytes.length + " size: " + e.getMessage());
 				continue;
+			} finally {
+				if ( bis != null ) {
+					try {
+						bis.close();
+					} catch (IOException e) {
+						// ignore
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
 
-	private void testIndividual() {
+	public void testIndividual() {
 		//TODO: Almost identical to above
 		for(byte[] bytes : arraysToTest) {
+			BufferedInputStream bis = null;
 			try {
-				BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
+				bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
 				int position = 0;
 				
 				boolean done = false; 
@@ -133,17 +131,26 @@ public class BufferedInputStreamTests extends TestCase{
 						break;
 					} else {
 						if(bytes[position] != (byte)read) {
-							this.fail("one-by-one BIS read failed at size " + bytes.length + " at position " + position);
+							fail("one-by-one BIS read failed at size " + bytes.length + " at position " + position);
 						}
 					}
 					position++;
 				}
 				if(position != bytes.length) {
-					this.fail("one-by-one BIS read failed to read full array of size " + bytes.length + " only read " + position);
+					fail("one-by-one BIS read failed to read full array of size " + bytes.length + " only read " + position);
 				}
 			} catch(Exception e) {
-				this.fail("Exception while testing buffered read for " + bytes.length + " size: " + e.getMessage());
+				fail("Exception while testing buffered read for " + bytes.length + " size: " + e.getMessage());
 				continue;
+			} finally {
+				if ( bis != null ) {
+					try {
+						bis.close();
+					} catch (IOException e) {
+						// ignore
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}

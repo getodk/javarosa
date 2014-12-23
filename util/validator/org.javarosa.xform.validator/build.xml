@@ -38,7 +38,6 @@
 			<zipfileset dir="${build.dir}/classes" prefix="" />
 			<zipfileset src="${base.dir}/tools/javarosa-libraries.jar" />
 			<zipfileset src="${lib.dir}/kxml2-2.3.0.jar" />
-			<zipfileset src="${lib.dir}/regexp-me.jar" />
 			<zipfileset src="${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar" />
 			<fileset dir="${build.dir}/classes" />
 			<manifest>
@@ -60,7 +59,7 @@
 		<javac 
 			srcdir="${build.dir}/src"
 			destdir="${build.dir}/classes" 
-			classpath="${base.dir}/tools/javarosa-libraries.jar:${lib.dir}/kxml2-2.3.0.jar:${lib.dir}/regexp-me.jar:${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar"
+			classpath="${base.dir}/tools/javarosa-libraries.jar:${lib.dir}/kxml2-2.3.0.jar:${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar"
 			includeAntRuntime="false"
 			debug="${build.debug}" 
 			deprecation="${build.deprecation}" />
