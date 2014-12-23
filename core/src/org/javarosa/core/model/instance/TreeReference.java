@@ -474,6 +474,31 @@ public class TreeReference implements Externalizable {
 		return sb.toString();
 	}
 
+	//For debugging purposes only.
+	public String toShortString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < size(); i++) {
+			int mult = getMultiplicity(i);
+
+			switch (mult) {
+				case INDEX_UNBOUND: break;
+				case INDEX_TEMPLATE: sb.append("[@template]"); break;
+				case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
+				default:
+					if ((i > 0 || mult != 0) && mult !=-4) {
+						if (sb.length() > 0) {
+							sb.append("_");
+						}
+						sb.append(mult + 1);
+					}
+					break;
+			}
+		}
+
+		return getNameLast() + " [" + sb.toString() + "]";
+	}
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		refLevel = ExtUtil.readInt(in);

@@ -64,6 +64,7 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.debug.EvaluationResult;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
@@ -1080,10 +1081,31 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // in the order they appear in 'triggerables'
       Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
 
-      for (int i = 0; i < triggerablesDAG.size(); i++) {
-         QuickTriggerable qt = triggerablesDAG.get(i);
+      List<TreeReference> firedAnchors = new ArrayList<TreeReference>();
+
+      for (QuickTriggerable qt : triggerablesDAG) {
          if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-            evaluateTriggerable(qt, anchorRef);
+
+            TreeReference contextAnchor = anchorRef;
+
+            TreeReference affectedTrigger = qt.t.findAffectedTrigger(firedAnchors);
+            if (affectedTrigger != null) {
+               contextAnchor = affectedTrigger;
+            }
+
+            List<EvaluationResult> evaluationResults = evaluateTriggerable(qt, contextAnchor);
+
+            if (evaluationResults.size() > 0) {
+               fired.add(qt);
+
+               for (EvaluationResult evaluationResult : evaluationResults) {
+                  TreeReference affectedRef = evaluationResult.getAffectedRef();
+                  if (!firedAnchors.contains(affectedRef)) {
+                     firedAnchors.add(affectedRef);
+                  }
+               }
+            }
+
 
             fired.add(qt);
          }
@@ -1095,13 +1117,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Step 3 in DAG cascade. evaluate the individual triggerable expressions
     * against the anchor (the value that changed which triggered recomputation)
-    *
-    * @param qt
+    *  @param qt
     *           The triggerable to be updated
     * @param anchorRef
-    *           The reference to the value which was changed.
     */
-   private void evaluateTriggerable(QuickTriggerable qt, TreeReference anchorRef) {
+   private List<EvaluationResult> evaluateTriggerable(QuickTriggerable qt, TreeReference anchorRef) {
 
       // Contextualize the reference used by the triggerable against the anchor
       TreeReference contextRef = qt.t.contextualizeContextRef(anchorRef);
@@ -1109,13 +1129,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
          // Now identify all of the fully qualified nodes which this triggerable
          // updates. (Multiple nodes can be updated by the same trigger)
-         List<TreeReference> v = exprEvalContext.expandReference(contextRef);
+         List<TreeReference> qualifiedList = exprEvalContext.expandReference(contextRef);
+
+         List<EvaluationResult> evaluationResults = new ArrayList<EvaluationResult>(0);
 
          // Go through each one and evaluate the trigger expresion
-         for (int i = 0; i < v.size(); i++) {
-            EvaluationContext ec = new EvaluationContext(exprEvalContext, v.get(i));
-            qt.t.apply(mainInstance, ec, v.get(i), this);
+         for (TreeReference qualified : qualifiedList) {
+            EvaluationContext ec = new EvaluationContext(exprEvalContext, qualified);
+            evaluationResults.addAll(qt.t.apply(mainInstance, ec, qualified, this));
          }
+
+         return evaluationResults;
       } catch (Exception e) {
          throw new WrappedException("Error evaluating field '" + contextRef.getNameLast() + "': "
                + e.getMessage(), e);
