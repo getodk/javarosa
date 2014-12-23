@@ -40,8 +40,8 @@ import java.util.List;
  *
  */
 public class Localizer implements Externalizable {
-	private List<String> locales; /* Vector<String> */
-	private OrderedMap<String, List<LocaleDataSource>> localeResources; /* String -> Vector<LocaleDataSource> */
+	private List<String> locales; /* List<String> */
+	private OrderedMap<String, List<LocaleDataSource>> localeResources; /* String -> List<LocaleDataSource> */
 	private OrderedMap<String, PrefixTreeNode> currentLocaleData; /* HashMap{ String -> String } */
 	private PrefixTree stringTree;
 	private String defaultLocale;

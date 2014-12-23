@@ -187,11 +187,11 @@ public class EvaluationContext {
 		return expandReference(ref, false);
 	}
 
-	// take in a potentially-ambiguous ref, and return a vector of refs for all nodes that match the passed-in ref
+	// take in a potentially-ambiguous ref, and return a List of refs for all nodes that match the passed-in ref
 	// meaning, search out all repeated nodes that match the pattern of the passed-in ref
-	// every ref in the returned vector will be unambiguous (no index will ever be INDEX_UNBOUND)
+	// every ref in the returned List will be unambiguous (no index will ever be INDEX_UNBOUND)
 	// does not return template nodes when matching INDEX_UNBOUND, but will match templates when INDEX_TEMPLATE is explicitly set
-	// return null if ref is relative, otherwise return vector of refs (but vector will be empty is no refs match)
+	// return null if ref is relative, otherwise return List of refs (but list will be empty is no refs match)
 	// '/' returns {'/'}
 	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
 	public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
@@ -219,7 +219,7 @@ public class EvaluationContext {
 	// sourceRef: original path we're matching against
 	// node: current node that has matched the sourceRef thus far
 	// workingRef: explicit path that refers to the current node
-	// refs: Vector to collect matching paths; if 'node' is a target node that
+	// refs: List to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
 	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates) {
 		int depth = workingRef.size();

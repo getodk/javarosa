@@ -337,11 +337,10 @@ public class April2014DagImpl extends IDag {
 			return;
 		}
 
-		// Our vector doesn't have a shallow copy op, so make one
-		ArrayList<QuickTriggerable> triggeredCopy = new ArrayList<QuickTriggerable>(
-				triggered);
+		ArrayList<QuickTriggerable> triggeredCopy =
+				new ArrayList<QuickTriggerable>(triggered);
 
-		// Evaluate all of the triggerables in our new vector
+		// Evaluate all of the triggerables in our new list
 		evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref,
 				cascadeToChildrenOfGroupsWithRelevanceExpressions);
 	}

@@ -378,7 +378,7 @@ public class ExtUtil {
 		if (a == null) {
 			return b == null;
 		} else if (a instanceof List) {
-			return (b instanceof List && vectorEquals((List)a, (List)b));
+			return (b instanceof List && listEquals((List)a, (List)b));
 		} else if (a instanceof HashMap) {
 			return (b instanceof HashMap && hashMapEquals((HashMap) a, (HashMap) b));
 		} else {
@@ -386,7 +386,7 @@ public class ExtUtil {
 		}
 	}
 
-	public static boolean vectorEquals (List a, List b) {
+	public static boolean listEquals (List a, List b) {
 		if ( a == b ) {
 			return true;
 		}

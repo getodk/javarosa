@@ -591,7 +591,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	/**
-	 * get value of the bind attribute with namespace:name' in the vector
+	 * get value of the bind attribute with namespace:name' in the list
 	 *
 	 * @return String
 	 */
@@ -705,7 +705,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	/* (non-Javadoc)
-	 * get namespace of attribute at 'index' in the vector
+	 * get namespace of attribute at 'index' in the list
 	 *
 	 * @param index
 	 * @return String
@@ -716,7 +716,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	/* (non-Javadoc)
-	 * get name of attribute at 'index' in the vector
+	 * get name of attribute at 'index' in the list
 	 *
 	 * @param index
 	 * @return String
@@ -727,7 +727,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	/* (non-Javadoc)
-	 * get value of attribute at 'index' in the vector
+	 * get value of attribute at 'index' in the list
 	 *
 	 * @param index
 	 * @return String
@@ -774,7 +774,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	/* (non-Javadoc)
-	 * get value of attribute with namespace:name' in the vector
+	 * get value of attribute with namespace:name' in the list
 	 *
 	 * @param index
 	 * @return String
@@ -824,11 +824,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		flags = ExtUtil.readInt(in);
 		value = (IAnswerData) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
 
-		// children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new
+		// children = ExtUtil.nullIfEmpty((List)ExtUtil.read(in, new
 		// ExtWrapList(TreeElement.class), pf));
 
 		// Jan 22, 2009 - csims@dimagi.com
-		// old line: children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new
+		// old line: children = ExtUtil.nullIfEmpty((List)ExtUtil.read(in, new
 		// ExtWrapList(TreeElement.class), pf));
 		// New Child deserialization
 		// 1. read null status as boolean

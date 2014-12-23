@@ -261,7 +261,7 @@ public class LegacyDagImpl extends IDag {
 		ArrayList<QuickTriggerable> triggeredCopy = new ArrayList<QuickTriggerable>(
 				triggered);
 
-		// Evaluate all of the triggerables in our new vector
+		// Evaluate all of the triggerables in our new List
 		evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref,
 				cascadeToChildrenOfGroupsWithRelevanceExpressions);
 	}
@@ -274,7 +274,7 @@ public class LegacyDagImpl extends IDag {
 	 * evaluations.
 	 *
 	 * @param tv
-	 *            A vector of all of the trigerrables directly triggered by the
+	 *            A list of all of the trigerrables directly triggered by the
 	 *            value changed
 	 * @param anchorRef
 	 *            The reference to original value that was updated

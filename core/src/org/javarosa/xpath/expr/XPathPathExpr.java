@@ -232,7 +232,7 @@ public class XPathPathExpr extends XPathExpression {
 
 		// this makes no sense...
 //		if (ref.isAbsolute() && m.getTemplatePath(ref) == null) {
-//			Vector<TreeReference> nodesetRefs = new Vector<TreeReference>();
+//			List<TreeReference> nodesetRefs = new List<TreeReference>();
 //			return new XPathNodeset(nodesetRefs, m, ec);
 //		}
 

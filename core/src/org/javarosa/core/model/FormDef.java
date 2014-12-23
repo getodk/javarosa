@@ -115,7 +115,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    
    private IDag dagImpl;
    
-   public EvaluationContext exprEvalContext;
+   private EvaluationContext exprEvalContext;
 
    private QuestionPreloader preloader = new QuestionPreloader();
 
@@ -249,7 +249,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    /**
-    * Dereference the form index and return a Vector of all interstitial nodes
+    * Dereference the form index and return a List of all interstitial nodes
     * (top-level parent first; index target last)
     *
     * Ignore 'new-repeat' node for now; just return/stop at ref to
@@ -423,7 +423,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       collapseIndex(index, indexes, multiplicities, elements);
 
       // loop backwards through the elements, removing objects from each
-      // vector, until we find a repeat
+      // list, until we find a repeat
       // TODO: should probably check to make sure size > 0
       for (int i = elements.size() - 1; i >= 0; i--) {
          IFormElement e = elements.get(i);
