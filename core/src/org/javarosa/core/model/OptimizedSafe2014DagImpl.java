@@ -32,17 +32,17 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.form.api.FormEntryController;
 
 /**
- * The safe (Latest_safest) eval logic for 2014
+ * The safe eval logic for 2014
  *
  * @author mitchellsundt@gmail.com
  * @author meletis@surveycto.com
  *
  */
-public class Safe2014DagImpl extends IDag {
+public class OptimizedSafe2014DagImpl extends IDag {
 
    private final EvalBehavior mode = EvalBehavior.Safe_2014;
 
-   public Safe2014DagImpl() {
+   public OptimizedSafe2014DagImpl() {
       super();
    }
 

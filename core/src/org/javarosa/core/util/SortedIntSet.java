@@ -19,7 +19,8 @@ package org.javarosa.core.util;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -29,10 +30,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 //maintain an array of integers in sorted order. no duplicates allowed.
 public class SortedIntSet implements Externalizable {
-	Vector<Integer> v;
+	List<Integer> v;
 
 	public SortedIntSet () {
-		v = new Vector<Integer>(0);
+		v = new ArrayList<Integer>(0);
 	}
 
 	//add new value; return index inserted at if value was not already present, -1 if it was
@@ -41,7 +42,7 @@ public class SortedIntSet implements Externalizable {
 		if (i != -1 && get(i) == n) {
 			return -1;
 		} else {
-			v.insertElementAt(Integer.valueOf(n), i + 1);
+			v.add(i+1,Integer.valueOf(n));
 			return i + 1;
 		}
 	}
@@ -50,13 +51,13 @@ public class SortedIntSet implements Externalizable {
 	public int remove (int n) {
 		int i = indexOf(n, true);
 		if (i != -1)
-			v.removeElementAt(i);
+			v.remove(i);
 		return i;
 	}
 
 	//return value at index
 	public int get (int i) {
-		return v.elementAt(i).intValue();
+		return v.get(i).intValue();
 	}
 
 	//return whether value is present
@@ -92,12 +93,12 @@ public class SortedIntSet implements Externalizable {
 	}
 
 	//return underlying vector (outside modification may corrupt the datastructure)
-	public Vector getVector () {
+	public List<Integer> getList () {
 		return v;
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		v = (Vector<Integer>)ExtUtil.read(in, new ExtWrapList(Integer.class));
+		v = (List<Integer>)ExtUtil.read(in, new ExtWrapList(Integer.class));
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

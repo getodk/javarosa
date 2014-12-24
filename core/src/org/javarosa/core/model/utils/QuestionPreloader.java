@@ -127,7 +127,7 @@ public class QuestionPreloader {
 			}
 			
 			public boolean handlePostProcess(TreeElement node, String params) {
-				Vector kids = node.getChildren();
+				List kids = node.getChildren();
 				Enumeration en = kids.elements();
 				while(en.hasMoreElements()) {
 					TreeElement kid = (TreeElement)en.nextElement();

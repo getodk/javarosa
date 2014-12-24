@@ -24,29 +24,56 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.parse.XFormParserReporter;
 
 /**
- * Abstract interface of the DAG management and triggerable processing logic
+ * Abstract interface of the DAG management and triggerable processing logic.
+ * 
+ * Some method bodies are intentionally duplicated in the derived classes
+ * so as to ensure that future changes do not affect the existing implementations.
  *
  * @author mitchellsundt@gmail.com
  *
  */
 public abstract class IDag {
 
-	// this list is topologically ordered, meaning for any tA and tB in
+   // NOT VALID UNTIL finalizeTriggerables() is called!!
+   //
+   // Topologically ordered list, meaning that for any tA and tB in
 	// the list, where tA comes before tB, evaluating tA cannot depend on any
-	// result from evaluating tB
-	protected ArrayList<QuickTriggerable> triggerablesDAG;
+	// result from evaluating tB. 
+	protected final ArrayList<QuickTriggerable> triggerablesDAG
+	   = new ArrayList<QuickTriggerable>();
+
+	// NOT VALID UNTIL finalizeTriggerables() is called!!
+   // 
+   // Associates repeatable nodes with the Condition that determines their
+   // relevance.
+	protected final HashMap<TreeReference, QuickTriggerable> conditionRepeatTargetIndex
+      = new HashMap<TreeReference, QuickTriggerable>();
+
+   // Maps a tree reference to the set of triggerables that need to be
+   // processed when the value at this reference changes.
+	protected final HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex 
+      = new HashMap<TreeReference, ArrayList<QuickTriggerable>>();
+
+   // List of all the triggerables in the form. Unordered.
+	protected final ArrayList<QuickTriggerable> unorderedTriggerables
+      = new ArrayList<QuickTriggerable>();
 
 	/**
 	 * The EvalBehavior that the implementation provides.
@@ -118,6 +145,73 @@ public abstract class IDag {
 			TreeElement copyToElement, boolean cascadeToGroupChildren);
 
 	/**
+	 * Add the triggerables to the dataset prior to finalizing.
+	 * 
+	 * @param t triggerable to add
+	 */
+
+   private final QuickTriggerable findTriggerable(Triggerable t) {
+      for (QuickTriggerable qt : unorderedTriggerables) {
+         if (t.equals(qt.t)) {
+            return qt;
+         }
+      }
+      return null;
+   }
+
+   /**
+    * Add the triggerables to the dataset prior to finalizing.
+    * 
+    * @param mainInstance
+    * @param evalContext
+    * @param t
+    */
+   public final Triggerable addTriggerable(Triggerable t) {
+      QuickTriggerable qt = findTriggerable(t);
+      if (qt != null) {
+         // one node may control access to many nodes; this means many nodes
+         // effectively have the same condition
+         // let's identify when conditions are the same, and store and calculate
+         // it only once
+
+         // nov-2-2011: ctsims - We need to merge the context nodes together
+         // whenever we do this (finding the highest
+         // common ground between the two), otherwise we can end up failing to
+         // trigger when the ignored context
+         // exists and the used one doesn't
+
+         Triggerable existingTriggerable = qt.t;
+
+         existingTriggerable.changeContextRefToIntersectWithTriggerable(t);
+
+         return existingTriggerable;
+
+         // note, if the contextRef is unnecessarily deep, the condition will be
+         // evaluated more times than needed
+         // perhaps detect when 'identical' condition has a shorter contextRef,
+         // and use that one instead?
+
+      } else {
+         qt = new QuickTriggerable(t);
+         unorderedTriggerables.add(qt);
+
+         Set<TreeReference> triggers = t.getTriggers();
+         for (TreeReference trigger : triggers) {
+            ArrayList<QuickTriggerable> triggered = triggerIndex.get(trigger);
+            if (triggered == null) {
+               triggered = new ArrayList<QuickTriggerable>();
+               triggerIndex.put(trigger.clone(), triggered);
+            }
+            if (!triggered.contains(qt)) {
+               triggered.add(qt);
+            }
+         }
+
+         return t;
+      }
+   }
+	
+	/**
 	 * Initialize the triggerableDAG array and the triggerIndex array.
 	 * 
 	 * @param mainInstance
@@ -127,9 +221,7 @@ public abstract class IDag {
 	 * @throws IllegalStateException
 	 */
 	public abstract void finalizeTriggerables(FormInstance mainInstance,
-			EvaluationContext evalContext,
-			ArrayList<QuickTriggerable> unorderedTriggereables,
-			HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex)
+			EvaluationContext evalContext)
 			throws IllegalStateException;
 
 	/**
@@ -145,8 +237,21 @@ public abstract class IDag {
 	public abstract void initializeTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference rootRef,
 			boolean cascadeToGroupChildren);
+	
+	/**
+	 * Invoked to validate a filled-in form. Sweeps through from beginning
+	 * to end, confirming that the entered values satisfy all constraints.
+	 * The FormEntryController is based upon the FormDef, but has its own
+	 * model and controller independent of anything at the UI layer.
+	 * 
+	 * @param formEntryControllerToBeValidated
+	 * @param markCompleted
+	 * @return
+	 */
+   public abstract ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted);
+   
 
-	protected void publishSummary(String lead,
+	protected final void publishSummary(String lead,
 			Set<QuickTriggerable> quickTriggerables) {
 		System.out.println(lead + ": " + quickTriggerables.size()
 				+ " triggerables were fired.");
@@ -155,7 +260,7 @@ public abstract class IDag {
 	/**
 	 * For debugging - note that path assumes Android device
 	 */
-	public void printTriggerables() {
+	public final void printTriggerables() {
 		OutputStreamWriter w = null;
 		try {
 			w = new OutputStreamWriter(new FileOutputStream(new File(
@@ -190,7 +295,7 @@ public abstract class IDag {
 	 * @param action
 	 * @return
 	 */
-	public IConditionExpr getConditionExpressionForTrueAction(
+	public final IConditionExpr getConditionExpressionForTrueAction(
 			FormInstance mainInstance, TreeElement instanceNode, int action) {
 		IConditionExpr expr = null;
 		for (int i = 0; i < triggerablesDAG.size() && expr == null; i++) {
@@ -220,4 +325,107 @@ public abstract class IDag {
 		}
 		return expr;
 	}
+	
+	/**
+	 * API for retrieving the list of conditions, for use when
+	 * serializing the form definition (e.g., into .cache file).
+	 * @return
+	 */  
+   public final ArrayList<Condition> getConditions() {
+      ArrayList<Condition> conditions = new ArrayList<Condition>();
+      for ( QuickTriggerable qt : unorderedTriggerables ) {
+         if ( qt.t instanceof Condition ) {
+            conditions.add((Condition) qt.t);
+         }
+      }
+      return conditions;
+   }
+   
+	/**
+	 * API for retrieving thelist of recalculates, for use when
+	 * serializing the form definition (e.g., into .cache file).
+	 * @return
+	 */
+   public final ArrayList<Recalculate> getRecalculates() {
+      ArrayList<Recalculate> recalculates = new ArrayList<Recalculate>();
+      for ( QuickTriggerable qt : unorderedTriggerables ) {
+         if ( qt.t instanceof Recalculate ) {
+            recalculates.add((Recalculate) qt.t);
+         }
+      }
+      return recalculates;
+   }
+
+   public final void reportDependencyCycles (XFormParserReporter reporter) {
+      HashSet<TreeReference> vertices = new HashSet<TreeReference>();
+      ArrayList<TreeReference[]> edges = new ArrayList<TreeReference[]>();
+
+      //build graph
+      ArrayList<TreeReference> targets = new ArrayList<TreeReference>();
+      for (TreeReference trigger : triggerIndex.keySet()) {
+         if (!vertices.contains(trigger))
+            vertices.add(trigger);
+         ArrayList<QuickTriggerable> triggered = triggerIndex.get(trigger);
+         targets.clear();
+         for (QuickTriggerable qt : triggered ) {
+            Triggerable t = qt.t;
+            for (int j = 0; j < t.getTargets().size(); j++) {
+               TreeReference target = t.getTargets().get(j);
+               if (!targets.contains(target))
+                  targets.add(target);
+            }
+         }
+
+         for (int i = 0; i < targets.size(); i++) {
+            TreeReference target = targets.get(i);
+            if (!vertices.contains(target))
+               vertices.add(target);
+
+            TreeReference[] edge = {trigger, target};
+            edges.add(edge);
+         }
+      }
+
+      //find cycles
+      boolean acyclic = true;
+      HashSet<TreeReference> leaves = new HashSet<TreeReference>(vertices.size());
+      while (vertices.size() > 0) {
+         //determine leaf nodes
+         leaves.clear();
+         leaves.addAll(vertices);
+         for (int i = 0; i < edges.size(); i++) {
+            TreeReference[] edge = (TreeReference[])edges.get(i);
+            leaves.remove(edge[0]);
+         }
+
+         //if no leaf nodes while graph still has nodes, graph has cycles
+         if (leaves.size() == 0) {
+            acyclic = false;
+            break;
+         }
+
+         //remove leaf nodes and edges pointing to them
+         for (TreeReference leaf : leaves ) {
+            vertices.remove(leaf);
+         }
+         for (int i = edges.size() - 1; i >= 0; i--) {
+            TreeReference[] edge = (TreeReference[])edges.get(i);
+            if (leaves.contains(edge[1]))
+               edges.remove(i);
+         }
+      }
+
+      if (!acyclic) {
+         StringBuilder b = new StringBuilder();
+         b.append("XPath Dependency Cycle:\n");
+         for (int i = 0; i < edges.size(); i++) {
+            TreeReference[] edge = edges.get(i);
+            b.append(edge[0].toString()).append(" => ").append(edge[1].toString()).append("\n");
+         }
+         reporter.error(b.toString());
+
+         throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
+      }
+   }
+
 }

@@ -16,9 +16,9 @@
 
 package org.javarosa.core.services;
 
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.properties.Property;
@@ -70,7 +70,7 @@ public class PropertyManager implements IPropertyManager {
     /**
      * The list of rules
      */
-    private Vector rulesList;
+    private List<IPropertyRules> rulesList;
 
     /**
      * The persistent storage utility
@@ -82,7 +82,7 @@ public class PropertyManager implements IPropertyManager {
      */
     public PropertyManager() {
     	this.properties = (IStorageUtilityIndexed)StorageManager.getStorage(STORAGE_KEY);
-    	rulesList = new Vector(0);
+    	rulesList = new ArrayList<IPropertyRules>(0);
     }
 
     /**
@@ -95,9 +95,9 @@ public class PropertyManager implements IPropertyManager {
     public String getSingularProperty(String propertyName) {
     	String retVal = null;
         if((rulesList.size() == 0 || checkPropertyAllowed(propertyName))) {
-        	Vector value = getValue(propertyName);
+         List<String> value = getValue(propertyName);
         	if(value != null && value.size() == 1) {
-        		retVal = (String)value.elementAt(0);
+        		retVal = value.get(0);
         	}
         }
         if(retVal == null) {
@@ -116,7 +116,7 @@ public class PropertyManager implements IPropertyManager {
      * @return The String value of the property specified if it exists, and is the current ruleset, if one exists.
      * null if the property is denied by the current ruleset.
      */
-    public Vector getProperty(String propertyName) {
+    public List<String> getProperty(String propertyName) {
         if(rulesList.size() == 0) {
             return getValue(propertyName);
         }
@@ -137,8 +137,8 @@ public class PropertyManager implements IPropertyManager {
      * @param propertyValue The value that the property will be set to
      */
     public void setProperty(String propertyName, String propertyValue) {
-        Vector wrapper = new Vector(1);
-        wrapper.addElement(propertyValue);
+       List<String> wrapper = new ArrayList<String>(1);
+        wrapper.add(propertyValue);
         setProperty(propertyName, wrapper);
     }
 
@@ -147,8 +147,8 @@ public class PropertyManager implements IPropertyManager {
      * @param propertyName The property to be set
      * @param propertyValue The value that the property will be set to
      */
-    public void setProperty(String propertyName, Vector propertyValue) {
-    	Vector oldValue = getProperty(propertyName);
+    public void setProperty(String propertyName, List<String> propertyValue) {
+      List<String> oldValue = getProperty(propertyName);
     	if(oldValue != null && vectorEquals(oldValue, propertyValue)) {
     		//No point in redundantly setting values!
     		return;
@@ -158,12 +158,11 @@ public class PropertyManager implements IPropertyManager {
         }
         else {
             boolean valid = true;
-            Enumeration en = propertyValue.elements();
-            while(en.hasMoreElements()) {
-                // RL - checkPropertyAllowed is implicit in checkValueAllowed
-                if (!checkValueAllowed(propertyName, (String)en.nextElement())) {
-                    valid = false;
-                }
+            for ( String pv : propertyValue ) {
+               // RL - checkPropertyAllowed is implicit in checkValueAllowed
+               if ( !checkValueAllowed(propertyName, pv)) {
+                  valid = false;
+               }
             }
             if(valid) {
                 writeValue(propertyName, propertyValue);
@@ -178,12 +177,12 @@ public class PropertyManager implements IPropertyManager {
 
     }
 
-    private boolean vectorEquals(Vector v1, Vector v2) {
+    private boolean vectorEquals(List<String> v1, List<String> v2) {
     	if(v1.size() != v2.size()) {
     		return false;
     	} else {
     		for(int i = 0; i < v1.size() ; ++i ) {
-    			if(!v1.elementAt(i).equals(v2.elementAt(i))) {
+    			if(!v1.get(i).equals(v2.get(i))) {
     				return false;
     			}
     		}
@@ -196,7 +195,7 @@ public class PropertyManager implements IPropertyManager {
      *
      * @return The rulesets being used by this property manager
      */
-    public Vector getRules(){
+    public List<IPropertyRules> getRules(){
         return rulesList;
     }
 
@@ -207,8 +206,8 @@ public class PropertyManager implements IPropertyManager {
      * @param rules The rules to be used.
      */
     public void setRules(IPropertyRules rules) {
-        this.rulesList.removeAllElements();
-        this.rulesList.addElement(rules);
+        this.rulesList.clear();
+        this.rulesList.add(rules);
     }
 
     /**
@@ -220,7 +219,7 @@ public class PropertyManager implements IPropertyManager {
      */
     public void addRules(IPropertyRules rules) {
     	if(rules != null) {
-    		this.rulesList.addElement(rules);
+    		this.rulesList.add(rules);
     	}
     }
 
@@ -235,13 +234,12 @@ public class PropertyManager implements IPropertyManager {
     		return true;
     	} else {
     		boolean allowed = false;
-    		Enumeration en = rulesList.elements();
-    		//We're fine if we return true, inclusive rules sets
-    		while(en.hasMoreElements() && !allowed) {
-    			IPropertyRules rules = (IPropertyRules)en.nextElement();
-    			if(rules.checkPropertyAllowed(propertyName)) {
-    				allowed = true;
-    			}
+         //We're fine if we return true, inclusive rules sets
+    		for ( IPropertyRules rules : rulesList ) {
+    		   if (rules.checkPropertyAllowed(propertyName)) {
+    		      allowed = true;
+    		      break;
+    		   }
     		}
     		return allowed;
     	}
@@ -260,14 +258,13 @@ public class PropertyManager implements IPropertyManager {
 			return true;
 		} else {
 			boolean allowed = false;
-			Enumeration en = rulesList.elements();
-			while (en.hasMoreElements() && !allowed) {
-				IPropertyRules rules = (IPropertyRules) en.nextElement();
-				if (rules.checkPropertyAllowed(propertyName)) {
-					if (rules.checkValueAllowed(propertyName, propertyValue)) {
-						allowed = true;
-					}
-				}
+			for ( IPropertyRules rules : rulesList ) {
+			   if (rules.checkPropertyAllowed(propertyName)) {
+			      if (rules.checkValueAllowed(propertyName, propertyValue)) {
+			         allowed = true;
+			         break;
+			      }
+			   }
 			}
 			return allowed;
 		}
@@ -284,18 +281,15 @@ public class PropertyManager implements IPropertyManager {
     		return;
     	}
 
-    	boolean notified = false;
-    	Enumeration rules = rulesList.elements();
-    	while(rules.hasMoreElements() && !notified) {
-    		IPropertyRules therules = (IPropertyRules)rules.nextElement();
-    		if(therules.checkPropertyAllowed(property)) {
-    			therules.handlePropertyChanges(property);
-    		}
+    	for ( IPropertyRules therules : rulesList ) {
+         if(therules.checkPropertyAllowed(property)) {
+            therules.handlePropertyChanges(property);
+         }
     	}
 
     }
 
-    public Vector getValue (String name) {
+    public List<String> getValue (String name) {
     	try {
     		Property p = (Property)properties.getRecordForValue("NAME", name);
 	       	return p.value;
@@ -304,14 +298,14 @@ public class PropertyManager implements IPropertyManager {
     	}
     }
 
-    public void writeValue(String propertyName, Vector value) {
+    public void writeValue(String propertyName, List<String> value) {
         Property theProp = new Property();
         theProp.name = propertyName;
         theProp.value = value;
 
-        Vector IDs = properties.getIDsForValue("NAME", propertyName);
+        List<Integer> IDs = properties.getIDsForValue("NAME", propertyName);
         if (IDs.size() == 1) {
-        	theProp.setID(((Integer)IDs.elementAt(0)).intValue());
+        	theProp.setID(IDs.get(0).intValue());
         }
 
         try {

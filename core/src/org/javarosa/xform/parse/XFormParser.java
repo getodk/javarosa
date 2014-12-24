@@ -16,22 +16,35 @@
 
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.*;
-
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormDef.EvalBehavior;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.QuickTriggerable;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.condition.*;
+import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.Constraint;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -63,9 +76,6 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.*;
-import java.util.*;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -735,7 +745,7 @@ public class XFormParser {
 
 	}
 
-	protected void processAdditionalAttributes(QuestionDef question, Element e, List usedAtts) {
+	protected void processAdditionalAttributes(QuestionDef question, Element e, List<String> usedAtts) {
 		// save all the unused attributes verbatim...
 		for(int i=0;i<e.getAttributeCount();i++){
 			String name = e.getAttributeName(i);
@@ -1601,7 +1611,7 @@ public class XFormParser {
 		return false;
 	}
 
-	protected DataBinding processStandardBindAttributes( List usedAtts, Element e) {
+	protected DataBinding processStandardBindAttributes( List<String> usedAtts, Element e) {
 		usedAtts.add(ID_ATTR);
 		usedAtts.add(NODESET_ATTR);
 		usedAtts.add("type");
@@ -2564,75 +2574,7 @@ public class XFormParser {
 	}
 
 	private void checkDependencyCycles () {
-		HashSet<TreeReference> vertices = new HashSet<TreeReference>();
-		ArrayList<TreeReference[]> edges = new ArrayList<TreeReference[]>();
-
-		//build graph
-      ArrayList<TreeReference> targets = new ArrayList<TreeReference>();
-      for (TreeReference trigger : _f.triggerIndex.keySet()) {
-			if (!vertices.contains(trigger))
-				vertices.add(trigger);
-			ArrayList<QuickTriggerable> triggered = _f.triggerIndex.get(trigger);
-			targets.clear();
-			for (QuickTriggerable qt : triggered ) {
-				Triggerable t = qt.t;
-				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = t.getTargets().get(j);
-					if (!targets.contains(target))
-						targets.add(target);
-				}
-			}
-
-			for (int i = 0; i < targets.size(); i++) {
-				TreeReference target = targets.get(i);
-				if (!vertices.contains(target))
-					vertices.add(target);
-
-				TreeReference[] edge = {trigger, target};
-				edges.add(edge);
-			}
-		}
-
-		//find cycles
-		boolean acyclic = true;
-      HashSet<TreeReference> leaves = new HashSet<TreeReference>(vertices.size());
-		while (vertices.size() > 0) {
-			//determine leaf nodes
-		   leaves.clear();
- 		   leaves.addAll(vertices);
-			for (int i = 0; i < edges.size(); i++) {
-				TreeReference[] edge = (TreeReference[])edges.get(i);
-				leaves.remove(edge[0]);
-			}
-
-			//if no leaf nodes while graph still has nodes, graph has cycles
-			if (leaves.size() == 0) {
-				acyclic = false;
-				break;
-			}
-
-			//remove leaf nodes and edges pointing to them
-			for (TreeReference leaf : leaves ) {
-				vertices.remove(leaf);
-			}
-			for (int i = edges.size() - 1; i >= 0; i--) {
-				TreeReference[] edge = (TreeReference[])edges.get(i);
-				if (leaves.contains(edge[1]))
-					edges.remove(i);
-			}
-		}
-
-		if (!acyclic) {
-			StringBuilder b = new StringBuilder();
-			b.append("XPath Dependency Cycle:\n");
-			for (int i = 0; i < edges.size(); i++) {
-				TreeReference[] edge = edges.get(i);
-				b.append(edge[0].toString()).append(" => ").append(edge[1].toString()).append("\n");
-			}
-			reporter.error(b.toString());
-
-			throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
-		}
+	   _f.reportDependencyCycles(reporter);
 	}
 
 	public void loadXmlInstance(FormDef f, Reader xmlReader) throws IOException {
