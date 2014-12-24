@@ -41,8 +41,8 @@ public class LegacyDagImpl extends IDag {
 	private final EvalBehavior mode = EvalBehavior.Legacy;
 
 	
-	public LegacyDagImpl() {
-	   super();
+	public LegacyDagImpl(EventNotifierAccessor accessor) {
+	   super(accessor);
 	}
 
 	@Override

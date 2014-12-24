@@ -40,8 +40,8 @@ public class April2014DagImpl extends IDag {
 
    private final EvalBehavior mode = EvalBehavior.April_2014;
 
-   public April2014DagImpl() {
-      super();
+   public April2014DagImpl(EventNotifierAccessor accessor) {
+      super(accessor);
    }
 
    @Override

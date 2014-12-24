@@ -29,6 +29,8 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.debug.EvaluationResult;
+import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
 
 /**
@@ -42,7 +44,8 @@ public class Fast2014DagImpl extends IDag {
 
 	private final EvalBehavior mode = EvalBehavior.Fast_2014;
 
-	public Fast2014DagImpl() {
+	public Fast2014DagImpl(EventNotifierAccessor accessor) {
+		super(accessor);
 	}
 
 	@Override
@@ -65,8 +68,8 @@ public class Fast2014DagImpl extends IDag {
 				new HashSet<QuickTriggerable>(0));
 		publishSummary("Deleted " + deleteRef.toString(true), alreadyEvaluated);
 
-		evaluateChildrenTriggerables(mainInstance, evalContext,
-				deletedElement, true, alreadyEvaluated);
+		evaluateChildrenTriggerables(mainInstance, evalContext, deletedElement,
+				false, true, alreadyEvaluated);
 	}
 
 	@Override
@@ -90,13 +93,13 @@ public class Fast2014DagImpl extends IDag {
 				qtSet1);
 		alreadyEvaluated.addAll(qtSet2);
 
-		evaluateChildrenTriggerables(mainInstance, evalContext,
-				createdElement, true, alreadyEvaluated);
+		evaluateChildrenTriggerables(mainInstance, evalContext, createdElement,
+				true, true, alreadyEvaluated);
 	}
 
 	private void evaluateChildrenTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeElement newNode,
-			boolean cascadeToGroupChildren,
+			boolean createdOrDeleted, boolean cascadeToGroupChildren,
 			Set<QuickTriggerable> alreadyEvaluated) {
 		// iterate into the group children and evaluate any triggerables that
 		// depend one them, if they are not already calculated.
@@ -106,8 +109,8 @@ public class Fast2014DagImpl extends IDag {
 			Set<QuickTriggerable> childTriggerables = triggerTriggerables(
 					mainInstance, evalContext, anchorRef,
 					cascadeToGroupChildren, alreadyEvaluated);
-			publishSummary("Node created/deleted: " + anchorRef.toString(true),
-					childTriggerables);
+			publishSummary((createdOrDeleted ? "Created" : "Deleted")
+					+ anchorRef.toString(true), childTriggerables);
 		}
 	}
 
@@ -147,16 +150,16 @@ public class Fast2014DagImpl extends IDag {
 	 */
 	@Override
 	public void finalizeTriggerables(FormInstance mainInstance,
-			EvaluationContext evalContext)
-			throws IllegalStateException {
+			EvaluationContext evalContext) throws IllegalStateException {
 		//
 		// DAGify the triggerables based on dependencies and sort them so that
 		// triggerables come only after the triggerables they depend on
 		//
 
 		ArrayList<QuickTriggerable> vertices = new ArrayList<QuickTriggerable>(
-		      unorderedTriggerables);
+				unorderedTriggerables);
 		triggerablesDAG.clear();
+
 		ArrayList<QuickTriggerable[]> partialOrdering = new ArrayList<QuickTriggerable[]>();
 		HashSet<QuickTriggerable> deps = new HashSet<QuickTriggerable>();
 		HashSet<QuickTriggerable> newDestinationSet = new HashSet<QuickTriggerable>();
@@ -207,7 +210,10 @@ public class Fast2014DagImpl extends IDag {
 				throw new IllegalStateException(message);
 			}
 
-			// order the root nodes - so the order is fixed
+			// order the root nodes - mainly for clean textual diffs when
+			// printing
+			// When this code is rewritten to use HashSet, this will become
+			// important.
 			orderedRoots.clear();
 			orderedRoots.addAll(roots);
 			Collections.sort(orderedRoots,
@@ -238,7 +244,7 @@ public class Fast2014DagImpl extends IDag {
 			if (qt.t instanceof Condition) {
 				ArrayList<TreeReference> targets = qt.t.getTargets();
 				for (int j = 0; j < targets.size(); j++) {
-					TreeReference target = targets.get(j);
+					TreeReference target = (TreeReference) targets.get(j);
 					if (mainInstance.getTemplate(target) != null) {
 						conditionRepeatTargetIndex.put(target, qt);
 					}
@@ -267,7 +273,8 @@ public class Fast2014DagImpl extends IDag {
 			Set<QuickTriggerable> newDestinationSet,
 			boolean cascadeToGroupChildren) {
 		if (qt.t.canCascade()) {
-			if (!cascadeToGroupChildren) {
+			if (mode == EvalBehavior.Legacy
+					|| (mode == EvalBehavior.Fast_2014 && !cascadeToGroupChildren)) {
 				for (int j = 0; j < qt.t.getTargets().size(); j++) {
 					TreeReference target = qt.t.getTargets().get(j);
 					ArrayList<QuickTriggerable> triggered = triggerIndex
@@ -282,36 +289,52 @@ public class Fast2014DagImpl extends IDag {
 					}
 				}
 			} else {
-				boolean expandRepeatables = true;
+				boolean expandRepeatables = mode != EvalBehavior.Legacy
+						&& mode != EvalBehavior.April_2014;
 
 				for (int j = 0; j < qt.t.getTargets().size(); j++) {
-					TreeReference target = qt.t.getTargets().get(j);
+					TreeReference target = (TreeReference) qt.t.getTargets()
+							.get(j);
 					Set<TreeReference> updatedNodes = new HashSet<TreeReference>();
 					updatedNodes.add(target);
 
 					// For certain types of triggerables, the update will affect
-					// not only the target, but also the children of the target.
-					// In that case, we want to add all of those nodes
+					// not
+					// only
+					// the target, but
+					// also the children of the target. In that case, we want to
+					// add
+					// all
+					// of those nodes
 					// to the list of updated elements as well.
 					if (qt.t.isCascadingToChildren()) {
-						addChildrenOfReference(mainInstance, evalContext,
-								target, updatedNodes, expandRepeatables);
+						addChildrenOfReference(mainInstance, evalContext, target, updatedNodes,
+								expandRepeatables);
 					}
 
 					// Now go through each of these updated nodes (generally
-					// just 1 for a normal calculation,
+					// just 1
+					// for a
+					// normal calculation,
 					// multiple nodes if there's a relevance cascade.
 					for (TreeReference ref : updatedNodes) {
 						// Check our index to see if that target is a Trigger
-						// for other conditions
+						// for
+						// other
+						// conditions
 						// IE: if they are an element of a different calculation
-						// or relevancy calc
+						// or
+						// relevancy calc
 
 						// We can't make this reference generic before now or
-						// we'll lose the target information,
+						// we'll
+						// lose the
+						// target information,
 						// so we'll be more inclusive than needed and see if any
-						// of our triggers are keyed on the predicate-less path
-						// of this ref
+						// of
+						// our
+						// triggers are keyed on
+						// the predicate-less path of this ref
 						ArrayList<QuickTriggerable> triggered = triggerIndex
 								.get(ref.hasPredicates() ? ref
 										.removePredicates() : ref);
@@ -321,7 +344,8 @@ public class Fast2014DagImpl extends IDag {
 							// found
 							for (QuickTriggerable qu : triggered) {
 								// And add them to the queue if they aren't
-								// there already
+								// there
+								// already
 								if (!destinationSet.contains(qu)) {
 									destinationSet.add(qu);
 									newDestinationSet.add(qu);
@@ -346,8 +370,8 @@ public class Fast2014DagImpl extends IDag {
 	 *            value changed
 	 * @param anchorRef
 	 */
-	private Set<QuickTriggerable> evaluateTriggerables(
-			FormInstance mainInstance, EvaluationContext evalContext,
+	private Set<QuickTriggerable> evaluateTriggerables(FormInstance mainInstance,
+			EvaluationContext evalContext,
 			Set<QuickTriggerable> tv, TreeReference anchorRef,
 			boolean cascadeToGroupChildren,
 			Set<QuickTriggerable> alreadyEvaluated) {
@@ -355,12 +379,30 @@ public class Fast2014DagImpl extends IDag {
 
 		// Iterate through all of the currently known triggerables to be
 		// triggered
+		// Iterate through all of the currently known triggerables to be
+		// triggered
 		Set<QuickTriggerable> refSet = new HashSet<QuickTriggerable>(tv);
 		for (; !refSet.isEmpty();) {
 			Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
 			for (QuickTriggerable qt : refSet) {
-				fillTriggeredElements(mainInstance, evalContext, qt, tv,
-						newSet, cascadeToGroupChildren);
+				if (mode == EvalBehavior.Legacy
+						|| mode == EvalBehavior.April_2014
+						|| mode == EvalBehavior.Fast_2014) {
+					fillTriggeredElements(mainInstance, evalContext, qt, tv, newSet,
+							cascadeToGroupChildren);
+				} else if (mode == EvalBehavior.Safe_2014) {
+					// leverage the saved DAG edges.
+					// This may over-fill the set of triggerables.
+					// but should be faster than recomputing the edges.
+					// with value-change optimizations, this should be
+					// much faster.
+					for (QuickTriggerable qu : qt.t.getImmediateCascades()) {
+						if (!tv.contains(qu)) {
+							tv.add(qu);
+							newSet.add(qu);
+						}
+					}
+				}
 			}
 			refSet = newSet;
 		}
@@ -374,10 +416,33 @@ public class Fast2014DagImpl extends IDag {
 		// in the order they appear in 'triggerables'
 		Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
 
-		for (int i = 0; i < triggerablesDAG.size(); i++) {
-			QuickTriggerable qt = triggerablesDAG.get(i);
+		List<TreeReference> firedAnchors = new ArrayList<TreeReference>();
+
+		for (QuickTriggerable qt : triggerablesDAG) {
 			if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-				evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
+
+				TreeReference contextAnchor = anchorRef;
+
+				TreeReference affectedTrigger = qt.t
+						.findAffectedTrigger(firedAnchors);
+				if (affectedTrigger != null) {
+					contextAnchor = affectedTrigger;
+				}
+
+				List<EvaluationResult> evaluationResults = evaluateTriggerable(
+						mainInstance, evalContext, qt, contextAnchor);
+
+				if (evaluationResults.size() > 0) {
+					fired.add(qt);
+
+					for (EvaluationResult evaluationResult : evaluationResults) {
+						TreeReference affectedRef = evaluationResult
+								.getAffectedRef();
+						if (!firedAnchors.contains(affectedRef)) {
+							firedAnchors.add(affectedRef);
+						}
+					}
+				}
 
 				fired.add(qt);
 			}
@@ -389,13 +454,12 @@ public class Fast2014DagImpl extends IDag {
 	/**
 	 * Step 3 in DAG cascade. evaluate the individual triggerable expressions
 	 * against the anchor (the value that changed which triggered recomputation)
-	 *
+	 * 
 	 * @param qt
 	 *            The triggerable to be updated
 	 * @param anchorRef
-	 *            The reference to the value which was changed.
 	 */
-	private void evaluateTriggerable(FormInstance mainInstance,
+	private List<EvaluationResult> evaluateTriggerable(FormInstance mainInstance,
 			EvaluationContext evalContext, QuickTriggerable qt,
 			TreeReference anchorRef) {
 
@@ -407,14 +471,28 @@ public class Fast2014DagImpl extends IDag {
 			// Now identify all of the fully qualified nodes which this
 			// triggerable
 			// updates. (Multiple nodes can be updated by the same trigger)
-			List<TreeReference> v = evalContext.expandReference(contextRef);
+			List<TreeReference> qualifiedList = evalContext
+					.expandReference(contextRef);
+
+			List<EvaluationResult> evaluationResults = new ArrayList<EvaluationResult>(
+					0);
 
 			// Go through each one and evaluate the trigger expresion
-			for (int i = 0; i < v.size(); i++) {
+			for (TreeReference qualified : qualifiedList) {
 				EvaluationContext ec = new EvaluationContext(evalContext,
-						v.get(i));
-				qt.t.apply(mainInstance, ec, v.get(i));
+						qualified);
+				evaluationResults.addAll(qt.t.apply(mainInstance, ec,
+						qualified));
 			}
+
+			boolean fired = evaluationResults.size() > 0;
+			if (fired) {
+				accessor.getEventNotifier().publishEvent(
+						new Event(qt.t.getClass().getSimpleName(),
+								evaluationResults));
+			}
+
+			return evaluationResults;
 		} catch (Exception e) {
 			throw new WrappedException("Error evaluating field '"
 					+ contextRef.getNameLast() + "': " + e.getMessage(), e);
@@ -425,7 +503,7 @@ public class Fast2014DagImpl extends IDag {
 	 * This is a utility method to get all of the references of a node. It can
 	 * be replaced when we support dependent XPath Steps (IE: /path/to//)
 	 */
-	private void addChildrenOfReference(FormInstance mainInstance,
+	public void addChildrenOfReference(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference original,
 			Set<TreeReference> toAdd, boolean expandRepeatables) {
 		// original has already been added to the 'toAdd' list.
@@ -436,38 +514,35 @@ public class Fast2014DagImpl extends IDag {
 			for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
 				TreeElement child = repeatTemplate.getChildAt(i);
 				toAdd.add(child.getRef().genericize());
-				addChildrenOfElement(mainInstance, evalContext, child, toAdd,
-						expandRepeatables);
+				addChildrenOfElement(mainInstance, evalContext, child, toAdd, expandRepeatables);
 			}
 		} else {
-			List<TreeReference> refSet = evalContext.expandReference(original);
+			List<TreeReference> refSet = evalContext
+					.expandReference(original);
 			for (TreeReference ref : refSet) {
-				addChildrenOfElement(mainInstance, evalContext,
-						evalContext.resolveReference(ref), toAdd,
-						expandRepeatables);
+				addChildrenOfElement(mainInstance, evalContext, evalContext.resolveReference(ref),
+						toAdd, expandRepeatables);
 			}
 		}
 	}
 
 	// Recursive step of utility method
 	private void addChildrenOfElement(FormInstance mainInstance,
-			EvaluationContext evalContext, TreeElement el,
-			Set<TreeReference> toAdd, boolean expandRepeatables) {
+			EvaluationContext evalContext, TreeElement el, Set<TreeReference> toAdd,
+			boolean expandRepeatables) {
 		TreeElement repeatTemplate = expandRepeatables ? mainInstance
 				.getTemplatePath(el.getRef()) : null;
 		if (repeatTemplate != null) {
 			for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
 				TreeElement child = repeatTemplate.getChildAt(i);
 				toAdd.add(child.getRef().genericize());
-				addChildrenOfElement(mainInstance, evalContext, child, toAdd,
-						expandRepeatables);
+				addChildrenOfElement(mainInstance, evalContext, child, toAdd, expandRepeatables);
 			}
 		} else {
 			for (int i = 0; i < el.getNumChildren(); ++i) {
 				TreeElement child = el.getChildAt(i);
 				toAdd.add(child.getRef().genericize());
-				addChildrenOfElement(mainInstance, evalContext, child, toAdd,
-						expandRepeatables);
+				addChildrenOfElement(mainInstance, evalContext, child, toAdd, expandRepeatables);
 			}
 		}
 	}
@@ -521,8 +596,12 @@ public class Fast2014DagImpl extends IDag {
 			EvaluationContext evalContext, TreeReference ref,
 			boolean cascadeToGroupChildren) {
 
-		this.triggerTriggerables(mainInstance, evalContext, ref,
-				cascadeToGroupChildren, new HashSet<QuickTriggerable>(1));
+		Set<QuickTriggerable> qts = this.triggerTriggerables(mainInstance,
+				evalContext, ref, cascadeToGroupChildren,
+				new HashSet<QuickTriggerable>(1));
+		publishSummary(
+				"need triggerTriggrables attribution string to come through API",
+				qts);
 	}
 
 	private Set<QuickTriggerable> triggerTriggerables(
@@ -548,31 +627,37 @@ public class Fast2014DagImpl extends IDag {
 		return evaluateTriggerables(mainInstance, evalContext, triggeredCopy,
 				ref, cascadeToGroupChildren, alreadyEvaluated);
 	}
-	  
-   public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
 
-      formEntryControllerToBeValidated.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+	public ValidateOutcome validate(
+			FormEntryController formEntryControllerToBeValidated,
+			boolean markCompleted) {
 
-      int event;
-      while ((event =
-            formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
-          if (event != FormEntryController.EVENT_QUESTION) {
-              continue;
-          } else {
-              FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated.getModel().getFormIndex();
+		formEntryControllerToBeValidated.jumpToIndex(FormIndex
+				.createBeginningOfFormIndex());
 
-              int saveStatus = 
-                    formEntryControllerToBeValidated.answerQuestion(formControllerToBeValidatedFormIndex,
-                          formEntryControllerToBeValidated.getModel().getQuestionPrompt().getAnswerValue(), true, markCompleted);
-              if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
-                  // jump to the error
-               ValidateOutcome vo = new ValidateOutcome(formControllerToBeValidatedFormIndex,
-                     saveStatus);
-                  return vo;
-              }
-          }
-      }
-      return null;
-   }
+		int event;
+		while ((event = formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
+			if (event != FormEntryController.EVENT_QUESTION) {
+				continue;
+			} else {
+				FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated
+						.getModel().getFormIndex();
+
+				int saveStatus = formEntryControllerToBeValidated
+						.answerQuestion(formControllerToBeValidatedFormIndex,
+								formEntryControllerToBeValidated.getModel()
+										.getQuestionPrompt().getAnswerValue(),
+								true, markCompleted);
+				if (markCompleted
+						&& saveStatus != FormEntryController.ANSWER_OK) {
+					// jump to the error
+					ValidateOutcome vo = new ValidateOutcome(
+							formControllerToBeValidatedFormIndex, saveStatus);
+					return vo;
+				}
+			}
+		}
+		return null;
+	}
 
 }
