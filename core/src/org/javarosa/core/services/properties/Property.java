@@ -16,16 +16,16 @@
 
 package org.javarosa.core.services.properties;
 
-import org.javarosa.core.services.storage.IMetaData;
-import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.List;
+
+import org.javarosa.core.services.storage.IMetaData;
+import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * Property is an encapsulation of a record containing a property in the J2ME
@@ -38,7 +38,7 @@ import java.util.Vector;
  */
 public class Property implements Persistable, IMetaData {
     public String name;
-    public Vector value;
+    public List<String> value;
     public int recordId = -1;
 
     /** (non-Javadoc)
@@ -56,7 +56,7 @@ public class Property implements Persistable, IMetaData {
         }
         String fullString = b.toString();
         int nameindex = fullString.indexOf(",");
-        value = new Vector();
+        value = new ArrayList<String>();
         if(nameindex == -1) {
     		//#if debug.output==verbose
             System.out.println("WARNING: Property in RMS with no value:"+fullString);
@@ -70,11 +70,11 @@ public class Property implements Persistable, IMetaData {
         while(packedvalue.length() != 0) {
             int index = packedvalue.indexOf(",");
             if(index == -1) {
-                value.addElement(packedvalue);
+                value.add(packedvalue);
                 packedvalue = "";
             }
             else {
-                value.addElement(packedvalue.substring(0,index));
+                value.add(packedvalue.substring(0,index));
                 packedvalue = packedvalue.substring(index + 1, packedvalue.length());
             }
         }
@@ -89,9 +89,8 @@ public class Property implements Persistable, IMetaData {
         String outputString = name;
         // Note that this enumeration should contain at least one element, otherwise the
         // deserialization is invalid
-        Enumeration en = value.elements();
-        while(en.hasMoreElements()) {
-            outputString += "," + (String)en.nextElement();
+        for ( String v : value ) {
+           outputString += "," + v;
         }
 
         for(int i = 0 ; i < outputString.length(); ++i) {

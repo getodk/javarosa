@@ -23,11 +23,10 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormDef.QuickTriggerable;
+import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -133,7 +132,7 @@ public abstract class Triggerable implements Externalizable {
 
 	protected abstract Object eval (FormInstance instance, EvaluationContext ec);
 
-	protected abstract void apply (TreeReference ref, Object result, FormInstance instance, FormDef f);
+	protected abstract void apply (TreeReference ref, Object result, FormInstance mainInstance);
 
 	public abstract boolean canCascade ();
 
@@ -143,22 +142,22 @@ public abstract class Triggerable implements Externalizable {
 	 * @param parentContext
 	 * @param f
 	 */
-	public final List<EvaluationResult> apply (FormInstance instance, EvaluationContext parentContext, TreeReference context, FormDef f) {
+	public final void apply (FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
 		//The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
 		//for the actual expressions, so we need genericize that ref against the current context
 		TreeReference ungenericised = originalContextRef.contextualize(context);
 		EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
 
-		Object result = eval(instance, ec);
+		Object result = eval(mainInstance, ec);
 
 		List<EvaluationResult> affectedNodes = new ArrayList<EvaluationResult>(0);
-
+			TreeReference targetRef = targets.get(i).contextualize(ec.getContextRef());
 		for (TreeReference target : targets) {
 			TreeReference targetRef = target.contextualize(ec.getContextRef());
 			List<TreeReference> v = ec.expandReference(targetRef);
 
 			for (TreeReference affectedRef : v) {
-				apply(affectedRef, result, instance, f);
+				apply(affectedRef, result, mainInstance);
 
 				affectedNodes.add(new EvaluationResult(affectedRef, result));
 			}
@@ -281,7 +280,7 @@ public abstract class Triggerable implements Externalizable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < targets.size(); i++) {
-			sb.append(((TreeReference)targets.get(i)).toString());
+			sb.append(targets.get(i).toString());
 			if (i < targets.size() - 1)
 				sb.append(",");
 		}

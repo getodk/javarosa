@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.javarosa.core.model.FormDef;
@@ -232,7 +233,7 @@ public class XPathPathExpr extends XPathExpression {
 
 		// this makes no sense...
 //		if (ref.isAbsolute() && m.getTemplatePath(ref) == null) {
-//			Vector<TreeReference> nodesetRefs = new Vector<TreeReference>();
+//			List<TreeReference> nodesetRefs = new List<TreeReference>();
 //			return new XPathNodeset(nodesetRefs, m, ec);
 //		}
 
@@ -240,7 +241,7 @@ public class XPathPathExpr extends XPathExpression {
 
 		//to fix conditions based on non-relevant data, filter the nodeset by relevancy
 		for (int i = 0; i < nodesetRefs.size(); i++) {
-			if (!m.resolveReference((TreeReference)nodesetRefs.get(i)).isRelevant()) {
+			if (!m.resolveReference(nodesetRefs.get(i)).isRelevant()) {
 				nodesetRefs.remove(i);
 				i--;
 			}
@@ -417,9 +418,7 @@ public class XPathPathExpr extends XPathExpression {
 			ExtUtil.write(out, filtExpr);
 		}
 
-      List v = new ArrayList(steps.length);
-		for (int i = 0; i < steps.length; i++)
-			v.add(steps[i]);
+      List<XPathStep> v = Arrays.asList(steps);
 		ExtUtil.write(out, new ExtWrapList(v));
 	}
 

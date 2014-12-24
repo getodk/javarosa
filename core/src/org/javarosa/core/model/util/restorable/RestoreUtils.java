@@ -75,7 +75,7 @@ public class RestoreUtils {
 		FormInstance dm = newDataModel(r.getRestorableType());
 
 		if (r instanceof Persistable) {
-			addData(dm, RECORD_ID_TAG, new Integer(((Persistable)r).getID()));
+			addData(dm, RECORD_ID_TAG, Integer.valueOf(((Persistable)r).getID()));
 		}
 
 		return dm;
@@ -189,7 +189,7 @@ public class RestoreUtils {
 
 		List<TreeReference> v = new EvaluationContext(dm).expandReference(ref);
 		for (int i = 0; i < v.size(); i++) {
-			TreeElement e = dm.resolveReference((TreeReference)v.get(i));
+			TreeElement e = dm.resolveReference(v.get(i));
 			e.setDataType(dataType);
 		}
 	}
@@ -276,7 +276,7 @@ public class RestoreUtils {
 		List<TreeElement> children = e.getChildrenWithName(childName);
 
 		for (int i = 0; i < children.size(); i++) {
-			FormInstance child = subDataModel((TreeElement)children.get(i));
+			FormInstance child = subDataModel(children.get(i));
 
 			Restorable inst = (Restorable)PrototypeFactory.getInstance(type);
 

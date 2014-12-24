@@ -257,7 +257,7 @@ public class FormEntryCaption implements FormElementStateListener {
 
 		HashMap<String, Object> vars = new HashMap<String, Object>();
 		vars.put("name", title);
-		vars.put("n", new Integer(count));
+		vars.put("n", Integer.valueOf(count));
 		return form.fillTemplateString(caption, index.getReference(), vars);
 	}
 
@@ -293,8 +293,8 @@ public class FormEntryCaption implements FormElementStateListener {
 
 			HashMap<String, Object> vars = new HashMap<String, Object>();
 			vars.put("name", title);
-			vars.put("i", new Integer(ix));
-			vars.put("n", new Integer(count));
+			vars.put("i", Integer.valueOf(ix));
+			vars.put("n", Integer.valueOf(count));
 			vars.put("new", new Boolean(newrep));
 			return form.fillTemplateString(caption, index.getReference(), vars);
 		} else {

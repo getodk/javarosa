@@ -164,8 +164,8 @@ public class ASTNodeAbstractExpr extends ASTNode {
 		for (int i = start; i < end; i++) {
 			for (int j = 0; j < separators.length; j++) {
 				if (getTokenType(i) == separators[j]) {
-					part.separators.addElement(new Integer(separators[j]));
-					sepIdxs.addElement(new Integer(i));
+					part.separators.addElement(Integer.valueOf(separators[j]));
+					sepIdxs.addElement(Integer.valueOf(i));
 					break;
 				}
 			}
@@ -193,8 +193,8 @@ public class ASTNodeAbstractExpr extends ASTNode {
 		do {
 			k = indexOfBalanced(k, sep, leftPush, rightPop);
 			if (k != -1) {
-				sepIdxs.addElement(new Integer(k));
-				part.separators.addElement(new Integer(sep));
+				sepIdxs.addElement(Integer.valueOf(k));
+				part.separators.addElement(Integer.valueOf(sep));
 			}
 		} while (k != -1);
 				
