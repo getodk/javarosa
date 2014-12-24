@@ -16,9 +16,9 @@
 
 package org.javarosa.form.api;
 
-import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -478,7 +478,9 @@ public class FormEntryModel {
 
     public boolean isIndexCompoundContainer(FormIndex index) {
     	FormEntryCaption caption = getCaptionPrompt(index);
-    	return getEvent(index) == FormEntryController.EVENT_GROUP && caption.getAppearanceHint() != null && caption.getAppearanceHint().toLowerCase().equals("full");
+    	return getEvent(index) == FormEntryController.EVENT_GROUP &&
+    	      caption.getAppearanceHint() != null &&
+    	      caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
     }
 
     public boolean isIndexCompoundElement() {
@@ -680,16 +682,16 @@ public class FormEntryModel {
 		}
 	}
 
-	private void decrementHelper(List indexes, List multiplicities,	List elements) {
+	private void decrementHelper(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
 		int i = indexes.size() - 1;
 
 		if (i != -1) {
-			int curIndex = ((Integer) indexes.get(i)).intValue();
-			int curMult = ((Integer) multiplicities.get(i)).intValue();
+			int curIndex = indexes.get(i).intValue();
+			int curMult = multiplicities.get(i).intValue();
 
 			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
 				elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
-				((Integer)multiplicities.get(multiplicities.size() - 1)).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+				multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
 				multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
 				return;
 			} else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
@@ -729,7 +731,7 @@ public class FormEntryModel {
 		}
 	}
 
-	private boolean setRepeatNextMultiplicity(List elements, List multiplicities) {
+	private boolean setRepeatNextMultiplicity(List<IFormElement> elements, List<Integer> multiplicities) {
 		// find out if node is repeatable
 		TreeReference nodeRef = form.getChildInstanceRef(elements, multiplicities);
 		TreeElement node = form.getMainInstance().resolveReference(nodeRef);

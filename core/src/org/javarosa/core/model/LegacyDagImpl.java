@@ -17,7 +17,6 @@
 package org.javarosa.core.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.javarosa.core.log.WrappedException;
@@ -28,6 +27,7 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.form.api.FormEntryController;
 
 /**
  * The legacy eval logic on or before javarosa-2013-09-30.jar
@@ -40,20 +40,9 @@ public class LegacyDagImpl extends IDag {
 
 	private final EvalBehavior mode = EvalBehavior.Legacy;
 
-	// <TreeReference, Condition>;
-	// associates repeatable nodes with the Condition that determines their
-	// relevancy
-	private HashMap<TreeReference, QuickTriggerable> conditionRepeatTargetIndex;
-
-	// Maps a tree reference to the set of triggerables that need to be
-	// processed when the value at this reference changes.
-	private HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex;
-
+	
 	public LegacyDagImpl() {
-		triggerablesDAG = new ArrayList<QuickTriggerable>(0);
-		triggerIndex = new HashMap<TreeReference, ArrayList<QuickTriggerable>>(
-				0);
-		conditionRepeatTargetIndex = new HashMap<TreeReference, QuickTriggerable>();
+	   super();
 	}
 
 	@Override
@@ -111,11 +100,8 @@ public class LegacyDagImpl extends IDag {
 	 */
 	@Override
 	public void finalizeTriggerables(FormInstance mainInstance,
-			EvaluationContext evalContext,
-			ArrayList<QuickTriggerable> unorderedTriggereables,
-			HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex)
+			EvaluationContext evalContext)
 			throws IllegalStateException {
-		this.triggerIndex = triggerIndex;
 		//
 		// DAGify the triggerables based on dependencies and sort them so that
 		// triggerables come only after the triggerables they depend on
@@ -128,16 +114,15 @@ public class LegacyDagImpl extends IDag {
 		//
 
 		ArrayList<QuickTriggerable[]> partialOrdering = new ArrayList<QuickTriggerable[]>();
-		for (int i = 0; i < unorderedTriggereables.size(); i++) {
-			QuickTriggerable qt = unorderedTriggereables.get(i);
+		for (int i = 0; i < unorderedTriggerables.size(); i++) {
+			QuickTriggerable qt = unorderedTriggerables.get(i);
 			Triggerable t = qt.t;
 			ArrayList<QuickTriggerable> deps = new ArrayList<QuickTriggerable>();
 
 			if (t.canCascade()) {
 				for (int j = 0; j < t.getTargets().size(); j++) {
 					TreeReference target = t.getTargets().get(j);
-					ArrayList<QuickTriggerable> triggered = new ArrayList<QuickTriggerable>(
-							triggerIndex.get(target));
+					ArrayList<QuickTriggerable> triggered = triggerIndex.get(target);
 					if (triggered != null) {
 						for (int k = 0; k < triggered.size(); k++) {
 							QuickTriggerable qu = triggered.get(k);
@@ -156,9 +141,9 @@ public class LegacyDagImpl extends IDag {
 		}
 
 		ArrayList<QuickTriggerable> vertices = new ArrayList<QuickTriggerable>(
-				unorderedTriggereables);
+		      unorderedTriggerables);
 		ArrayList<QuickTriggerable> roots = new ArrayList<QuickTriggerable>(
-				unorderedTriggereables.size());
+		      unorderedTriggerables.size());
 
 		while (vertices.size() > 0) {
 			// determine root nodes
@@ -233,8 +218,7 @@ public class LegacyDagImpl extends IDag {
 			}
 		}
 
-		evaluateTriggerables(mainInstance, evalContext, applicable, rootRef,
-				cascadeToGroupChildren);
+		evaluateTriggerables(mainInstance, evalContext, applicable, rootRef);
 	}
 
 	/**
@@ -262,8 +246,7 @@ public class LegacyDagImpl extends IDag {
 				triggered);
 
 		// Evaluate all of the triggerables in our new List
-		evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref,
-				cascadeToChildrenOfGroupsWithRelevanceExpressions);
+		evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref);
 	}
 
 	/**
@@ -281,8 +264,7 @@ public class LegacyDagImpl extends IDag {
 	 */
 	private void evaluateTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, ArrayList<QuickTriggerable> tv,
-			TreeReference anchorRef,
-			boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+			TreeReference anchorRef) {
 
 		// add all cascaded triggerables to queue
 		for (int i = 0; i < tv.size(); i++) {
@@ -342,4 +324,31 @@ public class LegacyDagImpl extends IDag {
 					+ contextRef.getNameLast() + "': " + e.getMessage(), e);
 		}
 	}
+	
+   public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
+
+      formEntryControllerToBeValidated.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+
+      int event;
+      while ((event =
+            formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
+          if (event != FormEntryController.EVENT_QUESTION) {
+              continue;
+          } else {
+              FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated.getModel().getFormIndex();
+
+              int saveStatus = 
+                    formEntryControllerToBeValidated.answerQuestion(formControllerToBeValidatedFormIndex,
+                          formEntryControllerToBeValidated.getModel().getQuestionPrompt().getAnswerValue(), true, markCompleted);
+              if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
+                  // jump to the error
+               ValidateOutcome vo = new ValidateOutcome(formControllerToBeValidatedFormIndex,
+                     saveStatus);
+                  return vo;
+              }
+          }
+      }
+      return null;
+   }
+
 }

@@ -6,8 +6,10 @@ package org.javarosa.core.services.storage.util;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -208,19 +210,19 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.IStorageUtility#removeAll(org.javarosa.core.services.storage.EntityFilter)
 	 */
-	public Vector<Integer> removeAll(EntityFilter ef) {
-		Vector<Integer> removed = new Vector<Integer>();
-		for(Enumeration en = data.keys(); en.hasMoreElements() ;) {
+	public List<Integer> removeAll(EntityFilter ef) {
+	   ArrayList<Integer> removed = new ArrayList<Integer>();
+		for(Enumeration<Integer> en = data.keys(); en.hasMoreElements() ;) {
 			Integer i = (Integer)en.nextElement();
 			switch(ef.preFilter(i.intValue(),null)) {
 			case EntityFilter.PREFILTER_INCLUDE:
-				removed.addElement(i);
+				removed.add(i);
 				break;
 			case EntityFilter.PREFILTER_EXCLUDE:
 				continue;
 			}
 			if(ef.matches(data.get(i))) {
-				removed.addElement(i);
+				removed.add(i);
 			}
 		}
 		for(Integer i : removed) {

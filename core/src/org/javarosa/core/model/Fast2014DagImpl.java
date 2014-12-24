@@ -18,7 +18,6 @@ package org.javarosa.core.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +29,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.form.api.FormEntryController;
 
 /**
  * The fast (Latest_fastest) eval logic for 2014
@@ -42,18 +42,7 @@ public class Fast2014DagImpl extends IDag {
 
 	private final EvalBehavior mode = EvalBehavior.Fast_2014;
 
-	// <TreeReference, Condition>;
-	// associates repeatable nodes with the Condition that determines their
-	// relevancy
-	private HashMap<TreeReference, QuickTriggerable> conditionRepeatTargetIndex;
-
-	// Maps a tree reference to the set of triggerables that need to be
-	// processed when the value at this reference changes.
-	protected HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex;
-
 	public Fast2014DagImpl() {
-		triggerablesDAG = new ArrayList<QuickTriggerable>();
-		triggerIndex = new HashMap<TreeReference, ArrayList<QuickTriggerable>>();
 	}
 
 	@Override
@@ -158,18 +147,15 @@ public class Fast2014DagImpl extends IDag {
 	 */
 	@Override
 	public void finalizeTriggerables(FormInstance mainInstance,
-			EvaluationContext evalContext,
-			ArrayList<QuickTriggerable> unorderedTriggereables,
-			HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex)
+			EvaluationContext evalContext)
 			throws IllegalStateException {
-		this.triggerIndex = triggerIndex;
 		//
 		// DAGify the triggerables based on dependencies and sort them so that
 		// triggerables come only after the triggerables they depend on
 		//
 
 		ArrayList<QuickTriggerable> vertices = new ArrayList<QuickTriggerable>(
-				triggerablesDAG);
+		      unorderedTriggerables);
 		triggerablesDAG.clear();
 		ArrayList<QuickTriggerable[]> partialOrdering = new ArrayList<QuickTriggerable[]>();
 		HashSet<QuickTriggerable> deps = new HashSet<QuickTriggerable>();
@@ -246,7 +232,7 @@ public class Fast2014DagImpl extends IDag {
 		// build the condition index for repeatable nodes
 		//
 
-		conditionRepeatTargetIndex = new HashMap<TreeReference, QuickTriggerable>();
+		conditionRepeatTargetIndex.clear();
 		for (int i = 0; i < triggerablesDAG.size(); i++) {
 			QuickTriggerable qt = triggerablesDAG.get(i);
 			if (qt.t instanceof Condition) {
@@ -562,4 +548,31 @@ public class Fast2014DagImpl extends IDag {
 		return evaluateTriggerables(mainInstance, evalContext, triggeredCopy,
 				ref, cascadeToGroupChildren, alreadyEvaluated);
 	}
+	  
+   public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
+
+      formEntryControllerToBeValidated.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+
+      int event;
+      while ((event =
+            formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
+          if (event != FormEntryController.EVENT_QUESTION) {
+              continue;
+          } else {
+              FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated.getModel().getFormIndex();
+
+              int saveStatus = 
+                    formEntryControllerToBeValidated.answerQuestion(formControllerToBeValidatedFormIndex,
+                          formEntryControllerToBeValidated.getModel().getQuestionPrompt().getAnswerValue(), true, markCompleted);
+              if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
+                  // jump to the error
+               ValidateOutcome vo = new ValidateOutcome(formControllerToBeValidatedFormIndex,
+                     saveStatus);
+                  return vo;
+              }
+          }
+      }
+      return null;
+   }
+
 }

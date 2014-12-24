@@ -16,7 +16,7 @@
 
 package org.javarosa.core.services;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.services.properties.IPropertyRules;
 
@@ -28,10 +28,10 @@ import org.javarosa.core.services.properties.IPropertyRules;
  */
 public interface IPropertyManager {
 
-    public Vector getProperty(String propertyName);
+    public List<String> getProperty(String propertyName);
     public void setProperty(String propertyName, String propertyValue);
-    public void setProperty(String propertyName, Vector propertyValue);
+    public void setProperty(String propertyName, List<String> propertyValue);
     public String getSingularProperty(String propertyName);
     public void addRules(IPropertyRules rules);
-    public Vector getRules();   
+    public List<IPropertyRules> getRules();   
 }

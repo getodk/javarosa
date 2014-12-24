@@ -71,7 +71,11 @@ public class SelectMultiData implements IAnswerData {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 
-		vs = new ArrayList<Selection>((List<Selection>)o);
+		ArrayList<Selection> selections = new ArrayList<Selection>(((List<Object>) o).size());
+		for ( Object obj : (List<Object>) o) {
+			selections.add((Selection) obj);
+		}
+		vs = selections;
 	}
 
 	/*

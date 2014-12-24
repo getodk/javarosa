@@ -16,8 +16,9 @@
 
 package org.javarosa.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 import org.javarosa.core.services.PropertyManager;
 
@@ -25,10 +26,10 @@ public class PropertyUtils {
 
 	//need 'addpropery' too.
 	public static String initializeProperty(String propName, String defaultValue) {
-		Vector propVal = PropertyManager._().getProperty(propName);
+		List<String> propVal = PropertyManager._().getProperty(propName);
 		if (propVal == null || propVal.size() == 0) {
-			propVal = new Vector(1);
-			propVal.addElement(defaultValue);
+			propVal = new ArrayList<String>(1);
+			propVal.add(defaultValue);
 			PropertyManager._().setProperty(propName, propVal);
 			//#if debug.output==verbose
 			System.out.println("No default value for [" + propName
@@ -36,7 +37,7 @@ public class PropertyUtils {
 			//#endif
 			return defaultValue;
 		}
-		return (String) propVal.elementAt(0);
+		return propVal.get(0);
 	}
 
 

@@ -19,8 +19,9 @@ package org.javarosa.core.model.instance.utils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -28,9 +29,9 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -181,16 +182,16 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		boolean isGroup = !templ.isLeaf();
 
 		if (isGroup) {
-			Vector childTypes = new Vector(templ.getNumChildren());
+			List<String> childTypes = new ArrayList<String>(templ.getNumChildren());
 			for (int i = 0; i < templ.getNumChildren(); i++) {
 				String childName = templ.getChildAt(i).getName();
 				if (!childTypes.contains(childName)) {
-					childTypes.addElement(childName);
+					childTypes.add(childName);
 				}
 			}
 
 			for (int i = 0; i < childTypes.size(); i++) {
-				String childName = (String)childTypes.elementAt(i);
+				String childName = childTypes.get(i);
 
 				TreeReference childTemplRef = e.getRef().extendRef(childName, 0);
 				TreeElement childTempl = instance.getTemplatePath(childTemplRef);
@@ -254,11 +255,11 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		boolean isGroup = !templ.isLeaf();
 
 		if (isGroup) {
-			Vector childTypesHandled = new Vector(templ.getNumChildren());
+		   List<String> childTypesHandled = new ArrayList<String>(templ.getNumChildren());
 			for (int i = 0; i < templ.getNumChildren(); i++) {
 				String childName = templ.getChildAt(i).getName();
 				if (!childTypesHandled.contains(childName)) {
-					childTypesHandled.addElement(childName);
+					childTypesHandled.add(childName);
 
 					int mult = e.getChildMultiplicity(childName);
 					if (mult > 0 && !e.getChild(childName, 0).isRelevant()) {
@@ -310,7 +311,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 				} else if (answerType == SelectOneData.class) {
 					val = getSelectOne(ExtUtil.read(in, CHOICE_MODE == CHOICE_VALUE ? String.class : Integer.class));
 				} else if (answerType == SelectMultiData.class) {
-					val = getSelectMulti((Vector)ExtUtil.read(in, new ExtWrapList(CHOICE_MODE == CHOICE_VALUE ? String.class : Integer.class)));
+					val = getSelectMulti((List)ExtUtil.read(in, new ExtWrapList(CHOICE_MODE == CHOICE_VALUE ? String.class : Integer.class)));
 				} else {
 					switch (flag) {
 					case 0x40: answerType = StringData.class; break;
@@ -389,15 +390,15 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	}
 
 	/**
-	 * reduce a SelectMultiData to a vector of integers (index mode) or strings (value mode)
+	 * reduce a SelectMultiData to a list of integers (index mode) or strings (value mode)
 	 * @param data
 	 * @return
 	 */
-	private Vector compactSelectMulti (SelectMultiData data) {
-		Vector val = (Vector)data.getValue();
-		Vector choices = new Vector(val.size());
+	private List<Object> compactSelectMulti (SelectMultiData data) {
+	   List<Selection> val = (List<Selection>)data.getValue();
+		List<Object> choices = new ArrayList<Object>(val.size());
 		for (int i = 0; i < val.size(); i++) {
-			choices.addElement(extractSelection((Selection)val.elementAt(i)));
+			choices.add(extractSelection((Selection)val.get(i)));
 		}
 		return choices;
 	}
@@ -410,12 +411,12 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	}
 
 	/**
-	 * create a SelectMultiData from a vector of integers (index mode) or strings (value mode)
+	 * create a SelectMultiData from a list of integers (index mode) or strings (value mode)
 	 */
-	private SelectMultiData getSelectMulti (Vector v) {
-		Vector choices = new Vector(v.size());
+	private SelectMultiData getSelectMulti (List<Object> v) {
+	   List<Selection> choices = new ArrayList<Selection>(v.size());
 		for (int i = 0; i < v.size(); i++) {
-			choices.addElement(makeSelection(v.elementAt(i)));
+			choices.add(makeSelection(v.get(i)));
 		}
 		return new SelectMultiData(choices);
 	}

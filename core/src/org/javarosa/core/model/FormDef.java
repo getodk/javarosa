@@ -25,7 +25,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.condition.Condition;
@@ -57,7 +56,10 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.parse.XFormParserReporter;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
 
@@ -79,7 +81,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       Fast_2014
    };
 
-   public static final EvalBehavior recommendedMode = EvalBehavior.Fast_2014;
+   public static final EvalBehavior recommendedMode = EvalBehavior.Safe_2014;
 
    // used by FormDef() constructor
    private static EvalBehavior defaultMode = recommendedMode;
@@ -103,14 +105,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * A unique external name that is used to identify the form between machines
     */
    private Localizer localizer;
-   private ArrayList<QuickTriggerable> unorderedTriggerables;
 
-   private List<IConditionExpr> outputFragments; // <IConditionExpr> contents
-                                                   // of <output>
+   // <IConditionExpr> contents of <output>
    // tags that serve as parameterized
    // arguments to captions
-
-   public HashMap<TreeReference, ArrayList<QuickTriggerable>> triggerIndex;
+   private List<IConditionExpr> outputFragments; 
    
    private IDag dagImpl;
    
@@ -153,8 +152,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     	  break;
       default:
       }
-      unorderedTriggerables = new ArrayList<QuickTriggerable>();
-      triggerIndex = new HashMap<TreeReference, ArrayList<QuickTriggerable>>();
       // This is kind of a wreck...
       resetEvaluationContext();
       outputFragments = new ArrayList<IConditionExpr>();
@@ -613,15 +610,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode, cascadeToGroupChildren);
    }
 
-   public QuickTriggerable findTriggerable(Triggerable t) {
-      for (QuickTriggerable qt : unorderedTriggerables) {
-         if (t.equals(qt.t)) {
-            return qt;
-         }
-      }
-      return null;
-   }
-
    /**
     * Add a Condition to the form's Collection.
     *
@@ -629,52 +617,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           the condition to be set
     */
    public Triggerable addTriggerable(Triggerable t) {
-      QuickTriggerable qt = findTriggerable(t);
-      if (qt != null) {
-         // one node may control access to many nodes; this means many nodes
-         // effectively have the same condition
-         // let's identify when conditions are the same, and store and calculate
-         // it only once
-
-         // nov-2-2011: ctsims - We need to merge the context nodes together
-         // whenever we do this (finding the highest
-         // common ground between the two), otherwise we can end up failing to
-         // trigger when the ignored context
-         // exists and the used one doesn't
-
-         Triggerable existingTriggerable = qt.t;
-
-         existingTriggerable.changeContextRefToIntersectWithTriggerable(t);
-         dagImpl = null;
-
-         return existingTriggerable;
-
-         // note, if the contextRef is unnecessarily deep, the condition will be
-         // evaluated more times than needed
-         // perhaps detect when 'identical' condition has a shorter contextRef,
-         // and use that one instead?
-
-      } else {
-         qt = new QuickTriggerable(t);
-         unorderedTriggerables.add(qt);
-         dagImpl = null;
-
-         Set<TreeReference> triggers = t.getTriggers();
-         for (TreeReference trigger : triggers) {
-            ArrayList<QuickTriggerable> triggered = triggerIndex.get(trigger);
-            if (triggered == null) {
-               triggered = new ArrayList<QuickTriggerable>();
-               triggerIndex.put(trigger.clone(), triggered);
-            }
-            if (!triggered.contains(qt)) {
-               triggered.add(qt);
-            }
-         }
-
-         return t;
-      }
+      return dagImpl.addTriggerable(t);
    }
 
+   /**
+    * Report any dependency cycles based upon the triggerIndex array.
+    * (Does not require that the DAG be finalized).
+    * 
+    * @param reporter
+    */
+   public void reportDependencyCycles (XFormParserReporter reporter) {
+      dagImpl.reportDependencyCycles(reporter);
+   }
+   
    /**
     * Finalize the DAG associated with the form's triggered conditions. This
     * will create the appropriate ordering and dependencies to ensure the
@@ -689,7 +644,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       // DAGify the triggerables based on dependencies and sort them so that
       // triggerables come only after the triggerables they depend on
       //
-	  dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext(), unorderedTriggerables, triggerIndex);
+	  dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext());
    }
 
    /**
@@ -710,6 +665,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     */
    public void triggerTriggerables(TreeReference ref, boolean cascadeToGroupChildren) {
 	  dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, cascadeToGroupChildren);
+   }
+   
+   public ValidateOutcome validate(boolean markCompleted) {
+
+      FormEntryModel formEntryModelToBeValidated = new FormEntryModel(this);
+      FormEntryController formEntryControllerToBeValidated = new FormEntryController(formEntryModelToBeValidated);
+
+      return dagImpl.validate(formEntryControllerToBeValidated, markCompleted );
    }
 
    public boolean evaluateConstraint(TreeReference ref, IAnswerData data) {
@@ -818,7 +781,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                   String questionXpath = (String) args[1];
                   TreeReference ref = RestoreUtils.xfFact.ref(questionXpath);
 
-                  QuestionDef q = f.findQuestionByRef(ref, f);
+                  QuestionDef q = findQuestionByRef(ref, f);
                   if (q == null
                         || (q.getControlType() != Constants.CONTROL_SELECT_ONE && q
                               .getControlType() != Constants.CONTROL_SELECT_MULTI)) {
@@ -911,7 +874,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    public String fillTemplateString(String template, TreeReference contextRef,
          HashMap<String, ?> variables) {
-      HashMap args = new HashMap();
+      HashMap<String,String> args = new HashMap<String,String>();
 
       int depth = 0;
       List<String> outstandingArgs = Localizer.getArgs(template);
@@ -1165,7 +1128,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       setID(ExtUtil.readInt(dis));
       setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
       setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-      setChildren((List) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+      setChildren((List<IFormElement>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
       setInstance((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
 
       setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
@@ -1227,10 +1190,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       initializeTriggerables(TreeReference.rootRef(), false);
    }
 
-   private void publishSummary(String lead, Set<QuickTriggerable> quickTriggerables) {
-      System.out.println(lead + ": " + quickTriggerables.size() + " triggerables were fired.");
-   }
-
    /**
     * Writes the form definition object to the supplied stream.
     *
@@ -1246,16 +1205,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       ExtUtil.write(dos, getMainInstance());
       ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
-      List<Condition> conditions = new ArrayList<Condition>();
-      List<Recalculate> recalcs = new ArrayList<Recalculate>();
-      for (QuickTriggerable qt : unorderedTriggerables) {
-         Triggerable t = qt.t;
-         if (t instanceof Condition) {
-            conditions.add((Condition) t);
-         } else if (t instanceof Recalculate) {
-            recalcs.add((Recalculate) t);
-         }
-      }
+      List<Condition> conditions = dagImpl.getConditions();
+      List<Recalculate> recalcs = dagImpl.getRecalculates();
+
       ExtUtil.write(dos, new ExtWrapList(conditions));
       ExtUtil.write(dos, new ExtWrapList(recalcs));
 
@@ -1658,8 +1610,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * data should be retained.
     */
    public void seal() {
-      unorderedTriggerables = null;
-      triggerIndex = null;
       dagImpl = null;
       // We may need ths one, actually
       exprEvalContext = null;
