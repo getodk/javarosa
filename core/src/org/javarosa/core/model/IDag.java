@@ -36,6 +36,7 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParserReporter;
@@ -51,6 +52,12 @@ import org.javarosa.xform.parse.XFormParserReporter;
  */
 public abstract class IDag {
 
+	public interface EventNotifierAccessor {
+		public EventNotifier getEventNotifier();
+	}
+	
+	protected final EventNotifierAccessor accessor;
+	
    // NOT VALID UNTIL finalizeTriggerables() is called!!
    //
    // Topologically ordered list, meaning that for any tA and tB in
@@ -75,6 +82,10 @@ public abstract class IDag {
 	protected final ArrayList<QuickTriggerable> unorderedTriggerables
       = new ArrayList<QuickTriggerable>();
 
+	protected IDag(EventNotifierAccessor accessor) {
+		this.accessor = accessor;
+	}
+	
 	/**
 	 * The EvalBehavior that the implementation provides.
 	 * 

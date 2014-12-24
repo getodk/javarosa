@@ -42,8 +42,8 @@ public class Safe2014DagImpl extends IDag {
 
    private final EvalBehavior mode = EvalBehavior.Safe_2014;
 
-   public Safe2014DagImpl() {
-      super();
+   public Safe2014DagImpl(EventNotifierAccessor accessor) {
+      super(accessor);
    }
 
    @Override

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.javarosa.core.log.WrappedException;
+import org.javarosa.core.model.IDag.EventNotifierAccessor;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -56,6 +57,8 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.debug.EventNotifier;
+import org.javarosa.debug.EventNotifierSilent;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
@@ -85,10 +88,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    // used by FormDef() constructor
    private static EvalBehavior defaultMode = recommendedMode;
-   
+   private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
+
    // call this to change the mode used for evaluations.
    public static final void setEvalBehavior(EvalBehavior mode) {
       defaultMode = mode;
+   }
+
+   public static void setDefaultEventNotifier(EventNotifier eventNotifier) {
+      defaultEventNotifier = eventNotifier;
    }
 
    private List<IFormElement> children;// <IFormElement>
@@ -127,30 +135,40 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    private HashMap<String, List<Action>> eventListeners;
 
+   private EventNotifier eventNotifier;
+
    public FormDef() {
-      this(defaultMode);
+      this(defaultMode, defaultEventNotifier);
    }
    
    /**
 	 *
 	 */
-   public FormDef(EvalBehavior mode) {
+   public FormDef(EvalBehavior mode, EventNotifier eventNotifier) {
       setID(-1);
       setChildren(null);
+      final EventNotifierAccessor ia = new EventNotifierAccessor() {
+
+		@Override
+		public EventNotifier getEventNotifier() {
+			return this.getEventNotifier();
+		}};
+      
       switch ( mode ) {
       case Legacy:
-    	  dagImpl = new LegacyDagImpl();
+    	  dagImpl = new LegacyDagImpl(ia);
     	  break;
       case April_2014:
-    	  dagImpl = new April2014DagImpl();
+    	  dagImpl = new April2014DagImpl(ia);
     	  break;
       case Safe_2014:
-    	  dagImpl = new Safe2014DagImpl();
+    	  dagImpl = new Safe2014DagImpl(ia);
     	  break;
       case Fast_2014:
-    	  dagImpl = new Fast2014DagImpl();
+    	  dagImpl = new Fast2014DagImpl(ia);
     	  break;
       default:
+    	  throw new IllegalStateException("Unexpected mode");
       }
       // This is kind of a wreck...
       resetEvaluationContext();
@@ -159,6 +177,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       formInstances = new HashMap<String, FormInstance>();
       eventListeners = new HashMap<String, List<Action>>();
       extensions = new ArrayList<XFormExtension>();
+
+      this.eventNotifier = eventNotifier;
+   }
+
+   public EventNotifier getEventNotifier() {
+      return eventNotifier;
+   }
+
+   public void setEventNotifier(EventNotifier eventNotifier) {
+      this.eventNotifier = eventNotifier;
    }
 
    /**
