@@ -36,6 +36,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.XPathException;
 
@@ -57,9 +58,10 @@ public class Recalculate extends Triggerable {
 	  return evalRaw(model, ec);
 	}
 
-	public void apply (TreeReference ref, Object result, FormInstance model, FormDef f) {
-		int dataType = f.getMainInstance().resolveReference(ref).getDataType();
-		f.setAnswer(wrapData(result, dataType), ref);
+	public void apply (TreeReference ref, Object result, FormInstance mainInstance) {
+		TreeElement element = mainInstance.resolveReference(ref);
+		int dataType = element.getDataType();
+		element.setAnswer(wrapData(result, dataType));
 	}
 
 	public boolean canCascade () {

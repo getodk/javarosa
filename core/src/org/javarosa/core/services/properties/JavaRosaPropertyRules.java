@@ -16,15 +16,13 @@
 
 package org.javarosa.core.services.properties;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
-
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Vector;
 
 /**
  * A set of rules governing the allowable properties for JavaRosa's
@@ -34,9 +32,9 @@ import java.util.Vector;
  *
  */
 public class JavaRosaPropertyRules implements IPropertyRules {
-    HashMap rules;
+    HashMap<String,ArrayList<String>> rules;
 
-    Vector readOnlyProperties;
+    ArrayList<String> readOnlyProperties;
 
     public final static String DEVICE_ID_PROPERTY = "DeviceID";
     public final static String CURRENT_LOCALE = "cur_locale";
@@ -53,39 +51,39 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * Creates the JavaRosa set of property rules
      */
     public JavaRosaPropertyRules() {
-        rules = new HashMap();
-        readOnlyProperties = new Vector();
+        rules = new HashMap<String,ArrayList<String>>();
+        readOnlyProperties = new ArrayList<String>(2);
 
         //DeviceID Property
-        rules.put(DEVICE_ID_PROPERTY, new Vector(1));
-        Vector logs = new Vector(2);
-        logs.addElement(LOGS_ENABLED_NO);
-        logs.addElement(LOGS_ENABLED_YES);
+        rules.put(DEVICE_ID_PROPERTY, new ArrayList<String>(1));
+        ArrayList<String> logs = new ArrayList<String>(2);
+        logs.add(LOGS_ENABLED_NO);
+        logs.add(LOGS_ENABLED_YES);
         rules.put(LOGS_ENABLED, logs);
 
-        rules.put(CURRENT_LOCALE, new Vector(1));
+        rules.put(CURRENT_LOCALE, new ArrayList<String>(1));
 
-        rules.put(OPENROSA_API_LEVEL, new Vector(1));
+        rules.put(OPENROSA_API_LEVEL, new ArrayList<String>(1));
 
-        readOnlyProperties.addElement(DEVICE_ID_PROPERTY);
-        readOnlyProperties.addElement(OPENROSA_API_LEVEL);
+        readOnlyProperties.add(DEVICE_ID_PROPERTY);
+        readOnlyProperties.add(OPENROSA_API_LEVEL);
 
     }
 
     /** (non-Javadoc)
      *  @see org.javarosa.core.services.properties.IPropertyRules#allowableValues(String)
      */
-    public Vector allowableValues(String propertyName) {
+    public ArrayList<String> allowableValues(String propertyName) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
     		Localizer l = Localization.getGlobalLocalizerAdvanced();
     		String[] locales = l.getAvailableLocales();
-    		Vector v = new Vector(locales.length);
-    		for(int i = 0 ; i < locales.length ; ++i) {
-    			v.addElement(locales[i]);
+    		ArrayList<String> v = new ArrayList<String>(locales.length);
+    		for ( String locale : locales ) {
+    		   v.add(locale);
     		}
     		return v;
     	}
-        return (Vector)rules.get(propertyName);
+      return rules.get(propertyName);
     }
 
     /** (non-Javadoc)
@@ -95,15 +93,15 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     	if(CURRENT_LOCALE.equals(propertyName)) {
     		return Localization.getGlobalLocalizerAdvanced().hasLocale(potentialValue);
     	}
-        Vector prop = ((Vector)rules.get(propertyName));
+    	ArrayList<String> prop = rules.get(propertyName);
         if(prop.size() != 0) {
             //Check whether this is a dynamic property
-            if(prop.size() == 1 && checkPropertyAllowed((String)prop.elementAt(0))) {
+            if(prop.size() == 1 && checkPropertyAllowed(prop.get(0))) {
                 // If so, get its list of available values, and see whether the potentival value is acceptable.
-                return ((Vector)PropertyManager._().getProperty((String)prop.elementAt(0))).contains(potentialValue);
+                return PropertyManager._().getProperty(prop.get(0)).contains(potentialValue);
             }
             else {
-                return ((Vector)rules.get(propertyName)).contains(potentialValue);
+                return rules.get(propertyName).contains(potentialValue);
             }
         }
         else
@@ -113,27 +111,17 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     /** (non-Javadoc)
      *  @see org.javarosa.core.services.properties.IPropertyRules#allowableProperties()
      */
-    public Vector allowableProperties() {
-    	Set keys = rules.keySet();
-        Vector propList = new Vector(keys.size());
-        Enumeration iter = Collections.enumeration(keys);
-        while (iter.hasMoreElements()) {
-            propList.addElement(iter.nextElement());
-        }
-        return propList;
+    public ArrayList<String> allowableProperties() {
+    	Set<String> keys = rules.keySet();
+    	ArrayList<String> propList = new ArrayList<String>(keys);
+      return propList;
     }
 
     /** (non-Javadoc)
      *  @see org.javarosa.core.services.properties.IPropertyRules#checkPropertyAllowed)
      */
     public boolean checkPropertyAllowed(String propertyName) {
-        Enumeration iter = Collections.enumeration(rules.keySet());
-        while (iter.hasMoreElements()) {
-            if(propertyName.equals(iter.nextElement())) {
-                return true;
-            }
-        }
-        return false;
+       return rules.containsKey(propertyName);
     }
 
     /** (non-Javadoc)

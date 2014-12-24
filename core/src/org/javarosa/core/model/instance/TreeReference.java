@@ -400,7 +400,7 @@ public class TreeReference implements Externalizable {
 	}
 
 	public int hashCode () {
-		int hash = (new Integer(refLevel)).hashCode();
+		int hash = (Integer.valueOf(refLevel)).hashCode();
 		for (int i = 0; i < size(); i++) {
 			//NOTE(ctsims): It looks like this is only using Integer to
 			//get the hashcode method, but that method

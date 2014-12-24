@@ -25,7 +25,7 @@ public interface IFunctionHandler {
 	String getName();
 
 	/**
-	 * @return Vector of allowed prototypes for this function. Each prototype is
+	 * @return List of allowed prototypes for this function. Each prototype is
 	 *         an array of Class, corresponding to the types of the expected
 	 *         arguments. The first matching prototype is used.
 	 */

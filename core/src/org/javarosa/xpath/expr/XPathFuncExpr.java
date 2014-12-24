@@ -19,6 +19,7 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -121,9 +122,7 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-      List v = new ArrayList(args.length);
-		for (int i = 0; i < args.length; i++)
-			v.add(args[i]);
+      List<XPathExpression> v = Arrays.asList(args);
 
 		ExtUtil.write(out, id);
 		ExtUtil.write(out, new ExtWrapListPoly(v));

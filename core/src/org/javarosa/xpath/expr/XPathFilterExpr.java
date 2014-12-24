@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -67,14 +68,14 @@ public class XPathFilterExpr extends XPathExpression {
 		if (o instanceof XPathFilterExpr) {
 			XPathFilterExpr fe = (XPathFilterExpr)o;
 
-         List a = new ArrayList(predicates.length);
+         List<XPathExpression> a = new ArrayList<XPathExpression>(predicates.length);
 			for (int i = 0; i < predicates.length; i++)
 				a.add(predicates[i]);
-         List b = new ArrayList(fe.predicates.length);
+         List<XPathExpression> b = new ArrayList<XPathExpression>(fe.predicates.length);
 			for (int i = 0; i < fe.predicates.length; i++)
 				b.add(fe.predicates[i]);
 
-			return x.equals(fe.x) && ExtUtil.vectorEquals(a, b);
+			return x.equals(fe.x) && ExtUtil.listEquals(a, b);
 		} else {
 			return false;
 		}
@@ -90,9 +91,7 @@ public class XPathFilterExpr extends XPathExpression {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-      List v = new ArrayList(predicates.length);
-		for (int i = 0; i < predicates.length; i++)
-			v.add(predicates[i]);
+      List<XPathExpression> v = Arrays.asList(predicates);
 
 		ExtUtil.write(out, new ExtWrapTagged(x));
 		ExtUtil.write(out, new ExtWrapListPoly(v));

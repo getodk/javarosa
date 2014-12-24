@@ -16,7 +16,9 @@ package org.javarosa.model.xform;
  * the License.
  */
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import org.javarosa.core.data.IDataPointer;
@@ -58,12 +60,12 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 	/** The schema to be used to serialize answer data */
 	FormDef schema; // not used
 
-	Vector dataPointers;
+	private List<IDataPointer> dataPointers;
 
 	private void init() {
 		theSmsStr = null;
 		schema = null;
-		dataPointers = new Vector(0);
+		dataPointers = new ArrayList<IDataPointer>(0);
 		theSmsStr = "";
 	}
 
@@ -207,7 +209,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 				IDataPointer[] pointer = serializer
 						.retrieveExternalDataPointer(instanceNode.getValue());
 				for (int i = 0; i < pointer.length; ++i) {
-					dataPointers.addElement(pointer[i]);
+					dataPointers.add(pointer[i]);
 				}
 			}
 		}

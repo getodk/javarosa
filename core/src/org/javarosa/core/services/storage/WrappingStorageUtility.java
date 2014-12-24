@@ -1,15 +1,10 @@
 package org.javarosa.core.services.storage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.javarosa.core.util.InvalidIndexException;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A wrapper implementation of IStorageUtility that lets you serialize an object with a serialization
@@ -153,7 +148,7 @@ public class WrappingStorageUtility implements IStorageUtilityIndexed {
 		storage.removeAll();
 	}
 
-	public Vector<Integer> removeAll(EntityFilter ef) {
+	public List<Integer> removeAll(EntityFilter ef) {
 		return storage.removeAll(ef);
 	}
 
@@ -197,7 +192,7 @@ public class WrappingStorageUtility implements IStorageUtilityIndexed {
 		return storage.getAccessLock();
 	}
 
-	public Vector getIDsForValue(String fieldName, Object value) {
+	public List<Integer> getIDsForValue(String fieldName, Object value) {
 		return indexedStorage().getIDsForValue(fieldName, value);
 	}
 

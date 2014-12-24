@@ -1,7 +1,7 @@
 package org.javarosa.core.services.storage;
 
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.javarosa.core.util.InvalidIndexException;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -11,18 +11,18 @@ import org.javarosa.core.util.externalizable.Externalizable;
 public interface IStorageUtilityIndexed<E extends Externalizable> extends IStorageUtility<E> {
 
 	/**
-	* Retrieves a Vector of IDs of Externalizable objects in storage for which the field
+	* Retrieves a List of IDs of Externalizable objects in storage for which the field
 	* specified contains the value specified.
 	*
 	* @param fieldName The name of a field which should be evaluated
 	* @param value The value which should be contained by the field specified
-	* @return A Vector of Integers such that retrieving the Externalizable object with any
+	* @return A List of Integers such that retrieving the Externalizable object with any
 	* of those integer IDs will result in an object for which the field specified is equal
 	* to the value provided.
 	* @throws RuntimeException (Fix this exception type) if the field is unrecognized by the
 	* meta data
 	*/
-	 	Vector getIDsForValue (String fieldName, Object value);
+	 	List<Integer> getIDsForValue (String fieldName, Object value);
  	/**
  	*
  	* Retrieves a Externalizable object from the storage which is reference by the unique index fieldName.

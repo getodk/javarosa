@@ -208,7 +208,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     	if (mTreeElement.getConstraint() == null) {
             return null;
         } else {
-        	EvaluationContext ec = new EvaluationContext(form.exprEvalContext, mTreeElement.getRef());
+        	EvaluationContext ec = new EvaluationContext(form.getEvaluationContext(), mTreeElement.getRef());
         	if(textForm != null) {
         		ec.setOutputTextForm(textForm);
         	}
@@ -386,7 +386,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 		//We could hide it by dispatching hints through a final abstract class instead.
 		Constraint c =  mTreeElement.getConstraint();
 		if(c != null) {
-			hint.init(new EvaluationContext(form.exprEvalContext, mTreeElement.getRef()), c.constraint, this.form.getMainInstance());
+			hint.init(new EvaluationContext(form.getEvaluationContext(), mTreeElement.getRef()), c.constraint, this.form.getMainInstance());
 		} else {
 			//can't pivot what ain't there.
 			throw new UnpivotableExpressionException();

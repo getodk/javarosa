@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.javarosa.core.util.CacheTable;
@@ -248,9 +249,8 @@ public class XPathStep implements Externalizable {
 		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
 		}
 
-      List v = new ArrayList(predicates.length);
-		for (int i = 0; i < predicates.length; i++)
-			v.add(predicates[i]);
+      List<XPathExpression> v = Arrays.asList(predicates);
+      
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 

@@ -52,7 +52,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	public abstract int getAttributeCount();
 
 	/**
-	 * get namespace of attribute at 'index' in the vector
+	 * get namespace of attribute at 'index' in the list
 	 * 
 	 * @param index
 	 * @return String
@@ -60,7 +60,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	public abstract String getAttributeNamespace(int index);
 
 	/**
-	 * get name of attribute at 'index' in the vector
+	 * get name of attribute at 'index' in the list
 	 * 
 	 * @param index
 	 * @return String
@@ -68,7 +68,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	public abstract String getAttributeName(int index);
 
 	/**
-	 * get value of attribute at 'index' in the vector
+	 * get value of attribute at 'index' in the list
 	 * 
 	 * @param index
 	 * @return String
@@ -87,7 +87,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 	public abstract T getAttribute(String namespace, String name);
 
 	/**
-	 * get value of attribute with namespace:name' in the vector
+	 * get value of attribute with namespace:name' in the list
 	 * 
 	 * @return String
 	 */
