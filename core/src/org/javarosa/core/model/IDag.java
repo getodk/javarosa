@@ -256,7 +256,38 @@ public abstract class IDag {
 	 * @param markCompleted
 	 * @return
 	 */
-   public abstract ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted);
+   public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
+
+      formEntryControllerToBeValidated.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+
+      int event;
+      while ((event =
+              formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
+         if (event != FormEntryController.EVENT_QUESTION) {
+            continue;
+         } else {
+            FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated.getModel().getFormIndex();
+
+            int saveStatus =
+                    formEntryControllerToBeValidated.answerQuestion(formControllerToBeValidatedFormIndex,
+                            formEntryControllerToBeValidated.getModel().getQuestionPrompt().getAnswerValue(), shouldTrustPreviouslyCommittedAnswer(), markCompleted);
+            if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
+               // jump to the error
+               ValidateOutcome vo = new ValidateOutcome(formControllerToBeValidatedFormIndex,
+                       saveStatus);
+               return vo;
+            }
+         }
+      }
+      return null;
+   }
+
+   /**
+    * Specifies if unchanged answers should be trusted (and not re-committed).
+    *
+    * @return
+    */
+   public abstract boolean shouldTrustPreviouslyCommittedAnswer();
 
    protected final void publishSummary(String lead,
                                  TreeReference ref,
