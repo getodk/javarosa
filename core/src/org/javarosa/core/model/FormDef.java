@@ -151,7 +151,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		@Override
 		public EventNotifier getEventNotifier() {
-			return this.getEventNotifier();
+			return FormDef.this.getEventNotifier();
 		}};
       
       switch ( mode ) {
