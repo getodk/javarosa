@@ -373,31 +373,8 @@ public class April2014DagImpl extends IDag {
       }
    }
 
-   public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated,
-         boolean markCompleted) {
-
-      formEntryControllerToBeValidated.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-
-      int event;
-      while ((event = formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
-         if (event != FormEntryController.EVENT_QUESTION) {
-            continue;
-         } else {
-            FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated
-                  .getModel().getFormIndex();
-
-            int saveStatus = formEntryControllerToBeValidated.answerQuestion(
-                  formControllerToBeValidatedFormIndex, formEntryControllerToBeValidated.getModel()
-                        .getQuestionPrompt().getAnswerValue(), true, markCompleted);
-            if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
-               // jump to the error
-               ValidateOutcome vo = new ValidateOutcome(formControllerToBeValidatedFormIndex,
-                     saveStatus);
-               return vo;
-            }
-         }
-      }
-      return null;
+   @Override
+   public boolean shouldTrustPreviouslyCommittedAnswer() {
+      return false;
    }
-
 }
