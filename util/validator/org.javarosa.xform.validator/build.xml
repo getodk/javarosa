@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project name="javarosa-validator-gui" default="compile">
+	
+	<property name="base.dir" location="." />
+	<property name="root.dir" location="../../../" />
+	<property name="dir.lib.root" location="${root.dir}" />
+	<property name="lib.dir" location="${dir.lib.root}/lib/" />
+	<property name="build.dir" location="build" />
+	<property name="build.debug" value="on" />
+	<property name="build.deprecation" value="on" />
+
+	<property name="compile.source" value="true" />	
+		
+	<target name="init">
+		<tstamp/>
+		<tstamp>
+			<format property="YEAR" pattern="yyyy" />
+		</tstamp>
+			
+		<condition property="compile.from.source.true">
+			<equals arg1="${compile.source}" arg2="true" />
+		</condition>		
+	</target>
+		
+	<target name="buildcore" if="compile.from.source.true">
+		<ant antfile="${root.dir}/core/build.xml" target="package" inheritAll="false" inheritRefs="false" />
+		<copy file="${root.dir}/core/dist/javarosa-libraries.jar" todir="${base.dir}/tools/" />
+	</target>
+	
+	<target name="buildClean" depends="clean,compile" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="jar" depends="javac">
+		<jar jarfile="${build.dir}/javarosa-xform-validator.jar">
+			<zipfileset dir="${build.dir}/classes" prefix="" />
+			<zipfileset src="${base.dir}/tools/javarosa-libraries.jar" />
+			<zipfileset src="${lib.dir}/kxml2-2.3.0.jar" />
+			<zipfileset src="${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar" />
+			<fileset dir="${build.dir}/classes" />
+			<manifest>
+				<attribute name="Specification-Version" value="${version}" />
+				<attribute name="Implementation-Version" value="${TODAY}" />
+				<attribute name="Main-Class" value="org.javarosa.xform.validator.gui.XFormValidatorGUI" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="javac" depends="init">
+		<mkdir dir="${build.dir}/classes"/>
+		<mkdir dir="${build.dir}/src"/>
+		<copy todir="${build.dir}/src">
+			<fileset dir="${base.dir}/src/" />
+			<fileset dir="${root.dir}/util/schema-gen/src/"/>
+		</copy>
+
+		<javac 
+			srcdir="${build.dir}/src"
+			destdir="${build.dir}/classes" 
+			classpath="${base.dir}/tools/javarosa-libraries.jar:${lib.dir}/kxml2-2.3.0.jar:${dir.lib.root}/util/schema-gen/lib/xpp3-1.1.4.jar"
+			includeAntRuntime="false"
+			debug="${build.debug}" 
+			deprecation="${build.deprecation}" />
+	</target>
+		
+	<target name="compile" depends="init, buildcore, jar" />
+
+</project>
