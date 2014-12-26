@@ -64,10 +64,10 @@ public class OptimizedSafe2014DagImpl extends IDag {
       Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(
             mainInstance, evalContext, deleteRef, true,
             new HashSet<QuickTriggerable>(0));
-      publishSummary("Deleted " + deleteRef.toString(true), alreadyEvaluated);
+      publishSummary("Deleted", deleteRef, alreadyEvaluated);
 
       evaluateChildrenTriggerables(mainInstance, evalContext,
-            deletedElement, true, alreadyEvaluated);
+            deletedElement, false, true, alreadyEvaluated);
    }
 
    @Override
@@ -78,26 +78,24 @@ public class OptimizedSafe2014DagImpl extends IDag {
       // trigger conditions that depend on the creation of this new node
       Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance,
             evalContext, createRef, true, new HashSet<QuickTriggerable>(0));
-      publishSummary("Created new repeat " + createRef.toString(true)
-            + "(phase 1)", qtSet1);
+      publishSummary("Created (phase 1)", createRef, qtSet1);
 
       // initialize conditions for the node (and sub-nodes)
       Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance,
             evalContext, createRef, true, new HashSet<QuickTriggerable>(0));
-      publishSummary("Created new repeat " + createRef.toString(true)
-            + "(phase 2)", qtSet2);
+      publishSummary("Created (phase 2)", createRef, qtSet2);
 
       Set<QuickTriggerable> alreadyEvaluated = new HashSet<QuickTriggerable>(
             qtSet1);
       alreadyEvaluated.addAll(qtSet2);
 
       evaluateChildrenTriggerables(mainInstance, evalContext,
-            createdElement, true, alreadyEvaluated);
+            createdElement, true, true, alreadyEvaluated);
    }
 
    private void evaluateChildrenTriggerables(FormInstance mainInstance,
          EvaluationContext evalContext, TreeElement newNode,
-         boolean cascadeToGroupChildren,
+         boolean createdOrDeleted, boolean cascadeToGroupChildren,
          Set<QuickTriggerable> alreadyEvaluated) {
       // iterate into the group children and evaluate any triggerables that
       // depend one them, if they are not already calculated.
@@ -107,8 +105,8 @@ public class OptimizedSafe2014DagImpl extends IDag {
          Set<QuickTriggerable> childTriggerables = triggerTriggerables(
                mainInstance, evalContext, anchorRef,
                cascadeToGroupChildren, alreadyEvaluated);
-         publishSummary("Node created/deleted: " + anchorRef.toString(true),
-               childTriggerables);
+         publishSummary((createdOrDeleted ? "Created" : "Deleted"),
+                 anchorRef, childTriggerables);
       }
    }
 
@@ -124,15 +122,13 @@ public class OptimizedSafe2014DagImpl extends IDag {
             new HashSet<QuickTriggerable>(0));// trigger conditions that
                                        // depend on the creation of
                                        // these new nodes
-      publishSummary("Copied itemset answer for " + targetRef.toString(true)
-            + " (phase 1)", qtSet1);
+      publishSummary("Copied itemset answer (phase 1)", targetRef, qtSet1);
 
       Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance,
             evalContext, copyRef, cascadeToGroupChildren,
             new HashSet<QuickTriggerable>(0));// initialize conditions for
                                        // the node (and sub-nodes)
-      publishSummary("Copied itemset answer for " + targetRef.toString(true)
-            + " (phase 2)", qtSet2);
+      publishSummary("Copied itemset answer (phase 2)", targetRef, qtSet2);
       // not 100% sure this will work since destRef is ambiguous as the last
       // step, but i think it's supposed to work
    }

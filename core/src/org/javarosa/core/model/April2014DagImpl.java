@@ -181,7 +181,7 @@ public class April2014DagImpl extends IDag {
     * Get all of the elements which will need to be evaluated (in order) when
     * the triggerable is fired.
     * 
-    * @param t
+    * @param qt
     */
    private void fillTriggeredElements(EvaluationContext evalContext, QuickTriggerable qt,
          ArrayList<QuickTriggerable> destination) {
@@ -344,7 +344,7 @@ public class April2014DagImpl extends IDag {
     * Step 3 in DAG cascade. evaluate the individual triggerable expressions
     * against the anchor (the value that changed which triggered recomputation)
     *
-    * @param t
+    * @param qt
     *           The triggerable to be updated
     * @param anchorRef
     *           The reference to the value which was changed.
