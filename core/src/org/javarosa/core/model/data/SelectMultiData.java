@@ -38,7 +38,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class SelectMultiData implements IAnswerData {
-   List<Selection> vs; //vector of Selection
+   List<Selection> vs; //List of Selection
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -71,7 +71,11 @@ public class SelectMultiData implements IAnswerData {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
 
-		vs = vectorCopy((List<Selection>)o);
+		ArrayList<Selection> selections = new ArrayList<Selection>(((List<Object>) o).size());
+		for ( Object obj : (List<Object>) o) {
+			selections.add((Selection) obj);
+		}
+		vs = selections;
 	}
 
 	/*
@@ -80,24 +84,10 @@ public class SelectMultiData implements IAnswerData {
 	 */
     @Override
 	public Object getValue () {
-		return vectorCopy(vs);
+		return new ArrayList<Selection>(vs);
 	}
 
-	/**
-	 * @return A type checked vector containing all of the elements
-	 * contained in the vector input
-	 * TODO: move to utility class
-	 */
-	private List<Selection> vectorCopy(List<Selection> input) {
-      List<Selection> output = new ArrayList<Selection>(input.size());
-		//validate type
-		for (int i = 0; i < input.size(); i++) {
-			Selection s = input.get(i);
-			output.add(s);
-		}
-		return output;
-	}
-	/**
+    /**
 	 * @return THE XMLVALUE!!
 	 */
 	/*

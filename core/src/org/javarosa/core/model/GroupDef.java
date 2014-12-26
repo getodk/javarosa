@@ -127,7 +127,7 @@ public class GroupDef implements IFormElement, Localizable {
 		if (children == null || i >= children.size()) {
 			return null;
 		} else {
-			return (IFormElement)children.get(i);
+			return children.get(i);
 		}
 	}
 

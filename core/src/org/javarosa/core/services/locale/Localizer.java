@@ -40,8 +40,8 @@ import java.util.List;
  *
  */
 public class Localizer implements Externalizable {
-	private List<String> locales; /* Vector<String> */
-	private OrderedMap<String, List<LocaleDataSource>> localeResources; /* String -> Vector<LocaleDataSource> */
+	private List<String> locales; /* List<String> */
+	private OrderedMap<String, List<LocaleDataSource>> localeResources; /* String -> List<LocaleDataSource> */
 	private OrderedMap<String, PrefixTreeNode> currentLocaleData; /* HashMap{ String -> String } */
 	private PrefixTree stringTree;
 	private String defaultLocale;
@@ -619,7 +619,7 @@ public class Localizer implements Externalizable {
 		return args;
 	}
 
-	public static String processArguments(String text, HashMap args) {
+	public static String processArguments(String text, HashMap<String,String> args) {
 		int i = text.indexOf("${");
 		while (i != -1) {
 			int j = text.indexOf("}", i);
@@ -629,7 +629,7 @@ public class Localizer implements Externalizable {
 			}
 
 			String argName = text.substring(i + 2, j);
-			String argVal = (String)args.get(argName);
+			String argVal = args.get(argName);
 			if (argVal != null) {
 				text = text.substring(0, i) + argVal + text.substring(j + 1);
 				j = i + argVal.length() - 1;

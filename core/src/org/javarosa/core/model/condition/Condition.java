@@ -66,9 +66,9 @@ public class Condition extends Triggerable {
 		return ((Boolean)eval(model, evalContext)).booleanValue();
 	}
 
-	public void apply (TreeReference ref, Object rawResult, FormInstance model, FormDef f) {
+	public void apply (TreeReference ref, Object rawResult, FormInstance mainInstance) {
 		boolean result = ((Boolean)rawResult).booleanValue();
-		performAction(model.resolveReference(ref), result ? trueAction : falseAction);
+		performAction(mainInstance.resolveReference(ref), result ? trueAction : falseAction);
 	}
 
 	public boolean canCascade () {

@@ -16,21 +16,35 @@
 
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormDef.EvalBehavior;
-import org.javarosa.core.model.FormDef.QuickTriggerable;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.QuickTriggerable;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.condition.*;
+import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.Constraint;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -62,9 +76,6 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.*;
-import java.util.*;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -207,34 +218,34 @@ public class XFormParser {
 
 	private static void initTypeMappings () {
 		typeMappings = new HashMap<String, Integer>();
-		typeMappings.put("string", new Integer(Constants.DATATYPE_TEXT));               //xsd:
-		typeMappings.put("integer", new Integer(Constants.DATATYPE_INTEGER));           //xsd:
-		typeMappings.put("long", new Integer(Constants.DATATYPE_LONG));                 //xsd:
-		typeMappings.put("int", new Integer(Constants.DATATYPE_INTEGER));               //xsd:
-		typeMappings.put("decimal", new Integer(Constants.DATATYPE_DECIMAL));           //xsd:
-		typeMappings.put("double", new Integer(Constants.DATATYPE_DECIMAL));            //xsd:
-		typeMappings.put("float", new Integer(Constants.DATATYPE_DECIMAL));             //xsd:
-		typeMappings.put("dateTime", new Integer(Constants.DATATYPE_DATE_TIME));        //xsd:
-		typeMappings.put("date", new Integer(Constants.DATATYPE_DATE));                 //xsd:
-		typeMappings.put("time", new Integer(Constants.DATATYPE_TIME));                 //xsd:
-		typeMappings.put("gYear", new Integer(Constants.DATATYPE_UNSUPPORTED));         //xsd:
-		typeMappings.put("gMonth", new Integer(Constants.DATATYPE_UNSUPPORTED));        //xsd:
-		typeMappings.put("gDay", new Integer(Constants.DATATYPE_UNSUPPORTED));          //xsd:
-		typeMappings.put("gYearMonth", new Integer(Constants.DATATYPE_UNSUPPORTED));    //xsd:
-		typeMappings.put("gMonthDay", new Integer(Constants.DATATYPE_UNSUPPORTED));     //xsd:
-		typeMappings.put("boolean", new Integer(Constants.DATATYPE_BOOLEAN));           //xsd:
-		typeMappings.put("base64Binary", new Integer(Constants.DATATYPE_UNSUPPORTED));  //xsd:
-		typeMappings.put("hexBinary", new Integer(Constants.DATATYPE_UNSUPPORTED));     //xsd:
-		typeMappings.put("anyURI", new Integer(Constants.DATATYPE_UNSUPPORTED));        //xsd:
-		typeMappings.put("listItem", new Integer(Constants.DATATYPE_CHOICE));           //xforms:
-		typeMappings.put("listItems", new Integer(Constants.DATATYPE_CHOICE_LIST));	    //xforms:
-		typeMappings.put(SELECTONE, new Integer(Constants.DATATYPE_CHOICE));	        //non-standard
-		typeMappings.put(SELECT, new Integer(Constants.DATATYPE_CHOICE_LIST));        //non-standard
-		typeMappings.put("geopoint", new Integer(Constants.DATATYPE_GEOPOINT));         //non-standard
-		typeMappings.put("geoshape", new Integer(Constants.DATATYPE_GEOSHAPE));         //non-standard
-		typeMappings.put("geotrace", new Integer(Constants.DATATYPE_GEOTRACE));         //non-standard
-		typeMappings.put("barcode", new Integer(Constants.DATATYPE_BARCODE));           //non-standard
-        typeMappings.put("binary", new Integer(Constants.DATATYPE_BINARY));             //non-standard
+		typeMappings.put("string", Integer.valueOf(Constants.DATATYPE_TEXT));               //xsd:
+		typeMappings.put("integer", Integer.valueOf(Constants.DATATYPE_INTEGER));           //xsd:
+		typeMappings.put("long", Integer.valueOf(Constants.DATATYPE_LONG));                 //xsd:
+		typeMappings.put("int", Integer.valueOf(Constants.DATATYPE_INTEGER));               //xsd:
+		typeMappings.put("decimal", Integer.valueOf(Constants.DATATYPE_DECIMAL));           //xsd:
+		typeMappings.put("double", Integer.valueOf(Constants.DATATYPE_DECIMAL));            //xsd:
+		typeMappings.put("float", Integer.valueOf(Constants.DATATYPE_DECIMAL));             //xsd:
+		typeMappings.put("dateTime", Integer.valueOf(Constants.DATATYPE_DATE_TIME));        //xsd:
+		typeMappings.put("date", Integer.valueOf(Constants.DATATYPE_DATE));                 //xsd:
+		typeMappings.put("time", Integer.valueOf(Constants.DATATYPE_TIME));                 //xsd:
+		typeMappings.put("gYear", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));         //xsd:
+		typeMappings.put("gMonth", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));        //xsd:
+		typeMappings.put("gDay", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));          //xsd:
+		typeMappings.put("gYearMonth", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));    //xsd:
+		typeMappings.put("gMonthDay", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));     //xsd:
+		typeMappings.put("boolean", Integer.valueOf(Constants.DATATYPE_BOOLEAN));           //xsd:
+		typeMappings.put("base64Binary", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));  //xsd:
+		typeMappings.put("hexBinary", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));     //xsd:
+		typeMappings.put("anyURI", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));        //xsd:
+		typeMappings.put("listItem", Integer.valueOf(Constants.DATATYPE_CHOICE));           //xforms:
+		typeMappings.put("listItems", Integer.valueOf(Constants.DATATYPE_CHOICE_LIST));	    //xforms:
+		typeMappings.put(SELECTONE, Integer.valueOf(Constants.DATATYPE_CHOICE));	        //non-standard
+		typeMappings.put(SELECT, Integer.valueOf(Constants.DATATYPE_CHOICE_LIST));        //non-standard
+		typeMappings.put("geopoint", Integer.valueOf(Constants.DATATYPE_GEOPOINT));         //non-standard
+		typeMappings.put("geoshape", Integer.valueOf(Constants.DATATYPE_GEOSHAPE));         //non-standard
+		typeMappings.put("geotrace", Integer.valueOf(Constants.DATATYPE_GEOTRACE));         //non-standard
+		typeMappings.put("barcode", Integer.valueOf(Constants.DATATYPE_BARCODE));           //non-standard
+        typeMappings.put("binary", Integer.valueOf(Constants.DATATYPE_BINARY));             //non-standard
 	}
 
 	private void initState () {
@@ -489,7 +500,7 @@ public class XFormParser {
 	}
 
 	private void parseTitle (Element e) {
-      List usedAtts = new ArrayList(); //no attributes parsed in title.
+      List<String> usedAtts = new ArrayList<String>(); //no attributes parsed in title.
 		String title = getXMLText(e, true);
 		System.out.println("Title: \"" + title + "\"");
 		_f.setTitle(title);
@@ -734,7 +745,7 @@ public class XFormParser {
 
 	}
 
-	protected void processAdditionalAttributes(QuestionDef question, Element e, List usedAtts) {
+	protected void processAdditionalAttributes(QuestionDef question, Element e, List<String> usedAtts) {
 		// save all the unused attributes verbatim...
 		for(int i=0;i<e.getAttributeCount();i++){
 			String name = e.getAttributeName(i);
@@ -748,7 +759,7 @@ public class XFormParser {
 	}
 
 	protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add("mediatype");
 		// get media type value
 		String mediaType = e.getAttributeValue(null, "mediatype");
@@ -772,11 +783,11 @@ public class XFormParser {
 		return parseControl (parent, e, controlType, null);
 	}
 
-	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType, List additionalUsedAtts ) {
+	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts ) {
 		QuestionDef question = new QuestionDef();
 		question.setID(serialQuestionID++); //until we come up with a better scheme
 
-      List usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new ArrayList();
+      List<String> usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new ArrayList<String>();
 		usedAtts.add(REF_ATTR);
 		usedAtts.add(BIND_ATTR);
 		usedAtts.add(APPEARANCE_ATTR);
@@ -860,7 +871,7 @@ public class XFormParser {
 		String label = getLabel(e);
 		String ref = e.getAttributeValue("", REF_ATTR);
 
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add(REF_ATTR);
 
 		if (ref != null) {
@@ -886,7 +897,7 @@ public class XFormParser {
 		if (g.getRepeat())
 			return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
 
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add(REF_ATTR);
 
 
@@ -1004,7 +1015,7 @@ public class XFormParser {
 	}
 
 	private void parseHint (QuestionDef q, Element e) {
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add(REF_ATTR);
 		String hint = getXMLText(e, true);
 		String hintInnerText = getLabel(e);
@@ -1033,9 +1044,9 @@ public class XFormParser {
 		final int MAX_VALUE_LEN = 32;
 
 		//catalogue of used attributes in this method/element
-      List usedAtts = new ArrayList();
-      List labelUA = new ArrayList();
-      List valueUA = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
+      List<String> labelUA = new ArrayList<String>();
+      List<String> valueUA = new ArrayList<String>();
 		labelUA.add(REF_ATTR);
 		valueUA.add(FORM_ATTR);
 
@@ -1122,10 +1133,10 @@ public class XFormParser {
 
 		////////////////USED FOR PARSER WARNING OUTPUT ONLY
 		//catalogue of used attributes in this method/element
-      List usedAtts = new ArrayList();
-      List labelUA = new ArrayList(); //for child with name 'label'
-      List valueUA = new ArrayList(); //for child with name 'value'
-      List copyUA = new ArrayList(); //for child with name 'copy'
+      List<String> usedAtts = new ArrayList<String>();
+      List<String> labelUA = new ArrayList<String>(); //for child with name 'label'
+      List<String> valueUA = new ArrayList<String>(); //for child with name 'value'
+      List<String> copyUA = new ArrayList<String>(); //for child with name 'copy'
 		usedAtts.add(NODESET_ATTR);
 		labelUA.add(REF_ATTR);
 		valueUA.add(REF_ATTR);
@@ -1231,7 +1242,7 @@ public class XFormParser {
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
 
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add(REF_ATTR);
 		usedAtts.add(NODESET_ATTR);
 		usedAtts.add(BIND_ATTR);
@@ -1422,7 +1433,7 @@ public class XFormParser {
 		_f.setLocalizer(l);
 		l.registerLocalizable(_f);
 
-      ArrayList usedAtts = new ArrayList(); //used for warning message
+      ArrayList<String> usedAtts = new ArrayList<String>(); //used for warning message
 
 		for (int i = 0; i < itext.getChildCount(); i++) {
 			Element trans = itext.getElement(i);
@@ -1446,7 +1457,7 @@ public class XFormParser {
 
 	private void parseTranslation (Localizer l, Element trans) {
 		/////for warning message
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add("lang");
 		usedAtts.add("default");
 		/////////////////////////
@@ -1500,8 +1511,8 @@ public class XFormParser {
 		String id = text.getAttributeValue("", ID_ATTR);
 
 		//used for parser warnings...
-      List usedAtts = new ArrayList();
-      List childUsedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
+      List<String> childUsedAtts = new ArrayList<String>();
 		usedAtts.add(ID_ATTR);
 		usedAtts.add(FORM_ATTR);
 		childUsedAtts.add(FORM_ATTR);
@@ -1600,7 +1611,7 @@ public class XFormParser {
 		return false;
 	}
 
-	protected DataBinding processStandardBindAttributes( List usedAtts, Element e) {
+	protected DataBinding processStandardBindAttributes( List<String> usedAtts, Element e) {
 		usedAtts.add(ID_ATTR);
 		usedAtts.add(NODESET_ATTR);
 		usedAtts.add("type");
@@ -1708,7 +1719,7 @@ public class XFormParser {
 	}
 
 	protected void parseBind (Element e) {
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 
 		DataBinding binding = processStandardBindAttributes( usedAtts, e);
 
@@ -1807,7 +1818,7 @@ public class XFormParser {
 			instanceModel.setName(name);
 		}
 
-      List usedAtts = new ArrayList();
+      List<String> usedAtts = new ArrayList<String>();
 		usedAtts.add("id");
 		usedAtts.add("version");
 		usedAtts.add("uiVersion");
@@ -1943,11 +1954,7 @@ public class XFormParser {
 	}
 
 	private List<TreeReference> getRepeatableRefs () {
-      List<TreeReference> refs = new ArrayList<TreeReference>(repeats.size());
-
-		for (int i = 0; i < repeats.size(); i++) {
-			refs.add((TreeReference) repeats.get(i));
-		}
+      List<TreeReference> refs = new ArrayList<TreeReference>(repeats);
 
 		for (int i = 0; i < itemsets.size(); i++) {
 			ItemsetBinding itemset = (ItemsetBinding)itemsets.get(i);
@@ -2065,7 +2072,7 @@ public class XFormParser {
 			return new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MUTLIPLICITY));
 	}
 
-	//checks which repeat bindings have explicit template nodes; returns a vector of the bindings that do not
+	//checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not
 	private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
 		if (repeatTree != null)
 			checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
@@ -2567,75 +2574,7 @@ public class XFormParser {
 	}
 
 	private void checkDependencyCycles () {
-		HashSet<TreeReference> vertices = new HashSet<TreeReference>();
-		ArrayList<TreeReference[]> edges = new ArrayList<TreeReference[]>();
-
-		//build graph
-      ArrayList<TreeReference> targets = new ArrayList<TreeReference>();
-      for (TreeReference trigger : _f.triggerIndex.keySet()) {
-			if (!vertices.contains(trigger))
-				vertices.add(trigger);
-			HashSet<QuickTriggerable> triggered = _f.triggerIndex.get(trigger);
-			targets.clear();
-			for (QuickTriggerable qt : triggered ) {
-				Triggerable t = qt.t;
-				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = t.getTargets().get(j);
-					if (!targets.contains(target))
-						targets.add(target);
-				}
-			}
-
-			for (int i = 0; i < targets.size(); i++) {
-				TreeReference target = targets.get(i);
-				if (!vertices.contains(target))
-					vertices.add(target);
-
-				TreeReference[] edge = {trigger, target};
-				edges.add(edge);
-			}
-		}
-
-		//find cycles
-		boolean acyclic = true;
-      HashSet<TreeReference> leaves = new HashSet<TreeReference>(vertices.size());
-		while (vertices.size() > 0) {
-			//determine leaf nodes
-		   leaves.clear();
- 		   leaves.addAll(vertices);
-			for (int i = 0; i < edges.size(); i++) {
-				TreeReference[] edge = (TreeReference[])edges.get(i);
-				leaves.remove(edge[0]);
-			}
-
-			//if no leaf nodes while graph still has nodes, graph has cycles
-			if (leaves.size() == 0) {
-				acyclic = false;
-				break;
-			}
-
-			//remove leaf nodes and edges pointing to them
-			for (TreeReference leaf : leaves ) {
-				vertices.remove(leaf);
-			}
-			for (int i = edges.size() - 1; i >= 0; i--) {
-				TreeReference[] edge = (TreeReference[])edges.get(i);
-				if (leaves.contains(edge[1]))
-					edges.remove(i);
-			}
-		}
-
-		if (!acyclic) {
-			StringBuilder b = new StringBuilder();
-			b.append("XPath Dependency Cycle:\n");
-			for (int i = 0; i < edges.size(); i++) {
-				TreeReference[] edge = edges.get(i);
-				b.append(edge[0].toString()).append(" => ").append(edge[1].toString()).append("\n");
-			}
-			reporter.error(b.toString());
-
-			throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
-		}
+	   _f.reportDependencyCycles(reporter);
 	}
 
 	public void loadXmlInstance(FormDef f, Reader xmlReader) throws IOException {
