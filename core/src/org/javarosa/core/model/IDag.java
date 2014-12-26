@@ -36,6 +36,7 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XPathReference;
@@ -173,8 +174,6 @@ public abstract class IDag {
    /**
     * Add the triggerables to the dataset prior to finalizing.
     * 
-    * @param mainInstance
-    * @param evalContext
     * @param t
     */
    public final Triggerable addTriggerable(Triggerable t) {
@@ -227,8 +226,6 @@ public abstract class IDag {
 	 * 
 	 * @param mainInstance
 	 * @param evalContext
-	 * @param unorderedTriggereables
-	 * @param triggerIndex
 	 * @throws IllegalStateException
 	 */
 	public abstract void finalizeTriggerables(FormInstance mainInstance,
@@ -260,13 +257,12 @@ public abstract class IDag {
 	 * @return
 	 */
    public abstract ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted);
-   
 
-	protected final void publishSummary(String lead,
-			Set<QuickTriggerable> quickTriggerables) {
-		System.out.println(lead + ": " + quickTriggerables.size()
-				+ " triggerables were fired.");
-	}
+   protected final void publishSummary(String lead,
+                                 TreeReference ref,
+                                 Set<QuickTriggerable> quickTriggerables) {
+      accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
+   }
 
 	/**
 	 * For debugging - note that path assumes Android device
