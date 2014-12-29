@@ -297,13 +297,13 @@ public abstract class IDag {
    }
 
 	/**
-	 * For debugging - note that path assumes Android device
+	 * For debugging
 	 */
-	public final void printTriggerables() {
+	public final void printTriggerables(String path) {
 		OutputStreamWriter w = null;
 		try {
 			w = new OutputStreamWriter(new FileOutputStream(new File(
-					"/sdcard/odk/trigger.log")), "UTF-8");
+					path)), "UTF-8");
 			for (int i = 0; i < triggerablesDAG.size(); i++) {
 				QuickTriggerable qt = triggerablesDAG.get(i);
 				w.write(Integer.toString(i) + ": ");
