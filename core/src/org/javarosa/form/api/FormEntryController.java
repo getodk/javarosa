@@ -62,8 +62,8 @@ public class FormEntryController {
      * @param data
      * @return
      */
-    public int answerQuestion(IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-        return answerQuestion(model.getFormIndex(), data, trustPreviousValue, cascadeToGroupChildren);
+    public int answerQuestion(IAnswerData data, boolean midSurvey) {
+        return answerQuestion(model.getFormIndex(), data, midSurvey);
     }
 
 
@@ -75,7 +75,7 @@ public class FormEntryController {
      * @param data
      * @return OK if save was successful, error if a constraint was violated.
      */
-    public int answerQuestion(FormIndex index, IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+    public int answerQuestion(FormIndex index, IAnswerData data, boolean midSurvey) {
     	QuestionDef q = model.getQuestionPrompt(index).getQuestion();
         if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
@@ -89,14 +89,14 @@ public class FormEntryController {
         } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
             return ANSWER_CONSTRAINT_VIOLATED;
         } else if (!complexQuestion) {
-            commitAnswer(element, index, data, trustPreviousValue, cascadeToGroupChildren);
+            commitAnswer(element, index, data, midSurvey);
             return ANSWER_OK;
         } else if (complexQuestion && hasConstraints) {
             //TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
             throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
         } else {
         	try {
-				model.getForm().copyItemsetAnswer(q, element, data, cascadeToGroupChildren);
+				model.getForm().copyItemsetAnswer(q, element, data, midSurvey);
 			} catch (InvalidReferenceException ire) {
 				ire.printStackTrace();
 				throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
@@ -116,12 +116,12 @@ public class FormEntryController {
      * @param data
      * @return true if saved successfully, false otherwise.
      */
-    public boolean saveAnswer(FormIndex index, IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+    public boolean saveAnswer(FormIndex index, IAnswerData data, boolean midSurvey) {
         if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
         }
         TreeElement element = model.getTreeElement(index);
-        return commitAnswer(element, index, data, trustPreviousValue, cascadeToGroupChildren);
+        return commitAnswer(element, index, data, midSurvey);
     }
 
 
@@ -134,8 +134,8 @@ public class FormEntryController {
      * @param data
      * @return true if saved successfully, false otherwise.
      */
-    public boolean saveAnswer(IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-        return saveAnswer(model.getFormIndex(), data, trustPreviousValue, cascadeToGroupChildren);
+    public boolean saveAnswer(IAnswerData data, boolean midSurvey) {
+        return saveAnswer(model.getFormIndex(), data, midSurvey);
     }
 
 
@@ -147,11 +147,11 @@ public class FormEntryController {
      * @param data
      * @return true if saved successfully, false otherwise
      */
-    private boolean commitAnswer(TreeElement element, FormIndex index, IAnswerData data, boolean trustPreviousValue, boolean cascadeToGroupChildren) {
+    private boolean commitAnswer(TreeElement element, FormIndex index, IAnswerData data, boolean midSurvey) {
         if (data != null || element.getValue() != null) {
             // we should check if the data to be saved is already the same as
             // the data in the model, but we can't (no IAnswerData.equals())
-            model.getForm().setValue(data, index.getReference(), element, trustPreviousValue, cascadeToGroupChildren);
+            model.getForm().setValue(data, index.getReference(), element, midSurvey);
             return true;
         } else {
             return false;

@@ -355,32 +355,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       throw new RuntimeException("method not implemented");
    }
 
-   public void setValue(IAnswerData data, TreeReference ref, boolean trustPreviousValue,
-         boolean cascadeToGroupChildren) {
-      setValue(data, ref, mainInstance.resolveReference(ref), trustPreviousValue,
-            cascadeToGroupChildren);
+   public void setValue(IAnswerData data, TreeReference ref, boolean midSurvey) {
+      setValue(data, ref, mainInstance.resolveReference(ref), midSurvey);
    }
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
-         boolean trustPreviousValue, boolean cascadeToGroupChildren) {
-      if (dagImpl.getEvalBehavior() == EvalBehavior.Legacy ||
-          dagImpl.getEvalBehavior() == EvalBehavior.April_2014 ||
-          dagImpl.getEvalBehavior() == EvalBehavior.Safe_2014) {
-         setAnswer(data, node);
-         triggerTriggerables(ref, cascadeToGroupChildren);
-      } else {
-         // Do not act if the data haven't changed.
-         // Use the serialized form of the data to avoid type conversions and
-         // errors from those.
-         IAnswerData oldValue = node.getValue();
-         IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
-         if (!trustPreviousValue
-               || !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
-                     answerDataSerializer.serializeAnswerData(data))) {
-            setAnswer(data, node);
-            triggerTriggerables(ref, cascadeToGroupChildren);
-         }
+         boolean midSurvey) {
+      IAnswerData oldValue = node.getValue();
+      IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
+      if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer()
+              && objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
+              answerDataSerializer.serializeAnswerData(data))) {
+         return;
       }
+      setAnswer(data, node);
+      Collection<QuickTriggerable> qts = triggerTriggerables(ref, midSurvey);
+      dagImpl.publishSummary("New value", ref, qts);
       // TODO: pre-populate fix-count repeats here?
    }
 
@@ -569,7 +559,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data,
-         boolean cascadeToGroupChildren) throws InvalidReferenceException {
+         boolean midSurvey) throws InvalidReferenceException {
       ItemsetBinding itemset = q.getDynamicChoices();
       TreeReference targetRef = targetNode.getRef();
       TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
@@ -630,7 +620,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             getMainInstance().copyItemsetNode(ch.copyNode, destRef, this);
          }
       }
-      dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode, cascadeToGroupChildren);
+      dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode, midSurvey);
    }
 
    /**
@@ -674,9 +664,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * Walks the current set of conditions, and evaluates each of them with the
     * current context.
     */
-   private void initializeTriggerables(TreeReference rootRef, boolean cascadeToGroupChildren) {
+   private Collection<QuickTriggerable> initializeTriggerables(TreeReference rootRef, boolean midSurvey) {
 	   
-	 dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, cascadeToGroupChildren);
+	 return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, midSurvey);
    }
 
    /**
@@ -686,8 +676,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *           The full contextualized unambiguous reference of the value that
     *           was changed.
     */
-   public void triggerTriggerables(TreeReference ref, boolean cascadeToGroupChildren) {
-	  dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, cascadeToGroupChildren);
+   public Collection<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean midSurvey) {
+      return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, midSurvey);
    }
    
    public ValidateOutcome validate(boolean markCompleted) {
@@ -716,10 +706,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       return c.constraint.eval(mainInstance, ec);
    }
 
-   /**
-    * @param ec
-    *           The new Evaluation Context
-    */
    private void resetEvaluationContext() {
 	  EvaluationContext ec = new EvaluationContext(null);
       ec = new EvaluationContext(mainInstance, formInstances, ec);
@@ -731,6 +717,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       return this.exprEvalContext;
    }
 
+   /**
+    * @param ec
+    *           The new Evaluation Context
+    */
    private void initEvalContext(EvaluationContext ec) {
       if (!ec.getFunctionHandlers().containsKey("jr:itext")) {
          final FormDef f = this;
@@ -1210,7 +1200,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          dispatchFormEvent(Action.EVENT_XFORMS_READY);
       }
 
-      initializeTriggerables(TreeReference.rootRef(), false);
+      Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef(), false);
+      dagImpl.publishSummary("Form initialized", qts);
    }
 
    /**

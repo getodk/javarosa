@@ -22,10 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
@@ -110,11 +107,11 @@ public abstract class IDag {
 	 * @param mainInstance
 	 * @param evalContext
 	 * @param ref
-	 * @param cascadeToGroupChildren
+	 * @param midSurvey
 	 */
-	public abstract void triggerTriggerables(FormInstance mainInstance,
+	public abstract Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference ref,
-			boolean cascadeToGroupChildren);
+			boolean midSurvey);
 
 	/**
 	 * Take whatever action is required when deleting a repeat group.
@@ -150,11 +147,11 @@ public abstract class IDag {
 	 * @param evalContext
 	 * @param ref
 	 * @param copyToElement
-	 * @param cascadeToGroupChildren
+	 * @param midSurvey
 	 */
 	public abstract void copyItemsetAnswer(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference ref,
-			TreeElement copyToElement, boolean cascadeToGroupChildren);
+			TreeElement copyToElement, boolean midSurvey);
 
 	/**
 	 * Add the triggerables to the dataset prior to finalizing.
@@ -240,11 +237,11 @@ public abstract class IDag {
 	 * @param mainInstance
 	 * @param evalContext
 	 * @param rootRef
-	 * @param cascadeToGroupChildren
+	 * @param midSurvey true if we are during the survey, false if we are on loading/saving phase
 	 */
-	public abstract void initializeTriggerables(FormInstance mainInstance,
+	public abstract Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference rootRef,
-			boolean cascadeToGroupChildren);
+			boolean midSurvey);
 	
 	/**
 	 * Invoked to validate a filled-in form. Sweeps through from beginning
@@ -270,7 +267,7 @@ public abstract class IDag {
 
             int saveStatus =
                     formEntryControllerToBeValidated.answerQuestion(formControllerToBeValidatedFormIndex,
-                            formEntryControllerToBeValidated.getModel().getQuestionPrompt().getAnswerValue(), shouldTrustPreviouslyCommittedAnswer(), markCompleted);
+                            formEntryControllerToBeValidated.getModel().getQuestionPrompt().getAnswerValue(), false);
             if (markCompleted && saveStatus != FormEntryController.ANSWER_OK) {
                // jump to the error
                ValidateOutcome vo = new ValidateOutcome(formControllerToBeValidatedFormIndex,
@@ -289,9 +286,13 @@ public abstract class IDag {
     */
    public abstract boolean shouldTrustPreviouslyCommittedAnswer();
 
+   protected void publishSummary(String lead, Collection<QuickTriggerable> quickTriggerables) {
+      publishSummary(lead, null, quickTriggerables);
+   }
+
    protected final void publishSummary(String lead,
                                  TreeReference ref,
-                                 Set<QuickTriggerable> quickTriggerables) {
+                                 Collection<QuickTriggerable> quickTriggerables) {
       accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
    }
 
