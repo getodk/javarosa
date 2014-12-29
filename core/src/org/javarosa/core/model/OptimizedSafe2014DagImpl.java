@@ -152,7 +152,7 @@ public class OptimizedSafe2014DagImpl extends IDag {
          HashSet<QuickTriggerable> deps = new HashSet<QuickTriggerable>();
          newDestinationSet.clear();
          fillTriggeredElements(mainInstance, evalContext, qt, deps,
-               newDestinationSet, true);
+               newDestinationSet);
 
          // remove any self-reference if we have one...
          deps.remove(qt);
@@ -242,13 +242,11 @@ public class OptimizedSafe2014DagImpl extends IDag {
     * @param qt
     * @param destinationSet
     *            where to store the triggerables
-    * @param midSurvey
     */
    public void fillTriggeredElements(FormInstance mainInstance,
          EvaluationContext evalContext, QuickTriggerable qt,
          Set<QuickTriggerable> destinationSet,
-         Set<QuickTriggerable> newDestinationSet,
-         boolean midSurvey) {
+         Set<QuickTriggerable> newDestinationSet) {
       if (qt.t.canCascade()) {
          {
             boolean expandRepeatables = true;

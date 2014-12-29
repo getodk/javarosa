@@ -89,16 +89,14 @@ public class Safe2014DagImpl extends IDag {
 
    private void evaluateChildrenTriggerables(FormInstance mainInstance,
          EvaluationContext evalContext, TreeElement newNode,
-         boolean createdOrDeleted,
-         Set<QuickTriggerable> alreadyEvaluated) {
+         boolean createdOrDeleted, Set<QuickTriggerable> alreadyEvaluated) {
       // iterate into the group children and evaluate any triggerables that
       // depend one them, if they are not already calculated.
       int numChildren = newNode.getNumChildren();
       for (int i = 0; i < numChildren; i++) {
          TreeReference anchorRef = newNode.getChildAt(i).getRef();
          Set<QuickTriggerable> childTriggerables = triggerTriggerables(
-               mainInstance, evalContext, anchorRef,
-                 alreadyEvaluated);
+               mainInstance, evalContext, anchorRef, alreadyEvaluated);
          publishSummary((createdOrDeleted ? "Created" : "Deleted"),
                  anchorRef, childTriggerables);
       }
@@ -154,7 +152,7 @@ public class Safe2014DagImpl extends IDag {
          HashSet<QuickTriggerable> deps = new HashSet<QuickTriggerable>();
          newDestinationSet.clear();
          fillTriggeredElements(mainInstance, evalContext, qt, deps,
-               newDestinationSet, true);
+               newDestinationSet);
 
          // remove any self-reference if we have one...
          deps.remove(qt);
@@ -244,13 +242,11 @@ public class Safe2014DagImpl extends IDag {
     * @param qt
     * @param destinationSet
     *            where to store the triggerables
-    * @param midSurvey
     */
    public void fillTriggeredElements(FormInstance mainInstance,
          EvaluationContext evalContext, QuickTriggerable qt,
          Set<QuickTriggerable> destinationSet,
-         Set<QuickTriggerable> newDestinationSet,
-         boolean midSurvey) {
+         Set<QuickTriggerable> newDestinationSet) {
       if (qt.t.canCascade()) {
          {
             boolean expandRepeatables = true;
