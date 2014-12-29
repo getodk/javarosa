@@ -306,28 +306,48 @@ public abstract class Triggerable implements Externalizable {
 	}
 
 	/**
-	 * Searches in the triggers of this Triggerables, trying to find one that is
-	 * contained in the given list of contextualized refs. If multiple are found then it returns the one
-	 * which is higher in the form tree.
+	 * Searches in the triggers of this Triggerable, trying to find the ones that are
+	 * contained in the given list of contextualized refs.
 	 *
 	 * @param firedAnchors a list of absolute refs
-	 * @return the higher-in-the-form element of the given list that matches in the list of triggers of this Triggerable.
+	 * @return either a set of siblings (repeated nodes) per trigger, or a parent of the trigger
 	 */
-	public TreeReference findAffectedTrigger(List<TreeReference> firedAnchors) {
-		TreeReference affectedTrigger = null;
+	public List<TreeReference> findAffectedTriggers(List<TreeReference> firedAnchors) {
+		List<TreeReference> affectedTriggers = new ArrayList<TreeReference>(0);
 
 		Set<TreeReference> triggers = this.getTriggers();
 		for (TreeReference trigger : triggers) {
 			for (TreeReference firedAnchor : firedAnchors) {
 				TreeReference genericizedFiredAnchor = firedAnchor.genericize();
 				if (genericizedFiredAnchor.equals(trigger)) {
-					if (affectedTrigger == null || genericizedFiredAnchor.isParentOf(affectedTrigger, false)) {
-						affectedTrigger = firedAnchor;
+					if (affectedTriggers.isEmpty()) {
+						affectedTriggers.add(firedAnchor);
+					} else {
+						// if there is a trigger in the list, then it might be a sibling
+						boolean addedAsSibling = false;
+						for (TreeReference affectedTrigger : affectedTriggers) {
+							if (affectedTrigger.genericize().equals(genericizedFiredAnchor) && !affectedTrigger.equals(firedAnchor)) {
+								affectedTriggers.add(firedAnchor);
+								addedAsSibling = true;
+								break;
+							}
+						}
+						if (!addedAsSibling) {
+							// replace one with a parent.
+							for (int i = 0; i < affectedTriggers.size(); i++) {
+								TreeReference affectedTrigger = affectedTriggers.get(i);
+								if (genericizedFiredAnchor.isParentOf(affectedTrigger, false)) {
+									affectedTriggers = new ArrayList<TreeReference>();
+									affectedTriggers.add(firedAnchor);
+									break;
+								}
+							}
+						}
 					}
 				}
 			}
 		}
 
-		return affectedTrigger;
+		return affectedTriggers;
 	}
 }
