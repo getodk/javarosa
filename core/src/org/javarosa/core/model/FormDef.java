@@ -16,42 +16,21 @@
 
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.*;
-
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.IDag.EventNotifierAccessor;
-import org.javarosa.core.model.condition.Condition;
-import org.javarosa.core.model.condition.Constraint;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.condition.IFunctionHandler;
-import org.javarosa.core.model.condition.Recalculate;
-import org.javarosa.core.model.condition.Triggerable;
+import org.javarosa.core.model.condition.*;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.model.instance.InvalidReferenceException;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.instance.*;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.*;
 import org.javarosa.debug.EventNotifier;
 import org.javarosa.debug.EventNotifierSilent;
 import org.javarosa.form.api.FormEntryController;
@@ -61,23 +40,27 @@ import org.javarosa.xform.parse.XFormParserReporter;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.*;
+
 /**
  * Definition of a form. This has some meta data about the form definition and a
  * collection of groups together with question branching or skipping rules.
  *
  * @author Daniel Kayiwa, Drew Roos
- *
  */
 public class FormDef implements IFormElement, Localizable, Persistable, IMetaData {
    public static final String STORAGE_KEY = "FORMDEF";
    public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
    public enum EvalBehavior {
-      Legacy, 
-      April_2014, 
+      Legacy,
+      April_2014,
       Safe_2014,
       Fast_2014
-   };
+   }
 
    public static final EvalBehavior recommendedMode = EvalBehavior.Safe_2014;
 
@@ -95,11 +78,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    private List<IFormElement> children;// <IFormElement>
-   /** A collection of group definitions. */
+   /**
+    * A collection of group definitions.
+    */
    private int id;
-   /** The numeric unique identifier of the form definition on the local device */
+   /**
+    * The numeric unique identifier of the form definition on the local device
+    */
    private String title;
-   /** The display title of the form. */
+   /**
+    * The display title of the form.
+    */
    private String name;
 
    private List<XFormExtension> extensions;
@@ -112,10 +101,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    // <IConditionExpr> contents of <output>
    // tags that serve as parameterized
    // arguments to captions
-   private List<IConditionExpr> outputFragments; 
-   
+   private List<IConditionExpr> outputFragments;
+
    private IDag dagImpl;
-   
+
    private EvaluationContext exprEvalContext;
 
    private QuestionPreloader preloader = new QuestionPreloader();
@@ -135,35 +124,36 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public FormDef() {
       this(defaultMode, defaultEventNotifier);
    }
-   
+
    /**
-	 *
-	 */
+    *
+    */
    public FormDef(EvalBehavior mode, EventNotifier eventNotifier) {
       setID(-1);
       setChildren(null);
       final EventNotifierAccessor ia = new EventNotifierAccessor() {
 
-		@Override
-		public EventNotifier getEventNotifier() {
-			return FormDef.this.getEventNotifier();
-		}};
-      
-      switch ( mode ) {
-      case Legacy:
-    	  dagImpl = new LegacyDagImpl(ia);
-    	  break;
-      case April_2014:
-    	  dagImpl = new April2014DagImpl(ia);
-    	  break;
-      case Safe_2014:
-    	  dagImpl = new Safe2014DagImpl(ia);
-    	  break;
-      case Fast_2014:
-    	  dagImpl = new Fast2014DagImpl(ia);
-    	  break;
-      default:
-    	  throw new IllegalStateException("Unexpected mode: " + mode);
+         @Override
+         public EventNotifier getEventNotifier() {
+            return FormDef.this.getEventNotifier();
+         }
+      };
+
+      switch (mode) {
+         case Legacy:
+            dagImpl = new LegacyDagImpl(ia);
+            break;
+         case April_2014:
+            dagImpl = new April2014DagImpl(ia);
+            break;
+         case Safe_2014:
+            dagImpl = new Safe2014DagImpl(ia);
+            break;
+         case Fast_2014:
+            dagImpl = new Fast2014DagImpl(ia);
+            break;
+         default:
+            throw new IllegalStateException("Unexpected mode: " + mode);
       }
       // This is kind of a wreck...
       resetEvaluationContext();
@@ -194,9 +184,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Get an instance based on a name
-    * 
-    * @param name
-    *           string name
+    *
+    * @param name string name
     * @return
     */
    public FormInstance getNonMainInstance(String name) {
@@ -209,7 +198,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Get the non main instances
-    * 
+    *
     * @return
     */
    public Enumeration<FormInstance> getNonMainInstances() {
@@ -218,7 +207,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Set the main instance
-    * 
+    *
     * @param fi
     */
    public void setInstance(FormInstance fi) {
@@ -230,7 +219,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Get the main instance
-    * 
+    *
     * @return
     */
    public FormInstance getMainInstance() {
@@ -255,7 +244,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          return this.children.get(i);
 
       throw new ArrayIndexOutOfBoundsException("FormDef: invalid child index: " + i + " only "
-            + children.size() + " children");
+              + children.size() + " children");
    }
 
    public IFormElement getChild(FormIndex index) {
@@ -270,7 +259,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Dereference the form index and return a List of all interstitial nodes
     * (top-level parent first; index target last)
-    *
+    * <p/>
     * Ignore 'new-repeat' node for now; just return/stop at ref to
     * yet-to-be-created repeat node (similar to repeats that already exist)
     *
@@ -278,9 +267,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public List<IFormElement> explodeIndex(FormIndex index) {
-	   List<Integer> indexes = new ArrayList<Integer>();
-	   List<Integer> multiplicities = new ArrayList<Integer>();
-	   List<IFormElement> elements = new ArrayList<IFormElement>();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 
       collapseIndex(index, indexes, multiplicities, elements);
       return elements;
@@ -288,14 +277,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    // take a reference, find the instance node it refers to (factoring in
    // multiplicities)
+
    /**
     * @param index
     * @return
     */
    public TreeReference getChildInstanceRef(FormIndex index) {
-	   List<Integer> indexes = new ArrayList<Integer>();
-	   List<Integer> multiplicities = new ArrayList<Integer>();
-	   List<IFormElement> elements = new ArrayList<IFormElement>();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 
       collapseIndex(index, indexes, multiplicities, elements);
       return getChildInstanceRef(elements, multiplicities);
@@ -310,10 +300,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       if (elements.size() == 0)
          return null;
 
-      IFormElement element = elements.get(elements.size()-1);
+      IFormElement element = elements.get(elements.size() - 1);
       // get reference for target element
       TreeReference ref = FormInstance.unpackReference(
-            element.getBind()).clone();
+              element.getBind()).clone();
       for (int i = 0; i < ref.size(); i++) {
          // There has to be a better way to encapsulate this
          if (ref.getMultiplicity(i) != TreeReference.INDEX_ATTRIBUTE) {
@@ -360,7 +350,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public void setValue(IAnswerData data, TreeReference ref, TreeElement node,
-         boolean midSurvey) {
+                        boolean midSurvey) {
       IAnswerData oldValue = node.getValue();
       IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
       if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer()
@@ -376,12 +366,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Copied from commons-lang 2.6: For reviewing purposes only.
-    *
+    * <p/>
     * <p>
     * Compares two objects for equality, where either one or both objects may be
     * <code>null</code>.
     * </p>
-    *
+    * <p/>
     * <pre>
     * ObjectUtils.equals(null, null)                  = true
     * ObjectUtils.equals(null, "")                    = false
@@ -393,10 +383,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * ObjectUtils.equals(Boolean.TRUE, Boolean.FALSE) = false
     * </pre>
     *
-    * @param object1
-    *           the first object, may be <code>null</code>
-    * @param object2
-    *           the second object, may be <code>null</code>
+    * @param object1 the first object, may be <code>null</code>
+    * @param object2 the second object, may be <code>null</code>
     * @return <code>true</code> if the values of both objects are the same
     */
    public static boolean objectEquals(Object object1, Object object2) {
@@ -426,9 +414,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public FormIndex deleteRepeat(FormIndex index) {
-	  List<Integer> indexes = new ArrayList<Integer>();
-	  List<Integer> multiplicities = new ArrayList<Integer>();
-	  List<IFormElement> elements = new ArrayList<IFormElement>();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
       collapseIndex(index, indexes, multiplicities, elements);
 
       // loop backwards through the elements, removing objects from each
@@ -511,7 +499,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          TreeElement templNode = mainInstance.getTemplate(repeatRef);
          TreeReference parentPath = templNode.getParent().getRef().genericize();
          TreeElement parentNode = mainInstance
-               .resolveReference(parentPath.contextualize(repeatRef));
+                 .resolveReference(parentPath.contextualize(repeatRef));
          relev = parentNode.isRelevant();
       }
 
@@ -533,10 +521,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             // repeat groups...
             TreeReference countRef = FormInstance.unpackReference(repeat.getCountReference());
             TreeElement countNode = this.getMainInstance().resolveReference(
-                  countRef.contextualize(repeatRef));
+                    countRef.contextualize(repeatRef));
             if (countNode == null) {
                throw new RuntimeException("Could not locate the repeat count value expected at "
-                     + repeat.getCountReference().getReference().toString());
+                       + repeat.getCountReference().getReference().toString());
             }
             // get the total multiplicity possible
             IAnswerData count = countNode.getValue();
@@ -559,7 +547,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data,
-         boolean midSurvey) throws InvalidReferenceException {
+                                 boolean midSurvey) throws InvalidReferenceException {
       ItemsetBinding itemset = q.getDynamicChoices();
       TreeReference targetRef = targetNode.getRef();
       TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
@@ -578,7 +566,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             selectedValues.add(selections.get(i).choice.getValue());
          }
       } else {
-    	  selectedValues = new ArrayList<String>(0);
+         selectedValues = new ArrayList<String>(0);
       }
 
       // delete existing dest nodes that are not in the answer selection
@@ -589,10 +577,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
          if (itemset.valueRef != null) {
             String value = itemset.getRelativeValue().evalReadable(this.getMainInstance(),
-                  new EvaluationContext(exprEvalContext, node.getRef()));
+                    new EvaluationContext(exprEvalContext, node.getRef()));
             if (selectedValues.contains(value)) {
                existingValues.put(value, node); // cache node if in selection
-                                                // and already exists
+               // and already exists
             }
          }
 
@@ -626,8 +614,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Add a Condition to the form's Collection.
     *
-    * @param t
-    *           the condition to be set
+    * @param t the condition to be set
     */
    public Triggerable addTriggerable(Triggerable t) {
       return dagImpl.addTriggerable(t);
@@ -636,28 +623,27 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Report any dependency cycles based upon the triggerIndex array.
     * (Does not require that the DAG be finalized).
-    * 
+    *
     * @param reporter
     */
-   public void reportDependencyCycles (XFormParserReporter reporter) {
+   public void reportDependencyCycles(XFormParserReporter reporter) {
       dagImpl.reportDependencyCycles(reporter);
    }
-   
+
    /**
     * Finalize the DAG associated with the form's triggered conditions. This
     * will create the appropriate ordering and dependencies to ensure the
     * conditions will be evaluated in the appropriate orders.
     *
-    * @throws IllegalStateException
-    *            - If the trigger ordering contains an illegal cycle and the
-    *            triggers can't be laid out appropriately
+    * @throws IllegalStateException - If the trigger ordering contains an illegal cycle and the
+    *                               triggers can't be laid out appropriately
     */
    public void finalizeTriggerables() throws IllegalStateException {
       //
       // DAGify the triggerables based on dependencies and sort them so that
       // triggerables come only after the triggerables they depend on
       //
-	  dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext());
+      dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext());
    }
 
    /**
@@ -665,27 +651,26 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * current context.
     */
    private Collection<QuickTriggerable> initializeTriggerables(TreeReference rootRef, boolean midSurvey) {
-	   
-	 return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, midSurvey);
+
+      return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, midSurvey);
    }
 
    /**
     * The entry point for the DAG cascade after a value is changed in the model.
     *
-    * @param ref
-    *           The full contextualized unambiguous reference of the value that
-    *           was changed.
+    * @param ref The full contextualized unambiguous reference of the value that
+    *            was changed.
     */
    public Collection<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean midSurvey) {
       return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, midSurvey);
    }
-   
+
    public ValidateOutcome validate(boolean markCompleted) {
 
       FormEntryModel formEntryModelToBeValidated = new FormEntryModel(this);
       FormEntryController formEntryControllerToBeValidated = new FormEntryController(formEntryModelToBeValidated);
 
-      return dagImpl.validate(formEntryControllerToBeValidated, markCompleted );
+      return dagImpl.validate(formEntryControllerToBeValidated, markCompleted);
    }
 
    public boolean evaluateConstraint(TreeReference ref, IAnswerData data) {
@@ -707,7 +692,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    private void resetEvaluationContext() {
-	  EvaluationContext ec = new EvaluationContext(null);
+      EvaluationContext ec = new EvaluationContext(null);
       ec = new EvaluationContext(mainInstance, formInstances, ec);
       initEvalContext(ec);
       this.exprEvalContext = ec;
@@ -718,8 +703,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    /**
-    * @param ec
-    *           The new Evaluation Context
+    * @param ec The new Evaluation Context
     */
    private void initEvalContext(EvaluationContext ec) {
       if (!ec.getFunctionHandlers().containsKey("jr:itext")) {
@@ -737,7 +721,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                   if (form != null) {
                      textID = textID + ";" + form;
                      String result = f.getLocalizer().getRawText(f.getLocalizer().getLocale(),
-                           textID);
+                             textID);
                      return result == null ? "" : result;
                   } else {
                      String text = f.getLocalizer().getText(textID);
@@ -749,7 +733,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             }
 
             public List<Class[]> getPrototypes() {
-               Class[] proto = { String.class };
+               Class[] proto = {String.class};
                List<Class[]> v = new ArrayList<Class[]>(1);
                v.add(proto);
                return v;
@@ -796,8 +780,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
                   QuestionDef q = findQuestionByRef(ref, f);
                   if (q == null
-                        || (q.getControlType() != Constants.CONTROL_SELECT_ONE && q
-                              .getControlType() != Constants.CONTROL_SELECT_MULTI)) {
+                          || (q.getControlType() != Constants.CONTROL_SELECT_ONE && q
+                          .getControlType() != Constants.CONTROL_SELECT_MULTI)) {
                      return "";
                   }
 
@@ -859,12 +843,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                   return "";
                } catch (Exception e) {
                   throw new WrappedException("error in evaluation of xpath function [choice-name]",
-                        e);
+                          e);
                }
             }
 
             public List<Class[]> getPrototypes() {
-               Class[] proto = { String.class, String.class };
+               Class[] proto = {String.class, String.class};
                List<Class[]> v = new ArrayList<Class[]>(1);
                v.add(proto);
                return v;
@@ -886,8 +870,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public String fillTemplateString(String template, TreeReference contextRef,
-         HashMap<String, ?> variables) {
-      HashMap<String,String> args = new HashMap<String,String>();
+                                    HashMap<String, ?> variables) {
+      HashMap<String, String> args = new HashMap<String, String>();
 
       int depth = 0;
       List<String> outstandingArgs = Localizer.getArgs(template);
@@ -930,30 +914,28 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * Identify the itemset in the backend model, and create a set of
     * SelectChoice objects at the current question reference based on the data
     * in the model.
-    *
+    * <p/>
     * Will modify the itemset binding to contain the relevant choices
     *
-    * @param itemset
-    *           The binding for an itemset, where the choices will be populated
-    * @param curQRef
-    *           A reference to the current question's element, which will be
-    *           used to determine the values to be chosen from.
+    * @param itemset The binding for an itemset, where the choices will be populated
+    * @param curQRef A reference to the current question's element, which will be
+    *                used to determine the values to be chosen from.
     */
    public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
-	   List<SelectChoice> choices = new ArrayList<SelectChoice>();
+      List<SelectChoice> choices = new ArrayList<SelectChoice>();
 
       List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
-            new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
+              new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
       FormInstance fi = null;
       if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
-                                                        // with the default
-                                                        // instance
+      // with the default
+      // instance
       {
          fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
          if (fi == null) {
             throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName()
-                  + " not found");
+                    + " not found");
          }
       } else {
          fi = getMainInstance();
@@ -961,7 +943,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       if (matches == null) {
          throw new XPathException("Could not find references depended on by"
-               + itemset.nodesetRef.getInstanceName());
+                 + itemset.nodesetRef.getInstanceName());
       }
 
       for (int i = 0; i < matches.size(); i++) {
@@ -971,7 +953,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          // itemset.labelExpr.evalReadable(this.getMainInstance(), new
          // EvaluationContext(exprEvalContext, item));
          String label = itemset.labelExpr.evalReadable(fi, new EvaluationContext(exprEvalContext,
-               item));
+                 item));
          String value = null;
          TreeElement copyNode = null;
 
@@ -982,12 +964,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             // value = itemset.valueExpr.evalReadable(this.getMainInstance(),
             // new EvaluationContext(exprEvalContext, item));
             value = itemset.valueExpr
-                  .evalReadable(fi, new EvaluationContext(exprEvalContext, item));
+                    .evalReadable(fi, new EvaluationContext(exprEvalContext, item));
          }
          // SelectChoice choice = new
          // SelectChoice(labelID,labelInnerText,value,isLocalizable);
          SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i,
-               itemset.labelIsItext);
+                 itemset.labelIsItext);
          choice.setIndex(i);
          if (itemset.copyMode)
             choice.copyNode = copyNode;
@@ -1007,9 +989,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          // to make a note of this
          // and not throw an exception.
          System.out
-               .println("Dynamic select question has no choices! ["
-                     + itemset.nodesetRef
-                     + "]. If this occurs while filling out a form (and not while saving an incomplete form), the filter condition may have eliminated all the choices. Is that what you intended?\n");
+                 .println("Dynamic select question has no choices! ["
+                         + itemset.nodesetRef
+                         + "]. If this occurs while filling out a form (and not while saving an incomplete form), the filter condition may have eliminated all the choices. Is that what you intended?\n");
 
       }
 
@@ -1024,8 +1006,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    /**
-    * @param preloads
-    *           the preloads to set
+    * @param preloads the preloads to set
     */
    public void setPreloader(QuestionPreloader preloads) {
       this.preloader = preloads;
@@ -1039,7 +1020,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * org.javarosa.core.model.utils.Localizer)
     */
    public void localeChanged(String locale, Localizer localizer) {
-	  for (IFormElement child : children) {
+      for (IFormElement child : children) {
          child.localeChanged(locale, localizer);
       }
    }
@@ -1109,7 +1090,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       if (node.isLeaf()) {
          if (node.getPreloadHandler() != null) {
             return preloader.questionPostProcess(node, node.getPreloadHandler(),
-                  node.getPreloadParams());
+                    node.getPreloadParams());
          } else {
             return false;
          }
@@ -1126,18 +1107,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Reads the form definition object from the supplied stream.
-    *
+    * <p/>
     * Requires that the instance has been set to a prototype of the instance
     * that should be used for deserialization.
     *
-    * @param dis
-    *           - the stream to read from.
+    * @param dis - the stream to read from.
     * @throws IOException
     * @throws InstantiationException
     * @throws IllegalAccessException
     */
    public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException,
-         DeserializationException {
+           DeserializationException {
       setID(ExtUtil.readInt(dis));
       setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
       setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -1159,13 +1139,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       outputFragments = (List<IConditionExpr>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
       submissionProfiles = (HashMap<String, SubmissionProfile>) ExtUtil.read(dis, new ExtWrapMap(
-            String.class, SubmissionProfile.class));
+              String.class, SubmissionProfile.class));
 
       formInstances = (HashMap<String, FormInstance>) ExtUtil.read(dis, new ExtWrapMap(
-            String.class, FormInstance.class));
+              String.class, FormInstance.class));
 
       eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
-            String.class, new ExtWrapListPoly()), pf);
+              String.class, new ExtWrapListPoly()), pf);
 
       extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
@@ -1175,9 +1155,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * meant to be called after deserialization and initialization of handlers
     *
-    * @param newInstance
-    *           true if the form is to be used for a new entry interaction,
-    *           false if it is using an existing IDataModel
+    * @param newInstance true if the form is to be used for a new entry interaction,
+    *                    false if it is using an existing IDataModel
     */
    public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
       for (String instanceId : formInstances.keySet()) {
@@ -1207,8 +1186,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Writes the form definition object to the supplied stream.
     *
-    * @param dos
-    *           - the stream to write to.
+    * @param dos - the stream to write to.
     * @throws IOException
     */
    public void writeExternal(DataOutputStream dos) throws IOException {
@@ -1247,7 +1225,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
          indexes.add(Integer.valueOf(i));
          multiplicities.add(Integer.valueOf(index.getInstanceIndex() == -1 ? 0 : index
-               .getInstanceIndex()));
+                 .getInstanceIndex()));
          elements.add(element);
 
          index = index.getNextLevel();
@@ -1277,7 +1255,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
          // ----end
          if (!(elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i))
-               .getRepeat())) {
+                 .getRepeat())) {
             mult = -1;
          }
 
@@ -1289,9 +1267,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public int getNumRepetitions(FormIndex index) {
-	  List<Integer> indexes = new ArrayList<Integer>();
-	  List<Integer> multiplicities = new ArrayList<Integer>();
-	  List<IFormElement> elements = new ArrayList<IFormElement>();
+      List<Integer> indexes = new ArrayList<Integer>();
+      List<Integer> multiplicities = new ArrayList<Integer>();
+      List<IFormElement> elements = new ArrayList<IFormElement>();
 
       if (!index.isInForm()) {
          throw new RuntimeException("not an in-form index");
@@ -1300,7 +1278,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       collapseIndex(index, indexes, multiplicities, elements);
 
       if (!(elements.get(elements.size() - 1) instanceof GroupDef)
-            || !((GroupDef) elements.get(elements.size() - 1)).getRepeat()) {
+              || !((GroupDef) elements.get(elements.size() - 1)).getRepeat()) {
          throw new RuntimeException("current element not a repeat");
       }
 
@@ -1308,7 +1286,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       TreeElement templNode = mainInstance.getTemplate(index.getReference());
       TreeReference parentPath = templNode.getParent().getRef().genericize();
       TreeElement parentNode = mainInstance.resolveReference(parentPath.contextualize(index
-            .getReference()));
+              .getReference()));
       return parentNode.getChildMultiplicity(templNode.getName());
    }
 
@@ -1342,7 +1320,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public int getDeepChildCount() {
       int total = 0;
       for (IFormElement child : children) {
-    	  total += child.getDeepChildCount();
+         total += child.getDeepChildCount();
       }
       return total;
    }
@@ -1429,7 +1407,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public String[] getMetaDataFields() {
-      return new String[] { "DESCRIPTOR", "XMLNS" };
+      return new String[]{"DESCRIPTOR", "XMLNS"};
    }
 
    /**
@@ -1459,7 +1437,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          QuestionDef q = findQuestionByRef(node.getRef(), this);
          if (q == null) {
             throw new RuntimeException(
-                  "FormDef.attachControlsToInstanceData: can't find question to link");
+                    "FormDef.attachControlsToInstanceData: can't find question to link");
          }
 
          if (q.getDynamicChoices() != null) {
@@ -1506,7 +1484,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     */
    public String getAppearanceAttr() {
       throw new RuntimeException(
-            "This method call is not relevant for FormDefs getAppearanceAttr ()");
+              "This method call is not relevant for FormDefs getAppearanceAttr ()");
    }
 
    /**
@@ -1515,7 +1493,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     */
    public void setAppearanceAttr(String appearanceAttr) {
       throw new RuntimeException(
-            "This method call is not relevant for FormDefs setAppearanceAttr()");
+              "This method call is not relevant for FormDefs setAppearanceAttr()");
    }
 
    /**
@@ -1619,7 +1597,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Frees all of the components of this form which are no longer needed once
     * it is completed.
-    *
+    * <p/>
     * Once this is called, the form is no longer capable of functioning, but all
     * data should be retained.
     */
@@ -1631,12 +1609,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    /**
     * Pull this in from FormOverview so that we can make fields private.
-    * 
+    *
     * @param instanceNode
     * @param action
     * @return
     */
-	public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, int action) {
-		return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action); 
-	}
+   public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, int action) {
+      return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action);
+   }
 }
