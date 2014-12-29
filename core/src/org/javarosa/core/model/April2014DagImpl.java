@@ -19,14 +19,12 @@ package org.javarosa.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.form.api.FormEntryController;
 
 /**
  * The April 2014 eval logic as of javarosa-2014-04-29.jar (also applies to
@@ -368,7 +366,7 @@ public class April2014DagImpl extends IDag {
             qt.t.apply(mainInstance, ec, v.get(i));
          }
       } catch (Exception e) {
-         throw new WrappedException("Error evaluating field '" + contextRef.getNameLast() + "': "
+         throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': "
                + e.getMessage(), e);
       }
    }
