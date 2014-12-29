@@ -178,6 +178,6 @@
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
 
-	<target name="BuildRelease" depends="package,CreateJavadoc,RunUnitTests"/>
+	<target name="BuildRelease" depends="package,RunUnitTests,CreateJavadoc"/>
 
 </project>
