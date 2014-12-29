@@ -90,7 +90,7 @@ public abstract class Triggerable implements Externalizable {
 	 * updated by the result of this triggerable
 	 *
 	 */
-	private ArrayList<TreeReference> targets;
+	private List<TreeReference> targets;
 
 	/**
 	 * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
@@ -138,9 +138,9 @@ public abstract class Triggerable implements Externalizable {
 
 	/**
 	 * Not for re-implementation, dispatches all of the evaluation
-	 * @param instance
+	 * @param mainInstance
 	 * @param parentContext
-	 * @param f
+	 * @param context
 	 */
 	public final List<EvaluationResult> apply (FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
 		//The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
@@ -175,7 +175,7 @@ public abstract class Triggerable implements Externalizable {
 		}
 	}
 
-	public ArrayList<TreeReference> getTargets () {
+	public List<TreeReference> getTargets () {
 		return targets;
 	}
 

@@ -176,12 +176,10 @@ public class LegacyDagImpl extends IDag {
 		//
 
 		conditionRepeatTargetIndex.clear();
-		for (int i = 0; i < triggerablesDAG.size(); i++) {
-			QuickTriggerable qt = triggerablesDAG.get(i);
+		for (QuickTriggerable qt : triggerablesDAG) {
 			if (qt.t instanceof Condition) {
-				ArrayList<TreeReference> targets = qt.t.getTargets();
-				for (int j = 0; j < targets.size(); j++) {
-					TreeReference target = targets.get(j);
+				List<TreeReference> targets = qt.t.getTargets();
+				for (TreeReference target : targets) {
 					if (mainInstance.getTemplate(target) != null) {
 						conditionRepeatTargetIndex.put(target, qt);
 					}
