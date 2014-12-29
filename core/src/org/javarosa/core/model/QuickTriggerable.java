@@ -17,6 +17,8 @@ import org.javarosa.core.model.condition.Triggerable;
 public final class QuickTriggerable {
 
 	public final Triggerable t;
+	private Integer hashCode = null;
+
 	public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
 
 		@Override
@@ -30,7 +32,10 @@ public final class QuickTriggerable {
 
 	@Override
 	public final int hashCode() {
-		return System.identityHashCode(t);
+		if (hashCode == null) {
+			hashCode = System.identityHashCode(t);
+		}
+		return hashCode;
 	}
 
 	@Override
