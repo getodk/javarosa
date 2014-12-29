@@ -31,6 +31,8 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.*;
+import org.javarosa.debug.EvaluationResult;
+import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.javarosa.debug.EventNotifierSilent;
 import org.javarosa.form.api.FormEntryController;
@@ -688,7 +690,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       ec.isConstraint = true;
       ec.candidateValue = data;
 
-      return c.constraint.eval(mainInstance, ec);
+      boolean result = c.constraint.eval(mainInstance, ec);
+
+      getEventNotifier().publishEvent(new Event("Constraint", new EvaluationResult(ref, new Boolean(result))));
+
+      return result;
    }
 
    private void resetEvaluationContext() {
@@ -922,6 +928,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *                used to determine the values to be chosen from.
     */
    public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
+      getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
+
       List<SelectChoice> choices = new ArrayList<SelectChoice>();
 
       List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
