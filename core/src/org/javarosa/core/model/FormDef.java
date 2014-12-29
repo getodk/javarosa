@@ -163,7 +163,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     	  dagImpl = new Fast2014DagImpl(ia);
     	  break;
       default:
-    	  throw new IllegalStateException("Unexpected mode");
+    	  throw new IllegalStateException("Unexpected mode: " + mode);
       }
       // This is kind of a wreck...
       resetEvaluationContext();

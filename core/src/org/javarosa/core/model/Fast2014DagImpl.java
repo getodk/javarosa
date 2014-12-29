@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -31,7 +30,6 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
-import org.javarosa.form.api.FormEntryController;
 
 /**
  * The fast (Latest_fastest) eval logic for 2014
@@ -490,7 +488,7 @@ public class Fast2014DagImpl extends IDag {
 
 			return evaluationResults;
 		} catch (Exception e) {
-			throw new WrappedException("Error evaluating field '"
+			throw new RuntimeException("Error evaluating field '"
 					+ contextRef.getNameLast() + "': " + e.getMessage(), e);
 		}
 	}
