@@ -369,7 +369,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          setAnswer(data, node);
          triggerTriggerables(ref, cascadeToGroupChildren);
       } else {
-         // SCTO-2286 : Do not act if the data haven't changed.
+         // Do not act if the data haven't changed.
          // Use the serialized form of the data to avoid type conversions and
          // errors from those.
          IAnswerData oldValue = node.getValue();

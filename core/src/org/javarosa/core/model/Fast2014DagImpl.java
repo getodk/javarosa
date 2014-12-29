@@ -267,12 +267,11 @@ public class Fast2014DagImpl extends IDag {
 			Set<QuickTriggerable> newDestinationSet,
 			boolean cascadeToGroupChildren) {
 		if (qt.t.canCascade()) {
-			if (mode == EvalBehavior.Legacy
-					|| (mode == EvalBehavior.Fast_2014 && !cascadeToGroupChildren)) {
-				for (int j = 0; j < qt.t.getTargets().size(); j++) {
-					TreeReference target = qt.t.getTargets().get(j);
+			ArrayList<TreeReference> targets = qt.t.getTargets();
+			if (!cascadeToGroupChildren) {
+				for (TreeReference target : targets) {
 					ArrayList<QuickTriggerable> triggered = triggerIndex
-							.get(target);
+							  .get(target);
 					if (triggered != null) {
 						for (QuickTriggerable qu : triggered) {
 							if (!destinationSet.contains(qu)) {
@@ -283,12 +282,9 @@ public class Fast2014DagImpl extends IDag {
 					}
 				}
 			} else {
-				boolean expandRepeatables = mode != EvalBehavior.Legacy
-						&& mode != EvalBehavior.April_2014;
+				boolean expandRepeatables = true;
 
-				for (int j = 0; j < qt.t.getTargets().size(); j++) {
-					TreeReference target = (TreeReference) qt.t.getTargets()
-							.get(j);
+				for (TreeReference target : targets) {
 					Set<TreeReference> updatedNodes = new HashSet<TreeReference>();
 					updatedNodes.add(target);
 
@@ -303,7 +299,7 @@ public class Fast2014DagImpl extends IDag {
 					// to the list of updated elements as well.
 					if (qt.t.isCascadingToChildren()) {
 						addChildrenOfReference(mainInstance, evalContext, target, updatedNodes,
-								expandRepeatables);
+								  expandRepeatables);
 					}
 
 					// Now go through each of these updated nodes (generally
@@ -379,24 +375,8 @@ public class Fast2014DagImpl extends IDag {
 		for (; !refSet.isEmpty();) {
 			Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
 			for (QuickTriggerable qt : refSet) {
-				if (mode == EvalBehavior.Legacy
-						|| mode == EvalBehavior.April_2014
-						|| mode == EvalBehavior.Fast_2014) {
-					fillTriggeredElements(mainInstance, evalContext, qt, tv, newSet,
-							cascadeToGroupChildren);
-				} else if (mode == EvalBehavior.Safe_2014) {
-					// leverage the saved DAG edges.
-					// This may over-fill the set of triggerables.
-					// but should be faster than recomputing the edges.
-					// with value-change optimizations, this should be
-					// much faster.
-					for (QuickTriggerable qu : qt.t.getImmediateCascades()) {
-						if (!tv.contains(qu)) {
-							tv.add(qu);
-							newSet.add(qu);
-						}
-					}
-				}
+				fillTriggeredElements(mainInstance, evalContext, qt, tv, newSet,
+						  cascadeToGroupChildren);
 			}
 			refSet = newSet;
 		}
