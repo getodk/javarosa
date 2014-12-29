@@ -229,12 +229,10 @@ public class Fast2014DagImpl extends IDag {
 		//
 
 		conditionRepeatTargetIndex.clear();
-		for (int i = 0; i < triggerablesDAG.size(); i++) {
-			QuickTriggerable qt = triggerablesDAG.get(i);
+		for (QuickTriggerable qt : triggerablesDAG) {
 			if (qt.t instanceof Condition) {
-				ArrayList<TreeReference> targets = qt.t.getTargets();
-				for (int j = 0; j < targets.size(); j++) {
-					TreeReference target = (TreeReference) targets.get(j);
+				List<TreeReference> targets = qt.t.getTargets();
+				for (TreeReference target : targets) {
 					if (mainInstance.getTemplate(target) != null) {
 						conditionRepeatTargetIndex.put(target, qt);
 					}
@@ -263,7 +261,7 @@ public class Fast2014DagImpl extends IDag {
 			Set<QuickTriggerable> newDestinationSet,
 			boolean midSurvey) {
 		if (qt.t.canCascade()) {
-			ArrayList<TreeReference> targets = qt.t.getTargets();
+			List<TreeReference> targets = qt.t.getTargets();
 			if (!midSurvey) {
 				for (TreeReference target : targets) {
 					ArrayList<QuickTriggerable> triggered = triggerIndex

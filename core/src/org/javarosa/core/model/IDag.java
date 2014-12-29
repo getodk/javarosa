@@ -348,7 +348,7 @@ public abstract class IDag {
 				Condition c = (Condition) qt.t;
 
 				if (c.trueAction == action) {
-					ArrayList<TreeReference> targets = c.getTargets();
+					List<TreeReference> targets = c.getTargets();
 					for (int j = 0; j < targets.size() && expr == null; j++) {
 						TreeReference target = targets.get(j);
 
