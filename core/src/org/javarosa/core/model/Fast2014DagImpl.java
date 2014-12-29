@@ -16,11 +16,7 @@
 
 package org.javarosa.core.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
@@ -95,7 +91,7 @@ public class Fast2014DagImpl extends IDag {
 
 	private void evaluateChildrenTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeElement newNode,
-			boolean createdOrDeleted, boolean cascadeToGroupChildren,
+			boolean createdOrDeleted, boolean midSurvey,
 			Set<QuickTriggerable> alreadyEvaluated) {
 		// iterate into the group children and evaluate any triggerables that
 		// depend one them, if they are not already calculated.
@@ -104,7 +100,7 @@ public class Fast2014DagImpl extends IDag {
 			TreeReference anchorRef = newNode.getChildAt(i).getRef();
 			Set<QuickTriggerable> childTriggerables = triggerTriggerables(
 					mainInstance, evalContext, anchorRef,
-					cascadeToGroupChildren, alreadyEvaluated);
+					  midSurvey, alreadyEvaluated);
 			publishSummary((createdOrDeleted ? "Created" : "Deleted"),
 					anchorRef, childTriggerables);
 		}
@@ -113,19 +109,19 @@ public class Fast2014DagImpl extends IDag {
 	@Override
 	public void copyItemsetAnswer(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference copyRef,
-			TreeElement copyToElement, boolean cascadeToGroupChildren) {
+			TreeElement copyToElement, boolean midSurvey) {
 
 		TreeReference targetRef = copyToElement.getRef();
 
 		Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance,
-				evalContext, copyRef, cascadeToGroupChildren,
+				evalContext, copyRef, midSurvey,
 				new HashSet<QuickTriggerable>(0));// trigger conditions that
 													// depend on the creation of
 													// these new nodes
 		publishSummary("Copied itemset answer (phase 1)", targetRef, qtSet1);
 
 		Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance,
-				evalContext, copyRef, cascadeToGroupChildren,
+				evalContext, copyRef, midSurvey,
 				new HashSet<QuickTriggerable>(0));// initialize conditions for
 													// the node (and sub-nodes)
 		publishSummary("Copied itemset answer (phase 2)", targetRef, qtSet2);
@@ -256,7 +252,7 @@ public class Fast2014DagImpl extends IDag {
 	 * @param qt
 	 * @param destinationSet
 	 *            where to store the triggerables
-	 * @param cascadeToGroupChildren
+	 * @param midSurvey
 	 *            if true, then the slow code will execute, if false, then
 	 *            old/fast code will execute that suffers from
 	 *            https://code.google.com/p/opendatakit/issues/detail?id=888
@@ -265,10 +261,10 @@ public class Fast2014DagImpl extends IDag {
 			EvaluationContext evalContext, QuickTriggerable qt,
 			Set<QuickTriggerable> destinationSet,
 			Set<QuickTriggerable> newDestinationSet,
-			boolean cascadeToGroupChildren) {
+			boolean midSurvey) {
 		if (qt.t.canCascade()) {
 			ArrayList<TreeReference> targets = qt.t.getTargets();
-			if (!cascadeToGroupChildren) {
+			if (!midSurvey) {
 				for (TreeReference target : targets) {
 					ArrayList<QuickTriggerable> triggered = triggerIndex
 							  .get(target);
@@ -327,7 +323,7 @@ public class Fast2014DagImpl extends IDag {
 						// the predicate-less path of this ref
 						ArrayList<QuickTriggerable> triggered = triggerIndex
 								.get(ref.hasPredicates() ? ref
-										.removePredicates() : ref);
+										  .removePredicates() : ref);
 
 						if (triggered != null) {
 							// If so, walk all of these triggerables that we
@@ -363,7 +359,7 @@ public class Fast2014DagImpl extends IDag {
 	private Set<QuickTriggerable> evaluateTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext,
 			Set<QuickTriggerable> tv, TreeReference anchorRef,
-			boolean cascadeToGroupChildren,
+			boolean midSurvey,
 			Set<QuickTriggerable> alreadyEvaluated) {
 		// add all cascaded triggerables to queue
 
@@ -376,7 +372,7 @@ public class Fast2014DagImpl extends IDag {
 			Set<QuickTriggerable> newSet = new HashSet<QuickTriggerable>();
 			for (QuickTriggerable qt : refSet) {
 				fillTriggeredElements(mainInstance, evalContext, qt, tv, newSet,
-						  cascadeToGroupChildren);
+						  midSurvey);
 			}
 			refSet = newSet;
 		}
@@ -527,17 +523,17 @@ public class Fast2014DagImpl extends IDag {
 	 */
 
 	@Override
-	public void initializeTriggerables(FormInstance mainInstance,
+	public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference rootRef,
-			boolean cascadeToGroupChildren) {
+			boolean midSurvey) {
 
-		initializeTriggerables(mainInstance, evalContext, rootRef,
-				cascadeToGroupChildren, new HashSet<QuickTriggerable>(1));
+		return initializeTriggerables(mainInstance, evalContext, rootRef,
+				  midSurvey, new HashSet<QuickTriggerable>(1));
 	}
 
 	private Set<QuickTriggerable> initializeTriggerables(
 			FormInstance mainInstance, EvaluationContext evalContext,
-			TreeReference rootRef, boolean cascadeToGroupChildren,
+			TreeReference rootRef, boolean midSurvey,
 			Set<QuickTriggerable> alreadyEvaluated) {
 		TreeReference genericRoot = rootRef.genericize();
 
@@ -554,7 +550,7 @@ public class Fast2014DagImpl extends IDag {
 		}
 
 		return evaluateTriggerables(mainInstance, evalContext, applicable,
-				rootRef, cascadeToGroupChildren, alreadyEvaluated);
+				rootRef, midSurvey, alreadyEvaluated);
 	}
 
 	/**
@@ -566,21 +562,18 @@ public class Fast2014DagImpl extends IDag {
 	 *            that was changed.
 	 */
 	@Override
-	public void triggerTriggerables(FormInstance mainInstance,
+	public Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance,
 			EvaluationContext evalContext, TreeReference ref,
-			boolean cascadeToGroupChildren) {
+			boolean midSurvey) {
 
-		Set<QuickTriggerable> qts = this.triggerTriggerables(mainInstance,
-				evalContext, ref, cascadeToGroupChildren,
-				new HashSet<QuickTriggerable>(1));
-		publishSummary(
-				"need triggerTriggrables attribution string to come through API", ref,
-				qts);
+		return this.triggerTriggerables(mainInstance,
+				  evalContext, ref, midSurvey,
+				  new HashSet<QuickTriggerable>(1));
 	}
 
 	private Set<QuickTriggerable> triggerTriggerables(
 			FormInstance mainInstance, EvaluationContext evalContext,
-			TreeReference ref, boolean cascadeToGroupChildren,
+			TreeReference ref, boolean midSurvey,
 			Set<QuickTriggerable> alreadyEvaluated) {
 
 		// turn unambiguous ref into a generic ref
@@ -599,7 +592,7 @@ public class Fast2014DagImpl extends IDag {
 
 		// Evaluate all of the triggerables in our new set
 		return evaluateTriggerables(mainInstance, evalContext, triggeredCopy,
-				ref, cascadeToGroupChildren, alreadyEvaluated);
+				ref, midSurvey, alreadyEvaluated);
 	}
 
 	@Override

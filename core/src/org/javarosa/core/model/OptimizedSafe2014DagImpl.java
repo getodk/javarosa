@@ -16,11 +16,7 @@
 
 package org.javarosa.core.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
@@ -60,12 +56,12 @@ public class OptimizedSafe2014DagImpl extends IDag {
          TreeElement parentElement, TreeElement deletedElement) {
 
       Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(
-            mainInstance, evalContext, deleteRef, true,
+            mainInstance, evalContext, deleteRef,
             new HashSet<QuickTriggerable>(0));
       publishSummary("Deleted", deleteRef, alreadyEvaluated);
 
       evaluateChildrenTriggerables(mainInstance, evalContext,
-            deletedElement, false, true, alreadyEvaluated);
+            deletedElement, false, alreadyEvaluated);
    }
 
    @Override
@@ -75,12 +71,12 @@ public class OptimizedSafe2014DagImpl extends IDag {
 
       // trigger conditions that depend on the creation of this new node
       Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance,
-            evalContext, createRef, true, new HashSet<QuickTriggerable>(0));
+            evalContext, createRef, new HashSet<QuickTriggerable>(0));
       publishSummary("Created (phase 1)", createRef, qtSet1);
 
       // initialize conditions for the node (and sub-nodes)
       Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance,
-            evalContext, createRef, true, new HashSet<QuickTriggerable>(0));
+            evalContext, createRef, new HashSet<QuickTriggerable>(0));
       publishSummary("Created (phase 2)", createRef, qtSet2);
 
       Set<QuickTriggerable> alreadyEvaluated = new HashSet<QuickTriggerable>(
@@ -88,21 +84,19 @@ public class OptimizedSafe2014DagImpl extends IDag {
       alreadyEvaluated.addAll(qtSet2);
 
       evaluateChildrenTriggerables(mainInstance, evalContext,
-            createdElement, true, true, alreadyEvaluated);
+            createdElement, true, alreadyEvaluated);
    }
 
    private void evaluateChildrenTriggerables(FormInstance mainInstance,
          EvaluationContext evalContext, TreeElement newNode,
-         boolean createdOrDeleted, boolean cascadeToGroupChildren,
-         Set<QuickTriggerable> alreadyEvaluated) {
+         boolean createdOrDeleted, Set<QuickTriggerable> alreadyEvaluated) {
       // iterate into the group children and evaluate any triggerables that
       // depend one them, if they are not already calculated.
       int numChildren = newNode.getNumChildren();
       for (int i = 0; i < numChildren; i++) {
          TreeReference anchorRef = newNode.getChildAt(i).getRef();
          Set<QuickTriggerable> childTriggerables = triggerTriggerables(
-               mainInstance, evalContext, anchorRef,
-               cascadeToGroupChildren, alreadyEvaluated);
+               mainInstance, evalContext, anchorRef, alreadyEvaluated);
          publishSummary((createdOrDeleted ? "Created" : "Deleted"),
                  anchorRef, childTriggerables);
       }
@@ -111,19 +105,19 @@ public class OptimizedSafe2014DagImpl extends IDag {
    @Override
    public void copyItemsetAnswer(FormInstance mainInstance,
          EvaluationContext evalContext, TreeReference copyRef,
-         TreeElement copyToElement, boolean cascadeToGroupChildren) {
+         TreeElement copyToElement, boolean midSurvey) {
 
       TreeReference targetRef = copyToElement.getRef();
 
       Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance,
-            evalContext, copyRef, cascadeToGroupChildren,
+            evalContext, copyRef,
             new HashSet<QuickTriggerable>(0));// trigger conditions that
                                        // depend on the creation of
                                        // these new nodes
       publishSummary("Copied itemset answer (phase 1)", targetRef, qtSet1);
 
       Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance,
-            evalContext, copyRef, cascadeToGroupChildren,
+            evalContext, copyRef,
             new HashSet<QuickTriggerable>(0));// initialize conditions for
                                        // the node (and sub-nodes)
       publishSummary("Copied itemset answer (phase 2)", targetRef, qtSet2);
@@ -250,16 +244,13 @@ public class OptimizedSafe2014DagImpl extends IDag {
     * @param qt
     * @param destinationSet
     *            where to store the triggerables
-    * @param cascadeToGroupChildren
-    *            if true, then the slow code will execute, if false, then
-    *            old/fast code will execute that suffers from
-    *            https://code.google.com/p/opendatakit/issues/detail?id=888
+    * @param midSurvey
     */
    public void fillTriggeredElements(FormInstance mainInstance,
          EvaluationContext evalContext, QuickTriggerable qt,
          Set<QuickTriggerable> destinationSet,
          Set<QuickTriggerable> newDestinationSet,
-         boolean cascadeToGroupChildren) {
+         boolean midSurvey) {
       if (qt.t.canCascade()) {
          {
             boolean expandRepeatables = true;
@@ -329,7 +320,6 @@ public class OptimizedSafe2014DagImpl extends IDag {
    private Set<QuickTriggerable> evaluateTriggerables(
          FormInstance mainInstance, EvaluationContext evalContext,
          Set<QuickTriggerable> tv, TreeReference anchorRef,
-         boolean cascadeToGroupChildren,
          Set<QuickTriggerable> alreadyEvaluated) {
       // add all cascaded triggerables to queue
 
@@ -467,17 +457,17 @@ public class OptimizedSafe2014DagImpl extends IDag {
     */
 
    @Override
-   public void initializeTriggerables(FormInstance mainInstance,
+   public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance,
          EvaluationContext evalContext, TreeReference rootRef,
-         boolean cascadeToGroupChildren) {
+         boolean midSurvey) {
 
-      initializeTriggerables(mainInstance, evalContext, rootRef,
-            cascadeToGroupChildren, new HashSet<QuickTriggerable>(1));
+      return initializeTriggerables(mainInstance, evalContext, rootRef,
+              new HashSet<QuickTriggerable>(1));
    }
 
    private Set<QuickTriggerable> initializeTriggerables(
          FormInstance mainInstance, EvaluationContext evalContext,
-         TreeReference rootRef, boolean cascadeToGroupChildren,
+         TreeReference rootRef,
          Set<QuickTriggerable> alreadyEvaluated) {
       TreeReference genericRoot = rootRef.genericize();
 
@@ -494,7 +484,7 @@ public class OptimizedSafe2014DagImpl extends IDag {
       }
 
       return evaluateTriggerables(mainInstance, evalContext, applicable,
-            rootRef, cascadeToGroupChildren, alreadyEvaluated);
+            rootRef, alreadyEvaluated);
    }
 
    /**
@@ -506,17 +496,17 @@ public class OptimizedSafe2014DagImpl extends IDag {
     *            that was changed.
     */
    @Override
-   public void triggerTriggerables(FormInstance mainInstance,
+   public Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance,
          EvaluationContext evalContext, TreeReference ref,
-         boolean cascadeToGroupChildren) {
+         boolean midSurvey) {
 
-      this.triggerTriggerables(mainInstance, evalContext, ref,
-            cascadeToGroupChildren, new HashSet<QuickTriggerable>(1));
+      return this.triggerTriggerables(mainInstance, evalContext, ref,
+              new HashSet<QuickTriggerable>(1));
    }
 
    private Set<QuickTriggerable> triggerTriggerables(
          FormInstance mainInstance, EvaluationContext evalContext,
-         TreeReference ref, boolean cascadeToGroupChildren,
+         TreeReference ref,
          Set<QuickTriggerable> alreadyEvaluated) {
 
       // turn unambiguous ref into a generic ref
@@ -535,7 +525,7 @@ public class OptimizedSafe2014DagImpl extends IDag {
 
       // Evaluate all of the triggerables in our new set
       return evaluateTriggerables(mainInstance, evalContext, triggeredCopy,
-            ref, cascadeToGroupChildren, alreadyEvaluated);
+            ref, alreadyEvaluated);
    }
 
    @Override

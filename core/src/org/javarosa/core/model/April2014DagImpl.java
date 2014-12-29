@@ -17,6 +17,8 @@
 package org.javarosa.core.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
@@ -71,12 +73,12 @@ public class April2014DagImpl extends IDag {
 
    @Override
    public void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext,
-         TreeReference copyRef, TreeElement copyToElement, boolean cascadeToGroupChildren) {
+         TreeReference copyRef, TreeElement copyToElement, boolean midSurvey) {
 
       // trigger conditions that depend on the creation of this new node
-      triggerTriggerables(mainInstance, evalContext, copyRef, cascadeToGroupChildren);
+      triggerTriggerables(mainInstance, evalContext, copyRef, midSurvey);
       // initialize conditions for the node (and sub-nodes)
-      initializeTriggerables(mainInstance, evalContext, copyRef, cascadeToGroupChildren);
+      initializeTriggerables(mainInstance, evalContext, copyRef, midSurvey);
       // not 100% sure this will work since destRef is ambiguous as the last
       // step, but i think it's supposed to work
    }
@@ -256,8 +258,8 @@ public class April2014DagImpl extends IDag {
     */
 
    @Override
-   public void initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext,
-         TreeReference rootRef, boolean cascadeToGroupChildren) {
+   public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext,
+         TreeReference rootRef, boolean midSurvey) {
       TreeReference genericRoot = rootRef.genericize();
 
       ArrayList<QuickTriggerable> applicable = new ArrayList<QuickTriggerable>();
@@ -272,7 +274,7 @@ public class April2014DagImpl extends IDag {
          }
       }
 
-      evaluateTriggerables(mainInstance, evalContext, applicable, rootRef);
+      return evaluateTriggerables(mainInstance, evalContext, applicable, rootRef);
    }
 
    /**
@@ -283,8 +285,8 @@ public class April2014DagImpl extends IDag {
     *           was changed.
     */
    @Override
-   public void triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext,
-         TreeReference ref, boolean cascadeToChildrenOfGroupsWithRelevanceExpressions) {
+   public Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext,
+         TreeReference ref, boolean midSurvey) {
       // turn unambiguous ref into a generic ref
       // to identify what nodes should be triggered by this
       // reference changing
@@ -293,13 +295,13 @@ public class April2014DagImpl extends IDag {
       // get triggerables which are activated by the generic reference
       ArrayList<QuickTriggerable> triggered = triggerIndex.get(genericRef);
       if (triggered == null) {
-         return;
+         return Collections.emptySet();
       }
 
       ArrayList<QuickTriggerable> triggeredCopy = new ArrayList<QuickTriggerable>(triggered);
 
       // Evaluate all of the triggerables in our new list
-      evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref);
+      return evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref);
    }
 
    /**
@@ -315,7 +317,7 @@ public class April2014DagImpl extends IDag {
     * @param anchorRef
     *           The reference to original value that was updated
     */
-   private void evaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext,
+   private Collection<QuickTriggerable> evaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext,
          ArrayList<QuickTriggerable> tv, TreeReference anchorRef) {
       // add all cascaded triggerables to queue
 
@@ -336,6 +338,8 @@ public class April2014DagImpl extends IDag {
             evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
          }
       }
+
+      return tv;
    }
 
    /**
