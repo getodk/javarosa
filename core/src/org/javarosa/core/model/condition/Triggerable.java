@@ -20,9 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
 import java.util.Set;
 
@@ -309,43 +307,20 @@ public abstract class Triggerable implements Externalizable {
 	 * Searches in the triggers of this Triggerable, trying to find the ones that are
 	 * contained in the given list of contextualized refs.
 	 *
-	 * @param firedAnchors a list of absolute refs
-	 * @return either a set of siblings (repeated nodes) per trigger, or a parent of the trigger
+	 * @param firedAnchorsMap a map of absolute refs
+	 * @return a list of affected nodes.
 	 */
-	public List<TreeReference> findAffectedTriggers(List<TreeReference> firedAnchors) {
+	public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
 		List<TreeReference> affectedTriggers = new ArrayList<TreeReference>(0);
 
 		Set<TreeReference> triggers = this.getTriggers();
 		for (TreeReference trigger : triggers) {
-			for (TreeReference firedAnchor : firedAnchors) {
-				TreeReference genericizedFiredAnchor = firedAnchor.genericize();
-				if (genericizedFiredAnchor.equals(trigger)) {
-					if (affectedTriggers.isEmpty()) {
-						affectedTriggers.add(firedAnchor);
-					} else {
-						// if there is a trigger in the list, then it might be a sibling
-						boolean addedAsSibling = false;
-						for (TreeReference affectedTrigger : affectedTriggers) {
-							if (affectedTrigger.genericize().equals(genericizedFiredAnchor) && !affectedTrigger.equals(firedAnchor)) {
-								affectedTriggers.add(firedAnchor);
-								addedAsSibling = true;
-								break;
-							}
-						}
-						if (!addedAsSibling) {
-							// replace one with a parent.
-							for (int i = 0; i < affectedTriggers.size(); i++) {
-								TreeReference affectedTrigger = affectedTriggers.get(i);
-								if (genericizedFiredAnchor.isParentOf(affectedTrigger, false)) {
-									affectedTriggers = new ArrayList<TreeReference>();
-									affectedTriggers.add(firedAnchor);
-									break;
-								}
-							}
-						}
-					}
-				}
+			List<TreeReference> firedAnchors = firedAnchorsMap.get(trigger.genericize());
+			if (firedAnchors == null) {
+				continue;
 			}
+			
+			affectedTriggers.addAll(firedAnchors);
 		}
 
 		return affectedTriggers;

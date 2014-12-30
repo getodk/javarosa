@@ -384,13 +384,11 @@ public class Fast2014DagImpl extends IDag {
 		// in the order they appear in 'triggerables'
 		Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
 
-		List<TreeReference> firedAnchors = new ArrayList<TreeReference>();
+		Map<TreeReference, List<TreeReference>> firedAnchors = new LinkedHashMap<TreeReference, List<TreeReference>>();
 
 		for (QuickTriggerable qt : triggerablesDAG) {
 			if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-
-				List<TreeReference> affectedTriggers = qt.t
-						.findAffectedTriggers(firedAnchors);
+				List<TreeReference> affectedTriggers = qt.t.findAffectedTriggers(firedAnchors);
 				if (affectedTriggers.isEmpty()) {
 					affectedTriggers.add(anchorRef);
 				}
@@ -402,11 +400,15 @@ public class Fast2014DagImpl extends IDag {
 					fired.add(qt);
 
 					for (EvaluationResult evaluationResult : evaluationResults) {
-						TreeReference affectedRef = evaluationResult
-								.getAffectedRef();
-						if (!firedAnchors.contains(affectedRef)) {
-							firedAnchors.add(affectedRef);
+						TreeReference affectedRef = evaluationResult.getAffectedRef();
+
+						TreeReference key = affectedRef.genericize();
+						List<TreeReference> values = firedAnchors.get(key);
+						if (values == null) {
+							values = new ArrayList<TreeReference>();
+							firedAnchors.put(key, values);
 						}
+						values.add(affectedRef);
 					}
 				}
 
