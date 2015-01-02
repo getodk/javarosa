@@ -32,7 +32,7 @@ import org.javarosa.core.model.instance.TreeReference;
  * @author meletis@surveycto.com
  *
  */
-public class Safe2014DagImpl extends IDag {
+public class Safe2014DagImpl extends LatestDagBase {
 
    private final EvalBehavior mode = EvalBehavior.Safe_2014;
 
@@ -340,60 +340,7 @@ public class Safe2014DagImpl extends IDag {
          refSet = newSet;
       }
 
-      // tv should now contain all of the triggerable components which are
-      // going
-      // to need to be addressed
-      // by this update.
-      // 'triggerables' is topologically-ordered by dependencies, so evaluate
-      // the triggerables in 'tv'
-      // in the order they appear in 'triggerables'
-      Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
-
-      for (int i = 0; i < triggerablesDAG.size(); i++) {
-         QuickTriggerable qt = triggerablesDAG.get(i);
-         if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-            evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
-
-            fired.add(qt);
-         }
-      }
-
-      return fired;
-   }
-
-   /**
-    * Step 3 in DAG cascade. evaluate the individual triggerable expressions
-    * against the anchor (the value that changed which triggered recomputation)
-    *
-    * @param qt
-    *            The triggerable to be updated
-    * @param anchorRef
-    *            The reference to the value which was changed.
-    */
-   private void evaluateTriggerable(FormInstance mainInstance,
-         EvaluationContext evalContext, QuickTriggerable qt,
-         TreeReference anchorRef) {
-
-      // Contextualize the reference used by the triggerable against the
-      // anchor
-      TreeReference contextRef = qt.t.contextualizeContextRef(anchorRef);
-      try {
-
-         // Now identify all of the fully qualified nodes which this
-         // triggerable
-         // updates. (Multiple nodes can be updated by the same trigger)
-         List<TreeReference> v = evalContext.expandReference(contextRef);
-
-         // Go through each one and evaluate the trigger expresion
-         for (int i = 0; i < v.size(); i++) {
-            EvaluationContext ec = new EvaluationContext(evalContext,
-                  v.get(i));
-            qt.t.apply(mainInstance, ec, v.get(i));
-         }
-      } catch (Exception e) {
-         throw new RuntimeException("Error evaluating field '"
-               + contextRef.getNameLast() + "': " + e.getMessage(), e);
-      }
+      return doEvaluateTriggerables(mainInstance, evalContext, tv, anchorRef, alreadyEvaluated);
    }
 
    /**

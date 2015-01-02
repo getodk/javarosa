@@ -34,7 +34,7 @@ import org.javarosa.debug.Event;
  * @author meletis@surveycto.com
  *
  */
-public class Fast2014DagImpl extends IDag {
+public class Fast2014DagImpl extends LatestDagBase {
 
 	private final EvalBehavior mode = EvalBehavior.Fast_2014;
 
@@ -375,48 +375,7 @@ public class Fast2014DagImpl extends IDag {
 			refSet = newSet;
 		}
 
-		// tv should now contain all of the triggerable components which are
-		// going
-		// to need to be addressed
-		// by this update.
-		// 'triggerables' is topologically-ordered by dependencies, so evaluate
-		// the triggerables in 'tv'
-		// in the order they appear in 'triggerables'
-		Set<QuickTriggerable> fired = new HashSet<QuickTriggerable>();
-
-		Map<TreeReference, List<TreeReference>> firedAnchors = new LinkedHashMap<TreeReference, List<TreeReference>>();
-
-		for (QuickTriggerable qt : triggerablesDAG) {
-			if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-				List<TreeReference> affectedTriggers = qt.t.findAffectedTriggers(firedAnchors);
-				if (affectedTriggers.isEmpty()) {
-					affectedTriggers.add(anchorRef);
-				}
-
-				List<EvaluationResult> evaluationResults = evaluateTriggerable(
-						mainInstance, evalContext, qt, affectedTriggers);
-
-				if (evaluationResults.size() > 0) {
-					fired.add(qt);
-
-					for (EvaluationResult evaluationResult : evaluationResults) {
-						TreeReference affectedRef = evaluationResult.getAffectedRef();
-
-						TreeReference key = affectedRef.genericize();
-						List<TreeReference> values = firedAnchors.get(key);
-						if (values == null) {
-							values = new ArrayList<TreeReference>();
-							firedAnchors.put(key, values);
-						}
-						values.add(affectedRef);
-					}
-				}
-
-				fired.add(qt);
-			}
-		}
-
-		return fired;
+		return doEvaluateTriggerables(mainInstance, evalContext, tv, anchorRef, alreadyEvaluated);
 	}
 
 	/**
