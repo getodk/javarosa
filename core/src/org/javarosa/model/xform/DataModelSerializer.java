@@ -26,7 +26,6 @@ import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeReference;
-import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
 
 	/**

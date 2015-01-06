@@ -24,10 +24,6 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.util.OrderedMap;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SelectOneDataTests extends TestCase {
 	QuestionDef question;
@@ -46,8 +42,6 @@ public class SelectOneDataTests extends TestCase {
 		question = new QuestionDef();
 		question.setID(57);
 		
-		OrderedMap oh = new OrderedMap();
-      List v = new ArrayList();
 		for (int i = 0; i < 3; i++) {
 			question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false));
 		}	

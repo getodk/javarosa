@@ -12,7 +12,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.XFormParseException;
 
 public class SelectChoice implements Externalizable, Localizable {

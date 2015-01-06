@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
@@ -406,7 +405,7 @@ public class XPathPathExpr extends XPathExpression {
 			filtExpr = (XPathFilterExpr)ExtUtil.read(in, XPathFilterExpr.class, pf);
 		}
 
-      List v = (List)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
+      List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
 		steps = new XPathStep[v.size()];
 		for (int i = 0; i < steps.length; i++)
 			steps[i] = ((XPathStep)v.get(i)).intern();

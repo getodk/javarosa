@@ -111,8 +111,8 @@ public class Property implements Persistable, IMetaData {
     	return recordId;
     }
 
-	public HashMap getMetaData() {
-		HashMap metadata = new HashMap();
+	public HashMap<String,Object> getMetaData() {
+		HashMap<String,Object> metadata = new HashMap<String,Object>();
 		String[] fields = getMetaDataFields();
 		for (int i = 0; i < fields.length; i++) {
 			metadata.put(fields[i], getMetaData(fields[i]));

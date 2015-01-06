@@ -16,7 +16,7 @@ public class Localization {
 		return globalLocalizer.getText(key, args);
 	}
 
-	public static String get(String key, HashMap args) {
+	public static String get(String key, HashMap<String,String> args) {
 		checkRep();
 		return globalLocalizer.getText(key, args);
 	}

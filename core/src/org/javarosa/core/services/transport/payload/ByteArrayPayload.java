@@ -108,7 +108,7 @@ public class ByteArrayPayload implements IDataPayload {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#accept(org.javarosa.core.services.transport.IDataPayloadVisitor)
 	 */
-	public Object accept(IDataPayloadVisitor visitor) {
+	public <T> T accept(IDataPayloadVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 

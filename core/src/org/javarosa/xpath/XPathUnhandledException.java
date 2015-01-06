@@ -17,6 +17,11 @@
 package org.javarosa.xpath;
 
 public class XPathUnhandledException extends XPathException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6425123190412285185L;
+
 	public XPathUnhandledException () {
 		
 	}

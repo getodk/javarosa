@@ -16,23 +16,23 @@
 
 package org.javarosa.core.model.instance;
 
-import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.util.restorable.Restorable;
-import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.model.utils.IInstanceVisitor;
-import org.javarosa.core.services.storage.IMetaData;
-import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.util.externalizable.*;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.utils.IInstanceVisitor;
+import org.javarosa.core.services.storage.IMetaData;
+import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 /**
@@ -316,7 +316,7 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 		schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
 		dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 
-		namespaces = (HashMap)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+		namespaces = (HashMap<String,Object>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 		setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
 
 	}

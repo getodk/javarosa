@@ -16,19 +16,17 @@
 
 package org.javarosa.core.model.condition;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
-import org.javarosa.xpath.expr.XPathFuncExpr;
-
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
 
 /* a collection of objects that affect the evaluation of an expression, like function handlers
  * and (not supported) variable bindings
@@ -36,7 +34,7 @@ import java.util.List;
 public class EvaluationContext {
 	private TreeReference contextNode; //unambiguous ref used as the anchor for relative paths
 	private HashMap<String, IFunctionHandler> functionHandlers;
-	private HashMap variables;
+	private HashMap<String, Object> variables;
 
 	public boolean isConstraint; //true if we are evaluating a constraint
 	public IAnswerData candidateValue; //if isConstraint, this is the value being validated
@@ -101,7 +99,7 @@ public class EvaluationContext {
 		this.instance = instance;
 		this.contextNode = TreeReference.rootRef();
 		functionHandlers = new HashMap<String, IFunctionHandler>();
-		variables = new HashMap();
+		variables = new HashMap<String, Object>();
 	}
 
 	public FormInstance getInstance(String id) {
@@ -126,7 +124,7 @@ public class EvaluationContext {
 		functionHandlers.put(fh.getName(), fh);
 	}
 
-	public HashMap getFunctionHandlers () {
+	public HashMap<String, IFunctionHandler> getFunctionHandlers () {
 		return functionHandlers;
 	}
 
@@ -248,7 +246,6 @@ public class EvaluationContext {
          List<TreeReference> set = new ArrayList<TreeReference>(1);
 
 			TreeElement node = instance.resolveReference(workingRef);
-         List<TreeReference> passingSet = new ArrayList<TreeReference>(0);
 
 			{
 				if (node.getNumChildren() > 0) {

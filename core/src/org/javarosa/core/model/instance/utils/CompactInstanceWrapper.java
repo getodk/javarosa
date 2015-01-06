@@ -309,9 +309,17 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					//custom data types
 					val = ExtUtil.read(in, new ExtWrapTagged(), pf);
 				} else if (answerType == SelectOneData.class) {
-					val = getSelectOne(ExtUtil.read(in, CHOICE_MODE == CHOICE_VALUE ? String.class : Integer.class));
+					if ( CHOICE_MODE == CHOICE_VALUE ) {
+						val = getSelectOne(ExtUtil.read(in, String.class));
+					} else {
+						val = getSelectOne(ExtUtil.read(in, Integer.class));
+					}
 				} else if (answerType == SelectMultiData.class) {
-					val = getSelectMulti((List)ExtUtil.read(in, new ExtWrapList(CHOICE_MODE == CHOICE_VALUE ? String.class : Integer.class)));
+					if ( CHOICE_MODE == CHOICE_VALUE ) {
+						val = getSelectMulti((List<Object>)ExtUtil.read(in, new ExtWrapList(String.class)));
+					} else {
+						val = getSelectMulti((List<Object>)ExtUtil.read(in, new ExtWrapList(Integer.class)));
+					}
 				} else {
 					switch (flag) {
 					case 0x40: answerType = StringData.class; break;

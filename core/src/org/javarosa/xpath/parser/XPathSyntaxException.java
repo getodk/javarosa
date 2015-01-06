@@ -18,6 +18,11 @@ package org.javarosa.xpath.parser;
 
 public class XPathSyntaxException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8753184668102340857L;
+
 	public XPathSyntaxException() {
 		super();
 	}

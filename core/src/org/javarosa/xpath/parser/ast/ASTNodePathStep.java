@@ -42,13 +42,13 @@ public class ASTNodePathStep extends ASTNode {
 	public ASTNodeFunctionCall nodeTestFunc;
 	public XPathQName nodeTestQName;
 	public String nodeTestNamespace;
-	public Vector predicates;
+	public Vector<ASTNode> predicates;
 	
 	public ASTNodePathStep () {
-		predicates = new Vector();
+		predicates = new Vector<ASTNode>();
 	}
 	
-	public Vector getChildren() {
+	public Vector<ASTNode> getChildren() {
 		return predicates;
 	}
 

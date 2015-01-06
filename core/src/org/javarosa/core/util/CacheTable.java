@@ -15,9 +15,10 @@ import java.util.Vector;
 public class CacheTable<K> {
 	int totalAdditions = 0;
 
-	private Hashtable<Integer, WeakReference> currentTable;
+	// Object is actually K...
+	private Hashtable<Integer, WeakReference<Object>> currentTable;
 
-	private static Vector<WeakReference> caches = new Vector<WeakReference>(1);
+	private static Vector<WeakReference<CacheTable<?>>> caches = new Vector<WeakReference<CacheTable<?>>>(1);
 
 	private static Thread cleaner = new Thread(new Runnable() {
 		public void run() {
@@ -26,17 +27,17 @@ public class CacheTable<K> {
 				try {
 					toRemove.removeAllElements();
 					for (int i = 0; i < caches.size(); ++i) {
-						CacheTable cache = (CacheTable) caches.elementAt(i).get();
+						CacheTable<?> cache = caches.elementAt(i).get();
 						if (cache == null) {
 							toRemove.addElement(DataUtil.integer(i));
 						} else {
-							Hashtable<Integer, WeakReference> table = cache.currentTable;
-							for (Enumeration en = table.keys(); en.hasMoreElements();) {
-								Object key = en.nextElement();
+							Hashtable<Integer, WeakReference<Object>> table = cache.currentTable;
+							for (Enumeration<Integer> en = table.keys(); en.hasMoreElements();) {
+								Integer key = en.nextElement();
 
 								synchronized(cache) {
 									//See whether or not the cached reference has been cleared by the GC
-									if (((WeakReference) table.get(key)).get() == null) {
+									if (table.get(key).get() == null) {
 											//If so, remove the entry, it's no longer useful.
 											table.remove(key);
 									}
@@ -49,10 +50,10 @@ public class CacheTable<K> {
 								//largest size it has ever been.
 								//TODO: 50 is a super arbitrary upper bound
 								if(cache.totalAdditions > 50 && cache.totalAdditions - cache.currentTable.size() > (cache.currentTable.size() >> 2) ) {
-									Hashtable newTable = new Hashtable(cache.currentTable.size());
+									Hashtable<Integer,WeakReference<Object>> newTable = new Hashtable<Integer,WeakReference<Object>>(cache.currentTable.size());
 									int oldMax = cache.totalAdditions;
-									for (Enumeration en = table.keys(); en.hasMoreElements();) {
-										Object key = en.nextElement();
+									for (Enumeration<Integer> en = table.keys(); en.hasMoreElements();) {
+										Integer key = en.nextElement();
 										newTable.put(key, cache.currentTable.get(key));
 									}
 									cache.currentTable = newTable;
@@ -79,8 +80,8 @@ public class CacheTable<K> {
 		}
 	});
 
-	private static void registerCache(CacheTable table) {
-		caches.addElement(new WeakReference(table));
+	private static void registerCache(CacheTable<?> table) {
+		caches.addElement(new WeakReference<CacheTable<?>>(table));
 		synchronized(cleaner) {
 			if(!cleaner.isAlive()) {
 				cleaner.start();
@@ -90,7 +91,7 @@ public class CacheTable<K> {
 
 	public CacheTable() {
 		super();
-		currentTable = new Hashtable<Integer, WeakReference>();
+		currentTable = new Hashtable<Integer, WeakReference<Object>>();
 		registerCache(this);
 	}
 
@@ -123,7 +124,7 @@ public class CacheTable<K> {
 
 	public void register(int key, K item) {
 		synchronized(this) {
-			currentTable.put(DataUtil.integer(key), new WeakReference(item));
+			currentTable.put(DataUtil.integer(key), new WeakReference<Object>(item));
 			totalAdditions++;
 		}
 	}

@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;

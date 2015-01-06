@@ -2,6 +2,11 @@ package org.javarosa.core.log;
 
 public class WrappedException extends RuntimeException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6187588881484173495L;
+	
 	String message;
 	Exception child;
 	

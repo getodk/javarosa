@@ -145,6 +145,11 @@ public class StreamsUtil {
 	//Unify the functional aspects here
 	
 	private abstract class DirectionalIOException extends IOException{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4028085294047475971L;
+		
 		IOException internal;
 
 		public DirectionalIOException(IOException internal) {
@@ -164,12 +169,22 @@ public class StreamsUtil {
 	}
 	
 	public class InputIOException extends DirectionalIOException{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5939766950738216779L;
+
 		public InputIOException(IOException internal) {
 			super(internal);
 		}
 	}
 	
     public class OutputIOException extends DirectionalIOException{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1816322555490749440L;
+
 		public OutputIOException(IOException internal) {
 			super(internal);
 		}

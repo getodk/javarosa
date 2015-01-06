@@ -6,12 +6,10 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import org.javarosa.core.util.ArrayUtilities;
 import org.javarosa.core.util.CacheTable;
-import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -84,7 +82,7 @@ public class TreeReferenceLevel implements Externalizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		multiplicity = ExtUtil.readInt(in);
-		predicates = ExtUtil.nullIfEmpty((List<XPathExpression>)ExtUtil.read(in,new ExtWrapListPoly()));
+		predicates = (List<XPathExpression>) ExtUtil.nullIfEmpty((List<XPathExpression>)ExtUtil.read(in,new ExtWrapListPoly()));
 	}
 
 

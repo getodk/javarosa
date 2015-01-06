@@ -57,7 +57,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.locale.LocaleDataSource#getLocalizedText()
 	 */
-	public OrderedMap getLocalizedText() {
+	public OrderedMap<String,String> getLocalizedText() {
 		return loadLocaleResource(resourceURI);
 	}
 
@@ -81,10 +81,10 @@ public class ResourceFileDataSource implements LocaleDataSource {
 	 *
 	 * @return a dictionary of key/value locale pairs from a file in the resource directory 
 	 */
-	private OrderedMap loadLocaleResource(String resourceName) {
+	private OrderedMap<String,String> loadLocaleResource(String resourceName) {
 		InputStream is = System.class.getResourceAsStream(resourceName);
 		// TODO: This might very well fail. Best way to handle?
-		OrderedMap locale = new OrderedMap();
+		OrderedMap<String,String> locale = new OrderedMap<String,String>();
 		int chunk = 100;
 		InputStreamReader isr;
 		try {
@@ -146,7 +146,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 		return locale;
 	}
 
-	private void parseAndAdd(OrderedMap locale, String line, int curline) {
+	private void parseAndAdd(OrderedMap<String,String> locale, String line, int curline) {
 
 		//trim whitespace.
 		line = line.trim();

@@ -2,6 +2,11 @@ package org.javarosa.core.log;
 
 public class FatalException extends WrappedException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 72929242925662685L;
+
 	public FatalException () {
 		this("");
 	}
