@@ -77,44 +77,44 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new ExtWrapNullable((SampleExtz)null), new ExtWrapNullable(SampleExtz.class));
 		testExternalizable(new ExtWrapNullable(new SampleExtz("hi", "there")), new ExtWrapNullable(SampleExtz.class));
 
-		//vectors of base types
-		Vector v = new Vector();
-		v.addElement(new Integer(27));
-		v.addElement(new Integer(-73));
-		v.addElement(new Integer(1024));
-		v.addElement(new Integer(66066066));
+		//lists of base types
+		List<Integer> v = new ArrayList<Integer>();
+		v.add(new Integer(27));
+		v.add(new Integer(-73));
+		v.add(new Integer(1024));
+		v.add(new Integer(66066066));
 		testExternalizable(new ExtWrapList(v), new ExtWrapList(Integer.class));
 
-		Vector vs = new Vector();
-		vs.addElement("alpha");
-		vs.addElement("beta");
-		vs.addElement("gamma");
+		List<String> vs = new ArrayList<String>();
+		vs.add("alpha");
+		vs.add("beta");
+		vs.add("gamma");
 		testExternalizable(new ExtWrapList(vs), new ExtWrapList(String.class));
 
-		Vector w = new Vector();
-		w.addElement(new SampleExtz("where", "is"));
-		w.addElement(new SampleExtz("the", "beef"));
+		List<Object> w = new ArrayList<Object>();
+		w.add(new SampleExtz("where", "is"));
+		w.add(new SampleExtz("the", "beef"));
 		testExternalizable(new ExtWrapList(w), new ExtWrapList(SampleExtz.class));
 
-		//nullable vectors; vectors of nullables (no practical use)
+		//nullable lists; lists of nullables (no practical use)
 		testExternalizable(new ExtWrapNullable(new ExtWrapList(v)), new ExtWrapNullable(new ExtWrapList(Integer.class)));
 		testExternalizable(new ExtWrapNullable((ExtWrapList)null), new ExtWrapNullable(new ExtWrapList(Integer.class)));
 		testExternalizable(new ExtWrapList(v, new ExtWrapNullable()), new ExtWrapList(new ExtWrapNullable(Integer.class)));
 
-		//empty vectors (base types)
-		testExternalizable(new ExtWrapList(new Vector()), new ExtWrapList(String.class));
-		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapBase(Integer.class)), new ExtWrapList(String.class)); //sub-types don't matter for empties
+		//empty lists (base types)
+		testExternalizable(new ExtWrapList(new ArrayList<String>()), new ExtWrapList(String.class));
+		testExternalizable(new ExtWrapList(new ArrayList(), new ExtWrapBase(Integer.class)), new ExtWrapList(String.class)); //sub-types don't matter for empties
 
-		//vectors of vectors (including empties)
-		Vector x = new Vector();
-		x.addElement(new Integer(-35));
-		x.addElement(new Integer(-31415926));
-		Vector y = new Vector();
-		y.addElement(v);
-		y.addElement(x);
-		y.addElement(new Vector());
+		//lists of lists (including empties)
+		ArrayList x = new ArrayList();
+		x.add(new Integer(-35));
+		x.add(new Integer(-31415926));
+		ArrayList y = new ArrayList();
+		y.add(v);
+		y.add(x);
+		y.add(new ArrayList());
 		testExternalizable(new ExtWrapList(y, new ExtWrapList()), new ExtWrapList(new ExtWrapList(Integer.class))); //risky to not specify 'leaf' type (Integer), but works in limited situations
-		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapList()), new ExtWrapList(new ExtWrapList(Integer.class))); //same as above
+		testExternalizable(new ExtWrapList(new ArrayList(), new ExtWrapList()), new ExtWrapList(new ExtWrapList(Integer.class))); //same as above
 
 		//tagged base types
 		testExternalizable(new ExtWrapTagged("string"), new ExtWrapTagged());
@@ -123,27 +123,27 @@ public class ExternalizableTest extends TestCase {
 		PrototypeFactory pf = new PrototypeFactory();
 		pf.addClass(SampleExtz.class);
 		testExternalizable(new ExtWrapTagged(new SampleExtz("bon", "jovi")), new ExtWrapTagged(), pf);
-		//tagged vector (base type)
+		//tagged list (base type)
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(v)), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(w)), new ExtWrapTagged(), pf);
-		//tagged nullables and compound vectors
+		//tagged nullables and compound lists
 		testExternalizable(new ExtWrapTagged(new ExtWrapNullable("string")), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapNullable((String)null)), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(y, new ExtWrapList(Integer.class))), new ExtWrapTagged());
-		testExternalizable(new ExtWrapTagged(new ExtWrapList(new Vector(), new ExtWrapList(Integer.class))), new ExtWrapTagged());
+		testExternalizable(new ExtWrapTagged(new ExtWrapList(new ArrayList(), new ExtWrapList(Integer.class))), new ExtWrapTagged());
 
-		//polymorphic vectors
-		Vector a = new Vector();
-		a.addElement(new Integer(47));
-		a.addElement("string");
-		a.addElement(Boolean.FALSE);
-		a.addElement(new SampleExtz("hello", "dolly"));
+		//polymorphic lists
+		List a = new ArrayList();
+		a.add(new Integer(47));
+		a.add("string");
+		a.add(Boolean.FALSE);
+		a.add(new SampleExtz("hello", "dolly"));
 		testExternalizable(new ExtWrapListPoly(a), new ExtWrapListPoly(), pf);
 		testExternalizable(new ExtWrapTagged(new ExtWrapListPoly(a)), new ExtWrapTagged(), pf);
-		//polymorphic vector with complex sub-types
-		a.addElement(new ExtWrapList(y, new ExtWrapList(Integer.class))); //note: must manually wrap children in polymorphic lists
+		//polymorphic list with complex sub-types
+		a.add(new ExtWrapList(y, new ExtWrapList(Integer.class))); //note: must manually wrap children in polymorphic lists
 		testExternalizable(new ExtWrapListPoly(a), new ExtWrapListPoly(), pf);
-		testExternalizable(new ExtWrapListPoly(new Vector()), new ExtWrapListPoly());
+		testExternalizable(new ExtWrapListPoly(new ArrayList()), new ExtWrapListPoly());
 
 		//hashtables
 		OrderedMap oh = new OrderedMap();
@@ -246,13 +246,17 @@ public class ExternalizableTest extends TestCase {
 
 		if (o == null) {
 			return "(null)";
-		} else if (o instanceof Vector) {
+		} else if (o instanceof List) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("V[");
-			for (Enumeration e = ((Vector)o).elements(); e.hasMoreElements(); ) {
-				sb.append(printObj(e.nextElement()));
-				if (e.hasMoreElements())
+			List lo = (List) o;
+			boolean first = true;
+			for ( Object obj : lo ) {
+				if ( !first ) {
 					sb.append(", ");
+				}
+				first = false;
+				sb.append(printObj(obj));
 			}
 			sb.append("]");
 			return sb.toString();

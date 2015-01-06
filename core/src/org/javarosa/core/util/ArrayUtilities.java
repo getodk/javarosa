@@ -18,7 +18,6 @@ package org.javarosa.core.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  *
@@ -66,34 +65,6 @@ public class ArrayUtilities {
 		return true;
 	}
 
-	/**
-	 * Find a single intersecting element common to two lists, or null if none
-	 * exists. Note that no unique condition will be reported if there are multiple
-	 * elements which intersect, so this should likely only be used if the possible
-	 * size of intersection is 0 or 1
-	 *
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	public static <E> E intersectSingle(Vector<E> a, Vector<E> b) {
-		for(E e : a) {
-			if(b.indexOf(e) != -1) {
-				return e;
-			}
-		}
-		return null;
-	}
-
-	public static <E> Vector<E> vectorCopy(Vector<E> a) {
-		if(a == null ) { return null; }
-		Vector<E> b = new Vector<E>(a.size());
-		for(E e : a) {
-			b.addElement(e);
-		}
-		return b;
-	}
-
    public static <E> List<E> listCopy(List<E> a) {
       if(a == null ) { return null; }
       List<E> b = new ArrayList<E>(a.size());
@@ -103,19 +74,4 @@ public class ArrayUtilities {
       return b;
    }
 
-	public static <E> E[] copyIntoArray(Vector<E> v, E[] a) {
-		int i = 0;
-		for(E e : v) {
-			a[i++] = e;
-		}
-		return a;
-	}
-
-	public static <E> Vector<E> toVector(E[] a) {
-		Vector<E> v = new Vector<E>(a.length);
-		for(E e : a) {
-			v.addElement(e);
-		}
-		return v;
-	}
 }

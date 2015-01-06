@@ -17,9 +17,7 @@ package org.javarosa.model.xform;
  */
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
 
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
@@ -30,9 +28,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.core.services.transport.payload.DataPointerPayload;
 import org.javarosa.core.services.transport.payload.IDataPayload;
-import org.javarosa.core.services.transport.payload.MultiMessagePayload;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;

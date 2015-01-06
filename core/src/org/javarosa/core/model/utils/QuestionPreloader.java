@@ -37,13 +37,14 @@ import org.javarosa.core.util.PropertyUtils;
  */
 public class QuestionPreloader {
 	/* String -> IPreloadHandler */
-	private Map preloadHandlers;
+	// NOTE: this is not java.util.Map!!!
+	private Map<String,IPreloadHandler> preloadHandlers;
 	
 	/**
 	 * Creates a new Preloader with default handlers
 	 */
 	public QuestionPreloader() {
-		preloadHandlers = new Map();
+		preloadHandlers = new Map<String,IPreloadHandler>();
 		initPreloadHandlers();
 	}
 	
@@ -164,7 +165,7 @@ public class QuestionPreloader {
 	 * the lack of a handler, or to invalid parameters
 	 */
 	public IAnswerData getQuestionPreload(String preloadType, String preloadParams) {
-		IPreloadHandler handler = (IPreloadHandler)preloadHandlers.get(preloadType);
+		IPreloadHandler handler = preloadHandlers.get(preloadType);
 		if(handler != null) {
 			return handler.handlePreload(preloadParams);
 		} else {
@@ -174,7 +175,7 @@ public class QuestionPreloader {
 	}
 	
 	public boolean questionPostProcess (TreeElement node, String preloadType, String params) {
-		IPreloadHandler handler = (IPreloadHandler)preloadHandlers.get(preloadType);
+		IPreloadHandler handler = preloadHandlers.get(preloadType);
 		if(handler != null) {
 			return handler.handlePostProcess(node, params);
 		} else {
