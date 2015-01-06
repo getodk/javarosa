@@ -148,11 +148,11 @@ public class ASTNodeAbstractExpr extends ASTNode {
 	
 	public class Partition {
 		public Partition () {
-			pieces = new Vector<ASTNodeAbstractExpr>();
+			pieces = new Vector<ASTNode>();
 			separators = new Vector<Integer>();
 		}
 		
-		public Vector<ASTNodeAbstractExpr> pieces;
+		public Vector<ASTNode> pieces;
 		public Vector<Integer> separators;
 	}
 	

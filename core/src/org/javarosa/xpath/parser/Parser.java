@@ -327,7 +327,7 @@ public class Parser {
 
 			while (i < node.content.size()) {
 				if (node.content.elementAt(i) instanceof ASTNodePredicate) {
-					step.predicates.addElement(node.content.elementAt(i));
+					step.predicates.addElement((ASTNode) node.content.elementAt(i));
 				} else {
 					throw new XPathSyntaxException();
 				}
@@ -343,7 +343,7 @@ public class Parser {
 		int i;
 		for (i = node.content.size() - 1; i >= 0; i--) {
 			if (node.content.elementAt(i) instanceof ASTNodePredicate) {
-				filt.predicates.insertElementAt(node.content.elementAt(i), 0);
+				filt.predicates.insertElementAt((ASTNode) node.content.elementAt(i), 0);
 			} else {
 				break;
 			}
