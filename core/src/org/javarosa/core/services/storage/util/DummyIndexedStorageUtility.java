@@ -11,7 +11,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IMetaData;
@@ -29,25 +28,22 @@ import org.javarosa.core.util.externalizable.Externalizable;
  */
 public class DummyIndexedStorageUtility<T extends Persistable> implements IStorageUtilityIndexed<T> {
 
-	private Hashtable<String, Hashtable<Object, Vector<Integer>>> meta;
+	private Hashtable<String, Hashtable<Object, ArrayList<Integer>>> meta;
 
 	private Hashtable<Integer, T> data;
 
 	int curCount;
 
 	public DummyIndexedStorageUtility() {
-		meta = new Hashtable<String, Hashtable<Object, Vector<Integer>>>();
+		meta = new Hashtable<String, Hashtable<Object, ArrayList<Integer>>>();
 		data = new Hashtable<Integer, T>();
 		curCount = 0;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.IStorageUtilityIndexed#getIDsForValue(java.lang.String, java.lang.Object)
-	 */
-	public Vector getIDsForValue(String fieldName, Object value) {
+	@Override
+	public List<Integer> getIDsForValue(String fieldName, Object value) {
 		if(meta.get(fieldName) == null || meta.get(fieldName).get(value) == null) {
-			return new Vector<Integer>(0);
+			return new ArrayList<Integer>(0);
 		}
 		return meta.get(fieldName).get(value);
 	}
@@ -61,7 +57,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 			throw new NoSuchElementException("No record matching meta index " + fieldName + " with value " + value);
 		}
 
-		Vector<Integer> matches = meta.get(fieldName).get(value);
+		ArrayList<Integer> matches = meta.get(fieldName).get(value);
 
 		if(matches == null || matches.size() == 0) {
 			throw new NoSuchElementException("No record matching meta index " + fieldName + " with value " + value);
@@ -70,7 +66,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 			throw new InvalidIndexException("Multiple records matching meta index " + fieldName + " with value " + value, fieldName);
 		}
 
-		return data.get(matches.elementAt(0));
+		return data.get(matches.get(0));
 	}
 
 	/* (non-Javadoc)
@@ -213,7 +209,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	public List<Integer> removeAll(EntityFilter ef) {
 	   ArrayList<Integer> removed = new ArrayList<Integer>();
 		for(Enumeration<Integer> en = data.keys(); en.hasMoreElements() ;) {
-			Integer i = (Integer)en.nextElement();
+			Integer i = en.nextElement();
 			switch(ef.preFilter(i.intValue(),null)) {
 			case EntityFilter.PREFILTER_INCLUDE:
 				removed.add(i);
@@ -271,8 +267,8 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 
 	private void syncMeta() {
 		meta.clear();
-		for(Enumeration en = data.keys(); en.hasMoreElements() ; ) {
-			Integer i = (Integer)en.nextElement();
+		for(Enumeration<Integer> en = data.keys(); en.hasMoreElements() ; ) {
+			Integer i = en.nextElement();
 			Externalizable e = (Externalizable)data.get(i);
 
 			if( e instanceof IMetaData ) {
@@ -280,27 +276,27 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 				IMetaData m = (IMetaData)e;
 				for(String key : m.getMetaDataFields()) {
 					if(!meta.containsKey(key)) {
-						meta.put(key, new Hashtable<Object,Vector<Integer>>());
+						meta.put(key, new Hashtable<Object,ArrayList<Integer>>());
 					}
 				}
 				for(String key : dynamicIndices) {
 					if(!meta.containsKey(key)) {
-						meta.put(key, new Hashtable<Object,Vector<Integer>>());
+						meta.put(key, new Hashtable<Object,ArrayList<Integer>>());
 					}
 				}
-				for(Enumeration keys = meta.keys() ; keys.hasMoreElements();) {
-					String key = (String)keys.nextElement();
+				for(Enumeration<String> keys = meta.keys() ; keys.hasMoreElements();) {
+					String key = keys.nextElement();
 
 					Object value = m.getMetaData(key);
 
-					Hashtable<Object,Vector<Integer>> records = meta.get(key);
+					Hashtable<Object,ArrayList<Integer>> records = meta.get(key);
 
 					if(!records.containsKey(value)) {
-						records.put(value, new Vector<Integer>(1));
+						records.put(value, new ArrayList<Integer>(1));
 					}
-					Vector<Integer> indices = records.get(value);
+					ArrayList<Integer> indices = records.get(value);
 					if(!indices.contains(i)) {
-						records.get(value).addElement(i);
+						records.get(value).add(i);
 					}
 				}
 			}
@@ -313,8 +309,8 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 	}
 
 
-	Vector<String> dynamicIndices = new Vector<String>(0);
+	ArrayList<String> dynamicIndices = new ArrayList<String>(0);
 	public void registerIndex(String filterIndex) {
-		dynamicIndices.addElement(filterIndex);
+		dynamicIndices.add(filterIndex);
 	}
 }

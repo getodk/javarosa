@@ -19,12 +19,11 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -942,9 +941,9 @@ public class XPathFuncExpr extends XPathExpression {
     public static String selectedAt (Object o1, Object o2) {
         String selection = (String)unpack(o1);
         int index = toInt(o2).intValue();
-       List stringVector = DateUtils.split(selection, " ", true);
+       List<String> stringVector = DateUtils.split(selection, " ", true);
         if (stringVector.size() > index && index >= 0) {
-            return (String) stringVector.get(index);
+            return stringVector.get(index);
         } else {
         	return ""; // empty string if outside of array
         }

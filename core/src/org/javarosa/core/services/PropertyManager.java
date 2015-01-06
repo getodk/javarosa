@@ -149,7 +149,7 @@ public class PropertyManager implements IPropertyManager {
      */
     public void setProperty(String propertyName, List<String> propertyValue) {
       List<String> oldValue = getProperty(propertyName);
-    	if(oldValue != null && vectorEquals(oldValue, propertyValue)) {
+    	if(oldValue != null && listEquals(oldValue, propertyValue)) {
     		//No point in redundantly setting values!
     		return;
     	}
@@ -177,7 +177,7 @@ public class PropertyManager implements IPropertyManager {
 
     }
 
-    private boolean vectorEquals(List<String> v1, List<String> v2) {
+    private boolean listEquals(List<String> v1, List<String> v2) {
     	if(v1.size() != v2.size()) {
     		return false;
     	} else {

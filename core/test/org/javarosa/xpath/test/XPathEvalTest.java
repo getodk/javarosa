@@ -16,12 +16,13 @@
 
 package org.javarosa.xpath.test;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.Date;
-import java.util.Vector;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -442,9 +443,9 @@ public class XPathEvalTest extends TestCase {
 //
 //		SelectOneData sod = new SelectOneData(new Selection(1, getSelectQuestion(false)));
 //		QuestionDef smq = getSelectQuestion(true);
-//		Vector sv = new Vector();
-//		sv.addElement(new Selection(0, smq));
-//		sv.addElement(new Selection(3, smq));
+//		List<Selection> sv = new ArrayList<Selection>();
+//		sv.add(new Selection(0, smq));
+//		sv.add(new Selection(3, smq));
 //		addDataRef(dm1, "/data/select-one", sod);
 //		addDataRef(dm1, "/data/select-multi", new SelectMultiData(sv));
 //		addDataRef(dm1, "/data/custom", new CustomAnswerData());
@@ -462,6 +463,7 @@ public class XPathEvalTest extends TestCase {
 //		//testEval("/.", null, null, new XPathUnsupportedException());
 //		//testEval("/..", null, null, new XPathUnsupportedException());
 	}
+
 	/*
 	private FormInstance newDataModel () {
 		return new FormInstance(new TreeElement());
@@ -476,26 +478,26 @@ public class XPathEvalTest extends TestCase {
 	}
 
 	private void addNodeRef (FormInstance dm, String ref, boolean terminal) {
-		Vector pieces = new Vector();
+		List<String> pieces = new ArrayList<String>();
 
 		//split ref by '/', assume first char is '/'
 		int i = 1;
 		while (i > 0) {
 			int j = ref.indexOf("/", i);
-			pieces.addElement(ref.substring(i, j == -1 ? ref.length() : j));
+			pieces.add(ref.substring(i, j == -1 ? ref.length() : j));
 			i = j + 1;
 		}
 
 		TreeElement node = dm.getRoot();
 		for (int k = 0; k < pieces.size(); k++) {
 			// find if child exists
-			Vector children = node.getChildren();
+			int numChildren = node.getNumChildren();
 			TreeElement child = null;
-			if (children != null) {
-				for (int l = 0; l < children.size(); l++) {
-					if (((TreeElement) children.elementAt(l)).getName().equals(
-							(String) pieces.elementAt(k))) {
-						child = (TreeElement) children.elementAt(l);
+			if (numChildren > 0) {
+				for (int l = 0; l < numChildren; l++) {
+					if (node.getChildAt(l).getName().equals(
+							(String) pieces.get(k))) {
+						child = node.getChildAt(l);
 						break;
 					}
 				}
@@ -503,10 +505,10 @@ public class XPathEvalTest extends TestCase {
 
 			if (child == null) {
 				if (k == pieces.size() - 1 && terminal) {
-					child = new TreeElement((String)pieces.elementAt(k));
+					child = new TreeElement(pieces.get(k));
 					//What do we do with the ref here?
 				} else {
-					child = new TreeElement((String)pieces.elementAt(k));
+					child = new TreeElement(pieces.get(k));
 				}
 
 				node.addChild(child);
@@ -523,13 +525,13 @@ public class XPathEvalTest extends TestCase {
 	}
 
 	private QuestionDef getSelectQuestion (boolean multi) {
-		QuestionDef q = new QuestionDef(1, "blah",
+		QuestionDef q = new QuestionDef(1,
 				multi ? Constants.CONTROL_SELECT_MULTI : Constants.CONTROL_SELECT_ONE);
-
-		q.addSelectItem("choice 1", "val1");
-		q.addSelectItem("choice 2", "val2");
-		q.addSelectItem("choice 3", "val3");
-		q.addSelectItem("choice 4", "val4");
+		q.setLabelInnerText("blah");
+		q.addSelectChoice(new SelectChoice("choice 1", "val1"));
+		q.addSelectChoice(new SelectChoice("choice 2", "val2"));
+		q.addSelectChoice(new SelectChoice("choice 3", "val3"));
+		q.addSelectChoice(new SelectChoice("choice 4", "val4"));
 
 		return q;
 	}
@@ -555,8 +557,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "testfunc"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(new Class[0]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(new Class[0]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -577,9 +579,9 @@ public class XPathEvalTest extends TestCase {
 				return new Boolean(true); // String.re  args[0].
 
 			}
-			public Vector getPrototypes () {
-				Vector p = new Vector();
-				p.addElement(allPrototypes[2]);
+			public List<Class[]> getPrototypes () {
+				List<Class[]> p = new ArrayList<Class[]>();
+				p.add(allPrototypes[2]);
 				return p;
 			}
 			public boolean rawArgs() { return false; }
@@ -590,8 +592,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "add"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(allPrototypes[0]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(allPrototypes[0]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -601,11 +603,11 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "proto"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(allPrototypes[0]);
-				p.addElement(allPrototypes[1]);
-				p.addElement(allPrototypes[2]);
-				p.addElement(allPrototypes[3]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(allPrototypes[0]);
+				p.add(allPrototypes[1]);
+				p.add(allPrototypes[2]);
+				p.add(allPrototypes[3]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -615,8 +617,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "raw"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(allPrototypes[3]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(allPrototypes[3]);
 				return p;
 			}
 			public boolean rawArgs () { return true; }
@@ -626,7 +628,7 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "null-proto"; }
-			public Vector getPrototypes () { return null; }
+			public List<Class[]> getPrototypes () { return null; }
 			public boolean rawArgs () { return false; }
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) { return Boolean.FALSE; }
@@ -634,7 +636,7 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "concat"; }
-			public Vector getPrototypes () { return new Vector(); }
+			public List<Class[]> getPrototypes () { return new ArrayList<Class[]>(); }
 			public boolean rawArgs () { return true; }
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args, EvaluationContext ec) {
@@ -647,8 +649,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "convertible"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(new Class[0]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(new Class[0]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -663,8 +665,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "inconvertible"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(new Class[0]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(new Class[0]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -674,8 +676,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "get-custom"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(allPrototypes[4]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(allPrototypes[4]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -685,8 +687,8 @@ public class XPathEvalTest extends TestCase {
 
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "check-types"; }
-			public Vector getPrototypes () { Vector p = new Vector();
-				p.addElement(allPrototypes[5]);
+			public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+				p.add(allPrototypes[5]);
 				return p;
 			}
 			public boolean rawArgs () { return false; }
@@ -758,8 +760,8 @@ public class XPathEvalTest extends TestCase {
 
 	StatefulFunc read = new StatefulFunc () {
 		public String getName () { return "read"; }
-		public Vector getPrototypes () { Vector p = new Vector();
-			p.addElement(new Class[0]);
+		public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+			p.add(new Class[0]);
 			return p;
 		}
 		public Object eval (Object[] args, EvaluationContext ec) { return val; }
@@ -767,9 +769,9 @@ public class XPathEvalTest extends TestCase {
 
 	StatefulFunc write = new StatefulFunc () {
 		public String getName () { return "write"; }
-		public Vector getPrototypes () { Vector p = new Vector();
+		public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
 			Class[] proto = {String.class};
-			p.addElement(proto);
+			p.add(proto);
 			return p;
 		}
 		public Object eval (Object[] args, EvaluationContext ec) { val = (String)args[0]; return Boolean.TRUE; }
