@@ -19,7 +19,6 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -233,7 +232,7 @@ public class XPathStep implements Externalizable {
 		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break;
 		}
 
-      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+      List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
 			predicates[i] = (XPathExpression)v.get(i);

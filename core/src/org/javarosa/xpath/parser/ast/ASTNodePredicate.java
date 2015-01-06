@@ -24,8 +24,8 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 public class ASTNodePredicate extends ASTNode {
 	public ASTNode expr;
 	
-	public Vector getChildren () {
-		Vector v = new Vector();
+	public Vector<ASTNode> getChildren () {
+		Vector<ASTNode> v = new Vector<ASTNode>();
 		v.addElement(expr);
 		return v;
 	}

@@ -113,7 +113,7 @@ public class XPathFuncExpr extends XPathExpression {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		id = (XPathQName)ExtUtil.read(in, XPathQName.class);
-      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+        List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
 		args = new XPathExpression[v.size()];
 		for (int i = 0; i < args.length; i++)
@@ -142,7 +142,7 @@ public class XPathFuncExpr extends XPathExpression {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 
-		HashMap funcHandlers = evalContext.getFunctionHandlers();
+		HashMap<String,IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
 
 		//TODO: Func handlers should be able to declare the desire for short circuiting as well
 		if(name.equals("if")) {
@@ -402,7 +402,7 @@ public class XPathFuncExpr extends XPathExpression {
       return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
     } else {
 			//check for custom handler
-			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
+			IFunctionHandler handler = funcHandlers.get(name);
 			if (handler != null) {
 				return evalCustomFunction(handler, argVals, evalContext);
 			} else {

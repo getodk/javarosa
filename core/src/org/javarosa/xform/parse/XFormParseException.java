@@ -28,6 +28,11 @@ import org.kxml2.kdom.Element;
 // to be a RuntimeException to me. Is there justification
 // as to why it is?
 public class XFormParseException extends RuntimeException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3852163642144479197L;
+	
 	Element element;
 	
 	public XFormParseException () { }

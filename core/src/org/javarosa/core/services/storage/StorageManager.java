@@ -18,6 +18,7 @@ package org.javarosa.core.services.storage;
 
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 import java.util.HashMap;
 
@@ -32,7 +33,7 @@ import java.util.HashMap;
  */
 public class StorageManager {
 	
-	private static HashMap<String, IStorageUtility> storageRegistry = new HashMap<String, IStorageUtility>();
+	private static HashMap<String, IStorageUtility<? extends Externalizable>> storageRegistry = new HashMap<String, IStorageUtility<? extends Externalizable>>();
 	private static IStorageFactory storageFactory;
 	
 	/**
@@ -84,7 +85,7 @@ public class StorageManager {
 	 * @param key
 	 * @param storage
 	 */
-	public static void registerStorage (String key, IStorageUtility storage) {
+	public static void registerStorage (String key, IStorageUtility<? extends Externalizable> storage) {
 		storageRegistry.put(key, storage);
 	}
 	
@@ -92,16 +93,16 @@ public class StorageManager {
 		StorageManager.registerStorage(key, new WrappingStorageUtility(storeName,wrapper,storageFactory));
 	}
 	
-	public static IStorageUtility getStorage (String key) {
+	public static IStorageUtility<? extends Externalizable> getStorage (String key) {
 		if (storageRegistry.containsKey(key)) {
-			return (IStorageUtility)storageRegistry.get(key);
+			return storageRegistry.get(key);
 		} else {
 			throw new RuntimeException("No storage utility has been registered to handle \"" + key + "\"; you must register one first with StorageManager.registerStorage()");
 		}
 	}
 	
 	public static void repairAll () {
-    for (IStorageUtility storageUtility : storageRegistry.values()) {
+    for (IStorageUtility<? extends Externalizable> storageUtility : storageRegistry.values()) {
       storageUtility.repair();
     }
 	}
@@ -117,7 +118,7 @@ public class StorageManager {
 	}
 	
 	public static void halt() {
-    for (IStorageUtility storageUtility : storageRegistry.values()) {
+    for (IStorageUtility<? extends Externalizable> storageUtility : storageRegistry.values()) {
       storageUtility.close();
     }
 	}

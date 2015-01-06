@@ -70,7 +70,6 @@ import java.util.zip.ZipEntry;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.schema.FormOverview;
-import org.javarosa.xform.schema.FormTranslationFormatter;
 import org.javarosa.xform.util.XFormUtils;
 
 /*
@@ -90,6 +89,11 @@ import org.javarosa.xform.util.XFormUtils;
 
 public class XFormValidatorGUI extends Frame implements ActionListener, KeyListener, ItemListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5950745528980926020L;
+	
 	private final String PROPERTIES_FILE = new String("settings.properties");
 	private final String WTK_PATH = new String("wtk.path");
 	private final String NEW_FORM = new String("new.form");
@@ -278,23 +282,23 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		String cmd = e.getActionCommand();
 		if (cmd.equals("eval")) {
 			// Clear the text area...
-			this.textarea.setText("");
+			textarea.setText("");
 			
 			// If user clicked "validate" button
 			if(checkNewForm())
 				this.validateFile(); 
 		}else if(cmd.equals("test")) {
 			// Clear the text area...
-			this.textarea.setText("");
+			textarea.setText("");
 
 			if(!checkParams()) {
-				this.addToTextArea("ERROR: Please fix parameters on the settings screen!");
+				addToTextArea("ERROR: Please fix parameters on the settings screen!");
 				return;
 			}
 			
 			// Run validation
 			if(!validateFile()) {
-				this.addToTextArea("\n\nERROR: cannot launch emulator until file validates!");
+				addToTextArea("\n\nERROR: cannot launch emulator until file validates!");
 				return;
 			}
 			
@@ -307,11 +311,11 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			this.testBtn.setEnabled(true);
 		} else if(cmd.equals("summary")) {
 			// Clear the text area...
-			this.textarea.setText("");
+			textarea.setText("");
 			
 			// Run validation
 			if(!validateFile()) {
-				this.addToTextArea("\n\nERROR: cannot launch emulator until file validates!");
+				addToTextArea("\n\nERROR: cannot launch emulator until file validates!");
 				return;
 			}
 			
@@ -319,16 +323,16 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			
 		} else if(cmd.equals("deploy")) {
 			// Clear the text area...
-			this.textarea.setText("");
+			textarea.setText("");
 
 			if(!checkDeployJar() || !checkNewForm()) {
-				this.addToTextArea("ERROR: Please fix parameters on the settings screen!");
+				addToTextArea("ERROR: Please fix parameters on the settings screen!");
 				return;
 			}
 			
 			// Run validation
 			if(!validateFile()) {
-				this.addToTextArea("\n\nERROR: cannot deploy form to new jar unless it validates!");
+				addToTextArea("\n\nERROR: cannot deploy form to new jar unless it validates!");
 				return;
 			}
 			
@@ -516,8 +520,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		System.setOut(origO);
 		
 		// and show the output
-		String prev = this.textarea.getText();
-		this.textarea.setText(prev + this.bufferedlogger.flush2());
+		String prev = textarea.getText();
+		textarea.setText(prev + this.bufferedlogger.flush2());
 		
 		return success;
 	}
@@ -872,12 +876,14 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}
 		form.delete();
 		
+		FileInputStream in = null;
+		FileOutputStream out = null;
 		try {
 			byte []data = new byte[BUFFER];
 			form.createNewFile();
 			
-			FileInputStream in = new FileInputStream(newForm);
-			FileOutputStream out = new FileOutputStream(form);
+			in = new FileInputStream(newForm);
+			out = new FileOutputStream(form);
 			
 			int count;
 			while((count = in.read(data, 0, 
@@ -890,6 +896,23 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} finally {
+			if ( in != null ) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					// ignore
+					e.printStackTrace();
+				}
+			}
+			if ( out != null ) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// ignore
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		updateStatus("Repacking JAR");
@@ -1020,12 +1043,14 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}
 		form.delete();
 		
+		FileInputStream in = null;
+		FileOutputStream out = null;
 		try {
 			byte []data = new byte[BUFFER];
 			form.createNewFile();
 			
-			FileInputStream in = new FileInputStream(newForm);
-			FileOutputStream out = new FileOutputStream(form);
+			in = new FileInputStream(newForm);
+			out = new FileOutputStream(form);
 			
 			int count;
 			while((count = in.read(data, 0, 
@@ -1038,6 +1063,23 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} finally {
+			if ( in != null ) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					// ignore
+					e.printStackTrace();
+				}
+			}
+			if ( out != null ) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// ignore
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		updateStatus("Creating test directory");
@@ -1260,20 +1302,21 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		if (destDir.charAt(destDir.length() - 1) != '/')
 			destDir += "\\";
 
+		JarFile jarfile = null;
 		try {
 			BufferedOutputStream dest = null;
 			BufferedInputStream is = null;
 			JarEntry entry;
-			JarFile jarfile;
 			try{
 				jarfile = new JarFile(filename);
 			}catch(Exception e) {
 				addToTextArea("\nError cannot find JAR t unpack: "+filename);
 				return false;
 			}
-			Enumeration e = jarfile.entries();
+
+			Enumeration<JarEntry> e = jarfile.entries();
 			while (e.hasMoreElements()) {
-				entry = (JarEntry) e.nextElement();
+				entry = e.nextElement();
 //				System.out.println("Extracting: " + entry);
 
 				if (entry.isDirectory()) {
@@ -1307,6 +1350,15 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if ( jarfile != null ) {
+				try {
+					jarfile.close();
+				} catch (IOException e) {
+					// ignore
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return true;

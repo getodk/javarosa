@@ -106,8 +106,8 @@ public class XFormAnswerDataParser {
 
 		case Constants.DATATYPE_CHOICE:
 
-         List selections = getSelections(text, q);
-			return (selections.size() == 0 ? null : new SelectOneData((Selection)selections.get(0)));
+            List<Selection> selections = getSelections(text, q);
+			return (selections.size() == 0 ? null : new SelectOneData(selections.get(0)));
 
 		case Constants.DATATYPE_CHOICE_LIST:
 
@@ -185,10 +185,10 @@ public class XFormAnswerDataParser {
 		}
 	}
 
-	private static List getSelections (String text, QuestionDef q) {
+	private static List<Selection> getSelections (String text, QuestionDef q) {
 
-      List choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
-      List v = new ArrayList(choices.size()); // assume they are all still valid...
+      List<String> choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
+      List<Selection> v = new ArrayList<Selection>(choices.size()); // assume they are all still valid...
 		for (int i = 0; i < choices.size(); i++) {
 			Selection s = getSelection((String)choices.get(i), q);
 			if (s != null)

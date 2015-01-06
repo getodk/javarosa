@@ -16,6 +16,11 @@ package org.javarosa.core.reference;
  *
  */
 public class InvalidReferenceException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2062070187063973388L;
+	
 	private String reference;
 	
 	/**

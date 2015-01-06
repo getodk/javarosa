@@ -46,7 +46,6 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
 
 public class QuestionDefTest extends TestCase {
-	QuestionDef q = null;
 	FormEntryPrompt fep = null;
 	FormParseInit fpi = null;
 	
@@ -57,7 +56,7 @@ public class QuestionDefTest extends TestCase {
 
 	public void setUp(){
 		fpi = new FormParseInit();
-		q = fpi.getFirstQuestionDef();
+		fpi.getFirstQuestionDef();
 		fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());
 	}
 	
@@ -291,14 +290,6 @@ public class QuestionDefTest extends TestCase {
 			this.e = question;
 			this.flags = changeFlags;
 		}
-	}
-
-	public QuestionDef getQ() {
-		return q;
-	}
-
-	public void setQ(QuestionDef q) {
-		this.q = q;
 	}
 
 	public FormEntryPrompt getFep() {

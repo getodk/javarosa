@@ -146,7 +146,7 @@ public class TextFormTests extends TestCase {
 			if(t.equals("Non-Localized label inner text!")) testFlag = true;
 
 
-		}while(fec.stepToNextEvent()!=fec.EVENT_END_OF_FORM);
+		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
 
 		if(!testFlag) fail("Failed to fallback to labelInnerText in testNonLocalizedText()");
 	}
@@ -190,13 +190,13 @@ public class TextFormTests extends TestCase {
 
 		Object a = onetext;
 		Object b = fep.getSelectChoiceText(one);
-		this.assertEquals("Invalid select choice text returned",a, b);
+		assertEquals("Invalid select choice text returned",a, b);
 
-		this.assertEquals("Invalid select choice text returned", twotext, fep.getSelectChoiceText(two));
+		assertEquals("Invalid select choice text returned", twotext, fep.getSelectChoiceText(two));
 
-		this.assertNull("Form Entry Caption incorrectly contains Image Text", fep.getSpecialFormSelectChoiceText(one, FormEntryCaption.TEXT_FORM_IMAGE));
+		assertNull("Form Entry Caption incorrectly contains Image Text", fep.getSpecialFormSelectChoiceText(one, FormEntryCaption.TEXT_FORM_IMAGE));
 
-		this.assertNull("Form Entry Caption incorrectly contains Audio Text", fep.getSpecialFormSelectChoiceText(one, FormEntryCaption.TEXT_FORM_AUDIO));
+		assertNull("Form Entry Caption incorrectly contains Audio Text", fep.getSpecialFormSelectChoiceText(one, FormEntryCaption.TEXT_FORM_AUDIO));
 
 		q.removeSelectChoice(q.getChoice(0));
 		q.removeSelectChoice(q.getChoice(0));

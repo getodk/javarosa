@@ -25,7 +25,6 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathVariableReference extends XPathExpression {
     public XPathQName id;

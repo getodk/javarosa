@@ -99,15 +99,15 @@ public class FormDefTest extends TestCase {
 			if(q==null || q.getTextID() == null || q.getTextID() == "")continue;
 			if(q.getTextID().equals("constraint-test")){
 				int response = fec.answerQuestion(ans, true);
-				if(response == fec.ANSWER_CONSTRAINT_VIOLATED){
+				if(response == FormEntryController.ANSWER_CONSTRAINT_VIOLATED){
 					fail("Answer Constraint test failed.");
-				}else if(response == fec.ANSWER_OK){
+				}else if(response == FormEntryController.ANSWER_OK){
 					break;
 				}else{
 					fail("Bad response from fec.answerQuestion()");
 				}
 			}
-		}while(fec.stepToNextEvent()!=fec.EVENT_END_OF_FORM);
+		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
 	}
 	
 	public IDataReference newRef(String xpath){
@@ -116,25 +116,5 @@ public class FormDefTest extends TestCase {
 			pf.addClass(DummyReference.class);
 			return ref;
 	}
-	
-	private class QuestionObserver implements FormElementStateListener {
-		public boolean flag = false;
-		public TreeElement e;
-		public QuestionDef q;
-		public int flags;
-		
-		public void formElementStateChanged (IFormElement q, int flags) {
-			flag = true;
-			this.q = (QuestionDef)q;
-			this.flags = flags;
-		}
-
-		public void formElementStateChanged(TreeElement question, int changeFlags) {
-			flag = true;
-			this.e = question;
-			this.flags = changeFlags;
-		}
-	}
-
 
 }

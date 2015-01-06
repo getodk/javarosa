@@ -22,7 +22,7 @@ public interface IStorageUtilityIndexed<E extends Externalizable> extends IStora
 	* @throws RuntimeException (Fix this exception type) if the field is unrecognized by the
 	* meta data
 	*/
-	 	List<Integer> getIDsForValue (String fieldName, Object value);
+    List<Integer> getIDsForValue (String fieldName, Object value);
  	/**
  	*
  	* Retrieves a Externalizable object from the storage which is reference by the unique index fieldName.

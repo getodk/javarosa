@@ -242,7 +242,7 @@ public class XPathParseTest extends TestCase {
 			//System.out.println("[ " + result + " ]");
 			
 			if (result == null || !result.equals(expected)) {
-				this.fail("XPath Parse Failed! Incorrect parse tree." +
+				fail("XPath Parse Failed! Incorrect parse tree." +
 							"\n    expression:[" + expr + "]" +
 							"\n    expected:[" + expected + "]" +
 							"\n    result:[" + result + "]");
@@ -251,7 +251,7 @@ public class XPathParseTest extends TestCase {
 			//test serialization of parse tree
 			ExternalizableTest.testExternalizable(new ExtWrapTagged(xpe), new ExtWrapTagged(), pf, this, "XPath");
 		} catch (XPathSyntaxException xse) {
-			this.fail("XPath Parse Failed! Unexpected syntax error." + 
+			fail("XPath Parse Failed! Unexpected syntax error." + 
 						"\n    expression:[" + expr + "]");
 		}
 	}
@@ -264,7 +264,7 @@ public class XPathParseTest extends TestCase {
 			XPathExpression xpe = XPathParseTool.parseXPath(expr);
 			String result = (xpe != null ? xpe.toString() : null);
 			
-			this.fail("XPath Parse Failed! Did not get syntax error as expected." + 
+			fail("XPath Parse Failed! Did not get syntax error as expected." + 
 						"\n    expression:[" + expr + "]" +
 						"\n    result:[" + (result == null ? "(null)" : result) + "]");
 		} catch (XPathSyntaxException xse) {

@@ -25,7 +25,7 @@ import org.javarosa.xpath.parser.Token;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public abstract class ASTNode {
-	public abstract Vector getChildren();
+	public abstract Vector<ASTNode> getChildren();
 	public abstract XPathExpression build() throws XPathSyntaxException;
 	
 	//horrible debugging code
@@ -130,7 +130,7 @@ public abstract class ASTNode {
 			if (x.nodeTestType == ASTNodePathStep.NODE_TEST_TYPE_QNAME) printStr("  node test name: " + x.nodeTestQName.toString()); 
 			if (x.nodeTestType == ASTNodePathStep.NODE_TEST_TYPE_FUNC) print(x.nodeTestFunc); 
 			printStr("predicates...");
-			for (Enumeration e = x.predicates.elements(); e.hasMoreElements(); )
+			for (Enumeration<ASTNode> e = x.predicates.elements(); e.hasMoreElements(); )
 				print(e.nextElement());
 			printStr("}");			
 		} else if (o instanceof ASTNodeFilterExpr) {
@@ -138,7 +138,7 @@ public abstract class ASTNode {
 			printStr("filter expr {");
 			print(x.expr);
 			printStr("predicates...");
-			for (Enumeration e = x.predicates.elements(); e.hasMoreElements(); )
+			for (Enumeration<ASTNode> e = x.predicates.elements(); e.hasMoreElements(); )
 				print(e.nextElement());
 			printStr("}");
 		}

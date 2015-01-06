@@ -7,7 +7,7 @@ public interface IMetaData {
 	//for the indefinite future, no meta-data field can have a value of null
 	
 	String[] getMetaDataFields ();
-	HashMap getMetaData(); //<String, E>
+	HashMap<String,Object> getMetaData(); //<String, E>
 	Object getMetaData(String fieldName);
 	
 }

@@ -95,7 +95,7 @@ public class MultiMessagePayload implements IDataPayload {
 		ExtUtil.write(out, new ExtWrapListPoly(payloads));
 	}
 
-	public Object accept(IDataPayloadVisitor visitor) {
+	public <T> T accept(IDataPayloadVisitor<T> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -83,7 +83,7 @@ public class XPathFilterExpr extends XPathExpression {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		x = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
-      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+        List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
 		predicates = new XPathExpression[v.size()];
 		for (int i = 0; i < predicates.length; i++)
