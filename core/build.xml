@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<project default="BuildRelease">
+	<tstamp/>
+	<property name="name" value="javarosa-libraries"/>
+	<property name="jar" value="${name}.jar"/>
+	<property name="dir.root" value="${basedir}/../"/>
+	<property name="dir.lib" value="${dir.root}/lib/"/>
+	<property name="includeantruntime" value="false"/>
+	<property name="ant.build.javac.source" value="1.6"/>
+	<property name="ant.build.javac.target" value="1.6"/>
+	
+	<!-- Get the resource files which'll be used -->
+	<fileset id="jr.resources" dir="${basedir}/">
+		<include name="**/resources/*.txt"/>
+	</fileset>
+
+	<path id="jr.classpath">
+		<fileset dir="${dir.lib}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="jr.compiled.classpath">
+		<path refid="jr.classpath"/>
+		<fileset dir="dist" includes="javarosa-libraries.jar"/>
+	</path>
+
+	<path id="jr.classpath.test">
+		<path refid="jr.compiled.classpath" />
+		<fileset dir="buildTest" includes="jr-resource-jar.jar"/>
+		<fileset dir="tools" includes="junit-3.8.2.jar"/>
+		<pathelement path="buildTest"/>
+	</path>
+
+	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
+	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
+		<attribute name="suite"/>
+		<!-- Note: The reason that we are using @{suite} as a property is because properties in ANT
+			are immutable, and this is a unique identifier -->
+		<sequential>
+			<java classname="junit.textui.TestRunner" failonerror="false" fork="true" resultproperty="@{suite}">
+				<classpath refid="jr.classpath.test" />
+				<arg value="@{suite}"/>
+			</java>
+			<condition property="testresult.global">
+				<not>
+					<equals arg1="${@{suite}}" arg2="0"/>
+				</not>
+			</condition>
+		</sequential>
+	</macrodef>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" onerror="report">
+		<classpath>
+			<pathelement location="tools/ant-contrib-0.6.jar"/>
+		</classpath>
+	</taskdef>
+
+	<target name="init" description="set classpath and make needed directories">
+		<mkdir dir="lib/"/>
+		<path id="classpath">
+			<fileset dir="${dir.lib}" includes="*.jar"/>
+		</path>
+		<mkdir dir="bin/"/>
+		<mkdir dir="dist/"/>
+		<mkdir dir="buildTest/"/>
+		<mkdir dir="documentation/"/>
+		<mkdir dir="documentation/javadoc/"/>
+
+	</target>
+	
+	<target name="clean" description="delete dist and bin directories">
+		<delete dir="dist/" quiet="true"/>
+		<delete dir="bin/" quiet="true"/>
+		<delete dir="buildTest/" quiet="true"/>
+		<delete dir="documentation/" quiet="true"/>
+	</target>
+	
+	<target name="compile" depends="clean,extract-libs,init" description="compile the source">
+		<javac includeantruntime="false" srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source"/>
+	</target>
+	
+	<target name="package" depends="compile" description="package binary into jar">
+		<jar destfile="dist/${jar}">
+			<fileset dir="bin/" includes="**/*.class"/>
+		</jar>
+	</target>
+
+	<!-- for use primarily by the build server to extract the required 3rd-party libraries into the
+	     javarosa source tree. to use this in your own build, set the 'extract-libs-fresh' property,
+	     then also set the 'javarosa-deps' property to the path of the library archive (make sure you
+	     are using the version of the archive compatible with the version you wish to build) -->
+	<target name="extract-libs" if="extract-libs-fresh">
+		<unzip src="${javarosa-deps}" dest="${dir.root}" overwrite="true" />
+	</target>
+	
+	<target name="CreateJavadoc" depends="package" description="generates javadoc and also UML Diagram">
+		<javadoc useexternalfile="yes" sourcepath="src" packagenames="org.javarosa.*" destdir="${basedir}/documentation/javadoc"
+	        	classpathref="jr.compiled.classpath" private="true" >
+			<doclet name="org.umlgraph.doclet.UmlGraphDoc"
+	        		  path="${basedir}/tools/UmlGraph.jar">
+				<param name="-attributes" />
+				<param name="-operations" />
+				<param name="-qualify" />
+				<param name="-types" />
+				<param name="-visibility" />
+			</doclet>
+			<link href="http://java.sun.com/javame/reference/apis/jsr030/"/>
+			<link href="http://java.sun.com/javame/reference/apis/jsr118/"/>
+		</javadoc>
+		<apply executable="dot" dest="${basedir}/documentation" parallel="false">
+			<arg value="-Tpng"/>
+			<arg value="-o"/>
+			<targetfile/>
+			<srcfile/>
+			<fileset dir="${basedir}/documentation" includes="*.dot"/>
+			<mapper type="glob" from="*.dot" to="*.png"/>
+		</apply>
+	</target>
+	
+	<target name="packageTestResources" depends="init">
+		<mkdir dir="buildTest"/>
+		<mkdir dir="buildTest/tmp"/>
+		<copy todir="buildTest/tmp">
+			<fileset refid="jr.resources"/>
+			<flattenmapper/>
+		</copy>
+		<zip destfile="buildTest/jr-resource-jar.jar" basedir="buildTest/tmp"/>
+		<delete dir="buildTest/tmp"/>
+	</target>
+
+	<target name="buildTests" depends="package,packageTestResources">
+		<javac includeantruntime="false" destdir="buildTest" classpathref="jr.classpath.test">
+			<src path="test/"/>
+			<include name="**/*.java"/>
+		</javac>
+	</target>
+
+	<!--target name="RunUnitTests" description="Runs all unit tests found in the code" depends="buildTests"-->
+	<target name="RunUnitTests" description="Runs all unit tests found in the code" depends="buildTests">
+		<fileset id="dist.contents.test" dir="buildTest" includes="**/*.class" excludes="**/*$*.class"/>
+
+		<!-- Now, convert that source list into a property which is newline seperated, and contains references
+				that start assuming you're in a zip file and in the src directory already -->
+		<pathconvert pathsep="${line.separator}" property="testclasses" refid="dist.contents.test">
+			<chainedmapper>
+				<!-- Cut all non-local elements from the path -->
+				<regexpmapper from="^(.*)buildTest(.*)$" to="\2"/>
+				<!-- Now covert from seperators to package seperators -->
+				<filtermapper>
+					<replacestring from="\" to="."/>
+					<replacestring from="/" to="."/>
+				</filtermapper>
+				<!-- Trim leading seperators -->
+				<globmapper from=".*" to="*"/>
+				<!-- snip the .class, we should now be left with fully qualified classnames -->
+				<globmapper from="*.class" to="*"/>
+			</chainedmapper>
+		</pathconvert>
+
+		<typedef name="instanceof" classname="org.javarosa.build.InstanceOfCondition" onerror="report">
+			<classpath>
+				<pathelement location="tools/javarosa-ant-libs.jar"/>
+				<path refid="jr.classpath.test" />
+			</classpath>
+		</typedef>
+
+		<for list="${testclasses}" delimiter="${line.separator}" param="name">
+			<sequential>
+				<if>
+					<instanceof classname="@{name}" baseclass="junit.framework.TestCase"/>
+					<then>
+						<RunTestSuite suite="@{name}"/>
+					</then>
+				</if>
+			</sequential>
+		</for>
+		<fail if="testresult.global">Unit Tests Failed!</fail>
+	</target>
+
+	<target name="BuildRelease" depends="package,RunUnitTests,CreateJavadoc"/>
+
+</project>
