@@ -24,13 +24,13 @@ public class NodeProcessingRule {
 	public String name;
 	public boolean allowUnknownChildren;
 	public boolean allowChildText;
-	public HashMap childRules;
+	public HashMap<String,ChildProcessingRule> childRules;
 	
 	public NodeProcessingRule (String name, boolean allowUnknownChildren, boolean allowChildText) {
 		this.name = name;
 		this.allowUnknownChildren = allowUnknownChildren;
 		this.allowChildText = allowChildText;
-		childRules = new HashMap();
+		childRules = new HashMap<String,ChildProcessingRule>();
 	}
 	
 	public void addChild (ChildProcessingRule cpr) {

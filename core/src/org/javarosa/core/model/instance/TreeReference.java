@@ -16,17 +16,20 @@
 
 package org.javarosa.core.model.instance;
 
-import org.javarosa.core.util.DataUtil;
-import org.javarosa.core.util.externalizable.*;
-import org.javarosa.xpath.XPathException;
-import org.javarosa.xpath.expr.XPathExpression;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.javarosa.core.util.DataUtil;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathException;
+import org.javarosa.xpath.expr.XPathExpression;
 
 public class TreeReference implements Externalizable {
 	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity

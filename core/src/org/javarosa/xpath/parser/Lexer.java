@@ -27,8 +27,8 @@ public class Lexer {
 	public static final int LEX_CONTEXT_VAL = 1;
 	public static final int LEX_CONTEXT_OP = 2;
 
-	public static Vector lex (String expr) throws XPathSyntaxException {
-		Vector tokens = new Vector();
+	public static Vector<Token> lex (String expr) throws XPathSyntaxException {
+		Vector<Token> tokens = new Vector<Token>();
 
 		int i = 0;
 		int context = LEX_CONTEXT_VAL;

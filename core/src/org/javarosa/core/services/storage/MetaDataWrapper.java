@@ -34,7 +34,7 @@ public class MetaDataWrapper implements IMetaData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.IMetaData#getMetaData()
 	 */
-	public HashMap getMetaData() {
+	public HashMap<String,Object> getMetaData() {
 		return data;
 	}
 

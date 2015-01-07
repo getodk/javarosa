@@ -34,15 +34,15 @@ public class ASTNodeBinaryOp extends ASTNode {
 	public static final int ASSOC_RIGHT = 2;
 	
 	public int associativity;
-	public Vector exprs;
-	public Vector ops;
+	public Vector<ASTNode> exprs;
+	public Vector<Integer> ops;
 	
 	public ASTNodeBinaryOp () {
-		exprs = new Vector();
-		ops = new Vector();
+		exprs = new Vector<ASTNode>();
+		ops = new Vector<Integer>();
 	}
 	
-	public Vector getChildren() {
+	public Vector<ASTNode> getChildren() {
 		return exprs;
 	}
 	
@@ -50,14 +50,14 @@ public class ASTNodeBinaryOp extends ASTNode {
 		XPathExpression x;
 		
 		if (associativity == ASSOC_LEFT) {
-			x = ((ASTNode)exprs.elementAt(0)).build();
+			x = exprs.elementAt(0).build();
 			for (int i = 1; i < exprs.size(); i++) {
-				x = getBinOpExpr(Parser.vectInt(ops, i - 1), x, ((ASTNode)exprs.elementAt(i)).build());
+				x = getBinOpExpr(Parser.vectInt(ops, i - 1), x, exprs.elementAt(i).build());
 			}
 		} else {
-			x = ((ASTNode)exprs.elementAt(exprs.size() - 1)).build();
+			x = exprs.elementAt(exprs.size() - 1).build();
 			for (int i = exprs.size() - 2; i >= 0; i--) {
-				x = getBinOpExpr(Parser.vectInt(ops, i), ((ASTNode)exprs.elementAt(i)).build(), x);
+				x = getBinOpExpr(Parser.vectInt(ops, i), exprs.elementAt(i).build(), x);
 			}			
 		}
 			

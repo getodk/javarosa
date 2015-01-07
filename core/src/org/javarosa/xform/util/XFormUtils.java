@@ -139,8 +139,8 @@ public class XFormUtils {
 		return atts;
 	}
 
-	public static List getUnusedAttributes(Element e,List usedAtts){
-      List unusedAtts = getAttributeList(e);
+	public static List<String> getUnusedAttributes(Element e,List<String> usedAtts){
+      List<String> unusedAtts = getAttributeList(e);
 		for(int i=0;i<usedAtts.size();i++){
 			if(unusedAtts.contains(usedAtts.get(i))){
 				unusedAtts.remove(usedAtts.get(i));
@@ -152,7 +152,7 @@ public class XFormUtils {
 
 	public static String unusedAttWarning(Element e, List<String> usedAtts){
 		String warning = "Warning: ";
-      List ua = getUnusedAttributes(e,usedAtts);
+      List<String> ua = getUnusedAttributes(e,usedAtts);
 		warning+=ua.size()+" Unrecognized attributes found in Element ["+e.getName()+"] and will be ignored: ";
 		warning+="[";
 		for(int i=0;i<ua.size();i++){
@@ -165,7 +165,7 @@ public class XFormUtils {
 		return warning;
 	}
 
-	public static boolean showUnusedAttributeWarning(Element e, List usedAtts){
+	public static boolean showUnusedAttributeWarning(Element e, List<String> usedAtts){
 		return getUnusedAttributes(e,usedAtts).size()>0;
 	}
 

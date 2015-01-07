@@ -19,12 +19,11 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -114,7 +113,7 @@ public class XPathFuncExpr extends XPathExpression {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		id = (XPathQName)ExtUtil.read(in, XPathQName.class);
-      List v = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+        List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
 		args = new XPathExpression[v.size()];
 		for (int i = 0; i < args.length; i++)
@@ -143,7 +142,7 @@ public class XPathFuncExpr extends XPathExpression {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 
-		HashMap funcHandlers = evalContext.getFunctionHandlers();
+		HashMap<String,IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
 
 		//TODO: Func handlers should be able to declare the desire for short circuiting as well
 		if(name.equals("if")) {
@@ -403,7 +402,7 @@ public class XPathFuncExpr extends XPathExpression {
       return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
     } else {
 			//check for custom handler
-			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
+			IFunctionHandler handler = funcHandlers.get(name);
 			if (handler != null) {
 				return evalCustomFunction(handler, argVals, evalContext);
 			} else {
@@ -942,9 +941,9 @@ public class XPathFuncExpr extends XPathExpression {
     public static String selectedAt (Object o1, Object o2) {
         String selection = (String)unpack(o1);
         int index = toInt(o2).intValue();
-       List stringVector = DateUtils.split(selection, " ", true);
+       List<String> stringVector = DateUtils.split(selection, " ", true);
         if (stringVector.size() > index && index >= 0) {
-            return (String) stringVector.get(index);
+            return stringVector.get(index);
         } else {
         	return ""; // empty string if outside of array
         }

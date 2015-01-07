@@ -24,8 +24,8 @@ public class DummyStorageIterator<T extends Persistable> implements IStorageIter
 		this.data = data;
 		keys = new Integer[data.size()];
 		int i = 0;
-		for(Enumeration en = data.keys() ;en.hasMoreElements();) {
-			keys[i] = (Integer)en.nextElement();
+		for(Enumeration<Integer> en = data.keys() ;en.hasMoreElements();) {
+			keys[i] = en.nextElement();
 			++i;
 		}
 		count = 0;
@@ -43,7 +43,7 @@ public class DummyStorageIterator<T extends Persistable> implements IStorageIter
 	 */
 	public int nextID() {
 		count++;
-		return ((Integer)keys[count -1]).intValue(); 
+		return keys[count -1].intValue(); 
 	}
 
 	/* (non-Javadoc)
@@ -61,7 +61,7 @@ public class DummyStorageIterator<T extends Persistable> implements IStorageIter
 	}
 
 	public int peekID() {
-		return (Integer)keys[count];
+		return keys[count];
 	}
 
 }

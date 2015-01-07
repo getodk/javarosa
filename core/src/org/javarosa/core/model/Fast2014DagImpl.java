@@ -16,7 +16,12 @@
 
 package org.javarosa.core.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
@@ -24,8 +29,6 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.debug.EvaluationResult;
-import org.javarosa.debug.Event;
 
 /**
  * The fast (Latest_fastest) eval logic for 2014
@@ -376,63 +379,6 @@ public class Fast2014DagImpl extends LatestDagBase {
 		}
 
 		return doEvaluateTriggerables(mainInstance, evalContext, tv, anchorRef, alreadyEvaluated);
-	}
-
-	/**
-	 * Step 3 in DAG cascade. evaluate the individual triggerable expressions
-	 * against the anchor (the value that changed which triggered recomputation)
-	 * 
-	 * @param qt
-	 *            The triggerable to be updated
-	 * @param anchorRefs
-	 */
-	private List<EvaluationResult> evaluateTriggerable(FormInstance mainInstance,
-																		EvaluationContext evalContext, QuickTriggerable qt,
-																		List<TreeReference> anchorRefs) {
-
-		List<EvaluationResult> evaluationResults = new ArrayList<EvaluationResult>(0);
-
-		// Contextualize the reference used by the triggerable against the
-		// anchor
-		Set<TreeReference> updatedContextRefs = new HashSet<TreeReference>();
-
-		for (TreeReference anchorRef : anchorRefs) {
-			TreeReference contextRef = qt.t.contextualizeContextRef(anchorRef);
-			if (updatedContextRefs.contains(contextRef)) {
-				continue;
-			}
-
-			try {
-
-				// Now identify all of the fully qualified nodes which this
-				// triggerable
-				// updates. (Multiple nodes can be updated by the same trigger)
-				List<TreeReference> qualifiedList = evalContext
-						  .expandReference(contextRef);
-
-				// Go through each one and evaluate the trigger expression
-				for (TreeReference qualified : qualifiedList) {
-					EvaluationContext ec = new EvaluationContext(evalContext,
-							  qualified);
-					evaluationResults.addAll(qt.t.apply(mainInstance, ec,
-							  qualified));
-				}
-
-				boolean fired = evaluationResults.size() > 0;
-				if (fired) {
-					accessor.getEventNotifier().publishEvent(
-							  new Event(qt.t.getClass().getSimpleName(),
-										 evaluationResults));
-				}
-
-				updatedContextRefs.add(contextRef);
-			} catch (Exception e) {
-				throw new RuntimeException("Error evaluating field '"
-						  + contextRef.getNameLast() + "': " + e.getMessage(), e);
-			}
-		}
-
-		return evaluationResults;
 	}
 
 	/**

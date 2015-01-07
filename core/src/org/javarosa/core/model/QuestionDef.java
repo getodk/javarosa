@@ -19,8 +19,6 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.text.Normalizer;
-import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -262,7 +260,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
 		additionalAttributes = ExtUtil.readAttributes(dis, null);
 
-		choices = ExtUtil.nullIfEmpty((List)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
+		choices = (List<SelectChoice>) ExtUtil.nullIfEmpty((List<SelectChoice>)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
 		for (int i = 0; i < getNumChoices(); i++) {
 			choices.get(i).setIndex(i);
 		}

@@ -28,8 +28,8 @@ public class ASTNodeUnaryOp extends ASTNode {
 	public ASTNode expr;
 	public int op;
 		
-	public Vector getChildren () {
-		Vector v = new Vector();
+	public Vector<ASTNode> getChildren () {
+		Vector<ASTNode> v = new Vector<ASTNode>();
 		v.addElement(expr);
 		return v;
 	}

@@ -70,7 +70,7 @@ public class ModelReferencePayload implements IDataPayload {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#accept(org.javarosa.core.services.transport.IDataPayloadVisitor)
 	 */
-	public Object accept(IDataPayloadVisitor visitor) {
+	public <T> T accept(IDataPayloadVisitor<T> visitor) {
 		memoize();
 		return payload.accept(visitor);
 	}
@@ -124,9 +124,9 @@ public class ModelReferencePayload implements IDataPayload {
 
 	private void memoize() {
 		if(payload == null) {
-			IStorageUtility instances = StorageManager.getStorage(FormInstance.STORAGE_KEY);
+			IStorageUtility<FormInstance> instances = (IStorageUtility<FormInstance>) StorageManager.getStorage(FormInstance.STORAGE_KEY);
 			try {
-				FormInstance tree = (FormInstance)instances.read(recordId);
+				FormInstance tree = instances.read(recordId);
 				payload = serializer.createSerializedPayload(tree);
 			} catch (IOException e) {
 				//Assertion, do not catch!

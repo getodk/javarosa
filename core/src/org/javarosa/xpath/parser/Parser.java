@@ -35,12 +35,12 @@ import org.javarosa.xpath.parser.ast.ASTNodeUnaryOp;
 
 public class Parser {
 
-	public static XPathExpression parse (Vector tokens) throws XPathSyntaxException {
+	public static XPathExpression parse (Vector<Token> tokens) throws XPathSyntaxException {
 		ASTNode tree = buildParseTree(tokens);
 		return tree.build();
 	}
 
-	public static ASTNode buildParseTree (Vector tokens) throws XPathSyntaxException {
+	public static ASTNode buildParseTree (Vector<Token> tokens) throws XPathSyntaxException {
 		ASTNodeAbstractExpr root = new ASTNodeAbstractExpr();
 		for (int i = 0; i < tokens.size(); i++)
 			root.content.addElement(tokens.elementAt(i));
@@ -327,7 +327,7 @@ public class Parser {
 
 			while (i < node.content.size()) {
 				if (node.content.elementAt(i) instanceof ASTNodePredicate) {
-					step.predicates.addElement(node.content.elementAt(i));
+					step.predicates.addElement((ASTNode) node.content.elementAt(i));
 				} else {
 					throw new XPathSyntaxException();
 				}
@@ -343,7 +343,7 @@ public class Parser {
 		int i;
 		for (i = node.content.size() - 1; i >= 0; i--) {
 			if (node.content.elementAt(i) instanceof ASTNodePredicate) {
-				filt.predicates.insertElementAt(node.content.elementAt(i), 0);
+				filt.predicates.insertElementAt((ASTNode) node.content.elementAt(i), 0);
 			} else {
 				break;
 			}
@@ -370,7 +370,7 @@ public class Parser {
 		}
 	}
 
-	public static int vectInt (Vector v, int i) {
-		return ((Integer)v.elementAt(i)).intValue();
+	public static int vectInt (Vector<Integer> v, int i) {
+		return v.elementAt(i).intValue();
 	}
 }

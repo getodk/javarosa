@@ -25,6 +25,7 @@ import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * PropertyManager is a class that is used to set and retrieve name/value pairs
@@ -75,13 +76,13 @@ public class PropertyManager implements IPropertyManager {
     /**
      * The persistent storage utility
      */
-    private IStorageUtilityIndexed properties;
+    private IStorageUtilityIndexed<? extends Externalizable> properties;
 
     /**
      * Constructor for this PropertyManager
      */
     public PropertyManager() {
-    	this.properties = (IStorageUtilityIndexed)StorageManager.getStorage(STORAGE_KEY);
+    	this.properties = (IStorageUtilityIndexed<? extends Externalizable>)StorageManager.getStorage(STORAGE_KEY);
     	rulesList = new ArrayList<IPropertyRules>(0);
     }
 
@@ -149,7 +150,7 @@ public class PropertyManager implements IPropertyManager {
      */
     public void setProperty(String propertyName, List<String> propertyValue) {
       List<String> oldValue = getProperty(propertyName);
-    	if(oldValue != null && vectorEquals(oldValue, propertyValue)) {
+    	if(oldValue != null && listEquals(oldValue, propertyValue)) {
     		//No point in redundantly setting values!
     		return;
     	}
@@ -177,7 +178,7 @@ public class PropertyManager implements IPropertyManager {
 
     }
 
-    private boolean vectorEquals(List<String> v1, List<String> v2) {
+    private boolean listEquals(List<String> v1, List<String> v2) {
     	if(v1.size() != v2.size()) {
     		return false;
     	} else {

@@ -20,7 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import org.javarosa.core.model.instance.FormInstance;
@@ -196,7 +195,7 @@ public class GroupDef implements IFormElement, Localizable {
 		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setRepeat(ExtUtil.readBool(dis));
-		setChildren((List)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+		setChildren((List<IFormElement>)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
 		noAddRemove = ExtUtil.readBool(dis);
 		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);

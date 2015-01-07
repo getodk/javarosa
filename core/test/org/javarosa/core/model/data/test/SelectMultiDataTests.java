@@ -36,8 +36,8 @@ public class SelectMultiDataTests extends TestCase {
 	Selection two;
 	Selection three;
 
-   List firstTwo;
-   List lastTwo;
+   List<Selection> firstTwo;
+   List<Selection> lastTwo;
    List invalid;
 	
 	private static int NUM_TESTS = 5;
@@ -61,15 +61,15 @@ public class SelectMultiDataTests extends TestCase {
 		three = new Selection("Selection 3");
 		three.attachChoice(question);
 		
-		firstTwo = new ArrayList();
+		firstTwo = new ArrayList<Selection>();
 		firstTwo.add(one);
 		firstTwo.add(two);
 		
-		lastTwo = new ArrayList();
+		lastTwo = new ArrayList<Selection>();
 		lastTwo.add(two);
 		lastTwo.add(three);
 		
-		invalid = new ArrayList();
+		invalid = new ArrayList<Object>();
 		invalid.add(three);
 		invalid.add(new Integer(12));
 		invalid.add(one);
@@ -141,12 +141,12 @@ public class SelectMultiDataTests extends TestCase {
 		firstTwo.set(0, two);
 		firstTwo.remove(1);
 		
-		List internal = (List)data.getValue();
+		List<Selection> internal = (List<Selection>)data.getValue();
 
 		assertVectorIdentity("External Reference: ", internal, copy);
 		
 		data.setValue(lastTwo);
-      List start = (List)data.getValue();
+        List<Selection> start = (List<Selection>)data.getValue();
 		
 		Selection[] external = new Selection[start.size()];
 		start.toArray(external);
@@ -154,15 +154,15 @@ public class SelectMultiDataTests extends TestCase {
 		start.remove(1);
 		start.set(0, one);
 		
-		assertVectorIdentity("Internal Reference: ", (List)data.getValue(), external);
+		assertVectorIdentity("Internal Reference: ", (List<Selection>)data.getValue(), external);
 	}
 	
-	private void assertVectorIdentity(String messageHeader, List v, Selection[] a) {
+	private void assertVectorIdentity(String messageHeader, List<Selection> v, Selection[] a) {
 		
 		assertEquals(messageHeader + "SelectMultiData's internal representation was violated. Vector size changed.",v.size(),a.length);
 		
 		for(int i = 0 ; i < v.size(); ++i) {
-			Selection internalValue = (Selection)v.get(i);
+			Selection internalValue = v.get(i);
 			Selection copyValue = a[i];
 			
 			assertEquals(messageHeader + "SelectMultiData's internal representation was violated. Element " + i + "changed.",internalValue,copyValue);
@@ -182,6 +182,6 @@ public class SelectMultiDataTests extends TestCase {
 		
 		Selection[] values = new Selection[firstTwo.size()];
 		firstTwo.toArray(values);
-		assertVectorIdentity("Ensure not overwritten: ", (List)data.getValue(), values);
+		assertVectorIdentity("Ensure not overwritten: ", (List<Selection>)data.getValue(), values);
 	}
 }

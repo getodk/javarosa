@@ -100,7 +100,7 @@ import org.kxml2.kdom.Node;
 		 */
 		public byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException {
 			init();
-			rootRef = model.unpackReference(ref);
+			rootRef = FormInstance.unpackReference(ref);
 			if(this.serializer == null) {
 				this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 			}
@@ -120,7 +120,7 @@ import org.kxml2.kdom.Node;
 
 		public IDataPayload createSerializedPayload	(FormInstance model, IDataReference ref) throws IOException {
 			init();
-			rootRef = model.unpackReference(ref);
+			rootRef = FormInstance.unpackReference(ref);
 			if(this.serializer == null) {
 				this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 			}

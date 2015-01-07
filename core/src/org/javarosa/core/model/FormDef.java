@@ -1385,8 +1385,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       this.outputFragments = outputFragments;
    }
 
-   public HashMap getMetaData() {
-      HashMap metadata = new HashMap();
+   public HashMap<String,Object> getMetaData() {
+      HashMap<String,Object> metadata = new HashMap<String,Object>();
       String[] fields = getMetaDataFields();
 
       for (int i = 0; i < fields.length; i++) {
@@ -1403,7 +1403,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       return metadata;
    }
 
-   public Object getMetaData(String fieldName) {
+   public String getMetaData(String fieldName) {
       if (fieldName.equals("DESCRIPTOR")) {
          return name;
       }

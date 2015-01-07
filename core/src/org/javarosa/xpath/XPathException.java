@@ -18,6 +18,11 @@ package org.javarosa.xpath;
 
 public class XPathException extends RuntimeException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1204382841959734320L;
+	
 	//A reference to the "Source" of this message helpful
 	//for tracking down where the invalid xpath was declared
 	String sourceRef;

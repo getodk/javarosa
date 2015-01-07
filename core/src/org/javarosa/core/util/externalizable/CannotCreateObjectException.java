@@ -20,6 +20,11 @@ package org.javarosa.core.util.externalizable;
  * Thrown when trying to create an object during serialization, but object cannot be created.
  */
 public class CannotCreateObjectException extends RuntimeException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5952200557740321532L;
+
 	public CannotCreateObjectException(String message) {
 		super(message);
 	}

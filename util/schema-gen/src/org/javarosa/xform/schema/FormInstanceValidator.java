@@ -105,7 +105,7 @@ public class FormInstanceValidator {
 			
 			answerValue = cast(answerValue, prompt.getDataType());
 			
-			int result = controller.answerQuestion(index, answerValue, false, true);
+			int result = controller.answerQuestion(index, answerValue, false);
 			switch(result) {
 			case FormEntryController.ANSWER_OK:
 				break;

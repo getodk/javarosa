@@ -10,6 +10,11 @@ package org.javarosa.core.model.condition.pivot;
 public class UnpivotableExpressionException extends Exception {
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2885907137779741374L;
+
+	/**
 	 * Default constructor. Should be used for semanticly unpivotable
 	 * expressions which are expected
 	 */

@@ -16,20 +16,26 @@
 
 package org.javarosa.core.services.locale;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.PrefixTree;
 import org.javarosa.core.util.PrefixTreeNode;
 import org.javarosa.core.util.UnregisteredLocaleException;
-import org.javarosa.core.util.externalizable.*;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * The Localizer object maintains mappings for locale ID's and Object
@@ -462,7 +468,7 @@ public class Localizer implements Externalizable {
 	 * @throws NullPointerException if textID is null
 	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
-	public String getText (String textID, HashMap args) {
+	public String getText (String textID, HashMap<String,String> args) {
 		String text = getText(textID, currentLocale);
 		if(text != null) {
 			text = processArguments(text, args);
@@ -706,7 +712,7 @@ public class Localizer implements Externalizable {
 		fallbackDefaultLocale = ExtUtil.readBool(dis);
 		fallbackDefaultForm = ExtUtil.readBool(dis);
 		localeResources = (OrderedMap<String,List<LocaleDataSource>>)ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapListPoly(), ExtWrapMap.TYPE_ORDERED),	pf);;
-		locales = (List)ExtUtil.read(dis, new ExtWrapList(String.class));
+		locales = (List<String>)ExtUtil.read(dis, new ExtWrapList(String.class));
 		setDefaultLocale((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		String currentLocale = (String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf);
 		if (currentLocale != null) {
