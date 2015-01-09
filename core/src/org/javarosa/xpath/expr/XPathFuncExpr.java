@@ -142,20 +142,20 @@ public class XPathFuncExpr extends XPathExpression {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 
-		HashMap<String,IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
+		HashMap<String, IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
 
 		//TODO: Func handlers should be able to declare the desire for short circuiting as well
-		if(name.equals("if")) {
-			assertArgsCount( name, args, 3);
+		if (name.equals("if")) {
+			assertArgsCount(name, args, 3);
 			return ifThenElse(model, evalContext, args, argVals);
 		} else if (name.equals("coalesce")) {
-			assertArgsCount( name, args, 2);
+			assertArgsCount(name, args, 2);
 			argVals[0] = args[0].eval(model, evalContext);
-			if(!isNull(argVals[0])) {
+			if (!isNull(argVals[0])) {
 				return argVals[0];
 			} else {
 				// that was null, so try the other one...
-				argVals[1] =args[1].eval(model, evalContext);
+				argVals[1] = args[1].eval(model, evalContext);
 				return argVals[1];
 			}
 		} else if (name.equals("indexed-repeat")) {
@@ -163,7 +163,7 @@ public class XPathFuncExpr extends XPathExpression {
 				return indexedRepeat(model, evalContext, args, argVals);
 			} else {
 				throw new XPathUnhandledException("function \'" + name + "\' requires " +
-						"3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
+						  "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
 			}
 		}
 
@@ -173,139 +173,139 @@ public class XPathFuncExpr extends XPathExpression {
 
 		//check built-in functions
 		if (name.equals("true")) {
-			assertArgsCount( name, args, 0);
+			assertArgsCount(name, args, 0);
 			return Boolean.TRUE;
 		} else if (name.equals("false")) {
-			assertArgsCount( name, args, 0);
+			assertArgsCount(name, args, 0);
 			return Boolean.FALSE;
 		} else if (name.equals("boolean")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toBoolean(argVals[0]);
 		} else if (name.equals("number")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toNumeric(argVals[0]);
 		} else if (name.equals("int")) { //non-standard
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toInt(argVals[0]);
 		} else if (name.equals("round")) { // non-standard Excel-style round(value,decimal place)
-			assertArgsCount( name, args, 2);
+			assertArgsCount(name, args, 2);
 			Double aval = toNumeric(argVals[0]);
 			Double bval = toInt(argVals[1]);
 			return round(aval, bval);
 		} else if (name.equals("string")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toString(argVals[0]);
 		} else if (name.equals("date")) { //non-standard
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toDate(argVals[0], false);
 		} else if (name.equals("date-time")) { //non-standard -- convert double/int/string to Date object
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toDate(argVals[0], true);
 		} else if (name.equals("decimal-date-time")) { //non-standard -- convert string/date to decimal days off 1970-01-01T00:00:00.000-000
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toDecimalDateTime(argVals[0], true);
 		} else if (name.equals("decimal-time")) { //non-standard -- convert string/date to decimal days off 1970-01-01T00:00:00.000-000
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return toDecimalDateTime(argVals[0], false);
 		} else if (name.equals("not")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return boolNot(argVals[0]);
 		} else if (name.equals("boolean-from-string")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return boolStr(argVals[0]);
 		} else if (name.equals("format-date")) {
-			assertArgsCount( name, args, 2);
+			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], false);
 		} else if (name.equals("format-date-time")) { // non-standard
-			assertArgsCount( name, args, 2);
+			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], true);
 		} else if ((name.equals("selected") || name.equals("is-selected"))) { //non-standard
-			assertArgsCount( name, args, 2);
+			assertArgsCount(name, args, 2);
 			return multiSelected(argVals[0], argVals[1], name);
 		} else if (name.equals("count-selected")) { //non-standard
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return countSelected(argVals[0]);
 		} else if (name.equals("selected-at")) { //non-standard
-			assertArgsCount( name, args, 2);
-            return selectedAt(argVals[0], argVals[1]);
+			assertArgsCount(name, args, 2);
+			return selectedAt(argVals[0], argVals[1]);
 		} else if (name.equals("position")) {
 			//TODO: Technically, only the 0 length argument is valid here.
-			if(args.length == 1) {
-				XPathNodeset nodes = (XPathNodeset)argVals[0];
-				if ( nodes.size() == 0 ) {
+			if (args.length == 1) {
+				XPathNodeset nodes = (XPathNodeset) argVals[0];
+				if (nodes.size() == 0) {
 					// Added to prevent an exception within ODK Validate.
 					// Will likely cause an error downstream when used in an XPath.
-					return new Double(1+TreeReference.INDEX_UNBOUND);
+					return new Double(1 + TreeReference.INDEX_UNBOUND);
 				} else {
 					// This is weird -- we are returning the position of the first
 					// Nodeset element but there may be a list of elements. Unclear
 					// if or how this might manifest into a bug... .
 					return position(nodes.getRefAt(0));
 				}
-			} else if(args.length == 0) {
-				if(evalContext.getContextPosition() != -1) {
-					return new Double(1+evalContext.getContextPosition());
+			} else if (args.length == 0) {
+				if (evalContext.getContextPosition() != -1) {
+					return new Double(1 + evalContext.getContextPosition());
 				}
 				return position(evalContext.getContextRef());
 			} else {
 				throw new XPathUnhandledException("function \'" + name +
-						"\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
+						  "\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
 			}
 		} else if (name.equals("count")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return count(argVals[0]);
 		} else if (name.equals("sum")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			if (argVals[0] instanceof XPathNodeset) {
 				return sum(((XPathNodeset) argVals[0]).toArgList());
 			} else {
 				throw new XPathTypeMismatchException("not a nodeset");
 			}
 		} else if (name.equals("max")) {
-            if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
-                    return max(((XPathNodeset)argVals[0]).toArgList());
-            } else {
-                    return max(argVals);
-            }
-		}  else if (name.equals("min")) {
-            if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
-                    return min(((XPathNodeset)argVals[0]).toArgList());
-            } else {
-                    return min(argVals);
-            }
+			if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
+				return max(((XPathNodeset) argVals[0]).toArgList());
+			} else {
+				return max(argVals);
+			}
+		} else if (name.equals("min")) {
+			if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
+				return min(((XPathNodeset) argVals[0]).toArgList());
+			} else {
+				return min(argVals);
+			}
 		} else if (name.equals("today")) {
-			assertArgsCount( name, args, 0);
+			assertArgsCount(name, args, 0);
 			return DateUtils.roundDate(new Date());
 		} else if (name.equals("now")) {
-			assertArgsCount( name, args, 0);
+			assertArgsCount(name, args, 0);
 			return new Date();
 		} else if (name.equals("concat")) {
 			if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
-				return join("", ((XPathNodeset)argVals[0]).toArgList());
+				return join("", ((XPathNodeset) argVals[0]).toArgList());
 			} else {
 				return join("", argVals);
 			}
 		} else if (name.equals("join") && args.length >= 1) {
 			if (args.length == 2 && argVals[1] instanceof XPathNodeset) {
-				return join(argVals[0], ((XPathNodeset)argVals[1]).toArgList());
+				return join(argVals[0], ((XPathNodeset) argVals[1]).toArgList());
 			} else {
 				return join(argVals[0], subsetArgList(argVals, 1));
 			}
 		} else if (name.equals("substr") && (args.length == 2 || args.length == 3)) {
 			return substring(argVals[0], argVals[1], args.length == 3 ? argVals[2] : null);
 		} else if (name.equals("string-length")) {
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			return stringLength(argVals[0]);
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
 			if (args.length == 3 && argVals[2] instanceof XPathNodeset) {
-				return checklist(argVals[0], argVals[1], ((XPathNodeset)argVals[2]).toArgList());
+				return checklist(argVals[0], argVals[1], ((XPathNodeset) argVals[2]).toArgList());
 			} else {
 				return checklist(argVals[0], argVals[1], subsetArgList(argVals, 2));
 			}
 		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
 			if (args.length == 4 && argVals[2] instanceof XPathNodeset && argVals[3] instanceof XPathNodeset) {
-				Object[] factors = ((XPathNodeset)argVals[2]).toArgList();
-				Object[] weights = ((XPathNodeset)argVals[3]).toArgList();
+				Object[] factors = ((XPathNodeset) argVals[2]).toArgList();
+				Object[] weights = ((XPathNodeset) argVals[3]).toArgList();
 				if (factors.length != weights.length) {
 					throw new XPathTypeMismatchException("weighted-checklist: nodesets not same length");
 				}
@@ -314,40 +314,40 @@ public class XPathFuncExpr extends XPathExpression {
 				return checklistWeighted(argVals[0], argVals[1], subsetArgList(argVals, 2, 2), subsetArgList(argVals, 3, 2));
 			}
 		} else if (name.equals("regex")) { //non-standard
-			assertArgsCount( name, args, 2);
+			assertArgsCount(name, args, 2);
 			return regex(argVals[0], argVals[1]);
 		} else if (name.equals("depend") && args.length >= 1) { //non-standard
 			return argVals[0];
 		} else if (name.equals("random")) { //non-standard
-			assertArgsCount( name, args, 0);
+			assertArgsCount(name, args, 0);
 			//calculated expressions may be recomputed w/o warning! use with caution!!
 			return new Double(MathUtils.getRand().nextDouble());
-        } else if (name.equals("once")) {
-            assertArgsCount( name, args, 1);
-            XPathPathExpr currentFieldPathExpr = XPathPathExpr.fromRef(evalContext.getContextRef());
-            Object currValue = currentFieldPathExpr.eval(model, evalContext).unpack();
-            if (currValue == null || toString(currValue).length() == 0) {
-                // this is the "once" case
-                return argVals[0];
-            } else {
-                return currValue;
-            }
-        } else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
+		} else if (name.equals("once")) {
+			assertArgsCount(name, args, 1);
+			XPathPathExpr currentFieldPathExpr = XPathPathExpr.fromRef(evalContext.getContextRef());
+			Object currValue = currentFieldPathExpr.eval(model, evalContext).unpack();
+			if (currValue == null || toString(currValue).length() == 0) {
+				// this is the "once" case
+				return argVals[0];
+			} else {
+				return currValue;
+			}
+		} else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
 			//calculated expressions may be recomputed w/o warning! use with caution!!
-			if(args.length == 0) {
+			if (args.length == 0) {
 				return PropertyUtils.genUUID();
 			}
 
 			int len = toInt(argVals[0]).intValue();
 			return PropertyUtils.genGUID(len);
 		} else if (name.equals("version")) { //non-standard
-			assertArgsCount( name, args, 0);
+			assertArgsCount(name, args, 0);
 			return model.formVersion == null ? "" : model.formVersion;
 		} else if (name.equals("property")) { // non-standard
 			// return a property defined by the property manager.
 			// NOTE: Property should be immutable.
 			// i.e., does not work with 'start' or 'end' property.
-			assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 			String s = toString(argVals[0]);
 			return PropertyManager._().getSingularProperty(s);
 		} else if (name.equals("pow") && (args.length == 2)) { //XPath 3.0
@@ -355,52 +355,52 @@ public class XPathFuncExpr extends XPathExpression {
 			double b = toDouble(argVals[1]).doubleValue();
 			return Math.pow(a, b);
 		} else if (name.equals("enclosed-area") || name.equals("area")) {
-      assertArgsCount( name, args, 1);
+			assertArgsCount(name, args, 1);
 
-      Object argVal = argVals[0];
-      if (!(argVal instanceof XPathNodeset)) {
-        throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
-      }
-      Object[] argList = ((XPathNodeset) argVal).toArgList();
-      int repeatSize = argList.length;
+			Object argVal = argVals[0];
+			if (!(argVal instanceof XPathNodeset)) {
+				throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
+			}
+			Object[] argList = ((XPathNodeset) argVal).toArgList();
+			int repeatSize = argList.length;
 
-      List<GeoUtils.GPSCoordinates> gpsCoordinatesList;
+			List<GeoUtils.GPSCoordinates> gpsCoordinatesList;
 
-      if (repeatSize == 1) {
-        // Try to determine if the argument is of type GeoShapeData
-        try {
-          GeoShapeData geoShapeData = new GeoShapeData().cast(new UncastData(toString(argList[0])));
-          if (geoShapeData.points.size() <= 2) {
-            return 0d;
-          } else {
-            gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
-            for (GeoPointData point : geoShapeData.points) {
-              gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(point.getPart(0), point.getPart(1)));
-            }
-          }
-        } catch (Exception e) {
-          throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
-        }
-      } else {
-        if (repeatSize <= 2) {
-          return 0d;
-        } else {
-          // treat the input as a series of GeoPointData
+			if (repeatSize == 1) {
+				// Try to determine if the argument is of type GeoShapeData
+				try {
+					GeoShapeData geoShapeData = new GeoShapeData().cast(new UncastData(toString(argList[0])));
+					if (geoShapeData.points.size() <= 2) {
+						return 0d;
+					} else {
+						gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
+						for (GeoPointData point : geoShapeData.points) {
+							gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(point.getPart(0), point.getPart(1)));
+						}
+					}
+				} catch (Exception e) {
+					throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
+				}
+			} else {
+				if (repeatSize <= 2) {
+					return 0d;
+				} else {
+					// treat the input as a series of GeoPointData
 
-          gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
-          for (Object arg : argList) {
-            try {
-              GeoPointData geoPointData = new GeoPointData().cast(new UncastData(toString(arg)));
-              gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
-            } catch (Exception e) {
-              throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
-            }
-          }
-        }
-      }
+					gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
+					for (Object arg : argList) {
+						try {
+							GeoPointData geoPointData = new GeoPointData().cast(new UncastData(toString(arg)));
+							gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
+						} catch (Exception e) {
+							throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
+						}
+					}
+				}
+			}
 
-      return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
-    } else {
+			return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+		} else {
 			//check for custom handler
 			IFunctionHandler handler = funcHandlers.get(name);
 			if (handler != null) {
