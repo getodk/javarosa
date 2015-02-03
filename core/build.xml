@@ -83,6 +83,7 @@
 	<target name="package" depends="compile" description="package binary into jar">
 		<jar destfile="dist/${jar}">
 			<fileset dir="bin/" includes="**/*.class"/>
+			<fileset dir="src/" includes="**/*.java"/>
 		</jar>
 	</target>
 
