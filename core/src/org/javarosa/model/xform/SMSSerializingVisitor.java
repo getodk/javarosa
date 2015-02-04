@@ -116,7 +116,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		}
 		model.accept(this);
 		if (theSmsStr != null) {
-			byte[] form = theSmsStr.getBytes("UTF-16BE");
+			byte[] form = theSmsStr.getBytes("UTF-8");
 			return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_SMS);
 		} else {
 			return null;
