@@ -157,7 +157,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 			TreeElement tee = root.getChildAt(j);
 			String e = serializeNode(tee);
 			if(e != null) {
-				theSmsStr += e.replace("\\", "\\\\").replace(delimiter, "\\" + delimiter);
+				theSmsStr += e;
 			}
 		}
 		theSmsStr = theSmsStr.trim();
