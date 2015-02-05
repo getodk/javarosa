@@ -789,7 +789,6 @@ public class XFormParser {
     			String name = childEl.getName();
     			if (name.equals("tag")) {
     				String tagKey = childEl.getText(0);
-    				System.out.println(tagKey);
     				tags.add(tagKey);
     			}
     		}
