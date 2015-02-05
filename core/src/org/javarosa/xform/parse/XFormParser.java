@@ -773,8 +773,28 @@ public class XFormParser {
             question.setControlType(Constants.CONTROL_VIDEO_CAPTURE);
         } else if ("osm/*".equals(mediaType)) {
         	question.setControlType(Constants.CONTROL_OSM_CAPTURE);
+        	List<String> tags = parseOsmTags(e);
+        	question.setOsmTags(tags);
         }
         return question;
+    }
+
+    private List<String> parseOsmTags(Element e) {
+    	List<String> tags = new ArrayList<String>();
+    	int childCount = e.getChildCount();
+    	for (int i = 0; i < childCount; ++i) {
+    		Object child = e.getChild(i);
+    		if (child instanceof Element) {
+    			Element childEl = (Element) child;
+    			String name = childEl.getName();
+    			if (name.equals("tag")) {
+    				String tagKey = childEl.getText(0);
+    				System.out.println(tagKey);
+    				tags.add(tagKey);
+    			}
+    		}
+    	}
+    	return tags;
     }
 
 	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType) {

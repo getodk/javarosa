@@ -50,6 +50,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 
 	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
+	private List<String> osmTags; // If it's an OSM Question, it might have tags.
 	private String appearanceAttr;
 	private String helpTextID;
 	private String labelInnerText;
@@ -96,6 +97,14 @@ public class QuestionDef implements IFormElement, Localizable {
 
 	public void setControlType(int controlType) {
 		this.controlType = controlType;
+	}
+
+	public void setOsmTags(List<String> tags) {
+		osmTags = tags;
+	}
+
+	public List<String> getOsmTags() {
+		return osmTags;
 	}
 
 	public String getAppearanceAttr () {
