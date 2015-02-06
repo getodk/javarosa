@@ -779,6 +779,10 @@ public class XFormParser {
         return question;
     }
 
+    /**
+     *  Parses the OSM Tag Elements if we are parsing
+     *  an OSM Upload element. 
+     */
     private List<String> parseOsmTags(Element e) {
     	List<String> tags = new ArrayList<String>();
     	int childCount = e.getChildCount();
