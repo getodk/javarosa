@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -50,7 +51,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 
 	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
-	private List<String> osmTags; // If it's an OSM Question, it might have tags.
+	private List<OSMTag> osmTags; // If it's an OSM Question, it might have tags.
 	private String appearanceAttr;
 	private String helpTextID;
 	private String labelInnerText;
@@ -99,11 +100,11 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.controlType = controlType;
 	}
 
-	public void setOsmTags(List<String> tags) {
+	public void setOsmTags(List<OSMTag> tags) {
 		osmTags = tags;
 	}
 
-	public List<String> getOsmTags() {
+	public List<OSMTag> getOsmTags() {
 		return osmTags;
 	}
 
