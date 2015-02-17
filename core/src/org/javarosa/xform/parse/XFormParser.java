@@ -49,6 +49,8 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.javarosa.core.model.osm.OSMTag;
+import org.javarosa.core.model.osm.OSMTagItem;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
@@ -773,27 +775,78 @@ public class XFormParser {
             question.setControlType(Constants.CONTROL_VIDEO_CAPTURE);
         } else if ("osm/*".equals(mediaType)) {
         	question.setControlType(Constants.CONTROL_OSM_CAPTURE);
-        	List<String> tags = parseOsmTags(e);
+        	List<OSMTag> tags = parseOsmTags(e);
         	question.setOsmTags(tags);
         }
         return question;
     }
 
     /**
-     *  Parses the OSM Tag Elements if we are parsing
+     *  Parses the OSM Tag Elements when we are parsing
      *  an OSM Upload element. 
      */
-    private List<String> parseOsmTags(Element e) {
-    	List<String> tags = new ArrayList<String>();
+    private List<OSMTag> parseOsmTags(Element e) {
+    	List<OSMTag> tags = new ArrayList<OSMTag>();
     	int childCount = e.getChildCount();
     	for (int i = 0; i < childCount; ++i) {
     		Object child = e.getChild(i);
     		if (child instanceof Element) {
     			Element childEl = (Element) child;
     			String name = childEl.getName();
+
+    			// the child elements we are interested in are tags
     			if (name.equals("tag")) {
-    				String tagKey = childEl.getText(0);
-    				tags.add(tagKey);
+    				OSMTag tag = new OSMTag();
+    				tags.add(tag);
+    				// parse tag key
+    				int attrCount = childEl.getAttributeCount();
+    				for (int j = 0; j < attrCount; ++j) {
+    					String attrName = childEl.getAttributeName(j);
+    					if (attrName.equals("key")) {
+    						tag.key = childEl.getAttributeValue(j);
+
+    						// parse tag children
+    						int tagChildCount = childEl.getChildCount();
+    						for (int k = 0; k < tagChildCount; ++k) {
+    							Object child2 = childEl.getChild(k);
+    							if (child2 instanceof Element) {
+    								Element tagChildEl = (Element) child2;
+    								String tagChildName = tagChildEl.getName();
+
+    								// a tag child might be a label
+    								if (tagChildName.equals("label")) {
+    									tag.label = tagChildEl.getText(0);
+    								}
+
+    								// a tag child might be an item
+    								else if (tagChildName.equals("item")) {
+    									OSMTagItem item = new OSMTagItem();
+    									tag.items.add(item);
+
+    									// parse item children
+    									int itemChildCount = tagChildEl.getChildCount();
+    									for (int l = 0; l < itemChildCount; ++l) {
+    										Object child3 = tagChildEl.getChild(l);
+    										if (child3 instanceof Element) {
+    											Element itemChildEl = (Element) child3;
+    											String itemChildName = itemChildEl.getName();
+
+    											// an item child might be a label
+    											if (itemChildName.equals("label")) {
+    												item.label = itemChildEl.getText(0);
+    											}
+
+    											// an item child might be a value
+    											else if (itemChildName.equals("value")) {
+    												item.value = itemChildEl.getText(0);
+    											}
+    										}
+    									}
+    								}
+    							}
+    						}
+    					}
+    				}
     			}
     		}
     	}
