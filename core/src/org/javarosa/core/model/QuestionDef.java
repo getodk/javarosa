@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.osm.OSMTag;
@@ -275,6 +276,8 @@ public class QuestionDef implements IFormElement, Localizable {
 			choices.get(i).setIndex(i);
 		}
 		setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
+
+		osmTags = (List<OSMTag>) ExtUtil.nullIfEmpty((List<OSMTag>)ExtUtil.read(dis, new ExtWrapList(OSMTag.class), pf));
 	}
 
 	/*
@@ -297,6 +300,8 @@ public class QuestionDef implements IFormElement, Localizable {
 
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
 		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
+
+		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(osmTags)));
 	}
 
 	/* === MANAGING OBSERVERS === */
