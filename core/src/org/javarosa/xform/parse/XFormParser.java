@@ -2760,7 +2760,7 @@ public class XFormParser {
 	}
 
 	public static FormInstance restoreDataModel (InputStream input, Class restorableType) throws IOException {
-		Document doc = getXMLDocument(new InputStreamReader(input));
+		Document doc = getXMLDocument(new InputStreamReader(input, "UTF-8"));
 		if (doc == null) {
 			throw new RuntimeException("syntax error in XML instance; could not parse");
 		}
