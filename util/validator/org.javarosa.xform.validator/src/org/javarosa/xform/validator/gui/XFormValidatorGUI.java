@@ -56,8 +56,10 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -220,7 +222,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 
 			addLineToTextArea("temp file created: " + tempfile.getAbsolutePath());
 			
-			BufferedWriter out = new BufferedWriter(new FileWriter(tempfile));
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempfile), "UTF-8"));
 			out.write(xml);
 			out.close();
 			
@@ -961,7 +963,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}
 		try {
 			newJad.createNewFile();
-			writer = new BufferedWriter(new FileWriter(newJad));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newJad), "UTF-8"));
 		} catch (IOException e) {
 			throw new FileNotFoundException("Problem Creating new Jad file");
 		}
@@ -1108,7 +1110,13 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		// make the jad file
 		String outJad = new String(testDir.getAbsolutePath() + "\\" + this.JAD_NAME);
 		try {
-			PrintWriter pw = new PrintWriter(outJad);
+			PrintWriter pw;
+			try {
+				pw = new PrintWriter(outJad, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				throw new IllegalStateException("UTF-8 encoding is not recognized!");
+			}
 			pw.print(this.JAD_START);
 			pw.print(jarSize);
 			pw.print(this.JAD_FINISH);
@@ -1217,9 +1225,9 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			process = Runtime.getRuntime().exec( new String[] { wtkPath + "bin\\emulator.exe\"","-Xheapsize:32M","-Xdescriptor", jad } );
 
 			brOut = new BufferedReader(
-			        new InputStreamReader(process.getInputStream()) );
+			        new InputStreamReader(process.getInputStream(), "UTF-8") );
 			brErr = new BufferedReader(
-			        new InputStreamReader(process.getErrorStream()) );
+			        new InputStreamReader(process.getErrorStream(), "UTF-8") );
 			
 			
 			
