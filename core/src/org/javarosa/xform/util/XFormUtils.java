@@ -72,8 +72,7 @@ public class XFormUtils {
             try {
                 isr = new InputStreamReader(is, "UTF-8");
             } catch (UnsupportedEncodingException uee) {
-                System.out.println("UTF 8 encoding unavailable, trying default encoding");
-                isr = new InputStreamReader(is);
+    			throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
             }
 
             return _factory.getXFormParser(isr).parse();

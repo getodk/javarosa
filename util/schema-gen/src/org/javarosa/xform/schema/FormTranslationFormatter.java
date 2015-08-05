@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -118,7 +119,12 @@ public class FormTranslationFormatter {
 	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output, String delimeter, String encoding, String printEncoding) {
 		InputStreamReader reader;
 		if(encoding == null) {
-			reader = new InputStreamReader(stream);
+			try {
+				reader = new InputStreamReader(stream, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				throw new IllegalStateException("Unrecognized UTF-8 charset");
+			}
 		} else {
 			Charset charset = Charset.forName(encoding);
 			reader = new InputStreamReader(stream, charset);

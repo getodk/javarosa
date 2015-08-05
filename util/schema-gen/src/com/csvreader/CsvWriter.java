@@ -108,12 +108,12 @@ public class CsvWriter {
 	 * @param delimiter
 	 *            The character to use as the column delimiter.
 	 */
-	public CsvWriter(Writer outputStream, char delimiter) {
+	public CsvWriter(Writer outputStreamWriter, char delimiter) {
 		if (outputStream == null) {
 			throw new IllegalArgumentException("Parameter outputStream can not be null.");
 		}
 
-		this.outputStream = new PrintWriter(outputStream);
+		this.outputStream = new PrintWriter(outputStreamWriter);
 		userSettings.Delimiter = delimiter;
 		initialized = true;
 	}
