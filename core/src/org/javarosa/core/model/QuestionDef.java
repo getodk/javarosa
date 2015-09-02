@@ -258,26 +258,30 @@ public class QuestionDef implements IFormElement, Localizable {
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		setID(ExtUtil.readInt(dis));
-		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
-		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-        setHelpInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		try {
+			setID(ExtUtil.readInt(dis));
+			binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
+			setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+	        setHelpInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+	
+			setControlType(ExtUtil.readInt(dis));
+	
+			additionalAttributes = ExtUtil.readAttributes(dis, null);
+	
+			choices = (List<SelectChoice>) ExtUtil.nullIfEmpty((List<SelectChoice>)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
+			for (int i = 0; i < getNumChoices(); i++) {
+				choices.get(i).setIndex(i);
+			}
+			setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
 
-		setControlType(ExtUtil.readInt(dis));
-
-		additionalAttributes = ExtUtil.readAttributes(dis, null);
-
-		choices = (List<SelectChoice>) ExtUtil.nullIfEmpty((List<SelectChoice>)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
-		for (int i = 0; i < getNumChoices(); i++) {
-			choices.get(i).setIndex(i);
+			osmTags = (List<OSMTag>) ExtUtil.nullIfEmpty((List<OSMTag>)ExtUtil.read(dis, new ExtWrapList(OSMTag.class), pf));
+		} catch ( OutOfMemoryError e ) {
+			throw new DeserializationException("serialization format change caused misalignment and out-of-memory error");
 		}
-		setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
-
-		osmTags = (List<OSMTag>) ExtUtil.nullIfEmpty((List<OSMTag>)ExtUtil.read(dis, new ExtWrapList(OSMTag.class), pf));
 	}
 
 	/*
