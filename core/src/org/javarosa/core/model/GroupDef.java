@@ -189,28 +189,32 @@ public class GroupDef implements IFormElement, Localizable {
 
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		setID(ExtUtil.readInt(dis));
-		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
-		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setRepeat(ExtUtil.readBool(dis));
-		setChildren((List<IFormElement>)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
-
-		noAddRemove = ExtUtil.readBool(dis);
-		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
-
-		chooseCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		addCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		delCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		doneCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		addEmptyCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		doneEmptyCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		entryHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		delHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		mainHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-
-		additionalAttributes = ExtUtil.readAttributes(dis, null);
+		try {
+			setID(ExtUtil.readInt(dis));
+			setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
+			setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+			setRepeat(ExtUtil.readBool(dis));
+			setChildren((List<IFormElement>)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+	
+			noAddRemove = ExtUtil.readBool(dis);
+			count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
+	
+			chooseCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			addCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			delCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			doneCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			addEmptyCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			doneEmptyCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			entryHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			delHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+			mainHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+	
+			additionalAttributes = ExtUtil.readAttributes(dis, null);
+		} catch ( OutOfMemoryError e ) {
+			throw new DeserializationException("serialization format change caused misalignment and out-of-memory error");
+		}
 	}
 
 	/** Write the group definition object to the supplied stream. */
