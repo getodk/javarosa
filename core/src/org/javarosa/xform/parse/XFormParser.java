@@ -1146,8 +1146,8 @@ public class XFormParser {
 				String ref = child.getAttributeValue("", REF_ATTR);
 
 				if (ref != null) {
-					if (ref.startsWith(DYNAMIC_ITEXT_CLOSE) && ref.endsWith(DYNAMIC_ITEXT_CLOSE)) {
-						textRef = ref.substring(DYNAMIC_ITEXT_OPEN.length(), ref.lastIndexOf(DYNAMIC_ITEXT_CLOSE));
+					if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
+						textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
 
 						verifyTextMappings(textRef, "Item <label>", true);
 					} else {
@@ -1244,8 +1244,8 @@ public class XFormParser {
 				/////////////////////////////////////////////////////////////
 
 				if (labelXpath != null) {
-					if (labelXpath.startsWith(ITEXT_OPEN) && labelXpath.endsWith(ITEXT_CLOSE)) {
-						labelXpath = labelXpath.substring(ITEXT_OPEN.length(), labelXpath.lastIndexOf(ITEXT_CLOSE));
+					if (labelXpath.startsWith(DYNAMIC_ITEXT_OPEN) && labelXpath.endsWith(DYNAMIC_ITEXT_CLOSE)) {
+						labelXpath = labelXpath.substring(DYNAMIC_ITEXT_OPEN.length(), labelXpath.lastIndexOf(DYNAMIC_ITEXT_CLOSE));
 						labelItext = true;
 					}
 				} else {
