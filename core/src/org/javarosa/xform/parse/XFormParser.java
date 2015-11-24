@@ -96,6 +96,8 @@ public class XFormParser {
 	private static final String VALUE = "value";
 	private static final String ITEXT_CLOSE = "')";
 	private static final String ITEXT_OPEN = "jr:itext('";
+	private static final String DYNAMIC_ITEXT_CLOSE = ")";
+	private static final String DYNAMIC_ITEXT_OPEN = "jr:itext(";
 	private static final String BIND_ATTR = "bind";
 	private static final String REF_ATTR = "ref";
 	private static final String SELECTONE = "select1";
@@ -1144,8 +1146,8 @@ public class XFormParser {
 				String ref = child.getAttributeValue("", REF_ATTR);
 
 				if (ref != null) {
-					if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
-						textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
+					if (ref.startsWith(DYNAMIC_ITEXT_CLOSE) && ref.endsWith(DYNAMIC_ITEXT_CLOSE)) {
+						textRef = ref.substring(DYNAMIC_ITEXT_OPEN.length(), ref.lastIndexOf(DYNAMIC_ITEXT_CLOSE));
 
 						verifyTextMappings(textRef, "Item <label>", true);
 					} else {
