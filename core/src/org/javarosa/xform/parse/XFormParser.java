@@ -951,7 +951,7 @@ public class XFormParser {
 
 		if (ref != null) {
 			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
-				String textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
+				String textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
 
 				verifyTextMappings(textRef, "Question <label>", true);
 				q.setTextID(textRef);
@@ -981,7 +981,7 @@ public class XFormParser {
 
 		if (ref != null) {
 			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
-				String textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
+				String textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
 
 				verifyTextMappings(textRef, "Group <label>", true);
 				g.setTextID(textRef);
@@ -1098,7 +1098,7 @@ public class XFormParser {
 
 		if (ref != null) {
 			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
-				String textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
+				String textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
 
 				verifyTextMappings(textRef, "<hint>", false);
 				q.setHelpTextID(textRef);
@@ -1145,7 +1145,7 @@ public class XFormParser {
 
 				if (ref != null) {
 					if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
-						textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
+						textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
 
 						verifyTextMappings(textRef, "Item <label>", true);
 					} else {
@@ -1242,8 +1242,8 @@ public class XFormParser {
 				/////////////////////////////////////////////////////////////
 
 				if (labelXpath != null) {
-					if (labelXpath.startsWith("jr:itext(") && labelXpath.endsWith(")")) {
-						labelXpath = labelXpath.substring("jr:itext(".length(), labelXpath.indexOf(")"));
+					if (labelXpath.startsWith(ITEXT_OPEN) && labelXpath.endsWith(ITEXT_CLOSE)) {
+						labelXpath = labelXpath.substring(ITEXT_OPEN.length(), labelXpath.lastIndexOf(ITEXT_CLOSE));
 						labelItext = true;
 					}
 				} else {
@@ -1301,8 +1301,8 @@ public class XFormParser {
 			}
 		}
 
-		q.setDynamicChoices(itemset);
 		itemsets.add(itemset);
+		q.setDynamicChoices(itemset);
 
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){

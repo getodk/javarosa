@@ -184,7 +184,12 @@ import org.kxml2.kdom.Node;
 			}
 
 			if (instanceNode.getValue() != null) {
-				Object serializedAnswer = serializer.serializeAnswerData(instanceNode.getValue(), instanceNode.getDataType());
+				Object serializedAnswer;
+				try {
+					serializedAnswer = serializer.serializeAnswerData(instanceNode.getValue(), instanceNode.getDataType());
+				} catch (RuntimeException ex) {
+					throw new RuntimeException("Unable to serialize " + instanceNode.getValue().toString() + ". Exception: " + ex.toString());
+				}
 
 				if (serializedAnswer instanceof Element) {
 					e = (Element)serializedAnswer;
