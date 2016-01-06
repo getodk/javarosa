@@ -127,7 +127,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	public String getQuestionText(String textID){
 		String tid = textID;
-		if(tid == "") tid = null; //to make things look clean
+		if(tid != null && tid.length() == 0) tid = null; //to make things look clean
 
 		//check for the null id case and return labelInnerText if it is so.
 		if(tid == null) return substituteStringArgs(element.getLabelInnerText());
@@ -159,7 +159,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
 	 */
 	public String getSpecialFormQuestionText(String textID,String form){
-		if(textID == null || textID.equals("")) return null;
+		if(textID == null || textID.length() == 0) return null;
 
 		String returnText = getIText(textID, form);
 
@@ -187,8 +187,8 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	protected String getIText(String textID,String form){
 		String returnText = null;
-		if(textID == null || textID.equals("")) return null;
-		if(form != null && !form.equals("")){
+		if(textID == null || textID.length() == 0) return null;
+		if(form != null && form.length() > 0){
 			try{
 				returnText = localizer().getRawText(localizer().getLocale(), textID + ";" + form);
 			}catch(NullPointerException npe){}

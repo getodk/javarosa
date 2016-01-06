@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.osm.OSMTag;
@@ -207,11 +206,13 @@ public class QuestionDef implements IFormElement, Localizable {
 	public ItemsetBinding getDynamicChoices () {
 		return dynamicChoices;
 	}
-
+	
 	public void setDynamicChoices (ItemsetBinding ib) {
-		if (ib != null) {
-			ib.setDestRef(this);
-		}
+		// the call to dynamicChoices.setDestRef(this) 
+		// 
+		// is now done later in the load sequence, within:
+		//
+		// dynamicChoices.initReferences(QuestionDef q)
 		this.dynamicChoices = ib;
 	}
 

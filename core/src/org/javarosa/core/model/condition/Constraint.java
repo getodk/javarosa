@@ -54,7 +54,7 @@ public class Constraint implements Externalizable {
         	} 
 			try{
 				Object value = xPathConstraintMsg.eval(instance, ec);
-				if(value != "") {
+				if(value != null && ((String) value).length() != 0) {
 					return (String)value;
 				}
 				return null;
