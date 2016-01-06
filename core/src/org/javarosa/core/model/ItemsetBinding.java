@@ -17,6 +17,9 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.expr.XPathPathExpr;
 
 public class ItemsetBinding implements Externalizable, Localizable {
 
@@ -37,6 +40,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public boolean labelIsItext;       //if true, content of 'label' is an itext id
 	
 	public boolean copyMode;           //true = copy subtree; false = copy string value
+	public IConditionExpr copyExpr;    // path expression for copy; may be relative, no predicates
 	public TreeReference copyRef;      //absolute ref to copy
 	public TreeReference valueRef;     //absolute ref to value
 	public IConditionExpr valueExpr;   //path expression for value; may be relative, no predicates (must be relative if copy mode)
@@ -77,13 +81,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
 		}
 	}
 	
-	public void setDestRef (QuestionDef q) {
-		destRef = FormInstance.unpackReference(q.getBind()).clone();
-		if (copyMode) {
-			destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
-		}
-	}
-	
 	public TreeReference getDestRef () {
 		return destRef;
 	}
@@ -99,29 +96,52 @@ public class ItemsetBinding implements Externalizable, Localizable {
 		
 		return relRef != null ? RestoreUtils.xfFact.refToPathExpr(relRef) : null;
 	}
-	
+
+	public void initReferences(QuestionDef q) {
+		// To construct the xxxRef, we need the full model, which wasn't available before now. 
+		// Compute the xxxRefs now.
+		nodesetRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(
+				((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference(true)), contextRef));
+		if ( labelExpr != null ) {
+			labelRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) labelExpr).getExpr())),
+					nodesetRef));
+		}
+		if ( copyExpr != null ) {
+			copyRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) copyExpr).getExpr())),
+					nodesetRef));
+		}
+		if ( valueExpr != null ) {
+			valueRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) valueExpr).getExpr())),
+					nodesetRef));
+		}
+
+		if ( q != null ) {
+			// When loading from XML, the first time through, during verification, q will be null.
+			// The second time through, q will be non-null.
+			// Otherwise, when loading from binary, this will be called only once with a non-null q.
+			destRef = FormInstance.unpackReference(q.getBind()).clone();
+			if (copyMode) {
+				destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
+			}
+		}
+	}
+
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		nodesetRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		nodesetExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		labelRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		labelExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		valueRef = (TreeReference)ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
 		valueExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
-		copyRef = (TreeReference)ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
+		copyExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
 		labelIsItext = ExtUtil.readBool(in);
 		copyMode = ExtUtil.readBool(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, nodesetRef);
 		ExtUtil.write(out, new ExtWrapTagged(nodesetExpr));
 		ExtUtil.write(out, contextRef);
-		ExtUtil.write(out, labelRef);
 		ExtUtil.write(out, new ExtWrapTagged(labelExpr));
-		ExtUtil.write(out, new ExtWrapNullable(valueRef));
 		ExtUtil.write(out, new ExtWrapNullable(valueExpr == null ? null : new ExtWrapTagged(valueExpr)));
-		ExtUtil.write(out, new ExtWrapNullable(copyRef));
+		ExtUtil.write(out, new ExtWrapNullable(copyExpr == null ? null : new ExtWrapTagged(copyExpr)));
 		ExtUtil.writeBool(out, labelIsItext);
 		ExtUtil.writeBool(out, copyMode);
 	}

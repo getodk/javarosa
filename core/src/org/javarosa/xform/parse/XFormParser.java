@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -123,6 +124,7 @@ public class XFormParser {
 	private Document _instDoc;
 
 	private boolean modelFound;
+	private Localizer localizer;
 	private HashMap<String, DataBinding> bindingsByID;
 	private List<DataBinding> bindings;
 	private List<TreeReference> actionTargets;
@@ -452,11 +454,18 @@ public class XFormParser {
 		if(mainInstanceNode != null) {
 			FormInstance fi = parseInstance(mainInstanceNode, true);
 			addMainInstanceToFormDef(mainInstanceNode, fi);
-
-			//set the main instance
-			_f.setInstance(fi);
 		}
 
+		// Clear the caches, as these may not have been initialized
+		// entirely correctly during the validation steps.
+		Enumeration<FormInstance> e = _f.getNonMainInstances();
+		while ( e.hasMoreElements() ) {
+			FormInstance fi = e.nextElement();
+			fi.getRoot().clearChildrenCaches();
+			fi.getRoot().clearCaches();
+		}
+		_f.getMainInstance().getRoot().clearChildrenCaches();
+		_f.getMainInstance().getRoot().clearCaches();
 	}
 
 	private void parseElement (Element e, Object parent, HashMap<String, IElementHandler> handlers) { //,
@@ -637,7 +646,7 @@ public class XFormParser {
 
 		if (dataRef != null) {
 			if (!refFromBind) {
-				dataRef = getAbsRef(dataRef, TreeReference.rootRef());
+				dataRef = FormDef.getAbsRef(dataRef, TreeReference.rootRef());
 			}
 		}
 
@@ -701,7 +710,7 @@ public class XFormParser {
 
 		if (dataRef != null) {
 			if (!refFromBind) {
-				dataRef = getAbsRef(dataRef, TreeReference.rootRef());
+				dataRef = FormDef.getAbsRef(dataRef, TreeReference.rootRef());
 			}
 		}
 
@@ -1221,12 +1230,22 @@ public class XFormParser {
 		copyUA.add(REF_ATTR);
 		////////////////////////////////////////////////////
 
+		/**
+		 * At this point in time, we cannot construct a valid nodesetRef
+		 * 
+		 * Leave all ...Ref entries as null and test the ...Expr entries for null / non-null values.
+		 * 
+		 * We will patch this all up in the verifyItemsetBindings() method.
+		 */
 		String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
 		if(nodesetStr == null ) throw new RuntimeException("No nodeset attribute in element: ["+e.getName()+"]. This is required. (Element Printout:"+XFormSerializer.elementToString(e)+")");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
 		itemset.nodesetExpr = new XPathConditional(path);
 		itemset.contextRef = getFormElementRef(qparent);
-		itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), itemset.contextRef));
+		// this is not valid yet...
+		itemset.nodesetRef = null;
+		// itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), itemset.contextRef));
+		itemset.copyMode = false;
 
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
@@ -1253,22 +1272,26 @@ public class XFormParser {
 				}
 
 				XPathPathExpr labelPath = XPathReference.getPathExpr(labelXpath);
-				itemset.labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelPath), itemset.nodesetRef));
+				itemset.labelRef = null;
+				// itemset.labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelPath), itemset.nodesetRef));
 				itemset.labelExpr = new XPathConditional(labelPath);
 				itemset.labelIsItext = labelItext;
 			} else if ("copy".equals(childName)) {
-				String copyRef = child.getAttributeValue("", REF_ATTR);
+				String copyXpath = child.getAttributeValue("", REF_ATTR);
 
 				//print unused attribute warning message for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, copyUA)){
 					reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(child, copyUA), getVagueLocation(child));
 				}
 
-				if (copyRef == null) {
+				if (copyXpath == null) {
 					throw new XFormParseException("<copy> in <itemset> requires 'ref'");
 				}
 
-				itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), itemset.nodesetRef));
+				XPathPathExpr copyPath = XPathReference.getPathExpr(copyXpath);
+				itemset.copyRef = null;
+				// itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyPath), itemset.nodesetRef));
+				itemset.copyExpr = new XPathConditional(copyPath);
 				itemset.copyMode = true;
 			} else if (VALUE.equals(childName)) {
 				String valueXpath = child.getAttributeValue("", REF_ATTR);
@@ -1283,23 +1306,21 @@ public class XFormParser {
 				}
 
 				XPathPathExpr valuePath = XPathReference.getPathExpr(valueXpath);
-				itemset.valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valuePath), itemset.nodesetRef));
+				itemset.valueRef = null;
+				// itemset.valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valuePath), itemset.nodesetRef));
 				itemset.valueExpr = new XPathConditional(valuePath);
-				itemset.copyMode = false;
 			}
 		}
 
-		if (itemset.labelRef == null) {
+		if (itemset.labelExpr == null) {
 			throw new XFormParseException("<itemset> requires <label>");
-		} else if (itemset.copyRef == null && itemset.valueRef == null) {
+		} else if (itemset.copyExpr == null && itemset.valueExpr == null) {
 			throw new XFormParseException("<itemset> requires <copy> or <value>");
 		}
 
-		if (itemset.copyRef != null) {
-			if (itemset.valueRef == null) {
+		if (itemset.copyExpr != null) {
+			if (itemset.valueExpr == null) {
 				reporter.warning(XFormParserReporter.TYPE_TECHNICAL, "<itemset>s with <copy> are STRONGLY recommended to have <value> as well; pre-selecting, default answers, and display of answers will not work properly otherwise",getVagueLocation(e));
-			} else if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
-				throw new XFormParseException("<value> is outside <copy>");
 			}
 		}
 
@@ -1437,29 +1458,7 @@ public class XFormParser {
 	}
 
 	private IDataReference getAbsRef (IDataReference ref, IFormElement parent) {
-		return getAbsRef(ref, getFormElementRef(parent));
-	}
-
-	//take a (possibly relative) reference, and make it absolute based on its parent
-	private static IDataReference getAbsRef (IDataReference ref, TreeReference parentRef) {
-		TreeReference tref;
-
-		if (!parentRef.isAbsolute()) {
-			throw new RuntimeException("XFormParser.getAbsRef: parentRef must be absolute");
-		}
-
-		if (ref != null) {
-			tref = (TreeReference)ref.getReference();
-		} else {
-			tref = TreeReference.selfRef(); //only happens for <group>s with no binding
-		}
-
-		tref = tref.parent(parentRef);
-		if (tref == null) {
-			throw new XFormParseException("Binding path [" + tref + "] not allowed with parent binding of [" + parentRef + "]");
-		}
-
-		return new XPathReference(tref);
+		return FormDef.getAbsRef(ref, getFormElementRef(parent));
 	}
 
 	//collapse groups whose only child is a repeat into a single repeat that uses the label of the wrapping group
@@ -1506,9 +1505,7 @@ public class XFormParser {
 	}
 
 	private void parseIText (Element itext) {
-		Localizer l = new Localizer(true, true);
-		_f.setLocalizer(l);
-		l.registerLocalizable(_f);
+	  Localizer l = new Localizer(true, true);
 
       ArrayList<String> usedAtts = new ArrayList<String>(); //used for warning message
 
@@ -1530,6 +1527,8 @@ public class XFormParser {
 		if(XFormUtils.showUnusedAttributeWarning(itext, usedAtts)){
 			reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(itext, usedAtts), getVagueLocation(itext));
 		}
+		
+		localizer = l;
 	}
 
 	private void parseTranslation (Localizer l, Element trans) {
@@ -1635,20 +1634,18 @@ public class XFormParser {
 	}
 
 	private boolean hasITextMapping (String textID, String locale) {
-		Localizer l = _f.getLocalizer();
-		return l.hasMapping(locale == null ? l.getDefaultLocale() : locale, textID);
+		return localizer.hasMapping(locale == null ? localizer.getDefaultLocale() : locale, textID);
 	}
 
 	private void verifyTextMappings (String textID, String type, boolean allowSubforms) {
-		Localizer l = _f.getLocalizer();
-		String[] locales = l.getAvailableLocales();
+		String[] locales = localizer.getAvailableLocales();
 
 		for (int i = 0; i < locales.length; i++) {
 			//Test whether there is a default translation, or whether there is any special form available.
 			if (!(hasITextMapping(textID, locales[i]) ||
 					(allowSubforms && hasSpecialFormMapping(textID, locales[i])))) {
-				if (locales[i].equals(l.getDefaultLocale())) {
-					throw new XFormParseException(type + " '" + textID + "': text is not localizable for default locale [" + l.getDefaultLocale() + "]!");
+				if (locales[i].equals(localizer.getDefaultLocale())) {
+					throw new XFormParseException(type + " '" + textID + "': text is not localizable for default locale [" + localizer.getDefaultLocale() + "]!");
 				} else {
 					reporter.warning(XFormParserReporter.TYPE_TECHNICAL, type + " '" + textID + "': text is not localizable for locale " + locales[i] + ".", null);
 				}
@@ -1670,7 +1667,7 @@ public class XFormParser {
 			}
 		}
 		//Otherwise this sucks and we have to test the keys
-		OrderedMap<String, PrefixTreeNode> table = _f.getLocalizer().getLocaleData(locale);
+		OrderedMap<String, PrefixTreeNode> table = localizer.getLocaleData(locale);
 		for (String key : table.keySet()) {
 			if(key.startsWith(textID + ";")) {
 				//A key is found, pull it out, add it to the list of guesses, and return positive
@@ -1869,6 +1866,8 @@ public class XFormParser {
 
 		checkDependencyCycles();
 		_f.setInstance(instanceModel);
+		_f.setLocalizer(localizer);
+
 		try {
 			_f.finalizeTriggerables();
 		} catch(IllegalStateException ise) {
@@ -1911,6 +1910,11 @@ public class XFormParser {
 		loadNamespaces(e, instanceModel);
 		if(isMainInstance)
 		{
+			// the initialization of the references is done twice. 
+			// The first time is here because they are needed before these
+			// validation steps can be performed.
+			// It is then done again during the call to _f.setInstance().
+			FormDef.updateItemsetReferences(_f.getChildren());
 			processRepeats(instanceModel);
 			verifyBindings(instanceModel);
 			verifyActions(instanceModel);
@@ -2440,7 +2444,7 @@ public class XFormParser {
 	private void verifyItemsetBindings (FormInstance instance) {
 		for (int i = 0; i < itemsets.size(); i++) {
 			ItemsetBinding itemset = itemsets.get(i);
-
+			
 			//check proper parent/child relationship
 			if (!itemset.nodesetRef.isParentOf(itemset.labelRef, false)) {
 				throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
@@ -2448,6 +2452,12 @@ public class XFormParser {
 				throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
 			} else if (itemset.valueRef != null && !itemset.nodesetRef.isParentOf(itemset.valueRef, false)) {
 				throw new XFormParseException("itemset nodeset ref is not a parent of value ref");
+			}
+
+			if (itemset.copyRef != null && itemset.valueRef != null) {
+				if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
+					throw new XFormParseException("itemset <copy> is not a parent of <value>");
+				}
 			}
 
 			//make sure the labelref is tested against the right instance
@@ -2518,7 +2528,7 @@ public class XFormParser {
 		for (int i = 0; i < bindings.size(); i++) {
 			DataBinding bind = bindings.get(i);
 			TreeReference ref = FormInstance.unpackReference(bind.getReference());
-         List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+            List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
 
 			if (nodes.size() > 0) {
 				attachBindGeneral(bind);
@@ -2580,7 +2590,7 @@ public class XFormParser {
 
 			for (int i = 0; i < selectRefs.size(); i++) {
 				TreeReference ref = selectRefs.get(i);
-            List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+                List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
 				for (int j = 0; j < nodes.size(); j++) {
 					TreeElement node = instance.resolveReference(nodes.get(j));
 					if (node.getDataType() == Constants.DATATYPE_CHOICE || node.getDataType() == Constants.DATATYPE_CHOICE_LIST) {

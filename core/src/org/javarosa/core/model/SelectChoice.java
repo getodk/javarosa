@@ -121,7 +121,7 @@ public class SelectChoice implements Externalizable, Localizable {
 	}
 	
 	public String toString () {
-		return ((textID != null && textID != "") ? "{" + textID + "}" : "") + (labelInnerText != null ? labelInnerText : "") + " => " + value;
+		return ((textID != null && textID.length() > 0) ? "{" + textID + "}" : "") + (labelInnerText != null ? labelInnerText : "") + " => " + value;
 	}
 
 	public String getTextID() {

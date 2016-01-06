@@ -38,6 +38,7 @@ import org.javarosa.debug.EventNotifierSilent;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParserReporter;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
@@ -78,6 +79,29 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public static void setDefaultEventNotifier(EventNotifier eventNotifier) {
       defaultEventNotifier = eventNotifier;
    }
+
+    //take a (possibly relative) reference, and make it absolute based on its parent
+    // moved from the parser to this class so it can be used more cleanly by ItemsetBinding
+	public static IDataReference getAbsRef (IDataReference ref, TreeReference parentRef) {
+		TreeReference tref;
+
+		if (!parentRef.isAbsolute()) {
+			throw new RuntimeException("XFormParser.getAbsRef: parentRef must be absolute");
+		}
+
+		if (ref != null) {
+			tref = (TreeReference)ref.getReference();
+		} else {
+			tref = TreeReference.selfRef(); //only happens for <group>s with no binding
+		}
+
+		tref = tref.parent(parentRef);
+		if (tref == null) {
+			throw new XFormParseException("Binding path [" + tref + "] not allowed with parent binding of [" + parentRef + "]");
+		}
+
+		return new XPathReference(tref);
+	}
 
    private List<IFormElement> children;// <IFormElement>
    /**
@@ -216,6 +240,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       mainInstance = fi;
       fi.setFormId(getID());
       resetEvaluationContext();
+
+      // construct the references in all the question itemsets 
+      // now so that the entire main instance is available
+      // for term resolution.
+      updateItemsetReferences(getChildren());
+
       attachControlsToInstanceData();
    }
 
@@ -1134,7 +1164,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       setInstance((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
 
       setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
-
+      
       List<Condition> vcond = (List<Condition>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
       for (Condition condition : vcond) {
          addTriggerable(condition);
@@ -1419,6 +1449,27 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       return new String[]{"DESCRIPTOR", "XMLNS"};
    }
 
+   /** 
+    * Recursively traverse the main instance and initialize any questions with
+    * dynamic ItemsetBindings.  We need to do this late in the process so that
+    * we have the entire main instance assembled. 
+    */
+   public static void updateItemsetReferences(List<IFormElement> children) {
+	  if ( children != null ) {
+		  for (IFormElement child : children ) {
+			  if ( child instanceof QuestionDef ) {
+				  QuestionDef q = (QuestionDef) child;
+				  ItemsetBinding itemset = q.getDynamicChoices();
+				  if ( itemset != null ) {
+					  itemset.initReferences(q);
+				  }
+			  } else {
+				  updateItemsetReferences(child.getChildren());
+			  }
+		  }
+	  }
+   }
+
    /**
     * Link a deserialized instance back up with its parent FormDef. this allows
     * select/select1 questions to be internationalizable in chatterbox, and (if
@@ -1427,7 +1478,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    public void attachControlsToInstanceData() {
       attachControlsToInstanceData(getMainInstance().getRoot());
    }
-
+   
    private void attachControlsToInstanceData(TreeElement node) {
       for (int i = 0; i < node.getNumChildren(); i++) {
          attachControlsToInstanceData(node.getChildAt(i));
