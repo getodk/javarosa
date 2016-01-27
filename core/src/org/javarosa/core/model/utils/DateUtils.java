@@ -409,7 +409,9 @@ public class DateUtils {
 		//Now apply any relevant offsets from the timezone.
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + (((60 * timeOffset.hour)  + timeOffset.minute) * 60 * 1000)));
+		// apply also the DST offset
+		long dstOffset = TimeZone.getDefault().inDaylightTime(new Date()) ? TimeZone.getDefault().getDSTSavings() : 0L;
+		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000) + dstOffset));
 
 		//c is now in the timezone of the parsed value, so put
 		//it in the local timezone.
