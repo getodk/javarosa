@@ -845,6 +845,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         // NOTE: this will return incorrect results if the list
                         // is filtered.
                         // fortunately, they are ignored by FormEntryPrompt
+
+                        if (ref.isAmbiguous()) {
+                           // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
+                           // like we do when we populate those at FormEntryPrompt (line 251).
+                           // The "ref" here is ambiguous, so we need to make it concrete first.
+                           ref = ref.contextualize(ec.getContextRef());
+                        }
+
                         f.populateDynamicChoices(itemset, ref);
                      }
                      choices = itemset.getChoices();
