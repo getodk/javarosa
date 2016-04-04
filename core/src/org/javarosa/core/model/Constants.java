@@ -81,6 +81,7 @@ public class Constants {
 	public static final int CONTROL_AUDIO_CAPTURE = 12;
 	public static final int CONTROL_VIDEO_CAPTURE = 13;
 	public static final int CONTROL_OSM_CAPTURE = 14;
+	public static final int CONTROL_FILE_CAPTURE = 15; // generic upload
 
 	/** constants for xform tags */
 	public static final String XFTAG_UPLOAD = "upload";

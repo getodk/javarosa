@@ -788,6 +788,10 @@ public class XFormParser {
         	question.setControlType(Constants.CONTROL_OSM_CAPTURE);
         	List<OSMTag> tags = parseOsmTags(e);
         	question.setOsmTags(tags);
+        } else {
+        	// everything else. 
+        	// Presumably, the appearance attribute would govern how this is handled.
+        	question.setControlType(Constants.CONTROL_FILE_CAPTURE);
         }
         return question;
     }

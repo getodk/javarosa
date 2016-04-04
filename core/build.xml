@@ -6,8 +6,8 @@
 	<property name="dir.root" value="${basedir}/../"/>
 	<property name="dir.lib" value="${dir.root}/lib/"/>
 	<property name="includeantruntime" value="false"/>
-	<property name="ant.build.javac.source" value="1.6"/>
-	<property name="ant.build.javac.target" value="1.6"/>
+	<property name="ant.build.javac.source" value="1.7"/>
+	<property name="ant.build.javac.target" value="1.7"/>
 	
 	<!-- Get the resource files which'll be used -->
 	<fileset id="jr.resources" dir="${basedir}/">
@@ -77,7 +77,9 @@
 	</target>
 	
 	<target name="compile" depends="clean,extract-libs,init" description="compile the source">
-		<javac includeantruntime="false" srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source"/>
+		<javac includeantruntime="false" srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source">
+			<compilerarg value="-Xlint:deprecation,unchecked"/>
+		</javac>
 	</target>
 	
 	<target name="package" depends="compile" description="package binary into jar">
