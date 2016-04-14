@@ -332,6 +332,10 @@ public class DateUtils {
 		if (!parseTime(str, fields)) {
 			return null;
 		}
+		// time zone may wrap time across midnight. Clear that.
+		fields.year = 1970;
+		fields.month = 1;
+		fields.day = 1;
 		return getDate(fields);
 	}
 
@@ -409,9 +413,8 @@ public class DateUtils {
 		//Now apply any relevant offsets from the timezone.
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-		// apply also the DST offset
-		long dstOffset = TimeZone.getDefault().inDaylightTime(new Date()) ? TimeZone.getDefault().getDSTSavings() : 0L;
-		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000) + dstOffset));
+		long msecOffset = (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
+		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
 
 		//c is now in the timezone of the parsed value, so put
 		//it in the local timezone.
@@ -421,6 +424,12 @@ public class DateUtils {
 
 		DateFields adjusted = getFields(c.getTime());
 
+		// time zone adjustment may +/- across midnight
+		// which can result in +/- across a year
+		f.year = adjusted.year;
+		f.month = adjusted.month;
+		f.day = adjusted.day;
+		f.dow = adjusted.dow;
 		f.hour = adjusted.hour;
 		f.minute = adjusted.minute;
 		f.second = adjusted.second;
