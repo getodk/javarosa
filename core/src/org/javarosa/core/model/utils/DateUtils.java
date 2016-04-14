@@ -212,7 +212,8 @@ public class DateUtils {
 		String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
 
 		//Time Zone ops (1 in the first field corresponds to 'CE' ERA)
-		int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, 0);
+		int milliday = ((f.hour * 60 + f.minute)*60 + f.second) * 1000 + f.secTicks;
+		int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, milliday);
 
 		//NOTE: offset is in millis
 		if(offset ==0 ) {
@@ -463,6 +464,29 @@ public class DateUtils {
 						break;
 				}
 				secStr = secStr.substring(0, i);
+
+				int idxDec = secStr.indexOf('.');
+				if ( idxDec == -1 ) {
+					if ( secStr.length() == 0 ) {
+						f.second = 0;
+					} else {
+						f.second = Integer.parseInt(secStr);
+					}
+					f.secTicks = 0;
+				} else {
+					String secPart = secStr.substring(0,idxDec);
+					if ( secPart.length() == 0 ) {
+						f.second = 0;
+					} else {
+						f.second = Integer.parseInt(secPart);
+					}
+					String secTickStr = secStr.substring(idxDec+1);
+					if ( secTickStr.length() > 0 ) {
+						f.secTicks = Integer.parseInt(secTickStr);
+					} else {
+						f.secTicks = 0;
+					}
+				}
 
 				double fsec = Double.parseDouble(secStr);
 				f.second = (int)fsec;
