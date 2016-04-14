@@ -466,7 +466,7 @@ public class DateUtils {
 
 				double fsec = Double.parseDouble(secStr);
 				f.second = (int)fsec;
-				f.secTicks = (int)(1000.0 * (fsec - f.second));
+				f.secTicks = (int)(1000.0 * fsec - 1000.0 * f.second);
 			}
 		} catch (NumberFormatException nfe) {
 			return false;
