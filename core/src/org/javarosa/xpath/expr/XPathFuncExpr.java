@@ -217,25 +217,25 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("format-date")) {
 			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], false);
-        }else if (name.equals("acos")) { //XPath 3.0
+        } else if (name.equals("acos")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return acos(argVals[0]);
-        }else if (name.equals("asin")) { //XPath 3.0
+        } else if (name.equals("asin")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return asin(argVals[0]);
-        }else if (name.equals("atan")) { //XPath 3.0
+        } else if (name.equals("atan")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return atan(argVals[0]);
-        }else if (name.equals("atan2")) { //XPath 3.0
+        } else if (name.equals("atan2")) { //XPath 3.0
             checkArity(name, 2, args.length);
             return atan2(argVals[0], argVals[1]);
-        }else if (name.equals("cos")) { //XPath 3.0
+        } else if (name.equals("cos")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return cosin(argVals[0]);
-        }else if (name.equals("exp")) { //XPath 3.0
+        } else if (name.equals("exp")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return exp(argVals[0]);
-        }else if (name.equals("exp10")) { //XPath 3.0
+        } else if (name.equals("exp10")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return exp10(argVals[0]);
 		} else if (name.equals("log")) { //XPath 3.0
@@ -244,19 +244,19 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("log10")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return log10(argVals[0]);
-        }else if (name.equals("pi")) { //XPath 3.0
+        } else if (name.equals("pi")) { //XPath 3.0
             checkArity(name, 0, args.length);
             return pi();
         } else if (name.equals("sin")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return sin(argVals[0]);
-        }else if (name.equals("sqrt")) { //XPath 3.0
+        } else if (name.equals("sqrt")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return sqrt(argVals[0]);
-        }else if (name.equals("tan")) { //XPath 3.0
+        } else if (name.equals("tan")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return tan(argVals[0]);
-        }else if (name.equals("format-date-time")) { // non-standard
+        } else if (name.equals("format-date-time")) { // non-standard
 			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], true);
 		} else if ((name.equals("selected") || name.equals("is-selected"))) { //non-standard
