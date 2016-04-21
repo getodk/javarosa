@@ -212,7 +212,8 @@ public class DateUtils {
 		String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
 
 		//Time Zone ops (1 in the first field corresponds to 'CE' ERA)
-		int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, 0);
+		int milliday = ((f.hour * 60 + f.minute)*60 + f.second) * 1000 + f.secTicks;
+		int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, milliday);
 
 		//NOTE: offset is in millis
 		if(offset ==0 ) {
@@ -332,6 +333,10 @@ public class DateUtils {
 		if (!parseTime(str, fields)) {
 			return null;
 		}
+		// time zone may wrap time across midnight. Clear that.
+		fields.year = 1970;
+		fields.month = 1;
+		fields.day = 1;
 		return getDate(fields);
 	}
 
@@ -409,9 +414,8 @@ public class DateUtils {
 		//Now apply any relevant offsets from the timezone.
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-		// apply also the DST offset
-		long dstOffset = TimeZone.getDefault().inDaylightTime(new Date()) ? TimeZone.getDefault().getDSTSavings() : 0L;
-		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000) + dstOffset));
+		long msecOffset = (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
+		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
 
 		//c is now in the timezone of the parsed value, so put
 		//it in the local timezone.
@@ -421,6 +425,12 @@ public class DateUtils {
 
 		DateFields adjusted = getFields(c.getTime());
 
+		// time zone adjustment may +/- across midnight
+		// which can result in +/- across a year
+		f.year = adjusted.year;
+		f.month = adjusted.month;
+		f.day = adjusted.day;
+		f.dow = adjusted.dow;
 		f.hour = adjusted.hour;
 		f.minute = adjusted.minute;
 		f.second = adjusted.second;
@@ -455,9 +465,32 @@ public class DateUtils {
 				}
 				secStr = secStr.substring(0, i);
 
+				int idxDec = secStr.indexOf('.');
+				if ( idxDec == -1 ) {
+					if ( secStr.length() == 0 ) {
+						f.second = 0;
+					} else {
+						f.second = Integer.parseInt(secStr);
+					}
+					f.secTicks = 0;
+				} else {
+					String secPart = secStr.substring(0,idxDec);
+					if ( secPart.length() == 0 ) {
+						f.second = 0;
+					} else {
+						f.second = Integer.parseInt(secPart);
+					}
+					String secTickStr = secStr.substring(idxDec+1);
+					if ( secTickStr.length() > 0 ) {
+						f.secTicks = Integer.parseInt(secTickStr);
+					} else {
+						f.secTicks = 0;
+					}
+				}
+
 				double fsec = Double.parseDouble(secStr);
 				f.second = (int)fsec;
-				f.secTicks = (int)(1000.0 * (fsec - f.second));
+				f.secTicks = (int)(1000.0 * fsec - 1000.0 * f.second);
 			}
 		} catch (NumberFormatException nfe) {
 			return false;

@@ -28,7 +28,7 @@ import org.javarosa.core.model.utils.DateUtils.DateFields;
 
 public class DateUtilsTests extends TestCase {
 	
-	private static int NUM_TESTS = 6;
+	private static int NUM_TESTS = 7;
 	
 	Date currentTime;
 	Date minusOneHour;
@@ -70,6 +70,7 @@ public class DateUtilsTests extends TestCase {
 		case 4: return "testTimeParses";
 		case 5: return "testParity";
 		case 6: return "testParseTime_with_DST";
+		case 7: return "testDateTimeParses";
 		}
 		throw new IllegalStateException("Unexpected index");
 	}
@@ -110,6 +111,64 @@ public class DateUtilsTests extends TestCase {
 		
 	}
 	
+	public void testDateTimeParses() {
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+		testDateTime("2016-04-13T16:26:00.000-07", 1460589960000L);
+		testDateTime("2015-12-16T16:09:00.000-08", 1450310940000L); // wraps day!!!
+		testDateTime("2015-12-16T07:09:00.000+08", 1450220940000L); // wraps day!!!
+		
+		testDateTime("2015-11-30T16:09:00.000-08", 1448928540000L); // wraps month!!!
+		testDateTime("2015-11-01T07:09:00.000+08", 1446332940000L); // wraps month!!!
+		
+		testDateTime("2015-12-31T16:09:00.000-08", 1451606940000L); // wraps year!!!
+		testDateTime("2015-01-01T07:09:00.000+08", 1420067340000L); // wraps year!!!
+		
+		testDateTime("2016-01-26T10:39:00.000-08", 1453833540000L);
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("PST"));
+
+		testDateTime("2016-04-13T16:26:00.000-07", 1460589960000L);
+		testDateTime("2015-12-16T16:09:00.000-08", 1450310940000L); // wraps day!!!
+		testDateTime("2015-12-16T07:09:00.000+08", 1450220940000L); // wraps day!!!
+		
+		testDateTime("2015-11-30T16:09:00.000-08", 1448928540000L); // wraps month!!!
+		testDateTime("2015-11-01T07:09:00.000+08", 1446332940000L); // wraps month!!!
+		
+		testDateTime("2015-12-31T16:09:00.000-08", 1451606940000L); // wraps year!!!
+		testDateTime("2015-01-01T07:09:00.000+08", 1420067340000L); // wraps year!!!
+		
+		testDateTime("2016-01-26T10:39:00.000-08", 1453833540000L);
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("PDT"));
+
+		testDateTime("2016-04-13T16:26:00.000-07", 1460589960000L);
+		testDateTime("2015-12-16T16:09:00.000-08", 1450310940000L); // wraps day!!!
+		testDateTime("2015-12-16T07:09:00.000+08", 1450220940000L); // wraps day!!!
+		
+		testDateTime("2015-11-30T16:09:00.000-08", 1448928540000L); // wraps month!!!
+		testDateTime("2015-11-01T07:09:00.000+08", 1446332940000L); // wraps month!!!
+		
+		testDateTime("2015-12-31T16:09:00.000-08", 1451606940000L); // wraps year!!!
+		testDateTime("2015-01-01T07:09:00.000+08", 1420067340000L); // wraps year!!!
+		
+		testDateTime("2016-01-26T10:39:00.000-08", 1453833540000L);
+	}
+	
+	private void testDateTime(String in, long test) {
+		try{ 
+			Date d = DateUtils.parseDateTime(in);
+			
+			long value = d.getTime();
+			
+			assertEquals("Fail: " + in + "(" + TimeZone.getDefault().getDisplayName() + ")", test, value);
+		} catch(Exception e) {
+			e.printStackTrace();
+			fail("Error: " + in + e.getMessage());
+		}
+	}
+
 	public void testTimeParses() {
 		//This is all kind of tricky. We need to assume J2ME level compliance, so
 		//dates won't every be assumed to have an intrinsic timezone, they'll be
@@ -117,56 +176,56 @@ public class DateUtilsTests extends TestCase {
 		
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		
-		testTime("10:00", 1000*60*60*10);
+		testTime("10:00", 1000*60*60*10 - getOffset());
 		testTime("10:00Z", 1000*60*60*10);
 		
 		testTime("10:00+02", 1000*60*60*8);
 		testTime("10:00-02", 1000*60*60*12);
 		
-		testTime("10:00+02:30", 1000*60*6*75);
-		testTime("10:00-02:30", 1000*60*6*125);
+		testTime("10:00+02:30", 1000*60*(60*10-150));
+		testTime("10:00-02:30", 1000*60*(60*10+150));
 		
 		TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
 		
 		TimeZone.setDefault(offsetTwoHours);
 		
-		testTime("10:00", 1000*60*60*10);
-		testTime("10:00Z", 1000*60*60*12);
+		testTime("10:00", 1000*60*60*10 - getOffset());
+		testTime("10:00Z", 1000*60*60*10);
 		
-		testTime("10:00+02", 1000*60*60*10);
-		testTime("10:00-02", 1000*60*60*14);
+		testTime("10:00+02", 1000*60*60*8);
+		testTime("10:00-02", 1000*60*60*12);
 		
-		testTime("10:00+02:30", 1000*60*6*95);
-		testTime("10:00-02:30", 1000*60*6*145);
+		testTime("10:00+02:30", 1000*60*(60*10-150));
+		testTime("10:00-02:30", 1000*60*(60*10+150));
 
 		TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-02");
 		
 		TimeZone.setDefault(offsetMinusTwoHours);
 		
-		testTime("14:00", 1000*60*60*14);
-		testTime("14:00Z", 1000*60*60*12);
+		testTime("14:00", 1000*60*60*14 - getOffset());
+		testTime("14:00Z", 1000*60*60*14);
 		
-		testTime("14:00+02", 1000*60*60*10);
-		testTime("14:00-02", 1000*60*60*14);
+		testTime("14:00+02", 1000*60*60*12);
+		testTime("14:00-02", 1000*60*60*16);
 		
-		testTime("14:00+02:30", 1000*60*6*95);
-		testTime("14:00-02:30", 1000*60*6*145);
+		testTime("14:00+02:30", 1000*60*(60*14-150));
+		testTime("14:00-02:30", 1000*60*(60*14+150));
 
 
 		TimeZone offsetPlusHalf = TimeZone.getTimeZone("GMT+0230");
 		
 		TimeZone.setDefault(offsetPlusHalf);
 		
-		testTime("14:00", 1000*60*6*140);
-		testTime("14:00Z", 1000*60*6*165);
+		testTime("14:00", 1000*60*60*14 - getOffset());
+		testTime("14:00Z", 1000*60*60*14);
 		
-		testTime("14:00+02", 1000*60*6*145);
-		testTime("14:00-02", 1000*60*6*185);
+		testTime("14:00+02", 1000*60*60*12);
+		testTime("14:00-02", 1000*60*60*16);
 		
-		testTime("14:00+02:30", 1000*60*6*140);
-		testTime("14:00-02:30", 1000*60*6*190);
+		testTime("14:00+02:30", 1000*60*(60*14-150));
+		testTime("14:00-02:30", 1000*60*(60*14+150));
 		
-		testTime("14:00+04:00", 1000*60*6*125);
+		testTime("14:00+04:00", 1000*60*60*10);
 		
 		TimeZone.setDefault(null);
 	}
@@ -175,12 +234,7 @@ public class DateUtilsTests extends TestCase {
 		try{ 
 			Date d = DateUtils.parseTime(in);
 			
-			//getTime here should always assume that it's in the UTC context, since that's the
-			//only available mode for j2me 1.3 (IE: Dates will always come out flat). We'll 
-			//simulate that here by offsetting.
-			long offset = getOffset();
-			
-			long value = d.getTime() + offset;
+			long value = d.getTime();
 			
 			assertEquals("Fail: " + in + "(" + TimeZone.getDefault().getDisplayName() + ")", test, value);
 		} catch(Exception e) {
@@ -197,9 +251,9 @@ public class DateUtilsTests extends TestCase {
 	}
 	
 	public void testParity() {
-		// This succeeds only when DST is not effective.
-//		testCycle(new Date(1300139579000l));
-//		testCycle(new Date(0));
+
+		testCycle(new Date(1300139579000l));
+		testCycle(new Date(0));
 		
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		
@@ -239,16 +293,17 @@ public class DateUtilsTests extends TestCase {
 
 		// this is a timezone that operates DST every day of the year!
 		SimpleTimeZone dstTimezone = new SimpleTimeZone(
-				7200000,
+				2*60*60*1000,
 				"Europe/Athens",
-				Calendar.JANUARY, 1, -Calendar.SUNDAY,
+				Calendar.JANUARY, 1, 0,
 				0, SimpleTimeZone.UTC_TIME,
-				Calendar.DECEMBER, 31, -Calendar.SUNDAY,
-				3600 * 24, SimpleTimeZone.UTC_TIME,
-				3600000);
+				Calendar.DECEMBER, 31, 0,
+				24*60*60*1000, SimpleTimeZone.UTC_TIME,
+				60*60*1000);
 		TimeZone.setDefault(dstTimezone);
 
 		String time = "12:03:05.000Z";
+		testTime(time, 43385000L);
 
 		Date date = DateUtils.parseTime(time);
 
