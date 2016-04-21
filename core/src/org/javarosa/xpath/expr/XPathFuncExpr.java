@@ -217,39 +217,45 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("format-date")) {
 			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], false);
-		} else if (name.equals("log10")) { //XPath 3.0
-                checkArity(name, 1, args.length);
-                return log10(argVals[0]);
-        } else if (name.equals("sin")) { //XPath 3.0
-            checkArity(name, 1, args.length);
-            return sin(argVals[0]);
-        }else if (name.equals("cos")) { //XPath 3.0
-            checkArity(name, 1, args.length);
-            return cosin(argVals[0]);
-        }else if (name.equals("tan")) { //XPath 3.0
-            checkArity(name, 1, args.length);
-            return tan(argVals[0]);
-        }else if (name.equals("asin")) { //XPath 3.0
-            checkArity(name, 1, args.length);
-            return asin(argVals[0]);
         }else if (name.equals("acos")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return acos(argVals[0]);
+        }else if (name.equals("asin")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return asin(argVals[0]);
         }else if (name.equals("atan")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return atan(argVals[0]);
         }else if (name.equals("atan2")) { //XPath 3.0
             checkArity(name, 2, args.length);
             return atan2(argVals[0], argVals[1]);
-        }else if (name.equals("sqrt")) { //XPath 3.0
+        }else if (name.equals("cos")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return sqrt(argVals[0]);
+            return cosin(argVals[0]);
         }else if (name.equals("exp")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return exp(argVals[0]);
+        }else if (name.equals("exp10")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return exp10(argVals[0]);
+		} else if (name.equals("log")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return log(argVals[0]);
+		} else if (name.equals("log10")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return log10(argVals[0]);
         }else if (name.equals("pi")) { //XPath 3.0
             checkArity(name, 0, args.length);
             return pi();
+        } else if (name.equals("sin")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return sin(argVals[0]);
+        }else if (name.equals("sqrt")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return sqrt(argVals[0]);
+        }else if (name.equals("tan")) { //XPath 3.0
+            checkArity(name, 1, args.length);
+            return tan(argVals[0]);
         }else if (name.equals("format-date-time")) { // non-standard
 			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], true);
@@ -1331,7 +1337,7 @@ public class XPathFuncExpr extends XPathExpression {
      * Returns the arc tan of the argument, expressed in radians.
      *
      * @param o Value
-     * @return tan of value
+     * @return v such that tan(v) = o
      */
     private Double atan(Object o) {
         //#if polish.cldc
@@ -1343,10 +1349,10 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * Implementation of logarithm with base ten
+     * Returns the arc tan of the 2 arguments, expressed in radians.
      *
      * @param o1, o2 Value
-     * @return Base ten log of value
+     * @return v such that o2*tan(v) = o1
      */
     private Double atan2(Object o1, Object o2) {
         //#if polish.cldc
@@ -1355,6 +1361,21 @@ public class XPathFuncExpr extends XPathExpression {
         double value1 = toDouble(o1).doubleValue();
         double value2 = toDouble(o2).doubleValue();
         return Math.atan2(value1, value2);
+        //#endif
+    }
+
+    /**
+     * Implementation of natural logarithm
+     *
+     * @param o Value
+     * @return natural log of value
+     */
+    private Double log(Object o) {
+        //#if polish.cldc
+        //# throw new XPathUnsupportedException("Sorry, logarithms are not supported on your platform");
+        //#else
+        double value = toDouble(o).doubleValue();
+        return Math.log(value);
         //#endif
     }
 
@@ -1374,9 +1395,8 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * Implementation of logarithm with base ten
      *
-     * @return Base ten log of value
+     * @return pi
      */
     private Double pi() {
         //#if polish.cldc
@@ -1387,10 +1407,10 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * Returns the square root of the argument, expressed in radians.
+     * Returns the square root of the argument.
      *
      * @param o Value
-     * @return tan of value
+     * @return sqrt of value
      */
     private Double sqrt(Object o) {
         //#if polish.cldc
@@ -1402,10 +1422,10 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * Implementation of logarithm with base ten
+     * Implementation of exponent base e
      *
      * @param o Value
-     * @return Base ten log of value
+     * @return e to the power of value
      */
     private Double exp(Object o) {
         //#if polish.cldc
@@ -1413,6 +1433,21 @@ public class XPathFuncExpr extends XPathExpression {
         //#else
         double value = toDouble(o).doubleValue();
         return Math.exp(value);
+        //#endif
+    }
+
+    /**
+     * Implementation of exponent base ten
+     *
+     * @param o Value
+     * @return 10 to the power of value
+     */
+    private Double exp10(Object o) {
+        //#if polish.cldc
+        //# throw new XPathUnsupportedException("Sorry, exponentials are not supported on your platform");
+        //#else
+        double value = toDouble(o).doubleValue();
+        return Math.pow(10.0, value);
         //#endif
     }
 
