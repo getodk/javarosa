@@ -27,6 +27,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
@@ -37,6 +38,7 @@ import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
@@ -299,6 +301,10 @@ public class XPathPathExpr extends XPathExpression {
 		} else if (val instanceof SelectMultiData) {
 			return (new XFormAnswerDataSerializer()).serializeAnswerData(val);
 		} else if (val instanceof DateData) {
+			return val.getValue();
+		} else if (val instanceof DateTimeData) {
+			return val.getValue();
+		} else if (val instanceof TimeData) {
 			return val.getValue();
 		} else if (val instanceof BooleanData) {
 			return val.getValue();
