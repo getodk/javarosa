@@ -1,0 +1,9 @@
+compile:
+  override:
+    - gradle jar javadoc
+
+test:
+  override:
+    - gradle test
+  post:
+    - cp -r build/libs $CIRCLE_ARTIFACTS
