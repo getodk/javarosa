@@ -1,0 +1,30 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets.main.java.srcDirs = ['core/src']
+sourceSets.test.java.srcDirs = ['core/test']
+
+dependencies {
+    compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
+    
+    testCompile group: 'junit', name: 'junit', version: '3.8.2'
+    testCompile group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
+}
+
+jar {
+    baseName = 'javarosa'
+    version = new Date().format('yyyy-MM-dd')
+    archiveName = baseName + '-' + version + '.jar'
+
+    manifest {
+        attributes 'Manifest-Version': "$jar.version"
+    }
+}
+
+// TODO: does not build UML diagrams
+javadoc {
+    failOnError = false
+}
