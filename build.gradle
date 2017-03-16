@@ -8,6 +8,9 @@ sourceSets.main.java.srcDirs = ['src']
 sourceSets.test.java.srcDirs = ['test']
 sourceSets.test.resources.srcDirs = ['resources']
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 dependencies {
     compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
     
