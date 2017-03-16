@@ -1,4 +1,4 @@
 .gradle
-build
+build/
 gradle
 *.class
