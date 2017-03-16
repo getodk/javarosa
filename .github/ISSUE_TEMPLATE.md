@@ -2,7 +2,7 @@
 
 Thank you for taking the time to report an ODK JavaRosa issue!
 
-This space is for submitting problems and feature requests. For general usage or form design questions, please email opendatakit@googlegroups.com or for ODK Validate source code questions, please email opendatakit-developers@googlegroups.com
+This space is for submitting problems and feature requests. For general usage or form design questions, please email opendatakit@googlegroups.com or for ODK JavaRosa source code questions, please email opendatakit-developers@googlegroups.com
 
 Before filling this form, visit https://github.com/opendatakit/javarosa/issues and search to see whether your issue was already reported or fixed. If you find a match, comment on it or add a +1 rather than posting a new issue. If you find a problem you know how to fix, submit a pull request. 🎉
 
