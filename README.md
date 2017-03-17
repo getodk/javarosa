@@ -41,4 +41,4 @@ Any and all contributions to the project are welcome. ODK JavaRosa is used acros
 If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
 ## Downloading builds
-Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/opendatakit/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab.
+Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/opendatakit/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS.
