@@ -2,10 +2,10 @@ test:
   override:
     - ./gradlew test javadoc jar
   post:
-    - cp -r build/libs/ $CIRCLE_ARTIFACTS
+    - cp -r build/libs/. $CIRCLE_ARTIFACTS
 
     - mkdir -p $CIRCLE_TEST_REPORTS/junit
-    - cp -r build/reports/tests/test/ $CIRCLE_TEST_REPORTS/junit
+    - cp -r build/reports/tests/test/. $CIRCLE_TEST_REPORTS/junit
 
     - mkdir -p $CIRCLE_TEST_REPORTS/javadoc
-    - cp -r build/docs/javadoc/ $CIRCLE_TEST_REPORTS/javadoc
+    - cp -r build/docs/javadoc/. $CIRCLE_TEST_REPORTS/javadoc
