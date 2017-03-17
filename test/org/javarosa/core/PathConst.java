@@ -14,6 +14,6 @@ public class PathConst {
 				base = f.getParentFile();
 			}
 		}
-		return new File(base, "core/resources");
+		return new File(base, "resources");
 	}
 }
