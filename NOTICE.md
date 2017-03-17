@@ -52,4 +52,4 @@
 * Sun Microsystems, Inc (SnapperMIDlet, FileBrowser, FileBrowseActivity, CameraCanvas)
 
 ## Notes
-If you have contributed to JavaRosa and are not included this list, please file a pull request.
+If you have contributed to JavaRosa and are not included this list, please issue a pull request.
