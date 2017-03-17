@@ -4,8 +4,9 @@ repositories {
     mavenCentral()
 }
 
-sourceSets.main.java.srcDirs = ['core/src']
-sourceSets.test.java.srcDirs = ['core/test']
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['test']
+sourceSets.test.resources.srcDirs = ['resources']
 
 dependencies {
     compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
