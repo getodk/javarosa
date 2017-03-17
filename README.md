@@ -31,9 +31,11 @@ ODK JavaRosa is part of Open Data Kit (ODK), a free and open-source set of tools
 
 We recommend using [IntelliJ IDEA](https://www.jetbrains.com/idea/) for development. On the welcome screen, click `Import Project`, navigate to your javarosa folder, and select the `build.gradle` file. Use the defaults through the wizard. Once the project is imported, IntelliJ may ask you to update your remote maven repositories. Follow the instructions to do so. 
  
-## Packaging the project
+## Building the project
  
-To package the project, go to the `View` menu, then `Tool Windows > Gradle`. `jar` will be in `odk-javarosa > Tasks > build > jar`. Double-click `jar` to package the application. This Gradle task will now be the default action in your `Run` menu. 
+To build the project, go to the `View` menu, then `Tool Windows > Gradle`. `build` will be in `odk-javarosa > Tasks > build > build`. Double-click `build` to package the application. This Gradle task will now be the default action in your `Run` menu. 
+
+To package a jar, use the `jar` Gradle task.
 
 ## Contributing code
 Any and all contributions to the project are welcome. ODK JavaRosa is used across the world primarily by organizations with a social purpose so you can have real impact!
@@ -41,4 +43,4 @@ Any and all contributions to the project are welcome. ODK JavaRosa is used acros
 If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
 ## Downloading builds
-Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/opendatakit/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab.
+Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/opendatakit/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS/libs.
