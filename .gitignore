@@ -1,6 +1,12 @@
-.gradle
-.gnupg
-build
-.idea
+# java
 *.class
+
+# gradle
+.gradle
+build
+
+# intellij
+.idea
+
+# mvn
 target

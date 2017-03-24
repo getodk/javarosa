@@ -37,6 +37,27 @@ To build the project, go to the `View` menu, then `Tool Windows > Gradle`. `buil
 
 To package a jar, use the `jar` Gradle task.
 
+## Distributing the jar
+
+We use [OSSRH](http://central.sonatype.org/pages/ossrh-guide.html) to distribute this jar to a few public Maven and Gradle repositories. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html). 
+
+We use maven instead of gradle for this process because OSSRH's gradle support is unreliable (e.g., snapshots not updating). One deviation from OSSRH's documentation is that the settings.xml should include `gpg.homedir`, `gpg.keyname`, and `gpg.passphrase`.
+```
+<!-- ${user.home}/.m2/settings.xml -->
+<settings>
+	<profiles>
+		<profile>
+		    ...
+			<properties>
+				<gpg.homedir>/path/to/opendatakit.gpg</gpg.homedir>
+				<gpg.keyname>the_keyname</gpg.keyname>
+				<gpg.passphrase>the_passphrase</gpg.passphrase>
+			</properties>
+		</profile>
+	</profiles>
+</settings>
+```
+
 ## Contributing code
 Any and all contributions to the project are welcome. ODK JavaRosa is used across the world primarily by organizations with a social purpose so you can have real impact!
 

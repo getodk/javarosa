@@ -1,6 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 repositories {
     mavenCentral()
@@ -22,7 +20,7 @@ dependencies {
 
 jar {
     baseName = 'opendatakit-javarosa'
-    version = '2.1.0'
+    version = '2.1.0-SNAPSHOT' // be sure to update version in pom.xml to match
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
