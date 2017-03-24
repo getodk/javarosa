@@ -12,15 +12,16 @@ targetCompatibility = '1.7'
 sourceCompatibility = '1.7'
 
 dependencies {
+    // Be sure to update dependencies in pom.xml to match
     compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
-    
     testCompile group: 'junit', name: 'junit', version: '3.8.2'
     testCompile group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
 }
 
 jar {
     baseName = 'opendatakit-javarosa'
-    version = '2.1.0-SNAPSHOT' // be sure to update version in pom.xml to match
+    // Be sure to update version in pom.xml to match
+    version = '2.1.0-SNAPSHOT'
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
