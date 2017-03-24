@@ -1,6 +1,6 @@
 .gradle
+.gnupg
 build
 .idea
 *.class
-gradle.properties
-secring.gpg
+target
