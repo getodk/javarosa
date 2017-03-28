@@ -1,4 +1,12 @@
+# java
+*.class
+
+# gradle
 .gradle
 build
+
+# intellij
 .idea
-*.class
+
+# mvn
+target
