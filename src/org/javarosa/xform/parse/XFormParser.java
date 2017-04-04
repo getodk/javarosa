@@ -419,11 +419,7 @@ public class XFormParser {
         _f.getMainInstance().getRoot().clearCaches();
     }
 
-    private void parseElement (Element e, Object parent, HashMap<String, IElementHandler> handlers) { //,
-//			boolean allowUnknownElements, boolean allowText, boolean recurseUnknown) {
-        String name = e.getName();
-
-        String[] suppressWarningArr = {
+    private final Set<String> validElementNames = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "html",
             "head",
             "body",
@@ -437,17 +433,16 @@ public class XFormParser {
             "mainHeader",
             "entryHeader",
             "delHeader"
-        };
-      List<String> suppressWarning = new ArrayList<String>(suppressWarningArr.length);
-        for (int i = 0; i < suppressWarningArr.length; i++) {
-            suppressWarning.add(suppressWarningArr[i]);
-        }
+    )));
+
+    private void parseElement (Element e, Object parent, HashMap<String, IElementHandler> handlers) {
+        String name = e.getName();
 
         IElementHandler eh = handlers.get(name);
         if (eh != null) {
             eh.handle(this, e, parent);
         } else {
-            if (!suppressWarning.contains(name)) {
+            if (!validElementNames.contains(name)) {
                 reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP,
                         "Unrecognized element [" + name	+ "]. Ignoring and processing children...",
                         getVagueLocation(e));
@@ -720,7 +715,7 @@ public class XFormParser {
     }
 
     protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
-      List<String> usedAtts = new ArrayList<String>();
+        List<String> usedAtts = new ArrayList<String>();
         usedAtts.add("mediatype");
         // get media type value
         String mediaType = e.getAttributeValue(null, "mediatype");
@@ -989,9 +984,7 @@ public class XFormParser {
             }
         }
 
-        String s = sb.toString().trim();
-
-        return s;
+        return sb.toString().trim();
     }
 
     private void recurseForOutput(Element e){
@@ -1003,18 +996,16 @@ public class XFormParser {
             if(e.getChild(i) instanceof String) { continue; }
             Element kid = (Element)e.getChild(i);
 
-                //is just text
+            //is just text
             if(kidType == Node.ELEMENT && XFormUtils.isOutput(kid)){
                 String s = "${"+parseOutput(kid)+"}";
                 e.removeChild(i);
                 e.addChild(i, Node.TEXT, s);
 
-                //has kids? Recurse through them and swap output tag for parsed version
+            //has kids? Recurse through them and swap output tag for parsed version
             }else if(kid.getChildCount() !=0){
                 recurseForOutput(kid);
                 //is something else
-            }else{
-                continue;
             }
         }
     }
@@ -1793,15 +1784,13 @@ public class XFormParser {
             throw new XFormParseException(errorMessage);
         }
 
-        Condition c = new Condition(cond, trueAction, falseAction, FormInstance.unpackReference(contextRef));
-        return c;
+        return new Condition(cond, trueAction, falseAction, FormInstance.unpackReference(contextRef));
     }
 
     private static Recalculate buildCalculate (String xpath, IDataReference contextRef) throws XPathSyntaxException {
         XPathConditional calc = new XPathConditional(xpath);
 
-        Recalculate r = new Recalculate(calc, FormInstance.unpackReference(contextRef));
-        return r;
+        return new Recalculate(calc, FormInstance.unpackReference(contextRef));
     }
 
     protected void addBinding (DataBinding binding) {
@@ -2142,7 +2131,7 @@ public class XFormParser {
     //helper function for removeInvalidTemplates
     private boolean removeInvalidTemplates (TreeElement instanceNode, TreeElement repeatTreeNode, boolean templateAllowed) {
         int mult = instanceNode.getMult();
-        boolean repeatable = (repeatTreeNode == null ? false : repeatTreeNode.isRepeatable());
+        boolean repeatable = repeatTreeNode != null && repeatTreeNode.isRepeatable();
 
         if (mult == TreeReference.INDEX_TEMPLATE) {
             if (!templateAllowed) {
@@ -2384,7 +2373,7 @@ public class XFormParser {
             //check that no nodes between the parent repeat and the target are repeatable
             for (int k = repeatBind.size(); k < childBind.size(); k++) {
                 TreeElement rChild = (k < repeatAncestry.size() ? repeatAncestry.get(k) : null);
-                boolean repeatable = (rChild == null ? false : rChild.isRepeatable());
+                boolean repeatable = rChild != null && rChild.isRepeatable();
                 if (repeatable && !(k == childBind.size() - 1 && isRepeat)) {
                     //catch <repeat nodeset="/a/b"><input ref="/a/b/c/d" /></repeat>...<repeat nodeset="/a/b/c">...</repeat>:
                     //  question's/group's/repeat's most immediate repeat parent in the instance is not its most immediate repeat parent in the form def
@@ -2590,8 +2579,8 @@ public class XFormParser {
                     } else {
                         //update multiplicity counter
                         Integer mult = multiplicities.get(name);
-                        index = (mult == null ? 0 : mult.intValue() + 1);
-                        multiplicities.put(name, Integer.valueOf(index));
+                        index = (mult == null ? 0 : mult + 1);
+                        multiplicities.put(name, index);
                     }
 
                     loadInstanceData(child, cur.getChild(name, index), f);
@@ -2665,7 +2654,7 @@ public class XFormParser {
             }
 
             if (typeMappings.containsKey(type)) {
-                dataType = ((Integer)typeMappings.get(type)).intValue();
+                dataType = (Integer) typeMappings.get(type);
             } else {
                 dataType = Constants.DATATYPE_UNSUPPORTED;
                 reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "unrecognized data type [" + type + "]", null);
@@ -2680,7 +2669,7 @@ public class XFormParser {
     }
 
     public static void addDataType (String type, int dataType) {
-        typeMappings.put(type, Integer.valueOf(dataType));
+        typeMappings.put(type, dataType);
     }
 
     public static void registerControlType(String type, final int typeId) {
