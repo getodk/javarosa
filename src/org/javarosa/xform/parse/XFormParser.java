@@ -16,28 +16,8 @@
 
 package org.javarosa.xform.parse;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-
-import org.javarosa.core.model.Action;
+import org.javarosa.core.model.*;
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.DataBinding;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.ItemsetBinding;
-import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
@@ -48,10 +28,10 @@ import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
-import org.javarosa.core.model.util.restorable.Restorable;
-import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.model.osm.OSMTagItem;
+import org.javarosa.core.model.util.restorable.Restorable;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
@@ -77,6 +57,12 @@ import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.*;
+import java.util.*;
+
+import static org.javarosa.xform.parse.Constants.SELECT;
+import static org.javarosa.xform.parse.Constants.SELECTONE;
+
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
 /**
@@ -101,8 +87,6 @@ public class XFormParser {
 	private static final String DYNAMIC_ITEXT_OPEN = "jr:itext(";
 	private static final String BIND_ATTR = "bind";
 	private static final String REF_ATTR = "ref";
-	private static final String SELECTONE = "select1";
-	private static final String SELECT = "select";
 
 	public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
 	public static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
@@ -112,7 +96,7 @@ public class XFormParser {
 
 	private static HashMap<String, IElementHandler> topLevelHandlers;
 	private static HashMap<String, IElementHandler> groupLevelHandlers;
-	private static HashMap<String, Integer> typeMappings;
+	private static final Map<String, Integer> typeMappings = TypeMappings.getMap();
 	private static PrototypeFactoryDeprecated modelPrototypes;
 	private static List<SubmissionParser> submissionParsers;
 
@@ -167,7 +151,6 @@ public class XFormParser {
 
 	private static void staticInit() {
 		initProcessingRules();
-		initTypeMappings();
 		modelPrototypes = new PrototypeFactoryDeprecated();
 		submissionParsers = new ArrayList<SubmissionParser>(1);
 	}
@@ -217,38 +200,6 @@ public class XFormParser {
 		topLevelHandlers.put("meta", meta);
 
 		groupLevelHandlers.put(LABEL_ELEMENT, groupLabel);
-	}
-
-	private static void initTypeMappings () {
-		typeMappings = new HashMap<String, Integer>();
-		typeMappings.put("string", Integer.valueOf(Constants.DATATYPE_TEXT));               //xsd:
-		typeMappings.put("integer", Integer.valueOf(Constants.DATATYPE_INTEGER));           //xsd:
-		typeMappings.put("long", Integer.valueOf(Constants.DATATYPE_LONG));                 //xsd:
-		typeMappings.put("int", Integer.valueOf(Constants.DATATYPE_INTEGER));               //xsd:
-		typeMappings.put("decimal", Integer.valueOf(Constants.DATATYPE_DECIMAL));           //xsd:
-		typeMappings.put("double", Integer.valueOf(Constants.DATATYPE_DECIMAL));            //xsd:
-		typeMappings.put("float", Integer.valueOf(Constants.DATATYPE_DECIMAL));             //xsd:
-		typeMappings.put("dateTime", Integer.valueOf(Constants.DATATYPE_DATE_TIME));        //xsd:
-		typeMappings.put("date", Integer.valueOf(Constants.DATATYPE_DATE));                 //xsd:
-		typeMappings.put("time", Integer.valueOf(Constants.DATATYPE_TIME));                 //xsd:
-		typeMappings.put("gYear", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));         //xsd:
-		typeMappings.put("gMonth", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));        //xsd:
-		typeMappings.put("gDay", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));          //xsd:
-		typeMappings.put("gYearMonth", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));    //xsd:
-		typeMappings.put("gMonthDay", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));     //xsd:
-		typeMappings.put("boolean", Integer.valueOf(Constants.DATATYPE_BOOLEAN));           //xsd:
-		typeMappings.put("base64Binary", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));  //xsd:
-		typeMappings.put("hexBinary", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));     //xsd:
-		typeMappings.put("anyURI", Integer.valueOf(Constants.DATATYPE_UNSUPPORTED));        //xsd:
-		typeMappings.put("listItem", Integer.valueOf(Constants.DATATYPE_CHOICE));           //xforms:
-		typeMappings.put("listItems", Integer.valueOf(Constants.DATATYPE_CHOICE_LIST));	    //xforms:
-		typeMappings.put(SELECTONE, Integer.valueOf(Constants.DATATYPE_CHOICE));	        //non-standard
-		typeMappings.put(SELECT, Integer.valueOf(Constants.DATATYPE_CHOICE_LIST));        //non-standard
-		typeMappings.put("geopoint", Integer.valueOf(Constants.DATATYPE_GEOPOINT));         //non-standard
-		typeMappings.put("geoshape", Integer.valueOf(Constants.DATATYPE_GEOSHAPE));         //non-standard
-		typeMappings.put("geotrace", Integer.valueOf(Constants.DATATYPE_GEOTRACE));         //non-standard
-		typeMappings.put("barcode", Integer.valueOf(Constants.DATATYPE_BARCODE));           //non-standard
-        typeMappings.put("binary", Integer.valueOf(Constants.DATATYPE_BINARY));             //non-standard
 	}
 
 	private void initState () {
