@@ -26,9 +26,15 @@ class StandardBindAttributesProcessor {
     private XFormParserReporter reporter;
     private Map<String, Integer> typeMappings;
 
+    /** Methods for setting certain binding properties */
+    private interface BoolAndConditionSetter {
+        void setBoolean(boolean value);
+        void setCondition(Condition condition);
+    }
+    
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Element element) {
-        final DataBinding binding  = new DataBinding();
+        final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
 
@@ -48,39 +54,21 @@ class StandardBindAttributesProcessor {
 
         binding.setDataType(getDataType(element.getAttributeValue(null, "type")));
 
-        final String xpathRel = element.getAttributeValue(null, "relevant");
-        if (xpathRel != null) {
-            if ("true()".equals(xpathRel)) {
-                binding.relevantAbsolute = true;
-            } else if ("false()".equals(xpathRel)) {
-                binding.relevantAbsolute = false;
-            } else {
-                binding.relevancyCondition = getCondition(formDef, ref, xpathRel, "relevant");
-            }
-        }
-
-        final String xpathReq = element.getAttributeValue(null, "required");
-        if (xpathReq != null) {
-            if ("true()".equals(xpathReq)) {
-                binding.requiredAbsolute = true;
-            } else if ("false()".equals(xpathReq)) {
-                binding.requiredAbsolute = false;
-            } else {
-                binding.requiredCondition = getCondition(formDef, ref, xpathReq, "required");
-            }
-        }
-
-        final String xpathRO = element.getAttributeValue(null, "readonly");
-        if (xpathRO != null) {
-            if ("true()".equals(xpathRO)) {
-                binding.readonlyAbsolute = true;
-            } else if ("false()".equals(xpathRO)) {
-                binding.readonlyAbsolute = false;
-            } else {
-                binding.readonlyCondition = getCondition(formDef, ref, xpathRO, "readonly");
-            }
-        }
-
+        setBoolAndCondition(ref, element, "relevant", formDef, new BoolAndConditionSetter() {
+            @Override public void setBoolean  (boolean value)       { binding.relevantAbsolute   = value;     }
+            @Override public void setCondition(Condition condition) { binding.relevancyCondition = condition; }
+        });
+        
+        setBoolAndCondition(ref, element, "required", formDef, new BoolAndConditionSetter() {
+            @Override public void setBoolean  (boolean value)       { binding.requiredAbsolute   = value;   }
+            @Override public void setCondition(Condition condition) { binding.requiredCondition= condition; }
+        });
+        
+        setBoolAndCondition(ref, element, "readonly", formDef, new BoolAndConditionSetter() {
+            @Override public void setBoolean  (boolean value)       { binding.readonlyAbsolute   = value;    }
+            @Override public void setCondition(Condition condition) { binding.readonlyCondition = condition; }
+        });
+        
         final String xpathConstr = element.getAttributeValue(null, "constraint");
         if (xpathConstr != null) {
             try {
@@ -111,58 +99,70 @@ class StandardBindAttributesProcessor {
 
         return binding;
     }
-    
-    
+
+    private void setBoolAndCondition(IDataReference ref, Element element, String name,
+                                     FormDef formDef, BoolAndConditionSetter setter) {
+        final String xpathRel = element.getAttributeValue(null, name);
+
+        if (xpathRel != null) {
+            switch (xpathRel) {
+                case "true()":
+                    setter.setBoolean(true);
+                    break;
+                case "false()":
+                    setter.setBoolean(false);
+                    break;
+                default:
+                    Condition condition = buildCondition(xpathRel, name, ref);
+                    setter.setCondition((Condition) formDef.addTriggerable(condition));
+                    break;
+            }
+        }
+    }
 
     private Condition buildCondition(String xpath, String type, IDataReference contextRef) {
-        XPathConditional cond;
-        int trueAction = -1, falseAction = -1;
+        final int trueAction;
+        final int falseAction;
+        final String prettyType;
 
-        String prettyType;
-
-        if ("relevant".equals(type)) {
-            prettyType = "display condition";
-            trueAction = Condition.ACTION_SHOW;
-            falseAction = Condition.ACTION_HIDE;
-        } else if ("required".equals(type)) {
-            prettyType = "require condition";
-            trueAction = Condition.ACTION_REQUIRE;
-            falseAction = Condition.ACTION_DONT_REQUIRE;
-        } else if ("readonly".equals(type)) {
-            prettyType = "readonly condition";
-            trueAction = Condition.ACTION_DISABLE;
-            falseAction = Condition.ACTION_ENABLE;
-        } else{
-            prettyType = "unknown condition";
+        switch (type) {
+            case "relevant":
+                prettyType  = "display";
+                trueAction  = Condition.ACTION_SHOW;
+                falseAction = Condition.ACTION_HIDE;
+                break;
+            case "required":
+                prettyType  = "require";
+                trueAction  = Condition.ACTION_REQUIRE;
+                falseAction = Condition.ACTION_DONT_REQUIRE;
+                break;
+            case "readonly":
+                prettyType  = "readonly";
+                trueAction  = Condition.ACTION_DISABLE;
+                falseAction = Condition.ACTION_ENABLE;
+                break;
+            default:
+                throw new XFormParseException("Unsupported type " + type + " passed to buildCondition");
         }
 
+        final XPathConditional xPathConditional;
         try {
-            cond = new XPathConditional(xpath);
+            xPathConditional = new XPathConditional(xpath);
         } catch (XPathSyntaxException xse) {
-
-            String errorMessage = "Encountered a problem with " + prettyType + " for node ["  + contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage();
-
+            String errorMessage = "Encountered a problem with " + prettyType + " condition for node ["  + 
+                    contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage();
             reporter.error(errorMessage);
-
             throw new XFormParseException(errorMessage);
         }
 
-        return new Condition(cond, trueAction, falseAction, FormInstance.unpackReference(contextRef));
+        return new Condition(xPathConditional, trueAction, falseAction, FormInstance.unpackReference(contextRef));
     }
 
     private Recalculate buildCalculate(String xpath, IDataReference contextRef) throws XPathSyntaxException {
-        XPathConditional calc = new XPathConditional(xpath);
-
-        return new Recalculate(calc, FormInstance.unpackReference(contextRef));
+        return new Recalculate(new XPathConditional(xpath), FormInstance.unpackReference(contextRef));
     }
 
-    private Condition getCondition(FormDef formDef, IDataReference ref, String xpathRel, String name) {
-        Condition c = buildCondition(xpathRel, name, ref);
-        c = (Condition) formDef.addTriggerable(c);
-        return c;
-    }
-
-    //returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown
+    /** Returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown */
     private int getDataType(String type) {
         int dataType = org.javarosa.core.model.Constants.DATATYPE_NULL;
 
@@ -186,8 +186,9 @@ class StandardBindAttributesProcessor {
     private void saveUnusedAttributes(DataBinding binding, Element element, Collection<String> usedAttributes) {
         for (int i = 0; i < element.getAttributeCount(); i++) {
             String name = element.getAttributeName(i);
-            if (usedAttributes.contains(name)) continue;
-            binding.setAdditionalAttribute(element.getAttributeNamespace(i), name, element.getAttributeValue(i));
+            if (! usedAttributes.contains(name)) {
+                binding.setAdditionalAttribute(element.getAttributeNamespace(i), name, element.getAttributeValue(i));
+            }
         }
     }
 }
