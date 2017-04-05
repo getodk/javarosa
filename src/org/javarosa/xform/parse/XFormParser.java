@@ -46,7 +46,6 @@ import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathConditional;
-import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -60,8 +59,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.*;
 import java.util.*;
 
-import static org.javarosa.xform.parse.Constants.SELECT;
-import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.Constants.*;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -72,13 +70,11 @@ import static org.javarosa.xform.parse.Constants.SELECTONE;
  * @author Drew Roos
  *
  */
-public class XFormParser {
+public class XFormParser implements IXFormParserFunctions {
 
     //Constants to clean up code and prevent user error
-    private static final String ID_ATTR = "id";
     private static final String FORM_ATTR = "form";
     private static final String APPEARANCE_ATTR = "appearance";
-    private static final String NODESET_ATTR = "nodeset";
     private static final String LABEL_ELEMENT = "label";
     private static final String VALUE = "value";
     private static final String ITEXT_CLOSE = "')";
@@ -88,7 +84,6 @@ public class XFormParser {
     private static final String BIND_ATTR = "bind";
     private static final String REF_ATTR = "ref";
 
-    public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
     public static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
     private static final int CONTAINER_GROUP = 1;
@@ -281,6 +276,10 @@ public class XFormParser {
                 loadXmlInstance(_f, _instDoc);
             }
         }
+        return _f;
+    }
+
+    public FormDef getFormDef() {
         return _f;
     }
 
@@ -1403,7 +1402,8 @@ public class XFormParser {
         }
     }
 
-    private IDataReference getAbsRef (IDataReference ref, IFormElement parent) {
+    @Override
+    public IDataReference getAbsRef(IDataReference ref, IFormElement parent) {
         return FormDef.getAbsRef(ref, getFormElementRef(parent));
     }
 
@@ -1631,127 +1631,34 @@ public class XFormParser {
         return false;
     }
 
-    protected DataBinding processStandardBindAttributes( List<String> usedAtts, Element e) {
-        usedAtts.add(ID_ATTR);
-        usedAtts.add(NODESET_ATTR);
-        usedAtts.add("type");
-        usedAtts.add("relevant");
-        usedAtts.add("required");
-        usedAtts.add("readonly");
-        usedAtts.add("constraint");
-        usedAtts.add("constraintMsg");
-        usedAtts.add("calculate");
-        usedAtts.add("preload");
-        usedAtts.add("preloadParams");
+    private final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList(
+            ID_ATTR,
+            NODESET_ATTR,
+            "type",
+            "relevant",
+            "required",
+            "readonly",
+            "constraint",
+            "constraintMsg",
+            "calculate",
+            "preload",
+            "preloadParams"
+    ));
 
-        DataBinding binding  = new DataBinding();
-
-
-        binding.setId(e.getAttributeValue("", ID_ATTR));
-
-        String nodeset = e.getAttributeValue(null, NODESET_ATTR);
-        if (nodeset == null) {
-            throw new XFormParseException("XForm Parse: <bind> without nodeset",e);
-        }
-        IDataReference ref;
-        try {
-            ref = new XPathReference(nodeset);
-        } catch(XPathException xpe) {
-            throw new XFormParseException(xpe.getMessage());
-        }
-        ref = getAbsRef(ref, _f);
-        binding.setReference(ref);
-
-        binding.setDataType(getDataType(e.getAttributeValue(null, "type")));
-
-        String xpathRel = e.getAttributeValue(null, "relevant");
-        if (xpathRel != null) {
-            if ("true()".equals(xpathRel)) {
-                binding.relevantAbsolute = true;
-            } else if ("false()".equals(xpathRel)) {
-                binding.relevantAbsolute = false;
-            } else {
-                Condition c = buildCondition(xpathRel, "relevant", ref);
-                c = (Condition)_f.addTriggerable(c);
-                binding.relevancyCondition = c;
-            }
-        }
-
-        String xpathReq = e.getAttributeValue(null, "required");
-        if (xpathReq != null) {
-            if ("true()".equals(xpathReq)) {
-                binding.requiredAbsolute = true;
-            } else if ("false()".equals(xpathReq)) {
-                binding.requiredAbsolute = false;
-            } else {
-                Condition c = buildCondition(xpathReq, "required", ref);
-                c = (Condition)_f.addTriggerable(c);
-                binding.requiredCondition = c;
-            }
-        }
-
-        String xpathRO = e.getAttributeValue(null, "readonly");
-        if (xpathRO != null) {
-            if ("true()".equals(xpathRO)) {
-                binding.readonlyAbsolute = true;
-            } else if ("false()".equals(xpathRO)) {
-                binding.readonlyAbsolute = false;
-            } else {
-                Condition c = buildCondition(xpathRO, "readonly", ref);
-                c = (Condition)_f.addTriggerable(c);
-                binding.readonlyCondition = c;
-            }
-        }
-
-        String xpathConstr = e.getAttributeValue(null, "constraint");
-        if (xpathConstr != null) {
-            try {
-                binding.constraint = new XPathConditional(xpathConstr);
-            } catch (XPathSyntaxException xse) {
-                throw new XFormParseException("bind for " + nodeset + " contains invalid constraint expression [" + xpathConstr + "] " + xse.getMessage());
-            }
-            binding.constraintMessage = e.getAttributeValue(NAMESPACE_JAVAROSA, "constraintMsg");
-        }
-
-        String xpathCalc = e.getAttributeValue(null, "calculate");
-        if (xpathCalc != null) {
-            Recalculate r;
-            try {
-                r = buildCalculate(xpathCalc, ref);
-            } catch (XPathSyntaxException xpse) {
-                throw new XFormParseException("Invalid calculate for the bind attached to \"" + nodeset + "\" : " + xpse.getMessage() + " in expression " + xpathCalc);
-            }
-            r = (Recalculate)_f.addTriggerable(r);
-            binding.calculate = r;
-        }
-
-        binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
-        binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
-
-        // save all the unused attributes verbatim...
-        for(int i=0;i<e.getAttributeCount();i++){
-            String name = e.getAttributeName(i);
-            if ( usedAtts.contains(name) ) continue;
-            binding.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
-        }
-
-        return binding;
-    }
-
-    protected void parseBind (Element e) {
-      List<String> usedAtts = new ArrayList<String>();
-
-        DataBinding binding = processStandardBindAttributes( usedAtts, e);
+    private void parseBind(Element element) {
+        DataBinding binding = StandardBindAttributesProcessor.process(this, usedAtts, element);
 
         //print unused attribute warning message for parent element
-        if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-            reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(e, usedAtts), getVagueLocation(e));
+        if(XFormUtils.showUnusedAttributeWarning(element, usedAtts)){
+            reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP,
+                    XFormUtils.unusedAttWarning(element, usedAtts), getVagueLocation(element));
         }
 
         addBinding(binding);
     }
 
-    private Condition buildCondition (String xpath, String type, IDataReference contextRef) {
+    @Override
+    public Condition buildCondition(String xpath, String type, IDataReference contextRef) {
         XPathConditional cond;
         int trueAction = -1, falseAction = -1;
 
@@ -1787,13 +1694,14 @@ public class XFormParser {
         return new Condition(cond, trueAction, falseAction, FormInstance.unpackReference(contextRef));
     }
 
-    private static Recalculate buildCalculate (String xpath, IDataReference contextRef) throws XPathSyntaxException {
+    @Override
+    public Recalculate buildCalculate(String xpath, IDataReference contextRef) throws XPathSyntaxException {
         XPathConditional calc = new XPathConditional(xpath);
 
         return new Recalculate(calc, FormInstance.unpackReference(contextRef));
     }
 
-    protected void addBinding (DataBinding binding) {
+    private void addBinding(DataBinding binding) {
         bindings.add(binding);
 
         if (binding.getId() != null) {
@@ -2644,17 +2552,18 @@ public class XFormParser {
     }
 
     //returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown
-    private int getDataType(String type) {
+    @Override
+    public int getDataType(String type) {
         int dataType = Constants.DATATYPE_NULL;
 
         if (type != null) {
             //cheap out and ignore namespace
-            if (type.indexOf(":") != -1) {
+            if (type.contains(":")) {
                 type = type.substring(type.indexOf(":") + 1);
             }
 
             if (typeMappings.containsKey(type)) {
-                dataType = (Integer) typeMappings.get(type);
+                dataType = typeMappings.get(type);
             } else {
                 dataType = Constants.DATATYPE_UNSUPPORTED;
                 reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "unrecognized data type [" + type + "]", null);
