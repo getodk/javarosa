@@ -19,10 +19,8 @@ package org.javarosa.xform.parse;
 import org.javarosa.core.model.*;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -1642,59 +1640,16 @@ public class XFormParser implements IXFormParserFunctions {
     ));
 
     private void parseBind(Element element) {
-        DataBinding binding = StandardBindAttributesProcessor.process(this, _f, usedAtts, element);
+        final DataBinding binding = new StandardBindAttributesProcessor(reporter, typeMappings).
+                createBinding(this, _f, usedAtts, element);
 
-        //print unused attribute warning message for parent element
-        if(XFormUtils.showUnusedAttributeWarning(element, usedAtts)){
+        // Warn of unused attributes of parent element
+        if (XFormUtils.showUnusedAttributeWarning(element, usedAtts)) {
             reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP,
                     XFormUtils.unusedAttWarning(element, usedAtts), getVagueLocation(element));
         }
 
         addBinding(binding);
-    }
-
-    @Override
-    public Condition buildCondition(String xpath, String type, IDataReference contextRef) {
-        XPathConditional cond;
-        int trueAction = -1, falseAction = -1;
-
-        String prettyType;
-
-        if ("relevant".equals(type)) {
-            prettyType = "display condition";
-            trueAction = Condition.ACTION_SHOW;
-            falseAction = Condition.ACTION_HIDE;
-        } else if ("required".equals(type)) {
-            prettyType = "require condition";
-            trueAction = Condition.ACTION_REQUIRE;
-            falseAction = Condition.ACTION_DONT_REQUIRE;
-        } else if ("readonly".equals(type)) {
-            prettyType = "readonly condition";
-            trueAction = Condition.ACTION_DISABLE;
-            falseAction = Condition.ACTION_ENABLE;
-        } else{
-            prettyType = "unknown condition";
-        }
-
-        try {
-            cond = new XPathConditional(xpath);
-        } catch (XPathSyntaxException xse) {
-
-            String errorMessage = "Encountered a problem with " + prettyType + " for node ["  + contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage();
-
-            reporter.error(errorMessage);
-
-            throw new XFormParseException(errorMessage);
-        }
-
-        return new Condition(cond, trueAction, falseAction, FormInstance.unpackReference(contextRef));
-    }
-
-    @Override
-    public Recalculate buildCalculate(String xpath, IDataReference contextRef) throws XPathSyntaxException {
-        XPathConditional calc = new XPathConditional(xpath);
-
-        return new Recalculate(calc, FormInstance.unpackReference(contextRef));
     }
 
     private void addBinding(DataBinding binding) {
@@ -2545,28 +2500,6 @@ public class XFormParser implements IXFormParserFunctions {
         //   if (loc != null) {
         //       f.localeChanged(loc.getLocale(), loc);
         //	 }
-    }
-
-    //returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown
-    @Override
-    public int getDataType(String type) {
-        int dataType = Constants.DATATYPE_NULL;
-
-        if (type != null) {
-            //cheap out and ignore namespace
-            if (type.contains(":")) {
-                type = type.substring(type.indexOf(":") + 1);
-            }
-
-            if (typeMappings.containsKey(type)) {
-                dataType = typeMappings.get(type);
-            } else {
-                dataType = Constants.DATATYPE_UNSUPPORTED;
-                reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "unrecognized data type [" + type + "]", null);
-            }
-        }
-
-        return dataType;
     }
 
     public static void addModelPrototype(int type, TreeElement element) {
