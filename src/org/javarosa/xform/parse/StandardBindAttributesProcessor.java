@@ -18,7 +18,7 @@ import java.util.Map;
 import static org.javarosa.xform.parse.Constants.*;
 
 class StandardBindAttributesProcessor {
-    public StandardBindAttributesProcessor(XFormParserReporter reporter, Map<String, Integer> typeMappings) {
+    StandardBindAttributesProcessor(XFormParserReporter reporter, Map<String, Integer> typeMappings) {
         this.reporter = reporter;
         this.typeMappings = typeMappings;
     }
@@ -27,7 +27,7 @@ class StandardBindAttributesProcessor {
     private Map<String, Integer> typeMappings;
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
-                                     Collection<String> usedAttributes, Element element) {
+                              Collection<String> usedAttributes, Element element) {
         final DataBinding binding  = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
@@ -55,7 +55,7 @@ class StandardBindAttributesProcessor {
             } else if ("false()".equals(xpathRel)) {
                 binding.relevantAbsolute = false;
             } else {
-                binding.relevancyCondition = getCondition(parserFunctions, formDef, ref, xpathRel, "relevant");
+                binding.relevancyCondition = getCondition(formDef, ref, xpathRel, "relevant");
             }
         }
 
@@ -66,7 +66,7 @@ class StandardBindAttributesProcessor {
             } else if ("false()".equals(xpathReq)) {
                 binding.requiredAbsolute = false;
             } else {
-                binding.requiredCondition = getCondition(parserFunctions, formDef, ref, xpathReq, "required");
+                binding.requiredCondition = getCondition(formDef, ref, xpathReq, "required");
             }
         }
 
@@ -77,7 +77,7 @@ class StandardBindAttributesProcessor {
             } else if ("false()".equals(xpathRO)) {
                 binding.readonlyAbsolute = false;
             } else {
-                binding.readonlyCondition = getCondition(parserFunctions, formDef, ref, xpathRO, "readonly");
+                binding.readonlyCondition = getCondition(formDef, ref, xpathRO, "readonly");
             }
         }
 
@@ -156,8 +156,7 @@ class StandardBindAttributesProcessor {
         return new Recalculate(calc, FormInstance.unpackReference(contextRef));
     }
 
-    private Condition getCondition(IXFormParserFunctions parserFunctions, FormDef formDef,
-                                          IDataReference ref, String xpathRel, String name) {
+    private Condition getCondition(FormDef formDef, IDataReference ref, String xpathRel, String name) {
         Condition c = buildCondition(xpathRel, name, ref);
         c = (Condition) formDef.addTriggerable(c);
         return c;
