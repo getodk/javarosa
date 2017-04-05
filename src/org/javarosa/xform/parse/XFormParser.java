@@ -279,10 +279,6 @@ public class XFormParser implements IXFormParserFunctions {
         return _f;
     }
 
-    public FormDef getFormDef() {
-        return _f;
-    }
-
     public static Document getXMLDocument(Reader reader) throws IOException  {
         return getXMLDocument(reader, null);
     }
@@ -1646,7 +1642,7 @@ public class XFormParser implements IXFormParserFunctions {
     ));
 
     private void parseBind(Element element) {
-        DataBinding binding = StandardBindAttributesProcessor.process(this, usedAtts, element);
+        DataBinding binding = StandardBindAttributesProcessor.process(this, _f, usedAtts, element);
 
         //print unused attribute warning message for parent element
         if(XFormUtils.showUnusedAttributeWarning(element, usedAtts)){

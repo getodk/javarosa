@@ -1,6 +1,7 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.DataBinding;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Recalculate;
@@ -16,22 +17,23 @@ import static org.javarosa.xform.parse.Constants.*;
 
 class StandardBindAttributesProcessor {
 
-    static DataBinding process(IXFormParserFunctions parserFunctions, List<String> usedAtts, Element e) {
+    static DataBinding process(IXFormParserFunctions parserFunctions, FormDef formDef, List<String> usedAtts, Element e) {
         final DataBinding binding  = new DataBinding();
 
         binding.setId(e.getAttributeValue("", ID_ATTR));
 
-        String nodeset = e.getAttributeValue(null, NODESET_ATTR);
+        final String nodeset = e.getAttributeValue(null, NODESET_ATTR);
         if (nodeset == null) {
             throw new XFormParseException("XForm Parse: <bind> without nodeset",e);
         }
+
         IDataReference ref;
         try {
             ref = new XPathReference(nodeset);
         } catch(XPathException xpe) {
             throw new XFormParseException(xpe.getMessage());
         }
-        ref = parserFunctions.getAbsRef(ref, parserFunctions.getFormDef());
+        ref = parserFunctions.getAbsRef(ref, formDef);
         binding.setReference(ref);
 
         binding.setDataType(parserFunctions.getDataType(e.getAttributeValue(null, "type")));
@@ -44,7 +46,7 @@ class StandardBindAttributesProcessor {
                 binding.relevantAbsolute = false;
             } else {
                 Condition c = parserFunctions.buildCondition(xpathRel, "relevant", ref);
-                c = (Condition) parserFunctions.getFormDef().addTriggerable(c);
+                c = (Condition) formDef.addTriggerable(c);
                 binding.relevancyCondition = c;
             }
         }
@@ -57,7 +59,7 @@ class StandardBindAttributesProcessor {
                 binding.requiredAbsolute = false;
             } else {
                 Condition c = parserFunctions.buildCondition(xpathReq, "required", ref);
-                c = (Condition) parserFunctions.getFormDef().addTriggerable(c);
+                c = (Condition) formDef.addTriggerable(c);
                 binding.requiredCondition = c;
             }
         }
@@ -70,7 +72,7 @@ class StandardBindAttributesProcessor {
                 binding.readonlyAbsolute = false;
             } else {
                 Condition c = parserFunctions.buildCondition(xpathRO, "readonly", ref);
-                c = (Condition) parserFunctions.getFormDef().addTriggerable(c);
+                c = (Condition) formDef.addTriggerable(c);
                 binding.readonlyCondition = c;
             }
         }
@@ -93,7 +95,7 @@ class StandardBindAttributesProcessor {
             } catch (XPathSyntaxException xpse) {
                 throw new XFormParseException("Invalid calculate for the bind attached to \"" + nodeset + "\" : " + xpse.getMessage() + " in expression " + xpathCalc);
             }
-            r = (Recalculate) parserFunctions.getFormDef().addTriggerable(r);
+            r = (Recalculate) formDef.addTriggerable(r);
             binding.calculate = r;
         }
 

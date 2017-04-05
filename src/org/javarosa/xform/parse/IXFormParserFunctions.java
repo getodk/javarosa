@@ -10,7 +10,6 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 /** Provides functions from XFormParser to classes split off from it, to avoid a cyclical dependency. */
 public interface IXFormParserFunctions {
     IDataReference getAbsRef (IDataReference ref, IFormElement parent);
-    FormDef getFormDef();
     Condition buildCondition (String xpath, String type, IDataReference contextRef);
     Recalculate buildCalculate (String xpath, IDataReference contextRef) throws XPathSyntaxException;
     int getDataType(String type);
