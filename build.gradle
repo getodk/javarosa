@@ -1,12 +1,26 @@
-apply plugin: 'java'
+plugins {
+    id 'java'
+}
 
 repositories {
     mavenCentral()
 }
 
-sourceSets.main.java.srcDirs = ['src']
-sourceSets.test.java.srcDirs = ['test']
-sourceSets.test.resources.srcDirs = ['resources']
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+}
 
 targetCompatibility = '1.7'
 sourceCompatibility = '1.7'
@@ -29,7 +43,14 @@ jar {
     }
 }
 
+// Useful for testing
+task explodedJar(type: Copy) {
+    into "$buildDir/libs/$jar.baseName $jar.version"
+    with jar
+}
+
 // TODO: does not build UML diagrams
 javadoc {
     failOnError = false
 }
+
