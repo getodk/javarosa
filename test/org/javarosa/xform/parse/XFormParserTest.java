@@ -14,9 +14,9 @@ public class XFormParserTest {
 
     @Test public void parsesForm2() throws IOException {
         FormDef formDef = parse("form2.xml");
-        assertEquals(formDef.getTitle(), "My Survey");
-        assertEquals(formDef.getChildren().size(), 3);
-        assertEquals(formDef.getChild(0).getLabelInnerText(), "What is your first name?");
+        assertEquals("My Survey", formDef.getTitle());
+        assertEquals(3, formDef.getChildren().size());
+        assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
     }
 
     private FormDef parse(String formName) throws IOException {

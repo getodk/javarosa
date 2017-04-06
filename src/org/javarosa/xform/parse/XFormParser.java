@@ -2087,7 +2087,7 @@ public class XFormParser implements IXFormParserFunctions {
                 bindings.remove(i);
                 i--;
             } else {
-            List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+                List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
                 if (nodes.size() == 0) {
                     reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "<bind> defined for a node that doesn't exist [" + ref.toString() + "]. The node's name was probably changed and the bind should be updated. ", null);
                 }

@@ -9,17 +9,14 @@
         <model>
             <instance>
                 <data id="mysurvey" orx:version="2014083101">
-                    <firstname></firstname>
-                    <lastname></lastname>
-                    <age></age>
-                    <orx:meta>
-                        <orx:instanceID/>
-                    </orx:meta>
+                    <firstname>John</firstname>
+                    <lastname/>
+                    <age>10</age>
                 </data>
             </instance>
-            <bind nodeset="/data/firstname" type="xsd:string" required="true()" />
-            <bind nodeset="/data/lastname"  type="xsd:string" required="false()" />
-            <bind nodeset="/data/age" type="xsd:int" required="abc" />
+            <bind nodeset="/data/firstname" type="xsd:string" required="true()"  readonly="true()"  relevant="true()" />
+            <bind nodeset="/data/lastname"  type="xsd:string" required="false()" readonly="false()" relevant="false()" />
+            <bind nodeset="/data/age"       type="xsd:int"    required="abc"     readonly="abc"     relevant="abc" />
         </model>
     </h:head>
     <h:body>
