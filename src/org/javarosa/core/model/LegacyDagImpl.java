@@ -16,8 +16,6 @@
 
 package org.javarosa.core.model;
 
-import java.util.*;
-
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -25,6 +23,11 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The legacy eval logic on or before javarosa-2013-09-30.jar
@@ -197,8 +200,8 @@ public class LegacyDagImpl extends IDag {
 
 	@Override
 	public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance,
-			EvaluationContext evalContext, TreeReference rootRef,
-			boolean midSurvey) {
+															   EvaluationContext evalContext, TreeReference rootRef,
+															   boolean midSurvey) {
 		TreeReference genericRoot = rootRef.genericize();
 
 		ArrayList<QuickTriggerable> applicable = new ArrayList<QuickTriggerable>();

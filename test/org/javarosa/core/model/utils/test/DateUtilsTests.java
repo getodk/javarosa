@@ -19,12 +19,15 @@ package org.javarosa.core.model.utils.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.text.DateFormat;
-import java.util.*;
-
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 public class DateUtilsTests extends TestCase {
 	
