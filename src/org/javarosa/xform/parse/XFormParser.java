@@ -1685,11 +1685,8 @@ public class XFormParser implements IXFormParserFunctions {
             instanceModel.setName(name);
         }
 
-        List<String> usedAtts = new ArrayList<>();
-        usedAtts.add("id");
-        usedAtts.add("version");
-        usedAtts.add("uiVersion");
-        usedAtts.add("name");
+        List<String> usedAtts = Collections.unmodifiableList(Arrays.asList(
+                "id", "version", "uiVersion", "name"));
 
         String schema = e.getNamespace();
         if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
