@@ -26,12 +26,6 @@ class StandardBindAttributesProcessor {
     private XFormParserReporter reporter;
     private Map<String, Integer> typeMappings;
 
-    /** Methods for setting certain binding properties */
-    private interface BoolAndConditionSetter {
-        void setBoolean(boolean value);
-        void setCondition(Condition condition);
-    }
-    
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Element element) {
         final DataBinding binding = new DataBinding();
@@ -54,20 +48,45 @@ class StandardBindAttributesProcessor {
 
         binding.setDataType(getDataType(element.getAttributeValue(null, "type")));
 
-        setBoolAndCondition(ref, element, "relevant", formDef, new BoolAndConditionSetter() {
-            @Override public void setBoolean  (boolean value)       { binding.relevantAbsolute   = value;     }
-            @Override public void setCondition(Condition condition) { binding.relevancyCondition = condition; }
-        });
-        
-        setBoolAndCondition(ref, element, "required", formDef, new BoolAndConditionSetter() {
-            @Override public void setBoolean  (boolean value)       { binding.requiredAbsolute   = value;   }
-            @Override public void setCondition(Condition condition) { binding.requiredCondition= condition; }
-        });
-        
-        setBoolAndCondition(ref, element, "readonly", formDef, new BoolAndConditionSetter() {
-            @Override public void setBoolean  (boolean value)       { binding.readonlyAbsolute   = value;    }
-            @Override public void setCondition(Condition condition) { binding.readonlyCondition = condition; }
-        });
+        String xpathRel = element.getAttributeValue(null, "relevant");
+        if (xpathRel != null) {
+            if ("true()".equals(xpathRel)) {
+                binding.relevantAbsolute = true;
+            } else if ("false()".equals(xpathRel)) {
+                binding.relevantAbsolute = false;
+            } else {
+                Condition c = buildCondition(xpathRel, "relevant", ref);
+                c = (Condition) formDef.addTriggerable(c);
+                binding.relevancyCondition = c;
+            }
+        }
+
+        String xpathReq = element.getAttributeValue(null, "required");
+        if (xpathReq != null) {
+            if ("true()".equals(xpathReq)) {
+                binding.requiredAbsolute = true;
+            } else if ("false()".equals(xpathReq)) {
+                binding.requiredAbsolute = false;
+            } else {
+                Condition c = buildCondition(xpathReq, "required", ref);
+                c = (Condition) formDef.addTriggerable(c);
+                binding.requiredCondition = c;
+            }
+        }
+
+        String xpathRO = element.getAttributeValue(null, "readonly");
+        if (xpathRO != null) {
+            if ("true()".equals(xpathRO)) {
+                binding.readonlyAbsolute = true;
+            } else if ("false()".equals(xpathRO)) {
+                binding.readonlyAbsolute = false;
+            } else {
+                Condition c = buildCondition(xpathRO, "readonly", ref);
+                c = (Condition) formDef.addTriggerable(c);
+                binding.readonlyCondition = c;
+            }
+        }
+
         
         final String xpathConstr = element.getAttributeValue(null, "constraint");
         if (xpathConstr != null) {
@@ -98,26 +117,6 @@ class StandardBindAttributesProcessor {
         saveUnusedAttributes(binding, element, usedAttributes);
 
         return binding;
-    }
-
-    private void setBoolAndCondition(IDataReference ref, Element element, String name,
-                                     FormDef formDef, BoolAndConditionSetter setter) {
-        final String xpathRel = element.getAttributeValue(null, name);
-
-        if (xpathRel != null) {
-            switch (xpathRel) {
-                case "true()":
-                    setter.setBoolean(true);
-                    break;
-                case "false()":
-                    setter.setBoolean(false);
-                    break;
-                default:
-                    Condition condition = buildCondition(xpathRel, name, ref);
-                    setter.setCondition((Condition) formDef.addTriggerable(condition));
-                    break;
-            }
-        }
     }
 
     private Condition buildCondition(String xpath, String type, IDataReference contextRef) {
