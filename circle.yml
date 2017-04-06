@@ -1,6 +1,7 @@
 test:
   override:
-    - ./gradlew test javadoc jar
+    - ./gradlew check test javadoc jar
+  
   post:
     - cp -r build/libs/. $CIRCLE_ARTIFACTS
 
@@ -9,3 +10,4 @@ test:
 
     - mkdir -p $CIRCLE_TEST_REPORTS/javadoc
     - cp -r build/docs/javadoc/. $CIRCLE_TEST_REPORTS/javadoc
+    - cp -r build/reports/checkstyle $CIRCLE_TEST_REPORTS

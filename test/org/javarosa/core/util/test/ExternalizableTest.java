@@ -19,13 +19,26 @@ package org.javarosa.core.util.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.externalizable.*;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapBase;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableWrapper;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class ExternalizableTest extends TestCase {
 

@@ -9,7 +9,6 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.test.DummyFormEntryPrompt;
-import org.javarosa.core.model.test.QuestionDefTest;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
