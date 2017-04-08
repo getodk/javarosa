@@ -80,8 +80,8 @@ public class XPathEvalTest extends TestCase {
                 if (Math.abs((Double) result - (Double) expected) > 1.0e-12) {
                     fail("Doubles outside of tolerance");
                 }
-            } else if (!expected.equals(result)) {
-                fail("Did not get expected result for expression: " + expr);
+            } else {
+                assertEquals(expected, result);
             }
         } catch (XPathException xpex) {
             if (!exceptionExpected) {
