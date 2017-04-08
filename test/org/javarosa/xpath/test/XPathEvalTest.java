@@ -85,7 +85,7 @@ public class XPathEvalTest extends TestCase {
             }
         } catch (XPathException xpex) {
             if (!exceptionExpected) {
-                fail("Did not expect exception");
+                fail("Unexpected exception: " + xpex);
             } else if (xpex.getClass() != expected.getClass()) {
                 fail("Did not get expected exception type");
             }
@@ -280,6 +280,9 @@ public class XPathEvalTest extends TestCase {
         testEval("5 mod 0" , null, null, Double.NaN);
         testEval("5 * (6 + 7)" , null, null, 65.0);
         testEval("'123' * '456'" , null, null, 56088.0);
+
+        logTestCategory("math functions");
+        testEval("abs(-3.5)", null, null, 3.5);
 
         logTestCategory("strange operators");
         testEval("true() + 8" , null, null, 9.0);
