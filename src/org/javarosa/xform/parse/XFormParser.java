@@ -687,7 +687,7 @@ public class XFormParser implements IXFormParserFunctions {
         instanceNodeIdStrs.add(instanceId);
     }
 
-    private void processAdditionalAttributes(QuestionDef question, Element e, List<String> usedAtts) {
+    protected void processAdditionalAttributes(QuestionDef question, Element e, List<String> usedAtts) {
         // save all the unused attributes verbatim...
         for(int i=0;i<e.getAttributeCount();i++){
             String name = e.getAttributeName(i);
@@ -700,7 +700,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
+    protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
         List<String> usedAtts = new ArrayList<>();
         usedAtts.add("mediatype");
         // get media type value
@@ -800,11 +800,11 @@ public class XFormParser implements IXFormParserFunctions {
         return tags;
     }
 
-    private QuestionDef parseControl(IFormElement parent, Element e, int controlType) {
+    protected QuestionDef parseControl(IFormElement parent, Element e, int controlType) {
         return parseControl (parent, e, controlType, null);
     }
 
-    private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
+    protected QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
         QuestionDef question = new QuestionDef();
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
@@ -1615,6 +1615,11 @@ public class XFormParser implements IXFormParserFunctions {
         return false;
     }
 
+    protected DataBinding processStandardBindAttributes(List<String> usedAtts, Element element) {
+        return new StandardBindAttributesProcessor(reporter, typeMappings).
+                createBinding(this, _f, usedAtts, element);
+    }
+
     private final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList(
             ID_ATTR,
             NODESET_ATTR,
@@ -1629,9 +1634,8 @@ public class XFormParser implements IXFormParserFunctions {
             "preloadParams"
     ));
 
-    private void parseBind(Element element) {
-        final DataBinding binding = new StandardBindAttributesProcessor(reporter, typeMappings).
-                createBinding(this, _f, usedAtts, element);
+    protected void parseBind(Element element) {
+        final DataBinding binding = processStandardBindAttributes(usedAtts, element);
 
         // Warn of unused attributes of parent element
         if (XFormUtils.showUnusedAttributeWarning(element, usedAtts)) {
@@ -1642,7 +1646,7 @@ public class XFormParser implements IXFormParserFunctions {
         addBinding(binding);
     }
 
-    private void addBinding(DataBinding binding) {
+    protected void addBinding(DataBinding binding) {
         bindings.add(binding);
 
         if (binding.getId() != null) {
