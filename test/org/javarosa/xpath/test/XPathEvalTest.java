@@ -43,7 +43,6 @@ public class XPathEvalTest extends TestCase {
 
     public XPathEvalTest(String name) {
         super(name);
-        logTestCategory(name);
     }
 
     public static Test suite() {
@@ -98,7 +97,6 @@ public class XPathEvalTest extends TestCase {
 
         FormInstance instance = createTestInstance();
 
-        /* unsupporteds */
         logTestCategory("unsupporteds");
         testEval("/union | /expr", null, null, new XPathUnsupportedException());
         testEval("/descendant::blah", null, null, new XPathUnsupportedException());
@@ -107,7 +105,7 @@ public class XPathEvalTest extends TestCase {
         testEval("/namespace:*", null, null, new XPathUnsupportedException());
         testEval("(filter-expr)[5]", instance, null, new XPathUnsupportedException());
         testEval("(filter-expr)/data", instance, null, new XPathUnsupportedException());
-        /* numeric literals */
+
         logTestCategory("numeric literals");
         testEval("5", null, null, 5.0);
         testEval("555555.555", null, null, 555555.555);
@@ -117,13 +115,13 @@ public class XPathEvalTest extends TestCase {
         testEval("-0", null, null, -0.0);
         testEval("1230000000000000000000", null, null, 1.23e21);
         testEval("0.00000000000000000123", null, null, 1.23e-18);
-        /* string literals */
+
         logTestCategory("string literals");
         testEval("''", null, null, "");
         testEval("'\"'", null, null, "\"");
         testEval("\"test string\"", null, null, "test string");
         testEval("'   '", null, null, "   ");
-        /* base type conversion functions */
+
         logTestCategory("type conversions");
         testEval("true()", null, null, Boolean.TRUE);
         testEval("false()", null, null, Boolean.FALSE);
@@ -227,6 +225,7 @@ public class XPathEvalTest extends TestCase {
         //		dates cannot reliably be compared/used across time zones (an issue with the code)
         //		any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
         /* other built-in functions */
+
         logTestCategory("boolean functions");
         testEval("not(true())", null, null, Boolean.FALSE);
         testEval("not(false())", null, null, Boolean.TRUE);
@@ -253,7 +252,7 @@ public class XPathEvalTest extends TestCase {
         testEval("selected('apple', 'apple')", null, null, Boolean.TRUE);
         testEval("selected('apple', 'ovoid')", null, null, Boolean.FALSE);
         testEval("selected('', 'apple')", null, null, Boolean.FALSE);
-        /* operators */
+
         logTestCategory("math operators");
         testEval("5.5 + 5.5" , null, null, 11.0);
         testEval("0 + 0" , null, null, 0.0);
@@ -281,6 +280,7 @@ public class XPathEvalTest extends TestCase {
         testEval("5 mod 0" , null, null, Double.NaN);
         testEval("5 * (6 + 7)" , null, null, 65.0);
         testEval("'123' * '456'" , null, null, 56088.0);
+
         logTestCategory("strange operators");
         testEval("true() + 8" , null, null, 9.0);
         testEval("date('2008-09-08') - date('1983-10-06')" , null, null, 9104.0);
@@ -310,6 +310,7 @@ public class XPathEvalTest extends TestCase {
         testEval("5 >= 5" , null, null, Boolean.TRUE);
         testEval("6 >= 5" , null, null, Boolean.TRUE);
         testEval("-3 > -6" , null, null, Boolean.TRUE);
+
         logTestCategory("odd comparisons");
         testEval("true() > 0.9999" , null, null, Boolean.TRUE);
         testEval("'-17' > '-172'" , null, null, Boolean.TRUE); //no string comparison: converted to number
@@ -347,8 +348,8 @@ public class XPathEvalTest extends TestCase {
         testEval("false() and true() != true()" , null, null, Boolean.FALSE);
         testEval("(false() and true()) != true()" , null, null, Boolean.TRUE);
         testEval("-3 < 3 = 6 >= 6" , null, null, Boolean.TRUE);
-        /* functions, including custom function handlers */
-        logTestCategory("other custom stuff");
+
+        logTestCategory("functions, including custom function handlers");
         testEval("true(5)", null, null, new XPathUnhandledException());
         testEval("number()", null, null, new XPathUnhandledException());
         testEval("string('too', 'many', 'args')", null, null, new XPathUnhandledException());
@@ -356,6 +357,7 @@ public class XPathEvalTest extends TestCase {
         testEval("testfunc()", null, ec, Boolean.TRUE);
         testEval("add(3, 5)", null, ec, 8.0);
         testEval("add('17', '-14')", null, ec, 3.0);
+
         logTestCategory("proto");
         testEval("proto()", null, ec, new XPathTypeMismatchException());
         testEval("proto(5, 5)", null, ec, "[Double:5.0,Double:5.0]");
@@ -367,12 +369,14 @@ public class XPathEvalTest extends TestCase {
         testEval("proto(false(), false(), false())", null, ec, "[Double:0.0,String:false,Boolean:false]");
         testEval("proto(1.1, 'asdf', inconvertible())", null, ec, new XPathTypeMismatchException());
         testEval("proto(1.1, 'asdf', true(), 16)", null, ec, new XPathTypeMismatchException());
+
         logTestCategory("raw");
         testEval("raw()", null, ec, "[]");
         testEval("raw(5, 5)", null, ec, "[Double:5.0,Double:5.0]");
         testEval("raw('7', '7')", null, ec, "[String:7,String:7]");
         testEval("raw('1.1', 'asdf', 17)", null, ec, "[Double:1.1,String:asdf,Boolean:true]"); //convertible to prototype
         testEval("raw(get-custom(false()), get-custom(true()))", null, ec, "[CustomType:,CustomSubType:]");
+
         logTestCategory("concat");
         testEval("concat()", null, ec, "");
         testEval("concat('a')", null, ec, "a");
@@ -380,6 +384,7 @@ public class XPathEvalTest extends TestCase {
         testEval("concat('ab','cde','','fgh',1,false(),'ijklmnop')", null, ec, "abcdefgh1falseijklmnop");
         testEval("check-types(55, '55', false(), '1999-09-09', get-custom(false()))", null, ec, Boolean.TRUE);
         testEval("check-types(55, '55', false(), '1999-09-09', get-custom(true()))", null, ec, Boolean.TRUE);
+
         logTestCategory("regex");
         testEval("regex('12345','[0-9]+')", null, ec, Boolean.TRUE);
         testEval("pow(2, 2)", null, null, 4.0);
@@ -394,7 +399,7 @@ public class XPathEvalTest extends TestCase {
         //precision. We'll try for things with clean answers
         testEval("pow(4, 0.5)", null, null, 2.0);
         testEval("pow(16, 0.25)", null, null, 2.0);
-        //Variables
+
         logTestCategory("variable refs");
         EvaluationContext varContext = getVariableContext();
         testEval("$var_float_five", null, varContext, 5.0);
