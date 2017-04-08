@@ -219,44 +219,44 @@ public class XPathFuncExpr extends XPathExpression {
 			return dateStr(argVals[0], argVals[1], false);
         } else if (name.equals("acos")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return acos(argVals[0]);
-        } else if (name.equals("asin")) { //XPath 3.0
+			return Math.acos(toDouble(argVals[0]));
+		} else if (name.equals("asin")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return asin(argVals[0]);
-        } else if (name.equals("atan")) { //XPath 3.0
+			return Math.asin(toDouble(argVals[0]));
+		} else if (name.equals("atan")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return atan(argVals[0]);
-        } else if (name.equals("atan2")) { //XPath 3.0
+			return Math.atan(toDouble(argVals[0]));
+		} else if (name.equals("atan2")) { //XPath 3.0
             checkArity(name, 2, args.length);
-            return atan2(argVals[0], argVals[1]);
-        } else if (name.equals("cos")) { //XPath 3.0
+			return Math.atan2(toDouble(argVals[0]), toDouble(argVals[1]));
+		} else if (name.equals("cos")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return cosin(argVals[0]);
-        } else if (name.equals("exp")) { //XPath 3.0
+			return Math.cos(toDouble(argVals[0]));
+		} else if (name.equals("exp")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return exp(argVals[0]);
-        } else if (name.equals("exp10")) { //XPath 3.0
+			return Math.exp(toDouble(argVals[0]));
+		} else if (name.equals("exp10")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return exp10(argVals[0]);
+			return Math.pow(10.0, toDouble(argVals[0]));
 		} else if (name.equals("log")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return log(argVals[0]);
+			return Math.log(toDouble(argVals[0]));
 		} else if (name.equals("log10")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return log10(argVals[0]);
-        } else if (name.equals("pi")) { //XPath 3.0
+			return Math.log10(toDouble(argVals[0]));
+		} else if (name.equals("pi")) { //XPath 3.0
             checkArity(name, 0, args.length);
-            return pi();
-        } else if (name.equals("sin")) { //XPath 3.0
+			return Math.PI;
+		} else if (name.equals("sin")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return sin(argVals[0]);
-        } else if (name.equals("sqrt")) { //XPath 3.0
+			return Math.sin(toDouble(argVals[0]));
+		} else if (name.equals("sqrt")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return sqrt(argVals[0]);
-        } else if (name.equals("tan")) { //XPath 3.0
+			return Math.sqrt(toDouble(argVals[0]));
+		} else if (name.equals("tan")) { //XPath 3.0
             checkArity(name, 1, args.length);
-            return tan(argVals[0]);
-        } else if (name.equals("format-date-time")) { // non-standard
+			return Math.tan(toDouble(argVals[0]));
+		} else if (name.equals("format-date-time")) { // non-standard
 			assertArgsCount(name, args, 2);
 			return dateStr(argVals[0], argVals[1], true);
 		} else if ((name.equals("selected") || name.equals("is-selected"))) { //non-standard
@@ -275,7 +275,7 @@ public class XPathFuncExpr extends XPathExpression {
 				if (nodes.size() == 0) {
 					// Added to prevent an exception within ODK Validate.
 					// Will likely cause an error downstream when used in an XPath.
-					return new Double(1 + TreeReference.INDEX_UNBOUND);
+					return (double) (1 + TreeReference.INDEX_UNBOUND);
 				} else {
 					// This is weird -- we are returning the position of the first
 					// Nodeset element but there may be a list of elements. Unclear
@@ -284,7 +284,7 @@ public class XPathFuncExpr extends XPathExpression {
 				}
 			} else if (args.length == 0) {
 				if (evalContext.getContextPosition() != -1) {
-					return new Double(1 + evalContext.getContextPosition());
+					return (double) (1 + evalContext.getContextPosition());
 				}
 				return position(evalContext.getContextRef());
 			} else {
@@ -361,7 +361,7 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("random")) { //non-standard
 			assertArgsCount(name, args, 0);
 			//calculated expressions may be recomputed w/o warning! use with caution!!
-			return new Double(MathUtils.getRand().nextDouble());
+			return MathUtils.getRand().nextDouble();
 		} else if (name.equals("once")) {
 			assertArgsCount(name, args, 1);
 			XPathPathExpr currentFieldPathExpr = XPathPathExpr.fromRef(evalContext.getContextRef());
@@ -391,8 +391,8 @@ public class XPathFuncExpr extends XPathExpression {
 			String s = toString(argVals[0]);
 			return PropertyManager._().getSingularProperty(s);
 		} else if (name.equals("pow") && (args.length == 2)) { //XPath 3.0
-			double a = toDouble(argVals[0]).doubleValue();
-			double b = toDouble(argVals[1]).doubleValue();
+			double a = toDouble(argVals[0]);
+			double b = toDouble(argVals[1]);
 			return Math.pow(a, b);
 		} else if (name.equals("enclosed-area") || name.equals("area")) {
 			assertArgsCount(name, args, 1);
@@ -570,9 +570,9 @@ public class XPathFuncExpr extends XPathExpression {
 	public static Double stringLength (Object o) {
 		String s = toString(o);
 		if(s == null) {
-			return new Double(0.0);
+			return 0.0;
 		}
-		return new Double(s.length());
+		return (double) s.length();
 	}
 
 	/**
@@ -589,11 +589,11 @@ public class XPathFuncExpr extends XPathExpression {
 		if (o instanceof Boolean) {
 			val = (Boolean)o;
 		} else if (o instanceof Double) {
-			double d = ((Double)o).doubleValue();
-			val = new Boolean(Math.abs(d) > 1.0e-12 && !Double.isNaN(d));
+			double d = (Double) o;
+			val = Math.abs(d) > 1.0e-12 && !Double.isNaN(d);
 		} else if (o instanceof String) {
 			String s = (String)o;
-			val = new Boolean(s.length() > 0);
+			val = s.length() > 0;
 		} else if (o instanceof Date) {
 			val = Boolean.TRUE;
 		} else if (o instanceof IExprDataType) {
@@ -629,7 +629,7 @@ public class XPathFuncExpr extends XPathExpression {
 		o = unpack(o);
 
 		if (o instanceof Boolean) {
-			val = new Double(((Boolean)o).booleanValue() ? 1 : 0);
+			val = (double) ((Boolean) o ? 1 : 0);
 		} else if (o instanceof Double) {
 			val = (Double)o;
 		} else if (o instanceof String) {
@@ -648,12 +648,12 @@ public class XPathFuncExpr extends XPathExpression {
 				}
 
 				d = Double.parseDouble(s);
-				val = new Double(d);
+				val = d;
 			} catch (NumberFormatException nfe) {
-				val = new Double(Double.NaN);
+				val = Double.NaN;
 			}
 		} else if (o instanceof Date) {
-			val = new Double(DateUtils.daysSinceEpoch((Date)o));
+			val = (double) DateUtils.daysSinceEpoch((Date) o);
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toNumeric();
 		}
@@ -678,13 +678,13 @@ public class XPathFuncExpr extends XPathExpression {
 
 		if (val.isInfinite() || val.isNaN()) {
 			return val;
-		} else if (val.doubleValue() >= Long.MAX_VALUE || val.doubleValue() <= Long.MIN_VALUE) {
+		} else if (val >= Long.MAX_VALUE || val <= Long.MIN_VALUE) {
 			return val;
 		} else {
 			long l = val.longValue();
-			Double dbl = new Double(l);
-			if (l == 0 && (val.doubleValue() < 0. || val.equals(new Double(-0.)))) {
-				dbl = new Double(-0.);
+			Double dbl = (double) l;
+			if (l == 0 && (val < 0. || val.equals(-0.))) {
+				dbl = -0.;
 			}
 			return dbl;
 		}
@@ -702,9 +702,9 @@ public class XPathFuncExpr extends XPathExpression {
 		o = unpack(o);
 
 		if (o instanceof Boolean) {
-			val = (((Boolean)o).booleanValue() ? "true" : "false");
+			val = ((Boolean) o ? "true" : "false");
 		} else if (o instanceof Double) {
-			double d = ((Double)o).doubleValue();
+			double d = (Double) o;
 			if (Double.isNaN(d)) {
 				val = "NaN";
 			} else if (Math.abs(d) < 1.0e-12) {
@@ -758,7 +758,7 @@ public class XPathFuncExpr extends XPathExpression {
 					return n;
 				}
 
-				if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+				if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
 					throw new XPathTypeMismatchException("converting out-of-range value to date");
 				}
 
@@ -773,7 +773,7 @@ public class XPathFuncExpr extends XPathExpression {
 					return n;
 				}
 
-				if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+				if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
 					throw new XPathTypeMismatchException("converting out-of-range value to date");
 				}
 
@@ -813,7 +813,7 @@ public class XPathFuncExpr extends XPathExpression {
 				return n;
 			}
 
-			if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+			if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
 				throw new XPathTypeMismatchException("converting out-of-range value to date");
 			}
 
@@ -856,8 +856,8 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 
 	public static Boolean boolNot (Object o) {
-		boolean b = toBoolean(o).booleanValue();
-		return new Boolean(!b);
+		boolean b = toBoolean(o);
+		return !b;
 	}
 
 	public static Boolean boolStr (Object o) {
@@ -878,12 +878,12 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 
 	private Double position(TreeReference refAt) {
-		return new Double(1+refAt.getMultLast());
+		return (double) (1 + refAt.getMultLast());
 	}
 
 	public static Object ifThenElse (FormInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) {
 		argVals[0] = args[0].eval(model, ec);
-		boolean b = toBoolean(argVals[0]).booleanValue();
+		boolean b = toBoolean(argVals[0]);
 		return (b ? args[1].eval(model, ec) : args[2].eval(model, ec));
 	}
 
@@ -956,7 +956,7 @@ public class XPathFuncExpr extends XPathExpression {
         String s1 = (String)unpack(o1);
         String s2 = ((String) indexObject).trim();
 
-		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
+		return (" " + s1 + " ").contains(" " + s2 + " ");
 	}
 
 	/**
@@ -968,7 +968,7 @@ public class XPathFuncExpr extends XPathExpression {
 	public static Double countSelected (Object o) {
 		String s = (String)unpack(o);
 
-		return new Double(DateUtils.split(s, " ", true).size());
+		return (double) DateUtils.split(s, " ", true).size();
 	}
 
     /**
@@ -997,7 +997,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 */
 	public static Double count (Object o) {
 		if (o instanceof XPathNodeset) {
-			return new Double(((XPathNodeset)o).size());
+			return (double) ((XPathNodeset) o).size();
 		} else {
 			throw new XPathTypeMismatchException("not a nodeset");
 		}
@@ -1005,28 +1005,20 @@ public class XPathFuncExpr extends XPathExpression {
 
 	/**
 	 * sum the values in a nodeset; each element is coerced to a numeric value
-	 *
-	 * @param model
-	 * @param o
-	 * @return
 	 */
 	public static Double sum (Object argVals[]) {
 		double sum = 0.0;
-		for (int i = 0; i < argVals.length; i++) {
-			Double dargVal=toNumeric(argVals[i]);
+		for (Object argVal : argVals) {
+			Double dargVal = toNumeric(argVal);
 			if (!dargVal.isNaN()) {
-				sum += dargVal.doubleValue();
+				sum += dargVal;
 			}
 		}
-		return new Double(sum);
+		return sum;
 	}
 
 	/**
 	 * round function like in Excel.
-	 *
-	 * @param num
-	 * @param dblDecim
-	 * @return
 	 */
 	private static Double round(double num, double numDecim) {
 		long p=0;
@@ -1035,12 +1027,12 @@ public class XPathFuncExpr extends XPathExpression {
 		if ( num == Double.NaN ||
 			 num == Double.NEGATIVE_INFINITY ||
 			 num == Double.POSITIVE_INFINITY ) {
-			return new Double(num);
+			return num;
 		}
 
 		// absurdly large rounding requests yield NaN...
 		if ( numDecim > 30.0 || numDecim < -30.0 ) {
-			return new Double(Double.NaN);
+			return Double.NaN;
 		}
 
 		// ignore fractional numDecim rounding values.
@@ -1080,7 +1072,7 @@ public class XPathFuncExpr extends XPathExpression {
 				--p;
 			}
 		}
-		return new Double(num);
+		return num;
 	}
 
     /**
@@ -1092,27 +1084,27 @@ public class XPathFuncExpr extends XPathExpression {
     private static Object max(Object[] argVals) {
         double max = Double.MIN_VALUE;
         boolean returnNaN = true;
-        for (int i = 0; i < argVals.length; i++) {
-            Double dargVal = toNumeric(argVals[i]);
-            if (!dargVal.isNaN()) {
-                max = Math.max(max, dargVal.doubleValue());
-                returnNaN = false;
-            }
-        }
-        return new Double(returnNaN ? Double.NaN : max);
+		for (Object argVal : argVals) {
+			Double dargVal = toNumeric(argVal);
+			if (!dargVal.isNaN()) {
+				max = Math.max(max, dargVal);
+				returnNaN = false;
+			}
+		}
+        return returnNaN ? Double.NaN : max;
     }
 
     private static Object min(Object[] argVals) {
         double min = Double.MAX_VALUE;
         boolean returnNaN = true;
-        for (int i = 0; i < argVals.length; i++) {
-            Double dargVal = toNumeric(argVals[i]);
-            if (!dargVal.isNaN()) {
-                min = Math.min(min, dargVal.doubleValue());
-                returnNaN = false;
-            }
-        }
-        return new Double(returnNaN ? Double.NaN : min);
+		for (Object argVal : argVals) {
+			Double dargVal = toNumeric(argVal);
+			if (!dargVal.isNaN()) {
+				min = Math.min(min, dargVal);
+				returnNaN = false;
+			}
+		}
+        return returnNaN ? Double.NaN : min;
     }
 
 	/**
@@ -1157,7 +1149,6 @@ public class XPathFuncExpr extends XPathExpression {
 	 * perform a 'checklist' computation, enabling expressions like 'if there are at least 3 risk
 	 * factors active'
 	 *
-	 * @param argVals
 	 *   the first argument is a numeric value expressing the minimum number of factors required.
 	 *     if -1, no minimum is applicable
 	 *   the second argument is a numeric value expressing the maximum number of allowed factors.
@@ -1171,12 +1162,12 @@ public class XPathFuncExpr extends XPathExpression {
 		int max = toNumeric(oMax).intValue();
 
 		int count = 0;
-		for (int i = 0; i < factors.length; i++) {
-			if (toBoolean(factors[i]).booleanValue())
+		for (Object factor : factors) {
+			if (toBoolean(factor))
 				count++;
 		}
 
-		return new Boolean((min < 0 || count >= min) && (max < 0 || count <= max));
+		return (min < 0 || count >= min) && (max < 0 || count <= max);
 	}
 
 	/**
@@ -1191,23 +1182,22 @@ public class XPathFuncExpr extends XPathExpression {
 	 * the weights of all the 'true' factors are summed, and the function returns whether
 	 * this sum is between the min and max
 	 *
-	 * @param argVals
 	 * @return
 	 */
 	public static Boolean checklistWeighted (Object oMin, Object oMax, Object[] flags, Object[] weights) {
-		double min = toNumeric(oMin).doubleValue();
-		double max = toNumeric(oMax).doubleValue();
+		double min = toNumeric(oMin);
+		double max = toNumeric(oMax);
 
 		double sum = 0.;
 		for (int i = 0; i < flags.length; i++) {
-			boolean flag = toBoolean(flags[i]).booleanValue();
-			double weight = toNumeric(weights[i]).doubleValue();
+			boolean flag = toBoolean(flags[i]);
+			double weight = toNumeric(weights[i]);
 
 			if (flag)
 				sum += weight;
 		}
 
-		return new Boolean(sum >= min && sum <= max);
+		return sum >= min && sum <= max;
 	}
 
 	/**
@@ -1221,8 +1211,7 @@ public class XPathFuncExpr extends XPathExpression {
 		String str = toString(o1);
 		String re = toString(o2);
 
-		boolean result = Pattern.matches(re, str);
-		return new Boolean(result);
+		return Pattern.matches(re, str);
 	}
 
 	private static Object[] subsetArgList (Object[] args, int start) {
@@ -1258,200 +1247,7 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 
-	    /**
-     * Returns the sine of the argument, expressed in radians.
-     *
-     * @param o Value
-     * @return sine of value
-     */
-    private Double sin(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, sines are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.sin(value);
-        //#endif
-    }
-
-    /**
-     * Returns the cosine of the argument, expressed in radians.
-     *
-     * @param o Value
-     * @return cosine of value
-     */
-    private Double cosin(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, cosines are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.cos(value);
-        //#endif
-    }
-
-    /**
-     * Returns the tangent of the argument, expressed in radians.
-     *
-     * @param o Value
-     * @return tan of value
-     */
-    private Double tan(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, tangents are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.tan(value);
-        //#endif
-    }
-
-    /**
-     * Returns the arc cosine of the argument, expressed in radians.
-     *
-     * @param o Value
-     * @return tan of value
-     */
-    private Double acos(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, arc cosines are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.acos(value);
-        //#endif
-    }
-
-    /**
-     * Returns the arc sine of the argument, expressed in radians.
-     *
-     * @param o Value
-     * @return tan of value
-     */
-    private Double asin(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, arc sines are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.asin(value);
-        //#endif
-    }
-
-    /**
-     * Returns the arc tan of the argument, expressed in radians.
-     *
-     * @param o Value
-     * @return v such that tan(v) = o
-     */
-    private Double atan(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, arc tans are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.atan(value);
-        //#endif
-    }
-
-    /**
-     * Returns the arc tan of the 2 arguments, expressed in radians.
-     *
-     * @param o1, o2 Value
-     * @return v such that o2*tan(v) = o1
-     */
-    private Double atan2(Object o1, Object o2) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, atan are not supported on your platform");
-        //#else
-        double value1 = toDouble(o1).doubleValue();
-        double value2 = toDouble(o2).doubleValue();
-        return Math.atan2(value1, value2);
-        //#endif
-    }
-
-    /**
-     * Implementation of natural logarithm
-     *
-     * @param o Value
-     * @return natural log of value
-     */
-    private Double log(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, logarithms are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.log(value);
-        //#endif
-    }
-
-    /**
-     * Implementation of logarithm with base ten
-     *
-     * @param o Value
-     * @return Base ten log of value
-     */
-    private Double log10(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, logarithms are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.log10(value);
-        //#endif
-    }
-
-    /**
-     *
-     * @return pi
-     */
-    private Double pi() {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, Pi are not supported on your platform");
-        //#else
-        return Math.PI;
-        //#endif
-    }
-
-    /**
-     * Returns the square root of the argument.
-     *
-     * @param o Value
-     * @return sqrt of value
-     */
-    private Double sqrt(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, square roots are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.sqrt(value);
-        //#endif
-    }
-
-    /**
-     * Implementation of exponent base e
-     *
-     * @param o Value
-     * @return e to the power of value
-     */
-    private Double exp(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, exponentials are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.exp(value);
-        //#endif
-    }
-
-    /**
-     * Implementation of exponent base ten
-     *
-     * @param o Value
-     * @return 10 to the power of value
-     */
-    private Double exp10(Object o) {
-        //#if polish.cldc
-        //# throw new XPathUnsupportedException("Sorry, exponentials are not supported on your platform");
-        //#else
-        double value = toDouble(o).doubleValue();
-        return Math.pow(10.0, value);
-        //#endif
-    }
-
-     /**
+	/**
      * Throws an arity exception if expected arity doesn't match the provided arity.
      *
      * @param name          the function name
@@ -1465,9 +1261,7 @@ public class XPathFuncExpr extends XPathExpression {
         }
     }
 
-	/**
-	 *
-	 */
+	@Override
 	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		String name = id.toString();
 
@@ -1491,13 +1285,13 @@ public class XPathFuncExpr extends XPathExpression {
 
 		boolean pivoted = false;
 		//evaluate the pivots
-		for(int i = 0 ; i < argVals.length; ++i) {
-			if(argVals[i] == null) {
+		for (Object argVal : argVals) {
+			if (argVal == null) {
 				//one of our arguments contained pivots,
 				pivoted = true;
-			} else if(sentinal.equals(argVals[i])) {
+			} else if (sentinal.equals(argVal)) {
 				//one of our arguments is the sentinal, return the sentinal if possible
-				if(id) {
+				if (id) {
 					return sentinal;
 				} else {
 					//This function modifies the sentinal in a way that makes it impossible to capture
@@ -1521,5 +1315,4 @@ public class XPathFuncExpr extends XPathExpression {
 		return eval(model, evalContext);
 
 	}
-
 }
