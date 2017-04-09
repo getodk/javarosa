@@ -19,6 +19,11 @@ public class XFormParserTest {
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
     }
 
+    @Test public void parsesExternalSecondaryInstanceForm() throws IOException {
+        FormDef formDef = parse("external-secondary-instance.xml");
+        assertEquals("Form with external secondary instance", formDef.getTitle());
+    }
+
     private FormDef parse(String formName) throws IOException {
         XFormParser parser = new XFormParser(new FileReader("resources/" + formName));
         return parser.parse();
