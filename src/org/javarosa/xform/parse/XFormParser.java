@@ -440,14 +440,18 @@ public class XFormParser implements IXFormParserFunctions {
         //we assume that the non-main instances won't
         //reference the main node, so we do them first.
         //if this assumption is wrong, well, then we're screwed.
-        if(instanceNodes.size() > 1)
-        {
-            for(int i = 1; i < instanceNodes.size(); i++)
-            {
-                Element e = instanceNodes.get(i);
-                FormInstance fi = instanceParser.parseInstance(e, false, instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
-                loadInstanceData(e, fi.getRoot(), _f);
-                _f.addNonMainInstance(fi);
+        if (instanceNodes.size() > 1) {
+            for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
+                final Element instance = instanceNodes.get(instanceIndex);
+                final String srcLocation = instance.getAttributeValue(null, "src");
+
+                if (srcLocation != null) {
+                    //ToDo: Use ExternalDataInstance, like Dimagi?
+                } else {
+                    FormInstance fi = instanceParser.parseInstance(instance, false, instanceNodeIdStrs.get(instanceNodes.indexOf(instance)));
+                    loadInstanceData(instance, fi.getRoot(), _f);
+                    _f.addNonMainInstance(fi);
+                }
             }
         }
         //now parse the main instance
