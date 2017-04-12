@@ -19,13 +19,10 @@ package org.javarosa.core.util.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.externalizable.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.*;
 
 public class ExternalizableTest extends TestCase {
 

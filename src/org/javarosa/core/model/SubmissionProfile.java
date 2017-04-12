@@ -3,7 +3,12 @@
  */
 package org.javarosa.core.model;
 
-import org.javarosa.core.util.externalizable.*;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
