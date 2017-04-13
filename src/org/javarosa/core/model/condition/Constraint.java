@@ -16,10 +16,6 @@
 
 package org.javarosa.core.model.condition;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -29,6 +25,10 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class Constraint implements Externalizable {
 	public IConditionExpr constraint;
