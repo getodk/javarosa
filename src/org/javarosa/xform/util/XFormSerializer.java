@@ -16,15 +16,15 @@
 
 package org.javarosa.xform.util;
 
+import org.kxml2.io.KXmlSerializer;
+import org.kxml2.kdom.Document;
+import org.kxml2.kdom.Element;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-
-import org.kxml2.io.KXmlSerializer;
-import org.kxml2.kdom.Document;
-import org.kxml2.kdom.Element;
 
 /* this is just a big dump of serialization-related code */
 
