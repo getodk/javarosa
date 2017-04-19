@@ -24,7 +24,12 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Meletis Margaritis
