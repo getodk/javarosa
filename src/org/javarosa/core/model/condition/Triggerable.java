@@ -16,14 +16,6 @@
 
 package org.javarosa.core.model.condition;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.*;
-import java.util.List;
-import java.util.Set;
-
 import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -35,6 +27,17 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.xpath.XPathException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A triggerable represents an action that should be processed based
