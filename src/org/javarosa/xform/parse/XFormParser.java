@@ -19,9 +19,8 @@ package org.javarosa.xform.parse;
 import org.javarosa.core.model.*;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.instance.*;
+import org.javarosa.core.model.instance.utils.ExternalDataInstance;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.model.osm.OSMTagItem;
@@ -385,7 +384,7 @@ public class XFormParser implements IXFormParserFunctions {
                 final String srcLocation = instance.getAttributeValue(null, "src");
 
                 if (srcLocation != null) {
-                    //ToDo: Use ExternalDataInstance, like Dimagi?
+                    _f.addNonMainInstance(new ExternalDataInstance(instance.getName()));
                 } else {
                     FormInstance fi = instanceParser.parseInstance(instance, false, instanceNodeIdStrs.get(instanceNodes.indexOf(instance)));
                     loadInstanceData(instance, fi.getRoot(), _f);
@@ -402,11 +401,14 @@ public class XFormParser implements IXFormParserFunctions {
 
         // Clear the caches, as these may not have been initialized
         // entirely correctly during the validation steps.
-        Enumeration<FormInstance> e = _f.getNonMainInstances();
+        Enumeration<DataInstance> e = _f.getNonMainInstances();
         while ( e.hasMoreElements() ) {
-            FormInstance fi = e.nextElement();
-            fi.getRoot().clearChildrenCaches();
-            fi.getRoot().clearCaches();
+            DataInstance instance = e.nextElement();
+            final AbstractTreeElement treeElement = instance.getRoot();
+            if (treeElement instanceof TreeElement) {
+                ((TreeElement) treeElement).clearChildrenCaches();
+            }
+            treeElement.clearCaches();
         }
         _f.getMainInstance().getRoot().clearChildrenCaches();
         _f.getMainInstance().getRoot().clearCaches();

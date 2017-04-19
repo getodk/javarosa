@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -44,7 +44,7 @@ public class XPathFilterExpr extends XPathExpression {
 		this.predicates = predicates;
 	}
 
-	public Object eval(FormInstance model, EvaluationContext evalContext) {
+	public Object eval(DataInstance model, EvaluationContext evalContext) {
 		throw new XPathUnsupportedException("filter expression");
 	}
 
@@ -97,7 +97,7 @@ public class XPathFilterExpr extends XPathExpression {
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 
-	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		throw new UnpivotableExpressionException();
 	}
 }

@@ -26,7 +26,7 @@ import org.javarosa.core.model.condition.pivot.CmpPivot;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.UncastData;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -47,7 +47,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		this.op = op;
 	}
 	
-	public Object eval (FormInstance model, EvaluationContext evalContext) {
+	public Object eval (DataInstance model, EvaluationContext evalContext) {
 		Object aval = a.eval(model, evalContext);
 		Object bval = b.eval(model, evalContext);
 		boolean result = false;
@@ -102,7 +102,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 	}
 	
 
-	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		Object aval = a.pivot(model, evalContext, pivots, sentinal);
 		Object bval = b.pivot(model, evalContext, pivots, sentinal);
 		if(bval instanceof XPathNodeset) {

@@ -140,7 +140,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
    private HashMap<String, SubmissionProfile> submissionProfiles;
 
-   private HashMap<String, FormInstance> formInstances;
+   private HashMap<String, DataInstance> formInstances;
    private FormInstance mainInstance = null;
 
    private HashMap<String, List<Action>> eventListeners;
@@ -185,7 +185,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       resetEvaluationContext();
       outputFragments = new ArrayList<IConditionExpr>();
       submissionProfiles = new HashMap<String, SubmissionProfile>();
-      formInstances = new HashMap<String, FormInstance>();
+      formInstances = new HashMap<String, DataInstance>();
       eventListeners = new HashMap<String, List<Action>>();
       extensions = new ArrayList<XFormExtension>();
 
@@ -203,7 +203,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    /**
     * Getters and setters for the lists
     */
-   public void addNonMainInstance(FormInstance instance) {
+   public void addNonMainInstance(DataInstance instance) {
       formInstances.put(instance.getName(), instance);
       resetEvaluationContext();
    }
@@ -214,7 +214,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @param name string name
     * @return
     */
-   public FormInstance getNonMainInstance(String name) {
+   public DataInstance getNonMainInstance(String name) {
       if (!formInstances.containsKey(name)) {
          return null;
       }
@@ -227,7 +227,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     *
     * @return
     */
-   public Enumeration<FormInstance> getNonMainInstances() {
+   public Enumeration<DataInstance> getNonMainInstances() {
       return Collections.enumeration(formInstances.values());
    }
 
@@ -973,7 +973,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
               new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
-      FormInstance fi = null;
+      DataInstance fi = null;
       if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
       // with the default
       // instance
@@ -1188,8 +1188,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       submissionProfiles = (HashMap<String, SubmissionProfile>) ExtUtil.read(dis, new ExtWrapMap(
               String.class, SubmissionProfile.class));
 
-      formInstances = (HashMap<String, FormInstance>) ExtUtil.read(dis, new ExtWrapMap(
-              String.class, FormInstance.class));
+      formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
+              String.class, DataInstance.class));
 
       eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
               String.class, new ExtWrapListPoly()), pf);
@@ -1207,7 +1207,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     */
    public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
       for (String instanceId : formInstances.keySet()) {
-         FormInstance instance = formInstances.get(instanceId);
+         DataInstance instance = formInstances.get(instanceId);
          instance.initialize(factory, instanceId);
       }
       if (newInstance) {// only preload new forms (we may have to revisit

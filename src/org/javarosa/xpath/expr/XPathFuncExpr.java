@@ -32,6 +32,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.UncastData;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
@@ -139,7 +140,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * the supplied arguments must match one of the function prototypes defined by the handler.
 	 *
 	 */
-	public Object eval (FormInstance model, EvaluationContext evalContext) {
+	public Object eval (DataInstance model, EvaluationContext evalContext) {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 
@@ -382,7 +383,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return PropertyUtils.genGUID(len);
 		} else if (name.equals("version")) { //non-standard
 			assertArgsCount(name, args, 0);
-			return model.formVersion == null ? "" : model.formVersion;
+			final String formVersion = (model instanceof FormInstance) ? ((FormInstance) model).formVersion : "";
+			return formVersion == null ? "" : formVersion;
 		} else if (name.equals("property")) { // non-standard
 			// return a property defined by the property manager.
 			// NOTE: Property should be immutable.
@@ -881,7 +883,7 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Double(1+refAt.getMultLast());
 	}
 
-	public static Object ifThenElse (FormInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) {
+	public static Object ifThenElse (DataInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) {
 		argVals[0] = args[0].eval(model, ec);
 		boolean b = toBoolean(argVals[0]).booleanValue();
 		return (b ? args[1].eval(model, ec) : args[2].eval(model, ec));
@@ -904,7 +906,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param argVals
 	 * @return
 	 */
-	public static Object indexedRepeat (FormInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) throws XPathTypeMismatchException {
+	public static Object indexedRepeat (DataInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) throws XPathTypeMismatchException {
 		// initialize target and context references
 		if (!(args[0] instanceof XPathPathExpr)) {
 			throw new XPathTypeMismatchException("indexed-repeat(): first parameter must be XPath field reference");
@@ -1468,7 +1470,7 @@ public class XPathFuncExpr extends XPathExpression {
 	/**
 	 *
 	 */
-	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		String name = id.toString();
 
 		//for now we'll assume that all that functions do is return the composition of their components

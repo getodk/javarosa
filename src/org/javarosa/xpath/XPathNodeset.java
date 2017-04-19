@@ -1,7 +1,7 @@
 package org.javarosa.xpath;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
 
@@ -30,7 +30,7 @@ import java.util.List;
 public class XPathNodeset {
 
 	private List<TreeReference> nodes;
-	protected FormInstance instance;
+	protected DataInstance instance;
 	protected EvaluationContext ec;
 	// these are purely for improved error messages
 	private String pathEvaluated;
@@ -46,7 +46,7 @@ public class XPathNodeset {
 	 * @param instance
 	 * @param ec
 	 */
-	protected XPathNodeset (FormInstance instance, EvaluationContext ec) {
+	protected XPathNodeset (DataInstance instance, EvaluationContext ec) {
 		this.instance = instance;
 		this.ec = ec;
 	}
@@ -59,7 +59,7 @@ public class XPathNodeset {
 	 * @param instance
 	 * @param ec
 	 */
-	public XPathNodeset (List<TreeReference> nodes, FormInstance instance, EvaluationContext ec) {
+	public XPathNodeset (List<TreeReference> nodes, DataInstance instance, EvaluationContext ec) {
 		if(nodes == null) { throw new NullPointerException("Node list cannot be null when constructing a nodeset"); }
 		this.nodes = nodes;
 		this.instance = instance;

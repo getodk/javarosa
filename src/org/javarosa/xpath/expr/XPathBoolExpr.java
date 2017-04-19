@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -39,7 +39,7 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 		this.op = op;
 	}
 	
-	public Object eval (FormInstance model, EvaluationContext evalContext) {
+	public Object eval (DataInstance model, EvaluationContext evalContext) {
 		boolean aval = XPathFuncExpr.toBoolean(a.eval(model, evalContext)).booleanValue();
 		
 		//short-circuiting

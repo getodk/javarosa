@@ -11,7 +11,7 @@
                     </meta>
                 </data>
             </instance>
-            <instance src="jr://file/countries.xml"/>
+            <instance id="countries" src="jr://file/country-data.xml"/>
         </model>
     </h:head>
 

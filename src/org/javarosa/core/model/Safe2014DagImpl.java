@@ -21,6 +21,7 @@ import java.util.*;
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -373,8 +374,8 @@ public class Safe2014DagImpl extends LatestDagBase {
 
    // Recursive step of utility method
    private void addChildrenOfElement(FormInstance mainInstance,
-         EvaluationContext evalContext, TreeElement el,
-         Set<TreeReference> toAdd, boolean expandRepeatables) {
+                                     EvaluationContext evalContext, AbstractTreeElement el,
+                                     Set<TreeReference> toAdd, boolean expandRepeatables) {
       TreeElement repeatTemplate = expandRepeatables ? mainInstance
             .getTemplatePath(el.getRef()) : null;
       if (repeatTemplate != null) {
@@ -386,7 +387,7 @@ public class Safe2014DagImpl extends LatestDagBase {
          }
       } else {
          for (int i = 0; i < el.getNumChildren(); ++i) {
-            TreeElement child = el.getChildAt(i);
+            AbstractTreeElement child = el.getChildAt(i);
             toAdd.add(child.getRef().genericize());
             addChildrenOfElement(mainInstance, evalContext, child, toAdd,
                   expandRepeatables);
