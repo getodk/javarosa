@@ -27,7 +27,7 @@ import org.javarosa.core.log.FatalException;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -66,7 +66,7 @@ public class XPathConditional implements IConditionExpr {
 		return expr;
 	}
 
-	public Object evalRaw (FormInstance model, EvaluationContext evalContext) {
+	public Object evalRaw (DataInstance model, EvaluationContext evalContext) {
 		try{
 			return XPathFuncExpr.unpack(expr.eval(model, evalContext));
 		} catch(XPathUnsupportedException e){
@@ -80,15 +80,15 @@ public class XPathConditional implements IConditionExpr {
 		}
 	}
 
-	public boolean eval (FormInstance model, EvaluationContext evalContext) {
+	public boolean eval (DataInstance model, EvaluationContext evalContext) {
 		return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
 	}
 
-	public String evalReadable (FormInstance model, EvaluationContext evalContext) {
+	public String evalReadable (DataInstance model, EvaluationContext evalContext) {
 		return XPathFuncExpr.toString(evalRaw(model, evalContext));
 	}
 
-	public List<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext) {
+	public List<TreeReference> evalNodeset (DataInstance model, EvaluationContext evalContext) {
 		if (expr instanceof XPathPathExpr) {
 			return ((XPathPathExpr)expr).eval(model, evalContext).getReferences();
 		} else {
@@ -166,7 +166,7 @@ public class XPathConditional implements IConditionExpr {
 		return "xpath[" + expr.toString() + "]";
 	}
 
-	public List<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+	public List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
 		return expr.pivot(model, evalContext);
 	}
 }
