@@ -1,12 +1,27 @@
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'checkstyle'
+}
 
 repositories {
     mavenCentral()
 }
 
-sourceSets.main.java.srcDirs = ['src']
-sourceSets.test.java.srcDirs = ['test']
-sourceSets.test.resources.srcDirs = ['resources']
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+}
 
 targetCompatibility = '1.7'
 sourceCompatibility = '1.7'
@@ -14,8 +29,13 @@ sourceCompatibility = '1.7'
 dependencies {
     // Be sure to update dependencies in pom.xml to match
     compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
-    testCompile group: 'junit', name: 'junit', version: '3.8.2'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
+}
+
+// Required to use fileExtensions property in checkstyle file
+checkstyle {
+    toolVersion = '7.6.1' 
 }
 
 jar {
@@ -29,7 +49,14 @@ jar {
     }
 }
 
+// Useful for testing
+task explodedJar(type: Copy) {
+    into "$buildDir/libs/$jar.baseName $jar.version"
+    with jar
+}
+
 // TODO: does not build UML diagrams
 javadoc {
     failOnError = false
 }
+
