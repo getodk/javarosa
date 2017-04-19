@@ -15,7 +15,9 @@ import org.kxml2.kdom.Element;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.javarosa.xform.parse.Constants.*;
+import static org.javarosa.xform.parse.Constants.ID_ATTR;
+import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
+import static org.javarosa.xform.parse.XFormParser.NAMESPACE_JAVAROSA;
 
 class StandardBindAttributesProcessor {
     StandardBindAttributesProcessor(XFormParserReporter reporter, Map<String, Integer> typeMappings) {
