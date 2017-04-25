@@ -66,6 +66,8 @@ import static org.javarosa.xform.parse.Constants.*;
  */
 public class XFormParser implements IXFormParserFunctions {
 
+    public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
+
     //Constants to clean up code and prevent user error
     private static final String FORM_ATTR = "form";
     private static final String APPEARANCE_ATTR = "appearance";
