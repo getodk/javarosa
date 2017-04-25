@@ -214,6 +214,17 @@ public class XPathEvalTest extends TestCase {
         testEval("substr('hello',1,4)", "ell");
         testEval("substr('hello',-2)", "lo");
         testEval("substr('hello',0,-1)", "hell");
+        testEval("contains('a', 'a')",      true);
+        testEval("contains('a', 'b')",      false);
+        testEval("contains('abc', 'b')",    true);
+        testEval("contains('abc', 'bcd')",  false);
+        testEval("not(contains('a', 'b'))", true);
+        testEval("starts-with('abc', 'a')", true);
+        testEval("starts-with('', 'a')",    false);
+        testEval("starts-with('', '')",     true);
+        testEval("ends-with('abc', 'a')",   false);
+        testEval("ends-with('abc', 'c')",   true);
+        testEval("ends-with('', '')",       true);
 
         logTestCategory("date functions");
         testEval("date('2000-01-01')", DateUtils.getDate(2000, 1, 1));
