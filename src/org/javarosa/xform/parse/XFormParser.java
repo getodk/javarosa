@@ -445,7 +445,7 @@ public class XFormParser implements IXFormParserFunctions {
                 final String srcLocation = instance.getAttributeValue(null, "src");
 
                 if (srcLocation != null) {
-                    _f.addNonMainInstance(new ExternalDataInstance(instance.getName()));
+                    _f.addNonMainInstance(new ExternalDataInstance(srcLocation, instance.getName()));
                 } else {
                     FormInstance fi = instanceParser.parseInstance(instance, false, instanceNodeIdStrs.get(instanceNodes.indexOf(instance)));
                     loadInstanceData(instance, fi.getRoot(), _f);

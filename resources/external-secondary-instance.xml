@@ -6,21 +6,15 @@
         <model>
             <instance>
                 <data id="a">
-                    <meta>
-                        <instanceID/>
-                    </meta>
+                    <data_set_used/>
                 </data>
             </instance>
-            <instance id="countries" src="jr://file/country-data.xml"/>
+            <instance id="towns" src="jr://file/towns.xml"/>
+            <bind nodeset="/data/data_set_used" calculate="instance('towns')/towndata/data_set"/>
         </model>
     </h:head>
 
     <h:body>
-        <group appearance="field-list">
-            <input ref="/data/meta/instanceID">
-                <label>Instance ID:</label>
-            </input>
-        </group>
     </h:body>
 
 </h:html>

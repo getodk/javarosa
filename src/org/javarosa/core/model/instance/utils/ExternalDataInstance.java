@@ -3,10 +3,14 @@ package org.javarosa.core.model.instance.utils;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
+import org.javarosa.core.model.instance.TreeElement;
 
 public class ExternalDataInstance extends DataInstance {
-    public ExternalDataInstance(String instanceid) {
+    private final String srcLocation;
+
+    public ExternalDataInstance(String srcLocation, String instanceid) {
         super(instanceid);
+        this.srcLocation = srcLocation;
     }
 
     @Override
@@ -16,11 +20,11 @@ public class ExternalDataInstance extends DataInstance {
 
     @Override
     public AbstractTreeElement getRoot() {
-        return null; // ToDo
+        return new TreeElement(srcLocation); // ToDo
     }
 
     @Override
     public void initialize(InstanceInitializationFactory initializer, String instanceId) {
-
+        throw new RuntimeException("Not implemented");
     }
 }
