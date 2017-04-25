@@ -1,16 +1,17 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
+
+import static org.javarosa.xpath.XPathParseTool.parseXPath;
+import static org.junit.Assert.assertEquals;
 
 public class XFormParserTest {
     @Test public void parsesSimpleForm() throws IOException {
@@ -28,10 +29,9 @@ public class XFormParserTest {
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
         FormDef formDef = parse("external-secondary-instance.xml");
         assertEquals("Form with external secondary instance", formDef.getTitle());
-        EvaluationContext ec = new EvaluationContext(formDef.getInstance());
-        TreeReference treeReference =
-                ((XPathPathExpr) XPathParseTool.parseXPath("instance('countries')/file")).getReference();
-        List<TreeReference> treeReferences = ec.expandReference(treeReference);
+        TreeReference treeReference = ((XPathPathExpr)
+                parseXPath("instance('towns')/towndata/data_set")).getReference();
+        List<TreeReference> treeReferences = formDef.getEvaluationContext().expandReference(treeReference);
         System.out.println(treeReferences);
     }
 
