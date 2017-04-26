@@ -144,51 +144,75 @@ public class XFormParser implements IXFormParserFunctions {
         submissionParsers = new ArrayList<>(1);
     }
 
-    private static void initProcessingRules () {
-        IElementHandler title = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseTitle(e); } };
-        IElementHandler meta = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseMeta(e); } };
-        IElementHandler model = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseModel(e); } };
-        IElementHandler input = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_INPUT); } };
-        IElementHandler secret = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_SECRET); } };
-        IElementHandler select = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_SELECT_MULTI); } };
-        IElementHandler select1 = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_SELECT_ONE); } };
-        IElementHandler group = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseGroup((IFormElement)parent, e, CONTAINER_GROUP); } };
-        IElementHandler repeat = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseGroup((IFormElement)parent, e, CONTAINER_REPEAT); } };
-        IElementHandler groupLabel = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseGroupLabel((GroupDef)parent, e); } };
-        IElementHandler trigger = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_TRIGGER); } };
-        IElementHandler upload = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseUpload((IFormElement)parent, e, Constants.CONTROL_UPLOAD); } };
+    private static void initProcessingRules() {
+        groupLevelHandlers = new HashMap<String, IElementHandler>() {{
+            put("input", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT);
+                }
+            });
+            put("secret", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SECRET);
+                }
+            });
+            put(SELECT, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_MULTI);
+                }
+            });
+            put(SELECTONE, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_ONE);
+                }
+            });
+            put("group", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseGroup((IFormElement) parent, e, CONTAINER_GROUP);
+                }
+            });
+            put("repeat", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseGroup((IFormElement) parent, e, CONTAINER_REPEAT);
+                }
+            });
+            put("trigger", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_TRIGGER);
+                }
+            }); //multi-purpose now; need to dig deeper
+            put(Constants.XFTAG_UPLOAD, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseUpload((IFormElement) parent, e, Constants.CONTROL_UPLOAD);
+                }
+            });
+            put(LABEL_ELEMENT, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    if (parent instanceof GroupDef) {
+                        p.parseGroupLabel((GroupDef) parent, e);
+                    } else throw new XFormParseException("parent of element is not a group", e);
+                }
+            });
+        }};
 
-        groupLevelHandlers = new HashMap<>();
-        groupLevelHandlers.put("input", input);
-        groupLevelHandlers.put("secret",secret);
-        groupLevelHandlers.put(SELECT, select);
-        groupLevelHandlers.put(SELECTONE, select1);
-        groupLevelHandlers.put("group", group);
-        groupLevelHandlers.put("repeat", repeat);
-        groupLevelHandlers.put("trigger", trigger); //multi-purpose now; need to dig deeper
-        groupLevelHandlers.put(Constants.XFTAG_UPLOAD, upload);
-
-        topLevelHandlers = new HashMap<>();
-    for (String key : groupLevelHandlers.keySet()) {
-            topLevelHandlers.put(key, groupLevelHandlers.get(key));
-        }
-        topLevelHandlers.put("model", model);
-        topLevelHandlers.put("title", title);
-        topLevelHandlers.put("meta", meta);
-
-        groupLevelHandlers.put(LABEL_ELEMENT, groupLabel);
+        topLevelHandlers = new HashMap<String, IElementHandler>() {{
+            put("model", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseModel(e);
+                }
+            });
+            put("title", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseTitle(e);
+                }
+            });
+            put("meta", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseMeta(e);
+                }
+            });
+        }};
+        topLevelHandlers.putAll(groupLevelHandlers);
     }
 
     private void initState () {
