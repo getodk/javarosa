@@ -102,16 +102,16 @@ public class BooleanData implements IAnswerData {
 
     @Override
 	public UncastData uncast() {
-		return new UncastData(data ? "1" : "0");
+		return new UncastData(data ? "true" : "false");
 	}
 
     @Override
 	public BooleanData cast(UncastData data) throws IllegalArgumentException {
-		if("1".equals(data)) {
+		if("true".equals(data)) {
 			return new BooleanData(true);
 		}
 
-		if("0".equals(data)) {
+		if("false".equals(data)) {
 			return new BooleanData(false);
 		}
 
