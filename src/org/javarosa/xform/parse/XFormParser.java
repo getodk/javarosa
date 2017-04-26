@@ -727,12 +727,10 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
-        List<String> usedAtts = new ArrayList<>();
-        usedAtts.add("mediatype");
         // get media type value
         String mediaType = e.getAttributeValue(null, "mediatype");
         // parse the control
-        QuestionDef question = parseControl(parent, e, controlUpload, usedAtts);
+        QuestionDef question = parseControl(parent, e, controlUpload, Arrays.asList("mediatype"));
 
         // apply the media type value to the returned question def.
         if ("image/*".equals(mediaType)) {
@@ -834,10 +832,10 @@ public class XFormParser implements IXFormParserFunctions {
         QuestionDef question = new QuestionDef();
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
-        List<String> usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new ArrayList<String>();
-        usedAtts.add(REF_ATTR);
-        usedAtts.add(BIND_ATTR);
-        usedAtts.add(APPEARANCE_ATTR);
+        final List<String> usedAtts = new ArrayList<>(Arrays.asList(REF_ATTR, BIND_ATTR, APPEARANCE_ATTR));
+        if (additionalUsedAtts != null) {
+            usedAtts.addAll(additionalUsedAtts);
+        }
 
         IDataReference dataRef = null;
         boolean refFromBind = false;
