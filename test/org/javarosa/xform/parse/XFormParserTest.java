@@ -1,10 +1,14 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.QuestionDef;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.junit.Assert.assertEquals;
 
 public class XFormParserTest {
     @Test public void parsesSimpleForm() throws IOException {
@@ -17,6 +21,11 @@ public class XFormParserTest {
         assertEquals("My Survey", formDef.getTitle());
         assertEquals(3, formDef.getChildren().size());
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
+    }
+
+    @Test public void parsesRangeForm() throws IOException {
+        FormDef formDef = parse("range-form.xml");
+        assertEquals(CONTROL_RANGE, ((QuestionDef) formDef.getChild(0)).getControlType());
     }
 
     private FormDef parse(String formName) throws IOException {

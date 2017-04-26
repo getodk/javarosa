@@ -1,0 +1,23 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml">
+
+    <h:head>
+        <h:title>Form with a Range</h:title>
+        <model>
+            <instance>
+                <stats id="a">
+                    <amount/>
+                    <balance/>
+                </stats>
+            </instance>
+            <bind nodeset="/stats/balance" type="xsd:decimal" />
+        </model>
+    </h:head>
+
+    <h:body>
+        <range ref="/stats/balance" start="-2.0" end="2.0" step="0.5">
+            <label>Balance</label>
+        </range>
+    </h:body>
+
+</h:html>

@@ -151,6 +151,11 @@ public class XFormParser implements IXFormParserFunctions {
                     p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT);
                 }
             });
+            put("range", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE, Arrays.asList("start", "end", "step"));
+                }
+            });
             put("secret", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
                     p.parseControl((IFormElement) parent, e, Constants.CONTROL_SECRET);
