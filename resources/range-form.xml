@@ -6,7 +6,6 @@
         <model>
             <instance>
                 <stats id="a">
-                    <amount/>
                     <balance/>
                 </stats>
             </instance>
