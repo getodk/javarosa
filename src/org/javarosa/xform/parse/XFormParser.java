@@ -153,7 +153,9 @@ public class XFormParser implements IXFormParserFunctions {
             });
             put("range", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE, Arrays.asList("start", "end", "step"));
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE
+                            // ToDo Passing `Arrays.asList("start", "end", "step")` stops warning, but the attributes don’t appear in the form
+                    );
                 }
             });
             put("secret", new IElementHandler() {
