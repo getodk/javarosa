@@ -72,16 +72,17 @@ public class XPathEvalTest extends TestCase {
 
         try {
             Object result = xpe.eval(model, ec);
-            //System.out.println("out: " + result);
 
             if (exceptionExpected) {
                 fail("Expected exception, expression : " + expr);
             } else if ((result instanceof Double && expected instanceof Double)) {
-                if (Math.abs((Double) result - (Double) expected) > 1.0e-12) {
-                    fail("Doubles outside of tolerance");
+                if (! expected.equals(result)) {
+                    System.out.println(String.format("%s result %s differed from expected %s",
+                            expr, result, expected));
                 }
-            } else if (!expected.equals(result)) {
-                fail("Did not get expected result for expression: " + expr);
+                assertEquals((Double) expected, (Double) result, 1e-12);
+            } else {
+                assertEquals(expected, result);
             }
         } catch (XPathException xpex) {
             if (!exceptionExpected) {
@@ -283,6 +284,21 @@ public class XPathEvalTest extends TestCase {
 
         logTestCategory("math functions");
         testEval("abs(-3.5)", null, null, 3.5);
+        testEval("round('14.29123456789', 0)", null, null, 14.0);
+        testEval("round('14.29123456789', 1)", null, null, 14.3);
+        testEval("round('14.29123456789', 1.5)", null, null, 14.3);
+        testEval("round('14.29123456789', 2)", null, null, 14.29);
+        testEval("round('14.29123456789', 3)", null, null, 14.291);
+        testEval("round('14.29123456789', 4)", null, null, 14.2912);
+        testEval("round('12345.14',     1)", null, null, 12345.1);
+        testEval("round('12345.15',     1)", null, null, 12345.2);
+        testEval("round('-12345.14',    1)", null, null, -12345.1);
+        testEval("round('-12345.15',    1)", null, null, -12345.2);
+        testEval("round('12345.12345',  0)", null, null, 12345.0);
+        testEval("round('12345.12345', -1)", null, null, 12350.0);
+        testEval("round('12345.12345', -2)", null, null, 12300.0);
+        testEval("round('12350.12345', -2)", null, null, 12400.0);
+        testEval("round('12345.12345', -3)", null, null, 12000.0);
 
         logTestCategory("strange operators");
         testEval("true() + 8" , null, null, 9.0);
