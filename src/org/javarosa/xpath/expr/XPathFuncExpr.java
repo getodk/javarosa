@@ -55,8 +55,6 @@ import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.NaN;
 import static java.lang.Double.POSITIVE_INFINITY;
 
-import java.lang.Double;
-
 /**
  * Representation of an xpath function expression.
  *
