@@ -16,16 +16,6 @@
 
 package org.javarosa.xpath.expr;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -44,10 +34,26 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
+import org.javarosa.xpath.XPathArityException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
-import org.javarosa.xpath.XPathArityException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static java.lang.Double.NEGATIVE_INFINITY;
+import static java.lang.Double.NaN;
+import static java.lang.Double.POSITIVE_INFINITY;
 
 /**
  * Representation of an xpath function expression.
@@ -190,9 +196,7 @@ public class XPathFuncExpr extends XPathExpression {
             return toInt(argVals[0]);
         } else if (name.equals("round")) { // non-standard Excel-style round(value,decimal place)
             assertArgsCount(name, args, 2);
-            Double aval = toNumeric(argVals[0]);
-            Double bval = toInt(argVals[1]);
-            return round(aval, bval);
+            return round(toNumeric(argVals[0]), toNumeric(argVals[1]).intValue());
         } else if (name.equals("string")) {
             assertArgsCount(name, args, 1);
             return toString(argVals[0]);
@@ -336,6 +340,12 @@ public class XPathFuncExpr extends XPathExpression {
             }
         } else if (name.equals("substr") && (args.length == 2 || args.length == 3)) {
             return substring(argVals[0], argVals[1], args.length == 3 ? argVals[2] : null);
+        } else if (name.equals("contains") && args.length == 2) {
+            return toString(argVals[0]).contains(toString(argVals[1]));
+        } else if (name.equals("starts-with") && args.length == 2) {
+            return toString(argVals[0]).startsWith(toString(argVals[1]));
+        } else if (name.equals("ends-with") && args.length == 2) {
+            return toString(argVals[0]).endsWith(toString(argVals[1]));
         } else if (name.equals("string-length")) {
             assertArgsCount(name, args, 1);
             return stringLength(argVals[0]);
@@ -653,7 +663,7 @@ public class XPathFuncExpr extends XPathExpression {
                 d = Double.parseDouble(s);
                 val = d;
             } catch (NumberFormatException nfe) {
-                val = Double.NaN;
+                val = NaN;
             }
         } else if (o instanceof Date) {
             val = (double) DateUtils.daysSinceEpoch((Date) o);
@@ -1023,59 +1033,33 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * round function like in Excel.
      */
-    private static Double round(double num, double numDecim) {
-        long p=0;
-
-        // rounding doesn't affect special values...
-        if ( num == Double.NaN ||
-             num == Double.NEGATIVE_INFINITY ||
-             num == Double.POSITIVE_INFINITY ) {
-            return num;
+    private static Double round(double number, int numDecimals) {
+        // rounding doesn't affect special values
+        if (number == NaN || number == NEGATIVE_INFINITY || number == POSITIVE_INFINITY) {
+            return number;
         }
 
-        // absurdly large rounding requests yield NaN...
-        if ( numDecim > 30.0 || numDecim < -30.0 ) {
-            return Double.NaN;
+        // absurdly large rounding requests yield NaN
+        if ( numDecimals > 30 || numDecimals < -30 ) {
+            return NaN;
         }
 
-        // ignore fractional numDecim rounding values.
-        // any numDecim that is more than 0.5 is considered "1"
-
-        if ( numDecim < 0.0 ) {
-            // we want to retain 100's or higher value
-            // round( 33.33, 1) = 30.0
-            // divide everything by 10's.
-            while ( numDecim <= -0.5 ) {
-                num /= 10.0;
-                ++p;
-                ++numDecim;
-            }
-        } else {
-            // we want to retain a fractional value
-            // round( 33.33, -1) = 3.3
-            // multiply everything by 10's.
-            while ( numDecim >= 0.5 ) {
-                num *= 10.0;
-                --p;
-                --numDecim;
-            }
+        if (numDecimals >= 0) {
+            final NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setMaximumFractionDigits(numDecimals);
+            nf.setGroupingUsed(false);
+            return Double.valueOf(nf.format(number));
         }
-        // truncate with a 0.5 offset to round to the nearest long...
-        num = (double)((long) (num+0.5));
 
-        // and now restore the number to the appropriate scale.
-        if ( p < 0 ) {
-            while ( p < 0 ) {
-                num /= 10.0;
-                ++p;
-            }
-        } else {
-            while ( p > 0 ) {
-                num *= 10.0;
-                --p;
-            }
-        }
-        return num;
+        // we want to retain 100's or higher value
+        // round(33.33, -1) = 30.0
+        final BigDecimal numScaled = BigDecimal.valueOf(number).scaleByPowerOfTen(numDecimals);
+
+        // round to the nearest long
+        final BigDecimal numRounded = BigDecimal.valueOf((double) ((long) (numScaled.doubleValue() + 0.5)));
+
+        // and now restore the number to the appropriate scale
+        return numRounded.scaleByPowerOfTen(-numDecimals).doubleValue();
     }
 
     /**
@@ -1094,7 +1078,7 @@ public class XPathFuncExpr extends XPathExpression {
                 returnNaN = false;
             }
         }
-        return returnNaN ? Double.NaN : max;
+        return returnNaN ? NaN : max;
     }
 
     private static Object min(Object[] argVals) {
@@ -1107,14 +1091,11 @@ public class XPathFuncExpr extends XPathExpression {
                 returnNaN = false;
             }
         }
-        return returnNaN ? Double.NaN : min;
+        return returnNaN ? NaN : min;
     }
 
     /**
-     * concatenate an abritrary-length argument list of string values together
-     *
-     * @param argVals
-     * @return
+     * concatenate an arbitrary-length argument list of string values together
      */
     public static String join (Object oSep, Object[] argVals) {
         String sep = toString(oSep);

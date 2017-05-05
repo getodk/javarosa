@@ -10,6 +10,7 @@ import java.io.IOException;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.junit.Assert.assertEquals;
 
+
 public class XFormParserTest {
     @Test public void parsesSimpleForm() throws IOException {
         FormDef formDef = parse("simple-form.xml");
