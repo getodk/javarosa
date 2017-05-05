@@ -2,9 +2,12 @@ package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.FormDef;
 import org.junit.Test;
+
+import java.io.FileReader;
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
-import java.io.*;
 
 public class XFormParserTest {
     @Test public void parsesSimpleForm() throws IOException {
