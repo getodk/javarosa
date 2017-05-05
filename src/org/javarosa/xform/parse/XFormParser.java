@@ -16,8 +16,17 @@
 
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.*;
+import org.javarosa.core.model.Action;
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataBinding;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.instance.*;
 import org.javarosa.core.model.instance.utils.ExternalDataInstance;
@@ -50,10 +59,27 @@ import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
-import static org.javarosa.xform.parse.Constants.*;
+import static org.javarosa.xform.parse.Constants.ID_ATTR;
+import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
+import static org.javarosa.xform.parse.Constants.SELECT;
+import static org.javarosa.xform.parse.Constants.SELECTONE;
+
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
