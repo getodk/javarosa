@@ -342,6 +342,12 @@ public class XPathFuncExpr extends XPathExpression {
             }
         } else if (name.equals("substr") && (args.length == 2 || args.length == 3)) {
             return substring(argVals[0], argVals[1], args.length == 3 ? argVals[2] : null);
+        } else if (name.equals("contains") && args.length == 2) {
+            return toString(argVals[0]).contains(toString(argVals[1]));
+        } else if (name.equals("starts-with") && args.length == 2) {
+            return toString(argVals[0]).startsWith(toString(argVals[1]));
+        } else if (name.equals("ends-with") && args.length == 2) {
+            return toString(argVals[0]).endsWith(toString(argVals[1]));
         } else if (name.equals("string-length")) {
             assertArgsCount(name, args, 1);
             return stringLength(argVals[0]);
@@ -1091,10 +1097,7 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * concatenate an abritrary-length argument list of string values together
-     *
-     * @param argVals
-     * @return
+     * concatenate an arbitrary-length argument list of string values together
      */
     public static String join (Object oSep, Object[] argVals) {
         String sep = toString(oSep);
