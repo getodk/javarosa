@@ -3,7 +3,22 @@ package org.javarosa.xform.parse;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.javarosa.core.model.Constants.*;
+import static org.javarosa.core.model.Constants.DATATYPE_BARCODE;
+import static org.javarosa.core.model.Constants.DATATYPE_BINARY;
+import static org.javarosa.core.model.Constants.DATATYPE_BOOLEAN;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST;
+import static org.javarosa.core.model.Constants.DATATYPE_DATE;
+import static org.javarosa.core.model.Constants.DATATYPE_DATE_TIME;
+import static org.javarosa.core.model.Constants.DATATYPE_DECIMAL;
+import static org.javarosa.core.model.Constants.DATATYPE_GEOPOINT;
+import static org.javarosa.core.model.Constants.DATATYPE_GEOSHAPE;
+import static org.javarosa.core.model.Constants.DATATYPE_GEOTRACE;
+import static org.javarosa.core.model.Constants.DATATYPE_INTEGER;
+import static org.javarosa.core.model.Constants.DATATYPE_LONG;
+import static org.javarosa.core.model.Constants.DATATYPE_TEXT;
+import static org.javarosa.core.model.Constants.DATATYPE_TIME;
+import static org.javarosa.core.model.Constants.DATATYPE_UNSUPPORTED;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
 
