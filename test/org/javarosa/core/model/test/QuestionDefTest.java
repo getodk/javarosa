@@ -24,11 +24,9 @@ import java.util.ArrayList;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormElementStateListener;
-import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.Reference;
@@ -37,12 +35,9 @@ import org.javarosa.core.reference.ResourceReferenceFactory;
 import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
 
 public class QuestionDefTest extends TestCase {
@@ -243,10 +238,10 @@ public class QuestionDefTest extends TestCase {
 		String audioURI = fep.getAudioText();
 		String ref;
 		
-		ReferenceManager._().addReferenceFactory(new ResourceReferenceFactory());
-		ReferenceManager._().addRootTranslator(new RootTranslator("jr://audio/", "jr://resource/"));
+		ReferenceManager.instance().addReferenceFactory(new ResourceReferenceFactory());
+		ReferenceManager.instance().addRootTranslator(new RootTranslator("jr://audio/", "jr://resource/"));
 		try{
-			Reference r = ReferenceManager._().DeriveReference(audioURI);
+			Reference r = ReferenceManager.instance().DeriveReference(audioURI);
 			ref = r.getURI();
 			if(!ref.equals("jr://resource/hah.mp3")){
 				fail("Root translation failed.");
@@ -257,12 +252,12 @@ public class QuestionDefTest extends TestCase {
 		}
 		
 		
-		ReferenceManager._().addRootTranslator(new RootTranslator("jr://images/","jr://resource/"));
+		ReferenceManager.instance().addRootTranslator(new RootTranslator("jr://images/","jr://resource/"));
 		q = fpi.getNextQuestion();
 		fep = fpi.getFormEntryModel().getQuestionPrompt();
 		String imURI = fep.getImageText();
 		try{
-			Reference r = ReferenceManager._().DeriveReference(imURI);
+			Reference r = ReferenceManager.instance().DeriveReference(imURI);
 			ref = r.getURI();
 			if(!ref.equals("jr://resource/four.gif")){
 				fail("Root translation failed.");

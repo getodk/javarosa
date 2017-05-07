@@ -81,7 +81,7 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
 	 */
 	public Reference derive(String URI, String context) throws InvalidReferenceException {
 		String referenceURI = context.substring(0,context.lastIndexOf('/') + 1) + URI;
-		return ReferenceManager._().DeriveReference(referenceURI);
+		return ReferenceManager.instance().DeriveReference(referenceURI);
 	}
 
 	/* (non-Javadoc)

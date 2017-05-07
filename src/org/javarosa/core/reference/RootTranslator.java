@@ -56,14 +56,14 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
 	 * @see org.commcare.reference.Root#derive(java.lang.String)
 	 */
 	public Reference derive(String URI) throws InvalidReferenceException {
-		return ReferenceManager._().DeriveReference(translatedPrefix + URI.substring(prefix.length()));
+		return ReferenceManager.instance().DeriveReference(translatedPrefix + URI.substring(prefix.length()));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.commcare.reference.Root#derive(java.lang.String, java.lang.String)
 	 */
 	public Reference derive(String URI, String context) throws InvalidReferenceException {
-		return ReferenceManager._().DeriveReference(URI, translatedPrefix + context.substring(prefix.length()));
+		return ReferenceManager.instance().DeriveReference(URI, translatedPrefix + context.substring(prefix.length()));
 	}
 
 	/* (non-Javadoc)

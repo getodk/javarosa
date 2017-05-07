@@ -40,6 +40,6 @@ public class JavaRosaCoreModule implements IModule {
 				"org.javarosa.core.services.locale.TableLocaleSource"
 		};		
 		PrototypeManager.registerPrototypes(classes);
-		ReferenceManager._().addReferenceFactory(new ResourceReferenceFactory());
+		ReferenceManager.instance().addReferenceFactory(new ResourceReferenceFactory());
 	}
 }
