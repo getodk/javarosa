@@ -10,6 +10,7 @@ public class ExternalDataInstance extends DataInstance {
 
     public ExternalDataInstance(String srcLocation, String instanceid) {
         super(instanceid);
+        setName(instanceid);
         this.srcLocation = srcLocation;
     }
 
