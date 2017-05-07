@@ -199,18 +199,21 @@ public class EvaluationContext {
 		}
 
 		List<TreeReference> treeReferences = new ArrayList<TreeReference>(1);
-		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), treeReferences, includeTemplates);
+		expandReferenceAccumulator(ref, baseInstance, baseInstance.getRoot().getRef(), treeReferences, includeTemplates);
 		return treeReferences;
 	}
 
-	// recursive helper function for expandReference
-	// sourceRef: original path we're matching against
-	// node: current node that has matched the sourceRef thus far
-	// workingRef: explicit path that refers to the current node
-	// refs: List to collect matching paths; if 'node' is a target node that
-	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef, DataInstance instance, TreeReference workingRef,
-                                 List<TreeReference> refs, boolean includeTemplates) {
+    /**
+     * Recursively performs the search for all repeated nodes that match the pattern of the 'ref' argument.
+     *
+     * @param sourceRef      original path we're matching against
+     * @param instance       original node obtained from sourceRef
+     * @param workingRef     explicit path that refers to the current node
+     * @param refs           accumulator List to collect matching paths.
+     */
+	private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance instance,
+                                            TreeReference workingRef, List<TreeReference> refs,
+                                            boolean includeTemplates) {
 		final int depth = workingRef.size();
         List<XPathExpression> predicates;
 
@@ -307,7 +310,7 @@ public class EvaluationContext {
 			}
 
 			for (TreeReference treeRef : treeReferences) {
-				expandReference(sourceRef, instance, treeRef, refs, includeTemplates);
+				expandReferenceAccumulator(sourceRef, instance, treeRef, refs, includeTemplates);
 			}
 		}
 	}
