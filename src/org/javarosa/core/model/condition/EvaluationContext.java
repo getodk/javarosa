@@ -162,20 +162,14 @@ public class EvaluationContext {
 
 		//Some datatypes can be trivially converted to a first order
 		//xpath datatype
-		if(value instanceof Integer) {
-			variables.put(name, new Double(((Integer)value).doubleValue()));
-			return;
-		}
-		if(value instanceof Float) {
-			variables.put(name, new Double(((Float)value).doubleValue()));
-			return;
-		}
-
-		//Otherwise we just hope for the best, I suppose? Should we log this?
-		else {
-			variables.put(name, value);
-		}
-	}
+        if (value instanceof Integer) {
+            variables.put(name, ((Integer) value).doubleValue());
+        } else if (value instanceof Float) {
+            variables.put(name, ((Float) value).doubleValue());
+        } else { //Otherwise we just hope for the best, I suppose? Should we log this?
+            variables.put(name, value);
+        }
+    }
 
 	public Object getVariable(String name) {
 		return variables.get(name);
@@ -240,7 +234,7 @@ public class EvaluationContext {
 			}
 			//ETHERTON: Is this where we should test for predicates?
             final int mult = sourceRef.getMultiplicity(depth);
-			final List<TreeReference> set = new ArrayList<TreeReference>(1);
+			final List<TreeReference> treeReferences = new ArrayList<TreeReference>(1);
 
             final AbstractTreeElement node = instance.resolveReference(workingRef);
 
@@ -253,12 +247,12 @@ public class EvaluationContext {
 						if (child.getMultiplicity() != i) {
 							throw new IllegalStateException("Unexpected multiplicity mismatch");
 						}
-    					set.add(child.getRef());
+    					treeReferences.add(child.getRef());
 					}
 					if (includeTemplates) {
 						AbstractTreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
 						if (template != null) {
-							set.add(template.getRef());
+							treeReferences.add(template.getRef());
 						}
 					}
 				} else if (mult != TreeReference.INDEX_ATTRIBUTE) {
@@ -267,7 +261,7 @@ public class EvaluationContext {
 					//the appropriate child
 					AbstractTreeElement child = node.getChild(name, mult);
 					if (child != null) {
-						set.add(child.getRef());
+						treeReferences.add(child.getRef());
 					}
 				}
 			}
@@ -275,21 +269,21 @@ public class EvaluationContext {
 			if (mult == TreeReference.INDEX_ATTRIBUTE) {
 				AbstractTreeElement attribute = node.getAttribute(null, name);
 				if (attribute != null) {
-					set.add(attribute.getRef());
+					treeReferences.add(attribute.getRef());
 				}
 			}
 
 			if (predicates != null && predicateEvaluationProgress != null) {
-				predicateEvaluationProgress[1] += set.size();
+				predicateEvaluationProgress[1] += treeReferences.size();
 			}
 
 			if (predicates != null) {
 				boolean firstTime = true;
-				List<TreeReference> passed = new ArrayList<TreeReference>(set.size());
+				List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
 				for (XPathExpression xpe : predicates) {
-					for (int i = 0; i < set.size(); ++i) {
+					for (int i = 0; i < treeReferences.size(); ++i) {
 						//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-						TreeReference treeRef = set.get(i);
+						TreeReference treeRef = treeReferences.get(i);
 
 						//test the predicate on the treeElement
 						EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
@@ -302,8 +296,8 @@ public class EvaluationContext {
 						}
 					}
 					firstTime = false;
-					set.clear();
-					set.addAll(passed);
+					treeReferences.clear();
+					treeReferences.addAll(passed);
 					passed.clear();
 
 					if (predicateEvaluationProgress != null) {
@@ -312,7 +306,7 @@ public class EvaluationContext {
 				}
 			}
 
-			for (TreeReference treeRef : set) {
+			for (TreeReference treeRef : treeReferences) {
 				expandReference(sourceRef, instance, treeRef, refs, includeTemplates);
 			}
 		}
