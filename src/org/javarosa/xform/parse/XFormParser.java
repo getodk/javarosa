@@ -25,6 +25,7 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
@@ -80,6 +81,7 @@ import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
@@ -179,8 +181,8 @@ public class XFormParser implements IXFormParserFunctions {
             });
             put("range", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE
-                            // ToDo Passing `Arrays.asList("start", "end", "step")` stops warning, but the attributes don’t appear in the form
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE,
+                            Arrays.asList("start", "end", "step") // Prevent warning about unexpected attributes
                     );
                 }
             });
@@ -862,7 +864,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     protected QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
-        QuestionDef question = new QuestionDef();
+        final QuestionDef question = questionForControlType(controlType);
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
         final List<String> usedAtts = new ArrayList<>(Arrays.asList(REF_ATTR, BIND_ATTR, APPEARANCE_ATTR));
@@ -939,11 +941,19 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
+        if (question instanceof RangeQuestion) {
+            populateQuestionWithRangeAttributes((RangeQuestion) question, e);
+        }
+
         parent.addChild(question);
 
         processAdditionalAttributes(question, e, usedAtts);
 
         return question;
+    }
+
+    private QuestionDef questionForControlType(int controlType) {
+        return controlType == Constants.CONTROL_RANGE ? new RangeQuestion() : new QuestionDef();
     }
 
     private void parseQuestionLabel (QuestionDef q, Element e) {
