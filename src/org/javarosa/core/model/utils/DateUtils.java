@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
 
+import org.joda.time.LocalDateTime;
+
 /**
  * Static utility methods for Dates in j2me
  *
@@ -114,19 +116,16 @@ public class DateUtils {
 	}
 
 	public static Date getDate (DateFields f, String timezone) {
-		Calendar cd = Calendar.getInstance();
-		if(timezone != null) {
-			cd.setTimeZone(TimeZone.getTimeZone(timezone));
-		}
-		cd.set(Calendar.YEAR, f.year);
-		cd.set(Calendar.MONTH, f.month - MONTH_OFFSET);
-		cd.set(Calendar.DAY_OF_MONTH, f.day);
-		cd.set(Calendar.HOUR_OF_DAY, f.hour);
-		cd.set(Calendar.MINUTE, f.minute);
-		cd.set(Calendar.SECOND, f.second);
-		cd.set(Calendar.MILLISECOND, f.secTicks);
+		LocalDateTime ldt = new LocalDateTime()
+				.withYear(f.year)
+				.withMonthOfYear(f.month)
+				.withDayOfMonth(f.day)
+				.withHourOfDay(f.hour)
+				.withMinuteOfHour(f.minute)
+				.withSecondOfMinute(f.second)
+				.withMillisOfSecond(f.secTicks);
 
-		return cd.getTime();
+		return timezone == null ? ldt.toDate() : ldt.toDate(TimeZone.getTimeZone(timezone));
 	}
 
 	/* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
