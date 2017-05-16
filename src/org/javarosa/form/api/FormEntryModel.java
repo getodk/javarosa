@@ -281,8 +281,7 @@ public class FormEntryModel {
         if (!currentFormIndex.equals(index)) {
             // See if a hint exists that says we should have a model for this
             // already
-            createModelIfNecessary(index);
-            currentFormIndex = index;
+            currentFormIndex = createModelIfNecessary(index);
         }
     }
 
@@ -425,7 +424,9 @@ public class FormEntryModel {
 
 
     /**
-     * For the current index: Checks whether the index represents a node which
+     * For the current index:
+     *
+     * 1. Checks whether the index represents a node which
      * should exist given a non-interactive repeat, along with a count for that
      * repeat which is beneath the dynamic level specified.
      *
@@ -437,10 +438,16 @@ public class FormEntryModel {
      * the interface, it will merely use the xforms repeat hint to create new
      * nodes that are assumed to exist
      *
+     * 2. Checks whether the index represents a node which should have been deleted because
+     * the count for that repeat had been changed to a lower value.
+     * If this index does represent such a node, this and all further extraneous
+     * repeat groups are deleted and it returns the first index after the last deleted repeat group.
+     *
      * @param index The index to be evaluated as to whether the underlying model is
      *        hinted to exist
+     * @return The current index after the model update
      */
-    private void createModelIfNecessary(FormIndex index) {
+    private FormIndex createModelIfNecessary(FormIndex index) {
         if (index.isInForm()) {
             IFormElement e = getForm().getChild(index);
             if (e instanceof GroupDef) {
@@ -454,23 +461,43 @@ public class FormEntryModel {
                         long fullcount = ((Integer) count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);
                         TreeElement element = getForm().getMainInstance().resolveReference(ref);
-                        if (element == null) {
-                            if (index.getTerminal().getInstanceIndex() < fullcount) {
-
-                              try {
+                        int currentInstanceIndex = index.getTerminal().getInstanceIndex();
+                        if (currentInstanceIndex < fullcount && element == null) {
+                            try {
                                 getForm().createNewRepeat(index);
-                              } catch (InvalidReferenceException ire) {
+                            } catch (InvalidReferenceException ire) {
                                 ire.printStackTrace();
                                 throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
-                              }
                             }
+                        } else if (currentInstanceIndex >= fullcount && element != null) {
+                            /*
+                             *  Delete the excessive repeat groups.
+                             *
+                             *  When a repeat group is deleted then all the following groups are shifted to fill the gap.
+                             *  Example:
+                             *  There are 6 repeat groups and the 4th is deleted.
+                             *  The 5th becomes the 4th and the 6th becomes the 5th. The index still points to
+                             *  the 4th repeat group which used to be the 5th so the form element represented by
+                             *  the index still exists.
+                             *
+                             *  The loop keeps deleting repeat groups pointed by the index
+                             *  (so in the above example it would be the 4th) till the last one is deleted.
+                             */
+                            do {
+                                getForm().deleteRepeat(index);
+                            } while (getForm().getMainInstance().resolveReference(index.getReference()) != null);
+
+                            /* At this moment index points to a non-existing repeat group so we must
+                             * leave it by stepping to the next form index.
+                             */
+                            return incrementIndex(index);
                         }
                     }
                 }
             }
         }
+        return index;
     }
-
 
     public boolean isIndexCompoundContainer() {
     	return isIndexCompoundContainer(getFormIndex());

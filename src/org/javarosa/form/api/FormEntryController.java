@@ -208,7 +208,7 @@ public class FormEntryController {
      */
     public int jumpToIndex(FormIndex index) {
         model.setQuestionIndex(index);
-        return model.getEvent(index);
+        return model.getEvent(model.getFormIndex());
     }
 
     public FormIndex descendIntoRepeat (int n) {
