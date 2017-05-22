@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 public class ExternalDataInstance extends DataInstance {
     private final String srcLocation;
@@ -26,7 +25,7 @@ public class ExternalDataInstance extends DataInstance {
         Document doc = new Document();
         try {
             URI uri = new URI(srcLocation);
-            if (Objects.equals(uri.getScheme(), "jr") && Objects.equals(uri.getHost(), "file")) {
+            if ("jr".equals(uri.getScheme()) && "file".equals(uri.getHost())) {
                 KXmlParser parser = new KXmlParser();
                 final String absolutePath = /* ToDo: find out how to get the actual location */
                         System.getProperty("user.dir") + "/resources" + uri.getPath();
