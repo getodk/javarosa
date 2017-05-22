@@ -1,4 +1,4 @@
-package org.javarosa.core.model.instance.utils;
+package org.javarosa.core.model.instance;
 
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
