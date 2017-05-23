@@ -29,11 +29,13 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
 
-/* a collection of objects that affect the evaluation of an expression, like function handlers
- * and (not supported) variable bindings
+/**
+ * A collection of objects that affect the evaluation of an expression, like
+ * function handlers and (not supported) variable bindings.
  */
 public class EvaluationContext {
-	private TreeReference contextNode; //unambiguous ref used as the anchor for relative paths
+    /** Unambiguous anchor reference for relative paths */
+	private TreeReference contextNode;
 	private HashMap<String, IFunctionHandler> functionHandlers;
 	private HashMap<String, Object> variables;
 
@@ -47,10 +49,14 @@ public class EvaluationContext {
 	private HashMap<String, DataInstance> formInstances;
 
 	private TreeReference original;
+    /**
+     * What element in a nodeset the context is currently pointing to.
+     * Used for calculating the position() xpath function.
+     */
 	private int currentContextPosition = -1;
 
-	DataInstance instance;
-	int[] predicateEvaluationProgress;
+	private DataInstance instance;
+	private int[] predicateEvaluationProgress;
 
 	/** Copy Constructor **/
 	private EvaluationContext (EvaluationContext base) {
@@ -145,13 +151,13 @@ public class EvaluationContext {
 	public void setVariable(String name, Object value) {
 		//No such thing as a null xpath variable. Empty
 		//values in XPath just get converted to ""
-		if(value == null) {
+		if (value == null) {
 			variables.put(name, "");
 			return;
 		}
 		//Otherwise check whether the value is one of the normal first
 		//order datatypes used in xpath evaluation
-		if(value instanceof Boolean ||
+		if (value instanceof Boolean ||
 				   value instanceof Double  ||
 				   value instanceof String  ||
 				   value instanceof Date    ||
@@ -179,13 +185,20 @@ public class EvaluationContext {
 		return expandReference(ref, false);
 	}
 
-	// take in a potentially-ambiguous ref, and return a List of refs for all nodes that match the passed-in ref
-	// meaning, search out all repeated nodes that match the pattern of the passed-in ref
-	// every ref in the returned List will be unambiguous (no index will ever be INDEX_UNBOUND)
-	// does not return template nodes when matching INDEX_UNBOUND, but will match templates when INDEX_TEMPLATE is explicitly set
-	// return null if ref is relative, otherwise return List of refs (but list will be empty is no refs match)
-	// '/' returns {'/'}
-	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
+	/**
+	 * Searches for all repeated nodes that match the pattern of the 'ref'
+	 * argument.
+	 *
+	 * '/' returns {'/'}
+	 * can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
+	 *
+	 * @param ref Potentially ambiguous reference
+	 * @return Null if 'ref' is relative reference. Otherwise, returns a vector
+	 * of references that point to nodes that match 'ref' argument. These
+	 * references are unambiguous (no index will ever be INDEX_UNBOUND). Template
+	 * nodes won't be included when matching INDEX_UNBOUND, but will be when
+	 * INDEX_TEMPLATE is explicitly set.
+	 */
 	public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
 		if (!ref.isAbsolute()) {
 			return null;
@@ -198,7 +211,7 @@ public class EvaluationContext {
                     ", no appropriate instance in evaluation context");
 		}
 
-		List<TreeReference> treeReferences = new ArrayList<TreeReference>(1);
+		List<TreeReference> treeReferences = new ArrayList<>(1);
 		TreeReference workingRef = baseInstance.getRoot().getRef();
 		expandReferenceAccumulator(ref, baseInstance, workingRef, treeReferences, includeTemplates);
 		return treeReferences;
