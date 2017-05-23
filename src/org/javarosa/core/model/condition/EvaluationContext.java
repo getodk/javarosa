@@ -199,7 +199,8 @@ public class EvaluationContext {
 		}
 
 		List<TreeReference> treeReferences = new ArrayList<TreeReference>(1);
-		expandReferenceAccumulator(ref, baseInstance, baseInstance.getRoot().getRef(), treeReferences, includeTemplates);
+		TreeReference workingRef = baseInstance.getRoot().getRef();
+		expandReferenceAccumulator(ref, baseInstance, workingRef, treeReferences, includeTemplates);
 		return treeReferences;
 	}
 

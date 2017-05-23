@@ -15,16 +15,17 @@ import java.net.URISyntaxException;
 public class ExternalDataInstance extends DataInstance {
     private TreeElement root;
 
-    public ExternalDataInstance(String srcLocation, String instanceid) {
-        super(instanceid);
-        setName(instanceid);
+    public ExternalDataInstance(String srcLocation, String instanceId) {
+        super(instanceId);
+        setName(instanceId);
         try {
             URI uri = new URI(srcLocation);
             if ("jr".equals(uri.getScheme()) && "file".equals(uri.getHost())) {
-                final String absolutePath = /* ToDo: find out how to get the actual location */
+                String absolutePath = /* ToDo: find out how to get the actual location */
                         System.getProperty("user.dir") + "/resources" + uri.getPath();
-                KXmlParser baseParser = ElementParser.instantiateParser(new FileInputStream(absolutePath));
-                root = new TreeElementParser(baseParser, 0, instanceid).parse();
+                KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(absolutePath));
+                TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
+                root = treeElementParser.parse();
             }
         } catch (XmlPullParserException | IOException | URISyntaxException | UnfullfilledRequirementsException |
                 InvalidStructureException e) {
