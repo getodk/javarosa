@@ -19,7 +19,6 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +31,30 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathExpression;
 
-public class TreeReference implements Externalizable, Serializable {
-	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
-	public static final int INDEX_UNBOUND = -1;//multiplicity
-	public static final int INDEX_TEMPLATE = -2;//multiplicity
+public class TreeReference implements Externalizable {
+    /**
+     * Multiplicity demarcates the position of a given element with respect to other elements
+     * of the same name.
+     *
+     * Since users usually want to select the first instance from the nodeset
+     * returned from a reference query, let the default multiplicity be selecting the first node.
+     */
+    public static final int DEFAULT_MUTLIPLICITY = 0;
+
+    /** Refers to all instances of an element, e.g. /data/b[-1] refers to b[0] and b[1] */
+    public static final int INDEX_UNBOUND = -1;
+
+    /**
+     * 'repeats' (sections of a form that can multiply themselves) are populated with a
+     * template that never exists in the form (IE: If you serialized the form to XML
+     * it wouldn't be there) but provides the xml structure that should be replicated
+     * when a 'repeat' is added
+     */
+    public static final int INDEX_TEMPLATE = -2;
+
+    /** Multiplicity flag for an attribute */
 	public static final int INDEX_ATTRIBUTE = -4;//multiplicity flag for an attribute
+
 	public static final int INDEX_REPEAT_JUNCTURE = -10;
 
 	//TODO: Roll these into RefLevel? Or more likely, take absolute
@@ -51,7 +69,8 @@ public class TreeReference implements Externalizable, Serializable {
 
 	public static final String NAME_WILDCARD = "*";
 
-	private int refLevel; //0 = context node, 1 = parent, 2 = grandparent ...
+	/** 0 = context node, 1 = parent, 2 = grandparent ... */
+	private int refLevel;
 	private int contextType;
 	private String instanceName = null;
 	private List<TreeReferenceLevel> data = null;
@@ -159,7 +178,8 @@ public class TreeReference implements Externalizable, Serializable {
 	}
 
 	//return a copy of the ref
-	public TreeReference clone () {
+	@Override
+    public TreeReference clone () {
 		TreeReference newRef = new TreeReference();
 		newRef.setRefLevel(this.refLevel);
 
@@ -276,7 +296,7 @@ public class TreeReference implements Externalizable, Serializable {
 		// unclear...
 		newRef.setContext(contextRef.getContext());
 
-		//apply multiplicites and fill in wildcards as necessary based on the context ref
+		//apply multiplicities and fill in wildcards as necessary based on the context ref
 		for (int i = 0; i < contextRef.size() && i < newRef.size(); i++) {
 
 			//If the the contextRef can provide a definition for a wildcard, do so
@@ -372,8 +392,8 @@ public class TreeReference implements Externalizable, Serializable {
 					int multA = this.getMultiplicity(i);
 					int multB = ref.getMultiplicity(i);
 
-               List<XPathExpression> predA = this.getPredicate(i);
-               List<XPathExpression> predB = ref.getPredicate(i);
+                    List<XPathExpression> predA = this.getPredicate(i);
+                    List<XPathExpression> predB = ref.getPredicate(i);
 
 					if (!nameA.equals(nameB)) {
 						return false;
@@ -437,8 +457,7 @@ public class TreeReference implements Externalizable, Serializable {
 
 	public String toString (boolean includePredicates) {
 		StringBuilder sb = new StringBuilder();
-		if(instanceName != null)
-		{
+		if(instanceName != null) {
 			sb.append("instance("+instanceName+")");
 		} else if(contextType == CONTEXT_ORIGINAL) {
 			sb.append("current()");
@@ -503,7 +522,8 @@ public class TreeReference implements Externalizable, Serializable {
 		return getNameLast() + " [" + sb.toString() + "]";
 	}
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	@Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		refLevel = ExtUtil.readInt(in);
 		instanceName = (String)ExtUtil.read(in, new ExtWrapNullable(String.class),pf);
@@ -515,7 +535,8 @@ public class TreeReference implements Externalizable, Serializable {
 		}
 	}
 
-	public void writeExternal(DataOutputStream out) throws IOException {
+	@Override
+    public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, refLevel);
 		ExtUtil.write(out, new ExtWrapNullable(instanceName));
 		ExtUtil.writeNumeric(out, contextType);
