@@ -308,7 +308,7 @@ public class DateUtils {
 		DateFields fields = new DateFields();
 		int i = str.indexOf("T");
 		if (i != -1) {
-			if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
+			if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields, true)) {
 				return null;
 			}
 		} else {
@@ -329,7 +329,7 @@ public class DateUtils {
 
 	public static Date parseTime (String str) {
 		DateFields fields = new DateFields();
-		if (!parseTime(str, fields)) {
+		if (!parseTime(str, fields, false)) {
 			return null;
 		}
 		// time zone may wrap time across midnight. Clear that.
@@ -355,7 +355,7 @@ public class DateUtils {
 		return f.check();
 	}
 
-	private static boolean parseTime (String timeStr, DateFields f) {
+	private static boolean parseTime (String timeStr, DateFields f, boolean isDateTime) {
 		//get timezone information first. Make a Datefields set for the possible offset
 		//NOTE: DO NOT DO DIRECT COMPUTATIONS AGAINST THIS. It's a holder for hour/minute
 		//data only, but has data in other fields
@@ -405,8 +405,8 @@ public class DateUtils {
 			return false;
 		}
 
-		//Time is good, if there was no timezone info, just return that;
-		if(timeOffset == null) {
+		//Time is good, if there was no timezone info or it's only time, just return that;
+		if(timeOffset == null || !isDateTime) {
 			return true;
 		}
 
