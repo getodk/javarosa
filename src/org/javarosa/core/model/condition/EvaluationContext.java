@@ -222,112 +222,111 @@ public class EvaluationContext {
      * Recursively performs the search for all repeated nodes that match the pattern of the 'ref' argument.
      *
      * @param sourceRef      original path we're matching against
-     * @param instance       original node obtained from sourceRef
+     * @param sourceInstance original node obtained from sourceRef
      * @param workingRef     explicit path that refers to the current node
      * @param refs           accumulator List to collect matching paths.
      */
-	private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance instance,
+	private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance sourceInstance,
                                             TreeReference workingRef, List<TreeReference> refs,
                                             boolean includeTemplates) {
 		final int depth = workingRef.size();
-        List<XPathExpression> predicates;
 
 		//check to see if we've matched fully
 		if (depth == sourceRef.size()) {
 			//TODO: Do we need to clone these references?
 			refs.add(workingRef);
-		} else {
-			//Otherwise, need to get the next set of matching references
-
-			String name = sourceRef.getName(depth);
-			predicates = sourceRef.getPredicate(depth);
-
-			//Copy predicates for batch fetch
-			if (predicates != null) {
-				List<XPathExpression> predCopy = new ArrayList<XPathExpression>(predicates.size());
-				for (XPathExpression xpe : predicates) {
-					predCopy.add(xpe);
-				}
-				predicates = predCopy;
-			}
-			//ETHERTON: Is this where we should test for predicates?
-            final int mult = sourceRef.getMultiplicity(depth);
-			final List<TreeReference> treeReferences = new ArrayList<>(1);
-
-            final AbstractTreeElement node = instance.resolveReference(workingRef);
-
-			if (node.getNumChildren() > 0) {
-				if (mult == TreeReference.INDEX_UNBOUND) {
-                    final List<TreeElement> childrenWithName = node.getChildrenWithName(name);
-                    final int count = childrenWithName.size();
-					for (int i = 0; i < count; i++) {
-						TreeElement child = childrenWithName.get(i);
-						if (child.getMultiplicity() != i) {
-							throw new IllegalStateException("Unexpected multiplicity mismatch");
-						}
-    					treeReferences.add(child.getRef());
-					}
-					if (includeTemplates) {
-						AbstractTreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-						if (template != null) {
-							treeReferences.add(template.getRef());
-						}
-					}
-				} else if (mult != TreeReference.INDEX_ATTRIBUTE) {
-					//TODO: Make this test mult >= 0?
-					//If the multiplicity is a simple integer, just get
-					//the appropriate child
-					AbstractTreeElement child = node.getChild(name, mult);
-					if (child != null) {
-						treeReferences.add(child.getRef());
-					}
-				}
-			}
-
-			if (mult == TreeReference.INDEX_ATTRIBUTE) {
-				AbstractTreeElement attribute = node.getAttribute(null, name);
-				if (attribute != null) {
-					treeReferences.add(attribute.getRef());
-				}
-			}
-
-			if (predicates != null && predicateEvaluationProgress != null) {
-				predicateEvaluationProgress[1] += treeReferences.size();
-			}
-
-			if (predicates != null) {
-				boolean firstTime = true;
-				List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
-				for (XPathExpression xpe : predicates) {
-					for (int i = 0; i < treeReferences.size(); ++i) {
-						//if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-						TreeReference treeRef = treeReferences.get(i);
-
-						//test the predicate on the treeElement
-						EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
-						Object o = xpe.eval(instance, evalContext);
-						if (o instanceof Boolean) {
-							boolean testOutcome = (Boolean) o;
-							if (testOutcome) {
-								passed.add(treeRef);
-							}
-						}
-					}
-					firstTime = false;
-					treeReferences.clear();
-					treeReferences.addAll(passed);
-					passed.clear();
-
-					if (predicateEvaluationProgress != null) {
-						predicateEvaluationProgress[0]++;
-					}
-				}
-			}
-
-			for (TreeReference treeRef : treeReferences) {
-				expandReferenceAccumulator(sourceRef, instance, treeRef, refs, includeTemplates);
-			}
+			return;
 		}
+
+        // Get the next set of matching references
+        final String name = sourceRef.getName(depth);
+        List<XPathExpression> predicates = sourceRef.getPredicate(depth);
+
+        // Copy predicates for batch fetch
+        if (predicates != null) {
+            List<XPathExpression> predCopy = new ArrayList<XPathExpression>(predicates.size());
+            for (XPathExpression xpe : predicates) {
+                predCopy.add(xpe);
+            }
+            predicates = predCopy;
+        }
+        //ETHERTON: Is this where we should test for predicates?
+        final int mult = sourceRef.getMultiplicity(depth);
+        final List<TreeReference> treeReferences = new ArrayList<>(1);
+
+        final AbstractTreeElement node = sourceInstance.resolveReference(workingRef);
+
+        if (node.getNumChildren() > 0) {
+            if (mult == TreeReference.INDEX_UNBOUND) {
+                final List<TreeElement> childrenWithName = node.getChildrenWithName(name);
+                final int count = childrenWithName.size();
+                for (int i = 0; i < count; i++) {
+                    TreeElement child = childrenWithName.get(i);
+                    if (child.getMultiplicity() != i) {
+                        throw new IllegalStateException("Unexpected multiplicity mismatch");
+                    }
+                    treeReferences.add(child.getRef());
+                }
+                if (includeTemplates) {
+                    AbstractTreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
+                    if (template != null) {
+                        treeReferences.add(template.getRef());
+                    }
+                }
+            } else if (mult != TreeReference.INDEX_ATTRIBUTE) {
+                //TODO: Make this test mult >= 0?
+                //If the multiplicity is a simple integer, just get
+                //the appropriate child
+                AbstractTreeElement child = node.getChild(name, mult);
+                if (child != null) {
+                    treeReferences.add(child.getRef());
+                }
+            }
+        }
+
+        if (mult == TreeReference.INDEX_ATTRIBUTE) {
+            AbstractTreeElement attribute = node.getAttribute(null, name);
+            if (attribute != null) {
+                treeReferences.add(attribute.getRef());
+            }
+        }
+
+        if (predicates != null && predicateEvaluationProgress != null) {
+            predicateEvaluationProgress[1] += treeReferences.size();
+        }
+
+        if (predicates != null) {
+            boolean firstTime = true;
+            List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
+            for (XPathExpression xpe : predicates) {
+                for (int i = 0; i < treeReferences.size(); ++i) {
+                    //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+                    TreeReference treeRef = treeReferences.get(i);
+
+                    //test the predicate on the treeElement
+                    EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
+                    Object o = xpe.eval(sourceInstance, evalContext);
+                    if (o instanceof Boolean) {
+                        boolean testOutcome = (Boolean) o;
+                        if (testOutcome) {
+                            passed.add(treeRef);
+                        }
+                    }
+                }
+                firstTime = false;
+                treeReferences.clear();
+                treeReferences.addAll(passed);
+                passed.clear();
+
+                if (predicateEvaluationProgress != null) {
+                    predicateEvaluationProgress[0]++;
+                }
+            }
+        }
+
+        for (TreeReference treeRef : treeReferences) {
+            expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
+        }
 	}
 
     private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
