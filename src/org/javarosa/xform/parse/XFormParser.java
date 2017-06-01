@@ -25,6 +25,7 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
@@ -83,6 +84,7 @@ import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
@@ -173,51 +175,82 @@ public class XFormParser implements IXFormParserFunctions {
         submissionParsers = new ArrayList<>(1);
     }
 
-    private static void initProcessingRules () {
-        IElementHandler title = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseTitle(e); } };
-        IElementHandler meta = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseMeta(e); } };
-        IElementHandler model = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseModel(e); } };
-        IElementHandler input = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_INPUT); } };
-        IElementHandler secret = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_SECRET); } };
-        IElementHandler select = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_SELECT_MULTI); } };
-        IElementHandler select1 = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_SELECT_ONE); } };
-        IElementHandler group = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseGroup((IFormElement)parent, e, CONTAINER_GROUP); } };
-        IElementHandler repeat = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseGroup((IFormElement)parent, e, CONTAINER_REPEAT); } };
-        IElementHandler groupLabel = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseGroupLabel((GroupDef)parent, e); } };
-        IElementHandler trigger = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, Constants.CONTROL_TRIGGER); } };
-        IElementHandler upload = new IElementHandler () {
-            public void handle (XFormParser p, Element e, Object parent) { p.parseUpload((IFormElement)parent, e, Constants.CONTROL_UPLOAD); } };
+    private static void initProcessingRules() {
+        groupLevelHandlers = new HashMap<String, IElementHandler>() {{
+            put("input", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT);
+                }
+            });
+            put("range", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE,
+                            Arrays.asList("start", "end", "step") // Prevent warning about unexpected attributes
+                    );
+                }
+            });
+            put("secret", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SECRET);
+                }
+            });
+            put(SELECT, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_MULTI);
+                }
+            });
+            put(SELECTONE, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_ONE);
+                }
+            });
+            put("group", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseGroup((IFormElement) parent, e, CONTAINER_GROUP);
+                }
+            });
+            put("repeat", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseGroup((IFormElement) parent, e, CONTAINER_REPEAT);
+                }
+            });
+            put("trigger", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_TRIGGER);
+                }
+            }); //multi-purpose now; need to dig deeper
+            put(Constants.XFTAG_UPLOAD, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseUpload((IFormElement) parent, e, Constants.CONTROL_UPLOAD);
+                }
+            });
+            put(LABEL_ELEMENT, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    if (parent instanceof GroupDef) {
+                        p.parseGroupLabel((GroupDef) parent, e);
+                    } else throw new XFormParseException("parent of element is not a group", e);
+                }
+            });
+        }};
 
-        groupLevelHandlers = new HashMap<>();
-        groupLevelHandlers.put("input", input);
-        groupLevelHandlers.put("secret",secret);
-        groupLevelHandlers.put(SELECT, select);
-        groupLevelHandlers.put(SELECTONE, select1);
-        groupLevelHandlers.put("group", group);
-        groupLevelHandlers.put("repeat", repeat);
-        groupLevelHandlers.put("trigger", trigger); //multi-purpose now; need to dig deeper
-        groupLevelHandlers.put(Constants.XFTAG_UPLOAD, upload);
-
-        topLevelHandlers = new HashMap<>();
-    for (String key : groupLevelHandlers.keySet()) {
-            topLevelHandlers.put(key, groupLevelHandlers.get(key));
-        }
-        topLevelHandlers.put("model", model);
-        topLevelHandlers.put("title", title);
-        topLevelHandlers.put("meta", meta);
-
-        groupLevelHandlers.put(LABEL_ELEMENT, groupLabel);
+        topLevelHandlers = new HashMap<String, IElementHandler>() {{
+            put("model", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseModel(e);
+                }
+            });
+            put("title", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseTitle(e);
+                }
+            });
+            put("meta", new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseMeta(e);
+                }
+            });
+        }};
+        topLevelHandlers.putAll(groupLevelHandlers);
     }
 
     private void initState () {
@@ -740,12 +773,10 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
-        List<String> usedAtts = new ArrayList<>();
-        usedAtts.add("mediatype");
         // get media type value
         String mediaType = e.getAttributeValue(null, "mediatype");
         // parse the control
-        QuestionDef question = parseControl(parent, e, controlUpload, usedAtts);
+        QuestionDef question = parseControl(parent, e, controlUpload, Arrays.asList("mediatype"));
 
         // apply the media type value to the returned question def.
         if ("image/*".equals(mediaType)) {
@@ -844,13 +875,13 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     protected QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
-        QuestionDef question = new QuestionDef();
+        final QuestionDef question = questionForControlType(controlType);
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
-        List<String> usedAtts = (additionalUsedAtts != null) ? additionalUsedAtts : new ArrayList<String>();
-        usedAtts.add(REF_ATTR);
-        usedAtts.add(BIND_ATTR);
-        usedAtts.add(APPEARANCE_ATTR);
+        final List<String> usedAtts = new ArrayList<>(Arrays.asList(REF_ATTR, BIND_ATTR, APPEARANCE_ATTR));
+        if (additionalUsedAtts != null) {
+            usedAtts.addAll(additionalUsedAtts);
+        }
 
         IDataReference dataRef = null;
         boolean refFromBind = false;
@@ -921,11 +952,19 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
+        if (question instanceof RangeQuestion) {
+            populateQuestionWithRangeAttributes((RangeQuestion) question, e);
+        }
+
         parent.addChild(question);
 
         processAdditionalAttributes(question, e, usedAtts);
 
         return question;
+    }
+
+    private QuestionDef questionForControlType(int controlType) {
+        return controlType == Constants.CONTROL_RANGE ? new RangeQuestion() : new QuestionDef();
     }
 
     private void parseQuestionLabel (QuestionDef q, Element e) {
