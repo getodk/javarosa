@@ -69,7 +69,7 @@ public class TreeReference implements Externalizable {
 
 	public static final String NAME_WILDCARD = "*";
 
-	/** 0 = context node, 1 = parent, 2 = grandparent ... */
+	/** -1 = absolute, 0 = context node, 1 = parent, 2 = grandparent ... */
 	private int refLevel;
 	private int contextType;
 	private String instanceName = null;
@@ -162,7 +162,7 @@ public class TreeReference implements Externalizable {
 	}
 
 	public boolean isAbsolute () {
-		return (refLevel == REF_ABSOLUTE);
+		return refLevel == REF_ABSOLUTE;
 	}
 
 	//return true if this ref contains any unbound multiplicities... ie, there is ANY chance this ref

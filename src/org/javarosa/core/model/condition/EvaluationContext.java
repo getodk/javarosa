@@ -110,7 +110,8 @@ public class EvaluationContext {
 	}
 
 	public DataInstance getInstance(String id) {
-		return formInstances.containsKey(id) ? formInstances.get(id) :
+        DataInstance formInstance = formInstances.get(id);
+        return formInstance != null ? formInstance :
 			(instance != null && id.equals(instance.getName()) ? instance : null);
 	}
 
@@ -251,7 +252,7 @@ public class EvaluationContext {
 			}
 			//ETHERTON: Is this where we should test for predicates?
             final int mult = sourceRef.getMultiplicity(depth);
-			final List<TreeReference> treeReferences = new ArrayList<TreeReference>(1);
+			final List<TreeReference> treeReferences = new ArrayList<>(1);
 
             final AbstractTreeElement node = instance.resolveReference(workingRef);
 
