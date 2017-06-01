@@ -15,6 +15,7 @@ import java.util.List;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class XFormParserTest {
     @Test
@@ -35,10 +36,11 @@ public class XFormParserTest {
         FormDef formDef = parse("external-secondary-instance.xml");
         assertEquals("Form with external secondary instance", formDef.getTitle());
         TreeReference treeReference = ((XPathPathExpr)
-                parseXPath("instance('towns')/towndata/data_set")).getReference();
+                parseXPath("instance('towns')/data_set")).getReference();
         EvaluationContext evaluationContext = formDef.getEvaluationContext();
         List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
         System.out.println(treeReferences);
+        assertNotEquals(0, treeReference.size());
     }
 
     @Test
