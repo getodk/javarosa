@@ -226,12 +226,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				return null;
 			}
 			return this.children.get(multiplicity); //droos: i'm suspicious of this
-		} else {
-			for (int i = 0; i < this.children.size(); i++) {
-				TreeElement child = this.children.get(i);
-				if (name.equals(child.getName()) && child.getMult() == multiplicity) {
-					return child;
-				}
+		}
+
+		for (TreeElement child : this.children) {
+			if (name.equals(child.getName()) && child.getMult() == multiplicity) {
+				return child;
 			}
 		}
 
