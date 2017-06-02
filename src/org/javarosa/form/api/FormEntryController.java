@@ -196,7 +196,18 @@ public class FormEntryController {
             }
         } while (index.isInForm() && !model.isIndexRelevant(index));
 
-        return jumpToIndex(index);
+        int event = jumpToIndex(index);
+
+        /* The above call may update the model (add or remove repeat groups) which may result in
+         * the model's current form index pointing to the first form element after
+         * the deleted repeat group which in fact may be non-relevant so it should be
+         * jumped over.
+         */
+        if (!model.getFormIndex().isInForm() || model.isIndexRelevant()) {
+            return event;
+        } else {
+            return stepEvent(forward);
+        }
     }
 
 

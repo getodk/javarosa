@@ -26,6 +26,26 @@ public class LimitedRepeatCountTests {
 
         FormEntryController formEntryController = formParseInit.getFormEntryController();
 
+        testSteps(formEntryController);
+    }
+
+    @Test
+    public void testRemoveExtraneousRepeatGroups_withNonRelevantIndexAfterRepeatGroup() {
+        FormParseInit formParseInit = new FormParseInit();
+        formParseInit.setFormToParse(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "limited-repeats-count-non-relevant-index-after-repeat-group.xml").toString());
+
+        FormEntryController formEntryController = formParseInit.getFormEntryController();
+
+        testSteps(formEntryController);
+    }
+
+    /**
+     * Steps are shared between {@link LimitedRepeatCountTests#testRemoveExtraneousRepeatGroups()}
+     * and {@link LimitedRepeatCountTests#testRemoveExtraneousRepeatGroups_withNonRelevantIndexAfterRepeatGroup()}.
+     * The only difference is in forms they use.
+     * @param formEntryController
+     */
+    private void testSteps(FormEntryController formEntryController) {
         assertTrue(formEntryController.getModel().getFormIndex().isBeginningOfFormIndex());
 
         formEntryController.stepToNextEvent();
@@ -64,5 +84,4 @@ public class LimitedRepeatCountTests {
         }
         assertEquals(FormEntryController.EVENT_END_OF_FORM, formEntryController.stepToNextEvent());
     }
-
 }
