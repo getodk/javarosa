@@ -19,6 +19,7 @@ package org.javarosa.xpath.test;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -55,6 +56,7 @@ public class XPathEvalTest extends TestCase {
         TestSuite aSuite = new TestSuite();
 
         aSuite.addTest(new XPathEvalTest("doTests"));
+        aSuite.addTest(new XPathEvalTest("doTestsInPolishLocale"));
 
         return aSuite;
     }
@@ -101,6 +103,17 @@ public class XPathEvalTest extends TestCase {
                 fail("Did not get expected exception type");
             }
         }
+    }
+
+    private void doTestsInSpecificLocale(Locale targetLocale) {
+        Locale previous = Locale.getDefault();
+        Locale.setDefault(targetLocale);
+        doTests();
+        Locale.setDefault(previous);
+    }
+
+    public void doTestsInPolishLocale() {
+        doTestsInSpecificLocale(Locale.forLanguageTag("pl"));
     }
 
     public void doTests () {
