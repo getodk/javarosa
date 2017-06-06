@@ -43,6 +43,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1046,6 +1047,7 @@ public class XPathFuncExpr extends XPathExpression {
 
         if (numDecimals >= 0) {
             final NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setRoundingMode(RoundingMode.HALF_UP);
             nf.setMaximumFractionDigits(numDecimals);
             nf.setGroupingUsed(false);
             return Double.valueOf(nf.format(number));
