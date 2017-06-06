@@ -70,7 +70,7 @@ public class SubmissionProfile implements Externalizable {
 	@SuppressWarnings("unchecked")
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged(IDataReference.class));
-		method = ExtUtil.readString(in);
+		method = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		action = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		mediaType = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		attributeMap = (HashMap<String, String>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
@@ -78,7 +78,7 @@ public class SubmissionProfile implements Externalizable {
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(ref));
-		ExtUtil.writeString(out, method);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(method));
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(action));
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(mediaType));
 		ExtUtil.write(out, new ExtWrapMap(attributeMap));
