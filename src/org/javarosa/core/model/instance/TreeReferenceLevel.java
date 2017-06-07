@@ -6,6 +6,7 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 
 import org.javarosa.core.util.ArrayUtilities;
@@ -21,7 +22,7 @@ import org.javarosa.xpath.expr.XPathExpression;
  * @author ctsims
  *
  */
-public class TreeReferenceLevel implements Externalizable {
+public class TreeReferenceLevel implements Externalizable, Serializable {
 	public static final int MULT_UNINIT = -16;
 	
 	private String name;

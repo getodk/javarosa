@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import org.javarosa.core.model.instance.TreeReference;
  * @author Clayton Sims
  *
  */
-public class FormIndex {
+public class FormIndex implements Serializable {
 
 	private boolean beginningOfForm = false;
 

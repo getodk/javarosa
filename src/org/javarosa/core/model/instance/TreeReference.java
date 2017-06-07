@@ -19,6 +19,7 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathExpression;
 
-public class TreeReference implements Externalizable {
+public class TreeReference implements Externalizable, Serializable {
 	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
 	public static final int INDEX_UNBOUND = -1;//multiplicity
 	public static final int INDEX_TEMPLATE = -2;//multiplicity
