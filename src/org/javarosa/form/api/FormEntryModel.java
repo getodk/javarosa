@@ -388,7 +388,7 @@ public class FormEntryModel {
         	relevant = form.isRepeatRelevant(ref);
         } else {
             TreeElement node = form.getMainInstance().resolveReference(ref);
-            relevant = node.isRelevant(); // check instance flag first
+            relevant = node != null && node.isRelevant(); // check instance flag first
         }
 
         if (relevant) { // if instance flag/condition says relevant, we still
