@@ -40,6 +40,12 @@ public class XFormParserTest {
         parse("bad-range-form.xml");
     }
 
+    @Test
+    public void parsesMetaNamespaceForm() throws IOException {
+        FormDef formDef = parse("meta-namespace-form.xml");
+        assertEquals(formDef.getTitle(), "Simple Form");
+    }
+
     private FormDef parse(String formName) throws IOException {
         XFormParser parser = new XFormParser(new FileReader("resources/" + formName));
         return parser.parse();

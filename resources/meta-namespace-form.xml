@@ -1,0 +1,17 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms">
+  <h:head>
+    <h:title>Audit test ORX</h:title>
+    <model>
+      <instance>
+        <data id="audit-test-orx">
+          <orx:meta>
+            <orx:audit/>
+          </orx:meta>
+        </data>
+      </instance>
+      <bind nodeset="/data/orx:meta/orx:audit" type="binary"/>
+    </model>
+  </h:head>
+  <h:body>
+  </h:body>
+</h:html>
