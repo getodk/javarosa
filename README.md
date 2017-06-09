@@ -15,8 +15,7 @@ JavaRosa is a Java library for rendering forms that are compliant with [ODK XFor
 ODK JavaRosa is part of Open Data Kit (ODK), a free and open-source set of tools which help organizations author, field, and manage mobile data collection solutions. Learn more about the Open Data Kit project and its history [here](https://opendatakit.org/about/) and read about example ODK deployments [here](https://opendatakit.org/about/deployments/).
 
 * ODK website: [https://opendatakit.org](https://opendatakit.org)
-* ODK community mailing list: [http://groups.google.com/group/opendatakit](http://groups.google.com/group/opendatakit)
-* ODK developer mailing list: [http://groups.google.com/group/opendatakit-developers](http://groups.google.com/group/opendatakit-developers)
+* ODK forum: [https://forum.opendatakit.org](https://forum.opendatakit.org)
 * ODK developer Slack chat: [http://slack.opendatakit.org](http://slack.opendatakit.org) 
 * ODK developer Slack archive: [http://opendatakit.slackarchive.io](http://opendatakit.slackarchive.io) 
 * ODK developer wiki: [https://github.com/opendatakit/opendatakit/wiki](https://github.com/opendatakit/opendatakit/wiki)

@@ -853,13 +853,14 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					}
 				}
 			}
-			for (int i = 0; i < incoming.getAttributeCount(); i++) {
-				String name = incoming.getAttributeName(i);
-				String ns = incoming.getAttributeNamespace(i);
-				String value = incoming.getAttributeValue(i);
+		}
 
-				this.setAttribute(ns, name, value);
-			}
+		for (int i = 0; i < incoming.getAttributeCount(); i++) {
+			String name = incoming.getAttributeName(i);
+			String ns = incoming.getAttributeNamespace(i);
+			String value = incoming.getAttributeValue(i);
+
+			this.setAttribute(ns, name, value);
 		}
 	}
 

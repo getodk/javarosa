@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>populate nodes attributes test</h:title>
+        <model>
+            <instance>
+                <data id="populate-nodes-attributes">
+                    <free_text_1/>
+                    <regular_group>
+                        <free_text_2/>
+                    </regular_group>
+                </data>
+            </instance>
+            <bind nodeset="/data/free_text_1" type="string"/>
+            <bind nodeset="/data/regular_group"/>
+            <bind nodeset="/data/regular_group/free_text_2" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/data/free_text_1">
+            <label>free text 1</label>
+        </input>
+        <group nodeset="/data/regular_group">
+            <label>regular group</label>
+            <input ref="/data/regular_group/free_text_2">
+                <label>free text 2</label>
+            </input>
+        </group>
+    </h:body>
+</h:html>
