@@ -102,19 +102,15 @@ public class XPathPathExpr extends XPathExpression {
 			parentsAllowed = true;
 			break;
 		case XPathPathExpr.INIT_CONTEXT_EXPR:
-			if (this.filtExpr.x != null && this.filtExpr.x instanceof XPathFuncExpr)
-			{
+			if (this.filtExpr.x != null && this.filtExpr.x instanceof XPathFuncExpr) {
 				XPathFuncExpr func = (XPathFuncExpr)(this.filtExpr.x);
-				if(func.id.toString().equals("instance"))
-				{
+				if(func.id.toString().equals("instance")) {
 					ref.setRefLevel(TreeReference.REF_ABSOLUTE); //i assume when refering the non main instance you have to be absolute
 					parentsAllowed = false;
-					if(func.args.length != 1)
-					{
+					if(func.args.length != 1) {
 						throw new XPathUnsupportedException("instance() function used with "+func.args.length+ " arguements. Expecting 1 arguement");
 					}
-					if(!(func.args[0] instanceof XPathStringLiteral))
-					{
+					if(!(func.args[0] instanceof XPathStringLiteral)) {
 						throw new XPathUnsupportedException("instance() function expecting 1 string literal arguement arguement");
 					}
 					XPathStringLiteral strLit = (XPathStringLiteral)(func.args[0]);
@@ -180,8 +176,7 @@ public class XPathPathExpr extends XPathExpression {
 			if(step.predicates.length > 0) {
 				int refLevel = ref.getRefLevel();
             List<XPathExpression> v = new ArrayList<XPathExpression>(step.predicates.length);
-				for(int j = 0; j < step.predicates.length; j++)
-				{
+				for(int j = 0; j < step.predicates.length; j++) {
 					v.add(step.predicates[j]);
 				}
 				ref.addPredicate(i, v);
@@ -204,15 +199,12 @@ public class XPathPathExpr extends XPathExpression {
 		//node
 
 		//check if this nodeset refers to a non-main instance
-		if(ref.getInstanceName() != null && ref.isAbsolute())
-		{
+		if(ref.getInstanceName() != null && ref.isAbsolute()) {
 			FormInstance nonMain = ec.getInstance(ref.getInstanceName());
-			if(nonMain != null)
-			{
+			if(nonMain != null) {
 				m = nonMain;
 			}
-			else
-			{
+			else {
 				throw new XPathMissingInstanceException(ref.getInstanceName(), "Instance referenced by " + ref.toString(true) + " does not exist");
 			}
 		} else {

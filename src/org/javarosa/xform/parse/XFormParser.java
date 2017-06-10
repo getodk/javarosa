@@ -280,7 +280,9 @@ public class XFormParser implements IXFormParserFunctions {
 
         structuredActions = new HashMap<>();
         structuredActions.put("setvalue", new IElementHandler() {
-                public void handle (XFormParser p, Element e, Object parent) { p.parseSetValueAction((FormDef)parent, e);}
+                public void handle (XFormParser p, Element e, Object parent) {
+                    p.parseSetValueAction((FormDef)parent, e);
+                }
         });
     }
 
@@ -440,10 +442,8 @@ public class XFormParser implements IXFormParserFunctions {
         //we assume that the non-main instances won't
         //reference the main node, so we do them first.
         //if this assumption is wrong, well, then we're screwed.
-        if(instanceNodes.size() > 1)
-        {
-            for(int i = 1; i < instanceNodes.size(); i++)
-            {
+        if(instanceNodes.size() > 1) {
+            for(int i = 1; i < instanceNodes.size(); i++) {
                 Element e = instanceNodes.get(i);
                 FormInstance fi = instanceParser.parseInstance(e, false, instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
                 loadInstanceData(e, fi.getRoot(), _f);
@@ -1045,8 +1045,12 @@ public class XFormParser implements IXFormParserFunctions {
 
         for(int i=0;i<e.getChildCount();i++){
             int kidType = e.getType(i);
-            if(kidType == Node.TEXT) { continue; }
-            if(e.getChild(i) instanceof String) { continue; }
+            if(kidType == Node.TEXT) {
+                continue;
+            }
+            if(e.getChild(i) instanceof String) {
+                continue;
+            }
             Element kid = (Element)e.getChild(i);
 
             //is just text

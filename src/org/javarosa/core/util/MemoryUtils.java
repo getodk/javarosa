@@ -94,7 +94,9 @@ public class MemoryUtils {
 	 * @param pause
 	 */
 	public static void printMemoryTest(String tag, int pause) {
-		if(!MEMORY_PRINT_ENABLED) { return; }
+		if(!MEMORY_PRINT_ENABLED) {
+			return;
+		}
 		System.gc();
 		Runtime r = Runtime.getRuntime();
 		long free = r.freeMemory();
@@ -182,7 +184,9 @@ public class MemoryUtils {
 				System.out.println("Memory profile is too small for this device's usage!");
 				break;
 			}
-			if(chunkSize < threshold) { succeeded = true; break;}
+			if(chunkSize < threshold) {
+				succeeded = true; break;
+			}
 			
 			try {
 				memoryHolders[currentCount] = new byte[chunkSize];

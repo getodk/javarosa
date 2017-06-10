@@ -125,8 +125,7 @@ public class PropertyManager implements IPropertyManager {
             if(checkPropertyAllowed(propertyName)) {
                 return getValue(propertyName);
             }
-            else
-            {
+            else {
                 return null;
             }
         }

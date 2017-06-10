@@ -193,7 +193,9 @@ public class ReferenceManager {
 	}
 
 	private String getPrettyPrintException(String uri) {
-		if(uri == null || uri.length() == 0) { return "Attempt to derive a blank reference";}
+		if(uri == null || uri.length() == 0) {
+			return "Attempt to derive a blank reference";
+		}
 		try {
 			String uriRoot = uri;
 			String jrRefMessagePortion = "reference type";

@@ -116,8 +116,12 @@ public class EvaluationContext {
 	}
 
 	public TreeReference getOriginalContext() {
-		if (this.original == null) { return this.contextNode; }
-		else { return this.original; }
+		if (this.original == null) {
+			return this.contextNode;
+		}
+		else {
+			return this.original;
+		}
 	}
 
 	public void addFunctionHandler (IFunctionHandler fh) {
@@ -304,8 +308,7 @@ public class EvaluationContext {
 						//test the predicate on the treeElement
 						EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
 						Object o = xpe.eval(instance, evalContext);
-						if(o instanceof Boolean)
-						{
+						if(o instanceof Boolean) {
 							boolean testOutcome = ((Boolean)o).booleanValue();
 							if ( testOutcome ) {
 								passed.add(treeRef);
@@ -341,8 +344,7 @@ public class EvaluationContext {
         } else {
                 //Check to see if we have a context, if not, the treeRef is the original declared
                 //nodeset.
-                if(TreeReference.rootRef().equals(this.getContextRef()))
-                {
+                if(TreeReference.rootRef().equals(this.getContextRef())) {
                         ec.setOriginalContext(treeRef);
                 } else {
                         //If we do have a legit context, use it!

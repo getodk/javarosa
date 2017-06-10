@@ -118,13 +118,11 @@ public class TreeReference implements Externalizable, Serializable {
 		add(new TreeReferenceLevel(name, mult).intern());
 	}
 
-	public void addPredicate(int key, List<XPathExpression> xpe)
-	{
+	public void addPredicate(int key, List<XPathExpression> xpe) {
 		data.set(key, data.get(key).setPredicates(xpe));
 	}
 
-	public List<XPathExpression> getPredicate(int key)
-	{
+	public List<XPathExpression> getPredicate(int key) {
 		return data.get(key).getPredicates();
 	}
 
@@ -384,7 +382,9 @@ public class TreeReference implements Externalizable, Serializable {
 							return false;
 						}
 					} else if(predA != null && predB != null) {
-						if(predA.size() != predB.size()) { return false;}
+						if(predA.size() != predB.size()) {
+							return false;
+						}
 						for(int j = 0 ; j < predA.size() ; ++j) {
 							if(!predA.get(j).equals(predB.get(j))) {
 								return false;
@@ -437,8 +437,7 @@ public class TreeReference implements Externalizable, Serializable {
 
 	public String toString (boolean includePredicates) {
 		StringBuilder sb = new StringBuilder();
-		if(instanceName != null)
-		{
+		if(instanceName != null) {
 			sb.append("instance("+instanceName+")");
 		} else if(contextType == CONTEXT_ORIGINAL) {
 			sb.append("current()");
@@ -540,13 +539,19 @@ public class TreeReference implements Externalizable, Serializable {
 		if(!this.isAbsolute() || !b.isAbsolute()) {
 			return TreeReference.rootRef();
 		}
-		if(this.equals(b)) { return this;}
+		if(this.equals(b)) {
+			return this;
+		}
 
 
 		TreeReference a;
 		//A should always be bigger if one ref is larger than the other
-		if(this.size() < b.size()) { a = b.clone() ; b = this.clone();}
-		else { a= this.clone(); b = b.clone();}
+		if(this.size() < b.size()) {
+			a = b.clone() ; b = this.clone();
+		}
+		else {
+			a= this.clone(); b = b.clone();
+		}
 
 		//Now, trim the refs to the same length.
 		int diff = a.size() - b.size();
@@ -593,7 +598,9 @@ public class TreeReference implements Externalizable, Serializable {
 	 * @return
 	 */
 	public TreeReference getSubReference(int level) {
-		if(!this.isAbsolute()) { throw new IllegalArgumentException("Cannot subreference a non-absolute ref"); }
+		if(!this.isAbsolute()) {
+			throw new IllegalArgumentException("Cannot subreference a non-absolute ref");
+		}
 
 		//Copy construct
 		TreeReference ret = new TreeReference();

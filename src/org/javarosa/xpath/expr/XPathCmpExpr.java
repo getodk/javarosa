@@ -109,7 +109,9 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 			bval = ((XPathNodeset)bval).unpack();
 		}
 		
-		if(handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) { return null; }
+		if(handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) {
+			return null;
+		}
 		
 		return this.eval(model, evalContext);
 	}
