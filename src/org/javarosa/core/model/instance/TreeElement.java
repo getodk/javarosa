@@ -272,19 +272,20 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		return getChildrenWithName(name, false);
 	}
 
-	private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
-		if(children == null) { return new ArrayList<TreeElement>(0);}
+    private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
+        if (children == null) {
+            return new ArrayList<>(0);
+        }
 
-      List<TreeElement> v = new ArrayList<TreeElement>();
-		for (int i = 0; i < this.children.size(); i++) {
-			TreeElement child = this.children.get(i);
-			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
-					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-				v.add(child);
-		}
+        List<TreeElement> v = new ArrayList<>();
+        for (TreeElement child : this.children) {
+            if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
+                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
+                v.add(child);
+        }
 
-		return v;
-	}
+        return v;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getNumChildren()
