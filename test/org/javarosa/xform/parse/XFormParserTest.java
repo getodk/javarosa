@@ -43,7 +43,7 @@ public class XFormParserTest {
     @Test
     public void parsesMetaNamespaceForm() throws IOException {
         FormDef formDef = parse("meta-namespace-form.xml");
-        assertEquals(formDef.getTitle(), "Simple Form");
+        assertEquals(formDef.getTitle(), "Namespace for Metadata");
     }
 
     private FormDef parse(String formName) throws IOException {
