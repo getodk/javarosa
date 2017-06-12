@@ -1,17 +1,20 @@
 <h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml"
-        xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms">
+        xmlns:orx2="http://openrosa.org/xforms">
     <h:head>
         <h:title>Namespace for Metadata</h:title>
         <model>
             <instance>
-                <data id="audit-test-orx">
-                    <orx:meta>
-                        <orx:audit/>
-                    </orx:meta>
+                <data id="test">
+                    <orx2:meta>
+                        <orx2:audit/>
+                        <orx2:audit2/>
+                        <audit3/>
+                    </orx2:meta>
                 </data>
             </instance>
-            <bind nodeset="/data/orx:meta/orx:audit" type="binary"/>
+            <bind nodeset="/data/orx2:meta/orx2:audit"/>
+            <bind nodeset="/data/meta/audit2"/>
+            <bind nodeset="/data/orx2:meta/audit3"/>
         </model>
     </h:head>
     <h:body>
