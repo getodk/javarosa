@@ -20,14 +20,14 @@ public class TreeElementNameComparator {
      * @return whether treeElement matches name
      */
     public static boolean elementMatchesName(TreeElement treeElement, String name) {
-	    if (name.equals(TreeReference.NAME_WILDCARD)) {
-	        return true;
+        if (name.equals(TreeReference.NAME_WILDCARD)) {
+            return true;
         }
 
         final String elementName = treeElement.getName();
 
-	    if (elementName.equals(name)) {
-	        return true;
+        if (elementName.equals(name)) {
+            return true;
         }
 
         final String namespace = treeElement.getNamespace();
