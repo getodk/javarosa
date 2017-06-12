@@ -334,15 +334,10 @@ public class XFormParser implements IXFormParserFunctions {
     private Map<String, String> buildNamespacesMap() {
         final Map<String, String> namespacePrefixesByURI = new HashMap<>();
 
-        for (int i = 0; i < _xmldoc.getChildCount(); i++) {
-            Object firstChild = _xmldoc.getChild(0);
-            if (firstChild instanceof Element) {
-                Element el = (Element) firstChild;
-                if (el.getName().equals("html")) {
-                    for (int j = 0; j < el.getNamespaceCount(); j++) {
-                        namespacePrefixesByURI.put(el.getNamespaceUri(j), el.getNamespacePrefix(j));
-                    }
-                }
+        Element el = _xmldoc.getRootElement();
+        if (el.getName().equals("html")) {
+            for (int i = 0; i < el.getNamespaceCount(); i++) {
+                namespacePrefixesByURI.put(el.getNamespaceUri(i), el.getNamespacePrefix(i));
             }
         }
 
