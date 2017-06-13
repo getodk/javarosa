@@ -42,7 +42,9 @@ checkstyle {
 jar {
     baseName = 'opendatakit-javarosa'
     // Be sure to update version in pom.xml to match
-    version = '2.2.0'
+    // snapshots releases = x.x.x-SNAPSHOT
+    // production releases = x.x.x
+    version = '2.3.0-SNAPSHOT'
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
