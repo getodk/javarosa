@@ -6,6 +6,8 @@ import org.javarosa.core.model.instance.TreeReference;
 
 import java.util.Map;
 
+import static java.lang.System.out;
+
 /** Supports locating {@link TreeElement}s by name. */
 public class TreeElementNameComparator {
 
@@ -20,26 +22,37 @@ public class TreeElementNameComparator {
      * @return whether treeElement matches name
      */
     public static boolean elementMatchesName(TreeElement treeElement, String name) {
+        final String namespace = treeElement.getNamespace();
+        final Map<String, String> namespacesMap = findNamespacesMap(treeElement);
+        final String prefix =
+            (namespacesMap != null && namespacesMap.containsKey(namespace)) ?
+            " " + namespacesMap.get(namespace) : "";
+        final String nsMsg = namespace == null ? "" : " in " + namespace + prefix;
+        // Todo remove the logging after development is finished
+        out.println("comparing " + treeElement.getName() + nsMsg + " with " + name);
+
         if (name.equals(TreeReference.NAME_WILDCARD)) {
+            out.println("Match");
             return true;
         }
 
         final String elementName = treeElement.getName();
 
         if (elementName.equals(name)) {
+            out.println("Match");
             return true;
         }
 
-        final String namespace = treeElement.getNamespace();
-        final Map<String, String> namespacesMap = findNamespacesMap(treeElement);
 
         if (namespace != null && namespacesMap != null) {
             String namespacePrefix = namespacesMap.get(namespace);
             if (namespacePrefix != null && (namespacePrefix + ":" + elementName).equals(name)) {
+                out.println("Match");
                 return true;
             }
         }
 
+        out.println("No match");
         return false;
     }
 
