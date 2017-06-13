@@ -3,7 +3,9 @@
   <groupId>org.opendatakit</groupId>
   <artifactId>opendatakit-javarosa</artifactId>
   <!-- Be sure to update version in build.gradle to match -->
-  <version>2.2.0</version> 
+  <!-- snapshot release = x.x.x-SNAPSHOT -->
+  <!-- production release = x.x.x -->
+  <version>2.3.0-SNAPSHOT</version> 
   <packaging>jar</packaging>
   <name>opendatakit-javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
