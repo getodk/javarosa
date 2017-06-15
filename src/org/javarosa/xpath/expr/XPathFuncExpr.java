@@ -1038,7 +1038,7 @@ public class XPathFuncExpr extends XPathExpression {
      */
     private static Double round(double number, int numDecimals) {
         // rounding doesn't affect special values
-        if (number == NaN || number == NEGATIVE_INFINITY || number == POSITIVE_INFINITY) {
+        if (Double.isNaN(number) || Double.isInfinite(number)) {
             return number;
         }
 
