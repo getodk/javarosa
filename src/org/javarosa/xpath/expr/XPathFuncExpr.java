@@ -52,9 +52,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.NaN;
-import static java.lang.Double.POSITIVE_INFINITY;
 
 /**
  * Representation of an xpath function expression.
@@ -1036,7 +1034,7 @@ public class XPathFuncExpr extends XPathExpression {
      */
     private static Double round(double number, int numDecimals) {
         // rounding doesn't affect special values
-        if (number == NaN || number == NEGATIVE_INFINITY || number == POSITIVE_INFINITY) {
+        if (Double.isNaN(number) || Double.isInfinite(number)) {
             return number;
         }
 
