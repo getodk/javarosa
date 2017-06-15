@@ -331,6 +331,7 @@ public class XPathEvalTest extends TestCase {
         testEval("round('12345.12345', -2)", 12300.0);
         testEval("round('12350.12345', -2)", 12400.0);
         testEval("round('12345.12345', -3)", 12000.0);
+        testEval("round('1 div 0', 0)", NaN);
         // Todo: get round('12345.15', 1) and round('-12345.15', 1) working on Java 8
         // See discussion at https://github.com/opendatakit/javarosa/pull/42#issuecomment-299527754
 
