@@ -38,14 +38,14 @@ To package a jar, use the `jar` Gradle task.
 
 ## Distributing the jar
 
-We use [OSSRH](http://central.sonatype.org/pages/ossrh-guide.html) to distribute this jar to a few public Maven and Gradle repositories. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html). 
+We use [OSSRH](http://central.sonatype.org/pages/ossrh-guide.html) to distribute this jar to a few public Maven and Gradle repositories. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html). Basically, run `mvn -s settings.xml clean deploy`.
 
 While we use gradle as our default build tool for all ODK tools (including this one), we use maven for distributing the jar because OSSRH's gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
 
 One deviation from OSSRH's documentation is that we use the latest versions of the maven plugins in `pom.xml`. We also use `gpg2` and our `settings.xml` includes `gpg.homedir`, `gpg.keyname`, and `gpg.passphrase` so core committers can easily deploy. All that is needed in the `gpg.homedir` is `private-keys-v1.d` and `pubring.gpg`.
 
 ```
-<!-- ${user.home}/.m2/settings.xml -->
+<!-- settings.xml -->
 <settings>
 	<servers>
 		<server>
