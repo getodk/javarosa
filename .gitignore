@@ -10,4 +10,4 @@ build
 
 # mvn
 target
-settings.xml
+secrets.xml
