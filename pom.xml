@@ -118,6 +118,14 @@
             <goals>
               <goal>sign</goal>
             </goals>
+            <configuration>
+              <!-- This is necessary for GPG to get passphrase from file -->
+              <!-- https://stackoverflow.com/a/28860520/152938 -->
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>
