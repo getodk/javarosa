@@ -19,6 +19,7 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathExpression;
 
-public class TreeReference implements Externalizable {
+public class TreeReference implements Externalizable, Serializable {
     /**
      * Multiplicity demarcates the position of a given element with respect to other elements
      * of the same name.

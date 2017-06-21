@@ -28,36 +28,13 @@ ODK JavaRosa is part of Open Data Kit (ODK), a free and open-source set of tools
 
         git clone https://github.com/YOUR-GITHUB-USERNAME/javarosa
 
-We recommend using [IntelliJ IDEA](https://www.jetbrains.com/idea/) for development. On the welcome screen, click `Import Project`, navigate to your javarosa folder, and select the `build.gradle` file. Use the defaults through the wizard. Once the project is imported, IntelliJ may ask you to update your remote maven repositories. Follow the instructions to do so. 
+We recommend using [IntelliJ IDEA](https://www.jetbrains.com/idea/) for development. On the welcome screen, click `Import Project`, navigate to your javarosa folder, and select the `build.gradle` file. Use the defaults through the wizard. Once the project is imported, IntelliJ may ask you to update your remote Maven repositories. Follow the instructions to do so. 
  
 ## Building the project
  
 To build the project, go to the `View` menu, then `Tool Windows > Gradle`. `build` will be in `odk-javarosa > Tasks > build > build`. Double-click `build` to package the application. This Gradle task will now be the default action in your `Run` menu. 
 
 To package a jar, use the `jar` Gradle task.
-
-## Distributing the jar
-
-We use [OSSRH](http://central.sonatype.org/pages/ossrh-guide.html) to distribute this jar to a few public Maven and Gradle repositories. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html). 
-
-While we use gradle as our default build tool for all ODK tools (including this one), we use maven for distributing the jar because OSSRH's gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
-
-One deviation from OSSRH's documentation is that we use the latest versions of the maven plugins in `pom.xml`. Another deviation is that our `settings.xml` includes `gpg.homedir`, `gpg.keyname`, and `gpg.passphrase` so core committers can easily refer to the `opendatakit.gpg` folder.
-```
-<!-- ${user.home}/.m2/settings.xml -->
-<settings>
-	<profiles>
-		<profile>
-		    ...
-			<properties>
-				<gpg.homedir>/path/to/opendatakit.gpg</gpg.homedir>
-				<gpg.keyname>the_keyname</gpg.keyname>
-				<gpg.passphrase>the_passphrase</gpg.passphrase>
-			</properties>
-		</profile>
-	</profiles>
-</settings>
-```
 
 ## Contributing code
 Any and all contributions to the project are welcome. ODK JavaRosa is used across the world primarily by organizations with a social purpose so you can have real impact!
@@ -66,3 +43,40 @@ If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md
 
 ## Downloading builds
 Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/opendatakit/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS.
+
+## Publishing the jar to OSSRH and Maven Central
+
+Project maintainers have the private keys to upload signed jars to Sonatype's OSS Repository Hosting (OSSRH) service which is then synced to Maven's Central Repository. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html).
+
+While Gradle is the default build tool for all ODK tools (including this one), Maven is used for for publishing the jar because OSSRH's Gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
+
+Deviations from OSSRH's documentation are that maintainers use `gpg2` (and not `gpg`), the latest versions of the Maven plugins in `pom.xml`, and a `secrets.xml` file that include the GPG home directory, key name, and pass phrase. All that is needed in the GPG home directory is `private-keys-v1.d` and `pubring.gpg`.
+```
+<!-- secrets.xml -->
+<settings>
+	<servers>
+		<server>
+			<id>ossrh</id>
+			<username>opendatakit</username>
+			<password>very-secure-password</password>
+		</server>
+	</servers>
+	<profiles>
+		<profile>
+			<id>ossrh</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<gpg.executable>gpg2</gpg.executable>
+				<gpg.homedir>/path/to/javarosa/gpg/folder</gpg.homedir>
+				<gpg.keyname>1234ABCD</gpg.keyname>
+				<gpg.passphrase>very-secure-passphrase</gpg.passphrase>
+			</properties>
+		</profile>
+	</profiles>
+</settings>
+```
+
+To generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file, and then run `mvn -s secrets.xml clean deploy` to publish. If successful, both snapshots and production releases will appear in OSSRH [here](https://oss.sonatype.org/content/groups/public/org/opendatakit/opendatakit-javarosa/). Production releases are automatically synced to Central 
+[here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22opendatakit-javarosa%22) a few hours later.

@@ -16,6 +16,7 @@
 
 package org.javarosa.xpath.expr;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.externalizable.Externalizable;
 
-public abstract class XPathExpression implements Externalizable {
+public abstract class XPathExpression implements Externalizable, Serializable {
 
 	public Object eval (EvaluationContext evalContext) {
 		return this.eval(evalContext.getMainInstance(), evalContext);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+   <h:head>
+      <h:title>FormIndex Serialization</h:title>
+      <model>
+         <instance>
+            <data id="formindex-serialization">
+               <section_1>
+                  <question_1/>
+               </section_1>
+            </data>
+         </instance>
+         <bind nodeset="/data/section_1"/>
+         <bind nodeset="/data/section_1/question_1" type="string"/>
+      </model>
+   </h:head>
+   <h:body>
+      <group nodeset="/data/section_1">
+         <label>Section 1</label>
+         <input ref="/data/section_1/question_1">
+            <label>Question 1</label>
+         </input>
+      </group>
+   </h:body>
+</h:html>
