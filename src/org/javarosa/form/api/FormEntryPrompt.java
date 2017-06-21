@@ -18,6 +18,7 @@ package org.javarosa.form.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -88,7 +89,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     //note: code overlap with FormDef.copyItemsetAnswer
-    public IAnswerData getAnswerValue() {
+    public IAnswerData getAnswerValue(Map<String, String> namespacesMap) {
     	QuestionDef q = getQuestion();
 
 		ItemsetBinding itemset = q.getDynamicChoices();
@@ -100,7 +101,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    		//determine which selections are already present in the answer
 	    		if (itemset.copyMode) {
 	    			TreeReference destRef = itemset.getDestRef().contextualize(mTreeElement.getRef());
-               List<TreeReference> subNodes = form.getEvaluationContext().expandReference(destRef);
+               List<TreeReference> subNodes = form.getEvaluationContext().expandReference(destRef, namespacesMap);
 	    			for (int i = 0; i < subNodes.size(); i++) {
 	    				TreeElement node = form.getMainInstance().resolveReference(subNodes.get(i));
     					String value = itemset.getRelativeValue().evalReadable(form.getMainInstance(), new EvaluationContext(form.getEvaluationContext(), node.getRef()));

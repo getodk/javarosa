@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
 import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
@@ -54,9 +53,8 @@ class FormInstanceParser {
         this.actionTargets = actionTargets;
     }
 
-    FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) {
+    FormInstance parseInstance(Element e, boolean isMainInstance, String name) {
         TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace());
-        root.setNamespacePrefixesByUri(namespacePrefixesByUri);
         FormInstance instanceModel = new FormInstance(root);
         instanceModel.setName(isMainInstance ? formDef.getTitle() : name);
 

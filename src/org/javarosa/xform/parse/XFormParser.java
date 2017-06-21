@@ -441,6 +441,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     private void parseDoc(Map<String, String> namespacePrefixesByUri) {
         _f = new FormDef();
+        _f.setNamespacePrefixesByUri(namespacePrefixesByUri);
 
         initState();
         final String defaultNamespace = _xmldoc.getRootElement().getNamespaceUri(null);
@@ -460,7 +461,7 @@ public class XFormParser implements IXFormParserFunctions {
             {
                 Element e = instanceNodes.get(i);
                 FormInstance fi = instanceParser.parseInstance(e, false,
-                        instanceNodeIdStrs.get(instanceNodes.indexOf(e)), namespacePrefixesByUri);
+                        instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
                 loadInstanceData(e, fi.getRoot(), _f);
                 _f.addNonMainInstance(fi);
             }
@@ -468,7 +469,7 @@ public class XFormParser implements IXFormParserFunctions {
         //now parse the main instance
         if(mainInstanceNode != null) {
             FormInstance fi = instanceParser.parseInstance(mainInstanceNode, true,
-                    instanceNodeIdStrs.get(instanceNodes.indexOf(mainInstanceNode)), namespacePrefixesByUri);
+                    instanceNodeIdStrs.get(instanceNodes.indexOf(mainInstanceNode)));
             addMainInstanceToFormDef(mainInstanceNode, fi);
         }
 

@@ -111,8 +111,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 	private String instanceName = null;
 
-    private Map<String, String> namespacePrefixesByUri;
-
 	/**
 	 * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
 	 */
@@ -273,18 +271,18 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 *
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildrenWithName(java.lang.String)
 	 */
-	public List<TreeElement> getChildrenWithName(String name) {
-		return getChildrenWithName(name, false);
+	public List<TreeElement> getChildrenWithName(String name, Map<String, String> namespacesMap) {
+		return getChildrenWithName(name, false, namespacesMap);
 	}
 
-    private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
+    private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate, Map<String, String> namespacesMap) {
         if (children == null) {
             return Collections.emptyList();
         }
 
         List<TreeElement> v = new ArrayList<>();
         for (TreeElement child : children) {
-            if (TreeElementNameComparator.elementMatchesName(child, name)
+            if (TreeElementNameComparator.elementMatchesName(child, name, namespacesMap)
                     && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
                 v.add(child);
         }
@@ -410,7 +408,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#removeChildren(java.lang.String, boolean)
 	 */
 	public void removeChildren(String name, boolean includeTemplate) {
-		List<TreeElement> v = getChildrenWithName(name, includeTemplate);
+		List<TreeElement> v = getChildrenWithName(name, includeTemplate, null);
 		for (int i = 0; i < v.size(); i++) {
 			removeChild(v.get(i));
 		}
@@ -428,7 +426,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildMultiplicity(java.lang.String)
 	 */
 	public int getChildMultiplicity(String name) {
-		return getChildrenWithName(name, false).size();
+		return getChildrenWithName(name, false, null).size();
 	}
 
 	/* (non-Javadoc)
@@ -1022,7 +1020,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName());
+				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName(),
+                        f.getNamespacePrefixesByUri());
 
 				if (child.getMaskVar(MASK_REPEATABLE)) {
 				    for (int k = 0; k < newChildren.size(); k++) {
@@ -1082,7 +1081,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		} else {
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName());
+				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName(),
+                        f.getNamespacePrefixesByUri());
 
 				if (child.getMaskVar(MASK_REPEATABLE)) {
 				    for (int k = 0; k < newChildren.size(); k++) {
@@ -1330,7 +1330,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		this.namespace = namespace;
 	}
 
-	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates, EvaluationContext evalContext) {
+	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates,
+                                                  EvaluationContext evalContext, Map<String, String> namespacesMap) {
 		//Only do for predicates
 		if(mult != TreeReference.INDEX_UNBOUND || predicates == null) { return null; }
 
@@ -1358,7 +1359,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					//don't want the overhead if our predicate is too complex anyway
 					if(indices == null) {
 						indices = new HashMap<XPathPathExpr, String>();
-						kids = this.getChildrenWithName(name);
+						kids = this.getChildrenWithName(name, namespacesMap);
 
 						if(kids.size() == 0 ) { return null; }
 
@@ -1406,17 +1407,4 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 		return selectedChildren;
 	}
-
-    /**
-     * Returns a map of namespace prefixes, keyed by namespace URI, pulled from the html element.
-     * These are needed because JavaRosa doesn’t otherwise preserve prefixes (such as in orx:meta).
-     * Will be null except for the root of the instance.
-     */
-    public Map<String, String> getNamespacePrefixesByUri() {
-        return namespacePrefixesByUri;
-    }
-
-    public void setNamespacePrefixesByUri(Map<String, String> namespacePrefixesByURI) {
-        this.namespacePrefixesByUri = namespacePrefixesByURI;
-    }
 }

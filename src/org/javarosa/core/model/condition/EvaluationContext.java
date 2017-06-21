@@ -16,10 +16,7 @@
 
 package org.javarosa.core.model.condition;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
@@ -181,8 +178,8 @@ public class EvaluationContext {
 		return variables.get(name);
 	}
 
-	public List<TreeReference> expandReference(TreeReference ref) {
-		return expandReference(ref, false);
+	public List<TreeReference> expandReference(TreeReference ref, Map<String, String> namespacesMap) {
+		return expandReference(ref, false, namespacesMap);
 	}
 
 	// take in a potentially-ambiguous ref, and return a List of refs for all nodes that match the passed-in ref
@@ -192,7 +189,7 @@ public class EvaluationContext {
 	// return null if ref is relative, otherwise return List of refs (but list will be empty is no refs match)
 	// '/' returns {'/'}
 	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
-	public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
+	public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates, Map<String, String> namespacesMap) {
 		if (!ref.isAbsolute()) {
 			return null;
 		}
@@ -209,7 +206,7 @@ public class EvaluationContext {
 		}
 
       List<TreeReference> v = new ArrayList<TreeReference>(1);
-		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), v, includeTemplates);
+		expandReference(ref, baseInstance, baseInstance.getRoot().getRef(), v, includeTemplates, namespacesMap);
 		return v;
 	}
 
@@ -219,7 +216,8 @@ public class EvaluationContext {
 	// workingRef: explicit path that refers to the current node
 	// refs: List to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates) {
+	private void expandReference(TreeReference sourceRef, FormInstance instance, TreeReference workingRef,
+								 List<TreeReference> refs, boolean includeTemplates, Map<String, String> namespacesMap) {
 		int depth = workingRef.size();
       List<XPathExpression> predicates = null;
 
@@ -250,7 +248,7 @@ public class EvaluationContext {
 			{
 				if (node.getNumChildren() > 0) {
 					if (mult == TreeReference.INDEX_UNBOUND) {
-                  List<TreeElement> childrenWithName = node.getChildrenWithName(name);
+                  List<TreeElement> childrenWithName = node.getChildrenWithName(name, namespacesMap);
 						int count = childrenWithName.size();
 						for (int i = 0; i < count; i++) {
 							TreeElement child = childrenWithName.get(i);
@@ -325,7 +323,7 @@ public class EvaluationContext {
 
 			for ( int i = 0 ; i < set.size() ; ++i ) {
 				TreeReference treeRef = set.get(i);
-				expandReference(sourceRef, instance, treeRef, refs, includeTemplates);
+				expandReference(sourceRef, instance, treeRef, refs, includeTemplates, namespacesMap);
 			}
 		}
 	}
