@@ -2,6 +2,8 @@ package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -13,7 +15,6 @@ import java.util.List;
 
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 public class XFormParserTest {
     @Test public void parsesSimpleForm() throws IOException {
@@ -35,8 +36,13 @@ public class XFormParserTest {
                 parseXPath("instance('towns')/data_set")).getReference();
         EvaluationContext evaluationContext = formDef.getEvaluationContext();
         List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
-        System.out.println(treeReferences);
-        assertNotEquals(0, treeReference.size());
+        assertEquals(1, treeReferences.size());
+        DataInstance townInstance = formDef.getNonMainInstance("towns");
+        AbstractTreeElement tiRoot = townInstance.getRoot();
+        assertEquals("towndata", tiRoot.getName());
+        assertEquals(1, tiRoot.getNumChildren());
+        AbstractTreeElement dataSetChild = tiRoot.getChild("data_set", 0);
+        assertEquals("us_east", dataSetChild.getValue().getDisplayText());
     }
 
     private FormDef parse(String formName) throws IOException {
