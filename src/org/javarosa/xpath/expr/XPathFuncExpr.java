@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import static java.lang.Double.NaN;
@@ -1045,7 +1046,10 @@ public class XPathFuncExpr extends XPathExpression {
         }
 
         if (numDecimals >= 0) {
-            final NumberFormat nf = NumberFormat.getNumberInstance();
+            // Some locales use ',' instead of '.' as a decimal separator. Since Double.valueOf
+            // doesn't handle comma as the decimal separator, we must ensure a dot will be used by
+            // forcing the US format locale.
+            final NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
             nf.setMaximumFractionDigits(numDecimals);
             nf.setGroupingUsed(false);
             return Double.valueOf(nf.format(number));
