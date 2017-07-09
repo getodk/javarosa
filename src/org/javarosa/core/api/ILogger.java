@@ -19,11 +19,11 @@
  */
 package org.javarosa.core.api;
 
-import org.javarosa.core.log.IFullLogSerializer;
-import org.javarosa.core.log.StreamLogSerializer;
-
 import java.io.IOException;
 import java.util.Date;
+
+import org.javarosa.core.log.IFullLogSerializer;
+import org.javarosa.core.log.StreamLogSerializer;
 
 /**
  * IIncidentLogger's are used for instrumenting applications to identify usage

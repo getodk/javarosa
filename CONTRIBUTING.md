@@ -36,8 +36,6 @@ To contribute code to ODK JavaRosa, you will need to open a [pull request](https
 
 1. Keep your pull request focused on one narrow goal. This could mean addressing an issue with multiple, smaller pull requests. Small pull requests are easier to review and less likely to introduce bugs. If you would like to make stylistic changes to the code, create a separate pull request.
 
-1. Run `./gradlew check` and fix any errors.
-
 1. Write clear code. Use descriptive names and create meaningful abstractions (methods, classes).
 
 1. Document your reasoning. Your commit messages should make it clear why each change has been made.

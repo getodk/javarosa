@@ -16,6 +16,14 @@
 
 package org.javarosa.core.model;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -30,19 +38,6 @@ import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParserReporter;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Abstract interface of the DAG management and triggerable processing logic.
@@ -115,8 +110,8 @@ public abstract class IDag {
 	 * @param midSurvey
 	 */
 	public abstract Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance,
-																	 EvaluationContext evalContext, TreeReference ref,
-																	 boolean midSurvey);
+			EvaluationContext evalContext, TreeReference ref,
+			boolean midSurvey);
 
 	/**
 	 * Take whatever action is required when deleting a repeat group.
