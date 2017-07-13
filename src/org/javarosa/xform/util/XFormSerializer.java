@@ -16,6 +16,7 @@
 
 package org.javarosa.xform.util;
 
+import org.javarosa.core.io.Std;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -42,7 +43,7 @@ public class XFormSerializer {
 			serializer.flush();
 			return bos;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Std.printStack(e);
 			return null;
 		}
 	}
@@ -60,9 +61,9 @@ public class XFormSerializer {
 			s = new String(bos.toByteArray(),"UTF-8");
 			return s;
 		}catch (UnsupportedEncodingException uce){
-			uce.printStackTrace();
+			Std.printStack(uce);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Std.printStack(ex);
 			return null;
 		}
 
@@ -91,7 +92,7 @@ public class XFormSerializer {
 			serializer.flush();
 			return bos.toByteArray();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Std.printStack(e);
 			return null;
 		}
 	}

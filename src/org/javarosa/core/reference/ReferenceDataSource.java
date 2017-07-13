@@ -19,6 +19,7 @@
  */
 package org.javarosa.core.reference;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.services.locale.LocaleDataSource;
 import org.javarosa.core.services.locale.LocalizationUtils;
 import org.javarosa.core.util.OrderedMap;
@@ -70,10 +71,10 @@ public class ReferenceDataSource implements LocaleDataSource {
 			InputStream is = ReferenceManager._().DeriveReference(referenceURI).getStream();
 			return LocalizationUtils.parseLocaleInput(is);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Std.printStack(e);
 			throw new RuntimeException("IOException while getting localized text at reference " + referenceURI);
 		} catch (InvalidReferenceException e) {
-			e.printStackTrace();
+			Std.printStack(e);
 			throw new RuntimeException("Invalid Reference! " + referenceURI);
 		}
 	}

@@ -139,13 +139,13 @@ public class ResourceFileDataSource implements LocaleDataSource {
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Std.printStack(e);
 		} finally {
 			try {
 				is.close();
 			} catch (IOException e) {
 				Std.out.println("Input Stream for resource file " + resourceURI + " failed to close. This will eat up your memory! Fix Problem! [" + e.getMessage() + "]");
-				e.printStackTrace();
+				Std.printStack(e);
 			}
 		}
 		return locale;

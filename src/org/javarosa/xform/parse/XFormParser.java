@@ -353,7 +353,7 @@ public class XFormParser implements IXFormParserFunctions {
         }  catch (XmlPullParserException e) {
             String errorMsg = "XML Syntax Error at Line: " + e.getLineNumber() +", Column: "+ e.getColumnNumber()+ "!";
             Std.err.println(errorMsg);
-            e.printStackTrace();
+            Std.printStack(e);
             throw new XFormParseException(errorMsg);
         } catch(IOException e){
             //CTS - 12/09/2012 - Stop swallowing IO Exceptions
@@ -362,7 +362,7 @@ public class XFormParser implements IXFormParserFunctions {
             //#if debug.output==verbose || debug.output==exception
             String errorMsg = "Unhandled Exception while Parsing XForm";
             Std.err.println(errorMsg);
-            e.printStackTrace();
+            Std.printStack(e);
             throw new XFormParseException(errorMsg);
             //#endif
         }
@@ -371,7 +371,7 @@ public class XFormParser implements IXFormParserFunctions {
             reader.close();
         } catch (IOException e) {
             Std.out.println("Error closing reader");
-            e.printStackTrace();
+            Std.printStack(e);
         }
 
         //For escaped unicode strings we end up with a looooot of cruft,
@@ -662,7 +662,7 @@ public class XFormParser implements IXFormParserFunctions {
             try {
                 action = new SetValueAction(treeref, XPathParseTool.parseXPath(valueRef));
             } catch (XPathSyntaxException e1) {
-                e1.printStackTrace();
+                Std.printStack(e1);
                 throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueRef + "'", e);
             }
         }
@@ -1994,7 +1994,7 @@ public class XFormParser implements IXFormParserFunctions {
         try {
             return restoreDataModel(new ByteArrayInputStream(data), restorableType);
         } catch (IOException e) {
-            e.printStackTrace();
+            Std.printStack(e);
             throw new XFormParseException("Bad parsing from byte array " + e.getMessage());
         }
     }

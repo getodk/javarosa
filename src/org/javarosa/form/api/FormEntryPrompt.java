@@ -307,7 +307,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 			Std.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
 		}catch(Exception e){
 			Logger.exception("FormEntryPrompt.getHelpText", e);
-			e.printStackTrace();
+			Std.printStack(e);
 		}
 
 		return helpText;

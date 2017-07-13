@@ -80,7 +80,7 @@ public class Logger {
 	}
 	
 	public static void exception (String info, Exception e) {
-		e.printStackTrace();
+		Std.printStack(e);
 		log("exception", (info != null ? info + ": " : "") + WrappedException.printException(e));
 	}
 	
@@ -89,7 +89,7 @@ public class Logger {
 		exception("unhandled exception at top level", e);
 				
 		//print stacktrace
-		e.printStackTrace();
+		Std.printStack(e);
 		
 		//crash
 		final FatalException crashException = new FatalException("unhandled exception in " + thread, e);

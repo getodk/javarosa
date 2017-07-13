@@ -146,7 +146,7 @@ public class MemoryUtils {
 				Thread.sleep(pause);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Std.printStack(e);
 			}
 		}
 	}

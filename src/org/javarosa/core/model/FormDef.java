@@ -1457,7 +1457,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          } catch (NullPointerException npe) {
             if (getMetaData(fields[i]) == null) {
                Std.out.println("ERROR! XFORM MUST HAVE A NAME!");
-               npe.printStackTrace();
+               Std.printStack(npe);
             }
          }
       }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -460,7 +461,7 @@ public class FormEntryModel {
                               try {
                                 getForm().createNewRepeat(index);
                               } catch (InvalidReferenceException ire) {
-                                ire.printStackTrace();
+                                Std.printStack(ire);
                                 throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
                               }
                             }

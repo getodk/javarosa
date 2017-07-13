@@ -16,6 +16,7 @@
 
 package org.javarosa.form.api;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -98,7 +99,7 @@ public class FormEntryController {
         	try {
 				model.getForm().copyItemsetAnswer(q, element, data, midSurvey);
 			} catch (InvalidReferenceException ire) {
-				ire.printStackTrace();
+				Std.printStack(ire);
 				throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
 			}
         	return ANSWER_OK;

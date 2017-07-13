@@ -86,7 +86,7 @@ public class XFormUtils {
                 }
             } catch (IOException e) {
                 Std.err.println("IO Exception while closing stream.");
-				e.printStackTrace();
+				Std.printStack(e);
 			}
 		}
 	}
@@ -105,22 +105,22 @@ public class XFormUtils {
                 //#endif
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Std.printStack(e);
         } catch (DeserializationException e) {
-            e.printStackTrace();
+            Std.printStack(e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Std.printStack(e);
                 }
             }
             if (dis != null) {
                 try {
                     dis.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Std.printStack(e);
                 }
             }
         }

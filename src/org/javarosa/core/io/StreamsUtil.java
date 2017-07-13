@@ -159,7 +159,7 @@ public class StreamsUtil {
 		}
 		
 		public void printStackTrace()  {
-			internal.printStackTrace();
+			Std.printStack(internal);
 		}
 		
 		//TODO: Override all common methodss

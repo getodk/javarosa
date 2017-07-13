@@ -25,4 +25,8 @@ public class Std {
     public static void setErr(PrintStream err) {
         Std.err = err;
     }
+
+    public static void printStack(Throwable t) {
+        t.printStackTrace(Std.err);
+    }
 }
