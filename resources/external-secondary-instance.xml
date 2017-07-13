@@ -1,0 +1,20 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml">
+
+    <h:head>
+        <h:title>Form with external secondary instance</h:title>
+        <model>
+            <instance>
+                <data id="a">
+                    <data_set_used/>
+                </data>
+            </instance>
+            <instance id="towns" src="jr://file/towns.xml"/>
+            <bind nodeset="/data/data_set_used" calculate="instance('towns')/towndata/data_set"/>
+        </model>
+    </h:head>
+
+    <h:body>
+    </h:body>
+
+</h:html>

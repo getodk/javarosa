@@ -29,6 +29,9 @@ import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.SetValueAction;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -440,14 +443,19 @@ public class XFormParser implements IXFormParserFunctions {
         //we assume that the non-main instances won't
         //reference the main node, so we do them first.
         //if this assumption is wrong, well, then we're screwed.
-        if(instanceNodes.size() > 1)
-        {
-            for(int i = 1; i < instanceNodes.size(); i++)
-            {
-                Element e = instanceNodes.get(i);
-                FormInstance fi = instanceParser.parseInstance(e, false, instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
-                loadInstanceData(e, fi.getRoot(), _f);
-                _f.addNonMainInstance(fi);
+        if (instanceNodes.size() > 1) {
+            for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
+                final Element instance = instanceNodes.get(instanceIndex);
+                final String srcLocation = instance.getAttributeValue(null, "src");
+                final String instanceId = instanceNodeIdStrs.get(instanceIndex);
+
+                if (srcLocation != null) {
+                    _f.addNonMainInstance(new ExternalDataInstance(srcLocation, instanceId));
+                } else {
+                    FormInstance fi = instanceParser.parseInstance(instance, false, instanceNodeIdStrs.get(instanceNodes.indexOf(instance)));
+                    loadInstanceData(instance, fi.getRoot(), _f);
+                    _f.addNonMainInstance(fi);
+                }
             }
         }
         //now parse the main instance
@@ -459,11 +467,14 @@ public class XFormParser implements IXFormParserFunctions {
 
         // Clear the caches, as these may not have been initialized
         // entirely correctly during the validation steps.
-        Enumeration<FormInstance> e = _f.getNonMainInstances();
+        Enumeration<DataInstance> e = _f.getNonMainInstances();
         while ( e.hasMoreElements() ) {
-            FormInstance fi = e.nextElement();
-            fi.getRoot().clearChildrenCaches();
-            fi.getRoot().clearCaches();
+            DataInstance instance = e.nextElement();
+            final AbstractTreeElement treeElement = instance.getRoot();
+            if (treeElement instanceof TreeElement) {
+                ((TreeElement) treeElement).clearChildrenCaches();
+            }
+            treeElement.clearCaches();
         }
         _f.getMainInstance().getRoot().clearChildrenCaches();
         _f.getMainInstance().getRoot().clearCaches();

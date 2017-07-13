@@ -10,10 +10,7 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InvalidReferenceException;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.instance.*;
 import org.javarosa.xform.util.XFormUtils;
 import org.kxml2.kdom.Element;
 
@@ -320,7 +317,7 @@ class FormInstanceParser {
 
             //make sure the labelref is tested against the right instance
             //check if it's not the main instance
-            FormInstance fi = null;
+            DataInstance fi = null;
             if (itemset.labelRef.getInstanceName() != null) {
                 fi = formDef.getNonMainInstance(itemset.labelRef.getInstanceName());
                 if (fi == null) {

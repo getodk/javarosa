@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -33,7 +33,7 @@ public class XPathUnionExpr extends XPathBinaryOpExpr {
 		super(a, b);
 	}
 	
-	public Object eval (FormInstance model, EvaluationContext evalContext) {
+	public Object eval (DataInstance model, EvaluationContext evalContext) {
 		throw new XPathUnsupportedException("nodeset union operation");
 	}
 

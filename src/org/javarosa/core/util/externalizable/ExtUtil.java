@@ -21,17 +21,11 @@ import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.OrderedMap;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.UTFDataFormatException;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExtUtil {
