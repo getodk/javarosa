@@ -3,6 +3,8 @@
  */
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.io.Std;
+
 import java.io.PrintStream;
 
 /**
@@ -21,7 +23,7 @@ public class XFormParserReporter {
 	PrintStream errorStream;
 	
 	public XFormParserReporter() {
-		this(System.err);
+		this(Std.err);
 	}
 	
 	public XFormParserReporter(PrintStream errorStream) {

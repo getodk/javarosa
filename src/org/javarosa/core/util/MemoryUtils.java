@@ -3,6 +3,7 @@
  */
 package org.javarosa.core.util;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.TreeReferenceLevel;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xpath.expr.XPathStep;
@@ -101,10 +102,10 @@ public class MemoryUtils {
 		long total = r.totalMemory();
 		
 		if(tag != null) {
-			System.out.println("=== Memory Evaluation: " + tag + " ===");
+			Std.out.println("=== Memory Evaluation: " + tag + " ===");
 		}
 		
-		System.out.println("Total: " +total + "\nFree: " + free);
+		Std.out.println("Total: " +total + "\nFree: " + free);
 		
 		int chunk = 100;
 		int lastSuccess = 100;
@@ -137,8 +138,8 @@ public class MemoryUtils {
 
 		int availPercent = (int)Math.floor((lastSuccess * 1.0 / total) * 100);
 		int fragmentation = (int)Math.floor((lastSuccess * 1.0 / free) * 100);
-		System.out.println("Usable Memory: " +lastSuccess + "\n" + availPercent + "% of available memory");
-		System.out.println("Fragmentation: " + fragmentation + "%");
+		Std.out.println("Usable Memory: " +lastSuccess + "\n" + availPercent + "% of available memory");
+		Std.out.println("Fragmentation: " + fragmentation + "%");
 		
 		if(pause != -1) {
 			try {
@@ -160,7 +161,7 @@ public class MemoryUtils {
 	 */
 	public static void profileMemory() {
 		if(memoryProfile == null) {
-			System.out.println("You must initialize the memory profiler before it can be used!");
+			Std.out.println("You must initialize the memory profiler before it can be used!");
 			return;
 		}
 		currentCount = 0;
@@ -179,7 +180,7 @@ public class MemoryUtils {
 		//on the type of fragmentation you are concerned about. 
 		while(true) {
 			if(currentCount >= MEMORY_PROFILE_SIZE) {
-				System.out.println("Memory profile is too small for this device's usage!");
+				Std.out.println("Memory profile is too small for this device's usage!");
 				break;
 			}
 			if(chunkSize < threshold) { succeeded = true; break;}
@@ -201,9 +202,9 @@ public class MemoryUtils {
 		
 		//For now, just print out the profile. Eventually we should compress it and output it in a useful format.
 		if(succeeded) {
-			System.out.println("Acquired memory profile for " + memoryAccountedFor + " of the " + memory + " available bytes, with " + currentCount + " traces");
+			Std.out.println("Acquired memory profile for " + memoryAccountedFor + " of the " + memory + " available bytes, with " + currentCount + " traces");
 			for(int i = 0 ; i < currentCount * 2 ; i+=2) { 
-				System.out.println("Address: " + memoryProfile[i] + " -> " + memoryProfile[i + 1]);
+				Std.out.println("Address: " + memoryProfile[i] + " -> " + memoryProfile[i + 1]);
 			}
 		}
 	}

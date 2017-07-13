@@ -3,6 +3,7 @@ package org.javarosa.core.services;
 import java.util.Date;
 
 import org.javarosa.core.api.ILogger;
+import org.javarosa.core.io.Std;
 import org.javarosa.core.log.FatalException;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
@@ -37,9 +38,9 @@ public class Logger {
 	}
 	
 	protected static void logForce(String type, String message) {
-		System.err.println("logger> " + type + ": " + message);
+		Std.err.println("logger> " + type + ": " + message);
 		if (message.length() > MAX_MSG_LENGTH)
-			System.err.println("  (message truncated)");
+			Std.err.println("  (message truncated)");
 		
 		message = message.substring(0, Math.min(message.length(), MAX_MSG_LENGTH));
 		if(logger != null) {
@@ -47,7 +48,7 @@ public class Logger {
 				logger.log(type, message, new Date());
 			} catch (RuntimeException e) {
 				//do not catch exceptions here; if this fails, we want the exception to propogate
-				System.err.println("exception when trying to write log message! " + WrappedException.printException(e));
+				Std.err.println("exception when trying to write log message! " + WrappedException.printException(e));
 				logger.panic();
 				
 				//be conservative for now

@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -55,7 +56,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	
 	public void setChoices (List<SelectChoice> choices, Localizer localizer) {
 		if (this.choices != null) {
-			System.out.println("warning: previous choices not cleared out");
+			Std.out.println("warning: previous choices not cleared out");
 			clearChoices();
 		}
 		this.choices = choices;

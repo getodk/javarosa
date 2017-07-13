@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.IDag.EventNotifierAccessor;
 import org.javarosa.core.model.condition.Condition;
@@ -949,7 +950,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                try {
                   ix = Integer.parseInt(argName);
                } catch (NumberFormatException nfe) {
-                  System.err.println("Warning: expect arguments to be numeric [" + argName + "]");
+                  Std.err.println("Warning: expect arguments to be numeric [" + argName + "]");
                }
 
                if (ix < 0 || ix >= outputFragments.size())
@@ -1056,7 +1057,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          // to chose from if the user hasn't filled them out. So I'm just going
          // to make a note of this
          // and not throw an exception.
-         System.out
+         Std.out
                  .println("Dynamic select question has no choices! ["
                          + itemset.nodesetRef
                          + "]. If this occurs while filling out a form (and not while saving an incomplete form), the filter condition may have eliminated all the choices. Is that what you intended?\n");
@@ -1455,7 +1456,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             metadata.put(fields[i], getMetaData(fields[i]));
          } catch (NullPointerException npe) {
             if (getMetaData(fields[i]) == null) {
-               System.out.println("ERROR! XFORM MUST HAVE A NAME!");
+               Std.out.println("ERROR! XFORM MUST HAVE A NAME!");
                npe.printStackTrace();
             }
          }

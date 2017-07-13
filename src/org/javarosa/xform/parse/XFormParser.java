@@ -16,6 +16,7 @@
 
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
@@ -312,7 +313,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     public FormDef parse() throws IOException {
         if (_f == null) {
-            System.out.println("Parsing form...");
+            Std.out.println("Parsing form...");
 
             if (_xmldoc == null) {
                 _xmldoc = getXMLDocument(_reader, stringCache);
@@ -351,7 +352,7 @@ public class XFormParser implements IXFormParserFunctions {
             doc.parse(parser);
         }  catch (XmlPullParserException e) {
             String errorMsg = "XML Syntax Error at Line: " + e.getLineNumber() +", Column: "+ e.getColumnNumber()+ "!";
-            System.err.println(errorMsg);
+            Std.err.println(errorMsg);
             e.printStackTrace();
             throw new XFormParseException(errorMsg);
         } catch(IOException e){
@@ -360,7 +361,7 @@ public class XFormParser implements IXFormParserFunctions {
         } catch(Exception e){
             //#if debug.output==verbose || debug.output==exception
             String errorMsg = "Unhandled Exception while Parsing XForm";
-            System.err.println(errorMsg);
+            Std.err.println(errorMsg);
             e.printStackTrace();
             throw new XFormParseException(errorMsg);
             //#endif
@@ -369,7 +370,7 @@ public class XFormParser implements IXFormParserFunctions {
         try {
             reader.close();
         } catch (IOException e) {
-            System.out.println("Error closing reader");
+            Std.out.println("Error closing reader");
             e.printStackTrace();
         }
 
@@ -508,7 +509,7 @@ public class XFormParser implements IXFormParserFunctions {
     private void parseTitle (Element e) {
         List<String> usedAtts = new ArrayList<>(); //no attributes parsed in title.
         String title = getXMLText(e, true);
-        System.out.println("Title: \"" + title + "\"");
+        Std.out.println("Title: \"" + title + "\"");
         _f.setTitle(title);
         if(_f.getName() == null) {
             //Jan 9, 2009 - ctsims
@@ -889,7 +890,7 @@ public class XFormParser implements IXFormParserFunctions {
             try {
                 dataRef = new XPathReference(ref);
             } catch(RuntimeException el) {
-                System.out.println(XFormParser.getVagueLocation(e));
+                Std.out.println(XFormParser.getVagueLocation(e));
                 throw el;
             }
         } else {
@@ -1028,7 +1029,7 @@ public class XFormParser implements IXFormParserFunctions {
                     sb.append(XFormSerializer.elementToString(child));
                 } else {
                     //Otherwise, ignore it.
-                    System.out.println("Unrecognized tag inside of text: <"  + child.getName() + ">. " +
+                    Std.out.println("Unrecognized tag inside of text: <"  + child.getName() + ">. " +
                             "Did you intend to use HTML markup? If so, ensure that the element is defined in " +
                             "the HTML namespace.");
                 }
@@ -1673,7 +1674,7 @@ public class XFormParser implements IXFormParserFunctions {
                 //for the other locale, but isn't super good.
                 //TODO: Clean up being able to get here
                 if(!itextKnownForms.contains(textForm)) {
-                    System.out.println("adding unexpected special itext form: " + textForm + " to list of expected forms");
+                    Std.out.println("adding unexpected special itext form: " + textForm + " to list of expected forms");
                     itextKnownForms.add(textForm);
                 }
                 return true;
@@ -1773,7 +1774,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
         if (hasElements && hasText) {
-            System.out.println("Warning: instance node '" + node.getName() + "' contains both elements and text as children; text ignored");
+            Std.out.println("Warning: instance node '" + node.getName() + "' contains both elements and text as children; text ignored");
         }
 
         //check for repeat templating
@@ -1801,7 +1802,7 @@ public class XFormParser implements IXFormParserFunctions {
             element = (TreeElement)modelPrototypes.getNewInstance(((Integer)typeMappings.get(modelType)).toString());
             if(element == null) {
                 element = new TreeElement(name, multiplicity);
-                System.out.println("No model type prototype available for " + modelType);
+                Std.out.println("No model type prototype available for " + modelType);
             } else {
                 element.setName(name);
                 element.setMult(multiplicity);

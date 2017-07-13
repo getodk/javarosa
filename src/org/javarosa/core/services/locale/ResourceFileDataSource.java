@@ -19,6 +19,7 @@
  */
 package org.javarosa.core.services.locale;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -143,7 +144,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 			try {
 				is.close();
 			} catch (IOException e) {
-				System.out.println("Input Stream for resource file " + resourceURI + " failed to close. This will eat up your memory! Fix Problem! [" + e.getMessage() + "]");
+				Std.out.println("Input Stream for resource file " + resourceURI + " failed to close. This will eat up your memory! Fix Problem! [" + e.getMessage() + "]");
 				e.printStackTrace();
 			}
 		}
@@ -165,7 +166,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 			if(line.trim().equals("")) {
 				//Empty Line
 			} else {
-				System.out.println("Invalid line (#" + curline + ") read: " + line);
+				Std.out.println("Invalid line (#" + curline + ") read: " + line);
 			}
 		} else {
 			//Check to see if there's anything after the '=' first. Otherwise there
@@ -175,7 +176,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 				locale.put(line.substring(0, line.indexOf('=')), value);
 			}
 			 else {
-				System.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+				Std.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
 			}
 		}
 	}

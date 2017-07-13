@@ -3,6 +3,7 @@
  */
 package org.javarosa.core.services.locale;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.util.OrderedMap;
 
 import java.io.IOException;
@@ -83,7 +84,7 @@ public class LocalizationUtils {
 				if(line.trim().equals("")) {
 					//Empty Line
 				} else {
-					System.out.println("Invalid line (#" + curline + ") read: " + line);
+					Std.out.println("Invalid line (#" + curline + ") read: " + line);
 				}
 			} else {
 				//Check to see if there's anything after the '=' first. Otherwise there
@@ -93,7 +94,7 @@ public class LocalizationUtils {
 					locale.put(line.substring(0, line.indexOf('=')), value);
 				}
 				 else {
-					System.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+					Std.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
 				}
 			}
 		}
