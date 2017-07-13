@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.util.MD5;
 import org.javarosa.core.util.PrefixTree;
 
@@ -141,7 +142,7 @@ public class PrototypeFactory {
 			hash[i] = md5[i];
 		byte[] badHash = new byte[] {0,4,78,97};
 		if(PrototypeFactory.compareHash(badHash, hash)) {
-			System.out.println("BAD CLASS: " + type.getName());
+			Std.out.println("BAD CLASS: " + type.getName());
 		}
 
 		return hash;

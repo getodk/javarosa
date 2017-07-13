@@ -3,6 +3,8 @@
  */
 package org.javarosa.core.util;
 
+import org.javarosa.core.io.Std;
+
 import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -70,10 +72,10 @@ public class CacheTable<K> {
 						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						Std.printStack(e);
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					Std.printStack(e);
 				}
 			}
 

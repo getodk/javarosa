@@ -1,5 +1,6 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -133,7 +134,7 @@ class FormInstanceParser {
             TreeReference ref = FormInstance.unpackReference(bind.getReference());
 
             if (ref.size() == 0) {
-                System.out.println("Cannot bind to '/'; ignoring bind...");
+                Std.out.println("Cannot bind to '/'; ignoring bind...");
                 bindings.remove(i);
                 i--;
             } else {
@@ -185,7 +186,7 @@ class FormInstanceParser {
         int mult = node.getMult();
         if (mult > 0) { //repeated node
             if (!node.isRepeatable()) {
-                System.out.println("Warning: repeated nodes [" + node.getName() + "] detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
+                Std.out.println("Warning: repeated nodes [" + node.getName() + "] detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
                 //we could do a more comprehensive safety check in the future
             }
         }

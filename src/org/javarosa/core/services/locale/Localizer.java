@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.PrefixTree;
@@ -611,7 +612,7 @@ public class Localizer implements Externalizable {
 		while (i != -1) {
 			int j = text.indexOf("}", i);
 			if (j == -1) {
-				System.err.println("Warning: unterminated ${...} arg");
+				Std.err.println("Warning: unterminated ${...} arg");
 				break;
 			}
 
@@ -630,7 +631,7 @@ public class Localizer implements Externalizable {
 		while (i != -1) {
 			int j = text.indexOf("}", i);
 			if (j == -1) {
-				System.err.println("Warning: unterminated ${...} arg");
+				Std.err.println("Warning: unterminated ${...} arg");
 				break;
 			}
 

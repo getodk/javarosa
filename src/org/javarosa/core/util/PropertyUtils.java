@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.services.PropertyManager;
 
 public class PropertyUtils {
@@ -32,7 +33,7 @@ public class PropertyUtils {
 			propVal.add(defaultValue);
 			PropertyManager._().setProperty(propName, propVal);
 			//#if debug.output==verbose
-			System.out.println("No default value for [" + propName
+			Std.out.println("No default value for [" + propName
 					+ "]; setting to [" + defaultValue + "]"); // debug
 			//#endif
 			return defaultValue;

@@ -19,6 +19,7 @@ package org.javarosa.form.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -303,10 +304,10 @@ public class FormEntryPrompt extends FormEntryCaption {
 		}catch(NoLocalizedTextException nlt){
 			//use fallback helptext
 		}catch(UnregisteredLocaleException ule){
-			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
+			Std.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
 		}catch(Exception e){
 			Logger.exception("FormEntryPrompt.getHelpText", e);
-			e.printStackTrace();
+			Std.printStack(e);
 		}
 
 		return helpText;

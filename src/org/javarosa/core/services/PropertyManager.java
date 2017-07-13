@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
@@ -103,7 +104,7 @@ public class PropertyManager implements IPropertyManager {
         }
         if(retVal == null) {
     		//#if debug.output==verbose
-            System.out.println("Warning: Singular property request failed for property " + propertyName);
+            Std.out.println("Warning: Singular property request failed for property " + propertyName);
             //#endif
         }
         return retVal;
@@ -171,7 +172,7 @@ public class PropertyManager implements IPropertyManager {
             }
             //#if debug.output==verbose
             else {
-            	System.out.println("Property Manager: Unable to write value (" + propertyValue + ") to " + propertyName);
+            	Std.out.println("Property Manager: Unable to write value (" + propertyValue + ") to " + propertyName);
             }
             //#endif
         }

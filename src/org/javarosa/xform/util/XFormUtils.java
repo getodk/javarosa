@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -51,7 +52,7 @@ public class XFormUtils {
 	public static FormDef getFormFromResource (String resource) {
 		InputStream is = System.class.getResourceAsStream(resource);
 		if (is == null) {
-			System.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
+			Std.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
 			return null;
 		}
 
@@ -84,8 +85,8 @@ public class XFormUtils {
                     isr.close();
                 }
             } catch (IOException e) {
-                System.err.println("IO Exception while closing stream.");
-				e.printStackTrace();
+                Std.err.println("IO Exception while closing stream.");
+				Std.printStack(e);
 			}
 		}
 	}
@@ -100,26 +101,26 @@ public class XFormUtils {
                 returnForm = (FormDef) ExtUtil.read(dis, FormDef.class);
             } else {
                 //#if debug.output==verbose
-                System.out.println("ResourceStream NULL");
+                Std.out.println("ResourceStream NULL");
                 //#endif
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Std.printStack(e);
         } catch (DeserializationException e) {
-            e.printStackTrace();
+            Std.printStack(e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Std.printStack(e);
                 }
             }
             if (dis != null) {
                 try {
                     dis.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Std.printStack(e);
                 }
             }
         }
