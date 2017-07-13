@@ -131,12 +131,9 @@ public class StreamsUtil {
 		}
 
 		if (len > 0 && read < len) {
-			// System.out.println("WARNING: expected " + len + "!!");
 			throw new RuntimeException("expected: " + len + " bytes but read "
 					+ read);
 		}
-		// replyS
-		// System.out.println(new String(data, "UTF-8"));
 
 		return data;
 	}
