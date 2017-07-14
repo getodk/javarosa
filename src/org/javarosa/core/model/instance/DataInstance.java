@@ -206,8 +206,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 
 	public String toString() {
 		String name = "NULL";
-		if(this.name != null)
-		{
+		if(this.name != null) {
 			name = this.name;
 		}
 		return name;

@@ -117,9 +117,13 @@ public class CacheTable<K> {
 
 	public K retrieve(int key) {
 		synchronized(this) {
-			if(!currentTable.containsKey(DataUtil.integer(key))) { return null; }
+			if(!currentTable.containsKey(DataUtil.integer(key))) {
+				return null;
+			}
 			K retVal = (K)currentTable.get(DataUtil.integer(key)).get();
-			if(retVal == null) { currentTable.remove(DataUtil.integer(key)); }
+			if(retVal == null) {
+				currentTable.remove(DataUtil.integer(key));
+			}
 			return retVal;
 		}
 	}

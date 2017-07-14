@@ -771,9 +771,13 @@ public class FormEntryModel {
 		}
 
     	List<IFormElement> children = parent.getChildren();
-    	if(children == null) { return false; }
+    	if(children == null) {
+            return false;
+    	}
        for (IFormElement child : children) {
-    		if(containsRepeatGuesses(child)) {return true;}
+    		if(containsRepeatGuesses(child)) {
+                return true;
+    		}
     	}
     	return false;
 	}

@@ -50,7 +50,9 @@ public class LocalizationUtils {
 						int nindex = stringchunk.indexOf('\n',index);
 						//UTF-8 often doesn't encode with newline, but with CR, so if we 
 						//didn't find one, we'll try that
-						if(nindex == -1) { nindex = stringchunk.indexOf('\r',index); }
+						if(nindex == -1) {
+							nindex = stringchunk.indexOf('\r',index);
+						}
 						if(nindex == -1) {
 							line += stringchunk.substring(index);
 							break;

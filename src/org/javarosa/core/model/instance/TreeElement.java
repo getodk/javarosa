@@ -240,7 +240,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChild(java.lang.String, int)
 	 */
 	public TreeElement getChild(String name, int multiplicity) {
-		if(this.children == null) { return null; }
+		if(this.children == null) {
+			return null;
+		}
 
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
 			if(multiplicity == TreeReference.INDEX_TEMPLATE || this.children.size() < multiplicity + 1) {
@@ -273,7 +275,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
-		if(children == null) { return new ArrayList<TreeElement>(0);}
+		if(children == null) {
+			return new ArrayList<TreeElement>(0);
+		}
 
       List<TreeElement> v = new ArrayList<TreeElement>();
 		for (int i = 0; i < this.children.size(); i++) {
@@ -353,7 +357,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				throw new RuntimeException("Attempted to add duplicate child!");
 			}
 		}
-		if(children == null) { children = new ArrayList<TreeElement>(0);}
+		if(children == null) {
+			children = new ArrayList<TreeElement>(0);
+		}
 
 		// try to keep things in order
 		int i = children.size();
@@ -379,7 +385,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#removeChild(org.javarosa.core.model.instance.TreeElement)
 	 */
 	public void removeChild(TreeElement child) {
-		if(children == null) { return;}
+		if(children == null) {
+			return;
+		}
 		children.remove(child);
 	}
 
@@ -687,7 +695,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	public void accept(ITreeVisitor visitor) {
 		visitor.visit(this);
 
-		if(children == null) { return;}
+		if(children == null) {
+			return;
+		}
       for (TreeElement child : children) {
          child.accept(visitor);
       }
@@ -1008,7 +1018,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					}
 
 					this.removeChildAt(j);
-					if(children == null) { children = new ArrayList<TreeElement>(); }
+					if(children == null) {
+						children = new ArrayList<TreeElement>();
+					}
 					this.children.add(i, child2);
 				}
 			}
@@ -1022,7 +1034,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				    for (int k = 0; k < newChildren.size(); k++) {
 				        TreeElement newChild = child.deepCopy(true);
 				        newChild.setMult(k);
-						if(children == null) { children = new ArrayList<TreeElement>(); }
+						if(children == null) {
+							children = new ArrayList<TreeElement>();
+						}
 				        this.children.add(i + k + 1, newChild);
 				        newChild.populate(newChildren.get(k), f);
 				    }
@@ -1083,7 +1097,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				    	TreeElement template = f.getMainInstance().getTemplate(child.getRef());
 				        TreeElement newChild = template.deepCopy(false);
 				        newChild.setMult(k);
-				        if(children == null) { children = new ArrayList<TreeElement>(); }
+				        if(children == null) {
+							children = new ArrayList<TreeElement>();
+				        }
 				        this.children.add(i + k + 1, newChild);
 				        newChild.populateTemplate(newChildren.get(k), f);
 				    }
@@ -1262,17 +1278,14 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * Because I'm tired of not knowing what a TreeElement object has just by looking at it.
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#toString()
 	 */
-	public String toString()
-	{
+	public String toString() {
 		String name = "NULL";
-		if(this.name != null)
-		{
+		if(this.name != null) {
 			name = this.name;
 		}
 
 		String childrenCount = "-1";
-		if(this.children != null)
-		{
+		if(this.children != null) {
 			childrenCount = Integer.toString(this.children.size());
 		}
 
@@ -1326,7 +1339,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates, EvaluationContext evalContext) {
 		//Only do for predicates
-		if(mult != TreeReference.INDEX_UNBOUND || predicates == null) { return null; }
+		if(mult != TreeReference.INDEX_UNBOUND || predicates == null) {
+			return null;
+		}
 
       List<Integer> toRemove = new ArrayList<Integer>();
       List<TreeReference> selectedChildren = null;
@@ -1354,7 +1369,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 						indices = new HashMap<XPathPathExpr, String>();
 						kids = this.getChildrenWithName(name);
 
-						if(kids.size() == 0 ) { return null; }
+						if(kids.size() == 0 ) {
+							return null;
+						}
 
 						//Anything that we're going to use across elements should be on all of them
 						TreeElement kid = kids.get(0);
@@ -1391,7 +1408,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		}
 
 		//if we weren't able to evaluate any predicates, signal that.
-		if(selectedChildren == null) { return null; }
+		if(selectedChildren == null) {
+			return null;
+		}
 
 		//otherwise, remove all of the predicates we've already evaluated
 		for(int i = toRemove.size() - 1; i >= 0 ; i--)  {

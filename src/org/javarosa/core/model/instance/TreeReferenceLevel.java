@@ -109,15 +109,29 @@ public class TreeReferenceLevel implements Externalizable, Serializable {
 			return false;
 		}
 		TreeReferenceLevel l = (TreeReferenceLevel)o;
-		if(multiplicity != l.multiplicity) { return false;}
-		if(name == null && l.name != null) { return false;}
-		if(!name.equals(l.name)) { return false;}
-		if(predicates == null && l.predicates == null) { return true; }
+		if(multiplicity != l.multiplicity) {
+			return false;
+		}
+		if(name == null && l.name != null) {
+			return false;
+		}
+		if(!name.equals(l.name)) {
+			return false;
+		}
+		if(predicates == null && l.predicates == null) {
+			return true;
+		}
 		
-		if((predicates == null && l.predicates != null) || (l.predicates == null && predicates != null)) { return false; }
-		if(predicates.size() != l.predicates.size()) { return false;}
+		if((predicates == null && l.predicates != null) || (l.predicates == null && predicates != null)) {
+			return false;
+		}
+		if(predicates.size() != l.predicates.size()) {
+			return false;
+		}
 		for(int i = 0 ; i < predicates.size() ; ++i) {
-			if(!predicates.get(i).equals(l.predicates.get(i))) { return false; }
+			if(!predicates.get(i).equals(l.predicates.get(i))) {
+				return false;
+			}
 		}
 		return true;
 	}

@@ -94,7 +94,9 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	public String getShortText(){
 		String returnText = getSpecialFormQuestionText(getTextID(), TEXT_FORM_SHORT);
-		if(returnText == null) { returnText = getLongText(); }
+		if(returnText == null) {
+			returnText = getLongText();
+		}
 		return returnText;
 	}
 

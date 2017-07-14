@@ -997,10 +997,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
               new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
       FormInstance fi = null;
-      if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
-      // with the default
-      // instance
-      {
+      if (itemset.nodesetRef.getInstanceName() != null) { // We're not dealing with the default instance
          fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
          if (fi == null) {
             throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName()
