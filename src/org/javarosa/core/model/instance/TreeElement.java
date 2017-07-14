@@ -19,8 +19,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -35,6 +37,7 @@ import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.instance.utils.TreeElementNameComparator;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -268,23 +271,24 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 *
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildrenWithName(java.lang.String)
 	 */
-	public List<TreeElement> getChildrenWithName(String name) {
-		return getChildrenWithName(name, false);
+	public List<TreeElement> getChildrenWithName(String name, Map<String, String> namespacesMap) {
+		return getChildrenWithName(name, false, namespacesMap);
 	}
 
-	private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
-		if(children == null) { return new ArrayList<TreeElement>(0);}
+    private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate, Map<String, String> namespacesMap) {
+        if (children == null) {
+            return Collections.emptyList();
+        }
 
-      List<TreeElement> v = new ArrayList<TreeElement>();
-		for (int i = 0; i < this.children.size(); i++) {
-			TreeElement child = this.children.get(i);
-			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
-					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-				v.add(child);
-		}
+        List<TreeElement> v = new ArrayList<>();
+        for (TreeElement child : children) {
+            if (TreeElementNameComparator.elementMatchesName(child, name, namespacesMap)
+                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
+                v.add(child);
+        }
 
-		return v;
-	}
+        return v;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getNumChildren()
@@ -404,7 +408,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#removeChildren(java.lang.String, boolean)
 	 */
 	public void removeChildren(String name, boolean includeTemplate) {
-		List<TreeElement> v = getChildrenWithName(name, includeTemplate);
+		List<TreeElement> v = getChildrenWithName(name, includeTemplate, null);
 		for (int i = 0; i < v.size(); i++) {
 			removeChild(v.get(i));
 		}
@@ -422,7 +426,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getChildMultiplicity(java.lang.String)
 	 */
 	public int getChildMultiplicity(String name) {
-		return getChildrenWithName(name, false).size();
+		return getChildrenWithName(name, false, null).size();
 	}
 
 	/* (non-Javadoc)
@@ -1016,7 +1020,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName());
+				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName(),
+                        f.getNamespacePrefixesByUri());
 
 				if (child.getMaskVar(MASK_REPEATABLE)) {
 				    for (int k = 0; k < newChildren.size(); k++) {
@@ -1076,7 +1081,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		} else {
 			for (int i = 0; i < this.getNumChildren(); i++) {
 				TreeElement child = this.getChildAt(i);
-				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName());
+				List<TreeElement> newChildren = incoming.getChildrenWithName(child.getName(),
+                        f.getNamespacePrefixesByUri());
 
 				if (child.getMaskVar(MASK_REPEATABLE)) {
 				    for (int k = 0; k < newChildren.size(); k++) {
@@ -1324,7 +1330,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		this.namespace = namespace;
 	}
 
-	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates, EvaluationContext evalContext) {
+	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates,
+                                                  EvaluationContext evalContext, Map<String, String> namespacesMap) {
 		//Only do for predicates
 		if(mult != TreeReference.INDEX_UNBOUND || predicates == null) { return null; }
 
@@ -1352,7 +1359,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					//don't want the overhead if our predicate is too complex anyway
 					if(indices == null) {
 						indices = new HashMap<XPathPathExpr, String>();
-						kids = this.getChildrenWithName(name);
+						kids = this.getChildrenWithName(name, namespacesMap);
 
 						if(kids.size() == 0 ) { return null; }
 
@@ -1400,5 +1407,4 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 		return selectedChildren;
 	}
-
 }

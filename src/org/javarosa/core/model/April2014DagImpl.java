@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
@@ -235,8 +236,8 @@ public class April2014DagImpl extends IDag {
     * replaced when we support dependent XPath Steps (IE: /path/to//)
     */
    private void addChildrenOfReference(EvaluationContext evalContext, TreeReference original,
-         ArrayList<TreeReference> toAdd) {
-      for (TreeReference ref : evalContext.expandReference(original)) {
+         ArrayList<TreeReference> toAdd, Map<String, String> namespacesMap) {
+      for (TreeReference ref : evalContext.expandReference(original, namespacesMap)) {
          addChildrenOfElement(evalContext.resolveReference(ref), toAdd);
       }
    }
@@ -350,7 +351,7 @@ public class April2014DagImpl extends IDag {
     *           The reference to the value which was changed.
     */
    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext,
-         QuickTriggerable qt, TreeReference anchorRef) {
+         QuickTriggerable qt, TreeReference anchorRef, Map<String, String> namespacesMap) {
 
       // Contextualize the reference used by the triggerable against the
       // anchor
@@ -360,7 +361,7 @@ public class April2014DagImpl extends IDag {
          // Now identify all of the fully qualified nodes which this
          // triggerable updates. (Multiple nodes can be updated by the
          // same trigger)
-         List<TreeReference> v = evalContext.expandReference(contextRef);
+         List<TreeReference> v = evalContext.expandReference(contextRef, namespacesMap);
 
          // Go through each one and evaluate the trigger expresion
          for (int i = 0; i < v.size(); i++) {

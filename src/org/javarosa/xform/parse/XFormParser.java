@@ -319,7 +319,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc();
+            parseDoc(buildNamespacesMap());
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -329,6 +329,20 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
         return _f;
+    }
+
+    /** Extracts the namespaces from the html element, if present, and creates a map of URI to prefix */
+    private Map<String, String> buildNamespacesMap() {
+        final Map<String, String> namespacePrefixesByURI = new HashMap<>();
+
+        Element el = _xmldoc.getRootElement();
+        if (el.getName().equals("html")) {
+            for (int i = 0; i < el.getNamespaceCount(); i++) {
+                namespacePrefixesByURI.put(el.getNamespaceUri(i), el.getNamespacePrefix(i));
+            }
+        }
+
+        return namespacePrefixesByURI;
     }
 
     public static Document getXMLDocument(Reader reader) throws IOException  {
@@ -426,8 +440,9 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc() {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri) {
         _f = new FormDef();
+        _f.setNamespacePrefixesByUri(namespacePrefixesByUri);
 
         initState();
         final String defaultNamespace = _xmldoc.getRootElement().getNamespaceUri(null);
@@ -446,7 +461,8 @@ public class XFormParser implements IXFormParserFunctions {
             for(int i = 1; i < instanceNodes.size(); i++)
             {
                 Element e = instanceNodes.get(i);
-                FormInstance fi = instanceParser.parseInstance(e, false, instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
+                FormInstance fi = instanceParser.parseInstance(e, false,
+                        instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
                 loadInstanceData(e, fi.getRoot(), _f);
                 _f.addNonMainInstance(fi);
             }

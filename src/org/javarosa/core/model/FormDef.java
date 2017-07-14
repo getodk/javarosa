@@ -69,6 +69,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -169,6 +170,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    private HashMap<String, List<Action>> eventListeners;
 
    private EventNotifier eventNotifier;
+
+   private Map<String, String> namespacePrefixesByUri;
 
    public FormDef() {
       this(defaultMode, defaultEventNotifier);
@@ -626,7 +629,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
       // delete existing dest nodes that are not in the answer selection
       HashMap<String, TreeElement> existingValues = new HashMap<String, TreeElement>();
-      List<TreeReference> existingNodes = exprEvalContext.expandReference(destRef);
+      List<TreeReference> existingNodes = exprEvalContext.expandReference(destRef, getNamespacePrefixesByUri());
       for (int i = 0; i < existingNodes.size(); i++) {
          TreeElement node = getMainInstance().resolveReference(existingNodes.get(i));
 
@@ -1647,6 +1650,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          return eventListeners.get(event);
       }
       return new ArrayList<Action>();
+   }
+
+   public Map<String, String> getNamespacePrefixesByUri() {
+      return namespacePrefixesByUri;
+   }
+
+   public void setNamespacePrefixesByUri(Map<String, String> namespacePrefixesByUri) {
+      this.namespacePrefixesByUri = namespacePrefixesByUri;
    }
 
    public void registerEventListener(String event, Action action) {

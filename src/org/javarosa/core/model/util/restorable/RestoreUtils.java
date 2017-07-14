@@ -18,6 +18,7 @@ package org.javarosa.core.model.util.restorable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -184,10 +185,11 @@ public class RestoreUtils {
 		applyDataType(dm, path, parent, getDataType(type));
 	}
 
-	public static void applyDataType (FormInstance dm, String path, TreeReference parent, int dataType) {
+	public static void applyDataType (FormInstance dm, String path, TreeReference parent, int dataType,
+									  Map<String, String> namespacesMap) {
 		TreeReference ref = childRef(path, parent);
 
-		List<TreeReference> v = new EvaluationContext(dm).expandReference(ref);
+		List<TreeReference> v = new EvaluationContext(dm).expandReference(ref, namespacesMap);
 		for (int i = 0; i < v.size(); i++) {
 			TreeElement e = dm.resolveReference(v.get(i));
 			e.setDataType(dataType);
