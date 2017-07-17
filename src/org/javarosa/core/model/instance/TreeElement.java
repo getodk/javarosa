@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -108,10 +107,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	private int flags = MASK_RELEVANT | MASK_ENABLED | MASK_RELEVANT_INH | MASK_ENABLED_INH;
 
 	private String namespace;
+	private String namespacePrefix;
 
 	private String instanceName = null;
-
-    private Map<String, String> namespacePrefixesByUri;
 
 	/**
 	 * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
@@ -1407,16 +1405,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		return selectedChildren;
 	}
 
-    /**
-     * Returns a map of namespace prefixes, keyed by namespace URI, pulled from the html element.
-     * These are needed because JavaRosa doesn’t otherwise preserve prefixes (such as in orx:meta).
-     * Will be null except for the root of the instance.
-     */
-    public Map<String, String> getNamespacePrefixesByUri() {
-        return namespacePrefixesByUri;
-    }
+	public String getNamespacePrefix() {
+		return namespacePrefix;
+	}
 
-    public void setNamespacePrefixesByUri(Map<String, String> namespacePrefixesByURI) {
-        this.namespacePrefixesByUri = namespacePrefixesByURI;
-    }
+	public void setNamespacePrefix(String namespacePrefix) {
+		this.namespacePrefix = namespacePrefix;
+	}
 }

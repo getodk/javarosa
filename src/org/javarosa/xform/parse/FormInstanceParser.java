@@ -55,8 +55,7 @@ class FormInstanceParser {
     }
 
     FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) {
-        TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace());
-        root.setNamespacePrefixesByUri(namespacePrefixesByUri);
+        TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace(), namespacePrefixesByUri);
         FormInstance instanceModel = new FormInstance(root);
         instanceModel.setName(isMainInstance ? formDef.getTitle() : name);
 

@@ -3,8 +3,6 @@ package org.javarosa.xform.parse;
 import org.javarosa.core.model.instance.TreeElement;
 import org.junit.Test;
 
-import java.util.HashMap;
-
 import static org.javarosa.core.model.instance.utils.TreeElementNameComparator.elementMatchesName;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +55,7 @@ public class TreeElementNameComparatorTest {
         TreeElement te = new TreeElement(name);
         if (namespace != null && prefix != null) {
             te.setNamespace(namespace);
-            te.setNamespacePrefixesByUri(new HashMap<String, String>() {{ put(namespace, prefix); }});
+            te.setNamespacePrefix(prefix);
         }
         return te;
     }
