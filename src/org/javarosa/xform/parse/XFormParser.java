@@ -328,7 +328,7 @@ public class XFormParser implements IXFormParserFunctions {
         return _f;
     }
 
-    /** Extracts the namespaces from the element, if present, and creates a map of URI to prefix */
+    /** Extracts the namespaces from the given element and creates a map of URI to prefix */
     private static Map<String, String> buildNamespacesMap(Element el) {
         final Map<String, String> namespacePrefixesByURI = new HashMap<>();
 
