@@ -144,8 +144,6 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> namedActions;
     private HashMap<String, IElementHandler> structuredActions;
 
-
-
     //incremented to provide unique question ID for each question
     private int serialQuestionID = 1;
 
@@ -319,7 +317,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc();
+            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()));
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -329,6 +327,17 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
         return _f;
+    }
+
+    /** Extracts the namespaces from the given element and creates a map of URI to prefix */
+    private static Map<String, String> buildNamespacesMap(Element el) {
+        final Map<String, String> namespacePrefixesByURI = new HashMap<>();
+
+        for (int i = 0; i < el.getNamespaceCount(); i++) {
+            namespacePrefixesByURI.put(el.getNamespaceUri(i), el.getNamespacePrefix(i));
+        }
+
+        return namespacePrefixesByURI;
     }
 
     public static Document getXMLDocument(Reader reader) throws IOException  {
@@ -426,7 +435,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc() {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri) {
         _f = new FormDef();
 
         initState();
@@ -446,7 +455,9 @@ public class XFormParser implements IXFormParserFunctions {
             for(int i = 1; i < instanceNodes.size(); i++)
             {
                 Element e = instanceNodes.get(i);
-                FormInstance fi = instanceParser.parseInstance(e, false, instanceNodeIdStrs.get(instanceNodes.indexOf(e)));
+                FormInstance fi = instanceParser.parseInstance(e, false,
+                        instanceNodeIdStrs.get(instanceNodes.indexOf(e)), namespacePrefixesByUri);
+                loadNamespaces(_xmldoc.getRootElement(), fi);
                 loadInstanceData(e, fi.getRoot(), _f);
                 _f.addNonMainInstance(fi);
             }
@@ -454,7 +465,8 @@ public class XFormParser implements IXFormParserFunctions {
         //now parse the main instance
         if(mainInstanceNode != null) {
             FormInstance fi = instanceParser.parseInstance(mainInstanceNode, true,
-                    instanceNodeIdStrs.get(instanceNodes.indexOf(mainInstanceNode)));
+                    instanceNodeIdStrs.get(instanceNodes.indexOf(mainInstanceNode)), namespacePrefixesByUri);
+            loadNamespaces(_xmldoc.getRootElement(), fi);
             addMainInstanceToFormDef(mainInstanceNode, fi);
         }
 
@@ -1751,12 +1763,12 @@ public class XFormParser implements IXFormParserFunctions {
         return prefixes;
     }
 
-    public static TreeElement buildInstanceStructure (Element node, TreeElement parent) {
-        return buildInstanceStructure(node, parent, null, node.getNamespace());
+    public static TreeElement buildInstanceStructure (Element node, TreeElement parent, Map<String, String> namespacePrefixesByUri) {
+        return buildInstanceStructure(node, parent, null, node.getNamespace(), namespacePrefixesByUri);
     }
 
     /** Parses instance hierarchy and turns into a skeleton model; ignoring data content, but respecting repeated nodes and 'template' flags */
-    public static TreeElement buildInstanceStructure (Element node, TreeElement parent, String instanceName, String docnamespace) {
+    public static TreeElement buildInstanceStructure (Element node, TreeElement parent, String instanceName, String docnamespace, Map<String, String> namespacePrefixesByUri) {
         TreeElement element = null;
 
         //catch when text content is mixed with children
@@ -1812,13 +1824,16 @@ public class XFormParser implements IXFormParserFunctions {
             if(!node.getNamespace().equals(docnamespace)) {
                 element.setNamespace(node.getNamespace());
             }
+            if (namespacePrefixesByUri.containsKey(node.getNamespace())) {
+                element.setNamespacePrefix(namespacePrefixesByUri.get(node.getNamespace()));
+            }
         }
 
 
         if (hasElements) {
             for (int i = 0; i < numChildren; i++) {
                 if (node.getType(i) == Node.ELEMENT) {
-                    element.addChild(buildInstanceStructure(node.getElement(i), element, instanceName, docnamespace));
+                    element.addChild(buildInstanceStructure(node.getElement(i), element, instanceName, docnamespace, namespacePrefixesByUri));
                 }
             }
         }
@@ -1979,7 +1994,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         Element e = doc.getRootElement();
 
-        TreeElement te = buildInstanceStructure(e, null);
+        TreeElement te = buildInstanceStructure(e, null, buildNamespacesMap(e));
         FormInstance dm = new FormInstance(te);
         loadNamespaces(e, dm);
         if (r != null) {

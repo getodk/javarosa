@@ -19,6 +19,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.instance.utils.TreeElementNameComparator;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -105,6 +107,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	private int flags = MASK_RELEVANT | MASK_ENABLED | MASK_RELEVANT_INH | MASK_ENABLED_INH;
 
 	private String namespace;
+	private String namespacePrefix;
 
 	private String instanceName = null;
 
@@ -272,19 +275,20 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		return getChildrenWithName(name, false);
 	}
 
-	private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
-		if(children == null) { return new ArrayList<TreeElement>(0);}
+    private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
+        if (children == null) {
+            return Collections.emptyList();
+        }
 
-      List<TreeElement> v = new ArrayList<TreeElement>();
-		for (int i = 0; i < this.children.size(); i++) {
-			TreeElement child = this.children.get(i);
-			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
-					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-				v.add(child);
-		}
+        List<TreeElement> v = new ArrayList<>();
+        for (TreeElement child : children) {
+            if (TreeElementNameComparator.elementMatchesName(child, name)
+                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
+                v.add(child);
+        }
 
-		return v;
-	}
+        return v;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.instance.AbstractTreeElement#getNumChildren()
@@ -1401,4 +1405,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		return selectedChildren;
 	}
 
+	public String getNamespacePrefix() {
+		return namespacePrefix;
+	}
+
+	public void setNamespacePrefix(String namespacePrefix) {
+		this.namespacePrefix = namespacePrefix;
+	}
 }
