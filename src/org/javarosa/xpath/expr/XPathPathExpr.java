@@ -42,7 +42,8 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -191,7 +192,7 @@ public class XPathPathExpr extends XPathExpression {
 		return ref;
 	}
 
-	public XPathNodeset eval (FormInstance m, EvaluationContext ec) {
+	public XPathNodeset eval (DataInstance m, EvaluationContext ec) {
 		TreeReference genericRef = getReference();
 
 		TreeReference ref;
@@ -207,7 +208,7 @@ public class XPathPathExpr extends XPathExpression {
 		//check if this nodeset refers to a non-main instance
 		if(ref.getInstanceName() != null && ref.isAbsolute())
 		{
-			FormInstance nonMain = ec.getInstance(ref.getInstanceName());
+			DataInstance nonMain = ec.getInstance(ref.getInstanceName());
 			if(nonMain != null)
 			{
 				m = nonMain;
@@ -269,12 +270,12 @@ public class XPathPathExpr extends XPathExpression {
 //		}
 //	}
 
-	public static Object getRefValue (FormInstance model, EvaluationContext ec, TreeReference ref) {
+	public static Object getRefValue (DataInstance model, EvaluationContext ec, TreeReference ref) {
 		if (ec.isConstraint && ref.equals(ec.getContextRef())) {
 			//ITEMSET TODO: need to update this; for itemset/copy constraints, need to simulate a whole xml sub-tree here
 			return unpackValue(ec.candidateValue);
 		} else {
-			TreeElement node = model.resolveReference(ref);
+			AbstractTreeElement node = model.resolveReference(ref);
 			if (node == null) {
 				//shouldn't happen -- only existent nodes should be in nodeset
 				throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
@@ -442,7 +443,7 @@ public class XPathPathExpr extends XPathExpression {
 		return path;
 	}
 
-	public Object pivot (FormInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		TreeReference ref = this.getReference();
 		//Either concretely the sentinal, or "."
 		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {

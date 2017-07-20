@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.List;
 
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.Externalizable;
 
@@ -49,7 +49,7 @@ public interface IConditionExpr extends Externalizable {
 	 * @param evalContext
 	 * @return
 	 */
-	boolean eval (FormInstance model, EvaluationContext evalContext);
+	boolean eval (DataInstance model, EvaluationContext evalContext);
 
 	/**
 	 * Evaluate this expression against the current models and
@@ -60,7 +60,7 @@ public interface IConditionExpr extends Externalizable {
 	 * @param evalContext
 	 * @return
 	 */
-	Object evalRaw (FormInstance model, EvaluationContext evalContext);
+	Object evalRaw (DataInstance model, EvaluationContext evalContext);
 
 	/**
 	 * Used for itemsets. Fill this documentation in.
@@ -69,7 +69,7 @@ public interface IConditionExpr extends Externalizable {
 	 * @param evalContext
 	 * @return
 	 */
-	String evalReadable (FormInstance model, EvaluationContext evalContext);
+	String evalReadable (DataInstance model, EvaluationContext evalContext);
 
 	/**
 	 * Used for itemsets. Fill this documentation in.
@@ -78,7 +78,7 @@ public interface IConditionExpr extends Externalizable {
 	 * @param evalContext
 	 * @return
 	 */
-   List<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext);
+   List<TreeReference> evalNodeset (DataInstance model, EvaluationContext evalContext);
 
 	/**
 	 * Provides a list of all of the references that this expression's value depends upon
@@ -100,5 +100,5 @@ public interface IConditionExpr extends Externalizable {
 	 * @return
 	 * @throws UnpivotableExpressionException
 	 */
-   List<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException;
+   List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException;
 }
