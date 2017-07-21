@@ -457,7 +457,7 @@ public class XFormParser implements IXFormParserFunctions {
                 Element e = instanceNodes.get(i);
                 FormInstance fi = instanceParser.parseInstance(e, false,
                         instanceNodeIdStrs.get(instanceNodes.indexOf(e)), namespacePrefixesByUri);
-                loadNamespaces(_xmldoc.getRootElement(), fi);
+                loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
                 loadInstanceData(e, fi.getRoot(), _f);
                 _f.addNonMainInstance(fi);
             }
@@ -466,6 +466,13 @@ public class XFormParser implements IXFormParserFunctions {
         if(mainInstanceNode != null) {
             FormInstance fi = instanceParser.parseInstance(mainInstanceNode, true,
                     instanceNodeIdStrs.get(instanceNodes.indexOf(mainInstanceNode)), namespacePrefixesByUri);
+            /*
+             Load namespaces definition (map of prefixes -> URIs) into a form instance so later it can be used
+             during the form instance serialization (XFormSerializingVisitor#visit). If the map is not present, then
+             serializer will provide own prefixes for the namespaces present in the nodes.
+             This will lead to inconsistency between prefixes used in the form definition (bindings)
+             and prefixes in the form instance after the instance is restored and inserted into the form definition.
+             */
             loadNamespaces(_xmldoc.getRootElement(), fi);
             addMainInstanceToFormDef(mainInstanceNode, fi);
         }

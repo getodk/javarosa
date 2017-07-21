@@ -36,6 +36,9 @@ public class XFormParserTest {
     private static final String AUDIT_3_NODE = "audit3";
     private static final String AUDIT_3_ANSWER = "audit333.csv";
 
+    private static final String ORX_2_NAMESPACE_PREFIX = "orx2";
+    private static final String ORX_2_NAMESPACE_URI = "http://openrosa.org/xforms";
+
     @After
     public void tearDown() throws Exception {
         new File(FORM_INSTANCE_XML_FILE_NAME).delete();
@@ -88,9 +91,19 @@ public class XFormParserTest {
         TreeElement audit = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_NODE);
         TreeElement audit2 = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_2_NODE);
         TreeElement audit3 = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_3_NODE);
+
         assertNotNull(audit);
+        assertEquals(ORX_2_NAMESPACE_PREFIX, audit.getNamespacePrefix());
+        assertEquals(ORX_2_NAMESPACE_URI, audit.getNamespace());
+
         assertNotNull(audit2);
+        assertEquals(ORX_2_NAMESPACE_PREFIX, audit2.getNamespacePrefix());
+        assertEquals(ORX_2_NAMESPACE_URI, audit2.getNamespace());
+
         assertNotNull(audit3);
+        assertEquals(null, audit3.getNamespacePrefix());
+        assertEquals(null, audit3.getNamespace());
+
         audit.setAnswer(new StringData(AUDIT_ANSWER));
         audit2.setAnswer(new StringData(AUDIT_2_ANSWER));
         audit3.setAnswer(new StringData(AUDIT_3_ANSWER));
@@ -112,12 +125,18 @@ public class XFormParserTest {
         audit3 = findDepthFirst(formInstance.getRoot(), AUDIT_3_NODE);
 
         assertNotNull(audit);
+        assertEquals(ORX_2_NAMESPACE_PREFIX, audit.getNamespacePrefix());
+        assertEquals(ORX_2_NAMESPACE_URI, audit.getNamespace());
         assertEquals(AUDIT_ANSWER, audit.getValue().getValue());
 
         assertNotNull(audit2);
+        assertEquals(ORX_2_NAMESPACE_PREFIX, audit2.getNamespacePrefix());
+        assertEquals(ORX_2_NAMESPACE_URI, audit2.getNamespace());
         assertEquals(AUDIT_2_ANSWER, audit2.getValue().getValue());
 
         assertNotNull(audit3);
+        assertEquals(null, audit3.getNamespacePrefix());
+        assertEquals(null, audit3.getNamespace());
         assertEquals(AUDIT_3_ANSWER, audit3.getValue().getValue());
     }
 
