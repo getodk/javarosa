@@ -464,7 +464,7 @@ public class XFormParser implements IXFormParserFunctions {
                 } else {
                     FormInstance fi = instanceParser.parseInstance(instance, false,
                         instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
-                    loadNamespaces(_xmldoc.getRootElement(), fi);
+                    loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
                     loadInstanceData(instance, fi.getRoot(), _f);
                     _f.addNonMainInstance(fi);
                 }
@@ -474,20 +474,24 @@ public class XFormParser implements IXFormParserFunctions {
         if(mainInstanceNode != null) {
             FormInstance fi = instanceParser.parseInstance(mainInstanceNode, true,
                     instanceNodeIdStrs.get(instanceNodes.indexOf(mainInstanceNode)), namespacePrefixesByUri);
+            /*
+             Load namespaces definition (map of prefixes -> URIs) into a form instance so later it can be used
+             during the form instance serialization (XFormSerializingVisitor#visit). If the map is not present, then
+             serializer will provide own prefixes for the namespaces present in the nodes.
+             This will lead to inconsistency between prefixes used in the form definition (bindings)
+             and prefixes in the form instance after the instance is restored and inserted into the form definition.
+             */
             loadNamespaces(_xmldoc.getRootElement(), fi);
             addMainInstanceToFormDef(mainInstanceNode, fi);
         }
 
         // Clear the caches, as these may not have been initialized
         // entirely correctly during the validation steps.
-        Enumeration<DataInstance> e = _f.getNonMainInstances();
+        Enumeration<FormInstance> e = _f.getNonMainInstances();
         while ( e.hasMoreElements() ) {
-            DataInstance instance = e.nextElement();
-            final AbstractTreeElement treeElement = instance.getRoot();
-            if (treeElement instanceof TreeElement) {
-                ((TreeElement) treeElement).clearChildrenCaches();
-            }
-            treeElement.clearCaches();
+            FormInstance fi = e.nextElement();
+            fi.getRoot().clearChildrenCaches();
+            fi.getRoot().clearCaches();
         }
         _f.getMainInstance().getRoot().clearChildrenCaches();
         _f.getMainInstance().getRoot().clearCaches();
