@@ -19,6 +19,7 @@ package org.javarosa.core.model.utils;
 import java.util.Date;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -169,7 +170,7 @@ public class QuestionPreloader {
 		if(handler != null) {
 			return handler.handlePreload(preloadParams);
 		} else {
-			System.err.println("Do not know how to handle preloader [" + preloadType + "]");
+			Std.err.println("Do not know how to handle preloader [" + preloadType + "]");
 			return null;
 		}
 	}
@@ -179,7 +180,7 @@ public class QuestionPreloader {
 		if(handler != null) {
 			return handler.handlePostProcess(node, params);
 		} else {
-			System.err.println("Do not know how to handle preloader [" + preloadType + "]");
+			Std.err.println("Do not know how to handle preloader [" + preloadType + "]");
 			return false;
 		}
 	}

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -263,7 +264,7 @@ public class GroupDef implements IFormElement, Localizable {
 			return;
 		}
 		if(DateUtils.stringContains(textID,";")){
-			System.err.println("Warning: TextID contains ;form modifier:: \""+textID.substring(textID.indexOf(";"))+"\"... will be stripped.");
+			Std.err.println("Warning: TextID contains ;form modifier:: \""+textID.substring(textID.indexOf(";"))+"\"... will be stripped.");
 			textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
 		}
 		this.textID = textID;

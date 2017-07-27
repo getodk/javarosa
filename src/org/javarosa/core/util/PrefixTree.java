@@ -169,7 +169,6 @@ public class PrefixTree {
 		return root.toString();
 	}
 	public void seal() {
-		//System.out.println(toString());
 		root.seal();
 		finalized = true;
 	}

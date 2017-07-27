@@ -19,6 +19,7 @@ package org.javarosa.xpath.parser.ast;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.Parser;
 import org.javarosa.xpath.parser.Token;
@@ -34,8 +35,8 @@ public abstract class ASTNode {
 	
 	private void printStr (String s) {
 		for (int i = 0; i < 2 * indent; i++)
-			System.out.print(" ");
-		System.out.println(s);
+			Std.out.print(" ");
+		Std.out.println(s);
 	}
 
 	public void print () {

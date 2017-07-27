@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
@@ -76,8 +77,8 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 
 	private void printStr (String s) {
 		for (int i = 0; i < 2 * indent; i++)
-			System.out.print(" ");
-		System.out.println(s);
+			Std.out.print(" ");
+		Std.out.println(s);
 	}
 
 	public void printParseTree () {

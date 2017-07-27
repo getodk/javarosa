@@ -23,6 +23,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -67,7 +68,7 @@ public class XPathReference implements IDataReference {
 			if (validNonPathExpr) {
 				throw new XPathTypeMismatchException("Expected XPath path, got XPath expression: [" + nodeset + "]," + xse.getMessage());
 			} else {
-				xse.printStackTrace();
+				Std.printStack(xse);
 				throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
 			}
 		}

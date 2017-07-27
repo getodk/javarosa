@@ -24,6 +24,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -130,7 +131,7 @@ public class ModelReferencePayload implements IDataPayload {
 				payload = serializer.createSerializedPayload(tree);
 			} catch (IOException e) {
 				//Assertion, do not catch!
-				e.printStackTrace();
+				Std.printStack(e);
 				throw new RuntimeException("ModelReferencePayload failed to retrieve its model from rms [" + e.getMessage() + "]");
 			}
 		}

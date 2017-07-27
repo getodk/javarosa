@@ -1,5 +1,6 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
 import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
@@ -53,8 +55,8 @@ class FormInstanceParser {
         this.actionTargets = actionTargets;
     }
 
-    FormInstance parseInstance(Element e, boolean isMainInstance, String name) {
-        TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace());
+    FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) {
+        TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace(), namespacePrefixesByUri);
         FormInstance instanceModel = new FormInstance(root);
         instanceModel.setName(isMainInstance ? formDef.getTitle() : name);
 
@@ -133,7 +135,7 @@ class FormInstanceParser {
             TreeReference ref = FormInstance.unpackReference(bind.getReference());
 
             if (ref.size() == 0) {
-                System.out.println("Cannot bind to '/'; ignoring bind...");
+                Std.out.println("Cannot bind to '/'; ignoring bind...");
                 bindings.remove(i);
                 i--;
             } else {
@@ -185,7 +187,7 @@ class FormInstanceParser {
         int mult = node.getMult();
         if (mult > 0) { //repeated node
             if (!node.isRepeatable()) {
-                System.out.println("Warning: repeated nodes [" + node.getName() + "] detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
+                Std.out.println("Warning: repeated nodes [" + node.getName() + "] detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
                 //we could do a more comprehensive safety check in the future
             }
         }

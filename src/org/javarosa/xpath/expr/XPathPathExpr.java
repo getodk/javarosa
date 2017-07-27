@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
@@ -318,7 +319,7 @@ public class XPathPathExpr extends XPathExpression {
 			// we have no access fns that interact with GeoTrace objects (the getValue() data type)...
 			return val.getDisplayText();
 		} else {
-			System.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
+			Std.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
 			return val.getValue(); //is this a good idea?
 		}
 	}

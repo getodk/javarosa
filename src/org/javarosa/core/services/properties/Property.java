@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -59,7 +60,7 @@ public class Property implements Persistable, IMetaData {
         value = new ArrayList<String>();
         if(nameindex == -1) {
     		//#if debug.output==verbose
-            System.out.println("WARNING: Property in RMS with no value:"+fullString);
+            Std.out.println("WARNING: Property in RMS with no value:"+fullString);
             //#endif
             name = fullString.substring(0, fullString.length());
         }

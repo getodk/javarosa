@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -315,18 +316,18 @@ public abstract class IDag {
 				qt.t.print(w);
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Std.printStack(e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Std.printStack(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Std.printStack(e);
 		} finally {
 			if (w != null) {
 				try {
 					w.flush();
 					w.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					Std.printStack(e);
 				}
 			}
 		}
