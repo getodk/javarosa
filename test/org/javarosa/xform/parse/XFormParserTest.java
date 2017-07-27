@@ -7,6 +7,12 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.model.xform.XFormSerializingVisitor;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
 
@@ -21,6 +27,7 @@ import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -56,6 +63,22 @@ public class XFormParserTest {
         assertEquals("My Survey", formDef.getTitle());
         assertEquals(3, formDef.getChildren().size());
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
+    }
+
+    @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
+        FormDef formDef = parse("external-secondary-instance.xml").formDef;
+        assertEquals("Form with external secondary instance", formDef.getTitle());
+        TreeReference treeReference = ((XPathPathExpr)
+                parseXPath("instance('towns')/data_set")).getReference();
+        EvaluationContext evaluationContext = formDef.getEvaluationContext();
+        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
+        assertEquals(1, treeReferences.size());
+        DataInstance townInstance = formDef.getNonMainInstance("towns");
+        AbstractTreeElement tiRoot = townInstance.getRoot();
+        assertEquals("towndata", tiRoot.getName());
+        assertEquals(1, tiRoot.getNumChildren());
+        AbstractTreeElement dataSetChild = tiRoot.getChild("data_set", 0);
+        assertEquals("us_east", dataSetChild.getValue().getDisplayText());
     }
 
     @Test
