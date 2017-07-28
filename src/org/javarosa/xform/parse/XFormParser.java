@@ -487,11 +487,14 @@ public class XFormParser implements IXFormParserFunctions {
 
         // Clear the caches, as these may not have been initialized
         // entirely correctly during the validation steps.
-        Enumeration<FormInstance> e = _f.getNonMainInstances();
+        Enumeration<DataInstance> e = _f.getNonMainInstances();
         while ( e.hasMoreElements() ) {
-            FormInstance fi = e.nextElement();
-            fi.getRoot().clearChildrenCaches();
-            fi.getRoot().clearCaches();
+            DataInstance instance = e.nextElement();
+            final AbstractTreeElement treeElement = instance.getRoot();
+            if (treeElement instanceof TreeElement) {
+                ((TreeElement) treeElement).clearChildrenCaches();
+            }
+            treeElement.clearCaches();
         }
         _f.getMainInstance().getRoot().clearChildrenCaches();
         _f.getMainInstance().getRoot().clearCaches();
