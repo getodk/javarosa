@@ -33,7 +33,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class DateData implements IAnswerData {
 	Date d;
-	boolean init = false;
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -47,16 +46,8 @@ public class DateData implements IAnswerData {
 		setValue(d);
 	}
 
-	private void init() {
-		if(!init) {
-			d = DateUtils.roundDate(d);
-			init = true;
-		}
-	}
-
     @Override
 	public IAnswerData clone () {
-		init();
 		return new DateData(new Date(d.getTime()));
 	}
 
@@ -66,19 +57,16 @@ public class DateData implements IAnswerData {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
-		d = (Date)o;
-		init = false;
+		d = DateUtils.roundDate((Date) o);
 	}
 
     @Override
 	public Object getValue () {
-		init();
 		return new Date(d.getTime());
 	}
 
     @Override
 	public String getDisplayText () {
-		init();
 		return DateUtils.formatDate(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 	}
 
@@ -87,7 +75,6 @@ public class DateData implements IAnswerData {
 	 */
     @Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		init();
 		setValue(ExtUtil.readDate(in));
 	}
 
@@ -96,13 +83,11 @@ public class DateData implements IAnswerData {
 	 */
     @Override
 	public void writeExternal(DataOutputStream out) throws IOException {
-		init();
 		ExtUtil.writeDate(out, d);
 	}
 
     @Override
 	public UncastData uncast() {
-		init();
 		return new UncastData(DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601));
 	}
 
