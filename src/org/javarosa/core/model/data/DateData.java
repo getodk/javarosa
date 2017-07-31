@@ -32,7 +32,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class DateData implements IAnswerData {
-	Date d;
+	private Date d;
 	boolean init = false;
 
 	/**
