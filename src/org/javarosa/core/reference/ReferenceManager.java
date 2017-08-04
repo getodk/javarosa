@@ -56,6 +56,15 @@ public class ReferenceManager {
 		return instance;
 	}
 
+    /**
+     * @deprecated use instance() instead
+     * @see ReferenceManager#instance
+     */
+	@Deprecated
+	public static ReferenceManager _() {
+	    return instance();
+    }
+
 	/**
 	 * @return The available reference factories
 	 */
