@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  * Static utility methods for Dates in j2me
@@ -270,8 +272,7 @@ public class DateUtils {
 				} else if (c == 'n') {	//numeric month
 					sb.append(f.month);
 				} else if (c == 'b') {	//short text month
-					String[] months = new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-					sb.append(months[f.month - 1]);
+                    sb.append(DateTimeFormat.forPattern("MMM").print(new DateTime(DateUtils.getDate(f))));
 				} else if (c == 'd') {	//0-padded day of month
 					sb.append(intPad(f.day, 2));
 				} else if (c == 'e') {	//day of month
@@ -287,8 +288,7 @@ public class DateUtils {
 				} else if (c == '3') {	//0-padded millisecond ticks (000-999)
 					sb.append(intPad(f.secTicks, 3));
 				} else if (c == 'a') {	//Three letter short text day
-					String[] dayNames = new String[] {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-					sb.append(dayNames[f.dow - 1]);
+                    sb.append(DateTimeFormat.forPattern("EEE").print(new DateTime(DateUtils.getDate(f))));
 				} else if (c == 'Z' || c == 'A' || c == 'B') {
 					throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
 				} else {

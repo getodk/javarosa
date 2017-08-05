@@ -21,6 +21,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -31,7 +33,7 @@ import java.util.TimeZone;
 
 public class DateUtilsTests extends TestCase {
 	
-	private static int NUM_TESTS = 7;
+	private static int NUM_TESTS = 8;
 	
 	Date currentTime;
 	Date minusOneHour;
@@ -74,6 +76,7 @@ public class DateUtilsTests extends TestCase {
 		case 5: return "testParity";
 		case 6: return "testParseTime_with_DST";
 		case 7: return "testDateTimeParses";
+		case 8: return "testFormatting";
 		}
 		throw new IllegalStateException("Unexpected index");
 	}
@@ -331,6 +334,40 @@ public class DateUtilsTests extends TestCase {
 		}
 
 	}
+
+	public void testFormatting() {
+	    class LangJanSun {
+            private LangJanSun(String language, String january, String sunday) {
+                this.language = language;
+                this.january = january;
+                this.sunday = sunday;
+            }
+
+            private String language;
+	        private String january;
+	        private String sunday;
+        }
+
+        LangJanSun langJanSuns[] = new LangJanSun[] {
+	      new LangJanSun("en", "Jan",   "Sun"),
+	      new LangJanSun("es", "ene",   "dom"),
+	      new LangJanSun("fr", "janv.", "dim.")
+        };
+
+	    Locale savedLocale = Locale.getDefault();
+
+	    for (LangJanSun ljs : langJanSuns) {
+            Locale.setDefault(Locale.forLanguageTag(ljs.language));
+
+            String month = DateUtils.format(new DateTime().withMonthOfYear(DateTimeConstants.JANUARY).toDate(), "%b");
+            assertEquals(ljs.january, month);
+
+            String day = DateUtils.format(new DateTime().withDayOfWeek(DateTimeConstants.SUNDAY).toDate(), "%a");
+            assertEquals(ljs.sunday, day);
+        }
+
+        Locale.setDefault(savedLocale);
+    }
 /*
 	private void testGetData() {
 		
