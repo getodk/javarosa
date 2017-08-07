@@ -86,4 +86,4 @@ To generate official signed releases, you'll need the GPG folder, GPG passwords,
 	* If successful, both snapshots and production releases will appear in OSSRH [here](https://oss.sonatype.org/content/groups/public/org/opendatakit/opendatakit-javarosa/). 
 	* Production releases are automatically synced to Central [here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22opendatakit-javarosa%22) a few hours later.
 
-Don't forget to update the `build.gradle` files in any downstream tools (e.g., ODK Collect, ODK Collect) to the newest version!
+Don't forget to update the `build.gradle` files in any downstream tools (e.g., ODK Collect, ODK Briefcase) to the newest version!
