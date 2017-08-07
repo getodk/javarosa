@@ -3,7 +3,7 @@ package org.javarosa.xpath;
 import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
 
@@ -39,7 +39,7 @@ public class XPathLazyNodeset extends XPathNodeset {
 	 * @param instance
 	 * @param ec
 	 */
-	public XPathLazyNodeset (TreeReference unExpandedRef, FormInstance instance, EvaluationContext ec) {
+	public XPathLazyNodeset (TreeReference unExpandedRef, DataInstance instance, EvaluationContext ec) {
 		super(instance, ec);
 		this.unExpandedRef = unExpandedRef;
 	}

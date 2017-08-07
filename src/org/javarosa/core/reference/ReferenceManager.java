@@ -49,12 +49,21 @@ public class ReferenceManager {
 	 * @return Singleton accessor to the global
 	 * ReferenceManager.
 	 */
-	public static ReferenceManager _() {
+	public static ReferenceManager instance() {
 		if(instance == null) {
 			instance = new ReferenceManager();
 		}
 		return instance;
 	}
+
+    /**
+     * @deprecated use instance() instead
+     * @see ReferenceManager#instance
+     */
+	@Deprecated
+	public static ReferenceManager _() {
+	    return instance();
+    }
 
 	/**
 	 * @return The available reference factories
