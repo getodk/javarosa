@@ -65,6 +65,12 @@ public class XFormParserTest {
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
     }
 
+    @Test
+    public void parsesPreloadForm() throws IOException {
+        FormDef formDef = parse("Sample-Preloading.xml").formDef;
+        assertEquals("Sample Form - Preloading", formDef.getTitle());
+    }
+
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
         FormDef formDef = parse("external-secondary-instance.xml").formDef;
         assertEquals("Form with external secondary instance", formDef.getTitle());
