@@ -54,6 +54,8 @@ import org.javarosa.xform.util.InterningKXmlParser;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.xml.util.InvalidStructureException;
+import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -81,6 +83,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExternalDataInstance;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.Constants.SELECT;
@@ -456,11 +459,15 @@ public class XFormParser implements IXFormParserFunctions {
         if (instanceNodes.size() > 1) {
             for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
                 final Element instance = instanceNodes.get(instanceIndex);
-                final String srcLocation = instance.getAttributeValue(null, "src");
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
+                final String ediPath = getPathIfExternalDataInstance(instance.getAttributeValue(null, "src"));
 
-                if (srcLocation != null) {
-                    _f.addNonMainInstance(new ExternalDataInstance(srcLocation, instanceId));
+                if (ediPath != null) {
+                    try { /* todo implement better error handling */
+                        _f.addNonMainInstance(new ExternalDataInstance(ediPath, instanceId));
+                    } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     FormInstance fi = instanceParser.parseInstance(instance, false,
                         instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
