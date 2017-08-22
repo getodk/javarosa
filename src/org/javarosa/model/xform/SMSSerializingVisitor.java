@@ -176,7 +176,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
 			if (serializedAnswer instanceof Element) {
 				// DON"T handle this.
-				throw new RuntimeException("Can't handle serialized output for"
+				throw new RuntimeException("Can't handle serialized output for "
 						+ instanceNode.getValue().toString() + ", "
 						+ serializedAnswer);
 			} else if (serializedAnswer instanceof String) {
