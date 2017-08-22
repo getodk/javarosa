@@ -68,7 +68,7 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` (and not `
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<gpg.executable>gpg2</gpg.executable>
+				<gpg.executable>/path/to/gpg2</gpg.executable>
 				<gpg.homedir>/path/to/javarosa/gpg/folder</gpg.homedir>
 				<gpg.keyname>1234ABCD</gpg.keyname>
 				<gpg.passphrase>very-secure-passphrase</gpg.passphrase>
