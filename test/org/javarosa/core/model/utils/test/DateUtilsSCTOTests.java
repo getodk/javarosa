@@ -47,7 +47,7 @@ public class DateUtilsSCTOTests extends TestCase {
 
         String formatted = DateUtils.formatTime(date, DateUtils.FORMAT_ISO8601);
 
-        assertEquals("11:03:05.011+02", formatted);
+        assertEquals("12:03:05.011+02", formatted);
 
         restoreTimeZone(timeZone);
     }

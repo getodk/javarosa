@@ -20,7 +20,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.model.utils.DateUtils.DateFields;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -173,63 +172,17 @@ public class DateUtilsTests extends TestCase {
 	}
 
 	public void testTimeParses() {
-		//This is all kind of tricky. We need to assume J2ME level compliance, so
-		//dates won't every be assumed to have an intrinsic timezone, they'll be
-		//assumed to be in the phone's default timezone
-		
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		
-		testTime("10:00", 1000*60*60*10 - getOffset());
+		testTime("10:00", 1000*60*60*10);
 		testTime("10:00Z", 1000*60*60*10);
 		
-		testTime("10:00+02", 1000*60*60*8);
-		testTime("10:00-02", 1000*60*60*12);
+		testTime("10:00+02", 1000*60*60*10);
+		testTime("10:00-02", 1000*60*60*10);
 		
-		testTime("10:00+02:30", 1000*60*(60*10-150));
-		testTime("10:00-02:30", 1000*60*(60*10+150));
-		
-		TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
-		
-		TimeZone.setDefault(offsetTwoHours);
-		
-		testTime("10:00", 1000*60*60*10 - getOffset());
-		testTime("10:00Z", 1000*60*60*10);
-		
-		testTime("10:00+02", 1000*60*60*8);
-		testTime("10:00-02", 1000*60*60*12);
-		
-		testTime("10:00+02:30", 1000*60*(60*10-150));
-		testTime("10:00-02:30", 1000*60*(60*10+150));
+		testTime("10:00+02:30", 1000*60*60*10);
+		testTime("10:00-02:30", 1000*60*60*10);
 
-		TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-02");
-		
-		TimeZone.setDefault(offsetMinusTwoHours);
-		
-		testTime("14:00", 1000*60*60*14 - getOffset());
-		testTime("14:00Z", 1000*60*60*14);
-		
-		testTime("14:00+02", 1000*60*60*12);
-		testTime("14:00-02", 1000*60*60*16);
-		
-		testTime("14:00+02:30", 1000*60*(60*14-150));
-		testTime("14:00-02:30", 1000*60*(60*14+150));
-
-
-		TimeZone offsetPlusHalf = TimeZone.getTimeZone("GMT+0230");
-		
-		TimeZone.setDefault(offsetPlusHalf);
-		
-		testTime("14:00", 1000*60*60*14 - getOffset());
-		testTime("14:00Z", 1000*60*60*14);
-		
-		testTime("14:00+02", 1000*60*60*12);
-		testTime("14:00-02", 1000*60*60*16);
-		
-		testTime("14:00+02:30", 1000*60*(60*14-150));
-		testTime("14:00-02:30", 1000*60*(60*14+150));
-		
-		testTime("14:00+04:00", 1000*60*60*10);
-		
 		TimeZone.setDefault(null);
 	}
 	
@@ -244,13 +197,6 @@ public class DateUtilsTests extends TestCase {
 			e.printStackTrace();
 			fail("Error: " + in + e.getMessage());
 		}
-	}
-	
-	private long getOffset() {
-		DateFields df = new DateFields();
-		Date d = DateUtils.getDate(df);
-
-		return -d.getTime();
 	}
 	
 	public void testParity() {
@@ -306,7 +252,7 @@ public class DateUtilsTests extends TestCase {
 		TimeZone.setDefault(dstTimezone);
 
 		String time = "12:03:05.000Z";
-		testTime(time, 43385000L);
+		testTime(time, 32585000);
 
 		Date date = DateUtils.parseTime(time);
 
@@ -314,7 +260,7 @@ public class DateUtilsTests extends TestCase {
 		String formatted = formatter.format(date);
 
 		// It should shift 3 hours, 2 for the zone and 1 for DST.
-		assertEquals("3:03:05 PM", formatted);
+		assertEquals("12:03:05 PM", formatted);
 
 		TimeZone.setDefault(backupZone);
 	}
