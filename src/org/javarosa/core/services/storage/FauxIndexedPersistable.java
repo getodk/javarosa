@@ -45,8 +45,8 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.Persistable#setID(int)
 	 */
-	public void setID(int ID) {
-		p.setID(ID);
+	public void setID(int id) {
+		p.setID(id);
 	}
 
 	/* (non-Javadoc)

@@ -640,11 +640,11 @@ public class DateUtils {
      * @param start "sun", "mon", ... etc. representing the start of the time period.
      * @param beginning true=return first day of period, false=return last day of period
      * @param includeToday Whether to include the current date in the returned calculation
-     * @param nAgo How many periods ago. 1=most recent period, 0=period in progress
+     * @param periodsAgo How many periods ago. 1=most recent period, 0=period in progress
      * @return a Date object representing the amount of time between the
      * reference date, and the given parameters.
      */
-	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
+	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int periodsAgo) {
 		Date d = null;
 
 		if (type.equals("week")) {
@@ -708,7 +708,7 @@ public class DateUtils {
 				throw new RuntimeException(); //something is wrong
 			}
 
-			diff = (((currentDow - targetDow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
+			diff = (((currentDow - targetDow) + (7 + offset)) % 7 - offset) + (7 * periodsAgo) - (beginning ? 0 : 6); //booyah
 			d = new Date(ref.getTime() - diff * DAY_IN_MS);
 		} else if (type.equals("month")) {
 			//not supported

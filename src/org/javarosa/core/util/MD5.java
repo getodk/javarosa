@@ -173,14 +173,14 @@ public class MD5 {
 				| (buffer[shift + 63] << 24);
 	}
 
-	private final void transform(MD5State state, byte buffer[], int shift, int[] decode_buf) {
+	private final void transform(MD5State state, byte buffer[], int shift, int[] decodeBuf) {
 		int a = state.state[0];
 		int b = state.state[1];
 		int c = state.state[2];
 		int d = state.state[3];
-		int x[] = decode_buf;
+		int x[] = decodeBuf;
 
-		decode(buffer, shift, decode_buf);
+		decode(buffer, shift, decodeBuf);
 
 		/* Round 1 */
 		a += ((b & c) | (~b & d)) + x[0] + 0xd76aa478; /* 1 */

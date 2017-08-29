@@ -54,10 +54,10 @@ public class SelectChoice implements Externalizable, Localizable {
 		}
 	}
 	
-	public SelectChoice(String labelOrID,String Value, boolean isLocalizable){
+	public SelectChoice(String labelOrID, String value, boolean isLocalizable){
 		this(isLocalizable ? labelOrID : null,
 			 isLocalizable ? null : labelOrID,
-			 Value,isLocalizable);
+			 value,isLocalizable);
 	}
 	
 	public void setIndex (int index) {

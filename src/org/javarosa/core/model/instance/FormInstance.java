@@ -258,8 +258,8 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.instance.FormInstanceAdapter#addNamespace(java.lang.String, java.lang.String)
 	 */
-	public void addNamespace(String prefix, String URI) {
-		namespaces.put(prefix, URI);
+	public void addNamespace(String prefix, String uri) {
+		namespaces.put(prefix, uri);
 	}
 
 	/* (non-Javadoc)

@@ -1105,8 +1105,8 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * concatenate an arbitrary-length argument list of string values together
      */
-    public static String join (Object oSep, Object[] argVals) {
-        String sep = toString(oSep);
+    public static String join (Object sepObject, Object[] argVals) {
+        String sep = toString(sepObject);
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < argVals.length; i++) {
@@ -1150,9 +1150,9 @@ public class XPathFuncExpr extends XPathExpression {
      * @return true if the count of 'true' factors is between the applicable minimum and maximum,
      *   inclusive
      */
-    public static Boolean checklist (Object oMin, Object oMax, Object[] factors) {
-        int min = toNumeric(oMin).intValue();
-        int max = toNumeric(oMax).intValue();
+    public static Boolean checklist (Object minObject, Object maxObject, Object[] factors) {
+        int min = toNumeric(minObject).intValue();
+        int max = toNumeric(maxObject).intValue();
 
         int count = 0;
         for (Object factor : factors) {
@@ -1178,9 +1178,9 @@ public class XPathFuncExpr extends XPathExpression {
      *
      * @return
      */
-    public static Boolean checklistWeighted (Object oMin, Object oMax, Object[] flags, Object[] weights) {
-        double min = toNumeric(oMin);
-        double max = toNumeric(oMax);
+    public static Boolean checklistWeighted (Object minObject, Object maxObject, Object[] flags, Object[] weights) {
+        double min = toNumeric(minObject);
+        double max = toNumeric(maxObject);
 
         double sum = 0.;
         for (int i = 0; i < flags.length; i++) {

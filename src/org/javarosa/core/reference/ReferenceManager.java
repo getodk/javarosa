@@ -258,11 +258,11 @@ public class ReferenceManager {
 	}
 
 	/**
-	 * @param URI
+	 * @param uri
 	 * @return Whether the provided URI describe a relative reference.
 	 */
-	public static boolean isRelative(String URI) {
-		if(URI.startsWith("./")) {
+	public static boolean isRelative(String uri) {
+		if(uri.startsWith("./")) {
 			return true;
 		}
 		return false;

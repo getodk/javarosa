@@ -25,7 +25,7 @@ public class ResourceReferenceFactory extends PrefixedRootFactory {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.reference.PrefixedRootFactory#factory(java.lang.String, java.lang.String)
 	 */
-	protected Reference factory(String terminal, String URI) {
+	protected Reference factory(String terminal, String uri) {
 		return new ResourceReference(terminal);
 	}
 }

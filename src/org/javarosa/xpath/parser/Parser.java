@@ -136,17 +136,17 @@ public class Parser {
 		public abstract ASTNode newNode (ASTNodeAbstractExpr node);
 	}
 
-	private static void parseBalanced (ASTNode node, SubNodeFactory snf, int lToken, int rToken) throws XPathSyntaxException {
+	private static void parseBalanced (ASTNode node, SubNodeFactory snf, int leftToken, int rightToken) throws XPathSyntaxException {
 		if (node instanceof ASTNodeAbstractExpr) {
 			ASTNodeAbstractExpr absNode = (ASTNodeAbstractExpr)node;
 
 			int i = 0;
 			while (i < absNode.content.size()) {
 				int type = absNode.getTokenType(i);
-				if (type == rToken) {
+				if (type == rightToken) {
 					throw new XPathSyntaxException("Unbalanced brackets or parentheses!"); //unbalanced
-				} else if (type == lToken) {
-					int j = absNode.indexOfBalanced(i, rToken, lToken, rToken);
+				} else if (type == leftToken) {
+					int j = absNode.indexOfBalanced(i, rightToken, leftToken, rightToken);
 					if (j == -1) {
 						throw new XPathSyntaxException("mismatched brackets or parentheses!"); //mismatched
 					}
@@ -158,7 +158,7 @@ public class Parser {
 		}
 
 		for (Enumeration e = node.getChildren().elements(); e.hasMoreElements(); ) {
-			parseBalanced((ASTNode)e.nextElement(), snf, lToken, rToken);
+			parseBalanced((ASTNode)e.nextElement(), snf, leftToken, rightToken);
 		}
 	}
 

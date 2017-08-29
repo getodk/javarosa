@@ -69,8 +69,8 @@ public class XPathPathExpr extends XPathExpression {
 
 	public XPathPathExpr () { } //for deserialization
 
-	public XPathPathExpr (int init_context, XPathStep[] steps) {
-		this.init_context = init_context;
+	public XPathPathExpr (int initContext, XPathStep[] steps) {
+		this.init_context = initContext;
 		this.steps = steps;
 	}
 

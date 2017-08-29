@@ -47,12 +47,12 @@ public class PrefixTree {
 		this.minimumHeuristicLength = Math.max((int)(minimumPrefixLength / 2), 3);
 	}
 
-	public static int sharedPrefixLength (char[] a, int aStart, char[] b) {
+	public static int sharedPrefixLength (char[] a, int start, char[] b) {
 		int len;
-		int minLength = Math.min(a.length - aStart, b.length);
+		int minLength = Math.min(a.length - start, b.length);
 
 		for (len = 0; len < minLength;len++) {
-			if (a[len + aStart] != b[len]) {
+			if (a[len + start] != b[len]) {
 				break;
 			}
 		}
