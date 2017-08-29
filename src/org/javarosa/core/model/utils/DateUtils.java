@@ -48,7 +48,7 @@ public class DateUtils {
 	/** RFC 822 **/
 	public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
-	public static final long DAY_IN_MS = 86400000l;
+	public static final long DAY_IN_MS = 86400000L;
 
 	public DateUtils() {
 		super();
