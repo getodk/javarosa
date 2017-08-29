@@ -1024,7 +1024,7 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * sum the values in a nodeset; each element is coerced to a numeric value
      */
-    public static Double sum (Object argVals[]) {
+    public static Double sum (Object[] argVals) {
         double sum = 0.0;
         for (Object argVal : argVals) {
             Double dargVal = toNumeric(argVal);

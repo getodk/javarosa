@@ -347,7 +347,7 @@ public class DateUtilsTests extends TestCase {
             private String sunday;
         }
 
-        LangJanSun langJanSuns[] = new LangJanSun[] {
+        LangJanSun[] langJanSuns = new LangJanSun[] {
             new LangJanSun("en", "Jan",   "Sun"),
             new LangJanSun("es", "ene",   "dom"),
             new LangJanSun("fr", "janv.", "dim.")
