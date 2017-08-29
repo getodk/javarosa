@@ -58,14 +58,14 @@ public class FormParseInit {
 	}
 	
 	public void init(){
-		String xf_name = FORM_NAME; 			
+		String xfName = FORM_NAME;
 		FileInputStream is;
 		try {
-			is = new FileInputStream(xf_name);
+			is = new FileInputStream(xfName);
 		} catch (FileNotFoundException e) {
-			System.err.println("Error: the file '" + xf_name
+			System.err.println("Error: the file '" + xfName
 					+ "' could not be found!");
-			throw new RuntimeException("Error: the file '" + xf_name
+			throw new RuntimeException("Error: the file '" + xfName
 					+ "' could not be found!");
 		}
 		

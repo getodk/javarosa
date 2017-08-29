@@ -60,14 +60,14 @@ public class FormDefTest extends TestCase {
 	}
 		
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 		
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new FormDefTest(doTest(testID)));
+			suite.addTest(new FormDefTest(doTest(testID)));
 		}
 			
-		return aSuite;
+		return suite;
 	}
 	
 	private void testSerialize (QuestionDef q, String msg) {

@@ -52,10 +52,10 @@ public class PrototypeFactory {
 		addDefaultClasses();
 
 		if (classNames != null) {
-			List<String> vClasses = classNames.getStrings();
+			List<String> classNamesStrings = classNames.getStrings();
 
-			for (int i = 0; i < vClasses.size(); i++) {
-				String name = (String)vClasses.get(i);
+			for (int i = 0; i < classNamesStrings.size(); i++) {
+				String name = (String)classNamesStrings.get(i);
 				try {
 					addClass(Class.forName(name));
 				} catch (ClassNotFoundException cnfe) {

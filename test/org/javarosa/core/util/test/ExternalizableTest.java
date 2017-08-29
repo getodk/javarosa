@@ -48,11 +48,11 @@ public class ExternalizableTest extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
-		aSuite.addTest(new ExternalizableTest("doTests"));
+		suite.addTest(new ExternalizableTest("doTests"));
 
-		return aSuite;
+		return suite;
 	}
 
 	public void doTests () {

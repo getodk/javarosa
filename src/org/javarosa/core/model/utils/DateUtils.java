@@ -654,28 +654,28 @@ public class DateUtils {
 			//includeToday: whether today's date can count as the last day of the period
 			//nAgo: how many periods ago; 1=most recent period, 0=period in progress
 
-			int target_dow = -1;
-			int current_dow = -1;
+			int targetDow = -1;
+			int currentDow = -1;
 			int diff;
 			int offset = (includeToday ? 1 : 0);
 
 			if (start.equals("sun")) {
-				target_dow = 0;
+				targetDow = 0;
 			} else if (start.equals("mon")) {
-				target_dow = 1;
+				targetDow = 1;
 			} else if (start.equals("tue")) {
-				target_dow = 2;
+				targetDow = 2;
 			} else if (start.equals("wed")) {
-				target_dow = 3;
+				targetDow = 3;
 			} else if (start.equals("thu")) {
-				target_dow = 4;
+				targetDow = 4;
 			} else if (start.equals("fri")) {
-				target_dow = 5;
+				targetDow = 5;
 			} else if (start.equals("sat")) {
-				target_dow = 6;
+				targetDow = 6;
 			}
 
-			if (target_dow == -1) {
+			if (targetDow == -1) {
 				throw new RuntimeException();
 			}
 
@@ -684,31 +684,31 @@ public class DateUtils {
 
 			switch(cd.get(Calendar.DAY_OF_WEEK)) {
 			case Calendar.SUNDAY:
-				current_dow = 0;
+				currentDow = 0;
 				break;
 			case Calendar.MONDAY:
-				current_dow = 1;
+				currentDow = 1;
 				break;
 			case Calendar.TUESDAY:
-				current_dow = 2;
+				currentDow = 2;
 				break;
 			case Calendar.WEDNESDAY:
-				current_dow = 3;
+				currentDow = 3;
 				break;
 			case Calendar.THURSDAY:
-				current_dow = 4;
+				currentDow = 4;
 				break;
 			case Calendar.FRIDAY:
-				current_dow = 5;
+				currentDow = 5;
 				break;
 			case Calendar.SATURDAY:
-				current_dow = 6;
+				currentDow = 6;
 				break;
 			default:
 				throw new RuntimeException(); //something is wrong
 			}
 
-			diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
+			diff = (((currentDow - targetDow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
 			d = new Date(ref.getTime() - diff * DAY_IN_MS);
 		} else if (type.equals("month")) {
 			//not supported

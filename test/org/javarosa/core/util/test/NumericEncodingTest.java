@@ -32,10 +32,10 @@ public class NumericEncodingTest extends TestCase  {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
-		aSuite.addTest(new NumericEncodingTest("testIntEncodingUniform"));
-		aSuite.addTest(new NumericEncodingTest("testIntEncodingSmall"));
-		return aSuite;
+		TestSuite suite = new TestSuite();
+		suite.addTest(new NumericEncodingTest("testIntEncodingUniform"));
+		suite.addTest(new NumericEncodingTest("testIntEncodingSmall"));
+		return suite;
 	}
 
 	public void testNumericEncoding (long val, ExtWrapIntEncoding encoding) {

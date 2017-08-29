@@ -375,17 +375,17 @@ public class MD5 {
 
 		if (length >= partlen) {
 			// update state (using only Java) to reflect input
-			int[] decode_buf = new int[16];
+			int[] decodeBuf = new int[16];
 			if (partlen == 64) {
 				partlen = 0;
 			} else {
 				for (i = 0; i < partlen; i++) {
 					stat.buffer[i + index] = buffer[i + offset];
 				}
-				transform(stat, stat.buffer, 0, decode_buf);
+				transform(stat, stat.buffer, 0, decodeBuf);
 			}
 			for (i = partlen; (i + 63) < length; i += 64) {
-				transform(stat, buffer, i + offset, decode_buf);
+				transform(stat, buffer, i + offset, decodeBuf);
 			}
 			index = 0;
 		} else {
@@ -454,8 +454,8 @@ public class MD5 {
 		MD5State fin;
 		if (finals == null) {
 			fin = new MD5State(state);
-			int[] count_ints = { (int) (fin.count << 3),(int) (fin.count >> 29) };
-			bits = encode(count_ints, 8);
+			int[] countInts = { (int) (fin.count << 3),(int) (fin.count >> 29) };
+			bits = encode(countInts, 8);
 			index = (int) (fin.count & 0x3f);
 			padlen = (index < 56) ? (56 - index) : (120 - index);
 			update(fin, padding, 0, padlen);

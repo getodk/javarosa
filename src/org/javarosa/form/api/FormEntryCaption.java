@@ -342,21 +342,21 @@ public class FormEntryCaption implements FormElementStateListener {
 
 	public RepeatOptions getRepeatOptions () {
 		RepeatOptions ro = new RepeatOptions();
-		boolean has_repetitions = (getNumRepetitions() > 0);
+		boolean hasRepetitions = (getNumRepetitions() > 0);
 
 		ro.header = getRepeatText("mainheader");
 
 		ro.add = null;
     	if (form.canCreateRepeat(form.getChildInstanceRef(index), index)) {
-    		ro.add = getRepeatText(has_repetitions ? "add" : "add-empty");
+    		ro.add = getRepeatText(hasRepetitions ? "add" : "add-empty");
     	}
     	ro.delete = null;
     	ro.delete_header = null;
-    	if (has_repetitions) {
+    	if (hasRepetitions) {
     		ro.delete = getRepeatText("del");
     		ro.delete_header = getRepeatText("delheader");
     	}
-    	ro.done = getRepeatText(has_repetitions ? "done" : "done-empty");
+    	ro.done = getRepeatText(hasRepetitions ? "done" : "done-empty");
 
     	return ro;
 	}

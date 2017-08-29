@@ -246,11 +246,11 @@ public abstract class Triggerable implements Externalizable {
 				// the
 				try {
 					// resolved triggers should match...
-					Set<TreeReference> Atriggers = this.getTriggers();
-					Set<TreeReference> Btriggers = t.getTriggers();
+					Set<TreeReference> atriggers = this.getTriggers();
+					Set<TreeReference> btriggers = t.getTriggers();
 
-					return (Atriggers.size() == Btriggers.size()) &&
-							Atriggers.containsAll(Btriggers);
+					return (atriggers.size() == btriggers.size()) &&
+							atriggers.containsAll(btriggers);
 				} catch (XPathException e) {
 					return false;
 				}

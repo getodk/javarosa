@@ -78,24 +78,24 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 	}
 
 	public String toString () {
-		String sOp = null;
+		String opString = null;
 		
 		switch (op) {
 		case LT:
-			sOp = "<";
+			opString = "<";
 			break;
 		case GT:
-			sOp = ">";
+			opString = ">";
 			break;
 		case LTE:
-			sOp = "<=";
+			opString = "<=";
 			break;
 		case GTE:
-			sOp = ">=";
+			opString = ">=";
 			break;
 		}
 		
-		return super.toString(sOp);
+		return super.toString(opString);
 	}
 	
 	public boolean equals (Object o) {

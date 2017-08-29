@@ -214,10 +214,10 @@ public class XPathParseTest extends TestCase {
 	}
 	
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
-		aSuite.addTest(new XPathParseTest("doTests"));
+		TestSuite suite = new TestSuite();
+		suite.addTest(new XPathParseTest("doTests"));
 		
-		return aSuite;
+		return suite;
 	}
 	
 	public void doTests() {

@@ -43,19 +43,19 @@ public class GeoShapeAreaTest extends TestCase {
   }
 
   public static Test suite() {
-    TestSuite aSuite = new TestSuite();
+    TestSuite suite = new TestSuite();
 
-    aSuite.addTest(new GeoShapeAreaTest("testGeoShapeSupportForEnclosedArea"));
+    suite.addTest(new GeoShapeAreaTest("testGeoShapeSupportForEnclosedArea"));
 
-    return aSuite;
+    return suite;
   }
 
   public void testGeoShapeSupportForEnclosedArea() throws Exception {
     // Read the form definition
-	String FORM_NAME = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
+	String formName = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
 	InputStream is = null;
 	FormDef formDef = null;
-	is = new FileInputStream(new File(FORM_NAME));
+	is = new FileInputStream(new File(formName));
     formDef = XFormUtils.getFormFromInputStream(is);
 
     // trigger all calculations

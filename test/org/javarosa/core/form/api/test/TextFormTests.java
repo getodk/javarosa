@@ -46,14 +46,14 @@ public class TextFormTests extends TestCase {
 
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 		System.out.println("Running TextFormTests...");
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new TextFormTests(doTest(testID)));
+			suite.addTest(new TextFormTests(doTest(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
 
 

@@ -343,8 +343,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 	public void removeChildren(String name) {
 		List<TreeElement> v = getChildrenWithName(name, false);
-		for (TreeElement aV : v) {
-			removeChild(aV);
+		for (TreeElement element : v) {
+			removeChild(element);
 		}
 	}
 
@@ -467,8 +467,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				}
 			}
 			if(children != null) {
-				for (TreeElement aChildren : children) {
-					aChildren.setRelevant(newRelevant, true);
+				for (TreeElement child : children) {
+					child.setRelevant(newRelevant, true);
 				}
 			}
 			alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);

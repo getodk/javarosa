@@ -299,9 +299,9 @@ public class PropertyManager implements IPropertyManager {
         theProp.name = propertyName;
         theProp.value = value;
 
-        List<Integer> IDs = properties.getIDsForValue("NAME", propertyName);
-        if (IDs.size() == 1) {
-        	theProp.setID(IDs.get(0).intValue());
+        List<Integer> ids = properties.getIDsForValue("NAME", propertyName);
+        if (ids.size() == 1) {
+        	theProp.setID(ids.get(0).intValue());
         }
 
         try {

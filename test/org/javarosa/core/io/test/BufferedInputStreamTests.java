@@ -56,15 +56,15 @@ public class BufferedInputStreamTests extends TestCase{
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new BufferedInputStreamTests(testMaster(testID)));
+			suite.addTest(new BufferedInputStreamTests(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
 
 	public static String testMaster (int testID) {

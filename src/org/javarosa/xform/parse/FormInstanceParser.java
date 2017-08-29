@@ -295,8 +295,8 @@ class FormInstanceParser {
             }
             //check that no nodes between the parent repeat and the target are repeatable
             for (int k = repeatBind.size(); k < childBind.size(); k++) {
-                TreeElement rChild = (k < repeatAncestry.size() ? repeatAncestry.get(k) : null);
-                boolean repeatable = rChild != null && rChild.isRepeatable();
+                TreeElement rchild = (k < repeatAncestry.size() ? repeatAncestry.get(k) : null);
+                boolean repeatable = rchild != null && rchild.isRepeatable();
                 if (repeatable && !(k == childBind.size() - 1 && isRepeat)) {
                     //catch <repeat nodeset="/a/b"><input ref="/a/b/c/d" /></repeat>...<repeat nodeset="/a/b/c">...</repeat>:
                     //  question's/group's/repeat's most immediate repeat parent in the instance is not its most immediate repeat parent in the form def

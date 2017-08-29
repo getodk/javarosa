@@ -599,9 +599,9 @@ public class TreeReference implements Externalizable, Serializable {
 			a.removeLastLevel();
 		}
 
-		int aSize = a.size();
+		int size = a.size();
 		//easy, but requires a lot of re-evaluation.
-		for(int i = 0 ; i <=  aSize; ++i) {
+		for(int i = 0 ; i <=  size; ++i) {
 			if(a.equals(b)) {
 				return a;
 			} else if(a.size() == 0) {

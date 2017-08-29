@@ -62,18 +62,18 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 	}
 
 	public String toString () {
-		String sOp = null;
+		String opString = null;
 		
 		switch (op) {
 		case AND:
-			sOp = "and";
+			opString = "and";
 			break;
 		case OR:
-			sOp = "or";
+			opString = "or";
 			break;
 		}
 		
-		return super.toString(sOp);
+		return super.toString(opString);
 	}
 	
 	public boolean equals (Object o) {

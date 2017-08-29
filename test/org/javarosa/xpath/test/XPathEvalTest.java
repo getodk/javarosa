@@ -53,12 +53,12 @@ public class XPathEvalTest extends TestCase {
     }
 
     public static Test suite() {
-        TestSuite aSuite = new TestSuite();
+        TestSuite suite = new TestSuite();
 
-        aSuite.addTest(new XPathEvalTest("doTests"));
-        aSuite.addTest(new XPathEvalTest("doTestsInPolishLocale"));
+        suite.addTest(new XPathEvalTest("doTests"));
+        suite.addTest(new XPathEvalTest("doTestsInPolishLocale"));
 
-        return aSuite;
+        return suite;
     }
 
     private void testEval (String expr, Object expected) {

@@ -68,27 +68,27 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
 	}
 	
 	public String toString () {
-		String sOp = null;
+		String opString = null;
 		
 		switch (op) {
 		case ADD:
-			sOp = "+";
+			opString = "+";
 			break;
 		case SUBTRACT:
-			sOp = "-";
+			opString = "-";
 			break;
 		case MULTIPLY:
-			sOp = "*";
+			opString = "*";
 			break;
 		case DIVIDE:
-			sOp = "/";
+			opString = "/";
 			break;
 		case MODULO:
-			sOp = "%";
+			opString = "%";
 			break;
 		}
 		
-		return super.toString(sOp);
+		return super.toString(opString);
 	}
 
 	public boolean equals (Object o) {

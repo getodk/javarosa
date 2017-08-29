@@ -230,14 +230,14 @@ public class QuestionPreloader {
 					includeToday = false;
 				}
 				
-				int nAgo;
+				int periodsAgo;
 				if (params.length >= 5) {
-					nAgo = Integer.parseInt(params[4]);
+					periodsAgo = Integer.parseInt(params[4]);
 				} else {
-					nAgo = 1;
+					periodsAgo = 1;
 				}
 	
-				d = DateUtils.getPastPeriodDate(new Date(), type, start, beginning, includeToday, nAgo);
+				d = DateUtils.getPastPeriodDate(new Date(), type, start, beginning, includeToday, periodsAgo);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("invalid preload params for preload mode 'date'");
 			}	

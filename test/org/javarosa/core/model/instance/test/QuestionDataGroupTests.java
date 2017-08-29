@@ -142,15 +142,15 @@ public class QuestionDataGroupTests extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new QuestionDataGroupTests(testMaster(testID)));
+			suite.addTest(new QuestionDataGroupTests(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
 
 	public static String testMaster (int testID) {
@@ -216,7 +216,7 @@ public class QuestionDataGroupTests extends TestCase {
 				dispatchedWrong.setValue(true);
 
 			}
-			
+
 			public void visit(AbstractTreeElement element) {
 				visitorAccepted.setValue(true);
 			}
