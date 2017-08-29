@@ -903,7 +903,8 @@ public class XPathEvalTest extends TestCase {
         }
         @Override
         public Object eval (Object[] args, EvaluationContext ec) {
-            val = (String)args[0]; return TRUE;
+            val = (String)args[0];
+            return TRUE;
         }
     };
 }

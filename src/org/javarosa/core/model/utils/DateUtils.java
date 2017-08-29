@@ -141,10 +141,18 @@ public class DateUtils {
 
 		String delim;
 		switch (format) {
-		case FORMAT_ISO8601: delim = "T"; break;
-		case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
-		case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
-		default: delim = " "; break;
+		case FORMAT_ISO8601:
+			delim = "T";
+			break;
+		case FORMAT_TIMESTAMP_SUFFIX:
+			delim = "";
+			break;
+		case FORMAT_TIMESTAMP_HTTP:
+			delim = " ";
+			break;
+		default:
+			delim = " ";
+			break;
 		}
 
 		return formatDate(fields, format) + delim + formatTime(fields, format);
@@ -160,22 +168,33 @@ public class DateUtils {
 
 	private static String formatDate (DateFields f, int format) {
 		switch (format) {
-		case FORMAT_ISO8601: return formatDateISO8601(f);
-		case FORMAT_HUMAN_READABLE_SHORT: return formatDateColloquial(f);
-		case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY: return formatDaysFromToday(f);
-		case FORMAT_TIMESTAMP_SUFFIX: return formatDateSuffix(f);
-		case FORMAT_TIMESTAMP_HTTP: return formatDateHttp(f);
-		default: return null;
+		case FORMAT_ISO8601:
+			return formatDateISO8601(f);
+		case FORMAT_HUMAN_READABLE_SHORT:
+			return formatDateColloquial(f);
+		case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY:
+			return formatDaysFromToday(f);
+		case FORMAT_TIMESTAMP_SUFFIX:
+			return formatDateSuffix(f);
+		case FORMAT_TIMESTAMP_HTTP:
+			return formatDateHttp(f);
+		default:
+			return null;
 		}
 	}
 
 	private static String formatTime (DateFields f, int format) {
 		switch (format) {
-		case FORMAT_ISO8601: return formatTimeISO8601(f);
-		case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
-		case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
-		case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
-		default: return null;
+		case FORMAT_ISO8601:
+			return formatTimeISO8601(f);
+		case FORMAT_HUMAN_READABLE_SHORT:
+			return formatTimeColloquial(f);
+		case FORMAT_TIMESTAMP_SUFFIX:
+			return formatTimeSuffix(f);
+		case FORMAT_TIMESTAMP_HTTP:
+			return formatTimeHttp(f);
+		default:
+			return null;
 		}
 	}
 
@@ -662,14 +681,29 @@ public class DateUtils {
 			cd.setTime(ref);
 
 			switch(cd.get(Calendar.DAY_OF_WEEK)) {
-			case Calendar.SUNDAY: current_dow = 0; break;
-			case Calendar.MONDAY: current_dow = 1; break;
-			case Calendar.TUESDAY: current_dow = 2; break;
-			case Calendar.WEDNESDAY: current_dow = 3; break;
-			case Calendar.THURSDAY: current_dow = 4; break;
-			case Calendar.FRIDAY: current_dow = 5; break;
-			case Calendar.SATURDAY: current_dow = 6; break;
-			default: throw new RuntimeException(); //something is wrong
+			case Calendar.SUNDAY:
+				current_dow = 0;
+				break;
+			case Calendar.MONDAY:
+				current_dow = 1;
+				break;
+			case Calendar.TUESDAY:
+				current_dow = 2;
+				break;
+			case Calendar.WEDNESDAY:
+				current_dow = 3;
+				break;
+			case Calendar.THURSDAY:
+				current_dow = 4;
+				break;
+			case Calendar.FRIDAY:
+				current_dow = 5;
+				break;
+			case Calendar.SATURDAY:
+				current_dow = 6;
+				break;
+			default:
+				throw new RuntimeException(); //something is wrong
 			}
 
 			diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah

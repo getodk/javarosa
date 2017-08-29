@@ -322,11 +322,21 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					}
 				} else {
 					switch (flag) {
-					case 0x40: answerType = StringData.class; break;
-					case 0x41: answerType = IntegerData.class; break;
-					case 0x42: answerType = DecimalData.class; break;
-					case 0x43: answerType = DateData.class; break;
-					case 0x44: answerType = BooleanData.class; break;
+					case 0x40:
+						answerType = StringData.class;
+						break;
+					case 0x41:
+						answerType = IntegerData.class;
+						break;
+					case 0x42:
+						answerType = DecimalData.class;
+						break;
+					case 0x43:
+						answerType = DateData.class;
+						break;
+					case 0x44:
+						answerType = BooleanData.class;
+						break;
 					}
 
 					val = (IAnswerData)ExtUtil.read(in, answerType);

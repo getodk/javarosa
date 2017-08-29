@@ -80,15 +80,32 @@ public class Condition extends Triggerable {
 
 	private void performAction (TreeElement node, int action) {
 		switch (action) {
-		case ACTION_NULL: break;
-		case ACTION_SHOW:         node.setRelevant(true); break;
-		case ACTION_HIDE:         node.setRelevant(false); break;
-		case ACTION_ENABLE:       node.setEnabled(true); break;
-		case ACTION_DISABLE:      node.setEnabled(false); break;
-		case ACTION_LOCK:         /* not supported */; break;
-		case ACTION_UNLOCK:       /* not supported */; break;
-		case ACTION_REQUIRE:      node.setRequired(true); break;
-		case ACTION_DONT_REQUIRE: node.setRequired(false); break;
+		case ACTION_NULL:
+			break;
+		case ACTION_SHOW:
+			node.setRelevant(true);
+			break;
+		case ACTION_HIDE:
+			node.setRelevant(false);
+			break;
+		case ACTION_ENABLE:
+			node.setEnabled(true);
+			break;
+		case ACTION_DISABLE:
+			node.setEnabled(false);
+			break;
+		case ACTION_LOCK:
+			/* not supported */;
+			break;
+		case ACTION_UNLOCK:
+			/* not supported */;
+			break;
+		case ACTION_REQUIRE:
+			node.setRequired(true);
+			break;
+		case ACTION_DONT_REQUIRE:
+			node.setRequired(false);
+			break;
 		}
 	}
 

@@ -1828,7 +1828,8 @@ public class XFormParser implements IXFormParserFunctions {
         for (int i = 0; i < numChildren; i++) {
             switch (node.getType(i)) {
             case Node.ELEMENT:
-                hasElements = true; break;
+                hasElements = true;
+                break;
             case Node.TEXT:
                 if (node.getText(i).trim().length() > 0) {
                     hasText = true;

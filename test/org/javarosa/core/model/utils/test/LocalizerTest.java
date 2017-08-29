@@ -491,9 +491,18 @@ public class LocalizerTest extends TestCase  {
 		String otherLocale = null;
 
 		switch (localeCase) {
-		case DEFAULT_LOCALE: ourLocale = "default"; otherLocale = null; break;
-		case NON_DEFAULT_LOCALE: ourLocale = "other"; otherLocale = "default"; break;
-		case NEUTRAL_LOCALE: ourLocale = "neutral"; otherLocale = null; break;
+		case DEFAULT_LOCALE:
+			ourLocale = "default";
+			otherLocale = null;
+			break;
+		case NON_DEFAULT_LOCALE:
+			ourLocale = "other";
+			otherLocale = "default";
+			break;
+		case NEUTRAL_LOCALE:
+			ourLocale = "neutral";
+			otherLocale = null;
+			break;
 		}
 
 		String textID = "textID" + (formCase == CUSTOM_FORM ? ";form" : "");
@@ -596,10 +605,18 @@ public class LocalizerTest extends TestCase  {
 			}
 
 			switch (i + 1) {
-			case 1: text = l.getRawText(l.getLocale(), textID); break;
-			case 2: text = l.getRawText(l.getLocale(), baseTextID); break;
-			case 3: text = l.getRawText(l.getDefaultLocale(), textID); break;
-			case 4: text = l.getRawText(l.getDefaultLocale(), baseTextID); break;
+			case 1:
+				text = l.getRawText(l.getLocale(), textID);
+				break;
+			case 2:
+				text = l.getRawText(l.getLocale(), baseTextID);
+				break;
+			case 3:
+				text = l.getRawText(l.getDefaultLocale(), textID);
+				break;
+			case 4:
+				text = l.getRawText(l.getDefaultLocale(), baseTextID);
+				break;
 			}
 		}
 

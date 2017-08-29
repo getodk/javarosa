@@ -85,20 +85,48 @@ public abstract class ASTNode {
 				print(x.exprs.elementAt(i));
 				if (i < x.exprs.size() - 1) {
 					switch (Parser.vectInt(x.ops, i)) {
-					case Token.AND: printStr("and:"); break;
-					case Token.OR: printStr("or:"); break;
-					case Token.EQ: printStr("eq:"); break;
-					case Token.NEQ: printStr("neq:"); break;
-					case Token.LT: printStr("lt:"); break;
-					case Token.LTE: printStr("lte:"); break;
-					case Token.GT: printStr("gt:"); break;
-					case Token.GTE: printStr("gte:"); break;
-					case Token.PLUS: printStr("plus:"); break;
-					case Token.MINUS: printStr("minus:"); break;
-					case Token.DIV: printStr("div:"); break;
-					case Token.MOD: printStr("mod:"); break;
-					case Token.MULT: printStr("mult:"); break;
-					case Token.UNION: printStr("union:"); break;					
+					case Token.AND:
+						printStr("and:");
+						break;
+					case Token.OR:
+						printStr("or:");
+						break;
+					case Token.EQ:
+						printStr("eq:");
+						break;
+					case Token.NEQ:
+						printStr("neq:");
+						break;
+					case Token.LT:
+						printStr("lt:");
+						break;
+					case Token.LTE:
+						printStr("lte:");
+						break;
+					case Token.GT:
+						printStr("gt:");
+						break;
+					case Token.GTE:
+						printStr("gte:");
+						break;
+					case Token.PLUS:
+						printStr("plus:");
+						break;
+					case Token.MINUS:
+						printStr("minus:");
+						break;
+					case Token.DIV:
+						printStr("div:");
+						break;
+					case Token.MOD:
+						printStr("mod:");
+						break;
+					case Token.MULT:
+						printStr("mult:");
+						break;
+					case Token.UNION:
+						printStr("union:");
+						break;
 					}
 				}
 			}
@@ -107,7 +135,9 @@ public abstract class ASTNode {
 			ASTNodeUnaryOp x = (ASTNodeUnaryOp)o;
 			printStr("opexpr {");
 			switch (x.op) {
-			case Token.UMINUS: printStr("num-neg:"); break;
+			case Token.UMINUS:
+				printStr("num-neg:");
+				break;
 			}
 			print(x.expr);
 			printStr("}");
@@ -121,8 +151,12 @@ public abstract class ASTNode {
 				}
 				if (i < x.separators.size()) {
 					switch (Parser.vectInt(x.separators, i)) {
-					case Token.DBL_SLASH: printStr("dbl-slash:"); break;
-					case Token.SLASH: printStr("slash:"); break;
+					case Token.DBL_SLASH:
+						printStr("dbl-slash:");
+						break;
+					case Token.SLASH:
+						printStr("slash:");
+						break;
 					}
 				}
 			}

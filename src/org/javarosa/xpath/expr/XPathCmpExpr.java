@@ -60,10 +60,18 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		double fb = ((Double)bval).doubleValue();
 
 		switch (op) {
-		case LT: result = fa < fb; break;
-		case GT: result = fa > fb; break;
-		case LTE: result = fa <= fb; break;
-		case GTE: result = fa >= fb; break;
+		case LT:
+			result = fa < fb;
+			break;
+		case GT:
+			result = fa > fb;
+			break;
+		case LTE:
+			result = fa <= fb;
+			break;
+		case GTE:
+			result = fa >= fb;
+			break;
 		}
 		
 		return new Boolean(result);		
@@ -73,10 +81,18 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		String sOp = null;
 		
 		switch (op) {
-		case LT: sOp = "<"; break;
-		case GT: sOp = ">"; break;
-		case LTE: sOp = "<="; break;
-		case GTE: sOp = ">="; break;
+		case LT:
+			sOp = "<";
+			break;
+		case GT:
+			sOp = ">";
+			break;
+		case LTE:
+			sOp = "<=";
+			break;
+		case GTE:
+			sOp = ">=";
+			break;
 		}
 		
 		return super.toString(sOp);

@@ -51,8 +51,12 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 		
 		boolean result = false;
 		switch (op) {
-		case AND: result = aval && bval; break;
-		case OR: result = aval || bval; break;
+		case AND:
+			result = aval && bval;
+			break;
+		case OR:
+			result = aval || bval;
+			break;
 		}
 		return new Boolean(result);
 	}
@@ -61,8 +65,12 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 		String sOp = null;
 		
 		switch (op) {
-		case AND: sOp = "and"; break;
-		case OR: sOp = "or"; break;
+		case AND:
+			sOp = "and";
+			break;
+		case OR:
+			sOp = "or";
+			break;
 		}
 		
 		return super.toString(sOp);

@@ -186,7 +186,8 @@ public class MemoryUtils {
 				break;
 			}
 			if (chunkSize < threshold) {
-				succeeded = true; break;
+				succeeded = true;
+				break;
 			}
 			
 			try {
