@@ -1746,8 +1746,8 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     protected DataBinding processStandardBindAttributes(List<String> usedAtts, Element element) {
-        return new StandardBindAttributesProcessor(reporter, typeMappings).
-                createBinding(this, _f, usedAtts, element);
+        return new StandardBindAttributesProcessor(reporter, typeMappings)
+                .createBinding(this, _f, usedAtts, element);
     }
 
     private final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList(
