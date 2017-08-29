@@ -230,7 +230,9 @@ public class XFormParser implements IXFormParserFunctions {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
                     if (parent instanceof GroupDef) {
                         p.parseGroupLabel((GroupDef) parent, e);
-                    } else throw new XFormParseException("parent of element is not a group", e);
+                    } else {
+                        throw new XFormParseException("parent of element is not a group", e);
+                    }
                 }
             });
         }};
@@ -790,7 +792,9 @@ public class XFormParser implements IXFormParserFunctions {
         // save all the unused attributes verbatim...
         for(int i=0;i<e.getAttributeCount();i++){
             String name = e.getAttributeName(i);
-            if ( usedAtts.contains(name) ) continue;
+            if ( usedAtts.contains(name) ) {
+                continue;
+            }
             question.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
         }
 
@@ -1021,9 +1025,9 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private void parseGroupLabel (GroupDef g, Element e) {
-        if (g.getRepeat())
+        if (g.getRepeat()) {
             return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
-
+        }
         List<String> usedAtts = new ArrayList<>();
         usedAtts.add(REF_ATTR);
 
@@ -1051,7 +1055,9 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private String getLabel (Element e){
-        if(e.getChildCount() == 0) return null;
+        if(e.getChildCount() == 0) {
+            return null;
+        }
 
         recurseForOutput(e);
 
@@ -1079,7 +1085,9 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private void recurseForOutput(Element e){
-        if(e.getChildCount() == 0) return;
+        if(e.getChildCount() == 0) {
+            return;
+        }
 
         for(int i=0;i<e.getChildCount();i++){
             int kidType = e.getType(i);
@@ -1275,7 +1283,9 @@ public class XFormParser implements IXFormParserFunctions {
          * We will patch this all up in the verifyItemsetBindings() method.
          */
         String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
-        if(nodesetStr == null ) throw new RuntimeException("No nodeset attribute in element: ["+e.getName()+"]. This is required. (Element Printout:"+XFormSerializer.elementToString(e)+")");
+        if(nodesetStr == null ) {
+            throw new RuntimeException("No nodeset attribute in element: ["+e.getName()+"]. This is required. (Element Printout:"+XFormSerializer.elementToString(e)+")");
+        }
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
         itemset.nodesetExpr = new XPathConditional(path);
         itemset.contextRef = getFormElementRef(qparent);
@@ -1472,7 +1482,9 @@ public class XFormParser implements IXFormParserFunctions {
         // save all the unused attributes verbatim...
         for(int i=0;i<e.getAttributeCount();i++){
             String name = e.getAttributeName(i);
-            if ( usedAtts.contains(name) ) continue;
+            if ( usedAtts.contains(name) ) {
+                continue;
+            }
             group.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
         }
 
@@ -1501,21 +1513,24 @@ public class XFormParser implements IXFormParserFunctions {
 
     /** Collapses groups whose only child is a repeat into a single repeat that uses the label of the wrapping group */
     private static void collapseRepeatGroups (IFormElement fe) {
-        if (fe.getChildren() == null)
+        if (fe.getChildren() == null) {
             return;
+        }
 
         for (int i = 0; i < fe.getChildren().size(); i++) {
             IFormElement child = fe.getChild(i);
             GroupDef group = null;
-            if (child instanceof GroupDef)
-                group = (GroupDef)child;
+            if (child instanceof GroupDef) {
+                group = (GroupDef) child;
+            }
 
             if (group != null) {
                 if (!group.getRepeat() && group.getChildren().size() == 1) {
                     IFormElement grandchild = (IFormElement)group.getChildren().get(0);
                     GroupDef repeat = null;
-                    if (grandchild instanceof GroupDef)
-                        repeat = (GroupDef)grandchild;
+                    if (grandchild instanceof GroupDef) {
+                        repeat = (GroupDef) grandchild;
+                    }
 
                     if (repeat != null && repeat.getRepeat()) {
                         //collapse the wrapping group
@@ -1545,17 +1560,20 @@ public class XFormParser implements IXFormParserFunctions {
 
         for (int i = 0; i < itext.getChildCount(); i++) {
             Element trans = itext.getElement(i);
-            if (trans == null || !trans.getName().equals("translation"))
+            if (trans == null || !trans.getName().equals("translation")) {
                 continue;
+            }
 
             parseTranslation(l, trans);
         }
 
-        if (l.getAvailableLocales().length == 0)
-            throw new XFormParseException("no <translation>s defined",itext);
+        if (l.getAvailableLocales().length == 0) {
+            throw new XFormParseException("no <translation>s defined", itext);
+        }
 
-        if (l.getDefaultLocale() == null)
+        if (l.getDefaultLocale() == null) {
             l.setDefaultLocale(l.getAvailableLocales()[0]);
+        }
 
         //print unused attribute warning message for parent element
         if(XFormUtils.showUnusedAttributeWarning(itext, usedAtts)){
@@ -1583,8 +1601,9 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         if (isDefault != null) {
-            if (l.getDefaultLocale() != null)
-                throw new XFormParseException("more than one <translation> set as default",trans);
+            if (l.getDefaultLocale() != null) {
+                throw new XFormParseException("more than one <translation> set as default", trans);
+            }
             l.setDefaultLocale(lang);
         }
 
@@ -1635,7 +1654,9 @@ public class XFormParser implements IXFormParserFunctions {
 
         for (int k = 0; k < text.getChildCount(); k++) {
             Element value = text.getElement(k);
-            if (value == null) continue;
+            if (value == null) {
+                continue;
+            }
             if(!value.getName().equals(VALUE)){
                 throw new XFormParseException("Unrecognized element ["+value.getName()+"] in Itext->translation->text");
             }
@@ -1805,8 +1826,9 @@ public class XFormParser implements IXFormParserFunctions {
             case Node.ELEMENT:
                 hasElements = true; break;
             case Node.TEXT:
-                if (node.getText(i).trim().length() > 0)
+                if (node.getText(i).trim().length() > 0) {
                     hasText = true;
+                }
                 break;
             }
         }
@@ -1988,20 +2010,24 @@ public class XFormParser implements IXFormParserFunctions {
         StringBuilder strBuff = null;
 
         String text = node.getText(i);
-        if (text == null)
+        if (text == null) {
             return null;
+        }
 
         for (i++; i < node.getChildCount() && node.getType(i) == Node.TEXT; i++) {
-            if (strBuff == null)
+            if (strBuff == null) {
                 strBuff = new StringBuilder(text);
+            }
 
             strBuff.append(node.getText(i));
         }
-        if (strBuff != null)
+        if (strBuff != null) {
             text = strBuff.toString();
+        }
 
-        if (trim)
+        if (trim) {
             text = text.trim();
+        }
 
         return text;
     }

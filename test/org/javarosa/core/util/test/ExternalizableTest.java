@@ -199,8 +199,9 @@ public class ExternalizableTest extends TestCase {
 	}
 
 	public static void testExternalizable (Object orig, Object template, PrototypeFactory pf, TestCase tc, String failMessage) {
-		if (failMessage == null)
+		if (failMessage == null) {
 			failMessage = "Serialization Failure";
+		}
 
 		byte[] bytes;
 		Object deser;
@@ -281,8 +282,9 @@ public class ExternalizableTest extends TestCase {
 				sb.append(printObj(key));
 				sb.append("=>");
 				sb.append(printObj(((HashMap)o).get(key)));
-				if (e.hasNext())
+				if (e.hasNext()) {
 					sb.append(", ");
+				}
 			}
 			sb.append("]");
 			return sb.toString();

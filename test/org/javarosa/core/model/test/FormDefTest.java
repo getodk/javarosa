@@ -92,7 +92,9 @@ public class FormDefTest extends TestCase {
 		do{
 			
 			QuestionDef q = fpi.getCurrentQuestion();
-			if(q==null || q.getTextID() == null || q.getTextID().length() == 0)continue;
+			if(q==null || q.getTextID() == null || q.getTextID().length() == 0) {
+				continue;
+			}
 			if(q.getTextID().equals("constraint-test")){
 				int response = fec.answerQuestion(ans, true);
 				if(response == FormEntryController.ANSWER_CONSTRAINT_VIOLATED){

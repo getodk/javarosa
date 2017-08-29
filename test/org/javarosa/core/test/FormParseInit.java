@@ -116,12 +116,16 @@ public class FormParseInit {
 	 */
 	public QuestionDef getNextQuestion(){
 		//jump to next event and check for end of form
-		if(fec.stepToNextEvent() == FormEntryController.EVENT_END_OF_FORM) return null;
+		if(fec.stepToNextEvent() == FormEntryController.EVENT_END_OF_FORM) {
+			return null;
+		}
 		
 		FormEntryCaption fep = this.getFormEntryModel().getCaptionPrompt();
 		
 		do{
-			if(fep.getFormElement() instanceof QuestionDef) return (QuestionDef)fep.getFormElement();
+			if(fep.getFormElement() instanceof QuestionDef) {
+				return (QuestionDef)fep.getFormElement();
+			}
 		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
 		
 		return null;
@@ -158,7 +162,9 @@ public class FormParseInit {
 				stuff+="\t[Type:QuestionDef, ";
 				List<SelectChoice> s = ((QuestionDef)fep.getFormElement()).getChoices();
 				stuff+="ContainsChoices: "+ ((s != null && s.size() > 0) ? "true " : "false" ) +", ";
-				if(s != null && s.size() > 0) choiceFlag = true;
+				if(s != null && s.size() > 0) {
+					choiceFlag = true;
+				}
 			}else if(fep.getFormElement() instanceof FormDef){
 				stuff+="\t[Type:FormDef, ";
 			}else if(fep.getFormElement() instanceof GroupDef){

@@ -341,8 +341,9 @@ public class DateUtils {
 
 	private static boolean parseDate (String dateStr, DateFields f) {
       List<String> pieces = split(dateStr, "-", false);
-		if (pieces.size() != 3)
+		if (pieces.size() != 3) {
 			return false;
+		}
 
 		try {
 			f.year = Integer.parseInt((String)pieces.get(0));
@@ -447,8 +448,9 @@ public class DateUtils {
 	 */
 	private static boolean parseRawTime (String timeStr, DateFields f) {
       List<String> pieces = split(timeStr, ":", false);
-		if (pieces.size() != 2 && pieces.size() != 3)
+		if (pieces.size() != 2 && pieces.size() != 3) {
 			return false;
+		}
 
 		try {
 			f.hour = Integer.parseInt((String)pieces.get(0));
@@ -459,8 +461,9 @@ public class DateUtils {
 				int i;
 				for (i = 0; i < secStr.length(); i++) {
 					char c = secStr.charAt(i);
-					if (!Character.isDigit(c) && c != '.')
+					if (!Character.isDigit(c) && c != '.') {
 						break;
+					}
 				}
 				secStr = secStr.substring(0, i);
 
@@ -514,7 +517,9 @@ public class DateUtils {
 	 * @return new Date object with same date but time set to midnight (in current timezone)
 	 */
 	public static Date roundDate (Date d) {
-		if ( d == null ) return null;
+		if ( d == null ) {
+			return null;
+		}
 		DateFields f = getFields(d);
 		return getDate(f.year, f.month, f.day);
 	}
@@ -634,16 +639,25 @@ public class DateUtils {
 			int target_dow = -1, current_dow = -1, diff;
 			int offset = (includeToday ? 1 : 0);
 
-			if (start.equals("sun")) target_dow = 0;
-			else if (start.equals("mon")) target_dow = 1;
-			else if (start.equals("tue")) target_dow = 2;
-			else if (start.equals("wed")) target_dow = 3;
-			else if (start.equals("thu")) target_dow = 4;
-			else if (start.equals("fri")) target_dow = 5;
-			else if (start.equals("sat")) target_dow = 6;
+			if (start.equals("sun")) {
+				target_dow = 0;
+			} else if (start.equals("mon")) {
+				target_dow = 1;
+			} else if (start.equals("tue")) {
+				target_dow = 2;
+			} else if (start.equals("wed")) {
+				target_dow = 3;
+			} else if (start.equals("thu")) {
+				target_dow = 4;
+			} else if (start.equals("fri")) {
+				target_dow = 5;
+			} else if (start.equals("sat")) {
+				target_dow = 6;
+			}
 
-			if (target_dow == -1)
+			if (target_dow == -1) {
 				throw new RuntimeException();
+			}
 
 			Calendar cd = Calendar.getInstance();
 			cd.setTime(ref);
@@ -770,8 +784,9 @@ public class DateUtils {
 	 */
 	public static String intPad (int n, int pad) {
 		String s = String.valueOf(n);
-		while (s.length() < pad)
+		while (s.length() < pad) {
 			s = "0" + s;
+		}
 		return s;
 	}
 

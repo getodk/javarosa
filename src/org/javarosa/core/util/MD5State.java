@@ -68,11 +68,13 @@ class MD5State {
     
     int i;
     
-    for (i = 0; i < buffer.length; i++)
+    for (i = 0; i < buffer.length; i++) {
       this.buffer[i] = from.buffer[i];
+    }
     
-    for (i = 0; i < state.length; i++)
+    for (i = 0; i < state.length; i++) {
       this.state[i] = from.state[i];
+    }
     
     this.count = from.count;
   }

@@ -20,8 +20,9 @@ public class PrototypeManager {
 	}
 	
 	public static void registerPrototypes (String[] classNames) {
-		for (int i = 0; i < classNames.length; i++)
+		for (int i = 0; i < classNames.length; i++) {
 			registerPrototype(classNames[i]);
+		}
 	}
 	
 	public static PrefixTree getPrototypes () {

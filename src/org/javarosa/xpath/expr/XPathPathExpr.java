@@ -336,8 +336,9 @@ public class XPathPathExpr extends XPathExpression {
 		sb.append(",{");
 		for (int i = 0; i < steps.length; i++) {
 			sb.append(steps[i].toString());
-			if (i < steps.length - 1)
+			if (i < steps.length - 1) {
 				sb.append(",");
+			}
 		}
 		sb.append("}}");
 
@@ -414,8 +415,9 @@ public class XPathPathExpr extends XPathExpression {
 
       List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
 		steps = new XPathStep[v.size()];
-		for (int i = 0; i < steps.length; i++)
-			steps[i] = ((XPathStep)v.get(i)).intern();
+		for (int i = 0; i < steps.length; i++) {
+			steps[i] = ((XPathStep) v.get(i)).intern();
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

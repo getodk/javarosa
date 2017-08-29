@@ -238,8 +238,9 @@ public class FormIndex implements Serializable {
 	}
 
 	public boolean equals(Object o) {
-		if(!(o instanceof FormIndex))
+		if(!(o instanceof FormIndex)) {
 			return false;
+		}
 
 		FormIndex a = this;
 		FormIndex b = (FormIndex)o;
@@ -267,8 +268,9 @@ public class FormIndex implements Serializable {
 	}
 
 	public int compareTo(Object o) {
-		if(!(o instanceof FormIndex))
+		if(!(o instanceof FormIndex)) {
 			throw new IllegalArgumentException("Attempt to compare Object of type " + o.getClass().getName() + " to a FormIndex");
+		}
 
 		FormIndex a = this;
 		FormIndex b = (FormIndex)o;

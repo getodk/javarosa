@@ -64,25 +64,32 @@ public class ASTNodePathStep extends ASTNode {
 		} else {
 			XPathStep step;
 			
-			if (axisType == AXIS_TYPE_NULL)
+			if (axisType == AXIS_TYPE_NULL) {
 				axisVal = XPathStep.AXIS_CHILD;
-			else if (axisType == AXIS_TYPE_ABBR)
+			} else if (axisType == AXIS_TYPE_ABBR) {
 				axisVal = XPathStep.AXIS_ATTRIBUTE;
+			}
 			
-			if (nodeTestType == NODE_TEST_TYPE_QNAME)
+			if (nodeTestType == NODE_TEST_TYPE_QNAME) {
 				step = new XPathStep(axisVal, nodeTestQName);
-			else if (nodeTestType == NODE_TEST_TYPE_WILDCARD)
+			} else if (nodeTestType == NODE_TEST_TYPE_WILDCARD) {
 				step = new XPathStep(axisVal, XPathStep.TEST_NAME_WILDCARD);
-			else if (nodeTestType == NODE_TEST_TYPE_NSWILDCARD)
+			} else if (nodeTestType == NODE_TEST_TYPE_NSWILDCARD) {
 				step = new XPathStep(axisVal, nodeTestNamespace);
-			else {
+			} else {
 				String funcName = nodeTestFunc.name.toString();
 				int type;
-				if      (funcName.equals("node"))                   type = XPathStep.TEST_TYPE_NODE;
-				else if (funcName.equals("text"))                   type = XPathStep.TEST_TYPE_TEXT;
-				else if (funcName.equals("comment"))                type = XPathStep.TEST_TYPE_COMMENT;
-				else if (funcName.equals("processing-instruction")) type = XPathStep.TEST_TYPE_PROCESSING_INSTRUCTION;
-				else throw new RuntimeException();
+				if (funcName.equals("node")) {
+					type = XPathStep.TEST_TYPE_NODE;
+				} else if (funcName.equals("text")) {
+					type = XPathStep.TEST_TYPE_TEXT;
+				} else if (funcName.equals("comment")) {
+					type = XPathStep.TEST_TYPE_COMMENT;
+				} else if (funcName.equals("processing-instruction")) {
+					type = XPathStep.TEST_TYPE_PROCESSING_INSTRUCTION;
+				} else {
+					throw new RuntimeException();
+				}
 			
 				step = new XPathStep(axisVal, type);
 				if (nodeTestFunc.args.size() > 0) {
@@ -91,8 +98,9 @@ public class ASTNodePathStep extends ASTNode {
 			}
 			
 			XPathExpression[] preds = new XPathExpression[predicates.size()];
-			for (int i = 0; i < preds.length; i++)
-				preds[i] = ((ASTNode)predicates.elementAt(i)).build();
+			for (int i = 0; i < preds.length; i++) {
+				preds[i] = ((ASTNode) predicates.elementAt(i)).build();
+			}
 			step.predicates = preds;
 			
 			return step;
@@ -102,19 +110,33 @@ public class ASTNodePathStep extends ASTNode {
 	public static int validateAxisName (String axisName) {
 		int axis = -1;
 
-		if      (axisName.equals("child"))              axis = XPathStep.AXIS_CHILD;
-		else if (axisName.equals("descendant"))         axis = XPathStep.AXIS_DESCENDANT;
-		else if (axisName.equals("parent"))             axis = XPathStep.AXIS_PARENT;
-		else if (axisName.equals("ancestor"))           axis = XPathStep.AXIS_ANCESTOR;
-		else if (axisName.equals("following-sibling"))  axis = XPathStep.AXIS_FOLLOWING_SIBLING;
-		else if (axisName.equals("preceding-sibling"))  axis = XPathStep.AXIS_PRECEDING_SIBLING;
-		else if (axisName.equals("following"))          axis = XPathStep.AXIS_FOLLOWING;
-		else if (axisName.equals("preceding"))          axis = XPathStep.AXIS_PRECEDING;
-		else if (axisName.equals("attribute"))          axis = XPathStep.AXIS_ATTRIBUTE;
-		else if (axisName.equals("namespace"))          axis = XPathStep.AXIS_NAMESPACE;
-		else if (axisName.equals("self"))               axis = XPathStep.AXIS_SELF;
-		else if (axisName.equals("descendant-or-self")) axis = XPathStep.AXIS_DESCENDANT_OR_SELF;
-		else if (axisName.equals("ancestor-or-self"))   axis = XPathStep.AXIS_ANCESTOR_OR_SELF;
+		if (axisName.equals("child")) {
+			axis = XPathStep.AXIS_CHILD;
+		} else if (axisName.equals("descendant")) {
+			axis = XPathStep.AXIS_DESCENDANT;
+		} else if (axisName.equals("parent")) {
+			axis = XPathStep.AXIS_PARENT;
+		} else if (axisName.equals("ancestor")) {
+			axis = XPathStep.AXIS_ANCESTOR;
+		} else if (axisName.equals("following-sibling")) {
+			axis = XPathStep.AXIS_FOLLOWING_SIBLING;
+		} else if (axisName.equals("preceding-sibling")) {
+			axis = XPathStep.AXIS_PRECEDING_SIBLING;
+		} else if (axisName.equals("following")) {
+			axis = XPathStep.AXIS_FOLLOWING;
+		} else if (axisName.equals("preceding")) {
+			axis = XPathStep.AXIS_PRECEDING;
+		} else if (axisName.equals("attribute")) {
+			axis = XPathStep.AXIS_ATTRIBUTE;
+		} else if (axisName.equals("namespace")) {
+			axis = XPathStep.AXIS_NAMESPACE;
+		} else if (axisName.equals("self")) {
+			axis = XPathStep.AXIS_SELF;
+		} else if (axisName.equals("descendant-or-self")) {
+			axis = XPathStep.AXIS_DESCENDANT_OR_SELF;
+		} else if (axisName.equals("ancestor-or-self")) {
+			axis = XPathStep.AXIS_ANCESTOR_OR_SELF;
+		}
 
 		return axis;
 	}

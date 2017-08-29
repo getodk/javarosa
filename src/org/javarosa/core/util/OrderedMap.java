@@ -30,8 +30,9 @@ public class OrderedMap<K,V> extends LinkedHashMap<K,V> {
     		sb.append(key.toString());
     		sb.append(" => ");
     		sb.append(get(key).toString());
-    		if (e.hasMoreElements())
-    			sb.append(", ");
+    		if (e.hasMoreElements()) {
+				sb.append(", ");
+			}
     	}
     	sb.append("]");
     	return sb.toString();

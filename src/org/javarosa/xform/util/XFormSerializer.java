@@ -76,8 +76,9 @@ public class XFormSerializer {
 
 		byte[] byteArr = bos.toByteArray();
 		char[] charArray = new char[byteArr.length];
-		for (int i = 0; i < byteArr.length; i++)
+		for (int i = 0; i < byteArr.length; i++) {
 			charArray[i] = (char) byteArr[i];
+		}
 
 		return String.valueOf(charArray);
 	}

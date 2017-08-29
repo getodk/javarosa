@@ -480,8 +480,9 @@ public class XPathEvalTest extends TestCase {
         testEval("read()", null, ec, "testing-read");
 
         testEval("write('testing-write')", null, ec, TRUE);
-        if (!"testing-write".equals(write.val))
+        if (!"testing-write".equals(write.val)) {
             fail("Custom function handler did not successfully send data to external source");
+        }
     }
 
     public FormInstance createTestInstance() {
@@ -626,8 +627,9 @@ public class XPathEvalTest extends TestCase {
             @Override
             public Object eval (Object[] args, EvaluationContext ec) {
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < args.length; i++)
+                for (int i = 0; i < args.length; i++) {
                     sb.append(XPathFuncExpr.toString(args[i]));
+                }
                 return sb.toString();
             }
         });
@@ -702,8 +704,9 @@ public class XPathEvalTest extends TestCase {
             @Override
             public Object eval (Object[] args, EvaluationContext ec) {
                 if (args.length != 5 || !(args[0] instanceof Boolean) || !(args[1] instanceof Double) ||
-                        !(args[2] instanceof String) || !(args[3] instanceof Date) || !(args[4] instanceof CustomType))
+                        !(args[2] instanceof String) || !(args[3] instanceof Date) || !(args[4] instanceof CustomType)) {
                     fail("Types in custom function handler not converted properly/prototype not matched properly");
+                }
 
                 return TRUE;
             }
@@ -731,8 +734,9 @@ public class XPathEvalTest extends TestCase {
             sb.append(fullName.substring(lastIndex + 1, fullName.length()));
             sb.append(":");
             sb.append(oa[i] instanceof Date ? DateUtils.formatDate((Date)oa[i], DateUtils.FORMAT_ISO8601) : oa[i].toString());
-            if (i < oa.length - 1)
+            if (i < oa.length - 1) {
                 sb.append(",");
+            }
         }
         sb.append("]");
         return sb.toString();

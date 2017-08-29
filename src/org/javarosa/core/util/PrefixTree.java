@@ -52,8 +52,9 @@ public class PrefixTree {
 		int minLength = Math.min(a.length - aStart, b.length);
 
 		for (len = 0; len < minLength;len++) {
-			if (a[len + aStart] != b[len])
+			if (a[len + aStart] != b[len]) {
 				break;
+			}
 		}
 
 		return len;

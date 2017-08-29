@@ -177,7 +177,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		}
 
 		// null-valued attributes are a "remove-this" instruction... ignore them
-		if ( value == null ) return;
+		if ( value == null ) {
+			return;
+		}
 
 		// create an attribute...
 		TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
@@ -248,8 +250,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         List<TreeElement> v = new ArrayList<>();
         for (TreeElement child : children) {
             if (TreeElementNameComparator.elementMatchesName(child, name)
-                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-                v.add(child);
+                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE)) {
+				v.add(child);
+			}
         }
 
         return v;
@@ -299,13 +302,15 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		int i = children.size();
 		if (child.getMult() == TreeReference.INDEX_TEMPLATE) {
 			TreeElement anchor = getChild(child.getName(), 0);
-			if (anchor != null)
+			if (anchor != null) {
 				i = children.indexOf(anchor);
+			}
 		} else {
 			TreeElement anchor = getChild(child.getName(),
 					(child.getMult() == 0 ? TreeReference.INDEX_TEMPLATE : child.getMult() - 1));
-			if (anchor != null)
+			if (anchor != null) {
 				i = children.indexOf(anchor) + 1;
+			}
 		}
 		children.add(i, child);
 		child.setParent(this);
@@ -531,8 +536,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	/* ==== OBSERVER PATTERN ==== */
 
 	public void registerStateObserver(FormElementStateListener qsl) {
-		if (observers == null)
+		if (observers == null) {
 			observers = new ArrayList<FormElementStateListener>(1);
+		}
 
 		if (!observers.contains(qsl)) {
 			observers.add(qsl);
@@ -542,8 +548,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	public void unregisterStateObserver(FormElementStateListener qsl) {
 		if (observers != null) {
 			observers.remove(qsl);
-			if (observers.isEmpty())
+			if (observers.isEmpty()) {
 				observers = null;
+			}
 		}
 	}
 

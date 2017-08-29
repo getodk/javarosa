@@ -223,8 +223,9 @@ public class Fast2014DagImpl extends LatestDagBase {
 			}
 			for (int i = partialOrdering.size() - 1; i >= 0; i--) {
 				QuickTriggerable[] edge = partialOrdering.get(i);
-				if (roots.contains(edge[0]))
+				if (roots.contains(edge[0])) {
 					partialOrdering.remove(i);
+				}
 			}
 		}
 

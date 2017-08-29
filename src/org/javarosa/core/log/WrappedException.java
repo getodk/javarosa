@@ -33,8 +33,9 @@ public class WrappedException extends RuntimeException {
 			str += (message != null ? " => " : "") + printException(child);
 		}
 		
-		if (str.equals(""))
-			str = "[exception]";		
+		if (str.equals("")) {
+			str = "[exception]";
+		}
 		return str;
 	}
 	

@@ -208,8 +208,9 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 			List<String> childNames = new ArrayList<String>(instanceNode.getNumChildren());
 			for (int i = 0; i < instanceNode.getNumChildren(); i++) {
 				String childName = instanceNode.getChildAt(i).getName();
-				if (!childNames.contains(childName))
+				if (!childNames.contains(childName)) {
 					childNames.add(childName);
+				}
 			}
 
 			for (int i = 0; i < childNames.size(); i++) {

@@ -408,23 +408,26 @@ public abstract class IDag {
       //build graph
       ArrayList<TreeReference> targets = new ArrayList<TreeReference>();
       for (TreeReference trigger : triggerIndex.keySet()) {
-         if (!vertices.contains(trigger))
-            vertices.add(trigger);
+         if (!vertices.contains(trigger)) {
+			 vertices.add(trigger);
+		 }
          ArrayList<QuickTriggerable> triggered = triggerIndex.get(trigger);
          targets.clear();
          for (QuickTriggerable qt : triggered ) {
             Triggerable t = qt.t;
             for (int j = 0; j < t.getTargets().size(); j++) {
                TreeReference target = t.getTargets().get(j);
-               if (!targets.contains(target))
-                  targets.add(target);
+               if (!targets.contains(target)) {
+				   targets.add(target);
+			   }
             }
          }
 
          for (int i = 0; i < targets.size(); i++) {
             TreeReference target = targets.get(i);
-            if (!vertices.contains(target))
-               vertices.add(target);
+            if (!vertices.contains(target)) {
+				vertices.add(target);
+			}
 
             TreeReference[] edge = {trigger, target};
             edges.add(edge);
@@ -455,8 +458,9 @@ public abstract class IDag {
          }
          for (int i = edges.size() - 1; i >= 0; i--) {
             TreeReference[] edge = (TreeReference[])edges.get(i);
-            if (leaves.contains(edge[1]))
-               edges.remove(i);
+            if (leaves.contains(edge[1])) {
+				edges.remove(i);
+			}
          }
       }
 

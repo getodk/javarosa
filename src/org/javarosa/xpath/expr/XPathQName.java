@@ -52,8 +52,9 @@ public class XPathQName implements Externalizable {
 	private void init (String namespace, String name) {
 		if (name == null ||
 				(name != null && name.length() == 0) ||
-				(namespace != null && namespace.length() == 0))
+				(namespace != null && namespace.length() == 0)) {
 			throw new IllegalArgumentException("Invalid QName");
+		}
 
 		this.namespace = namespace;
 		this.name = name;

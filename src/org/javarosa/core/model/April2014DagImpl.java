@@ -152,8 +152,9 @@ public class April2014DagImpl extends IDag {
          }
          for (int i = partialOrdering.size() - 1; i >= 0; i--) {
             QuickTriggerable[] edge = partialOrdering.get(i);
-            if (roots.contains(edge[0]))
+            if (roots.contains(edge[0])) {
                partialOrdering.remove(i);
+            }
          }
       }
 
@@ -221,8 +222,9 @@ public class April2014DagImpl extends IDag {
 
                      // And add them to the queue if they aren't there
                      // already
-                     if (!destination.contains(qu))
+                     if (!destination.contains(qu)) {
                         destination.add(qu);
+                     }
                   }
                }
             }

@@ -138,8 +138,9 @@ public class XPathConditional implements IConditionExpr {
 			getTriggers(((XPathUnaryOpExpr)x).a, v, contextRef);
 		} else if (x instanceof XPathFuncExpr) {
 			XPathFuncExpr fx = (XPathFuncExpr)x;
-			for (int i = 0; i < fx.args.length; i++)
+			for (int i = 0; i < fx.args.length; i++) {
 				getTriggers(fx.args[i], v, contextRef);
+			}
 		}
 	}
 

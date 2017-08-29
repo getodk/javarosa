@@ -56,12 +56,14 @@ public class NumericEncodingTest extends TestCase  {
 
 			testNumericEncoding(max - 1, enc);
 			testNumericEncoding(max, enc);
-			if (i < 64)
+			if (i < 64) {
 				testNumericEncoding(max + 1, enc);
+			}
 			testNumericEncoding(min + 1, enc);
 			testNumericEncoding(min, enc);
-			if (i < 64)
-				testNumericEncoding(min - 1, enc);					
+			if (i < 64) {
+				testNumericEncoding(min - 1, enc);
+			}
 		}
 	}
 	
@@ -77,16 +79,18 @@ public class NumericEncodingTest extends TestCase  {
 				bias = ExtWrapIntEncodingSmall.DEFAULT_BIAS;
 			} else {
 				bias = biases[i];
-				if (bias == ExtWrapIntEncodingSmall.DEFAULT_BIAS)
+				if (bias == ExtWrapIntEncodingSmall.DEFAULT_BIAS) {
 					continue;
+				}
 			}
 			
 			ExtWrapIntEncoding enc = new ExtWrapIntEncodingSmall(bias);
 			
 			for (int j = 0; j < smallTests.length; j++) {
 				testNumericEncoding(smallTests[j], enc);
-				if (bias != 0)
+				if (bias != 0) {
 					testNumericEncoding(smallTests[j] - bias, enc);
+				}
 			}
 
 			for (int j = 0; j < largeTests.length; j++) {

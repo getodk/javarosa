@@ -110,8 +110,9 @@ public class XPathStep implements Externalizable {
 			sb.append(",{");
 			for (int i = 0; i < predicates.length; i++) {
 				sb.append(predicates[i].toString());
-				if (i < predicates.length - 1)
+				if (i < predicates.length - 1) {
 					sb.append(",");
+				}
 			}
 			sb.append("}");
 		}
@@ -234,8 +235,9 @@ public class XPathStep implements Externalizable {
 
       List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		predicates = new XPathExpression[v.size()];
-		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.get(i);
+		for (int i = 0; i < predicates.length; i++) {
+			predicates[i] = (XPathExpression) v.get(i);
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

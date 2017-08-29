@@ -187,11 +187,13 @@ public class Lexer {
 		for (; i < expr.length(); i++) {
 			c = expr.charAt(i);
 
-			if (!(isDigit(c) || (!seenDecimalPoint && c == '.')))
+			if (!(isDigit(c) || (!seenDecimalPoint && c == '.'))) {
 				break;
+			}
 
-			if (c == '.')
+			if (c == '.') {
 				seenDecimalPoint = true;
+			}
 		}
 
 		return i - start;
@@ -203,8 +205,9 @@ public class Lexer {
 		if (len > 0 && getChar(expr, i + len) == ':') {
 			int len2 = matchNCName(expr, i + len + 1);
 
-			if (len2 > 0)
+			if (len2 > 0) {
 				len += len2 + 1;
+			}
 		}
 
 		return len;
@@ -217,8 +220,9 @@ public class Lexer {
 		for (; i < expr.length(); i++) {
 			c = expr.charAt(i);
 
-			if (!(isAlpha(c) || c == '_' || (i > start && (isDigit(c) || c == '.' || c == '-'))))
+			if (!(isAlpha(c) || c == '_' || (i > start && (isDigit(c) || c == '.' || c == '-')))) {
 				break;
+			}
 		}
 
 		return i - start;

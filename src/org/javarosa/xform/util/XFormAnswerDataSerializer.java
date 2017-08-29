@@ -170,8 +170,9 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		StringBuilder selectString = new StringBuilder();
 
       for (Selection selection : selections) {
-			if (selectString.length() > 0)
+			if (selectString.length() > 0) {
 				selectString.append(DELIMITER);
+			}
 			selectString.append(selection.getValue());
 		}
 		//As Crazy, and stupid, as it sounds, this is the XForms specification

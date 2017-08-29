@@ -69,8 +69,9 @@ public class Recalculate extends Triggerable {
 	public boolean equals (Object o) {
 		if (o instanceof Recalculate) {
 			Recalculate r = (Recalculate)o;
-			if (this == r)
+			if (this == r) {
 				return true;
+			}
 
 			return super.equals(r);
 		} else {

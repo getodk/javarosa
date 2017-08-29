@@ -355,8 +355,9 @@ public class MD5 {
 		int index, partlen, i, start;
 		finals = null;
 		/* Length can be told to be shorter, but not inter */
-		if ((length - offset) > buffer.length)
+		if ((length - offset) > buffer.length) {
 			length = buffer.length - offset;
+		}
 
 		/* compute number of bytes mod 64 */
 
@@ -371,16 +372,18 @@ public class MD5 {
 			if (partlen == 64) {
 				partlen = 0;
 			} else {
-				for (i = 0; i < partlen; i++)
+				for (i = 0; i < partlen; i++) {
 					stat.buffer[i + index] = buffer[i + offset];
+				}
 				transform(stat, stat.buffer, 0, decode_buf);
 			}
 			for (i = partlen; (i + 63) < length; i += 64) {
 				transform(stat, buffer, i + offset, decode_buf);
 			}
 			index = 0;
-		} else
+		} else {
 			i = 0;
+		}
 		/* buffer remaining input */
 		if (i < length) {
 			start = i;
@@ -416,14 +419,16 @@ public class MD5 {
 	 *            Array of bytes to use for updating the hash
 	 */
 	public final void update( final byte buffer[]) {
-		if( buffer == null )
+		if( buffer == null ) {
 			return;
+		}
 	    update(buffer,0,buffer.length);
 	}
 
     public final void update( final byte buffer[], int offset, int length) {
-        if( buffer == null )
-            return;
+        if( buffer == null ) {
+			return;
+		}
         update( state, buffer, offset, length );
     }
 
@@ -515,21 +520,25 @@ public class MD5 {
 	 *         equal.
 	 */
 	public static final boolean equals(byte[] hash1, byte[] hash2) {
-		if (hash1 == null)
+		if (hash1 == null) {
 			return hash2 == null;
-		if (hash2 == null)
+		}
+		if (hash2 == null) {
 			return false;
+		}
 		int targ = 16;
 		if (hash1.length < 16) {
-			if (hash2.length != hash1.length)
+			if (hash2.length != hash1.length) {
 				return false;
+			}
 			targ = hash1.length;
 		} else if (hash2.length < 16) {
 			return false;
 		}
 		for (int i = 0; i < targ; i++) {
-			if (hash1[i] != hash2[i])
+			if (hash1[i] != hash2[i]) {
 				return false;
+			}
 		}
 		return true;
 	}

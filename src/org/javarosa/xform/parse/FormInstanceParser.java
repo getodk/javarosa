@@ -204,11 +204,13 @@ class FormInstanceParser {
             TreeElement template = null;
             for (TreeReference nref : new EvaluationContext(instance).expandReference(ref)) {
                 TreeElement node = instance.resolveReference(nref);
-                if (node == null) //don't crash on '/'... invalid repeat binding will be caught later
+                if (node == null) { //don't crash on '/'... invalid repeat binding will be caught later
                     continue;
+                }
 
-                if (template == null)
+                if (template == null) {
                     template = instance.getTemplate(nref);
+                }
 
                 if (!FormInstance.isHomogeneous(template, node)) {
                     reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Not all repeated nodes for a given repeat binding [" + nref.toString() + "] are homogeneous! This will cause serious problems!", null);
@@ -218,8 +220,9 @@ class FormInstanceParser {
     }
 
     private void verifyControlBindings (IFormElement fe, FormInstance instance, List<String> errors) { //throws XmlPullParserException {
-        if (fe.getChildren() == null)
+        if (fe.getChildren() == null) {
             return;
+        }
 
         for (int i = 0; i < fe.getChildren().size(); i++) {
             IFormElement child = fe.getChildren().get(i);
@@ -254,8 +257,9 @@ class FormInstanceParser {
     }
 
     private void verifyRepeatMemberBindings (IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
-        if (fe.getChildren() == null)
+        if (fe.getChildren() == null) {
             return;
+        }
 
         for (int i = 0; i < fe.getChildren().size(); i++) {
             IFormElement child = fe.getChildren().get(i);
@@ -429,8 +433,9 @@ class FormInstanceParser {
 
     /** Checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not */
     private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
-        if (repeatTree != null)
+        if (repeatTree != null) {
             checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
+        }
     }
 
     /** Helper function for checkRepeatsForTemplate */
@@ -473,8 +478,9 @@ class FormInstanceParser {
             }
         }
 
-        if (repeatable && mult != TreeReference.INDEX_TEMPLATE)
+        if (repeatable && mult != TreeReference.INDEX_TEMPLATE) {
             templateAllowed = false;
+        }
 
         for (int i = 0; i < instanceNode.getNumChildren(); i++) {
             TreeElement child = instanceNode.getChildAt(i);

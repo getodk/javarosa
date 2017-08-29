@@ -138,8 +138,9 @@ public class PrototypeFactory {
 		byte[] hash = new byte[CLASS_HASH_SIZE];
 		byte[] md5 = MD5.hash(type.getName().getBytes()); //add support for a salt, in case of collision?
 
-		for (int i = 0; i < hash.length; i++)
+		for (int i = 0; i < hash.length; i++) {
 			hash[i] = md5[i];
+		}
 		byte[] badHash = new byte[] {0,4,78,97};
 		if(PrototypeFactory.compareHash(badHash, hash)) {
 			Std.out.println("BAD CLASS: " + type.getName());
@@ -154,8 +155,9 @@ public class PrototypeFactory {
 		}
 
 		for (int i = 0; i < a.length; i++) {
-			if (a[i] != b[i])
+			if (a[i] != b[i]) {
 				return false;
+			}
 		}
 
 		return true;

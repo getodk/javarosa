@@ -96,8 +96,9 @@ public class Condition extends Triggerable {
 	public boolean equals (Object o) {
 		if (o instanceof Condition) {
 			Condition c = (Condition)o;
-			if (this == c)
+			if (this == c) {
 				return true;
+			}
 
 			return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && super.equals(c));
 		} else {

@@ -85,8 +85,9 @@ public class XPathFuncExpr extends XPathExpression {
         sb.append(",{");
         for (int i = 0; i < args.length; i++) {
             sb.append(args[i].toString());
-            if (i < args.length - 1)
+            if (i < args.length - 1) {
                 sb.append(",");
+            }
         }
         sb.append("}}");
 
@@ -123,8 +124,9 @@ public class XPathFuncExpr extends XPathExpression {
         List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
         args = new XPathExpression[v.size()];
-        for (int i = 0; i < args.length; i++)
-            args[i] = (XPathExpression)v.get(i);
+        for (int i = 0; i < args.length; i++) {
+            args[i] = (XPathExpression) v.get(i);
+        }
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -538,8 +540,9 @@ public class XPathFuncExpr extends XPathExpression {
                     } catch (XPathTypeMismatchException xptme) { /* swallow type mismatch exception */ }
                 }
 
-                if (typed[i] == null)
+                if (typed[i] == null) {
                     return null;
+                }
             }
         }
 
@@ -657,8 +660,9 @@ public class XPathFuncExpr extends XPathExpression {
                 s = s.trim();
                 for (int i = 0; i < s.length(); i++) {
                     char c = s.charAt(i);
-                    if (c != '-' && c != '.' && (c < '0' || c > '9'))
+                    if (c != '-' && c != '.' && (c < '0' || c > '9')) {
                         throw new NumberFormatException();
+                    }
                 }
 
                 d = Double.parseDouble(s);
@@ -876,10 +880,11 @@ public class XPathFuncExpr extends XPathExpression {
 
     public static Boolean boolStr (Object o) {
         String s = toString(o);
-        if (s.equalsIgnoreCase("true") || s.equals("1"))
+        if (s.equalsIgnoreCase("true") || s.equals("1")) {
             return Boolean.TRUE;
-        else
+        } else {
             return Boolean.FALSE;
+        }
     }
 
     public static String dateStr (Object od, Object of, boolean preserveTime) {
@@ -1107,8 +1112,9 @@ public class XPathFuncExpr extends XPathExpression {
 
         for (int i = 0; i < argVals.length; i++) {
             sb.append(toString(argVals[i]));
-            if (i < argVals.length - 1)
+            if (i < argVals.length - 1) {
                 sb.append(sep);
+            }
         }
 
         return sb.toString();
@@ -1151,8 +1157,9 @@ public class XPathFuncExpr extends XPathExpression {
 
         int count = 0;
         for (Object factor : factors) {
-            if (toBoolean(factor))
+            if (toBoolean(factor)) {
                 count++;
+            }
         }
 
         return (min < 0 || count >= min) && (max < 0 || count <= max);
@@ -1181,8 +1188,9 @@ public class XPathFuncExpr extends XPathExpression {
             boolean flag = toBoolean(flags[i]);
             double weight = toNumeric(weights[i]);
 
-            if (flag)
+            if (flag) {
                 sum += weight;
+            }
         }
 
         return sum >= min && sum <= max;

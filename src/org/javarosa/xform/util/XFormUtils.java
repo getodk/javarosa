@@ -157,7 +157,9 @@ public class XFormUtils {
 		warning+="[";
 		for(int i=0;i<ua.size();i++){
 			warning+=ua.get(i);
-			if(i!=ua.size()-1) warning+=",";
+			if(i!=ua.size()-1) {
+				warning+=",";
+			}
 		}
 		warning+="] ";
 		warning+="Location:\n"+XFormParser.getVagueLocation(e);
@@ -175,8 +177,11 @@ public class XFormUtils {
 	 * @return
 	 */
 	public static boolean isOutput(Element e){
-		if(e.getName().toLowerCase().equals("output")) return true;
-		else return false;
+		if(e.getName().toLowerCase().equals("output")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

@@ -64,8 +64,9 @@ public class ASTNodeLocPath extends ASTNode {
 		}
 
 		XPathStep[] stepArr = new XPathStep[steps.size()];
-		for (int i = 0; i < stepArr.length; i++)
+		for (int i = 0; i < stepArr.length; i++) {
 			stepArr[i] = steps.elementAt(i);
+		}
 		
 		if (filtExpr == null) {
 			return new XPathPathExpr(isAbsolute() ? XPathPathExpr.INIT_CONTEXT_ROOT : XPathPathExpr.INIT_CONTEXT_RELATIVE, stepArr);

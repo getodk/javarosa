@@ -347,10 +347,12 @@ public class TreeReference implements Externalizable, Serializable {
 	//return true if 'this' equals 'child' only if properParent is false
 	public boolean isParentOf (TreeReference child, boolean properParent) {
 		//Instances and context types;
-		if (refLevel != child.refLevel)
+		if (refLevel != child.refLevel) {
 			return false;
-		if (child.size() < size() + (properParent ? 1 : 0))
+		}
+		if (child.size() < size() + (properParent ? 1 : 0)) {
 			return false;
+		}
 
 		for (int i = 0; i < size(); i++) {
 			if (!this.getName(i).equals(child.getName(i))) {
@@ -433,8 +435,9 @@ public class TreeReference implements Externalizable, Serializable {
 			//this should potentially just be replaced by
 			//an int.
 			Integer mult = DataUtil.integer(getMultiplicity(i));
-			if (i == 0 && mult.intValue() == INDEX_UNBOUND)
+			if (i == 0 && mult.intValue() == INDEX_UNBOUND) {
 				mult = DataUtil.integer(0);
+			}
 
 			hash ^= getName(i).hashCode();
 			hash ^= mult.hashCode();
@@ -468,8 +471,9 @@ public class TreeReference implements Externalizable, Serializable {
 		if (isAbsolute()) {
 			sb.append("/");
 		} else {
-			for (int i = 0; i < refLevel; i++)
+			for (int i = 0; i < refLevel; i++) {
 				sb.append("../");
+			}
 		}
 		for (int i = 0; i < size(); i++) {
 			String name = getName(i);
@@ -486,14 +490,16 @@ public class TreeReference implements Externalizable, Serializable {
 				case INDEX_TEMPLATE: sb.append("[@template]"); break;
 				case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
 				default:
-					if ((i > 0 || mult != 0) && mult !=-4)
+					if ((i > 0 || mult != 0) && mult !=-4) {
 						sb.append("[" + (mult + 1) + "]");
+					}
 					break;
 				}
 			}
 
-			if (i < size() - 1)
+			if (i < size() - 1) {
 				sb.append("/");
+			}
 		}
 		return sb.toString();
 	}

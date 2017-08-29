@@ -42,8 +42,9 @@ public class Parser {
 
 	public static ASTNode buildParseTree (Vector<Token> tokens) throws XPathSyntaxException {
 		ASTNodeAbstractExpr root = new ASTNodeAbstractExpr();
-		for (int i = 0; i < tokens.size(); i++)
+		for (int i = 0; i < tokens.size(); i++) {
 			root.content.addElement(tokens.elementAt(i));
+		}
 
 		parseFuncCalls(root);
 		parseParens(root);
@@ -81,8 +82,9 @@ public class Parser {
 
 			int i = 0;
 			while (i < absNode.content.size() - 1) {
-				if (absNode.getTokenType(i + 1) == Token.LPAREN && absNode.getTokenType(i) == Token.QNAME)
+				if (absNode.getTokenType(i + 1) == Token.LPAREN && absNode.getTokenType(i) == Token.QNAME) {
 					condenseFuncCall(absNode, i);
+				}
 				i++;
 			}
 		}
@@ -238,10 +240,11 @@ public class Parser {
 								} else {
 									//filter expr
 									ASTNodeFilterExpr filt = parseFilterExp(x);
-									if (filt != null)
+									if (filt != null) {
 										path.clauses.addElement(filt);
-									else
+									} else {
 										path.clauses.addElement(x);
+									}
 								}
 							} else {
 								throw new XPathSyntaxException("Unexpected beginning of path");
@@ -349,8 +352,9 @@ public class Parser {
 			}
 		}
 
-		if (filt.predicates.size() == 0)
+		if (filt.predicates.size() == 0) {
 			return null;
+		}
 
 		filt.expr = node.extract(0, i + 1);
 		return filt;

@@ -61,8 +61,9 @@ public class PrefixTreeNode {
 		StringBuffer sb = new StringBuffer();
 		sb.append("{");
 		sb.append(prefix);
-		if (terminal)
+		if (terminal) {
 			sb.append("*");
+		}
 		if (children != null) {
          for (PrefixTreeNode child : children) {
             sb.append(child.toString());

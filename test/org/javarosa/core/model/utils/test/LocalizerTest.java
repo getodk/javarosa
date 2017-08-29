@@ -544,16 +544,20 @@ public class LocalizerTest extends TestCase  {
 		TableLocaleSource firstLocale = new TableLocaleSource();
 		TableLocaleSource secondLocale = new TableLocaleSource();
 
-		if (j / 2 == 0 || "default".equals(ourLocale))
+		if (j / 2 == 0 || "default".equals(ourLocale)) {
 			firstLocale.setLocaleMapping("textID", "text:" + ourLocale + ":base");
-		if (j % 2 == 0 || "default".equals(ourLocale))
+		}
+		if (j % 2 == 0 || "default".equals(ourLocale)) {
 			firstLocale.setLocaleMapping("textID;form", "text:" + ourLocale + ":form");
+		}
 
 		if (otherLocale != null) {
-			if (k / 2 == 0 || "default".equals(otherLocale))
+			if (k / 2 == 0 || "default".equals(otherLocale)) {
 				secondLocale.setLocaleMapping("textID", "text:" + otherLocale + ":base");
-			if (k % 2 == 0 || "default".equals(otherLocale))
+			}
+			if (k % 2 == 0 || "default".equals(otherLocale)) {
 				secondLocale.setLocaleMapping("textID;form", "text:" + otherLocale + ":form");
+			}
 		}
 
 		l.addAvailableLocale(ourLocale);
@@ -587,8 +591,9 @@ public class LocalizerTest extends TestCase  {
 
 		String text = null;
 		for (int i = 0; text == null && i < 4; i++) {
-			if (!searchOrder[i])
+			if (!searchOrder[i]) {
 				continue;
+			}
 
 			switch (i + 1) {
 			case 1: text = l.getRawText(l.getLocale(), textID); break;

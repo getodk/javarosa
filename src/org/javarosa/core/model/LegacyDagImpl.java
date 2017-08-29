@@ -126,8 +126,9 @@ public class LegacyDagImpl extends IDag {
 					if (triggered != null) {
 						for (int k = 0; k < triggered.size(); k++) {
 							QuickTriggerable qu = triggered.get(k);
-							if (!deps.contains(qu))
+							if (!deps.contains(qu)) {
 								deps.add(qu);
+							}
 						}
 					}
 				}
@@ -169,8 +170,9 @@ public class LegacyDagImpl extends IDag {
 			}
 			for (int i = partialOrdering.size() - 1; i >= 0; i--) {
 				QuickTriggerable[] edge = partialOrdering.get(i);
-				if (roots.contains(edge[0]))
+				if (roots.contains(edge[0])) {
 					partialOrdering.remove(i);
+				}
 			}
 		}
 
@@ -273,8 +275,9 @@ public class LegacyDagImpl extends IDag {
 					if (triggered != null) {
 						for (int k = 0; k < triggered.size(); k++) {
 							QuickTriggerable qu = triggered.get(k);
-							if (!tv.contains(qu))
+							if (!tv.contains(qu)) {
 								tv.add(qu);
+							}
 						}
 					}
 				}

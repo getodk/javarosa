@@ -104,8 +104,9 @@ public class JavaRosaPropertyRules implements IPropertyRules {
                 return rules.get(propertyName).contains(potentialValue);
             }
         }
-        else
+        else {
             return true;
+        }
     }
 
     /** (non-Javadoc)

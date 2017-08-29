@@ -24,10 +24,18 @@ public class SubmissionParser {
         int nAttr = element.getAttributeCount();
         for ( int i = 0 ; i < nAttr ; ++i ) {
             String name = element.getAttributeName(i);
-            if ( name.equals("ref")) continue;
-            if ( name.equals("bind")) continue;
-            if ( name.equals("method")) continue;
-            if ( name.equals("action")) continue;
+            if ( name.equals("ref")) {
+                continue;
+            }
+            if ( name.equals("bind")) {
+                continue;
+            }
+            if ( name.equals("method")) {
+                continue;
+            }
+            if ( name.equals("action")) {
+                continue;
+            }
             String value = element.getAttributeValue(i);
             attributeMap.put(name, value);
         }
