@@ -55,7 +55,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
 		public GeoShape(ArrayList<double[]> points) {
 			this.points = points;
 		}
-	};
+	}
 
 	public final ArrayList<GeoPointData> points = new ArrayList<GeoPointData>();
 

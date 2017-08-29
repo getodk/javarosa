@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.api;
 
 import org.javarosa.core.util.TrivialTransitions;

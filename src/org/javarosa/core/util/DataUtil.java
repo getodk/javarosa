@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.util;
 
 /**

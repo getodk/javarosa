@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.util;
 
 import org.javarosa.core.io.Std;
@@ -33,6 +34,7 @@ public class MemoryUtils {
 	static boolean oldterning;
 	static boolean otrt;
 	static boolean oldxpath;
+
 	public static void stopTerning() {
 		oldterning = ExtUtil.interning;
 		otrt = TreeReferenceLevel.treeRefLevelInterningEnabled;
@@ -53,6 +55,7 @@ public class MemoryUtils {
 	//this run through. If you get an error when you try to profile memory,
 	//due to lack of space, you can increase the profile size.
 	private static final int MEMORY_PROFILE_SIZE = 5000;
+
 	public static void enableMemoryProfile() {
 		memoryProfile = new long[MEMORY_PROFILE_SIZE * 2];
 		memoryHolders = new byte[MEMORY_PROFILE_SIZE][];

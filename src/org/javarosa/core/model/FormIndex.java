@@ -88,6 +88,7 @@ public class FormIndex implements Serializable {
 		this.reference = reference;
 
 	}
+
 	/**
 	 * Constructs a simple form index that references a specific element in
 	 * a list of elements.

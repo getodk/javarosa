@@ -44,6 +44,7 @@ public class DecimalData implements IAnswerData {
 	public DecimalData(double d) {
 		this.d = d;
 	}
+
 	public DecimalData(Double d) {
 		setValue(d);
 	}

@@ -464,6 +464,7 @@ public class Localizer implements Externalizable {
 		}
 		return text;
 	}
+
 	/**
 	 * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
 	 *

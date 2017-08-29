@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.model;
 
 import org.javarosa.core.util.externalizable.DeserializationException;

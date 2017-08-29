@@ -68,6 +68,7 @@ public class SelectOneDataTests extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -84,6 +85,7 @@ public class SelectOneDataTests extends TestCase {
 		assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
 		
 	}
+
 	public void testSetData() {
 		SelectOneData data = new SelectOneData(one);
 		data.setValue(two);
@@ -96,6 +98,7 @@ public class SelectOneDataTests extends TestCase {
 		assertEquals("SelectOneData did not properly reset value ", data.getValue(), one);
 		
 	}
+
 	public void testNullData() {
 		boolean exceptionThrown = false;
 		SelectOneData data = new SelectOneData();

@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.services.storage;
 
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
@@ -21,6 +22,7 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	Persistable p;
 	SerializationWrapper w;
 	IMetaData m;
+
 	public FauxIndexedPersistable(Persistable p, SerializationWrapper w) {
 		this.p = p;
 		this.w = w;

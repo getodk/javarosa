@@ -75,6 +75,7 @@ public class StringData implements IAnswerData {
 	public String getDisplayText () {
 		return s;
 	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */

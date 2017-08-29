@@ -292,6 +292,7 @@ public class XPathStep implements Externalizable {
 	}
 
 	public static boolean XPathStepInterningEnabled = true;
+
 	public XPathStep intern() {
 		if(!XPathStepInterningEnabled || refs == null) {
 			return this;

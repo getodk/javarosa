@@ -17,6 +17,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.api;
 
 import org.javarosa.core.log.IFullLogSerializer;
@@ -42,6 +43,7 @@ public interface ILogger {
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer);
 	
 	public void serializeLogs(StreamLogSerializer serializer) throws IOException;
+
 	public void serializeLogs(StreamLogSerializer serializer, int limit) throws IOException;
 	
 	public void panic();

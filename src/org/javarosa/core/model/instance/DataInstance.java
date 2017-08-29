@@ -59,6 +59,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 	protected void setInstanceId(String instanceid) {
 		this.instanceid = instanceid;
 	}
+
 	/**
 	 * Whether the structure of this instance is only available at runtime.
 	 *

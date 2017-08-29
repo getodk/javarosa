@@ -29,9 +29,14 @@ import java.util.List;
 public interface IPropertyManager {
 
     public List<String> getProperty(String propertyName);
+
     public void setProperty(String propertyName, String propertyValue);
+
     public void setProperty(String propertyName, List<String> propertyValue);
+
     public String getSingularProperty(String propertyName);
+
     public void addRules(IPropertyRules rules);
+
     public List<IPropertyRules> getRules();   
 }

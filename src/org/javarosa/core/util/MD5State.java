@@ -78,4 +78,4 @@ class MD5State {
     
     this.count = from.count;
   }
-};
+}

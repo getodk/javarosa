@@ -69,6 +69,7 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 		public XFormSerializingVisitor() {
 			this(true);
 		}
+
 		public XFormSerializingVisitor(boolean respectRelevance) {
 			this.respectRelevance = respectRelevance;
 		}

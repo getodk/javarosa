@@ -176,6 +176,7 @@ public class GroupDef implements IFormElement, Localizable {
 	public String toString() {
 		return "<group>";
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.IFormElement#getDeepChildCount()

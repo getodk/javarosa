@@ -66,6 +66,7 @@ public class BufferedInputStreamTests extends TestCase{
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		

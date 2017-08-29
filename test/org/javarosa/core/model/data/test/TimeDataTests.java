@@ -53,6 +53,7 @@ public class TimeDataTests extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -77,6 +78,7 @@ public class TimeDataTests extends TestCase {
 		assertEquals("TimeData's getValue was mutated incorrectly", data.getValue(), temp);
 		
 	}
+
 	public void testSetData() {
 		TimeData data = new TimeData(now);
 		data.setValue(minusOneHour);
@@ -93,6 +95,7 @@ public class TimeDataTests extends TestCase {
 		
 		assertEquals("TimeData's value was mutated incorrectly", data.getValue(), temp);
 	}
+
 	public void testNullData() {
 		boolean exceptionThrown = false;
 		TimeData data = new TimeData();

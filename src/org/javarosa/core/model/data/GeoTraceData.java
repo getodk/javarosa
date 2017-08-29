@@ -55,7 +55,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
 		public GeoTrace(ArrayList<double[]> points) {
 			this.points = points;
 		}
-	};
+	}
 
 	public final ArrayList<GeoPointData> points = new ArrayList<GeoPointData>();
 

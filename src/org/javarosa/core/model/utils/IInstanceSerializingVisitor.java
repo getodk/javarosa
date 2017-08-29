@@ -36,9 +36,11 @@ public interface IInstanceSerializingVisitor extends IInstanceVisitor {
 	byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException;
 	
 	byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException;
+
 	byte[] serializeInstance(FormInstance model) throws IOException;
 	
 	public IDataPayload createSerializedPayload	(FormInstance model, IDataReference ref) throws IOException;
+
 	public IDataPayload createSerializedPayload	(FormInstance model) throws IOException;
 	
 	void setAnswerDataSerializer(IAnswerDataSerializer ads);

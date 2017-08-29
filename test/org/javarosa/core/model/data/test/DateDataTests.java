@@ -55,6 +55,7 @@ public class DateDataTests extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -79,6 +80,7 @@ public class DateDataTests extends TestCase {
 		
 		assertEquals("DateData's getValue was mutated incorrectly", data.getValue(), temp);
 	}
+
 	public void testSetData() {
 		DateData data = new DateData(notToday);
 		data.setValue(today);

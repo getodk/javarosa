@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.model.actions;
 
 import java.io.DataInputStream;

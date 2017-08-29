@@ -59,6 +59,7 @@ public class TextFormTests extends TestCase {
 
 
 	public final static int NUM_TESTS = 8;
+
 	public static String doTest (int i) {
 		switch (i) {
 		case 1: return "testConstructors";

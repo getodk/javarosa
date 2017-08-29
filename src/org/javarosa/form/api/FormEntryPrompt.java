@@ -223,6 +223,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     public List<TreeElement> getBindAttributes() {
     	return mTreeElement.getBindAttributes();
     }
+
     public List<SelectChoice> getSelectChoices() {
     	QuestionDef q = getQuestion();
 

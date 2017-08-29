@@ -33,6 +33,7 @@ public interface IDataReference extends Externalizable {
 	/**
 	 * @param reference the data reference value to be set
 	 */
+
 	void setReference (Object reference); 
 	
 //	/**

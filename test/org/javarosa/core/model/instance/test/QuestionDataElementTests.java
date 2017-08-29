@@ -149,6 +149,7 @@ public class QuestionDataElementTests extends TestCase{
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
@@ -224,6 +225,7 @@ public class QuestionDataElementTests extends TestCase{
 			public void visit(FormInstance tree) {
 				dispatchedWrong.bool = true;
 			}
+
 			public void visit(AbstractTreeElement element) {
 				visitorAccepted.bool = true;
 			}

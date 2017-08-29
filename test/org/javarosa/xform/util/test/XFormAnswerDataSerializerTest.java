@@ -92,6 +92,7 @@ public class XFormAnswerDataSerializerTest extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		switch (testID) {
 			case 1: return "testString";

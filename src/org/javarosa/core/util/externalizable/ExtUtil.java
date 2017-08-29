@@ -37,6 +37,7 @@ import java.util.List;
 public class ExtUtil {
 	public static boolean interning = true;
 	public static CacheTable<String> stringCache;
+
 	public static byte[] serialize (Object o) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -498,6 +499,7 @@ public class ExtUtil {
 	public static void deserialize (byte[] data, Externalizable ext) throws IOException, DeserializationException {
 		ext.readExternal(new DataInputStream(new ByteArrayInputStream(data)), defaultPrototypes());
 	}
+
 	public static Object deserialize (byte[] data, Class type, PrototypeFactory pf) throws IOException, DeserializationException {
         return read(new DataInputStream(new ByteArrayInputStream(data)), type, pf);
 	}

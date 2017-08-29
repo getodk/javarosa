@@ -107,6 +107,7 @@ public class SelectMultiData implements IAnswerData {
 
 		return b.toString();
 	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */

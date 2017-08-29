@@ -66,6 +66,7 @@ public class XFormAnswerDataParser {
 	public static IAnswerData getAnswerData (String text, int dataType) {
 		return getAnswerData(text, dataType, null);
 	}
+
 	public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
 		String trimmedText = text.trim();
 		if (trimmedText.length() == 0) {

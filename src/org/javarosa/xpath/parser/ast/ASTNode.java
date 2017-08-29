@@ -27,6 +27,7 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public abstract class ASTNode {
 	public abstract Vector<ASTNode> getChildren();
+
 	public abstract XPathExpression build() throws XPathSyntaxException;
 	
 	//horrible debugging code

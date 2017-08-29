@@ -54,6 +54,7 @@ public class IntegerDataTests extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -69,6 +70,7 @@ public class IntegerDataTests extends TestCase {
 		IntegerData data = new IntegerData(one);
 		assertEquals("IntegerData's getValue returned an incorrect integer", data.getValue(), one);
 	}
+
 	public void testSetData() {
 		IntegerData data = new IntegerData(one);
 		data.setValue(two);
@@ -81,6 +83,7 @@ public class IntegerDataTests extends TestCase {
 		assertEquals("IntegerData did not properly reset value ", data.getValue(), one);
 		
 	}
+
 	public void testNullData() {
 		boolean exceptionThrown = false;
 		IntegerData data = new IntegerData();

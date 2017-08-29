@@ -44,6 +44,7 @@ public class IntegerData implements IAnswerData {
 	public IntegerData(int n) {
 		this.n = n;
 	}
+
 	public IntegerData(Integer n) {
 		setValue(n);
 	}

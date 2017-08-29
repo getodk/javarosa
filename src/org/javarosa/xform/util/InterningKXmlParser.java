@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.xform.util;
 
 import org.javarosa.core.util.CacheTable;
@@ -18,6 +19,7 @@ public class InterningKXmlParser extends KXmlParser{
 		super();
 		this.stringCache = stringCache;
 	}
+
 	public void release() {
 		//Anything?
 	}

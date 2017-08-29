@@ -88,7 +88,7 @@ public class QuestionDataGroupTests extends TestCase {
 			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
-			public void writeExternal(DataOutputStream out) throws IOException {};
+			public void writeExternal(DataOutputStream out) throws IOException {}
 
 		};
 
@@ -123,7 +123,7 @@ public class QuestionDataGroupTests extends TestCase {
 			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
-			public void writeExternal(DataOutputStream out) throws IOException {};
+			public void writeExternal(DataOutputStream out) throws IOException {}
 
 		};
 
@@ -152,6 +152,7 @@ public class QuestionDataGroupTests extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
@@ -215,6 +216,7 @@ public class QuestionDataGroupTests extends TestCase {
 				dispatchedWrong.setValue(true);
 
 			}
+			
 			public void visit(AbstractTreeElement element) {
 				visitorAccepted.setValue(true);
 			}

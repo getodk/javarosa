@@ -7,5 +7,6 @@ import org.javarosa.core.util.externalizable.Externalizable;
  */
 public interface Persistable extends Externalizable {
 	void setID (int ID);
+
 	int getID ();
 }

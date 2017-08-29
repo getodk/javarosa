@@ -17,6 +17,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.util;
 
 /**
@@ -27,6 +28,7 @@ package org.javarosa.core.util;
 public class NoLocalizedTextException extends RuntimeException {
 	private String keynames;
 	private String locale;
+	
 	public NoLocalizedTextException(String message, String keynames, String locale) {
 		super(message);
 		this.keynames = keynames;

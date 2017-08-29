@@ -54,6 +54,7 @@ public class StringDataTests extends TestCase {
 
 		return aSuite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -70,6 +71,7 @@ public class StringDataTests extends TestCase {
 		assertEquals("StringData's getValue returned an incorrect String", data.getValue(), stringA);
 		
 	}
+
 	public void testSetData() {
 		StringData data = new StringData(stringA);
 		data.setValue(stringB);
@@ -81,6 +83,7 @@ public class StringDataTests extends TestCase {
 		assertTrue("StringData did not set value properly. Maintained old value.", !(data.getValue().equals(stringB)));
 		assertEquals("StringData did not properly reset value ", data.getValue(), stringA);
 	}
+
 	public void testNullData() {
 		boolean exceptionThrown = false;
 		StringData data = new StringData();
