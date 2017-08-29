@@ -77,7 +77,6 @@ public class FormParseInit {
 		
 		if( xform == null ) {
 			System.out.println("\n\n==================================\nERROR: XForm has failed validation!!");
-		} else {
 		}
 	}
 	
