@@ -654,7 +654,9 @@ public class DateUtils {
 			//includeToday: whether today's date can count as the last day of the period
 			//nAgo: how many periods ago; 1=most recent period, 0=period in progress
 
-			int target_dow = -1, current_dow = -1, diff;
+			int target_dow = -1;
+			int current_dow = -1;
+			int diff;
 			int offset = (includeToday ? 1 : 0);
 
 			if (start.equals("sun")) {

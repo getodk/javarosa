@@ -25,7 +25,8 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class SampleExtz implements Externalizable {
-	String a, b;
+	String a;
+	String b;
 
 	public SampleExtz (String a, String b) {
 		this.a = a;

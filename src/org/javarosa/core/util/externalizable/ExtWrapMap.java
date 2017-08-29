@@ -161,7 +161,8 @@ public class ExtWrapMap extends ExternalizableWrapper {
 
 	public void metaWriteExternal (DataOutputStream out) throws IOException {
 		HashMap h = (HashMap)val;
-		Object keyTagObj, elemTagObj;
+		Object keyTagObj;
+		Object elemTagObj;
 
 		keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keySet().iterator().next()) : keyType);
 		elemTagObj = (dataType == null ? (h.size() == 0 ? new Object() : h.values().iterator().next()) : dataType);

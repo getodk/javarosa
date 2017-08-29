@@ -525,7 +525,8 @@ public class LocalizerTest extends TestCase  {
 
 		Localizer l = buildLocalizer(i, j, k, ourLocale, otherLocale);
 		String expected = expectedText(textID, l);
-		String text, text2;
+		String text;
+		String text2;
 
 		text = l.getText(textID, ourLocale);
 		if (expected == null ? text != null : !expected.equals(text)) {

@@ -30,7 +30,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 public abstract class XPathBinaryOpExpr extends XPathOpExpr {
-	public XPathExpression a, b;
+	public XPathExpression a;
+	public XPathExpression b;
 
 	public XPathBinaryOpExpr () { } //for deserialization of children
 	

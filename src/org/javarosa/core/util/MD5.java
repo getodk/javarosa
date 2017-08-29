@@ -174,7 +174,11 @@ public class MD5 {
 	}
 
 	private final void transform(MD5State state, byte buffer[], int shift, int[] decode_buf) {
-		int a = state.state[0], b = state.state[1], c = state.state[2], d = state.state[3], x[] = decode_buf;
+		int a = state.state[0];
+		int b = state.state[1];
+		int c = state.state[2];
+		int d = state.state[3];
+		int x[] = decode_buf;
 
 		decode(buffer, shift, decode_buf);
 
@@ -352,7 +356,10 @@ public class MD5 {
 	 *            buffer.length)
 	 */
 	private final void update(MD5State stat, byte buffer[], int offset, int length) {
-		int index, partlen, i, start;
+		int index;
+		int partlen;
+		int i;
+		int start;
 		finals = null;
 		/* Length can be told to be shorter, but not inter */
 		if ((length - offset) > buffer.length) {
@@ -394,7 +401,8 @@ public class MD5 {
 	}
 
 	private static final byte[] encode( final int input[], final int len) {
-		int i, j;
+		int i;
+		int j;
 		byte out[];
 		out = new byte[len];
 		for (i = j = 0; j < len; i++, j += 4) {
@@ -441,7 +449,8 @@ public class MD5 {
 	 */
 	public synchronized final byte[] doFinal() {
 		byte bits[];
-		int index, padlen;
+		int index;
+		int padlen;
 		MD5State fin;
 		if (finals == null) {
 			fin = new MD5State(state);
