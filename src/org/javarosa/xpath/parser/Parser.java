@@ -132,7 +132,7 @@ public class Parser {
 		}, Token.LBRACK, Token.RBRACK);
 	}
 
-	private static abstract class SubNodeFactory {
+	private abstract static class SubNodeFactory {
 		public abstract ASTNode newNode (ASTNodeAbstractExpr node);
 	}
 

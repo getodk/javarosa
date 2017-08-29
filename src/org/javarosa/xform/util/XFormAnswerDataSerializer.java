@@ -57,7 +57,7 @@ import org.kxml2.kdom.Element;
  */
 public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 
-	public final static String DELIMITER = " ";
+	public static final String DELIMITER = " ";
 
    List<IAnswerDataSerializer> additionalSerializers = new ArrayList<IAnswerDataSerializer>(1);
 

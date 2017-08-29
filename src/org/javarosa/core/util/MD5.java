@@ -447,7 +447,7 @@ public class MD5 {
 	 *
 	 * @return Array of 16 bytes, the hash of all updated bytes
 	 */
-	public synchronized final byte[] doFinal() {
+	public final synchronized byte[] doFinal() {
 		byte bits[];
 		int index;
 		int padlen;

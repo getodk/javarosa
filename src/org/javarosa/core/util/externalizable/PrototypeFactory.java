@@ -25,7 +25,7 @@ import org.javarosa.core.util.MD5;
 import org.javarosa.core.util.PrefixTree;
 
 public class PrototypeFactory {
-	public final static int CLASS_HASH_SIZE = 4;
+	public static final int CLASS_HASH_SIZE = 4;
 
 	private Vector classes;
 	private Vector hashes;

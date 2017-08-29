@@ -36,16 +36,16 @@ public class JavaRosaPropertyRules implements IPropertyRules {
 
     ArrayList<String> readOnlyProperties;
 
-    public final static String DEVICE_ID_PROPERTY = "DeviceID";
-    public final static String CURRENT_LOCALE = "cur_locale";
+    public static final String DEVICE_ID_PROPERTY = "DeviceID";
+    public static final String CURRENT_LOCALE = "cur_locale";
 
-    public final static String LOGS_ENABLED = "logenabled";
+    public static final String LOGS_ENABLED = "logenabled";
 
-    public final static String LOGS_ENABLED_YES = "Enabled";
-    public final static String LOGS_ENABLED_NO = "Disabled";
+    public static final String LOGS_ENABLED_YES = "Enabled";
+    public static final String LOGS_ENABLED_NO = "Disabled";
 
     /** The expected compliance version for the OpenRosa API set **/
-    public final static String OPENROSA_API_LEVEL = "jr_openrosa_api";
+    public static final String OPENROSA_API_LEVEL = "jr_openrosa_api";
 
     /**
      * Creates the JavaRosa set of property rules

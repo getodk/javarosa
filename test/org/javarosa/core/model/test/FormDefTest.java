@@ -74,7 +74,7 @@ public class FormDefTest extends TestCase {
 		//ExternalizableTest.testExternalizable(q, this, pf, "QuestionDef [" + msg + "]");
 	}
 	
-	public final static int NUM_TESTS = 1;
+	public static final int NUM_TESTS = 1;
 	
 	public static String doTest (int i) {
 		switch (i) {

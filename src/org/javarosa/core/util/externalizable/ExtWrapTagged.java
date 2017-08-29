@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class ExtWrapTagged extends ExternalizableWrapper {
-	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}; //must be same length as PrototypeFactory.CLASS_HASH_SIZE
+	public static final byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}; //must be same length as PrototypeFactory.CLASS_HASH_SIZE
 	
 	public static HashMap<Class, Integer> WRAPPER_CODES;
 	
