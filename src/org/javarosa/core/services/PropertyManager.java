@@ -121,12 +121,10 @@ public class PropertyManager implements IPropertyManager {
     public List<String> getProperty(String propertyName) {
         if(rulesList.size() == 0) {
             return getValue(propertyName);
-        }
-        else {
+        } else {
             if(checkPropertyAllowed(propertyName)) {
                 return getValue(propertyName);
-            }
-            else {
+            } else {
                 return null;
             }
         }
@@ -156,8 +154,7 @@ public class PropertyManager implements IPropertyManager {
     	}
         if(rulesList.size() == 0) {
            writeValue(propertyName, propertyValue);
-        }
-        else {
+        } else {
             boolean valid = true;
             for ( String pv : propertyValue ) {
                // RL - checkPropertyAllowed is implicit in checkValueAllowed
@@ -168,9 +165,7 @@ public class PropertyManager implements IPropertyManager {
             if(valid) {
                 writeValue(propertyName, propertyValue);
                 notifyChanges(propertyName);
-            }
-            //#if debug.output==verbose
-            else {
+            } else { //#if debug.output==verbose
             	Std.out.println("Property Manager: Unable to write value (" + propertyValue + ") to " + propertyName);
             }
             //#endif

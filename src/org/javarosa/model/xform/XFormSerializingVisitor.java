@@ -105,8 +105,7 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 			model.accept(this);
 			if(theXmlDoc != null) {
 				return XFormSerializer.getUtfBytes(theXmlDoc);
-			}
-			else {
+			} else {
 				return null;
 			}
 		}
@@ -134,8 +133,7 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 					payload.addPayload(new DataPointerPayload(pointer));
 				}
 				return payload;
-			}
-			else {
+			} else {
 				return null;
 			}
 		}

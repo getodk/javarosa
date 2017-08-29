@@ -302,8 +302,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			IDataPointer[] pointer = new IDataPointer[1];
 			pointer[0] = (IDataPointer)((PointerAnswerData)data).getValue();
 			return pointer;
-		}
-		else if (data instanceof MultiPointerAnswerData ) {
+		} else if (data instanceof MultiPointerAnswerData ) {
 			return (IDataPointer[])((MultiPointerAnswerData)data).getValue();
 		}
 		//This shouldn't have been called.

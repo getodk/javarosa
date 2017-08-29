@@ -99,12 +99,10 @@ public class JavaRosaPropertyRules implements IPropertyRules {
             if(prop.size() == 1 && checkPropertyAllowed(prop.get(0))) {
                 // If so, get its list of available values, and see whether the potentival value is acceptable.
                 return PropertyManager._().getProperty(prop.get(0)).contains(potentialValue);
-            }
-            else {
+            } else {
                 return rules.get(propertyName).contains(potentialValue);
             }
-        }
-        else {
+        } else {
             return true;
         }
     }

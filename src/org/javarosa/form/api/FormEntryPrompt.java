@@ -166,8 +166,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 
         if (data == null) {
 			return null;
-		}
-        else {
+		} else {
         	String text;
 
         	//csims@dimagi.com - Aug 11, 2010 - Added special logic to

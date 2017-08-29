@@ -219,8 +219,7 @@ public class DateUtils {
 		//NOTE: offset is in millis
 		if(offset ==0 ) {
 			time += "Z";
-		}
-		else {
+		} else {
 
 			//Start with sign
 			String offsetSign = offset >0 ? "+" : "-";

@@ -126,10 +126,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 					nodes.add(cur);
 				}
 				cur = cur.getAttribute(null, name);
-			}
-
-			//Otherwise, it's another child element
-			else {
+			} else { //Otherwise, it's another child element
 				if (mult == TreeReference.INDEX_UNBOUND) {
 					if (cur.getChildMultiplicity(name) == 1) {
 						mult = 0;

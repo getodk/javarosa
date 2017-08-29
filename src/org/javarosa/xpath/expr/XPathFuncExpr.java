@@ -948,8 +948,7 @@ public class XPathFuncExpr extends XPathExpression {
             int groupIdx = toInt(args[idxargi].eval(model, ec)).intValue();
             if (groupIdx <= 0) {
                 // ignore invalid indexes (primarily happens during validation)
-            }
-            else {
+            } else {
                 // otherwise, add the index to the context reference
                 contextRef.setMultiplicity(groupRef.size()-1, groupIdx-1);
             }

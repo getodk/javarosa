@@ -125,10 +125,7 @@ public class BufferedInputStream extends InputStream {
 						//1) This was actually our first attempt on the end of stream. signal EOF 
 						if (counter == 0) {
 							return -1;
-						}
-						
-						//2) This was the last pile of bits. Return the ones we read.
-						else {
+						} else { //2) This was the last pile of bits. Return the ones we read.
 							return counter;
 						}
 					}

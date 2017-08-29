@@ -139,8 +139,7 @@ public class ASTNodeAbstractExpr extends ASTNode {
 			
 			if (type == leftPush) {
 				depth++;
-			}
-			else if (type == rightPop) {
+			} else if (type == rightPop) {
 				depth--;
 			}
 			

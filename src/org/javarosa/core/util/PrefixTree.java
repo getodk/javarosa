@@ -138,9 +138,7 @@ public class PrefixTree {
 
 				//Add this to the highest level prefix we've found
 				current.addChild(node);
-			}
-			//Otherwise check to see if we are going to split the current prefix
-			else if (len < node.getPrefix().length) {
+			} else if (len < node.getPrefix().length) { //Otherwise check to see if we are going to split the current prefix
 				char[] newPrefix = new char[len];
 				for(int i = 0; i < len ; ++i) {
 					newPrefix[i] = chars[currentIndex + i];

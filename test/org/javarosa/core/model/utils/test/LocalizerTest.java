@@ -857,26 +857,30 @@ public class LocalizerTest extends TestCase  {
 
 		runAsync(new Runnable() { public void run() {
 				holder[0] = Localizer.processArguments("${0}", new String[] {C});
-			}});
+			}
+		});
 
 		assertEquals(holder[0], C);
 
 
 		runAsync(new Runnable() { public void run() {
-			holder[0] = Localizer.processArguments("${0}", new String[] {D});
-		}});
+				holder[0] = Localizer.processArguments("${0}", new String[] {D});
+			}
+		});
 
 		assertEquals(holder[0], D);
 
 		runAsync(new Runnable() { public void run() {
-			holder[0] = Localizer.processArguments(holder[0], res);
-		}});
+				holder[0] = Localizer.processArguments(holder[0], res);
+			}
+		});
 
 		assertEquals(holder[0], res[1] + res[0]);
 
 		runAsync(new Runnable() { public void run() {
-			holder[0] = Localizer.processArguments("$ {0} ${1}", res);
-		}});
+				holder[0] = Localizer.processArguments("$ {0} ${1}", res);
+			}
+		});
 
 		assertEquals(holder[0], "$ {0} " + res[1]);
 

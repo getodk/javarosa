@@ -178,82 +178,86 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private static void initProcessingRules() {
-        groupLevelHandlers = new HashMap<String, IElementHandler>() {{
-            put("input", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT);
-                }
-            });
-            put("range", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE,
-                            Arrays.asList("start", "end", "step") // Prevent warning about unexpected attributes
-                    );
-                }
-            });
-            put("secret", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SECRET);
-                }
-            });
-            put(SELECT, new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_MULTI);
-                }
-            });
-            put(SELECTONE, new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_ONE);
-                }
-            });
-            put("group", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseGroup((IFormElement) parent, e, CONTAINER_GROUP);
-                }
-            });
-            put("repeat", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseGroup((IFormElement) parent, e, CONTAINER_REPEAT);
-                }
-            });
-            put("trigger", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_TRIGGER);
-                }
-            }); //multi-purpose now; need to dig deeper
-            put(Constants.XFTAG_UPLOAD, new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseUpload((IFormElement) parent, e, Constants.CONTROL_UPLOAD);
-                }
-            });
-            put(LABEL_ELEMENT, new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    if (parent instanceof GroupDef) {
-                        p.parseGroupLabel((GroupDef) parent, e);
-                    } else {
-                        throw new XFormParseException("parent of element is not a group", e);
+        groupLevelHandlers = new HashMap<String, IElementHandler>() {
+            {
+                put("input", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT);
                     }
-                }
-            });
-        }};
+                });
+                put("range", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE,
+                                Arrays.asList("start", "end", "step") // Prevent warning about unexpected attributes
+                        );
+                    }
+                });
+                put("secret", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseControl((IFormElement) parent, e, Constants.CONTROL_SECRET);
+                    }
+                });
+                put(SELECT, new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_MULTI);
+                    }
+                });
+                put(SELECTONE, new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_ONE);
+                    }
+                });
+                put("group", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseGroup((IFormElement) parent, e, CONTAINER_GROUP);
+                    }
+                });
+                put("repeat", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseGroup((IFormElement) parent, e, CONTAINER_REPEAT);
+                    }
+                });
+                put("trigger", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseControl((IFormElement) parent, e, Constants.CONTROL_TRIGGER);
+                    }
+                }); //multi-purpose now; need to dig deeper
+                put(Constants.XFTAG_UPLOAD, new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseUpload((IFormElement) parent, e, Constants.CONTROL_UPLOAD);
+                    }
+                });
+                put(LABEL_ELEMENT, new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        if (parent instanceof GroupDef) {
+                            p.parseGroupLabel((GroupDef) parent, e);
+                        } else {
+                            throw new XFormParseException("parent of element is not a group", e);
+                        }
+                    }
+                });
+            }
+        };
 
-        topLevelHandlers = new HashMap<String, IElementHandler>() {{
-            put("model", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseModel(e);
-                }
-            });
-            put("title", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseTitle(e);
-                }
-            });
-            put("meta", new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseMeta(e);
-                }
-            });
-        }};
+        topLevelHandlers = new HashMap<String, IElementHandler>() {
+            {
+                put("model", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseModel(e);
+                    }
+                });
+                put("title", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseTitle(e);
+                    }
+                });
+                put("meta", new IElementHandler() {
+                    @Override public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseMeta(e);
+                    }
+                });
+            }
+        };
         topLevelHandlers.putAll(groupLevelHandlers);
     }
 
@@ -866,10 +870,7 @@ public class XFormParser implements IXFormParserFunctions {
                                     // a tag child might be a label
                                     if (tagChildName.equals("label")) {
                                         tag.label = tagChildEl.getText(0);
-                                    }
-
-                                    // a tag child might be an item
-                                    else if (tagChildName.equals("item")) {
+                                    } else if (tagChildName.equals("item")) { // a tag child might be an item
                                         OSMTagItem item = new OSMTagItem();
                                         tag.items.add(item);
 
@@ -884,10 +885,7 @@ public class XFormParser implements IXFormParserFunctions {
                                                 // an item child might be a label
                                                 if (itemChildName.equals("label")) {
                                                     item.label = itemChildEl.getText(0);
-                                                }
-
-                                                // an item child might be a value
-                                                else if (itemChildName.equals("value")) {
+                                                } else if (itemChildName.equals("value")) { // an item child might be a value
                                                     item.value = itemChildEl.getText(0);
                                                 }
                                             }

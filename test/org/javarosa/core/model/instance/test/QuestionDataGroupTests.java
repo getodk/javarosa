@@ -241,8 +241,7 @@ public class QuestionDataGroupTests extends TestCase {
 			group.addChild(stringElement);
 			group.getChildAt(0);
 			assertTrue("Added element was not in Question Data Group's children!",group.getChildAt(0).equals(stringElement));
-		}
-		catch(RuntimeException e) {
+		} catch(RuntimeException e) {
 			if(!added) {
 				fail("Group did not report success adding a valid child");
 			}
@@ -252,8 +251,7 @@ public class QuestionDataGroupTests extends TestCase {
 			TreeElement leafGroup = new TreeElement("leaf group");
 			group.addChild(leafGroup);
 			assertTrue("Added element was not in Question Data Group's children",group.getChildAt(1).equals(leafGroup));
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			if(!added) {
 				fail("Group did not report success adding a valid child");
 			}

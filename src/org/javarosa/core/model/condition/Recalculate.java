@@ -145,8 +145,7 @@ public class Recalculate extends Triggerable {
 		} else if (val instanceof Date) {
 			if ( dataType == Constants.DATATYPE_DATE_TIME) {
 				return new DateTimeData((Date)val);
-			}
-			else if ( dataType == Constants.DATATYPE_TIME ) {
+			} else if ( dataType == Constants.DATATYPE_TIME ) {
 				return new TimeData((Date)val);
 			} else {
 				return new DateData((Date)val);

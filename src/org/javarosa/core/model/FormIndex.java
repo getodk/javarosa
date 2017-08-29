@@ -447,14 +447,12 @@ public class FormIndex implements Serializable {
 		if(!parent.isTerminal() && child.isTerminal()) {
 			//can't be the parent if the child is earlier on
 			return false;
-		}
-		else if(parent.getLocalIndex() != child.getLocalIndex()) {
+		} else if(parent.getLocalIndex() != child.getLocalIndex()) {
 			//Either they're at the same level, in which case only
 			//identical indices should match, or they should have
 			//the same root
 			return false;
-		}
-		else if(parent.getInstanceIndex() != -1 && (parent.getInstanceIndex() != child.getInstanceIndex())) {
+		} else if(parent.getInstanceIndex() != -1 && (parent.getInstanceIndex() != child.getInstanceIndex())) {
 			return false;
 		}
 		//Barring all of these cases, it should be true.

@@ -63,8 +63,7 @@ public class Property implements Persistable, IMetaData {
             Std.out.println("WARNING: Property in RMS with no value:"+fullString);
             //#endif
             name = fullString.substring(0, fullString.length());
-        }
-        else {
+        } else {
             name = fullString.substring(0, nameindex);
         // The format of the properties should be each one in a list, comma delimited
         String packedvalue = fullString.substring(fullString.indexOf(",")+1,fullString.length());
@@ -73,8 +72,7 @@ public class Property implements Persistable, IMetaData {
             if(index == -1) {
                 value.add(packedvalue);
                 packedvalue = "";
-            }
-            else {
+            } else {
                 value.add(packedvalue.substring(0,index));
                 packedvalue = packedvalue.substring(index + 1, packedvalue.length());
             }

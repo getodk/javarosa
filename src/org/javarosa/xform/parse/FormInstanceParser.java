@@ -340,9 +340,7 @@ class FormInstanceParser {
 
             if (fi.getTemplatePath(itemset.labelRef) == null) {
                 throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
-            }
-            //check value nodes exist
-            else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
+            } else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) { //check value nodes exist
                 throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
             }
         }

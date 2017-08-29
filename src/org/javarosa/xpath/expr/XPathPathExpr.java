@@ -440,8 +440,7 @@ public class XPathPathExpr extends XPathExpression {
 		//Either concretely the sentinal, or "."
 		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {
 			return sentinal;
-		}
-		else {
+		} else {
 			//It's very, very hard to figure out how to pivot predicates. For now, just skip it
 			for(int i = 0 ; i < ref.size(); ++i) {
 				if(ref.getPredicate(i) != null && ref.getPredicate(i).size() > 0) {
