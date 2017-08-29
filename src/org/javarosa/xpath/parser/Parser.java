@@ -116,7 +116,9 @@ public class Parser {
 
 	private static void parseParens (ASTNode node) throws XPathSyntaxException {
 		parseBalanced(node, new SubNodeFactory () {
-			public ASTNode newNode (ASTNodeAbstractExpr node) { return node; }
+			public ASTNode newNode (ASTNodeAbstractExpr node) {
+				return node;
+			}
 		}, Token.LPAREN, Token.RPAREN);
 	}
 

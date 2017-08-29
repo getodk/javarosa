@@ -508,24 +508,35 @@ public class XPathEvalTest extends TestCase {
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "testfunc"; }
+            public String getName () {
+                return "testfunc";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(new Class[0]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return TRUE; }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return TRUE;
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler(){
 
             @Override
-            public String getName() { return "regex";	}
+            public String getName() {
+                return "regex";
+            }
             @Override
             public Object eval(Object[] args, EvaluationContext ec) {
                 System.out.println("EVAL REGEX TESTS:");
@@ -544,34 +555,50 @@ public class XPathEvalTest extends TestCase {
                 return p;
             }
             @Override
-            public boolean rawArgs() { return false; }
+            public boolean rawArgs() {
+                return false;
+            }
             @Override
-            public boolean realTime() {	return false; }
+            public boolean realTime() {
+                return false;
+            }
 
         });
 
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "add"; }
+            public String getName () {
+                return "add";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(allPrototypes[0]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return (Double) args[0] + (Double) args[1]; }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return (Double) args[0] + (Double) args[1];
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "proto"; }
+            public String getName () {
+                return "proto";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(allPrototypes[0]);
                 p.add(allPrototypes[1]);
                 p.add(allPrototypes[2]);
@@ -579,51 +606,84 @@ public class XPathEvalTest extends TestCase {
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return printArgs(args); }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return printArgs(args);
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "raw"; }
+            public String getName () {
+                return "raw";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(allPrototypes[3]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return true; }
+            public boolean rawArgs () {
+                return true;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return printArgs(args); }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return printArgs(args);
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "null-proto"; }
+            public String getName () {
+                return "null-proto";
+            }
             @Override
-            public List<Class[]> getPrototypes () { return null; }
+            public List<Class[]> getPrototypes () {
+                return null;
+            }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return FALSE; }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return FALSE;
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "concat"; }
+            public String getName () {
+                return "concat";
+            }
             @Override
-            public List<Class[]> getPrototypes () { return new ArrayList<Class[]>(); }
+            public List<Class[]> getPrototypes () {
+                return new ArrayList<Class[]>();
+            }
             @Override
-            public boolean rawArgs () { return true; }
+            public boolean rawArgs () {
+                return true;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
             public Object eval (Object[] args, EvaluationContext ec) {
                 StringBuilder sb = new StringBuilder();
@@ -636,71 +696,110 @@ public class XPathEvalTest extends TestCase {
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "convertible"; }
+            public String getName () {
+                return "convertible";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(new Class[0]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return new IExprDataType () {
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return new IExprDataType () {
                     @Override
-                    public Boolean toBoolean () { return TRUE; }
+                    public Boolean toBoolean () {
+                        return TRUE;
+                    }
                     @Override
-                    public Double toNumeric () { return 5.0; }
-                    public String toString () { return "hi"; }
+                    public Double toNumeric () {
+                        return 5.0;
+                    }
+                    public String toString () {
+                        return "hi";
+                    }
                 };
             }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "inconvertible"; }
+            public String getName () {
+                return "inconvertible";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(new Class[0]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return new Object(); }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return new Object();
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "get-custom"; }
+            public String getName () {
+                return "get-custom";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(allPrototypes[4]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return (Boolean) args[0] ? new CustomSubType() : new CustomType(); }
+            public Object eval (Object[] args, EvaluationContext ec) {
+                return (Boolean) args[0] ? new CustomSubType() : new CustomType();
+            }
         });
 
         ec.addFunctionHandler(new IFunctionHandler () {
             @Override
-            public String getName () { return "check-types"; }
+            public String getName () {
+                return "check-types";
+            }
             @Override
-            public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+            public List<Class[]> getPrototypes () {
+                List<Class[]> p = new ArrayList<Class[]>();
                 p.add(allPrototypes[5]);
                 return p;
             }
             @Override
-            public boolean rawArgs () { return false; }
+            public boolean rawArgs () {
+                return false;
+            }
             @Override
-            public boolean realTime () { return false; }
+            public boolean realTime () {
+                return false;
+            }
             @Override
             public Object eval (Object[] args, EvaluationContext ec) {
                 if (args.length != 5 || !(args[0] instanceof Boolean) || !(args[1] instanceof Double) ||
@@ -743,47 +842,69 @@ public class XPathEvalTest extends TestCase {
     }
 
     private class CustomType {
-        public String val () { return "custom"; }
-        public String toString() { return ""; }
-        public boolean equals (Object o) { return o instanceof CustomType; }
+        public String val () {
+            return "custom";
+        }
+        public String toString() {
+            return "";
+        }
+        public boolean equals (Object o) {
+            return o instanceof CustomType;
+        }
     }
 
     private class CustomSubType extends CustomType {
         @Override
-        public String val () { return "custom-sub"; }
+        public String val () {
+            return "custom-sub";
+        }
     }
 
     private abstract class StatefulFunc implements IFunctionHandler {
         public String val;
         @Override
-        public boolean rawArgs () { return false; }
+        public boolean rawArgs () {
+            return false;
+        }
         @Override
-        public boolean realTime () { return false; }
+        public boolean realTime () {
+            return false;
+        }
     }
 
     StatefulFunc read = new StatefulFunc () {
         @Override
-        public String getName () { return "read"; }
+        public String getName () {
+            return "read";
+        }
         @Override
-        public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+        public List<Class[]> getPrototypes () {
+            List<Class[]> p = new ArrayList<Class[]>();
             p.add(new Class[0]);
             return p;
         }
         @Override
-        public Object eval (Object[] args, EvaluationContext ec) { return val; }
+        public Object eval (Object[] args, EvaluationContext ec) {
+            return val;
+        }
     };
 
     StatefulFunc write = new StatefulFunc () {
         @Override
-        public String getName () { return "write"; }
+        public String getName () {
+            return "write";
+        }
         @Override
-        public List<Class[]> getPrototypes () { List<Class[]> p = new ArrayList<Class[]>();
+        public List<Class[]> getPrototypes () {
+            List<Class[]> p = new ArrayList<Class[]>();
             Class[] proto = {String.class};
             p.add(proto);
             return p;
         }
         @Override
-        public Object eval (Object[] args, EvaluationContext ec) { val = (String)args[0]; return TRUE; }
+        public Object eval (Object[] args, EvaluationContext ec) {
+            val = (String)args[0]; return TRUE;
+        }
     };
 }
 

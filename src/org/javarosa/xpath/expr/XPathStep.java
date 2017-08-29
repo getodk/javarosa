@@ -163,9 +163,21 @@ public class XPathStep implements Externalizable {
 			}
 
 			switch (test) {
-			case TEST_NAME: if(!name.equals(x.name)) {return false;} break;
-			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
-			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
+			case TEST_NAME:
+				if (!name.equals(x.name)) {
+					return false;
+				}
+				break;
+			case TEST_NAMESPACE_WILDCARD:
+				if (!namespace.equals(x.namespace)) {
+					return false;
+				}
+				break;
+			case TEST_TYPE_PROCESSING_INSTRUCTION:
+				if (!ExtUtil.equals(literal, x.literal)) {
+					return false;
+				}
+				break;
 			default: break;
 			}
 
@@ -203,9 +215,21 @@ public class XPathStep implements Externalizable {
 			}
 
 			switch (test) {
-			case TEST_NAME: if(x.test != TEST_NAME_WILDCARD && !name.equals(x.name)) {return false;} break;
-			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
-			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
+			case TEST_NAME:
+				if (x.test != TEST_NAME_WILDCARD && !name.equals(x.name)) {
+					return false;
+				}
+				break;
+			case TEST_NAMESPACE_WILDCARD:
+				if (!namespace.equals(x.namespace)) {
+					return false;
+				}
+				break;
+			case TEST_TYPE_PROCESSING_INSTRUCTION:
+				if (!ExtUtil.equals(literal, x.literal)) {
+					return false;
+				}
+				break;
 			default: break;
 			}
 

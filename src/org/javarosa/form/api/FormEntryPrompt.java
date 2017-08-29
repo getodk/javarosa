@@ -137,8 +137,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    			}
 	    			//if it's a dynamic question, then there's a good choice what they selected last time
 	    			//will no longer be an option this go around
-	    			if(choice != null)
-	    			{
+	    			if (choice != null) {
 	    				selection.add(choice.selection());
 	    			}
 	    		}
@@ -339,7 +338,9 @@ public class FormEntryPrompt extends FormEntryCaption {
 		}
 
 		//Just in case the selection hasn't had a chance to be initialized yet.
-		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+		if (sel.index == -1) {
+			sel.attachChoice(this.getQuestion());
+		}
 
 		//check for the null id case and return labelInnerText if it is so.
 		String tid = sel.choice.getTextID();
@@ -380,7 +381,9 @@ public class FormEntryPrompt extends FormEntryCaption {
 		}
 
 		//Just in case the selection hasn't had a chance to be initialized yet.
-		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+		if (sel.index == -1) {
+			sel.attachChoice(this.getQuestion());
+		}
 
 		String textID = sel.choice.getTextID();
 		if(textID == null || textID.length() == 0) {

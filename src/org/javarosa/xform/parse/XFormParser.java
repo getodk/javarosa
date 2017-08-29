@@ -287,7 +287,9 @@ public class XFormParser implements IXFormParserFunctions {
 
         structuredActions = new HashMap<>();
         structuredActions.put("setvalue", new IElementHandler() {
-                public void handle (XFormParser p, Element e, Object parent) { p.parseSetValueAction((FormDef)parent, e);}
+                public void handle (XFormParser p, Element e, Object parent) {
+                    p.parseSetValueAction((FormDef)parent, e);
+                }
         });
     }
 
@@ -1091,8 +1093,12 @@ public class XFormParser implements IXFormParserFunctions {
 
         for(int i=0;i<e.getChildCount();i++){
             int kidType = e.getType(i);
-            if(kidType == Node.TEXT) { continue; }
-            if(e.getChild(i) instanceof String) { continue; }
+            if (kidType == Node.TEXT) {
+                continue;
+            }
+            if (e.getChild(i) instanceof String) {
+                continue;
+            }
             Element kid = (Element)e.getChild(i);
 
             //is just text

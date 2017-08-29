@@ -128,7 +128,9 @@ public class PrefixTree {
 					newArray = chars;
 				} else {
 					newArray = new char[chars.length - currentIndex];
-					for(int i = 0 ; i < chars.length - currentIndex; ++i) { newArray[i] = chars[i + currentIndex];}
+					for (int i = 0 ; i < chars.length - currentIndex; ++i) {
+						newArray[i] = chars[i + currentIndex];
+					}
 				}
 				node = new PrefixTreeNode(newArray);
 
