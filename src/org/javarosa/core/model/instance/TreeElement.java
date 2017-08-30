@@ -898,8 +898,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 				if (classType == null) {
 					throw new RuntimeException("data type [" + value.getClass().getName() + "] not supported inside itemset");
-				} else if (classType.isAssignableFrom(value.getClass()) &&
-							!(value instanceof SelectOneData || value instanceof SelectMultiData)) {
+				} else if (classType.isAssignableFrom(value.getClass())
+						&& !(value instanceof SelectOneData || value instanceof SelectMultiData)) {
 					this.setValue(value);
 				} else {
 					String textVal = RestoreUtils.xfFact.serializeData(value);

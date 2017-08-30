@@ -89,12 +89,12 @@ public class Localizer implements Externalizable {
 			Localizer l = (Localizer)o;
 
 			//TODO: Compare all resources
-			return (ExtUtil.equals(locales, locales) &&
-					ExtUtil.equals(localeResources, l.localeResources) &&
-					ExtUtil.equals(defaultLocale, l.defaultLocale) &&
-					ExtUtil.equals(currentLocale, l.currentLocale) &&
-					fallbackDefaultLocale == l.fallbackDefaultLocale &&
-					fallbackDefaultForm == l.fallbackDefaultForm);
+			return (ExtUtil.equals(locales, locales)
+					&& ExtUtil.equals(localeResources, l.localeResources)
+					&& ExtUtil.equals(defaultLocale, l.defaultLocale)
+					&& ExtUtil.equals(currentLocale, l.currentLocale)
+					&& fallbackDefaultLocale == l.fallbackDefaultLocale
+					&& fallbackDefaultForm == l.fallbackDefaultForm);
 		} else {
 			return false;
 		}
@@ -358,11 +358,11 @@ public class Localizer implements Externalizable {
 			}
 			if(keysmissing > 0) {
 				//Is there a good way to localize these exceptions?
-				throw new NoLocalizedTextException("Error loading locale " + locale +
-						". There were " + keysmissing + " keys which were contained in this locale, but were not " +
-						"properly registered in the default Locale. Any keys which are added to a locale should always " +
-						"be added to the default locale to ensure appropriate functioning.\n" +
-						"The missing translations were for the keys: " + missingKeys,missingKeys, defaultLocale);
+				throw new NoLocalizedTextException("Error loading locale " + locale
+						+ ". There were " + keysmissing + " keys which were contained in this locale, but were not "
+						+ "properly registered in the default Locale. Any keys which are added to a locale should always "
+						+ "be added to the default locale to ensure appropriate functioning.\n"
+						+ "The missing translations were for the keys: " + missingKeys,missingKeys, defaultLocale);
 			}
 		}
 

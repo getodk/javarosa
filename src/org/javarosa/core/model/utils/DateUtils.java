@@ -84,8 +84,12 @@ public class DateUtils {
 //		public int tzOffset; //s ahead of UTC
 
 		public boolean check () {
-			return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year)) &&
-					inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999));
+			return (inRange(month, 1, 12)
+					&& inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year))
+					&& inRange(hour, 0, 23)
+					&& inRange(minute, 0, 59)
+					&& inRange(second, 0, 59)
+					&& inRange(secTicks, 0, 999));
 		}
 	}
 

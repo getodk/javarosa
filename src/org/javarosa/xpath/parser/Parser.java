@@ -267,12 +267,12 @@ public class Parser {
 	private static boolean isStep (ASTNodeAbstractExpr node) {
 		if (node.content.size() > 0) {
 			int type = node.getTokenType(0);
-			if (type == Token.QNAME ||
-				type == Token.WILDCARD ||
-				type == Token.NSWILDCARD ||
-				type == Token.AT ||
-				type == Token.DOT ||
-				type == Token.DBL_DOT) {
+			if (type == Token.QNAME
+					|| type == Token.WILDCARD
+					|| type == Token.NSWILDCARD
+					|| type == Token.AT
+					|| type == Token.DOT
+					|| type == Token.DBL_DOT) {
 				return true;
 			} else if (node.content.elementAt(0) instanceof ASTNodeFunctionCall) {
 				String name = ((ASTNodeFunctionCall)node.content.elementAt(0)).name.toString();

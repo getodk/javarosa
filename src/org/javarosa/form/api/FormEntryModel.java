@@ -350,8 +350,8 @@ public class FormEntryModel {
         }
 
         TreeReference ref = form.getChildInstanceRef(index);
-        boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT ||
-        						  getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
+        boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT
+                || getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
 
         if (isAskNewRepeat) {
             return false;
@@ -481,9 +481,9 @@ public class FormEntryModel {
 
     public boolean isIndexCompoundContainer(FormIndex index) {
     	FormEntryCaption caption = getCaptionPrompt(index);
-    	return getEvent(index) == FormEntryController.EVENT_GROUP &&
-    	      caption.getAppearanceHint() != null &&
-    	      caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
+    	return getEvent(index) == FormEntryController.EVENT_GROUP
+                && caption.getAppearanceHint() != null
+                && caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
     }
 
     public boolean isIndexCompoundElement() {
@@ -692,9 +692,10 @@ public class FormEntryModel {
 			int curIndex = indexes.get(i).intValue();
 			int curMult = multiplicities.get(i).intValue();
 
-			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
-				elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
-				multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR
+                    && elements.get(elements.size() - 1) instanceof GroupDef
+                    && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()
+                    && multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
 				multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
 				return;
 			} else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {

@@ -221,8 +221,9 @@ public class ReferenceManager {
 			if(endOfRoot != -1 ){
 				uriRoot = uriRoot.substring(0, endOfRoot);
 			}
-			String message = "The reference \"" + uri + "\" was invalid and couldn't be understood. The " + jrRefMessagePortion + " \"" + uriRoot +
-					"\" is not available on this system and may have been mis-typed. Some available roots: ";
+			String message = "The reference \"" + uri + "\" was invalid and couldn't be understood. The "
+					+ jrRefMessagePortion + " \"" + uriRoot
+					+ "\" is not available on this system and may have been mis-typed. Some available roots: ";
 			for(RootTranslator root : sessionTranslators) {
 				message += "\n" + root.prefix;
 			}
@@ -251,9 +252,9 @@ public class ReferenceManager {
 			}
 			return message;
 		} catch(Exception e) {
-			return "Couldn't process the reference " + uri + " . It may have been entered incorrectly. " +
-					"Note that this doesn't mean that this doesn't mean the file or location referenced " +
-					"couldn't be found, the reference itself was not understood.";
+			return "Couldn't process the reference " + uri + " . It may have been entered incorrectly. "
+					+ "Note that this doesn't mean that this doesn't mean the file or location referenced "
+					+ "couldn't be found, the reference itself was not understood.";
 		}
 	}
 

@@ -360,8 +360,9 @@ class FormInstanceParser {
 
                 if (!FormInstance.isHomogeneous(srcNode, dstNode)) {
                     reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                            "Your itemset source [" + srcNode.getRef().toString() + "] and dest [" + dstNode.getRef().toString() +
-                                    "] of appear to be incompatible!", null);
+                            "Your itemset source [" + srcNode.getRef().toString() + "] and dest ["
+                                    + dstNode.getRef().toString()
+                                    + "] of appear to be incompatible!", null);
                 }
 
                 //TODO: i feel like, in theory, i should additionally check that the repeatable children of src and dst
@@ -516,8 +517,8 @@ class FormInstanceParser {
                 instance.copyNode(firstMatch, templRef);
             } catch (InvalidReferenceException e) {
                 reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                        "Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on " +
-                                templRef.toString() + ")", null);
+                        "Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on "
+                                + templRef.toString() + ")", null);
             }
             trimRepeatChildren(instance.resolveReference(templRef));
         }

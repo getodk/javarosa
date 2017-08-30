@@ -848,8 +848,8 @@ public class XPathEvalTest extends TestCase {
 
             @Override
             public Object eval (Object[] args, EvaluationContext ec) {
-                if (args.length != 5 || !(args[0] instanceof Boolean) || !(args[1] instanceof Double) ||
-                        !(args[2] instanceof String) || !(args[3] instanceof Date) || !(args[4] instanceof CustomType)) {
+                if (args.length != 5 || !(args[0] instanceof Boolean) || !(args[1] instanceof Double)
+                        || !(args[2] instanceof String) || !(args[3] instanceof Date) || !(args[4] instanceof CustomType)) {
                     fail("Types in custom function handler not converted properly/prototype not matched properly");
                 }
 

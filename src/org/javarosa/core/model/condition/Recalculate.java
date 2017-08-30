@@ -94,8 +94,8 @@ public class Recalculate extends Triggerable {
 	 *
 	 */
 	public static IAnswerData wrapData (Object val, int dataType) {
-		if ((val instanceof String && ((String)val).length() == 0) ||
-			(val instanceof Double && ((Double)val).isNaN())) {
+		if ((val instanceof String && ((String)val).length() == 0)
+				|| (val instanceof Double && ((Double)val).isNaN())) {
 			return null;
 		}
 
@@ -122,8 +122,8 @@ public class Recalculate extends Triggerable {
 			double d = ((Double)val).doubleValue();
 			long l = (long) d;
 			boolean isIntegral = Math.abs(d - l) < 1.0e-9;
-			if(Constants.DATATYPE_INTEGER == dataType ||
-					   (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
+			if(Constants.DATATYPE_INTEGER == dataType
+					|| (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
 				return new IntegerData((int)d);
 			} else if(Constants.DATATYPE_LONG == dataType || isIntegral) {
 				return new LongData((long)d);

@@ -104,12 +104,12 @@ public class XPathFuncExpr extends XPathExpression {
             //Dec 8, 2011 - Added "uuid", since we should never assume one uuid equals another
             //May 6, 2013 - Added "random", since two calls asking for a random
             //Jun 4, 2013 - Added "now" and "today", since these could change during the course of a survey
-            if(!id.equals(x.id) || args.length != x.args.length ||
-                id.toString().equals("uuid") ||
-                id.toString().equals("random") ||
-                id.toString().equals("once") ||
-                id.toString().equals("now") ||
-                id.toString().equals("today")) {
+            if(!id.equals(x.id) || args.length != x.args.length
+                    || id.toString().equals("uuid")
+                    || id.toString().equals("random")
+                    || id.toString().equals("once")
+                    || id.toString().equals("now")
+                    || id.toString().equals("today")) {
                 return false;
             }
 
@@ -171,8 +171,8 @@ public class XPathFuncExpr extends XPathExpression {
             if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
                 return indexedRepeat(model, evalContext, args, argVals);
             } else {
-                throw new XPathUnhandledException("function \'" + name + "\' requires " +
-                          "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
+                throw new XPathUnhandledException("function \'" + name + "\' requires "
+                        + "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
             }
         }
 
@@ -297,8 +297,8 @@ public class XPathFuncExpr extends XPathExpression {
                 }
                 return position(evalContext.getContextRef());
             } else {
-                throw new XPathUnhandledException("function \'" + name +
-                          "\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
+                throw new XPathUnhandledException("function \'" + name
+                        + "\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
             }
         } else if (name.equals("count")) {
             assertArgsCount(name, args, 1);
@@ -469,8 +469,8 @@ public class XPathFuncExpr extends XPathExpression {
 
     private static void assertArgsCount(String name, Object[] args, int count) {
         if ( args.length != count ) {
-            throw new XPathUnhandledException("function \'" + name + "\' requires " +
-                    count + " arguments. Only " + args.length + " provided.");
+            throw new XPathUnhandledException("function \'" + name + "\' requires "
+                    + count + " arguments. Only " + args.length + " provided.");
         }
     }
 

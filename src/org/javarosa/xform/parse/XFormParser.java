@@ -1072,9 +1072,10 @@ public class XFormParser implements IXFormParserFunctions {
                     sb.append(XFormSerializer.elementToString(child));
                 } else {
                     //Otherwise, ignore it.
-                    Std.out.println("Unrecognized tag inside of text: <"  + child.getName() + ">. " +
-                            "Did you intend to use HTML markup? If so, ensure that the element is defined in " +
-                            "the HTML namespace.");
+                    Std.out.println("Unrecognized tag inside of text: <"
+                            + child.getName() + ">. "
+                            + "Did you intend to use HTML markup? If so, ensure that the element is defined in "
+                            + "the HTML namespace.");
                 }
             }else{
                 sb.append(e.getText(i));
@@ -1234,8 +1235,9 @@ public class XFormParser implements IXFormParserFunctions {
                         if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
                             boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
                             reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE,
-                                    (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] " +
-                                    (isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks",
+                                    (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] "
+                                            + (isMultiSelect ? "cannot" : "should not")
+                                            + " contain spaces, and are recommended not to contain apostraphes/quotation marks",
                                     getVagueLocation(child));
                             break;
                         }
@@ -1703,12 +1705,12 @@ public class XFormParser implements IXFormParserFunctions {
             //Test whether there is a default translation, or whether there is any special form available.
             if (!(hasITextMapping(textID, locale) || (allowSubforms && hasSpecialFormMapping(textID, locale)))) {
                 if (locale.equals(localizer.getDefaultLocale())) {
-                    throw new XFormParseException(type + " '" + textID +
-                            "': text is not localizable for default locale [" + localizer.getDefaultLocale() + "]!");
+                    throw new XFormParseException(type + " '" + textID
+                            + "': text is not localizable for default locale [" + localizer.getDefaultLocale() + "]!");
                 }
 
-                reporter.warning(XFormParserReporter.TYPE_TECHNICAL, type + " '" +
-                        textID + "': text is not localizable for locale " + locale + ".", null);
+                reporter.warning(XFormParserReporter.TYPE_TECHNICAL, type + " '"
+                        + textID + "': text is not localizable for locale " + locale + ".", null);
             }
         }
     }

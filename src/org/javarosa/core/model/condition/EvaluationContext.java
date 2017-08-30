@@ -158,12 +158,12 @@ public class EvaluationContext {
 		}
 		//Otherwise check whether the value is one of the normal first
 		//order datatypes used in xpath evaluation
-		if (value instanceof Boolean ||
-				   value instanceof Double  ||
-				   value instanceof String  ||
-				   value instanceof Date    ||
-				   value instanceof IExprDataType) {
-				variables.put(name, value);
+		if (value instanceof Boolean
+				|| value instanceof Double
+				|| value instanceof String
+				|| value instanceof Date
+				|| value instanceof IExprDataType) {
+			variables.put(name, value);
 				return;
 		}
 
@@ -208,8 +208,8 @@ public class EvaluationContext {
 		final DataInstance baseInstance = (ref.getInstanceName() != null) ? getInstance(ref.getInstanceName()) : instance;
 
 		if (baseInstance == null) {
-			throw new RuntimeException("Unable to expand reference " + ref.toString(true) +
-                    ", no appropriate instance in evaluation context");
+			throw new RuntimeException("Unable to expand reference " + ref.toString(true)
+					+ ", no appropriate instance in evaluation context");
 		}
 
 		List<TreeReference> treeReferences = new ArrayList<>(1);

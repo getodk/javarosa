@@ -66,12 +66,13 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	}
 
 	public boolean canSerialize(IAnswerData data) {
-		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
-		    data instanceof SelectMultiData || data instanceof SelectOneData ||
-		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData ||
-		    data instanceof GeoPointData || data instanceof GeoTraceData || data instanceof GeoShapeData ||
-		    data instanceof LongData || data instanceof DateTimeData || data instanceof UncastData) {
+		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData
+				|| data instanceof SelectMultiData || data instanceof SelectOneData
+				|| data instanceof IntegerData || data instanceof DecimalData
+				|| data instanceof PointerAnswerData || data instanceof MultiPointerAnswerData
+				|| data instanceof GeoPointData || data instanceof GeoTraceData
+				|| data instanceof GeoShapeData || data instanceof LongData
+				|| data instanceof DateTimeData || data instanceof UncastData) {
 			return true;
 		} else {
 			return false;
@@ -284,8 +285,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 				return contains;
 			}
 		}
-		if( data instanceof PointerAnswerData	||
-	    data instanceof MultiPointerAnswerData ) {
+		if( data instanceof PointerAnswerData || data instanceof MultiPointerAnswerData ) {
 			return Boolean.TRUE;
 		}
 		return Boolean.FALSE;

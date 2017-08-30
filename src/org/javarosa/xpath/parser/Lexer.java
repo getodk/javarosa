@@ -146,16 +146,16 @@ public class Lexer {
 				badParse(expr, i, (char)c);
 			}
 			if (token != null) {
-				if (token.type == Token.WILDCARD ||
-					token.type == Token.NSWILDCARD ||
-					token.type == Token.QNAME ||
-					token.type == Token.VAR ||
-					token.type == Token.NUM ||
-					token.type == Token.STR ||
-					token.type == Token.RBRACK ||
-					token.type == Token.RPAREN ||
-					token.type == Token.DOT ||
-					token.type == Token.DBL_DOT) {
+				if (token.type == Token.WILDCARD
+						|| token.type == Token.NSWILDCARD
+						|| token.type == Token.QNAME
+						|| token.type == Token.VAR
+						|| token.type == Token.NUM
+						|| token.type == Token.STR
+						|| token.type == Token.RBRACK
+						|| token.type == Token.RPAREN
+						|| token.type == Token.DOT
+						|| token.type == Token.DBL_DOT) {
 					context = LEX_CONTEXT_OP;
 				} else {
 					context = LEX_CONTEXT_VAL;
