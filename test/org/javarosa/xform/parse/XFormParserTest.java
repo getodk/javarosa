@@ -42,6 +42,8 @@ import static org.junit.Assert.assertNotNull;
 public class XFormParserTest {
 
     private static final String FORM_INSTANCE_XML_FILE_NAME = "instance.xml";
+    private static final String EXTERNAL_SECONDARY_INSTANCE_XML = "external-secondary-instance.xml";
+
     private static final String AUDIT_NODE = "audit";
     private static final String AUDIT_ANSWER = "audit111.csv";
 
@@ -53,7 +55,6 @@ public class XFormParserTest {
 
     private static final String ORX_2_NAMESPACE_PREFIX = "orx2";
     private static final String ORX_2_NAMESPACE_URI = "http://openrosa.org/xforms";
-    private static final String EXTERNAL_SECONDARY_INSTANCE_XML = "external-secondary-instance.xml";
 
     @After
     public void tearDown() throws Exception {
