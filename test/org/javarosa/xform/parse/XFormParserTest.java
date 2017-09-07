@@ -97,7 +97,7 @@ public class XFormParserTest {
     }
 
     @Test public void serAndDeserializeMultipleInstancesForm() throws IOException, DeserializationException {
-        serAndDeserializeForm("Simpler_Cascading_select_Form.xml");
+        serAndDeserializeForm("Simpler_Cascading_Select_Form.xml");
     }
 
     @Test public void serAndDeserializeExternalSecondaryInstanceForm() throws IOException, DeserializationException {
