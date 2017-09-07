@@ -5,20 +5,27 @@ import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +34,7 @@ import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,6 +53,7 @@ public class XFormParserTest {
 
     private static final String ORX_2_NAMESPACE_PREFIX = "orx2";
     private static final String ORX_2_NAMESPACE_URI = "http://openrosa.org/xforms";
+    private static final String EXTERNAL_SECONDARY_INSTANCE_XML = "external-secondary-instance.xml";
 
     @After
     public void tearDown() throws Exception {
@@ -72,7 +81,7 @@ public class XFormParserTest {
     }
 
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        FormDef formDef = parse("external-secondary-instance.xml").formDef;
+        FormDef formDef = parse(EXTERNAL_SECONDARY_INSTANCE_XML).formDef;
         assertEquals("Form with external secondary instance", formDef.getTitle());
         TreeReference treeReference = ((XPathPathExpr)
                 parseXPath("instance('towns')/data_set")).getReference();
@@ -85,6 +94,50 @@ public class XFormParserTest {
         assertEquals(1, tiRoot.getNumChildren());
         AbstractTreeElement dataSetChild = tiRoot.getChild("data_set", 0);
         assertEquals("us_east", dataSetChild.getValue().getDisplayText());
+    }
+
+    @Test public void serAndDeserializeMultipleInstancesForm() throws IOException, DeserializationException {
+        serAndDeserializeForm("Simpler_Cascading_select_Form.xml");
+    }
+
+    @Test public void serAndDeserializeExternalSecondaryInstanceForm() throws IOException, DeserializationException {
+        // todo test when working
+        if (false) {
+            serAndDeserializeForm(EXTERNAL_SECONDARY_INSTANCE_XML);
+        }
+    }
+
+    private void serAndDeserializeForm(String formName) throws IOException, DeserializationException {
+        initSerialization();
+        FormDef formDef = parse(formName).formDef;
+        Path p = Files.createTempFile("serialized-form", null);
+        formDef.writeExternal(new DataOutputStream(Files.newOutputStream(p)));
+        formDef.readExternal(new DataInputStream(Files.newInputStream(p)), defaultPrototypes());
+        Files.delete(p);
+    }
+
+    private void initSerialization() {
+        final String[] SERIALIZABLE_CLASSES = { // Copied from Collect application
+                "org.javarosa.core.services.locale.ResourceFileDataSource",
+                "org.javarosa.core.services.locale.TableLocaleSource",
+                "org.javarosa.core.model.FormDef",
+                "org.javarosa.core.model.SubmissionProfile",
+                "org.javarosa.core.model.QuestionDef",
+                "org.javarosa.core.model.GroupDef",
+                "org.javarosa.core.model.instance.FormInstance",
+                "org.javarosa.core.model.data.MultiPointerAnswerData",
+                "org.javarosa.core.model.data.PointerAnswerData",
+                "org.javarosa.core.model.data.SelectMultiData",
+                "org.javarosa.core.model.data.SelectOneData",
+                "org.javarosa.core.model.data.StringData",
+                "org.javarosa.core.model.data.TimeData",
+                "org.javarosa.core.model.data.UncastData",
+                "org.javarosa.core.model.data.helper.BasicDataPointer",
+                "org.javarosa.core.model.Action",
+                "org.javarosa.core.model.actions.SetValueAction"
+        };
+        PrototypeManager.registerPrototypes(SERIALIZABLE_CLASSES);
+        new XFormsModule().registerModule();
     }
 
     @Test
