@@ -1213,7 +1213,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
               String.class, SubmissionProfile.class));
 
       formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
-              String.class, DataInstance.class));
+              String.class, FormInstance.class));
 
       eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
               String.class, new ExtWrapListPoly()), pf);
