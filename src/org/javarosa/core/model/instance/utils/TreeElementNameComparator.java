@@ -26,8 +26,9 @@ public class TreeElementNameComparator {
 
         final String elementName = treeElement.getName();
 
-        return elementName.equals(name) ||
-                (namespacePrefix != null && (namespacePrefix + ":" + elementName).equals(name));
+        return elementName.equals(name)
+                || (namespacePrefix != null
+                && (namespacePrefix + ":" + elementName).equals(name));
     }
 
 }

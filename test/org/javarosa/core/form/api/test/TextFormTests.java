@@ -46,19 +46,20 @@ public class TextFormTests extends TestCase {
 
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 		System.out.println("Running TextFormTests...");
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new TextFormTests(doTest(testID)));
+			suite.addTest(new TextFormTests(doTest(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
 
 
 
-	public final static int NUM_TESTS = 8;
+	public static final int NUM_TESTS = 8;
+
 	public static String doTest (int i) {
 		switch (i) {
 		case 1: return "testConstructors";
@@ -109,9 +110,15 @@ public class TextFormTests extends TestCase {
 		}
 		fep = fec.getModel().getQuestionPrompt();
 
-		if(!fep.getLongText().equals("Patient ID")) fail("getLongText() not returning correct value");
-		if(!fep.getShortText().equals("ID")) fail("getShortText() not returning correct value");
-		if(!fep.getAudioText().equals("jr://audio/hah.mp3")) fail("getAudioText() not returning correct value");
+		if(!fep.getLongText().equals("Patient ID")) {
+			fail("getLongText() not returning correct value");
+		}
+		if(!fep.getShortText().equals("ID")) {
+			fail("getShortText() not returning correct value");
+		}
+		if(!fep.getAudioText().equals("jr://audio/hah.mp3")) {
+			fail("getAudioText() not returning correct value");
+		}
 
 		state = -99;
 		while(state != FormEntryController.EVENT_QUESTION){
@@ -119,10 +126,16 @@ public class TextFormTests extends TestCase {
 		}
 
 		fep = fec.getModel().getQuestionPrompt();
-		if(!fep.getShortText().equals("Name")) fail("getShortText() not returning correct value");
-		if(!fep.getLongText().equals("Full Name")) fail("getLongText() not falling back to default text form correctly");
+		if(!fep.getShortText().equals("Name")) {
+			fail("getShortText() not returning correct value");
+		}
+		if(!fep.getLongText().equals("Full Name")) {
+			fail("getLongText() not falling back to default text form correctly");
+		}
 		String v = fep.getSpecialFormQuestionText("long");
-		if(fep.getSpecialFormQuestionText("long") != null) fail("getSpecialFormQuestionText() returning incorrect value");
+		if(fep.getSpecialFormQuestionText("long") != null) {
+			fail("getSpecialFormQuestionText() returning incorrect value");
+		}
 
 	}
 
@@ -136,17 +149,25 @@ public class TextFormTests extends TestCase {
 		l.setLocale(l.getAvailableLocales()[0]);
 
 		do{
-			if(fpi.getCurrentQuestion()==null) continue;
+			if(fpi.getCurrentQuestion()==null) {
+				continue;
+			}
 			QuestionDef q = fpi.getCurrentQuestion();
 			fep = fpi.getFormEntryModel().getQuestionPrompt();
 			String t = fep.getQuestionText();
-			if(t==null) continue;
-			if(t.equals("Non-Localized label inner text!")) testFlag = true;
+			if(t==null) {
+				continue;
+			}
+			if(t.equals("Non-Localized label inner text!")) {
+				testFlag = true;
+			}
 
 
 		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
 
-		if(!testFlag) fail("Failed to fallback to labelInnerText in testNonLocalizedText()");
+		if(!testFlag) {
+			fail("Failed to fallback to labelInnerText in testNonLocalizedText()");
+		}
 	}
 
 	public void testSelectChoiceIDsNoLocalizer () {

@@ -32,13 +32,13 @@ public class GeoUtilsTest extends TestCase {
   }
 
   public static Test suite() {
-    TestSuite aSuite = new TestSuite();
+    TestSuite suite = new TestSuite();
 
-    aSuite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_1st_Route"));
-    aSuite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_2nd_Route"));
-    aSuite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_3rd_Route"));
+    suite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_1st_Route"));
+    suite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_2nd_Route"));
+    suite.addTest(new GeoUtilsTest("testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_3rd_Route"));
 
-    return aSuite;
+    return suite;
   }
 
   /**

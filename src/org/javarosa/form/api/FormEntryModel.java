@@ -313,10 +313,11 @@ public class FormEntryModel {
             IFormElement element = form.getChild(localIndex);
             if (element != null) {
                 FormEntryCaption caption = null;
-                if (element instanceof GroupDef)
+                if (element instanceof GroupDef) {
                     caption = new FormEntryCaption(getForm(), localIndex);
-                else if (element instanceof QuestionDef)
+                } else if (element instanceof QuestionDef) {
                     caption = new FormEntryPrompt(getForm(), localIndex);
+                }
 
                 if (caption != null) {
                     captions.add(caption);
@@ -344,12 +345,13 @@ public class FormEntryModel {
      * @return true if the element at the specified index is read only
      */
     public boolean isIndexReadonly(FormIndex index) {
-        if (index.isBeginningOfFormIndex() || index.isEndOfFormIndex())
+        if (index.isBeginningOfFormIndex() || index.isEndOfFormIndex()) {
             return true;
+        }
 
         TreeReference ref = form.getChildInstanceRef(index);
-        boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT ||
-        						  getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
+        boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT
+                || getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
 
         if (isAskNewRepeat) {
             return false;
@@ -479,9 +481,9 @@ public class FormEntryModel {
 
     public boolean isIndexCompoundContainer(FormIndex index) {
     	FormEntryCaption caption = getCaptionPrompt(index);
-    	return getEvent(index) == FormEntryController.EVENT_GROUP &&
-    	      caption.getAppearanceHint() != null &&
-    	      caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
+    	return getEvent(index) == FormEntryController.EVENT_GROUP
+                && caption.getAppearanceHint() != null
+                && caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
     }
 
     public boolean isIndexCompoundElement() {
@@ -690,9 +692,10 @@ public class FormEntryModel {
 			int curIndex = indexes.get(i).intValue();
 			int curMult = multiplicities.get(i).intValue();
 
-			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
-				elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
-				multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR
+                    && elements.get(elements.size() - 1) instanceof GroupDef
+                    && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()
+                    && multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
 				multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
 				return;
 			} else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
@@ -703,8 +706,9 @@ public class FormEntryModel {
 				multiplicities.set(i, Integer.valueOf(0));
 				elements.set(i, (i == 0 ? form : elements.get(i - 1)).getChild(curIndex - 1));
 
-				if (setRepeatNextMultiplicity(elements, multiplicities))
-					return;
+				if (setRepeatNextMultiplicity(elements, multiplicities)) {
+                    return;
+                }
 			} else {
 				// at absolute beginning of current level; index to parent
 				indexes.remove(i);
@@ -727,8 +731,9 @@ public class FormEntryModel {
 			multiplicities.add(Integer.valueOf(0));
 			elements.add(element);
 
-			if (setRepeatNextMultiplicity(elements, multiplicities))
-				return;
+			if (setRepeatNextMultiplicity(elements, multiplicities)) {
+                return;
+            }
 		}
 	}
 
@@ -771,9 +776,13 @@ public class FormEntryModel {
 		}
 
     	List<IFormElement> children = parent.getChildren();
-    	if(children == null) { return false; }
-       for (IFormElement child : children) {
-    		if(containsRepeatGuesses(child)) {return true;}
+    	if (children == null) {
+            return false;
+    	}
+    	for (IFormElement child : children) {
+    		if (containsRepeatGuesses(child)) {
+                return true;
+    		}
     	}
     	return false;
 	}

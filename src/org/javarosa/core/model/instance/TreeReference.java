@@ -138,13 +138,11 @@ public class TreeReference implements Externalizable, Serializable {
 		add(new TreeReferenceLevel(name, mult).intern());
 	}
 
-	public void addPredicate(int key, List<XPathExpression> xpe)
-	{
+	public void addPredicate(int key, List<XPathExpression> xpe) {
 		data.set(key, data.get(key).setPredicates(xpe));
 	}
 
-	public List<XPathExpression> getPredicate(int key)
-	{
+	public List<XPathExpression> getPredicate(int key) {
 		return data.get(key).getPredicates();
 	}
 
@@ -347,10 +345,12 @@ public class TreeReference implements Externalizable, Serializable {
 	//return true if 'this' equals 'child' only if properParent is false
 	public boolean isParentOf (TreeReference child, boolean properParent) {
 		//Instances and context types;
-		if (refLevel != child.refLevel)
+		if (refLevel != child.refLevel) {
 			return false;
-		if (child.size() < size() + (properParent ? 1 : 0))
+		}
+		if (child.size() < size() + (properParent ? 1 : 0)) {
 			return false;
+		}
 
 		for (int i = 0; i < size(); i++) {
 			if (!this.getName(i).equals(child.getName(i))) {
@@ -405,7 +405,9 @@ public class TreeReference implements Externalizable, Serializable {
 							return false;
 						}
 					} else if(predA != null && predB != null) {
-						if(predA.size() != predB.size()) { return false;}
+						if (predA.size() != predB.size()) {
+							return false;
+						}
 						for(int j = 0 ; j < predA.size() ; ++j) {
 							if(!predA.get(j).equals(predB.get(j))) {
 								return false;
@@ -433,8 +435,9 @@ public class TreeReference implements Externalizable, Serializable {
 			//this should potentially just be replaced by
 			//an int.
 			Integer mult = DataUtil.integer(getMultiplicity(i));
-			if (i == 0 && mult.intValue() == INDEX_UNBOUND)
+			if (i == 0 && mult.intValue() == INDEX_UNBOUND) {
 				mult = DataUtil.integer(0);
+			}
 
 			hash ^= getName(i).hashCode();
 			hash ^= mult.hashCode();
@@ -468,8 +471,9 @@ public class TreeReference implements Externalizable, Serializable {
 		if (isAbsolute()) {
 			sb.append("/");
 		} else {
-			for (int i = 0; i < refLevel; i++)
+			for (int i = 0; i < refLevel; i++) {
 				sb.append("../");
+			}
 		}
 		for (int i = 0; i < size(); i++) {
 			String name = getName(i);
@@ -482,18 +486,25 @@ public class TreeReference implements Externalizable, Serializable {
 
 			if (includePredicates) {
 				switch (mult) {
-				case INDEX_UNBOUND: break;
-				case INDEX_TEMPLATE: sb.append("[@template]"); break;
-				case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
+				case INDEX_UNBOUND:
+					break;
+				case INDEX_TEMPLATE:
+					sb.append("[@template]");
+					break;
+				case INDEX_REPEAT_JUNCTURE:
+					sb.append("[@juncture]");
+					break;
 				default:
-					if ((i > 0 || mult != 0) && mult !=-4)
+					if ((i > 0 || mult != 0) && mult !=-4) {
 						sb.append("[" + (mult + 1) + "]");
+					}
 					break;
 				}
 			}
 
-			if (i < size() - 1)
+			if (i < size() - 1) {
 				sb.append("/");
+			}
 		}
 		return sb.toString();
 	}
@@ -506,9 +517,14 @@ public class TreeReference implements Externalizable, Serializable {
 			int mult = getMultiplicity(i);
 
 			switch (mult) {
-				case INDEX_UNBOUND: break;
-				case INDEX_TEMPLATE: sb.append("[@template]"); break;
-				case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
+				case INDEX_UNBOUND:
+					break;
+				case INDEX_TEMPLATE:
+					sb.append("[@template]");
+					break;
+				case INDEX_REPEAT_JUNCTURE:
+					sb.append("[@juncture]");
+					break;
 				default:
 					if ((i > 0 || mult != 0) && mult !=-4) {
 						if (sb.length() > 0) {
@@ -562,13 +578,20 @@ public class TreeReference implements Externalizable, Serializable {
 		if(!this.isAbsolute() || !b.isAbsolute()) {
 			return TreeReference.rootRef();
 		}
-		if(this.equals(b)) { return this;}
+		if (this.equals(b)) {
+			return this;
+		}
 
 
 		TreeReference a;
 		//A should always be bigger if one ref is larger than the other
-		if(this.size() < b.size()) { a = b.clone() ; b = this.clone();}
-		else { a= this.clone(); b = b.clone();}
+		if (this.size() < b.size()) {
+			a = b.clone() ;
+			b = this.clone();
+		} else {
+			a= this.clone();
+			b = b.clone();
+		}
 
 		//Now, trim the refs to the same length.
 		int diff = a.size() - b.size();
@@ -576,9 +599,9 @@ public class TreeReference implements Externalizable, Serializable {
 			a.removeLastLevel();
 		}
 
-		int aSize = a.size();
+		int size = a.size();
 		//easy, but requires a lot of re-evaluation.
-		for(int i = 0 ; i <=  aSize; ++i) {
+		for(int i = 0 ; i <=  size; ++i) {
 			if(a.equals(b)) {
 				return a;
 			} else if(a.size() == 0) {
@@ -615,7 +638,9 @@ public class TreeReference implements Externalizable, Serializable {
 	 * @return
 	 */
 	public TreeReference getSubReference(int level) {
-		if(!this.isAbsolute()) { throw new IllegalArgumentException("Cannot subreference a non-absolute ref"); }
+		if (!this.isAbsolute()) {
+			throw new IllegalArgumentException("Cannot subreference a non-absolute ref");
+		}
 
 		//Copy construct
 		TreeReference ret = new TreeReference();

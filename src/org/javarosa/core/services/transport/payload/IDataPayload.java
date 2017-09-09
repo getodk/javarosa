@@ -34,12 +34,12 @@ public interface IDataPayload extends Externalizable {
 	/**
 	 * Data payload codes
 	 */
-	final public static int PAYLOAD_TYPE_TEXT = 0;
-	final public static int PAYLOAD_TYPE_XML = 1;
-	final public static int PAYLOAD_TYPE_JPG = 2;
-	final public static int PAYLOAD_TYPE_HEADER = 3;
-	final public static int PAYLOAD_TYPE_MULTI = 4;
-	final public static int PAYLOAD_TYPE_SMS = 5; // sms's are a variant of TEXT having a limit on length.
+	public static final int PAYLOAD_TYPE_TEXT = 0;
+	public static final int PAYLOAD_TYPE_XML = 1;
+	public static final int PAYLOAD_TYPE_JPG = 2;
+	public static final int PAYLOAD_TYPE_HEADER = 3;
+	public static final int PAYLOAD_TYPE_MULTI = 4;
+	public static final int PAYLOAD_TYPE_SMS = 5; // sms's are a variant of TEXT having a limit on length.
 
 	/**
 	 * Gets the stream for this payload.

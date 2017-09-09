@@ -17,6 +17,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.services.locale;
 
 import org.javarosa.core.io.Std;
@@ -94,8 +95,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 		InputStreamReader isr;
 		try {
 			isr = new InputStreamReader(is,"UTF-8");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Failed to load locale resource " + resourceName + ". Is it in the jar?");
 		}
 		boolean done = false;
@@ -122,12 +122,13 @@ public class ResourceFileDataSource implements LocaleDataSource {
 					int nindex = stringchunk.indexOf('\n',index);
 					//UTF-8 often doesn't encode with newline, but with CR, so if we 
 					//didn't find one, we'll try that
-					if(nindex == -1) { nindex = stringchunk.indexOf('\r',index); }
+					if (nindex == -1) {
+						nindex = stringchunk.indexOf('\r',index);
+					}
 					if(nindex == -1) {
 						line += stringchunk.substring(index);
 						break;
-					}
-					else {
+					} else {
 						line += stringchunk.substring(index,nindex);
 						//Newline. process our string and start the next one.
 						curline++;
@@ -174,8 +175,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 			if(line.indexOf('=') != line.length()-1) {
 				String value = line.substring(line.indexOf('=') + 1,line.length());
 				locale.put(line.substring(0, line.indexOf('=')), value);
-			}
-			 else {
+			} else {
 				Std.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
 			}
 		}

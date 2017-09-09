@@ -38,7 +38,7 @@ class MD5State {
   /**
    * 128-bit state 
    */
-  int	state[];
+  int[] state;
   
   /**
    * 64-bit character count
@@ -48,7 +48,7 @@ class MD5State {
   /**
    * 64-byte buffer (512 bits) for storing to-be-hashed characters
    */
-  byte	buffer[];
+  byte[] buffer;
 
   public MD5State() {
     buffer = new byte[64];
@@ -68,12 +68,14 @@ class MD5State {
     
     int i;
     
-    for (i = 0; i < buffer.length; i++)
+    for (i = 0; i < buffer.length; i++) {
       this.buffer[i] = from.buffer[i];
+    }
     
-    for (i = 0; i < state.length; i++)
+    for (i = 0; i < state.length; i++) {
       this.state[i] = from.state[i];
+    }
     
     this.count = from.count;
   }
-};
+}

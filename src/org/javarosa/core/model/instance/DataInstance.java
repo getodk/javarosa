@@ -59,6 +59,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 	protected void setInstanceId(String instanceid) {
 		this.instanceid = instanceid;
 	}
+
 	/**
 	 * Whether the structure of this instance is only available at runtime.
 	 *
@@ -108,8 +109,9 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 	}
 
 	public List<AbstractTreeElement<T>> explodeReference(TreeReference ref) {
-		if (!ref.isAbsolute())
+		if (!ref.isAbsolute()) {
 			return null;
+		}
 
       List<AbstractTreeElement<T>> nodes = new ArrayList<AbstractTreeElement<T>>(ref.size());
 		AbstractTreeElement<T> cur = getBase();
@@ -125,10 +127,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 					nodes.add(cur);
 				}
 				cur = cur.getAttribute(null, name);
-			}
-
-			//Otherwise, it's another child element
-			else {
+			} else { //Otherwise, it's another child element
 				if (mult == TreeReference.INDEX_UNBOUND) {
 					if (cur.getChildMultiplicity(name) == 1) {
 						mult = 0;
@@ -157,8 +156,9 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 	}
 
 	public T getTemplatePath(TreeReference ref) {
-		if (!ref.isAbsolute())
+		if (!ref.isAbsolute()) {
 			return null;
+		}
 
 		T walker = null;
 		AbstractTreeElement<T> node = getBase();
@@ -206,8 +206,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 
 	public String toString() {
 		String name = "NULL";
-		if(this.name != null)
-		{
+		if (this.name != null) {
 			name = this.name;
 		}
 		return name;

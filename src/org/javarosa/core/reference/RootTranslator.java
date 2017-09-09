@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.reference;
 
 import java.io.DataInputStream;
@@ -55,22 +56,22 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
 	/* (non-Javadoc)
 	 * @see org.commcare.reference.Root#derive(java.lang.String)
 	 */
-	public Reference derive(String URI) throws InvalidReferenceException {
-		return ReferenceManager.instance().DeriveReference(translatedPrefix + URI.substring(prefix.length()));
+	public Reference derive(String uri) throws InvalidReferenceException {
+		return ReferenceManager.instance().DeriveReference(translatedPrefix + uri.substring(prefix.length()));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.commcare.reference.Root#derive(java.lang.String, java.lang.String)
 	 */
-	public Reference derive(String URI, String context) throws InvalidReferenceException {
-		return ReferenceManager.instance().DeriveReference(URI, translatedPrefix + context.substring(prefix.length()));
+	public Reference derive(String uri, String context) throws InvalidReferenceException {
+		return ReferenceManager.instance().DeriveReference(uri, translatedPrefix + context.substring(prefix.length()));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.commcare.reference.Root#derives(java.lang.String)
 	 */
-	public boolean derives(String URI) {
-		if(URI.startsWith(prefix)) {
+	public boolean derives(String uri) {
+		if(uri.startsWith(prefix)) {
 			return true;
 		} else{
 			return false;

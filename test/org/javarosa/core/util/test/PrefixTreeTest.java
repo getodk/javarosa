@@ -32,9 +32,9 @@ public class PrefixTreeTest extends TestCase  {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
-		aSuite.addTest(new PrefixTreeTest("doTests"));
-		return aSuite;
+		TestSuite suite = new TestSuite();
+		suite.addTest(new PrefixTreeTest("doTests"));
+		return suite;
 	}
 	
 	public void doTests() {

@@ -48,7 +48,7 @@ public class DateUtils {
 	/** RFC 822 **/
 	public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
-	public static final long DAY_IN_MS = 86400000l;
+	public static final long DAY_IN_MS = 86400000L;
 
 	public DateUtils() {
 		super();
@@ -84,8 +84,12 @@ public class DateUtils {
 //		public int tzOffset; //s ahead of UTC
 
 		public boolean check () {
-			return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year)) &&
-					inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999));
+			return (inRange(month, 1, 12)
+					&& inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year))
+					&& inRange(hour, 0, 23)
+					&& inRange(minute, 0, 59)
+					&& inRange(second, 0, 59)
+					&& inRange(secTicks, 0, 999));
 		}
 	}
 
@@ -141,10 +145,18 @@ public class DateUtils {
 
 		String delim;
 		switch (format) {
-		case FORMAT_ISO8601: delim = "T"; break;
-		case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
-		case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
-		default: delim = " "; break;
+		case FORMAT_ISO8601:
+			delim = "T";
+			break;
+		case FORMAT_TIMESTAMP_SUFFIX:
+			delim = "";
+			break;
+		case FORMAT_TIMESTAMP_HTTP:
+			delim = " ";
+			break;
+		default:
+			delim = " ";
+			break;
 		}
 
 		return formatDate(fields, format) + delim + formatTime(fields, format);
@@ -160,22 +172,33 @@ public class DateUtils {
 
 	private static String formatDate (DateFields f, int format) {
 		switch (format) {
-		case FORMAT_ISO8601: return formatDateISO8601(f);
-		case FORMAT_HUMAN_READABLE_SHORT: return formatDateColloquial(f);
-		case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY: return formatDaysFromToday(f);
-		case FORMAT_TIMESTAMP_SUFFIX: return formatDateSuffix(f);
-		case FORMAT_TIMESTAMP_HTTP: return formatDateHttp(f);
-		default: return null;
+		case FORMAT_ISO8601:
+			return formatDateISO8601(f);
+		case FORMAT_HUMAN_READABLE_SHORT:
+			return formatDateColloquial(f);
+		case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY:
+			return formatDaysFromToday(f);
+		case FORMAT_TIMESTAMP_SUFFIX:
+			return formatDateSuffix(f);
+		case FORMAT_TIMESTAMP_HTTP:
+			return formatDateHttp(f);
+		default:
+			return null;
 		}
 	}
 
 	private static String formatTime (DateFields f, int format) {
 		switch (format) {
-		case FORMAT_ISO8601: return formatTimeISO8601(f);
-		case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
-		case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
-		case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
-		default: return null;
+		case FORMAT_ISO8601:
+			return formatTimeISO8601(f);
+		case FORMAT_HUMAN_READABLE_SHORT:
+			return formatTimeColloquial(f);
+		case FORMAT_TIMESTAMP_SUFFIX:
+			return formatTimeSuffix(f);
+		case FORMAT_TIMESTAMP_HTTP:
+			return formatTimeHttp(f);
+		default:
+			return null;
 		}
 	}
 
@@ -219,8 +242,7 @@ public class DateUtils {
 		//NOTE: offset is in millis
 		if(offset ==0 ) {
 			time += "Z";
-		}
-		else {
+		} else {
 
 			//Start with sign
 			String offsetSign = offset >0 ? "+" : "-";
@@ -341,8 +363,9 @@ public class DateUtils {
 
 	private static boolean parseDate (String dateStr, DateFields f) {
       List<String> pieces = split(dateStr, "-", false);
-		if (pieces.size() != 3)
+		if (pieces.size() != 3) {
 			return false;
+		}
 
 		try {
 			f.year = Integer.parseInt((String)pieces.get(0));
@@ -447,8 +470,9 @@ public class DateUtils {
 	 */
 	private static boolean parseRawTime (String timeStr, DateFields f) {
       List<String> pieces = split(timeStr, ":", false);
-		if (pieces.size() != 2 && pieces.size() != 3)
+		if (pieces.size() != 2 && pieces.size() != 3) {
 			return false;
+		}
 
 		try {
 			f.hour = Integer.parseInt((String)pieces.get(0));
@@ -459,8 +483,9 @@ public class DateUtils {
 				int i;
 				for (i = 0; i < secStr.length(); i++) {
 					char c = secStr.charAt(i);
-					if (!Character.isDigit(c) && c != '.')
+					if (!Character.isDigit(c) && c != '.') {
 						break;
+					}
 				}
 				secStr = secStr.substring(0, i);
 
@@ -514,7 +539,9 @@ public class DateUtils {
 	 * @return new Date object with same date but time set to midnight (in current timezone)
 	 */
 	public static Date roundDate (Date d) {
-		if ( d == null ) return null;
+		if ( d == null ) {
+			return null;
+		}
 		DateFields f = getFields(d);
 		return getDate(f.year, f.month, f.day);
 	}
@@ -617,11 +644,11 @@ public class DateUtils {
      * @param start "sun", "mon", ... etc. representing the start of the time period.
      * @param beginning true=return first day of period, false=return last day of period
      * @param includeToday Whether to include the current date in the returned calculation
-     * @param nAgo How many periods ago. 1=most recent period, 0=period in progress
+     * @param periodsAgo How many periods ago. 1=most recent period, 0=period in progress
      * @return a Date object representing the amount of time between the
      * reference date, and the given parameters.
      */
-	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
+	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int periodsAgo) {
 		Date d = null;
 
 		if (type.equals("week")) {
@@ -631,35 +658,61 @@ public class DateUtils {
 			//includeToday: whether today's date can count as the last day of the period
 			//nAgo: how many periods ago; 1=most recent period, 0=period in progress
 
-			int target_dow = -1, current_dow = -1, diff;
+			int targetDow = -1;
+			int currentDow = -1;
+			int diff;
 			int offset = (includeToday ? 1 : 0);
 
-			if (start.equals("sun")) target_dow = 0;
-			else if (start.equals("mon")) target_dow = 1;
-			else if (start.equals("tue")) target_dow = 2;
-			else if (start.equals("wed")) target_dow = 3;
-			else if (start.equals("thu")) target_dow = 4;
-			else if (start.equals("fri")) target_dow = 5;
-			else if (start.equals("sat")) target_dow = 6;
+			if (start.equals("sun")) {
+				targetDow = 0;
+			} else if (start.equals("mon")) {
+				targetDow = 1;
+			} else if (start.equals("tue")) {
+				targetDow = 2;
+			} else if (start.equals("wed")) {
+				targetDow = 3;
+			} else if (start.equals("thu")) {
+				targetDow = 4;
+			} else if (start.equals("fri")) {
+				targetDow = 5;
+			} else if (start.equals("sat")) {
+				targetDow = 6;
+			}
 
-			if (target_dow == -1)
+			if (targetDow == -1) {
 				throw new RuntimeException();
+			}
 
 			Calendar cd = Calendar.getInstance();
 			cd.setTime(ref);
 
 			switch(cd.get(Calendar.DAY_OF_WEEK)) {
-			case Calendar.SUNDAY: current_dow = 0; break;
-			case Calendar.MONDAY: current_dow = 1; break;
-			case Calendar.TUESDAY: current_dow = 2; break;
-			case Calendar.WEDNESDAY: current_dow = 3; break;
-			case Calendar.THURSDAY: current_dow = 4; break;
-			case Calendar.FRIDAY: current_dow = 5; break;
-			case Calendar.SATURDAY: current_dow = 6; break;
-			default: throw new RuntimeException(); //something is wrong
+			case Calendar.SUNDAY:
+				currentDow = 0;
+				break;
+			case Calendar.MONDAY:
+				currentDow = 1;
+				break;
+			case Calendar.TUESDAY:
+				currentDow = 2;
+				break;
+			case Calendar.WEDNESDAY:
+				currentDow = 3;
+				break;
+			case Calendar.THURSDAY:
+				currentDow = 4;
+				break;
+			case Calendar.FRIDAY:
+				currentDow = 5;
+				break;
+			case Calendar.SATURDAY:
+				currentDow = 6;
+				break;
+			default:
+				throw new RuntimeException(); //something is wrong
 			}
 
-			diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
+			diff = (((currentDow - targetDow) + (7 + offset)) % 7 - offset) + (7 * periodsAgo) - (beginning ? 0 : 6); //booyah
 			d = new Date(ref.getTime() - diff * DAY_IN_MS);
 		} else if (type.equals("month")) {
 			//not supported
@@ -770,8 +823,9 @@ public class DateUtils {
 	 */
 	public static String intPad (int n, int pad) {
 		String s = String.valueOf(n);
-		while (s.length() < pad)
+		while (s.length() < pad) {
 			s = "0" + s;
+		}
 		return s;
 	}
 

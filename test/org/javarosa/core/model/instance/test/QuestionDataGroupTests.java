@@ -88,7 +88,7 @@ public class QuestionDataGroupTests extends TestCase {
 			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
-			public void writeExternal(DataOutputStream out) throws IOException {};
+			public void writeExternal(DataOutputStream out) throws IOException {}
 
 		};
 
@@ -123,7 +123,7 @@ public class QuestionDataGroupTests extends TestCase {
 			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
-			public void writeExternal(DataOutputStream out) throws IOException {};
+			public void writeExternal(DataOutputStream out) throws IOException {}
 
 		};
 
@@ -142,16 +142,17 @@ public class QuestionDataGroupTests extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new QuestionDataGroupTests(testMaster(testID)));
+			suite.addTest(new QuestionDataGroupTests(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
@@ -215,6 +216,7 @@ public class QuestionDataGroupTests extends TestCase {
 				dispatchedWrong.setValue(true);
 
 			}
+
 			public void visit(AbstractTreeElement element) {
 				visitorAccepted.setValue(true);
 			}
@@ -241,8 +243,7 @@ public class QuestionDataGroupTests extends TestCase {
 			group.addChild(stringElement);
 			group.getChildAt(0);
 			assertTrue("Added element was not in Question Data Group's children!",group.getChildAt(0).equals(stringElement));
-		}
-		catch(RuntimeException e) {
+		} catch(RuntimeException e) {
 			if(!added) {
 				fail("Group did not report success adding a valid child");
 			}
@@ -252,8 +253,7 @@ public class QuestionDataGroupTests extends TestCase {
 			TreeElement leafGroup = new TreeElement("leaf group");
 			group.addChild(leafGroup);
 			assertTrue("Added element was not in Question Data Group's children",group.getChildAt(1).equals(leafGroup));
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			if(!added) {
 				fail("Group did not report success adding a valid child");
 			}

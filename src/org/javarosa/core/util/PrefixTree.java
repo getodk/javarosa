@@ -47,13 +47,14 @@ public class PrefixTree {
 		this.minimumHeuristicLength = Math.max((int)(minimumPrefixLength / 2), 3);
 	}
 
-	public static int sharedPrefixLength (char[] a, int aStart, char[] b) {
+	public static int sharedPrefixLength (char[] a, int start, char[] b) {
 		int len;
-		int minLength = Math.min(a.length - aStart, b.length);
+		int minLength = Math.min(a.length - start, b.length);
 
 		for (len = 0; len < minLength;len++) {
-			if (a[len + aStart] != b[len])
+			if (a[len + start] != b[len]) {
 				break;
+			}
 		}
 
 		return len;
@@ -127,7 +128,9 @@ public class PrefixTree {
 					newArray = chars;
 				} else {
 					newArray = new char[chars.length - currentIndex];
-					for(int i = 0 ; i < chars.length - currentIndex; ++i) { newArray[i] = chars[i + currentIndex];}
+					for (int i = 0 ; i < chars.length - currentIndex; ++i) {
+						newArray[i] = chars[i + currentIndex];
+					}
 				}
 				node = new PrefixTreeNode(newArray);
 
@@ -135,9 +138,7 @@ public class PrefixTree {
 
 				//Add this to the highest level prefix we've found
 				current.addChild(node);
-			}
-			//Otherwise check to see if we are going to split the current prefix
-			else if (len < node.getPrefix().length) {
+			} else if (len < node.getPrefix().length) { //Otherwise check to see if we are going to split the current prefix
 				char[] newPrefix = new char[len];
 				for(int i = 0; i < len ; ++i) {
 					newPrefix[i] = chars[currentIndex + i];
@@ -168,6 +169,7 @@ public class PrefixTree {
 	public String toString() {
 		return root.toString();
 	}
+
 	public void seal() {
 		root.seal();
 		finalized = true;

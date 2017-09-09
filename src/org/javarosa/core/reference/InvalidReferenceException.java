@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.reference;
 
 /**
@@ -34,6 +35,7 @@ public class InvalidReferenceException extends Exception {
 		super(message);
 		this.reference = reference;
 	}
+
 	public String getReferenceString() {
 		return reference;
 	}

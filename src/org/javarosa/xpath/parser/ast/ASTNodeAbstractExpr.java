@@ -76,8 +76,9 @@ public class ASTNodeAbstractExpr extends ASTNode {
 	public boolean isNormalized () {
 		if (content.size() == 1 && getType(0) == CHILD) {
 			ASTNode child = (ASTNode)content.elementAt(0);
-			if (child instanceof ASTNodePathStep || child instanceof ASTNodePredicate)
+			if (child instanceof ASTNodePathStep || child instanceof ASTNodePredicate) {
 				throw new RuntimeException("shouldn't happen");
+			}
 			return true;
 		} else {
 			return isTerminal();
@@ -86,12 +87,13 @@ public class ASTNodeAbstractExpr extends ASTNode {
 		
 	public int getType (int i) {
 		Object o = content.elementAt(i);
-		if (o instanceof Token)
+		if (o instanceof Token) {
 			return TOKEN;
-		else if (o instanceof ASTNode)
+		} else if (o instanceof ASTNode) {
 			return CHILD;
-		else
+		} else {
 			return -1;
+		}
 	}
 	
 	public Token getToken (int i) {
@@ -135,10 +137,11 @@ public class ASTNodeAbstractExpr extends ASTNode {
 				break;
 			}
 			
-			if (type == leftPush)
+			if (type == leftPush) {
 				depth++;
-			else if (type == rightPop)
+			} else if (type == rightPop) {
 				depth--;
+			}
 			
 			i++;
 		}
@@ -186,8 +189,9 @@ public class ASTNodeAbstractExpr extends ASTNode {
 		Partition part = new Partition();
 		Vector<Integer> sepIdxs = new Vector<Integer>();
 		int end = indexOfBalanced(start, rightPop, leftPush, rightPop);
-		if (end == -1)
+		if (end == -1) {
 			return null;
+		}
 		
 		int k = start;
 		do {

@@ -56,8 +56,9 @@ public class XPathFilterExpr extends XPathExpression {
 		sb.append(",{");
 		for (int i = 0; i < predicates.length; i++) {
 			sb.append(predicates[i].toString());
-			if (i < predicates.length - 1)
+			if (i < predicates.length - 1) {
 				sb.append(",");
+			}
 		}
 		sb.append("}}");
 
@@ -69,11 +70,13 @@ public class XPathFilterExpr extends XPathExpression {
 			XPathFilterExpr fe = (XPathFilterExpr)o;
 
          List<XPathExpression> a = new ArrayList<XPathExpression>(predicates.length);
-			for (int i = 0; i < predicates.length; i++)
+			for (int i = 0; i < predicates.length; i++) {
 				a.add(predicates[i]);
+			}
          List<XPathExpression> b = new ArrayList<XPathExpression>(fe.predicates.length);
-			for (int i = 0; i < fe.predicates.length; i++)
+			for (int i = 0; i < fe.predicates.length; i++) {
 				b.add(fe.predicates[i]);
+			}
 
 			return x.equals(fe.x) && ExtUtil.listEquals(a, b);
 		} else {
@@ -86,8 +89,9 @@ public class XPathFilterExpr extends XPathExpression {
         List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
 		predicates = new XPathExpression[v.size()];
-		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.get(i);
+		for (int i = 0; i < predicates.length; i++) {
+			predicates[i] = (XPathExpression) v.get(i);
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

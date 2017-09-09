@@ -90,8 +90,7 @@ public class SHA1 {
                 w[j] = (j < 16) ? blks[i + j] :
                        ( rol(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1) );
 
-                int t = rol(a, 5) + e + w[j] +
-                   ( (j < 20) ?  1518500249 + ((b & c) | ((~b) & d))
+                int t = rol(a, 5) + e + w[j] + ( (j < 20) ?  1518500249 + ((b & c) | ((~b) & d))
                    : (j < 40) ?  1859775393 + (b ^ c ^ d)
                    : (j < 60) ? -1894007588 + ((b & c) | (b & d) | (c & d))
                    : -899497514 + (b ^ c ^ d) );
@@ -122,11 +121,11 @@ public class SHA1 {
              if (offset <= 26) {
                  result[i] = base64[(words[word] >> (26 - offset)) & 0x3F];
              } else if (offset == 28) {
-                 result[i] = base64[(((words[word] & 0x0F) << 2) |
-                                    ((words[word+1] >> 30) & 0x03)) & 0x3F];
+                 result[i] = base64[(((words[word] & 0x0F) << 2)
+                         | ((words[word+1] >> 30) & 0x03)) & 0x3F];
              } else {
-                 result[i] = base64[(((words[word] & 0x03) << 4) |
-                                    ((words[word+1] >> 28) & 0x0F)) & 0x3F];
+                 result[i] = base64[(((words[word] & 0x03) << 4)
+                         | ((words[word+1] >> 28) & 0x0F)) & 0x3F];
              }
           }
           result[27]='=';
@@ -174,8 +173,7 @@ public class SHA1 {
                 w[j] = (j < 16) ? blks[i + j] :
                        ( rol(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1) );
 
-                int t = rol(a, 5) + e + w[j] +
-                   ( (j < 20) ?  1518500249 + ((b & c) | ((~b) & d))
+                int t = rol(a, 5) + e + w[j] + ( (j < 20) ?  1518500249 + ((b & c) | ((~b) & d))
                    : (j < 40) ?  1859775393 + (b ^ c ^ d)
                    : (j < 60) ? -1894007588 + ((b & c) | (b & d) | (c & d))
                    : -899497514 + (b ^ c ^ d) );

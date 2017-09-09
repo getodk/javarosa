@@ -39,8 +39,9 @@ public class Logger {
 	
 	protected static void logForce(String type, String message) {
 		Std.err.println("logger> " + type + ": " + message);
-		if (message.length() > MAX_MSG_LENGTH)
+		if (message.length() > MAX_MSG_LENGTH) {
 			Std.err.println("  (message truncated)");
+		}
 		
 		message = message.substring(0, Math.min(message.length(), MAX_MSG_LENGTH));
 		if(logger != null) {

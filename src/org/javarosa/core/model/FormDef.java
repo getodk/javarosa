@@ -296,8 +296,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
    }
 
    public IFormElement getChild(int i) {
-      if (i < this.children.size())
+      if (i < this.children.size()) {
          return this.children.get(i);
+      }
 
       throw new ArrayIndexOutOfBoundsException("FormDef: invalid child index: " + i + " only "
               + children.size() + " children");
@@ -353,8 +354,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     * @return
     */
    public TreeReference getChildInstanceRef(List<IFormElement> elements, List<Integer> multiplicities) {
-      if (elements.size() == 0)
+      if (elements.size() == 0) {
          return null;
+      }
 
       IFormElement element = elements.get(elements.size() - 1);
       // get reference for target element
@@ -954,8 +956,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                   Std.err.println("Warning: expect arguments to be numeric [" + argName + "]");
                }
 
-               if (ix < 0 || ix >= outputFragments.size())
+               if (ix < 0 || ix >= outputFragments.size()) {
                   continue;
+               }
 
                IConditionExpr expr = outputFragments.get(ix);
                EvaluationContext ec = new EvaluationContext(exprEvalContext, contextRef);
@@ -998,10 +1001,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
               new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
       DataInstance fi = null;
-      if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
+      if (itemset.nodesetRef.getInstanceName() != null) { // We're not dealing
       // with the default
       // instance
-      {
          fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
          if (fi == null) {
             throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName()
@@ -1041,8 +1043,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i,
                  itemset.labelIsItext);
          choice.setIndex(i);
-         if (itemset.copyMode)
+         if (itemset.copyMode) {
             choice.copyNode = copyNode;
+         }
 
          choices.add(choice);
       }
@@ -1118,10 +1121,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       if (!node.isLeaf()) {
          for (int i = 0; i < node.getNumChildren(); i++) {
             TreeElement child = node.getChildAt(i);
-            if (child.getMult() != TreeReference.INDEX_TEMPLATE)
+            if (child.getMult() != TreeReference.INDEX_TEMPLATE) {
                // don't preload templates; new repeats are preloaded as they're
                // created
                preloadInstance(child);
+            }
          }
       }
       // }
@@ -1169,8 +1173,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
          boolean instanceModified = false;
          for (int i = 0; i < node.getNumChildren(); i++) {
             TreeElement child = node.getChildAt(i);
-            if (child.getMult() != TreeReference.INDEX_TEMPLATE)
+            if (child.getMult() != TreeReference.INDEX_TEMPLATE) {
                instanceModified |= postProcessInstance(child);
+            }
          }
          return instanceModified;
       }
@@ -1563,8 +1568,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
       } else {
          for (int i = 0; i < fe.getChildren().size(); i++) {
             QuestionDef ret = findQuestionByRef(ref, fe.getChild(i));
-            if (ret != null)
+            if (ret != null) {
                return ret;
+            }
          }
          return null;
       }

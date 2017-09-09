@@ -44,16 +44,17 @@ public class IntegerDataTests extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new IntegerDataTests(testMaster(testID)));
+			suite.addTest(new IntegerDataTests(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -69,6 +70,7 @@ public class IntegerDataTests extends TestCase {
 		IntegerData data = new IntegerData(one);
 		assertEquals("IntegerData's getValue returned an incorrect integer", data.getValue(), one);
 	}
+
 	public void testSetData() {
 		IntegerData data = new IntegerData(one);
 		data.setValue(two);
@@ -81,6 +83,7 @@ public class IntegerDataTests extends TestCase {
 		assertEquals("IntegerData did not properly reset value ", data.getValue(), one);
 		
 	}
+
 	public void testNullData() {
 		boolean exceptionThrown = false;
 		IntegerData data = new IntegerData();

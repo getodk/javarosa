@@ -60,26 +60,42 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		double fb = ((Double)bval).doubleValue();
 
 		switch (op) {
-		case LT: result = fa < fb; break;
-		case GT: result = fa > fb; break;
-		case LTE: result = fa <= fb; break;
-		case GTE: result = fa >= fb; break;
+		case LT:
+			result = fa < fb;
+			break;
+		case GT:
+			result = fa > fb;
+			break;
+		case LTE:
+			result = fa <= fb;
+			break;
+		case GTE:
+			result = fa >= fb;
+			break;
 		}
 		
 		return new Boolean(result);		
 	}
 
 	public String toString () {
-		String sOp = null;
+		String opString = null;
 		
 		switch (op) {
-		case LT: sOp = "<"; break;
-		case GT: sOp = ">"; break;
-		case LTE: sOp = "<="; break;
-		case GTE: sOp = ">="; break;
+		case LT:
+			opString = "<";
+			break;
+		case GT:
+			opString = ">";
+			break;
+		case LTE:
+			opString = "<=";
+			break;
+		case GTE:
+			opString = ">=";
+			break;
 		}
 		
-		return super.toString(sOp);
+		return super.toString(opString);
 	}
 	
 	public boolean equals (Object o) {
@@ -109,7 +125,9 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 			bval = ((XPathNodeset)bval).unpack();
 		}
 		
-		if(handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) { return null; }
+		if (handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) {
+			return null;
+		}
 		
 		return this.eval(model, evalContext);
 	}

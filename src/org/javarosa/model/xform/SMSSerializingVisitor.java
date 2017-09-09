@@ -167,8 +167,9 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		StringBuilder b = new StringBuilder();
 		// don't serialize template nodes or non-relevant nodes
 		if (!instanceNode.isRelevant()
-				|| instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
+				|| instanceNode.getMult() == TreeReference.INDEX_TEMPLATE) {
 			return null;
+		}
 
 		if (instanceNode.getValue() != null) {
 			Object serializedAnswer = serializer.serializeAnswerData(

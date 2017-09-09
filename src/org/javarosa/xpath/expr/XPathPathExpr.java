@@ -69,8 +69,8 @@ public class XPathPathExpr extends XPathExpression {
 
 	public XPathPathExpr () { } //for deserialization
 
-	public XPathPathExpr (int init_context, XPathStep[] steps) {
-		this.init_context = init_context;
+	public XPathPathExpr (int initContext, XPathStep[] steps) {
+		this.init_context = initContext;
 		this.steps = steps;
 	}
 
@@ -103,19 +103,15 @@ public class XPathPathExpr extends XPathExpression {
 			parentsAllowed = true;
 			break;
 		case XPathPathExpr.INIT_CONTEXT_EXPR:
-			if (this.filtExpr.x != null && this.filtExpr.x instanceof XPathFuncExpr)
-			{
+			if (this.filtExpr.x != null && this.filtExpr.x instanceof XPathFuncExpr) {
 				XPathFuncExpr func = (XPathFuncExpr)(this.filtExpr.x);
-				if(func.id.toString().equals("instance"))
-				{
+				if(func.id.toString().equals("instance")) {
 					ref.setRefLevel(TreeReference.REF_ABSOLUTE); //i assume when refering the non main instance you have to be absolute
 					parentsAllowed = false;
-					if(func.args.length != 1)
-					{
+					if(func.args.length != 1) {
 						throw new XPathUnsupportedException("instance() function used with "+func.args.length+ " arguements. Expecting 1 arguement");
 					}
-					if(!(func.args[0] instanceof XPathStringLiteral))
-					{
+					if(!(func.args[0] instanceof XPathStringLiteral)) {
 						throw new XPathUnsupportedException("instance() function expecting 1 string literal arguement arguement");
 					}
 					XPathStringLiteral strLit = (XPathStringLiteral)(func.args[0]);
@@ -181,8 +177,7 @@ public class XPathPathExpr extends XPathExpression {
 			if(step.predicates.length > 0) {
 				int refLevel = ref.getRefLevel();
             List<XPathExpression> v = new ArrayList<XPathExpression>(step.predicates.length);
-				for(int j = 0; j < step.predicates.length; j++)
-				{
+				for (int j = 0; j < step.predicates.length; j++) {
 					v.add(step.predicates[j]);
 				}
 				ref.addPredicate(i, v);
@@ -205,15 +200,11 @@ public class XPathPathExpr extends XPathExpression {
 		//node
 
 		//check if this nodeset refers to a non-main instance
-		if(ref.getInstanceName() != null && ref.isAbsolute())
-		{
+		if(ref.getInstanceName() != null && ref.isAbsolute()) {
 			DataInstance nonMain = ec.getInstance(ref.getInstanceName());
-			if(nonMain != null)
-			{
+			if (nonMain != null) {
 				m = nonMain;
-			}
-			else
-			{
+			} else {
 				throw new XPathMissingInstanceException(ref.getInstanceName(), "Instance referenced by " + ref.toString(true) + " does not exist");
 			}
 		} else {
@@ -329,15 +320,22 @@ public class XPathPathExpr extends XPathExpression {
 
 		sb.append("{path-expr:");
 		switch (init_context) {
-		case INIT_CONTEXT_ROOT: sb.append("abs"); break;
-		case INIT_CONTEXT_RELATIVE: sb.append("rel"); break;
-		case INIT_CONTEXT_EXPR: sb.append(filtExpr.toString()); break;
+		case INIT_CONTEXT_ROOT:
+			sb.append("abs");
+			break;
+		case INIT_CONTEXT_RELATIVE:
+			sb.append("rel");
+			break;
+		case INIT_CONTEXT_EXPR:
+			sb.append(filtExpr.toString());
+			break;
 		}
 		sb.append(",{");
 		for (int i = 0; i < steps.length; i++) {
 			sb.append(steps[i].toString());
-			if (i < steps.length - 1)
+			if (i < steps.length - 1) {
 				sb.append(",");
+			}
 		}
 		sb.append("}}");
 
@@ -414,8 +412,9 @@ public class XPathPathExpr extends XPathExpression {
 
       List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
 		steps = new XPathStep[v.size()];
-		for (int i = 0; i < steps.length; i++)
-			steps[i] = ((XPathStep)v.get(i)).intern();
+		for (int i = 0; i < steps.length; i++) {
+			steps[i] = ((XPathStep) v.get(i)).intern();
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -447,8 +446,7 @@ public class XPathPathExpr extends XPathExpression {
 		//Either concretely the sentinal, or "."
 		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {
 			return sentinal;
-		}
-		else {
+		} else {
 			//It's very, very hard to figure out how to pivot predicates. For now, just skip it
 			for(int i = 0 ; i < ref.size(); ++i) {
 				if(ref.getPredicate(i) != null && ref.getPredicate(i).size() > 0) {

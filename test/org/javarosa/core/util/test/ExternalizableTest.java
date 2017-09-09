@@ -48,11 +48,11 @@ public class ExternalizableTest extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
-		aSuite.addTest(new ExternalizableTest("doTests"));
+		suite.addTest(new ExternalizableTest("doTests"));
 
-		return aSuite;
+		return suite;
 	}
 
 	public void doTests () {
@@ -68,8 +68,8 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new Integer(1234567890), Integer.class);
 		testExternalizable(new Integer(-1234567890), Integer.class);
 		testExternalizable(new Long(0), Long.class);
-		testExternalizable(new Long(1234567890123456789l), Long.class);
-		testExternalizable(new Long(-1234567890123456789l), Long.class);
+		testExternalizable(new Long(1234567890123456789L), Long.class);
+		testExternalizable(new Long(-1234567890123456789L), Long.class);
 		testExternalizable(Boolean.TRUE, Boolean.class);
 		testExternalizable(Boolean.FALSE, Boolean.class);
 		testExternalizable(new Character('e'), Character.class);
@@ -199,8 +199,9 @@ public class ExternalizableTest extends TestCase {
 	}
 
 	public static void testExternalizable (Object orig, Object template, PrototypeFactory pf, TestCase tc, String failMessage) {
-		if (failMessage == null)
+		if (failMessage == null) {
 			failMessage = "Serialization Failure";
+		}
 
 		byte[] bytes;
 		Object deser;
@@ -281,8 +282,9 @@ public class ExternalizableTest extends TestCase {
 				sb.append(printObj(key));
 				sb.append("=>");
 				sb.append(printObj(((HashMap)o).get(key)));
-				if (e.hasNext())
+				if (e.hasNext()) {
 					sb.append(", ");
+				}
 			}
 			sb.append("]");
 			return sb.toString();

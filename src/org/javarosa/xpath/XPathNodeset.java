@@ -60,7 +60,9 @@ public class XPathNodeset {
 	 * @param ec
 	 */
 	public XPathNodeset (List<TreeReference> nodes, DataInstance instance, EvaluationContext ec) {
-		if(nodes == null) { throw new NullPointerException("Node list cannot be null when constructing a nodeset"); }
+		if (nodes == null) {
+			throw new NullPointerException("Node list cannot be null when constructing a nodeset");
+		}
 		this.nodes = nodes;
 		this.instance = instance;
 		this.ec = ec;

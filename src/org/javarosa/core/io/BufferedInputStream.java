@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.io;
 
 import java.io.IOException;
@@ -46,7 +47,9 @@ public class BufferedInputStream extends InputStream {
 	 * @see java.io.InputStream#available()
 	 */
 	public int available() throws IOException {
-		if(count == -1) { return 0; }
+		if (count == -1) {
+			return 0;
+		}
 		//Size of our stream + the number of bytes we haven't yet read.
 		return in.available() + (count - position);
 	}
@@ -121,10 +124,9 @@ public class BufferedInputStream extends InputStream {
 						//We're at EOF. Two possible conditions here.
 						
 						//1) This was actually our first attempt on the end of stream. signal EOF 
-						if(counter == 0) { return -1; }
-						
-						//2) This was the last pile of bits. Return the ones we read.
-						else {
+						if (counter == 0) {
+							return -1;
+						} else { //2) This was the last pile of bits. Return the ones we read.
 							return counter;
 						}
 					}

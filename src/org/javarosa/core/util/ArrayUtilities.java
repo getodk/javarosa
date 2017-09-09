@@ -66,7 +66,9 @@ public class ArrayUtilities {
 	}
 
    public static <E> List<E> listCopy(List<E> a) {
-      if(a == null ) { return null; }
+      if (a == null ) {
+		  return null;
+      }
       List<E> b = new ArrayList<E>(a.size());
       for(E e : a) {
          b.add(e);

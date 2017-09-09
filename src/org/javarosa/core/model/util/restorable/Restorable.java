@@ -22,8 +22,11 @@ import org.javarosa.core.model.instance.TreeReference;
 public interface Restorable {
 
 	String getRestorableType ();
+
 	FormInstance exportData ();
+
 	void templateData (FormInstance dm, TreeReference parentRef);
+
 	void importData (FormInstance dm);
 	
 }

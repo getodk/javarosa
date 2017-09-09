@@ -80,15 +80,32 @@ public class Condition extends Triggerable {
 
 	private void performAction (TreeElement node, int action) {
 		switch (action) {
-		case ACTION_NULL: break;
-		case ACTION_SHOW:         node.setRelevant(true); break;
-		case ACTION_HIDE:         node.setRelevant(false); break;
-		case ACTION_ENABLE:       node.setEnabled(true); break;
-		case ACTION_DISABLE:      node.setEnabled(false); break;
-		case ACTION_LOCK:         /* not supported */; break;
-		case ACTION_UNLOCK:       /* not supported */; break;
-		case ACTION_REQUIRE:      node.setRequired(true); break;
-		case ACTION_DONT_REQUIRE: node.setRequired(false); break;
+		case ACTION_NULL:
+			break;
+		case ACTION_SHOW:
+			node.setRelevant(true);
+			break;
+		case ACTION_HIDE:
+			node.setRelevant(false);
+			break;
+		case ACTION_ENABLE:
+			node.setEnabled(true);
+			break;
+		case ACTION_DISABLE:
+			node.setEnabled(false);
+			break;
+		case ACTION_LOCK:
+			/* not supported */;
+			break;
+		case ACTION_UNLOCK:
+			/* not supported */;
+			break;
+		case ACTION_REQUIRE:
+			node.setRequired(true);
+			break;
+		case ACTION_DONT_REQUIRE:
+			node.setRequired(false);
+			break;
 		}
 	}
 
@@ -96,8 +113,9 @@ public class Condition extends Triggerable {
 	public boolean equals (Object o) {
 		if (o instanceof Condition) {
 			Condition c = (Condition)o;
-			if (this == c)
+			if (this == c) {
 				return true;
+			}
 
 			return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && super.equals(c));
 		} else {

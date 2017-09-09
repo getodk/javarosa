@@ -85,8 +85,9 @@ public class XPathFuncExpr extends XPathExpression {
         sb.append(",{");
         for (int i = 0; i < args.length; i++) {
             sb.append(args[i].toString());
-            if (i < args.length - 1)
+            if (i < args.length - 1) {
                 sb.append(",");
+            }
         }
         sb.append("}}");
 
@@ -103,12 +104,12 @@ public class XPathFuncExpr extends XPathExpression {
             //Dec 8, 2011 - Added "uuid", since we should never assume one uuid equals another
             //May 6, 2013 - Added "random", since two calls asking for a random
             //Jun 4, 2013 - Added "now" and "today", since these could change during the course of a survey
-            if(!id.equals(x.id) || args.length != x.args.length ||
-                id.toString().equals("uuid") ||
-                id.toString().equals("random") ||
-                id.toString().equals("once") ||
-                id.toString().equals("now") ||
-                id.toString().equals("today")) {
+            if(!id.equals(x.id) || args.length != x.args.length
+                    || id.toString().equals("uuid")
+                    || id.toString().equals("random")
+                    || id.toString().equals("once")
+                    || id.toString().equals("now")
+                    || id.toString().equals("today")) {
                 return false;
             }
 
@@ -123,8 +124,9 @@ public class XPathFuncExpr extends XPathExpression {
         List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
         args = new XPathExpression[v.size()];
-        for (int i = 0; i < args.length; i++)
-            args[i] = (XPathExpression)v.get(i);
+        for (int i = 0; i < args.length; i++) {
+            args[i] = (XPathExpression) v.get(i);
+        }
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -169,8 +171,8 @@ public class XPathFuncExpr extends XPathExpression {
             if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
                 return indexedRepeat(model, evalContext, args, argVals);
             } else {
-                throw new XPathUnhandledException("function \'" + name + "\' requires " +
-                          "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
+                throw new XPathUnhandledException("function \'" + name + "\' requires "
+                        + "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
             }
         }
 
@@ -295,8 +297,8 @@ public class XPathFuncExpr extends XPathExpression {
                 }
                 return position(evalContext.getContextRef());
             } else {
-                throw new XPathUnhandledException("function \'" + name +
-                          "\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
+                throw new XPathUnhandledException("function \'" + name
+                        + "\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
             }
         } else if (name.equals("count")) {
             assertArgsCount(name, args, 1);
@@ -467,8 +469,8 @@ public class XPathFuncExpr extends XPathExpression {
 
     private static void assertArgsCount(String name, Object[] args, int count) {
         if ( args.length != count ) {
-            throw new XPathUnhandledException("function \'" + name + "\' requires " +
-                    count + " arguments. Only " + args.length + " provided.");
+            throw new XPathUnhandledException("function \'" + name + "\' requires "
+                    + count + " arguments. Only " + args.length + " provided.");
         }
     }
 
@@ -538,8 +540,9 @@ public class XPathFuncExpr extends XPathExpression {
                     } catch (XPathTypeMismatchException xptme) { /* swallow type mismatch exception */ }
                 }
 
-                if (typed[i] == null)
+                if (typed[i] == null) {
                     return null;
+                }
             }
         }
 
@@ -657,8 +660,9 @@ public class XPathFuncExpr extends XPathExpression {
                 s = s.trim();
                 for (int i = 0; i < s.length(); i++) {
                     char c = s.charAt(i);
-                    if (c != '-' && c != '.' && (c < '0' || c > '9'))
+                    if (c != '-' && c != '.' && (c < '0' || c > '9')) {
                         throw new NumberFormatException();
+                    }
                 }
 
                 d = Double.parseDouble(s);
@@ -876,10 +880,11 @@ public class XPathFuncExpr extends XPathExpression {
 
     public static Boolean boolStr (Object o) {
         String s = toString(o);
-        if (s.equalsIgnoreCase("true") || s.equals("1"))
+        if (s.equalsIgnoreCase("true") || s.equals("1")) {
             return Boolean.TRUE;
-        else
+        } else {
             return Boolean.FALSE;
+        }
     }
 
     public static String dateStr (Object od, Object of, boolean preserveTime) {
@@ -943,8 +948,7 @@ public class XPathFuncExpr extends XPathExpression {
             int groupIdx = toInt(args[idxargi].eval(model, ec)).intValue();
             if (groupIdx <= 0) {
                 // ignore invalid indexes (primarily happens during validation)
-            }
-            else {
+            } else {
                 // otherwise, add the index to the context reference
                 contextRef.setMultiplicity(groupRef.size()-1, groupIdx-1);
             }
@@ -1020,7 +1024,7 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * sum the values in a nodeset; each element is coerced to a numeric value
      */
-    public static Double sum (Object argVals[]) {
+    public static Double sum (Object[] argVals) {
         double sum = 0.0;
         for (Object argVal : argVals) {
             Double dargVal = toNumeric(argVal);
@@ -1101,14 +1105,15 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * concatenate an arbitrary-length argument list of string values together
      */
-    public static String join (Object oSep, Object[] argVals) {
-        String sep = toString(oSep);
+    public static String join (Object sepObject, Object[] argVals) {
+        String sep = toString(sepObject);
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < argVals.length; i++) {
             sb.append(toString(argVals[i]));
-            if (i < argVals.length - 1)
+            if (i < argVals.length - 1) {
                 sb.append(sep);
+            }
         }
 
         return sb.toString();
@@ -1145,14 +1150,15 @@ public class XPathFuncExpr extends XPathExpression {
      * @return true if the count of 'true' factors is between the applicable minimum and maximum,
      *   inclusive
      */
-    public static Boolean checklist (Object oMin, Object oMax, Object[] factors) {
-        int min = toNumeric(oMin).intValue();
-        int max = toNumeric(oMax).intValue();
+    public static Boolean checklist (Object minObject, Object maxObject, Object[] factors) {
+        int min = toNumeric(minObject).intValue();
+        int max = toNumeric(maxObject).intValue();
 
         int count = 0;
         for (Object factor : factors) {
-            if (toBoolean(factor))
+            if (toBoolean(factor)) {
                 count++;
+            }
         }
 
         return (min < 0 || count >= min) && (max < 0 || count <= max);
@@ -1172,17 +1178,18 @@ public class XPathFuncExpr extends XPathExpression {
      *
      * @return
      */
-    public static Boolean checklistWeighted (Object oMin, Object oMax, Object[] flags, Object[] weights) {
-        double min = toNumeric(oMin);
-        double max = toNumeric(oMax);
+    public static Boolean checklistWeighted (Object minObject, Object maxObject, Object[] flags, Object[] weights) {
+        double min = toNumeric(minObject);
+        double max = toNumeric(maxObject);
 
         double sum = 0.;
         for (int i = 0; i < flags.length; i++) {
             boolean flag = toBoolean(flags[i]);
             double weight = toNumeric(weights[i]);
 
-            if (flag)
+            if (flag) {
                 sum += weight;
+            }
         }
 
         return sum >= min && sum <= max;

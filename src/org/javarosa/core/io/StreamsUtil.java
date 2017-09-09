@@ -113,8 +113,9 @@ public class StreamsUtil {
 			read = 0;
 			while (read < len) {
 				int k = in.read(data, read, len - read);
-				if (k == -1)
+				if (k == -1) {
 					break;
+				}
 				read += k;
 			}
 		} else {

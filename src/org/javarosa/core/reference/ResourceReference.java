@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.reference;
 
 import java.io.IOException;
@@ -26,10 +27,10 @@ public class ResourceReference implements Reference {
 	 * Creates a new resource reference with URI in the format
 	 * of a fully global resource URI, IE: "/path/file.ext".
 	 * 
-	 * @param URI
+	 * @param uri
 	 */
-	public ResourceReference(String URI) {
-		this.URI = URI;
+	public ResourceReference(String uri) {
+		this.URI = uri;
 	}
 	
 	/*

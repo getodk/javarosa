@@ -99,17 +99,38 @@ public class RestoreUtils {
 
 		IAnswerData val;
 		switch (dataType) {
-		case -1: val = null; break;
-		case Constants.DATATYPE_TEXT: val = new StringData((String)data); break;
-		case Constants.DATATYPE_INTEGER: val = new IntegerData((Integer)data); break;
-		case Constants.DATATYPE_LONG: val = new LongData((Long)data); break;
-		case Constants.DATATYPE_DECIMAL: val = new DecimalData((Double)data); break;
-		case Constants.DATATYPE_BOOLEAN: val = new StringData(((Boolean)data).booleanValue() ? "t" : "f"); break;
-		case Constants.DATATYPE_DATE: val = new DateData((Date)data); break;
-		case Constants.DATATYPE_DATE_TIME: val = new DateTimeData((Date)data); break;
-		case Constants.DATATYPE_TIME: val = new TimeData((Date)data); break;
-		case Constants.DATATYPE_CHOICE_LIST: val = (SelectMultiData)data; break;
-		default: throw new IllegalArgumentException("Don't know how to handle data type [" + dataType + "]");
+		case -1:
+			val = null;
+			break;
+		case Constants.DATATYPE_TEXT:
+			val = new StringData((String)data);
+			break;
+		case Constants.DATATYPE_INTEGER:
+			val = new IntegerData((Integer)data);
+			break;
+		case Constants.DATATYPE_LONG:
+			val = new LongData((Long)data);
+			break;
+		case Constants.DATATYPE_DECIMAL:
+			val = new DecimalData((Double)data);
+			break;
+		case Constants.DATATYPE_BOOLEAN:
+			val = new StringData(((Boolean)data).booleanValue() ? "t" : "f");
+			break;
+		case Constants.DATATYPE_DATE:
+			val = new DateData((Date)data);
+			break;
+		case Constants.DATATYPE_DATE_TIME:
+			val = new DateTimeData((Date)data);
+			break;
+		case Constants.DATATYPE_TIME:
+			val = new TimeData((Date)data);
+			break;
+		case Constants.DATATYPE_CHOICE_LIST:
+			val = (SelectMultiData)data;
+			break;
+		default:
+			throw new IllegalArgumentException("Don't know how to handle data type [" + dataType + "]");
 		}
 
 		TreeReference ref = absRef(xpath, dm);

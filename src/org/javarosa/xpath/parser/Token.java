@@ -68,38 +68,102 @@ public class Token {
 		String s = null;
 		
 		switch (type) {
-		case AND: s = "AND"; break;
-		case AT: s = "AT"; break;
-		case COMMA: s = "COMMA"; break;
-		case DBL_COLON: s = "DBL_COLON"; break;
-		case DBL_DOT: s = "DBL_DOT"; break;
-		case DBL_SLASH: s = "DBL_SLASH"; break;
-		case DIV: s = "DIV"; break;
-		case DOT: s = "DOT"; break;
-		case EQ: s = "EQ"; break;
-		case GT: s = "GT"; break;
-		case GTE: s = "GTE"; break;
-		case LBRACK: s = "LBRACK"; break;
-		case LPAREN: s = "LPAREN"; break;
-		case LT: s = "LT"; break;
-		case LTE: s = "LTE"; break;
-		case MINUS: s = "MINUS"; break;
-		case MOD: s = "MOD"; break;
-		case MULT: s = "MULT"; break;
-		case NEQ: s = "NEQ"; break;
-		case NSWILDCARD: s = "NSWILDCARD(" + (String)val + ")"; break;
-		case NUM: s = "NUM(" + ((Double)val).toString() + ")"; break;
-		case OR: s = "OR"; break;
-		case PLUS: s = "PLUS"; break;
-		case QNAME: s = "QNAME(" + ((XPathQName)val).toString() + ")"; break;
-		case RBRACK: s = "RBRACK"; break;
-		case RPAREN: s = "RPAREN"; break;
-		case SLASH: s = "SLASH"; break;
-		case STR: s = "STR(" + (String)val + ")"; break;
-		case UMINUS: s = "UMINUS"; break;
-		case UNION: s = "UNION"; break;
-		case VAR: s = "VAR(" + ((XPathQName)val).toString() + ")"; break;
-		case WILDCARD: s = "WILDCARD"; break;		
+		case AND:
+			s = "AND";
+			break;
+		case AT:
+			s = "AT";
+			break;
+		case COMMA:
+			s = "COMMA";
+			break;
+		case DBL_COLON:
+			s = "DBL_COLON";
+			break;
+		case DBL_DOT:
+			s = "DBL_DOT";
+			break;
+		case DBL_SLASH:
+			s = "DBL_SLASH";
+			break;
+		case DIV:
+			s = "DIV";
+			break;
+		case DOT:
+			s = "DOT";
+			break;
+		case EQ:
+			s = "EQ";
+			break;
+		case GT:
+			s = "GT";
+			break;
+		case GTE:
+			s = "GTE";
+			break;
+		case LBRACK:
+			s = "LBRACK";
+			break;
+		case LPAREN:
+			s = "LPAREN";
+			break;
+		case LT:
+			s = "LT";
+			break;
+		case LTE:
+			s = "LTE";
+			break;
+		case MINUS:
+			s = "MINUS";
+			break;
+		case MOD:
+			s = "MOD";
+			break;
+		case MULT:
+			s = "MULT";
+			break;
+		case NEQ:
+			s = "NEQ";
+			break;
+		case NSWILDCARD:
+			s = "NSWILDCARD(" + (String)val + ")";
+			break;
+		case NUM:
+			s = "NUM(" + ((Double)val).toString() + ")";
+			break;
+		case OR:
+			s = "OR";
+			break;
+		case PLUS:
+			s = "PLUS";
+			break;
+		case QNAME:
+			s = "QNAME(" + ((XPathQName)val).toString() + ")";
+			break;
+		case RBRACK:
+			s = "RBRACK";
+			break;
+		case RPAREN:
+			s = "RPAREN";
+			break;
+		case SLASH:
+			s = "SLASH";
+			break;
+		case STR:
+			s = "STR(" + (String)val + ")";
+			break;
+		case UMINUS:
+			s = "UMINUS";
+			break;
+		case UNION:
+			s = "UNION";
+			break;
+		case VAR:
+			s = "VAR(" + ((XPathQName)val).toString() + ")";
+			break;
+		case WILDCARD:
+			s = "WILDCARD";
+			break;
 		}
 		
 		return s;

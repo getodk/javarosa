@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.xform.parse;
 
 
@@ -21,13 +22,21 @@ public class SubmissionParser {
     public SubmissionProfile parseSubmission(String method, String action, IDataReference ref, Element element) {
         String mediatype = element.getAttributeValue(null,"mediatype");
         HashMap<String,String> attributeMap = new HashMap<String,String>();
-        int nAttr = element.getAttributeCount();
-        for ( int i = 0 ; i < nAttr ; ++i ) {
+        int attributeCount = element.getAttributeCount();
+        for ( int i = 0 ; i < attributeCount ; ++i ) {
             String name = element.getAttributeName(i);
-            if ( name.equals("ref")) continue;
-            if ( name.equals("bind")) continue;
-            if ( name.equals("method")) continue;
-            if ( name.equals("action")) continue;
+            if ( name.equals("ref")) {
+                continue;
+            }
+            if ( name.equals("bind")) {
+                continue;
+            }
+            if ( name.equals("method")) {
+                continue;
+            }
+            if ( name.equals("action")) {
+                continue;
+            }
             String value = element.getAttributeValue(i);
             attributeMap.put(name, value);
         }

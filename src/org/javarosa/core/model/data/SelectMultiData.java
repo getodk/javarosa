@@ -100,12 +100,14 @@ public class SelectMultiData implements IAnswerData {
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.get(i);
 			b.append(s.getValue());
-			if (i < vs.size() - 1)
+			if (i < vs.size() - 1) {
 				b.append(", ");
+			}
 		}
 
 		return b.toString();
 	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
@@ -128,8 +130,9 @@ public class SelectMultiData implements IAnswerData {
 		StringBuilder selectString = new StringBuilder();
 
        for (Selection selection : vs) {
-          if (selectString.length() > 0)
-             selectString.append(" ");
+          if (selectString.length() > 0) {
+			  selectString.append(" ");
+		  }
           selectString.append(selection.getValue());
        }
 		//As Crazy, and stupid, as it sounds, this is the XForms specification

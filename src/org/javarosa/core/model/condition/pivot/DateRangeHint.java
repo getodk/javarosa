@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.model.condition.pivot;
 
 import java.util.Date;

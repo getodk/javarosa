@@ -60,21 +60,21 @@ public class FormDefTest extends TestCase {
 	}
 		
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 		
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new FormDefTest(doTest(testID)));
+			suite.addTest(new FormDefTest(doTest(testID)));
 		}
 			
-		return aSuite;
+		return suite;
 	}
 	
 	private void testSerialize (QuestionDef q, String msg) {
 		//ExternalizableTest.testExternalizable(q, this, pf, "QuestionDef [" + msg + "]");
 	}
 	
-	public final static int NUM_TESTS = 1;
+	public static final int NUM_TESTS = 1;
 	
 	public static String doTest (int i) {
 		switch (i) {
@@ -92,7 +92,9 @@ public class FormDefTest extends TestCase {
 		do{
 			
 			QuestionDef q = fpi.getCurrentQuestion();
-			if(q==null || q.getTextID() == null || q.getTextID().length() == 0)continue;
+			if(q==null || q.getTextID() == null || q.getTextID().length() == 0) {
+				continue;
+			}
 			if(q.getTextID().equals("constraint-test")){
 				int response = fec.answerQuestion(ans, true);
 				if(response == FormEntryController.ANSWER_CONSTRAINT_VIOLATED){

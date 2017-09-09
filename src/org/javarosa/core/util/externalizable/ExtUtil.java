@@ -37,6 +37,7 @@ import java.util.List;
 public class ExtUtil {
 	public static boolean interning = true;
 	public static CacheTable<String> stringCache;
+
 	public static byte[] serialize (Object o) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -155,8 +156,9 @@ public class ExtUtil {
 
 	public static void writeBytes(DataOutputStream out, byte[] bytes) throws IOException {
 		ExtUtil.writeNumeric(out, bytes.length);
-		if (bytes.length > 0) //i think writing zero-length array might close the stream
+		if (bytes.length > 0) { //i think writing zero-length array might close the stream
 			out.write(bytes);
+		}
 	}
 
 	//functions like these are bad; they should use the built-in list serialization facilities
@@ -305,20 +307,23 @@ public class ExtUtil {
 	}
 
 	public static int toInt (long l) {
-		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
+		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
 			throw new ArithmeticException("Value (" + l + ") cannot fit into int");
+		}
 		return (int)l;
 	}
 
 	public static short toShort (long l) {
-		if (l < Short.MIN_VALUE || l > Short.MAX_VALUE)
+		if (l < Short.MIN_VALUE || l > Short.MAX_VALUE) {
 			throw new ArithmeticException("Value (" + l + ") cannot fit into short");
+		}
 		return (short)l;
 	}
 
 	public static byte toByte (long l) {
-		if (l < Byte.MIN_VALUE || l > Byte.MAX_VALUE)
+		if (l < Byte.MIN_VALUE || l > Byte.MAX_VALUE) {
 			throw new ArithmeticException("Value (" + l + ") cannot fit into byte");
+		}
 		return (byte)l;
 	}
 
@@ -465,18 +470,20 @@ public class ExtUtil {
 		sb.append("[");
 		for (int i = 0; i < data.length; i++) {
 			String hex = Integer.toHexString(data[i]);
-			if (hex.length() == 1)
+			if (hex.length() == 1) {
 				hex = "0" + hex;
-			else
+			} else {
 				hex = hex.substring(hex.length() - 2);
+			}
 			sb.append(hex);
 			if (i < data.length - 1) {
-				if ((i + 1) % 30 == 0)
+				if ((i + 1) % 30 == 0) {
 					sb.append("\n ");
-				else if ((i + 1) % 10 == 0)
+				} else if ((i + 1) % 10 == 0) {
 					sb.append("  ");
-				else
+				} else {
 					sb.append(" ");
+				}
 			}
 		}
 		sb.append("]");
@@ -492,6 +499,7 @@ public class ExtUtil {
 	public static void deserialize (byte[] data, Externalizable ext) throws IOException, DeserializationException {
 		ext.readExternal(new DataInputStream(new ByteArrayInputStream(data)), defaultPrototypes());
 	}
+
 	public static Object deserialize (byte[] data, Class type, PrototypeFactory pf) throws IOException, DeserializationException {
         return read(new DataInputStream(new ByteArrayInputStream(data)), type, pf);
 	}

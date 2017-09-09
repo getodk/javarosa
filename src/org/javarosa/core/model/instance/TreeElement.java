@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package org.javarosa.core.model.instance;
 
 import java.io.DataInputStream;
@@ -177,7 +178,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		}
 
 		// null-valued attributes are a "remove-this" instruction... ignore them
-		if ( value == null ) return;
+		if ( value == null ) {
+			return;
+		}
 
 		// create an attribute...
 		TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
@@ -219,7 +222,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 	@Override
 	public TreeElement getChild(String name, int multiplicity) {
-		if(this.children == null) { return null; }
+		if (this.children == null) {
+			return null;
+		}
 
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
 			if(multiplicity == TreeReference.INDEX_TEMPLATE || this.children.size() < multiplicity + 1) {
@@ -243,13 +248,16 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	private List<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
-		if(children == null) { return new ArrayList<TreeElement>(0);}
+		if (children == null) {
+			return new ArrayList<TreeElement>(0);
+		}
 
         List<TreeElement> v = new ArrayList<>();
         for (TreeElement child : children) {
             if (TreeElementNameComparator.elementMatchesName(child, name)
-                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-                v.add(child);
+                    && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE)) {
+				v.add(child);
+			}
         }
 
         return v;
@@ -293,19 +301,23 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 			throw new RuntimeException("Cannot add child with an unbound index!");
 		}
 
-		if(children == null) { children = new ArrayList<TreeElement>(0);}
+		if (children == null) {
+			children = new ArrayList<TreeElement>(0);
+		}
 
 		// try to keep things in order
 		int i = children.size();
 		if (child.getMult() == TreeReference.INDEX_TEMPLATE) {
 			TreeElement anchor = getChild(child.getName(), 0);
-			if (anchor != null)
+			if (anchor != null) {
 				i = children.indexOf(anchor);
+			}
 		} else {
 			TreeElement anchor = getChild(child.getName(),
 					(child.getMult() == 0 ? TreeReference.INDEX_TEMPLATE : child.getMult() - 1));
-			if (anchor != null)
+			if (anchor != null) {
 				i = children.indexOf(anchor) + 1;
+			}
 		}
 		children.add(i, child);
 		child.setParent(this);
@@ -316,7 +328,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	}
 
 	public void removeChild(TreeElement child) {
-		if(children == null) { return;}
+		if (children == null) {
+			return;
+		}
 		children.remove(child);
 	}
 
@@ -329,8 +343,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 	public void removeChildren(String name) {
 		List<TreeElement> v = getChildrenWithName(name, false);
-		for (TreeElement aV : v) {
-			removeChild(aV);
+		for (TreeElement element : v) {
+			removeChild(element);
 		}
 	}
 
@@ -453,8 +467,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				}
 			}
 			if(children != null) {
-				for (TreeElement aChildren : children) {
-					aChildren.setRelevant(newRelevant, true);
+				for (TreeElement child : children) {
+					child.setRelevant(newRelevant, true);
 				}
 			}
 			alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
@@ -531,8 +545,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	/* ==== OBSERVER PATTERN ==== */
 
 	public void registerStateObserver(FormElementStateListener qsl) {
-		if (observers == null)
+		if (observers == null) {
 			observers = new ArrayList<FormElementStateListener>(1);
+		}
 
 		if (!observers.contains(qsl)) {
 			observers.add(qsl);
@@ -542,8 +557,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	public void unregisterStateObserver(FormElementStateListener qsl) {
 		if (observers != null) {
 			observers.remove(qsl);
-			if (observers.isEmpty())
+			if (observers.isEmpty()) {
 				observers = null;
+			}
 		}
 	}
 
@@ -825,7 +841,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 					}
 
 					this.removeChildAt(j);
-					if(children == null) { children = new ArrayList<TreeElement>(); }
+					if (children == null) {
+						children = new ArrayList<TreeElement>();
+					}
 					this.children.add(i, child2);
 				}
 			}
@@ -839,7 +857,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				    for (int k = 0; k < newChildren.size(); k++) {
 				        TreeElement newChild = child.deepCopy(true);
 				        newChild.setMult(k);
-						if(children == null) { children = new ArrayList<TreeElement>(); }
+						if (children == null) {
+							children = new ArrayList<TreeElement>();
+						}
 				        this.children.add(i + k + 1, newChild);
 				        newChild.populate(newChildren.get(k), f);
 				    }
@@ -878,8 +898,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
 				if (classType == null) {
 					throw new RuntimeException("data type [" + value.getClass().getName() + "] not supported inside itemset");
-				} else if (classType.isAssignableFrom(value.getClass()) &&
-							!(value instanceof SelectOneData || value instanceof SelectMultiData)) {
+				} else if (classType.isAssignableFrom(value.getClass())
+						&& !(value instanceof SelectOneData || value instanceof SelectMultiData)) {
 					this.setValue(value);
 				} else {
 					String textVal = RestoreUtils.xfFact.serializeData(value);
@@ -897,7 +917,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 				    	TreeElement template = f.getMainInstance().getTemplate(child.getRef());
 				        TreeElement newChild = template.deepCopy(false);
 				        newChild.setMult(k);
-				        if(children == null) { children = new ArrayList<TreeElement>(); }
+				        if (children == null) {
+							children = new ArrayList<TreeElement>();
+				        }
 				        this.children.add(i + k + 1, newChild);
 				        newChild.populateTemplate(newChildren.get(k), f);
 				    }
@@ -1032,17 +1054,14 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		return value;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		String name = "NULL";
-		if(this.name != null)
-		{
+		if (this.name != null) {
 			name = this.name;
 		}
 
 		String childrenCount = "-1";
-		if(this.children != null)
-		{
+		if(this.children != null) {
 			childrenCount = Integer.toString(this.children.size());
 		}
 
@@ -1091,7 +1110,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 	@Override
 	public List<TreeReference> tryBatchChildFetch(String name, int mult, List<XPathExpression> predicates, EvaluationContext evalContext) {
 		//Only do for predicates
-		if(mult != TreeReference.INDEX_UNBOUND || predicates == null) { return null; }
+		if (mult != TreeReference.INDEX_UNBOUND || predicates == null) {
+			return null;
+		}
 
 		List<Integer> toRemove = new ArrayList<Integer>();
 		List<TreeReference> selectedChildren = null;
@@ -1119,7 +1140,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 						indices = new HashMap<XPathPathExpr, String>();
 						kids = this.getChildrenWithName(name);
 
-						if(kids.size() == 0 ) { return null; }
+						if (kids.size() == 0 ) {
+							return null;
+						}
 
 						//Anything that we're going to use across elements should be on all of them
 						TreeElement kid = kids.get(0);
@@ -1155,7 +1178,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 		}
 
 		//if we weren't able to evaluate any predicates, signal that.
-		if(selectedChildren == null) { return null; }
+		if (selectedChildren == null) {
+			return null;
+		}
 
 		//otherwise, remove all of the predicates we've already evaluated
 		for(int i = toRemove.size() - 1; i >= 0 ; i--)  {

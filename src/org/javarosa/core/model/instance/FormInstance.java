@@ -81,8 +81,9 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 
 	public TreeElement getRoot() {
 
-		if (root.getNumChildren() == 0)
+		if (root.getNumChildren() == 0) {
 			throw new RuntimeException("root node has no children");
+		}
 
 		return root.getChildAt(0);
 	}
@@ -122,8 +123,9 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 	// references EXCEPT 'to' may be ambiguous at its final step
 	// return true is successfully copied, false otherwise
 	public TreeElement copyNode(TreeElement src, TreeReference to) throws InvalidReferenceException {
-		if (!to.isAbsolute())
+		if (!to.isAbsolute()) {
 			throw new InvalidReferenceException("Destination reference must be absolute for copying", to);
+		}
 
 		// strip out dest node info and get dest parent
 		String dstName = to.getNameLast();
@@ -256,8 +258,8 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.instance.FormInstanceAdapter#addNamespace(java.lang.String, java.lang.String)
 	 */
-	public void addNamespace(String prefix, String URI) {
-		namespaces.put(prefix, URI);
+	public void addNamespace(String prefix, String uri) {
+		namespaces.put(prefix, uri);
 	}
 
 	/* (non-Javadoc)
@@ -369,24 +371,29 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 
 				for (int i = 0; i < n1.getNumChildren(); i++) {
 					TreeElement child1 = n1.getChildAt(i);
-					if (child1.isRepeatable())
+					if (child1.isRepeatable()) {
 						continue;
+					}
 					TreeElement child2 = n2.getChild(child1.getName(), 0);
-					if (child2 == null)
+					if (child2 == null) {
 						return false;
-					if (child2.isRepeatable())
+					}
+					if (child2.isRepeatable()) {
 						throw new RuntimeException("shouldn't happen");
+					}
 				}
 			}
 
 			// compare children
 			for (int i = 0; i < a.getNumChildren(); i++) {
 				TreeElement childA = a.getChildAt(i);
-				if (childA.isRepeatable())
+				if (childA.isRepeatable()) {
 					continue;
+				}
 				TreeElement childB = b.getChild(childA.getName(), 0);
-				if (!isHomogeneous(childA, childB))
+				if (!isHomogeneous(childA, childB)) {
 					return false;
+				}
 			}
 
 			return true;

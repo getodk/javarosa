@@ -88,6 +88,7 @@ public class FormIndex implements Serializable {
 		this.reference = reference;
 
 	}
+
 	/**
 	 * Constructs a simple form index that references a specific element in
 	 * a list of elements.
@@ -238,8 +239,9 @@ public class FormIndex implements Serializable {
 	}
 
 	public boolean equals(Object o) {
-		if(!(o instanceof FormIndex))
+		if(!(o instanceof FormIndex)) {
 			return false;
+		}
 
 		FormIndex a = this;
 		FormIndex b = (FormIndex)o;
@@ -267,8 +269,9 @@ public class FormIndex implements Serializable {
 	}
 
 	public int compareTo(Object o) {
-		if(!(o instanceof FormIndex))
+		if(!(o instanceof FormIndex)) {
 			throw new IllegalArgumentException("Attempt to compare Object of type " + o.getClass().getName() + " to a FormIndex");
+		}
 
 		FormIndex a = this;
 		FormIndex b = (FormIndex)o;
@@ -445,14 +448,12 @@ public class FormIndex implements Serializable {
 		if(!parent.isTerminal() && child.isTerminal()) {
 			//can't be the parent if the child is earlier on
 			return false;
-		}
-		else if(parent.getLocalIndex() != child.getLocalIndex()) {
+		} else if(parent.getLocalIndex() != child.getLocalIndex()) {
 			//Either they're at the same level, in which case only
 			//identical indices should match, or they should have
 			//the same root
 			return false;
-		}
-		else if(parent.getInstanceIndex() != -1 && (parent.getInstanceIndex() != child.getInstanceIndex())) {
+		} else if(parent.getInstanceIndex() != -1 && (parent.getInstanceIndex() != child.getInstanceIndex())) {
 			return false;
 		}
 		//Barring all of these cases, it should be true.

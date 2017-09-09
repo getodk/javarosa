@@ -48,27 +48,47 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
 		
 		double result = 0;
 		switch (op) {
-		case ADD: result = aval + bval; break;
-		case SUBTRACT: result = aval - bval; break;
-		case MULTIPLY: result = aval * bval; break;
-		case DIVIDE: result = aval / bval; break;
-		case MODULO: result = aval % bval; break;
+		case ADD:
+			result = aval + bval;
+			break;
+		case SUBTRACT:
+			result = aval - bval;
+			break;
+		case MULTIPLY:
+			result = aval * bval;
+			break;
+		case DIVIDE:
+			result = aval / bval;
+			break;
+		case MODULO:
+			result = aval % bval;
+			break;
 		}
 		return new Double(result);
 	}
 	
 	public String toString () {
-		String sOp = null;
+		String opString = null;
 		
 		switch (op) {
-		case ADD: sOp = "+"; break;
-		case SUBTRACT: sOp = "-"; break;
-		case MULTIPLY: sOp = "*"; break;
-		case DIVIDE: sOp = "/"; break;
-		case MODULO: sOp = "%"; break;
+		case ADD:
+			opString = "+";
+			break;
+		case SUBTRACT:
+			opString = "-";
+			break;
+		case MULTIPLY:
+			opString = "*";
+			break;
+		case DIVIDE:
+			opString = "/";
+			break;
+		case MODULO:
+			opString = "%";
+			break;
 		}
 		
-		return super.toString(sOp);
+		return super.toString(opString);
 	}
 
 	public boolean equals (Object o) {

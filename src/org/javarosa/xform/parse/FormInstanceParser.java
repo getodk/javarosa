@@ -204,11 +204,13 @@ class FormInstanceParser {
             TreeElement template = null;
             for (TreeReference nref : new EvaluationContext(instance).expandReference(ref)) {
                 TreeElement node = instance.resolveReference(nref);
-                if (node == null) //don't crash on '/'... invalid repeat binding will be caught later
+                if (node == null) { //don't crash on '/'... invalid repeat binding will be caught later
                     continue;
+                }
 
-                if (template == null)
+                if (template == null) {
                     template = instance.getTemplate(nref);
+                }
 
                 if (!FormInstance.isHomogeneous(template, node)) {
                     reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Not all repeated nodes for a given repeat binding [" + nref.toString() + "] are homogeneous! This will cause serious problems!", null);
@@ -218,8 +220,9 @@ class FormInstanceParser {
     }
 
     private void verifyControlBindings (IFormElement fe, FormInstance instance, List<String> errors) { //throws XmlPullParserException {
-        if (fe.getChildren() == null)
+        if (fe.getChildren() == null) {
             return;
+        }
 
         for (int i = 0; i < fe.getChildren().size(); i++) {
             IFormElement child = fe.getChildren().get(i);
@@ -254,8 +257,9 @@ class FormInstanceParser {
     }
 
     private void verifyRepeatMemberBindings (IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
-        if (fe.getChildren() == null)
+        if (fe.getChildren() == null) {
             return;
+        }
 
         for (int i = 0; i < fe.getChildren().size(); i++) {
             IFormElement child = fe.getChildren().get(i);
@@ -291,8 +295,8 @@ class FormInstanceParser {
             }
             //check that no nodes between the parent repeat and the target are repeatable
             for (int k = repeatBind.size(); k < childBind.size(); k++) {
-                TreeElement rChild = (k < repeatAncestry.size() ? repeatAncestry.get(k) : null);
-                boolean repeatable = rChild != null && rChild.isRepeatable();
+                TreeElement rchild = (k < repeatAncestry.size() ? repeatAncestry.get(k) : null);
+                boolean repeatable = rchild != null && rchild.isRepeatable();
                 if (repeatable && !(k == childBind.size() - 1 && isRepeat)) {
                     //catch <repeat nodeset="/a/b"><input ref="/a/b/c/d" /></repeat>...<repeat nodeset="/a/b/c">...</repeat>:
                     //  question's/group's/repeat's most immediate repeat parent in the instance is not its most immediate repeat parent in the form def
@@ -336,9 +340,7 @@ class FormInstanceParser {
 
             if (fi.getTemplatePath(itemset.labelRef) == null) {
                 throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
-            }
-            //check value nodes exist
-            else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
+            } else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) { //check value nodes exist
                 throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
             }
         }
@@ -358,8 +360,9 @@ class FormInstanceParser {
 
                 if (!FormInstance.isHomogeneous(srcNode, dstNode)) {
                     reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                            "Your itemset source [" + srcNode.getRef().toString() + "] and dest [" + dstNode.getRef().toString() +
-                                    "] of appear to be incompatible!", null);
+                            "Your itemset source [" + srcNode.getRef().toString() + "] and dest ["
+                                    + dstNode.getRef().toString()
+                                    + "] of appear to be incompatible!", null);
                 }
 
                 //TODO: i feel like, in theory, i should additionally check that the repeatable children of src and dst
@@ -429,8 +432,9 @@ class FormInstanceParser {
 
     /** Checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not */
     private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
-        if (repeatTree != null)
+        if (repeatTree != null) {
             checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
+        }
     }
 
     /** Helper function for checkRepeatsForTemplate */
@@ -473,8 +477,9 @@ class FormInstanceParser {
             }
         }
 
-        if (repeatable && mult != TreeReference.INDEX_TEMPLATE)
+        if (repeatable && mult != TreeReference.INDEX_TEMPLATE) {
             templateAllowed = false;
+        }
 
         for (int i = 0; i < instanceNode.getNumChildren(); i++) {
             TreeElement child = instanceNode.getChildAt(i);
@@ -512,8 +517,8 @@ class FormInstanceParser {
                 instance.copyNode(firstMatch, templRef);
             } catch (InvalidReferenceException e) {
                 reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                        "Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on " +
-                                templRef.toString() + ")", null);
+                        "Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on "
+                                + templRef.toString() + ")", null);
             }
             trimRepeatChildren(instance.resolveReference(templRef));
         }

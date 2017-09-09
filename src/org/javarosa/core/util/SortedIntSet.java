@@ -50,8 +50,9 @@ public class SortedIntSet implements Externalizable {
 	//remove a value; return index of item just removed if it was present, -1 if it was not
 	public int remove (int n) {
 		int i = indexOf(n, true);
-		if (i != -1)
+		if (i != -1) {
 			v.remove(i);
+		}
 		return i;
 	}
 

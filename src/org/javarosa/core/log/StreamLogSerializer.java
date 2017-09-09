@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.log;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ public abstract class StreamLogSerializer {
 	Purger purger = null;
 
 	public interface Purger {
-		void purge(SortedIntSet IDs);
+		void purge(SortedIntSet ids);
 	}
 
 	public StreamLogSerializer () {

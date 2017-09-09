@@ -146,16 +146,16 @@ public class Lexer {
 				badParse(expr, i, (char)c);
 			}
 			if (token != null) {
-				if (token.type == Token.WILDCARD ||
-					token.type == Token.NSWILDCARD ||
-					token.type == Token.QNAME ||
-					token.type == Token.VAR ||
-					token.type == Token.NUM ||
-					token.type == Token.STR ||
-					token.type == Token.RBRACK ||
-					token.type == Token.RPAREN ||
-					token.type == Token.DOT ||
-					token.type == Token.DBL_DOT) {
+				if (token.type == Token.WILDCARD
+						|| token.type == Token.NSWILDCARD
+						|| token.type == Token.QNAME
+						|| token.type == Token.VAR
+						|| token.type == Token.NUM
+						|| token.type == Token.STR
+						|| token.type == Token.RBRACK
+						|| token.type == Token.RPAREN
+						|| token.type == Token.DOT
+						|| token.type == Token.DBL_DOT) {
 					context = LEX_CONTEXT_OP;
 				} else {
 					context = LEX_CONTEXT_VAL;
@@ -187,11 +187,13 @@ public class Lexer {
 		for (; i < expr.length(); i++) {
 			c = expr.charAt(i);
 
-			if (!(isDigit(c) || (!seenDecimalPoint && c == '.')))
+			if (!(isDigit(c) || (!seenDecimalPoint && c == '.'))) {
 				break;
+			}
 
-			if (c == '.')
+			if (c == '.') {
 				seenDecimalPoint = true;
+			}
 		}
 
 		return i - start;
@@ -203,8 +205,9 @@ public class Lexer {
 		if (len > 0 && getChar(expr, i + len) == ':') {
 			int len2 = matchNCName(expr, i + len + 1);
 
-			if (len2 > 0)
+			if (len2 > 0) {
 				len += len2 + 1;
+			}
 		}
 
 		return len;
@@ -217,8 +220,9 @@ public class Lexer {
 		for (; i < expr.length(); i++) {
 			c = expr.charAt(i);
 
-			if (!(isAlpha(c) || c == '_' || (i > start && (isDigit(c) || c == '.' || c == '-'))))
+			if (!(isAlpha(c) || c == '_' || (i > start && (isDigit(c) || c == '.' || c == '-')))) {
 				break;
+			}
 		}
 
 		return i - start;

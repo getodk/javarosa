@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.model.actions;
 
 import java.io.DataInputStream;
@@ -78,7 +79,9 @@ public class SetValueAction extends Action {
 		}
 
 		AbstractTreeElement node = context.resolveReference(qualifiedReference);
-		if(node == null) { throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!"); }
+		if (node == null) {
+			throw new NullPointerException("Target of TreeReference " + qualifiedReference.toString(true) +" could not be resolved!");
+		}
 		int dataType = node.getDataType();
 		IAnswerData val = Recalculate.wrapData(result, dataType);
 

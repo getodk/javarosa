@@ -139,16 +139,17 @@ public class QuestionDataElementTests extends TestCase{
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new QuestionDataElementTests(testMaster(testID)));
+			suite.addTest(new QuestionDataElementTests(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 
@@ -224,6 +225,7 @@ public class QuestionDataElementTests extends TestCase{
 			public void visit(FormInstance tree) {
 				dispatchedWrong.bool = true;
 			}
+
 			public void visit(AbstractTreeElement element) {
 				visitorAccepted.bool = true;
 			}

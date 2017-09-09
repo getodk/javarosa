@@ -38,8 +38,9 @@ public class ASTNodeFunctionCall extends ASTNode {
 	
 	public XPathExpression build() throws XPathSyntaxException {
 		XPathExpression[] xargs = new XPathExpression[args.size()];
-		for (int i = 0; i < args.size(); i++)
+		for (int i = 0; i < args.size(); i++) {
 			xargs[i] = args.elementAt(i).build();
+		}
 		
 		return new XPathFuncExpr(name, xargs);
 	}

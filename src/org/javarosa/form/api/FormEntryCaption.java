@@ -94,7 +94,9 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	public String getShortText(){
 		String returnText = getSpecialFormQuestionText(getTextID(), TEXT_FORM_SHORT);
-		if(returnText == null) { returnText = getLongText(); }
+		if (returnText == null) {
+			returnText = getLongText();
+		}
 		return returnText;
 	}
 
@@ -131,15 +133,21 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	public String getQuestionText(String textID){
 		String tid = textID;
-		if(tid != null && tid.length() == 0) tid = null; //to make things look clean
+		if(tid != null && tid.length() == 0) {
+			tid = null; //to make things look clean
+		}
 
 		//check for the null id case and return labelInnerText if it is so.
-		if(tid == null) return substituteStringArgs(element.getLabelInnerText());
+		if(tid == null) {
+			return substituteStringArgs(element.getLabelInnerText());
+		}
 
 		//otherwise check for 'long' form of the textID, then for the default form and return
 		String returnText;
 		returnText = getIText(tid, "long");
-		if(returnText == null) returnText = getIText(tid,null);
+		if(returnText == null) {
+			returnText = getIText(tid,null);
+		}
 
 		return substituteStringArgs(returnText);
 	}
@@ -163,7 +171,9 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
 	 */
 	public String getSpecialFormQuestionText(String textID,String form){
-		if(textID == null || textID.length() == 0) return null;
+		if(textID == null || textID.length() == 0) {
+			return null;
+		}
 
 		String returnText = getIText(textID, form);
 
@@ -191,7 +201,9 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	protected String getIText(String textID,String form){
 		String returnText = null;
-		if(textID == null || textID.length() == 0) return null;
+		if(textID == null || textID.length() == 0) {
+			return null;
+		}
 		if(form != null && form.length() > 0){
 			try{
 				returnText = localizer().getRawText(localizer().getLocale(), textID + ";" + form);
@@ -330,21 +342,21 @@ public class FormEntryCaption implements FormElementStateListener {
 
 	public RepeatOptions getRepeatOptions () {
 		RepeatOptions ro = new RepeatOptions();
-		boolean has_repetitions = (getNumRepetitions() > 0);
+		boolean hasRepetitions = (getNumRepetitions() > 0);
 
 		ro.header = getRepeatText("mainheader");
 
 		ro.add = null;
     	if (form.canCreateRepeat(form.getChildInstanceRef(index), index)) {
-    		ro.add = getRepeatText(has_repetitions ? "add" : "add-empty");
+    		ro.add = getRepeatText(hasRepetitions ? "add" : "add-empty");
     	}
     	ro.delete = null;
     	ro.delete_header = null;
-    	if (has_repetitions) {
+    	if (hasRepetitions) {
     		ro.delete = getRepeatText("del");
     		ro.delete_header = getRepeatText("delheader");
     	}
-    	ro.done = getRepeatText(has_repetitions ? "done" : "done-empty");
+    	ro.done = getRepeatText(hasRepetitions ? "done" : "done-empty");
 
     	return ro;
 	}

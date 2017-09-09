@@ -57,7 +57,7 @@ import org.kxml2.kdom.Element;
  */
 public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 
-	public final static String DELIMITER = " ";
+	public static final String DELIMITER = " ";
 
    List<IAnswerDataSerializer> additionalSerializers = new ArrayList<IAnswerDataSerializer>(1);
 
@@ -66,12 +66,13 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	}
 
 	public boolean canSerialize(IAnswerData data) {
-		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
-		    data instanceof SelectMultiData || data instanceof SelectOneData ||
-		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData ||
-		    data instanceof GeoPointData || data instanceof GeoTraceData || data instanceof GeoShapeData ||
-		    data instanceof LongData || data instanceof DateTimeData || data instanceof UncastData) {
+		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData
+				|| data instanceof SelectMultiData || data instanceof SelectOneData
+				|| data instanceof IntegerData || data instanceof DecimalData
+				|| data instanceof PointerAnswerData || data instanceof MultiPointerAnswerData
+				|| data instanceof GeoPointData || data instanceof GeoTraceData
+				|| data instanceof GeoShapeData || data instanceof LongData
+				|| data instanceof DateTimeData || data instanceof UncastData) {
 			return true;
 		} else {
 			return false;
@@ -170,8 +171,9 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		StringBuilder selectString = new StringBuilder();
 
       for (Selection selection : selections) {
-			if (selectString.length() > 0)
+			if (selectString.length() > 0) {
 				selectString.append(DELIMITER);
+			}
 			selectString.append(selection.getValue());
 		}
 		//As Crazy, and stupid, as it sounds, this is the XForms specification
@@ -283,8 +285,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 				return contains;
 			}
 		}
-		if( data instanceof PointerAnswerData	||
-	    data instanceof MultiPointerAnswerData ) {
+		if( data instanceof PointerAnswerData || data instanceof MultiPointerAnswerData ) {
 			return Boolean.TRUE;
 		}
 		return Boolean.FALSE;
@@ -301,8 +302,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			IDataPointer[] pointer = new IDataPointer[1];
 			pointer[0] = (IDataPointer)((PointerAnswerData)data).getValue();
 			return pointer;
-		}
-		else if (data instanceof MultiPointerAnswerData ) {
+		} else if (data instanceof MultiPointerAnswerData ) {
 			return (IDataPointer[])((MultiPointerAnswerData)data).getValue();
 		}
 		//This shouldn't have been called.

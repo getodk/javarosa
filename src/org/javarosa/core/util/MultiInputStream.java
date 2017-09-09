@@ -17,6 +17,7 @@
 /**
  *
  */
+
 package org.javarosa.core.util;
 
 import java.io.IOException;
@@ -60,8 +61,7 @@ public class MultiInputStream extends InputStream {
 	public boolean prepare() {
 		if(streams.size() == 0) {
 			return false;
-		}
-		else {
+		} else {
 			currentStream = 0;
 		}
 		return true;

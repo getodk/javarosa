@@ -66,10 +66,12 @@ public class XFormAnswerDataParser {
 	public static IAnswerData getAnswerData (String text, int dataType) {
 		return getAnswerData(text, dataType, null);
 	}
+
 	public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
 		String trimmedText = text.trim();
-		if (trimmedText.length() == 0)
+		if (trimmedText.length() == 0) {
 			trimmedText = null;
+		}
 
 		switch (dataType) {
 		case Constants.DATATYPE_NULL:
@@ -133,8 +135,12 @@ public class XFormAnswerDataParser {
 			if(trimmedText == null) {
 				return null;
 			} else {
-				if(trimmedText.equals("1")) { return new BooleanData(true); }
-				if(trimmedText.equals("0")) { return new BooleanData(false); }
+				if (trimmedText.equals("1")) {
+					return new BooleanData(true);
+				}
+				if (trimmedText.equals("0")) {
+					return new BooleanData(false);
+				}
 				return trimmedText.equals("t") ? new BooleanData(true) : new BooleanData(false);
 			}
 
@@ -191,8 +197,9 @@ public class XFormAnswerDataParser {
       List<Selection> v = new ArrayList<Selection>(choices.size()); // assume they are all still valid...
 		for (int i = 0; i < choices.size(); i++) {
 			Selection s = getSelection((String)choices.get(i), q);
-			if (s != null)
+			if (s != null) {
 				v.add(s);
+			}
 		}
 
 		return v;

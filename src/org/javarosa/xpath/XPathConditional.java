@@ -124,7 +124,9 @@ public class XPathConditional implements IConditionExpr {
 				}
 
 				//we can't generate this properly without an absolute reference
-				if(!ref.isAbsolute()) { throw new IllegalArgumentException("can't get triggers for relative references");}
+				if (!ref.isAbsolute()) {
+					throw new IllegalArgumentException("can't get triggers for relative references");
+				}
 				TreeReference predicateContext = ref.getSubReference(i);
 
 				for(XPathExpression predicate : predicates) {
@@ -138,8 +140,9 @@ public class XPathConditional implements IConditionExpr {
 			getTriggers(((XPathUnaryOpExpr)x).a, v, contextRef);
 		} else if (x instanceof XPathFuncExpr) {
 			XPathFuncExpr fx = (XPathFuncExpr)x;
-			for (int i = 0; i < fx.args.length; i++)
+			for (int i = 0; i < fx.args.length; i++) {
 				getTriggers(fx.args[i], v, contextRef);
+			}
 		}
 	}
 

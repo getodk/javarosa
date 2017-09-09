@@ -36,11 +36,13 @@ public interface IAnswerData extends Externalizable {
 	 * @throws NullPointerException if o is null
 	 */
 	void setValue (Object o); //can't be null
+
 	/**
 	 * @return The value of this answer, will never
 	 * be null
 	 */
 	Object getValue ();       //will never be null
+
 	/**
 	 * @return Gets a string representation of this 
 	 * answer

@@ -42,8 +42,9 @@ public class Parser {
 
 	public static ASTNode buildParseTree (Vector<Token> tokens) throws XPathSyntaxException {
 		ASTNodeAbstractExpr root = new ASTNodeAbstractExpr();
-		for (int i = 0; i < tokens.size(); i++)
+		for (int i = 0; i < tokens.size(); i++) {
 			root.content.addElement(tokens.elementAt(i));
+		}
 
 		parseFuncCalls(root);
 		parseParens(root);
@@ -81,8 +82,9 @@ public class Parser {
 
 			int i = 0;
 			while (i < absNode.content.size() - 1) {
-				if (absNode.getTokenType(i + 1) == Token.LPAREN && absNode.getTokenType(i) == Token.QNAME)
+				if (absNode.getTokenType(i + 1) == Token.LPAREN && absNode.getTokenType(i) == Token.QNAME) {
 					condenseFuncCall(absNode, i);
+				}
 				i++;
 			}
 		}
@@ -114,7 +116,9 @@ public class Parser {
 
 	private static void parseParens (ASTNode node) throws XPathSyntaxException {
 		parseBalanced(node, new SubNodeFactory () {
-			public ASTNode newNode (ASTNodeAbstractExpr node) { return node; }
+			public ASTNode newNode (ASTNodeAbstractExpr node) {
+				return node;
+			}
 		}, Token.LPAREN, Token.RPAREN);
 	}
 
@@ -128,21 +132,21 @@ public class Parser {
 		}, Token.LBRACK, Token.RBRACK);
 	}
 
-	private static abstract class SubNodeFactory {
+	private abstract static class SubNodeFactory {
 		public abstract ASTNode newNode (ASTNodeAbstractExpr node);
 	}
 
-	private static void parseBalanced (ASTNode node, SubNodeFactory snf, int lToken, int rToken) throws XPathSyntaxException {
+	private static void parseBalanced (ASTNode node, SubNodeFactory snf, int leftToken, int rightToken) throws XPathSyntaxException {
 		if (node instanceof ASTNodeAbstractExpr) {
 			ASTNodeAbstractExpr absNode = (ASTNodeAbstractExpr)node;
 
 			int i = 0;
 			while (i < absNode.content.size()) {
 				int type = absNode.getTokenType(i);
-				if (type == rToken) {
+				if (type == rightToken) {
 					throw new XPathSyntaxException("Unbalanced brackets or parentheses!"); //unbalanced
-				} else if (type == lToken) {
-					int j = absNode.indexOfBalanced(i, rToken, lToken, rToken);
+				} else if (type == leftToken) {
+					int j = absNode.indexOfBalanced(i, rightToken, leftToken, rightToken);
 					if (j == -1) {
 						throw new XPathSyntaxException("mismatched brackets or parentheses!"); //mismatched
 					}
@@ -154,7 +158,7 @@ public class Parser {
 		}
 
 		for (Enumeration e = node.getChildren().elements(); e.hasMoreElements(); ) {
-			parseBalanced((ASTNode)e.nextElement(), snf, lToken, rToken);
+			parseBalanced((ASTNode)e.nextElement(), snf, leftToken, rightToken);
 		}
 	}
 
@@ -238,10 +242,11 @@ public class Parser {
 								} else {
 									//filter expr
 									ASTNodeFilterExpr filt = parseFilterExp(x);
-									if (filt != null)
+									if (filt != null) {
 										path.clauses.addElement(filt);
-									else
+									} else {
 										path.clauses.addElement(x);
+									}
 								}
 							} else {
 								throw new XPathSyntaxException("Unexpected beginning of path");
@@ -262,12 +267,12 @@ public class Parser {
 	private static boolean isStep (ASTNodeAbstractExpr node) {
 		if (node.content.size() > 0) {
 			int type = node.getTokenType(0);
-			if (type == Token.QNAME ||
-				type == Token.WILDCARD ||
-				type == Token.NSWILDCARD ||
-				type == Token.AT ||
-				type == Token.DOT ||
-				type == Token.DBL_DOT) {
+			if (type == Token.QNAME
+					|| type == Token.WILDCARD
+					|| type == Token.NSWILDCARD
+					|| type == Token.AT
+					|| type == Token.DOT
+					|| type == Token.DBL_DOT) {
 				return true;
 			} else if (node.content.elementAt(0) instanceof ASTNodeFunctionCall) {
 				String name = ((ASTNodeFunctionCall)node.content.elementAt(0)).name.toString();
@@ -349,8 +354,9 @@ public class Parser {
 			}
 		}
 
-		if (filt.predicates.size() == 0)
+		if (filt.predicates.size() == 0) {
 			return null;
+		}
 
 		filt.expr = node.extract(0, i + 1);
 		return filt;

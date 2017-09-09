@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.reference;
 
 /**
@@ -56,13 +57,13 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.reference.ReferenceFactory#derive(java.lang.String)
 	 */
-	public Reference derive(String URI) throws InvalidReferenceException {
+	public Reference derive(String uri) throws InvalidReferenceException {
 		for(String root : roots) {
-			if(URI.indexOf(root) != -1) {
-				return factory(URI.substring(root.length()),URI);
+			if(uri.indexOf(root) != -1) {
+				return factory(uri.substring(root.length()),uri);
 			}
 		}
-		throw new InvalidReferenceException("Invalid attempt to derive a reference from a prefixed root. Valid prefixes for this factory are " + roots,URI);
+		throw new InvalidReferenceException("Invalid attempt to derive a reference from a prefixed root. Valid prefixes for this factory are " + roots,uri);
 	}
 	
 	/**
@@ -71,25 +72,25 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
 	 * 
 	 * @param terminal The local part of the URI for this prefixed root
 	 * (excluding the root itself)
-	 * @param URI The full URI 
+	 * @param uri The full URI
 	 * @return A reference which describes the URI 
 	 */
-	protected abstract Reference factory(String terminal, String URI);
+	protected abstract Reference factory(String terminal, String uri);
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.reference.ReferenceFactory#derive(java.lang.String, java.lang.String)
 	 */
-	public Reference derive(String URI, String context) throws InvalidReferenceException {
-		String referenceURI = context.substring(0,context.lastIndexOf('/') + 1) + URI;
+	public Reference derive(String uri, String context) throws InvalidReferenceException {
+		String referenceURI = context.substring(0,context.lastIndexOf('/') + 1) + uri;
 		return ReferenceManager.instance().DeriveReference(referenceURI);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.reference.ReferenceFactory#derives(java.lang.String)
 	 */
-	public boolean derives(String URI) {
+	public boolean derives(String uri) {
 		for(String root : roots) {
-			if(URI.indexOf(root) != -1) {
+			if(uri.indexOf(root) != -1) {
 				return true;
 			}
 		}

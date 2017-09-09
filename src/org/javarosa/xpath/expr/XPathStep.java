@@ -110,8 +110,9 @@ public class XPathStep implements Externalizable {
 			sb.append(",{");
 			for (int i = 0; i < predicates.length; i++) {
 				sb.append(predicates[i].toString());
-				if (i < predicates.length - 1)
+				if (i < predicates.length - 1) {
 					sb.append(",");
+				}
 			}
 			sb.append("}");
 		}
@@ -162,9 +163,21 @@ public class XPathStep implements Externalizable {
 			}
 
 			switch (test) {
-			case TEST_NAME: if(!name.equals(x.name)) {return false;} break;
-			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
-			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
+			case TEST_NAME:
+				if (!name.equals(x.name)) {
+					return false;
+				}
+				break;
+			case TEST_NAMESPACE_WILDCARD:
+				if (!namespace.equals(x.namespace)) {
+					return false;
+				}
+				break;
+			case TEST_TYPE_PROCESSING_INSTRUCTION:
+				if (!ExtUtil.equals(literal, x.literal)) {
+					return false;
+				}
+				break;
 			default: break;
 			}
 
@@ -202,9 +215,21 @@ public class XPathStep implements Externalizable {
 			}
 
 			switch (test) {
-			case TEST_NAME: if(x.test != TEST_NAME_WILDCARD && !name.equals(x.name)) {return false;} break;
-			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
-			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
+			case TEST_NAME:
+				if (x.test != TEST_NAME_WILDCARD && !name.equals(x.name)) {
+					return false;
+				}
+				break;
+			case TEST_NAMESPACE_WILDCARD:
+				if (!namespace.equals(x.namespace)) {
+					return false;
+				}
+				break;
+			case TEST_TYPE_PROCESSING_INSTRUCTION:
+				if (!ExtUtil.equals(literal, x.literal)) {
+					return false;
+				}
+				break;
 			default: break;
 			}
 
@@ -227,15 +252,22 @@ public class XPathStep implements Externalizable {
 		test = ExtUtil.readInt(in);
 
 		switch (test) {
-		case TEST_NAME: name = (XPathQName)ExtUtil.read(in, XPathQName.class); break;
-		case TEST_NAMESPACE_WILDCARD: namespace = ExtUtil.readString(in); break;
-		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break;
+		case TEST_NAME:
+			name = (XPathQName)ExtUtil.read(in, XPathQName.class);
+			break;
+		case TEST_NAMESPACE_WILDCARD:
+			namespace = ExtUtil.readString(in);
+			break;
+		case TEST_TYPE_PROCESSING_INSTRUCTION:
+			literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
+			break;
 		}
 
       List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		predicates = new XPathExpression[v.size()];
-		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.get(i);
+		for (int i = 0; i < predicates.length; i++) {
+			predicates[i] = (XPathExpression) v.get(i);
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -243,9 +275,15 @@ public class XPathStep implements Externalizable {
 		ExtUtil.writeNumeric(out, test);
 
 		switch (test) {
-		case TEST_NAME: ExtUtil.write(out, name); break;
-		case TEST_NAMESPACE_WILDCARD: ExtUtil.writeString(out, namespace); break;
-		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
+		case TEST_NAME:
+			ExtUtil.write(out, name);
+			break;
+		case TEST_NAMESPACE_WILDCARD:
+			ExtUtil.writeString(out, namespace);
+			break;
+		case TEST_TYPE_PROCESSING_INSTRUCTION:
+			ExtUtil.write(out, new ExtWrapNullable(literal));
+			break;
 		}
 
       List<XPathExpression> v = Arrays.asList(predicates);
@@ -254,6 +292,7 @@ public class XPathStep implements Externalizable {
 	}
 
 	public static boolean XPathStepInterningEnabled = true;
+
 	public XPathStep intern() {
 		if(!XPathStepInterningEnabled || refs == null) {
 			return this;

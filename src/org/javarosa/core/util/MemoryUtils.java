@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.util;
 
 import org.javarosa.core.io.Std;
@@ -33,6 +34,7 @@ public class MemoryUtils {
 	static boolean oldterning;
 	static boolean otrt;
 	static boolean oldxpath;
+
 	public static void stopTerning() {
 		oldterning = ExtUtil.interning;
 		otrt = TreeReferenceLevel.treeRefLevelInterningEnabled;
@@ -53,6 +55,7 @@ public class MemoryUtils {
 	//this run through. If you get an error when you try to profile memory,
 	//due to lack of space, you can increase the profile size.
 	private static final int MEMORY_PROFILE_SIZE = 5000;
+
 	public static void enableMemoryProfile() {
 		memoryProfile = new long[MEMORY_PROFILE_SIZE * 2];
 		memoryHolders = new byte[MEMORY_PROFILE_SIZE][];
@@ -95,7 +98,9 @@ public class MemoryUtils {
 	 * @param pause
 	 */
 	public static void printMemoryTest(String tag, int pause) {
-		if(!MEMORY_PRINT_ENABLED) { return; }
+		if (!MEMORY_PRINT_ENABLED) {
+			return;
+		}
 		System.gc();
 		Runtime r = Runtime.getRuntime();
 		long free = r.freeMemory();
@@ -183,7 +188,10 @@ public class MemoryUtils {
 				Std.out.println("Memory profile is too small for this device's usage!");
 				break;
 			}
-			if(chunkSize < threshold) { succeeded = true; break;}
+			if (chunkSize < threshold) {
+				succeeded = true;
+				break;
+			}
 			
 			try {
 				memoryHolders[currentCount] = new byte[chunkSize];

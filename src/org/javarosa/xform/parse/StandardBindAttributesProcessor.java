@@ -106,8 +106,10 @@ class StandardBindAttributesProcessor {
             try {
                 r = buildCalculate(xpathCalc, ref);
             } catch (XPathSyntaxException xpse) {
-                throw new XFormParseException("Invalid calculate for the bind attached to \"" + nodeset +
-                        "\" : " + xpse.getMessage() + " in expression " + xpathCalc);
+                throw new XFormParseException("Invalid calculate for the bind attached to \""
+                        + nodeset + "\" : "
+                        + xpse.getMessage() + " in expression "
+                        + xpathCalc);
             }
             r = (Recalculate) formDef.addTriggerable(r);
             binding.calculate = r;
@@ -150,8 +152,10 @@ class StandardBindAttributesProcessor {
         try {
             xPathConditional = new XPathConditional(xpath);
         } catch (XPathSyntaxException xse) {
-            String errorMessage = "Encountered a problem with " + prettyType + " condition for node ["  + 
-                    contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage();
+            String errorMessage = "Encountered a problem with "
+                    + prettyType + " condition for node ["
+                    + contextRef.getReference().toString() + "] at line: "
+                    + xpath + ", " +  xse.getMessage();
             reporter.error(errorMessage);
             throw new XFormParseException(errorMessage);
         }

@@ -76,8 +76,9 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 	int indent;
 
 	private void printStr (String s) {
-		for (int i = 0; i < 2 * indent; i++)
+		for (int i = 0; i < 2 * indent; i++) {
 			Std.out.print(" ");
+		}
 		Std.out.println(s);
 	}
 
@@ -102,11 +103,21 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 			XPathArithExpr x = (XPathArithExpr)o;
 			String op = null;
 			switch(x.op) {
-			case XPathArithExpr.ADD: op = "add"; break;
-			case XPathArithExpr.SUBTRACT: op = "subtr"; break;
-			case XPathArithExpr.MULTIPLY: op = "mult"; break;
-			case XPathArithExpr.DIVIDE: op = "div"; break;
-			case XPathArithExpr.MODULO: op = "mod"; break;
+			case XPathArithExpr.ADD:
+				op = "add";
+				break;
+			case XPathArithExpr.SUBTRACT:
+				op = "subtr";
+				break;
+			case XPathArithExpr.MULTIPLY:
+				op = "mult";
+				break;
+			case XPathArithExpr.DIVIDE:
+				op = "div";
+				break;
+			case XPathArithExpr.MODULO:
+				op = "mod";
+				break;
 			}
 			printStr(op + " {{");
 			print(x.a);
@@ -117,8 +128,12 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 			XPathBoolExpr x = (XPathBoolExpr)o;
 			String op = null;
 			switch(x.op) {
-			case XPathBoolExpr.AND: op = "and"; break;
-			case XPathBoolExpr.OR: op = "or"; break;
+			case XPathBoolExpr.AND:
+				op = "and";
+				break;
+			case XPathBoolExpr.OR:
+				op = "or";
+				break;
 			}
 			printStr(op + " {{");
 			print(x.a);
@@ -129,10 +144,18 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 			XPathCmpExpr x = (XPathCmpExpr)o;
 			String op = null;
 			switch(x.op) {
-			case XPathCmpExpr.LT: op = "lt"; break;
-			case XPathCmpExpr.LTE: op = "lte"; break;
-			case XPathCmpExpr.GT: op = "gt"; break;
-			case XPathCmpExpr.GTE: op = "gte"; break;
+			case XPathCmpExpr.LT:
+				op = "lt";
+				break;
+			case XPathCmpExpr.LTE:
+				op = "lte";
+				break;
+			case XPathCmpExpr.GT:
+				op = "gt";
+				break;
+			case XPathCmpExpr.GTE:
+				op = "gte";
+				break;
 			}
 			printStr(op + " {{");
 			print(x.a);
@@ -167,8 +190,9 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 				printStr("func {" + x.id.toString() + ", args {{");
 				for (int i = 0; i < x.args.length; i++) {
 					print(x.args[i]);
-					if (i < x.args.length - 1)
+					if (i < x.args.length - 1) {
 						printStr(" } {");
+					}
 				}
 				printStr("}}}");
 			}
@@ -177,9 +201,15 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 			String init = null;
 
 			switch (x.init_context) {
-			case XPathPathExpr.INIT_CONTEXT_ROOT: init = "root"; break;
-			case XPathPathExpr.INIT_CONTEXT_RELATIVE: init = "relative"; break;
-			case XPathPathExpr.INIT_CONTEXT_EXPR: init = "expr"; break;
+			case XPathPathExpr.INIT_CONTEXT_ROOT:
+				init = "root";
+				break;
+			case XPathPathExpr.INIT_CONTEXT_RELATIVE:
+				init = "relative";
+				break;
+			case XPathPathExpr.INIT_CONTEXT_EXPR:
+				init = "expr";
+				break;
 			}
 
 			printStr("path {init-context:" + init + ",");
@@ -197,8 +227,9 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 				printStr(" steps {{");
 				for (int i = 0; i < x.steps.length; i++) {
 					print(x.steps[i]);
-					if (i < x.steps.length - 1)
+					if (i < x.steps.length - 1) {
 						printStr(" } {");
+					}
 				}
 				printStr("}}}");
 			}
@@ -214,8 +245,9 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 				printStr(" } predicates {{");
 				for (int i = 0; i < x.predicates.length; i++) {
 					print(x.predicates[i]);
-					if (i < x.predicates.length - 1)
+					if (i < x.predicates.length - 1) {
 						printStr(" } {");
+					}
 				}
 				printStr(" }}}");
 			}
@@ -233,8 +265,9 @@ public abstract class XPathExpression implements Externalizable, Serializable {
 				printStr("step {axis:" + axis + " test:" + test + " predicates {{");
 				for (int i = 0; i < x.predicates.length; i++) {
 					print(x.predicates[i]);
-					if (i < x.predicates.length - 1)
+					if (i < x.predicates.length - 1) {
 						printStr(" } {");
+					}
 				}
 				printStr("}}}");
 			}

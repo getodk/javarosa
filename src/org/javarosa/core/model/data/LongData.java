@@ -44,6 +44,7 @@ public class LongData implements IAnswerData {
 	public LongData(long n) {
 		this.n = n;
 	}
+
 	public LongData(Long n) {
 		setValue(n);
 	}

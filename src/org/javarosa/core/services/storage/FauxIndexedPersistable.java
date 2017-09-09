@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package org.javarosa.core.services.storage;
 
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
@@ -21,6 +22,7 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	Persistable p;
 	SerializationWrapper w;
 	IMetaData m;
+
 	public FauxIndexedPersistable(Persistable p, SerializationWrapper w) {
 		this.p = p;
 		this.w = w;
@@ -43,8 +45,8 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.Persistable#setID(int)
 	 */
-	public void setID(int ID) {
-		p.setID(ID);
+	public void setID(int id) {
+		p.setID(id);
 	}
 
 	/* (non-Javadoc)
@@ -66,7 +68,9 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	 * @see org.javarosa.core.services.storage.IMetaData#getMetaData()
 	 */
 	public HashMap<String,Object> getMetaData() {
-		if(m != null) {return m.getMetaData();}
+		if (m != null) {
+			return m.getMetaData();
+		}
 		throw new RuntimeException("Attempt to index unindexible " + p.getClass().getName());
 	}
 
@@ -74,7 +78,9 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	 * @see org.javarosa.core.services.storage.IMetaData#getMetaData(java.lang.String)
 	 */
 	public Object getMetaData(String fieldName) {
-		if(m != null) {return m.getMetaData(fieldName);}
+		if (m != null) {
+			return m.getMetaData(fieldName);
+		}
 		throw new RuntimeException("Attempt to index unindexible " + p.getClass().getName());
 	}
 
@@ -82,7 +88,9 @@ public class FauxIndexedPersistable implements Persistable, IMetaData {
 	 * @see org.javarosa.core.services.storage.IMetaData#getMetaDataFields()
 	 */
 	public String[] getMetaDataFields() {
-		if(m != null) {return m.getMetaDataFields();}
+		if (m != null) {
+			return m.getMetaDataFields();
+		}
 		throw new RuntimeException("Attempt to index unindexible " + p.getClass().getName());
 	}
 

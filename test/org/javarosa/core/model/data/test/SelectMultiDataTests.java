@@ -81,16 +81,17 @@ public class SelectMultiDataTests extends TestCase {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new SelectMultiDataTests(testMaster(testID)));
+			suite.addTest(new SelectMultiDataTests(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
+
 	public static String testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -109,6 +110,7 @@ public class SelectMultiDataTests extends TestCase {
 		assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
 		
 	}
+
 	public void testSetData() {
 		SelectMultiData data = new SelectMultiData(firstTwo);
 		data.setValue(lastTwo);
@@ -121,6 +123,7 @@ public class SelectMultiDataTests extends TestCase {
 		assertEquals("SelectMultiData did not properly reset value ", data.getValue(), firstTwo);
 		
 	}
+
 	public void testNullData() {
 		boolean exceptionThrown = false;
 		SelectMultiData data = new SelectMultiData();

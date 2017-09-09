@@ -1,6 +1,7 @@
 /**
  *
  */
+
 package org.javarosa.core.services.storage.util;
 
 import java.io.ByteArrayOutputStream;
@@ -310,6 +311,7 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
 
 
 	ArrayList<String> dynamicIndices = new ArrayList<String>(0);
+
 	public void registerIndex(String filterIndex) {
 		dynamicIndices.add(filterIndex);
 	}

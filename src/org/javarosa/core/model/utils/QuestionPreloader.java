@@ -106,6 +106,7 @@ public class QuestionPreloader {
 			public String preloadHandled() {
 				return "uid";
 			}
+
 			public IAnswerData handlePreload(String preloadParams) {
 				return new StringData(PropertyUtils.genGUID(25));
 			}
@@ -199,35 +200,44 @@ public class QuestionPreloader {
 		} else if (preloadParams.substring(0, 11).equals("prevperiod-")) {
          List<String> v = DateUtils.split(preloadParams.substring(11), "-", false);
 			String[] params = new String[v.size()];
-			for (int i = 0; i < params.length; i++)
-				params[i] = (String)v.get(i);
+			for (int i = 0; i < params.length; i++) {
+				params[i] = (String) v.get(i);
+			}
 			
 			try {
 				String type = params[0];
 				String start = params[1];
 				
 				boolean beginning;
-				if (params[2].equals("head")) beginning = true;
-				else if (params[2].equals("tail")) beginning = false;
-				else throw new RuntimeException();					
+				if (params[2].equals("head")) {
+					beginning = true;
+				} else if (params[2].equals("tail")) {
+					beginning = false;
+				} else {
+					throw new RuntimeException();
+				}
 				
 				boolean includeToday;
 				if (params.length >= 4) {
-					if (params[3].equals("x")) includeToday = true;
-					else if (params[3].equals("")) includeToday = false;
-					else throw new RuntimeException();											
+					if (params[3].equals("x")) {
+						includeToday = true;
+					} else if (params[3].equals("")) {
+						includeToday = false;
+					} else {
+						throw new RuntimeException();
+					}
 				} else {
 					includeToday = false;
 				}
 				
-				int nAgo;
+				int periodsAgo;
 				if (params.length >= 5) {
-					nAgo = Integer.parseInt(params[4]);
+					periodsAgo = Integer.parseInt(params[4]);
 				} else {
-					nAgo = 1;
+					periodsAgo = 1;
 				}
 	
-				d = DateUtils.getPastPeriodDate(new Date(), type, start, beginning, includeToday, nAgo);
+				d = DateUtils.getPastPeriodDate(new Date(), type, start, beginning, includeToday, periodsAgo);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("invalid preload params for preload mode 'date'");
 			}	
@@ -256,8 +266,9 @@ public class QuestionPreloader {
 	private void saveProperty (String propName, TreeElement node) {
 		IAnswerData answer = node.getValue();
 		String value = (answer == null ? null : answer.getDisplayText());
-		if (propName != null && propName.length() > 0 && value != null && value.length() > 0)
+		if (propName != null && propName.length() > 0 && value != null && value.length() > 0) {
 			PropertyManager._().setProperty(propName, value);
+		}
 	}
 	
 	private DateTimeData getTimestamp() {

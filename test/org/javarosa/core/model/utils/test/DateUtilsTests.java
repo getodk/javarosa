@@ -258,19 +258,19 @@ public class DateUtilsTests extends TestCase {
 
     public void testParity() {
 
-        testCycle(new Date(1300139579000l));
+        testCycle(new Date(1300139579000L));
         testCycle(new Date(0));
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        testCycle(new Date(1300139579000l));
+        testCycle(new Date(1300139579000L));
         testCycle(new Date(0));
 
         TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
 
         TimeZone.setDefault(offsetTwoHours);
 
-        testCycle(new Date(1300139579000l));
+        testCycle(new Date(1300139579000L));
         testCycle(new Date(0));
 
 
@@ -278,14 +278,14 @@ public class DateUtilsTests extends TestCase {
 
         TimeZone.setDefault(offTwoHalf);
 
-        testCycle(new Date(1300139579000l));
+        testCycle(new Date(1300139579000L));
         testCycle(new Date(0));
 
         TimeZone offMinTwoHalf = TimeZone.getTimeZone("GMT-0230");
 
         TimeZone.setDefault(offMinTwoHalf);
 
-        testCycle(new Date(1300139579000l));
+        testCycle(new Date(1300139579000L));
         testCycle(new Date(0));
 
 
@@ -347,7 +347,7 @@ public class DateUtilsTests extends TestCase {
             private String sunday;
         }
 
-        LangJanSun langJanSuns[] = new LangJanSun[] {
+        LangJanSun[] langJanSuns = new LangJanSun[] {
             new LangJanSun("en", "Jan",   "Sun"),
             new LangJanSun("es", "ene",   "dom"),
             new LangJanSun("fr", "janv.", "dim.")

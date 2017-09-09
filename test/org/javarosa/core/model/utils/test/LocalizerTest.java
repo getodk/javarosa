@@ -40,15 +40,15 @@ public class LocalizerTest extends TestCase  {
 	}
 
 	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+		TestSuite suite = new TestSuite();
 
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new LocalizerTest(testMaster(testID)));
+			suite.addTest(new LocalizerTest(testMaster(testID)));
 		}
 
-		return aSuite;
+		return suite;
 	}
 
 	public static final int NUM_TESTS = 31;
@@ -491,9 +491,18 @@ public class LocalizerTest extends TestCase  {
 		String otherLocale = null;
 
 		switch (localeCase) {
-		case DEFAULT_LOCALE: ourLocale = "default"; otherLocale = null; break;
-		case NON_DEFAULT_LOCALE: ourLocale = "other"; otherLocale = "default"; break;
-		case NEUTRAL_LOCALE: ourLocale = "neutral"; otherLocale = null; break;
+		case DEFAULT_LOCALE:
+			ourLocale = "default";
+			otherLocale = null;
+			break;
+		case NON_DEFAULT_LOCALE:
+			ourLocale = "other";
+			otherLocale = "default";
+			break;
+		case NEUTRAL_LOCALE:
+			ourLocale = "neutral";
+			otherLocale = null;
+			break;
 		}
 
 		String textID = "textID" + (formCase == CUSTOM_FORM ? ";form" : "");
@@ -516,7 +525,8 @@ public class LocalizerTest extends TestCase  {
 
 		Localizer l = buildLocalizer(i, j, k, ourLocale, otherLocale);
 		String expected = expectedText(textID, l);
-		String text, text2;
+		String text;
+		String text2;
 
 		text = l.getText(textID, ourLocale);
 		if (expected == null ? text != null : !expected.equals(text)) {
@@ -544,16 +554,20 @@ public class LocalizerTest extends TestCase  {
 		TableLocaleSource firstLocale = new TableLocaleSource();
 		TableLocaleSource secondLocale = new TableLocaleSource();
 
-		if (j / 2 == 0 || "default".equals(ourLocale))
+		if (j / 2 == 0 || "default".equals(ourLocale)) {
 			firstLocale.setLocaleMapping("textID", "text:" + ourLocale + ":base");
-		if (j % 2 == 0 || "default".equals(ourLocale))
+		}
+		if (j % 2 == 0 || "default".equals(ourLocale)) {
 			firstLocale.setLocaleMapping("textID;form", "text:" + ourLocale + ":form");
+		}
 
 		if (otherLocale != null) {
-			if (k / 2 == 0 || "default".equals(otherLocale))
+			if (k / 2 == 0 || "default".equals(otherLocale)) {
 				secondLocale.setLocaleMapping("textID", "text:" + otherLocale + ":base");
-			if (k % 2 == 0 || "default".equals(otherLocale))
+			}
+			if (k % 2 == 0 || "default".equals(otherLocale)) {
 				secondLocale.setLocaleMapping("textID;form", "text:" + otherLocale + ":form");
+			}
 		}
 
 		l.addAvailableLocale(ourLocale);
@@ -587,14 +601,23 @@ public class LocalizerTest extends TestCase  {
 
 		String text = null;
 		for (int i = 0; text == null && i < 4; i++) {
-			if (!searchOrder[i])
+			if (!searchOrder[i]) {
 				continue;
+			}
 
 			switch (i + 1) {
-			case 1: text = l.getRawText(l.getLocale(), textID); break;
-			case 2: text = l.getRawText(l.getLocale(), baseTextID); break;
-			case 3: text = l.getRawText(l.getDefaultLocale(), textID); break;
-			case 4: text = l.getRawText(l.getDefaultLocale(), baseTextID); break;
+			case 1:
+				text = l.getRawText(l.getLocale(), textID);
+				break;
+			case 2:
+				text = l.getRawText(l.getLocale(), baseTextID);
+				break;
+			case 3:
+				text = l.getRawText(l.getDefaultLocale(), textID);
+				break;
+			case 4:
+				text = l.getRawText(l.getDefaultLocale(), baseTextID);
+				break;
 			}
 		}
 
@@ -852,26 +875,30 @@ public class LocalizerTest extends TestCase  {
 
 		runAsync(new Runnable() { public void run() {
 				holder[0] = Localizer.processArguments("${0}", new String[] {C});
-			}});
+			}
+		});
 
 		assertEquals(holder[0], C);
 
 
 		runAsync(new Runnable() { public void run() {
-			holder[0] = Localizer.processArguments("${0}", new String[] {D});
-		}});
+				holder[0] = Localizer.processArguments("${0}", new String[] {D});
+			}
+		});
 
 		assertEquals(holder[0], D);
 
 		runAsync(new Runnable() { public void run() {
-			holder[0] = Localizer.processArguments(holder[0], res);
-		}});
+				holder[0] = Localizer.processArguments(holder[0], res);
+			}
+		});
 
 		assertEquals(holder[0], res[1] + res[0]);
 
 		runAsync(new Runnable() { public void run() {
-			holder[0] = Localizer.processArguments("$ {0} ${1}", res);
-		}});
+				holder[0] = Localizer.processArguments("$ {0} ${1}", res);
+			}
+		});
 
 		assertEquals(holder[0], "$ {0} " + res[1]);
 

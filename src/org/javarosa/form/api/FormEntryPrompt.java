@@ -137,8 +137,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	    			}
 	    			//if it's a dynamic question, then there's a good choice what they selected last time
 	    			//will no longer be an option this go around
-	    			if(choice != null)
-	    			{
+	    			if (choice != null) {
 	    				selection.add(choice.selection());
 	    			}
 	    		}
@@ -165,9 +164,9 @@ public class FormEntryPrompt extends FormEntryCaption {
     public String getAnswerText() {
     	IAnswerData data = this.getAnswerValue();
 
-        if (data == null)
-            return null;
-        else {
+        if (data == null) {
+			return null;
+		} else {
         	String text;
 
         	//csims@dimagi.com - Aug 11, 2010 - Added special logic to
@@ -224,6 +223,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     public List<TreeElement> getBindAttributes() {
     	return mTreeElement.getBindAttributes();
     }
+
     public List<SelectChoice> getSelectChoices() {
     	QuestionDef q = getQuestion();
 
@@ -274,10 +274,12 @@ public class FormEntryPrompt extends FormEntryCaption {
 	}
 
 	public void formElementStateChanged(TreeElement instanceNode, int changeFlags) {
-		if (this.mTreeElement != instanceNode)
+		if (this.mTreeElement != instanceNode) {
 			throw new IllegalStateException("Widget received event from foreign question");
-		if (viewWidget != null)
+		}
+		if (viewWidget != null) {
 			viewWidget.refreshWidget(changeFlags);
+		}
 	}
 
        /**
@@ -328,20 +330,30 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 */
 	public String getSelectItemText(Selection sel){
 		//throw tantrum if this method is called when it shouldn't be or sel==null
-		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
-		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
+		if(!(getFormElement() instanceof QuestionDef)) {
+			throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
+		}
+		if(sel == null) {
+			throw new IllegalArgumentException("Cannot use null as an argument!");
+		}
 
 		//Just in case the selection hasn't had a chance to be initialized yet.
-		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+		if (sel.index == -1) {
+			sel.attachChoice(this.getQuestion());
+		}
 
 		//check for the null id case and return labelInnerText if it is so.
 		String tid = sel.choice.getTextID();
-		if(tid == null || tid.length() == 0) return substituteStringArgs(sel.choice.getLabelInnerText());
+		if(tid == null || tid.length() == 0) {
+			return substituteStringArgs(sel.choice.getLabelInnerText());
+		}
 
 		//otherwise check for 'long' form of the textID, then for the default form and return
 		String returnText;
 		returnText = getIText(tid, "long");
-		if(returnText == null) returnText = getIText(tid,null);
+		if(returnText == null) {
+			returnText = getIText(tid,null);
+		}
 
 		return substituteStringArgs(returnText);
 	}
@@ -364,13 +376,19 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @throws IllegalArgumentException if <code>sel == null</code>
 	 */
 	public String getSpecialFormSelectItemText(Selection sel,String form){
-		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument for Selection!");
+		if(sel == null) {
+			throw new IllegalArgumentException("Cannot use null as an argument for Selection!");
+		}
 
 		//Just in case the selection hasn't had a chance to be initialized yet.
-		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+		if (sel.index == -1) {
+			sel.attachChoice(this.getQuestion());
+		}
 
 		String textID = sel.choice.getTextID();
-		if(textID == null || textID.length() == 0) return null;
+		if(textID == null || textID.length() == 0) {
+			return null;
+		}
 
 		String returnText = getIText(textID, form);
 
