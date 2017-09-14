@@ -30,11 +30,11 @@ import org.javarosa.core.model.instance.FormInstance;
  *
  */
 public interface IInstanceProcessor {
-	
-	/**
-	 * Processes the provided data model.
-	 * 
-	 * @param tree The data model that will be handled.
-	 */
-	public void processInstance(FormInstance tree);
+
+    /**
+     * Processes the provided data model.
+     *
+     * @param tree The data model that will be handled.
+     */
+    public void processInstance(FormInstance tree);
 }

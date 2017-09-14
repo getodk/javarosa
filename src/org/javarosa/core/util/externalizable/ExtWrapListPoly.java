@@ -26,51 +26,51 @@ import java.util.List;
 //list of objects of multiple types
 //if elements are compound types (i.e., need wrappers), they must be pre-wrapped before invoking this wrapper, because... come on now.
 public class ExtWrapListPoly extends ExternalizableWrapper {
-	/* serializaiton */
+    /* serializaiton */
 
-	public ExtWrapListPoly (List val) {
-		if (val == null) {
-			throw new NullPointerException();
-		}
+    public ExtWrapListPoly (List val) {
+        if (val == null) {
+            throw new NullPointerException();
+        }
 
-		this.val = val;
-	}
+        this.val = val;
+    }
 
-	/* deserialization */
+    /* deserialization */
 
-	public ExtWrapListPoly () {
+    public ExtWrapListPoly () {
 
-	}
+    }
 
-	public ExternalizableWrapper clone (Object val) {
-		return new ExtWrapListPoly((List)val);
-	}
+    public ExternalizableWrapper clone (Object val) {
+        return new ExtWrapListPoly((List)val);
+    }
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 
-		long size = ExtUtil.readNumeric(in);
+        long size = ExtUtil.readNumeric(in);
       List v = new ArrayList((int) size);
-		for (int i = 0; i < size; i++) {
-			v.add(ExtUtil.read(in, new ExtWrapTagged(), pf));
-		}
+        for (int i = 0; i < size; i++) {
+            v.add(ExtUtil.read(in, new ExtWrapTagged(), pf));
+        }
 
-		val = v;
-	}
+        val = v;
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
+    public void writeExternal(DataOutputStream out) throws IOException {
       List v = (List)val;
 
-		ExtUtil.writeNumeric(out, v.size());
-		for (int i = 0; i < v.size(); i++) {
-			ExtUtil.write(out, new ExtWrapTagged(v.get(i)));
-		}
-	}
+        ExtUtil.writeNumeric(out, v.size());
+        for (int i = 0; i < v.size(); i++) {
+            ExtUtil.write(out, new ExtWrapTagged(v.get(i)));
+        }
+    }
 
-	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) {
-		//do nothing
-	}
+    public void metaReadExternal (DataInputStream in, PrototypeFactory pf) {
+        //do nothing
+    }
 
-	public void metaWriteExternal (DataOutputStream out) {
-		//do nothing
-	}
+    public void metaWriteExternal (DataOutputStream out) {
+        //do nothing
+    }
 }

@@ -25,5 +25,5 @@ package org.javarosa.core.log;
  *
  */
 public interface IFullLogSerializer<T> {
-	public T serializeLogs(LogEntry[] logs);
+    public T serializeLogs(LogEntry[] logs);
 }

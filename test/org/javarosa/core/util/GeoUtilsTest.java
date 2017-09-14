@@ -28,7 +28,7 @@ public class GeoUtilsTest extends TestCase {
 
   public GeoUtilsTest(String name) {
     super(name);
-	System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
   }
 
   public static Test suite() {

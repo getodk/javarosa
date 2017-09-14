@@ -17,43 +17,43 @@ import org.kxml2.kdom.Document;
  *
  */
 public class XFormParserFactory implements IXFormParserFactory {
-	CacheTable<String> stringCache;
+    CacheTable<String> stringCache;
 
-	public XFormParserFactory() {
-	}
+    public XFormParserFactory() {
+    }
 
-	public XFormParserFactory(CacheTable<String> stringCache) {
-		this.stringCache = stringCache;
-	}
+    public XFormParserFactory(CacheTable<String> stringCache) {
+        this.stringCache = stringCache;
+    }
 
-	public XFormParser getXFormParser(Reader reader) {
-		XFormParser parser = new XFormParser(reader);
-		init(parser);
-		return parser;
-	}
+    public XFormParser getXFormParser(Reader reader) {
+        XFormParser parser = new XFormParser(reader);
+        init(parser);
+        return parser;
+    }
 
-	private void init(XFormParser parser) {
-		if(stringCache != null) {
-			parser.setStringCache(stringCache);
-		}
-	}
+    private void init(XFormParser parser) {
+        if(stringCache != null) {
+            parser.setStringCache(stringCache);
+        }
+    }
 
-	public XFormParser getXFormParser(Document doc) {
-		XFormParser parser = new XFormParser(doc);
-		init(parser);
-		return parser;
-	}
+    public XFormParser getXFormParser(Document doc) {
+        XFormParser parser = new XFormParser(doc);
+        init(parser);
+        return parser;
+    }
 
-	public XFormParser getXFormParser(Reader form, Reader instance) {
-		XFormParser parser = new XFormParser(form, instance);
-		init(parser);
-		return parser;
-	}
+    public XFormParser getXFormParser(Reader form, Reader instance) {
+        XFormParser parser = new XFormParser(form, instance);
+        init(parser);
+        return parser;
+    }
 
-	public XFormParser getXFormParser(Document form, Document instance) {
-		XFormParser parser = new XFormParser(form, instance);
-		init(parser);
-		return parser;
-	}
+    public XFormParser getXFormParser(Document form, Document instance) {
+        XFormParser parser = new XFormParser(form, instance);
+        init(parser);
+        return parser;
+    }
 
 }

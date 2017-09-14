@@ -35,140 +35,140 @@ import org.javarosa.xpath.expr.XPathExpression;
  */
 public class EvaluationContext {
     /** Unambiguous anchor reference for relative paths */
-	private TreeReference contextNode;
-	private HashMap<String, IFunctionHandler> functionHandlers;
-	private HashMap<String, Object> variables;
+    private TreeReference contextNode;
+    private HashMap<String, IFunctionHandler> functionHandlers;
+    private HashMap<String, Object> variables;
 
-	public boolean isConstraint; //true if we are evaluating a constraint
-	public IAnswerData candidateValue; //if isConstraint, this is the value being validated
-	public boolean isCheckAddChild; //if isConstraint, true if we are checking the constraint of a parent node on how
-									//  many children it may have
+    public boolean isConstraint; //true if we are evaluating a constraint
+    public IAnswerData candidateValue; //if isConstraint, this is the value being validated
+    public boolean isCheckAddChild; //if isConstraint, true if we are checking the constraint of a parent node on how
+                                    //  many children it may have
 
-	private String outputTextForm = null; //Responsible for informing itext what form is requested if relevant
+    private String outputTextForm = null; //Responsible for informing itext what form is requested if relevant
 
-	private HashMap<String, DataInstance> formInstances;
+    private HashMap<String, DataInstance> formInstances;
 
-	private TreeReference original;
+    private TreeReference original;
     /**
      * What element in a nodeset the context is currently pointing to.
      * Used for calculating the position() xpath function.
      */
-	private int currentContextPosition = -1;
+    private int currentContextPosition = -1;
 
-	private DataInstance instance;
-	private int[] predicateEvaluationProgress;
+    private DataInstance instance;
+    private int[] predicateEvaluationProgress;
 
-	/** Copy Constructor **/
-	private EvaluationContext (EvaluationContext base) {
-		//TODO: These should be deep, not shallow
-		functionHandlers = base.functionHandlers;
-		formInstances = base.formInstances;
-		variables = base.variables;
+    /** Copy Constructor **/
+    private EvaluationContext (EvaluationContext base) {
+        //TODO: These should be deep, not shallow
+        functionHandlers = base.functionHandlers;
+        formInstances = base.formInstances;
+        variables = base.variables;
 
-		contextNode = base.contextNode;
-		instance = base.instance;
+        contextNode = base.contextNode;
+        instance = base.instance;
 
-		isConstraint = base.isConstraint;
-		candidateValue = base.candidateValue;
-		isCheckAddChild = base.isCheckAddChild;
+        isConstraint = base.isConstraint;
+        candidateValue = base.candidateValue;
+        isCheckAddChild = base.isCheckAddChild;
 
-		outputTextForm = base.outputTextForm;
-		original = base.original;
+        outputTextForm = base.outputTextForm;
+        original = base.original;
 
-		//Hrm....... not sure about this one. this only happens after a rescoping,
-		//and is fixed on the context. Anything that changes the context should
-		//invalidate this
-		currentContextPosition = base.currentContextPosition;
-	}
+        //Hrm....... not sure about this one. this only happens after a rescoping,
+        //and is fixed on the context. Anything that changes the context should
+        //invalidate this
+        currentContextPosition = base.currentContextPosition;
+    }
 
-	public EvaluationContext (EvaluationContext base, TreeReference context) {
-		this(base);
-		this.contextNode = context;
-	}
+    public EvaluationContext (EvaluationContext base, TreeReference context) {
+        this(base);
+        this.contextNode = context;
+    }
 
-	public EvaluationContext (EvaluationContext base, HashMap<String, DataInstance> formInstances, TreeReference context) {
-		this(base, context);
-		this.formInstances = formInstances;
-	}
+    public EvaluationContext (EvaluationContext base, HashMap<String, DataInstance> formInstances, TreeReference context) {
+        this(base, context);
+        this.formInstances = formInstances;
+    }
 
-	public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances, EvaluationContext base) {
-		this(base);
-		this.formInstances = formInstances;
-		this.instance = instance;
-	}
+    public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances, EvaluationContext base) {
+        this(base);
+        this.formInstances = formInstances;
+        this.instance = instance;
+    }
 
-	public EvaluationContext (DataInstance instance) {
-		this(instance, new HashMap<String, DataInstance>());
-	}
+    public EvaluationContext (DataInstance instance) {
+        this(instance, new HashMap<String, DataInstance>());
+    }
 
-	public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances) {
-		this.formInstances = formInstances;
-		this.instance = instance;
-		this.contextNode = TreeReference.rootRef();
-		functionHandlers = new HashMap<String, IFunctionHandler>();
-		variables = new HashMap<String, Object>();
-	}
+    public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances) {
+        this.formInstances = formInstances;
+        this.instance = instance;
+        this.contextNode = TreeReference.rootRef();
+        functionHandlers = new HashMap<String, IFunctionHandler>();
+        variables = new HashMap<String, Object>();
+    }
 
-	public DataInstance getInstance(String id) {
+    public DataInstance getInstance(String id) {
         DataInstance formInstance = formInstances.get(id);
         return formInstance != null ? formInstance :
-			(instance != null && id.equals(instance.getName()) ? instance : null);
-	}
+            (instance != null && id.equals(instance.getName()) ? instance : null);
+    }
 
-	public TreeReference getContextRef () {
-		return contextNode;
-	}
+    public TreeReference getContextRef () {
+        return contextNode;
+    }
 
-	public void setOriginalContext(TreeReference ref) {
-		original = ref;
-	}
+    public void setOriginalContext(TreeReference ref) {
+        original = ref;
+    }
 
-	public TreeReference getOriginalContext() {
-		return (original == null) ? contextNode : original;
-	}
+    public TreeReference getOriginalContext() {
+        return (original == null) ? contextNode : original;
+    }
 
-	public void addFunctionHandler (IFunctionHandler fh) {
-		functionHandlers.put(fh.getName(), fh);
-	}
+    public void addFunctionHandler (IFunctionHandler fh) {
+        functionHandlers.put(fh.getName(), fh);
+    }
 
-	public HashMap<String, IFunctionHandler> getFunctionHandlers () {
-		return functionHandlers;
-	}
+    public HashMap<String, IFunctionHandler> getFunctionHandlers () {
+        return functionHandlers;
+    }
 
-	public void setOutputTextForm(String form) {
-		outputTextForm = form;
-	}
+    public void setOutputTextForm(String form) {
+        outputTextForm = form;
+    }
 
-	public String getOutputTextForm() {
-		return outputTextForm;
-	}
+    public String getOutputTextForm() {
+        return outputTextForm;
+    }
 
-	public void setVariables(HashMap<String, ?> variables) {
-		for (String var : variables.keySet()) {
-			setVariable(var, variables.get(var));
-		}
-	}
+    public void setVariables(HashMap<String, ?> variables) {
+        for (String var : variables.keySet()) {
+            setVariable(var, variables.get(var));
+        }
+    }
 
-	public void setVariable(String name, Object value) {
-		//No such thing as a null xpath variable. Empty
-		//values in XPath just get converted to ""
-		if (value == null) {
-			variables.put(name, "");
-			return;
-		}
-		//Otherwise check whether the value is one of the normal first
-		//order datatypes used in xpath evaluation
-		if (value instanceof Boolean ||
-				   value instanceof Double  ||
-				   value instanceof String  ||
-				   value instanceof Date    ||
-				   value instanceof IExprDataType) {
-				variables.put(name, value);
-				return;
-		}
+    public void setVariable(String name, Object value) {
+        //No such thing as a null xpath variable. Empty
+        //values in XPath just get converted to ""
+        if (value == null) {
+            variables.put(name, "");
+            return;
+        }
+        //Otherwise check whether the value is one of the normal first
+        //order datatypes used in xpath evaluation
+        if (value instanceof Boolean ||
+                   value instanceof Double  ||
+                   value instanceof String  ||
+                   value instanceof Date    ||
+                   value instanceof IExprDataType) {
+                variables.put(name, value);
+                return;
+        }
 
-		//Some datatypes can be trivially converted to a first order
-		//xpath datatype
+        //Some datatypes can be trivially converted to a first order
+        //xpath datatype
         if (value instanceof Integer) {
             variables.put(name, ((Integer) value).doubleValue());
         } else if (value instanceof Float) {
@@ -178,45 +178,45 @@ public class EvaluationContext {
         }
     }
 
-	public Object getVariable(String name) {
-		return variables.get(name);
-	}
+    public Object getVariable(String name) {
+        return variables.get(name);
+    }
 
-	public List<TreeReference> expandReference(TreeReference ref) {
-		return expandReference(ref, false);
-	}
+    public List<TreeReference> expandReference(TreeReference ref) {
+        return expandReference(ref, false);
+    }
 
-	/**
-	 * Searches for all repeated nodes that match the pattern of the 'ref'
-	 * argument.
-	 *
-	 * '/' returns {'/'}
-	 * can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
-	 *
-	 * @param ref Potentially ambiguous reference
-	 * @return Null if 'ref' is relative reference. Otherwise, returns a vector
-	 * of references that point to nodes that match 'ref' argument. These
-	 * references are unambiguous (no index will ever be INDEX_UNBOUND). Template
-	 * nodes won't be included when matching INDEX_UNBOUND, but will be when
-	 * INDEX_TEMPLATE is explicitly set.
-	 */
-	public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
-		if (!ref.isAbsolute()) {
-			return null;
-		}
+    /**
+     * Searches for all repeated nodes that match the pattern of the 'ref'
+     * argument.
+     *
+     * '/' returns {'/'}
+     * can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
+     *
+     * @param ref Potentially ambiguous reference
+     * @return Null if 'ref' is relative reference. Otherwise, returns a vector
+     * of references that point to nodes that match 'ref' argument. These
+     * references are unambiguous (no index will ever be INDEX_UNBOUND). Template
+     * nodes won't be included when matching INDEX_UNBOUND, but will be when
+     * INDEX_TEMPLATE is explicitly set.
+     */
+    public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
+        if (!ref.isAbsolute()) {
+            return null;
+        }
 
-		final DataInstance baseInstance = (ref.getInstanceName() != null) ? getInstance(ref.getInstanceName()) : instance;
+        final DataInstance baseInstance = (ref.getInstanceName() != null) ? getInstance(ref.getInstanceName()) : instance;
 
-		if (baseInstance == null) {
-			throw new RuntimeException("Unable to expand reference " + ref.toString(true) +
+        if (baseInstance == null) {
+            throw new RuntimeException("Unable to expand reference " + ref.toString(true) +
                     ", no appropriate instance in evaluation context");
-		}
+        }
 
-		List<TreeReference> treeReferences = new ArrayList<>(1);
-		TreeReference workingRef = baseInstance.getRoot().getRef();
-		expandReferenceAccumulator(ref, baseInstance, workingRef, treeReferences, includeTemplates);
-		return treeReferences;
-	}
+        List<TreeReference> treeReferences = new ArrayList<>(1);
+        TreeReference workingRef = baseInstance.getRoot().getRef();
+        expandReferenceAccumulator(ref, baseInstance, workingRef, treeReferences, includeTemplates);
+        return treeReferences;
+    }
 
     /**
      * Recursively performs the search for all repeated nodes that match the pattern of the 'ref' argument.
@@ -226,17 +226,17 @@ public class EvaluationContext {
      * @param workingRef     explicit path that refers to the current node
      * @param refs           accumulator List to collect matching paths.
      */
-	private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance sourceInstance,
+    private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance sourceInstance,
                                             TreeReference workingRef, List<TreeReference> refs,
                                             boolean includeTemplates) {
-		final int depth = workingRef.size();
+        final int depth = workingRef.size();
 
-		//check to see if we've matched fully
-		if (depth == sourceRef.size()) {
-			//TODO: Do we need to clone these references?
-			refs.add(workingRef);
-			return;
-		}
+        //check to see if we've matched fully
+        if (depth == sourceRef.size()) {
+            //TODO: Do we need to clone these references?
+            refs.add(workingRef);
+            return;
+        }
 
         // Get the next set of matching references
         final String name = sourceRef.getName(depth);
@@ -327,7 +327,7 @@ public class EvaluationContext {
         for (TreeReference treeRef : treeReferences) {
             expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
         }
-	}
+    }
 
     private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
         EvaluationContext ec = new EvaluationContext(this, treeRef);

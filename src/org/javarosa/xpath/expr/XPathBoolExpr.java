@@ -27,63 +27,63 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class XPathBoolExpr extends XPathBinaryOpExpr {
-	public static final int AND = 0;
-	public static final int OR = 1;
+    public static final int AND = 0;
+    public static final int OR = 1;
 
-	public int op;
+    public int op;
 
-	public XPathBoolExpr () { } //for deserialization
+    public XPathBoolExpr () { } //for deserialization
 
-	public XPathBoolExpr (int op, XPathExpression a, XPathExpression b) {
-		super (a, b);
-		this.op = op;
-	}
-	
-	public Object eval (DataInstance model, EvaluationContext evalContext) {
-		boolean aval = XPathFuncExpr.toBoolean(a.eval(model, evalContext)).booleanValue();
-		
-		//short-circuiting
-		if ((!aval && op == AND) || (aval && op == OR)) {
-			return new Boolean(aval);
-		}
+    public XPathBoolExpr (int op, XPathExpression a, XPathExpression b) {
+        super (a, b);
+        this.op = op;
+    }
 
-		boolean bval = XPathFuncExpr.toBoolean(b.eval(model, evalContext)).booleanValue();
-		
-		boolean result = false;
-		switch (op) {
-		case AND: result = aval && bval; break;
-		case OR: result = aval || bval; break;
-		}
-		return new Boolean(result);
-	}
+    public Object eval (DataInstance model, EvaluationContext evalContext) {
+        boolean aval = XPathFuncExpr.toBoolean(a.eval(model, evalContext)).booleanValue();
 
-	public String toString () {
-		String sOp = null;
-		
-		switch (op) {
-		case AND: sOp = "and"; break;
-		case OR: sOp = "or"; break;
-		}
-		
-		return super.toString(sOp);
-	}
-	
-	public boolean equals (Object o) {
-		if (o instanceof XPathBoolExpr) {
-			XPathBoolExpr x = (XPathBoolExpr)o;
-			return super.equals(o) && op == x.op;
-		} else {
-			return false;
-		}
-	}
-	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		op = ExtUtil.readInt(in);
-		super.readExternal(in, pf);
-	}
+        //short-circuiting
+        if ((!aval && op == AND) || (aval && op == OR)) {
+            return new Boolean(aval);
+        }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeNumeric(out, op);
-		super.writeExternal(out);
-	}
+        boolean bval = XPathFuncExpr.toBoolean(b.eval(model, evalContext)).booleanValue();
+
+        boolean result = false;
+        switch (op) {
+        case AND: result = aval && bval; break;
+        case OR: result = aval || bval; break;
+        }
+        return new Boolean(result);
+    }
+
+    public String toString () {
+        String sOp = null;
+
+        switch (op) {
+        case AND: sOp = "and"; break;
+        case OR: sOp = "or"; break;
+        }
+
+        return super.toString(sOp);
+    }
+
+    public boolean equals (Object o) {
+        if (o instanceof XPathBoolExpr) {
+            XPathBoolExpr x = (XPathBoolExpr)o;
+            return super.equals(o) && op == x.op;
+        } else {
+            return false;
+        }
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        op = ExtUtil.readInt(in);
+        super.readExternal(in, pf);
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.writeNumeric(out, op);
+        super.writeExternal(out);
+    }
 }

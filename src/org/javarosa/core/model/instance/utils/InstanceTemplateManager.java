@@ -11,12 +11,12 @@ import org.javarosa.core.model.instance.FormInstance;
  */
 public interface InstanceTemplateManager {
 
-	/**
-	 * return FormInstance for the FormDef with the given form ID
-	 * @param formID
-	 * @return
-	 */
-	FormInstance getTemplateInstance (int formID);
+    /**
+     * return FormInstance for the FormDef with the given form ID
+     * @param formID
+     * @return
+     */
+    FormInstance getTemplateInstance (int formID);
 
 }
 

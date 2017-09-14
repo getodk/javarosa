@@ -37,43 +37,43 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 
 public class XFormsModule implements IModule {
 
-	public void registerModule() {
-		String[] classes = {
-				"org.javarosa.model.xform.XPathReference",
-				"org.javarosa.xpath.XPathConditional"
-		};
-		
-		PrototypeManager.registerPrototypes(classes);
-		PrototypeManager.registerPrototypes(XPathParseTool.xpathClasses);
-		RestoreUtils.xfFact = new IXFormyFactory () {
-			public TreeReference ref (String refStr) {
-				return FormInstance.unpackReference(new XPathReference(refStr));
-			}
-			
-			public IDataPayload serializeInstance (FormInstance dm) {
-				try {
-					return (new XFormSerializingVisitor()).createSerializedPayload(dm);
-				} catch (IOException e) {
-					return null;
-				}
-			}
+    public void registerModule() {
+        String[] classes = {
+                "org.javarosa.model.xform.XPathReference",
+                "org.javarosa.xpath.XPathConditional"
+        };
 
-			public FormInstance parseRestore(byte[] data, Class restorableType) {
-				return XFormParser.restoreDataModel(data, restorableType);
-			}
-			
-			public IAnswerData parseData (String textVal, int dataType, TreeReference ref, FormDef f) {
-				return XFormAnswerDataParser.getAnswerData(textVal, dataType, XFormParser.ghettoGetQuestionDef(dataType, f, ref));
-			}
+        PrototypeManager.registerPrototypes(classes);
+        PrototypeManager.registerPrototypes(XPathParseTool.xpathClasses);
+        RestoreUtils.xfFact = new IXFormyFactory () {
+            public TreeReference ref (String refStr) {
+                return FormInstance.unpackReference(new XPathReference(refStr));
+            }
 
-			public String serializeData(IAnswerData data) {
-				return (String)(new XFormAnswerDataSerializer().serializeAnswerData(data));
-			}
+            public IDataPayload serializeInstance (FormInstance dm) {
+                try {
+                    return (new XFormSerializingVisitor()).createSerializedPayload(dm);
+                } catch (IOException e) {
+                    return null;
+                }
+            }
 
-			public IConditionExpr refToPathExpr(TreeReference ref) {
-				return new XPathConditional(XPathPathExpr.fromRef(ref));
-			}
-		};
-	}
+            public FormInstance parseRestore(byte[] data, Class restorableType) {
+                return XFormParser.restoreDataModel(data, restorableType);
+            }
+
+            public IAnswerData parseData (String textVal, int dataType, TreeReference ref, FormDef f) {
+                return XFormAnswerDataParser.getAnswerData(textVal, dataType, XFormParser.ghettoGetQuestionDef(dataType, f, ref));
+            }
+
+            public String serializeData(IAnswerData data) {
+                return (String)(new XFormAnswerDataSerializer().serializeAnswerData(data));
+            }
+
+            public IConditionExpr refToPathExpr(TreeReference ref) {
+                return new XPathConditional(XPathPathExpr.fromRef(ref));
+            }
+        };
+    }
 
 }

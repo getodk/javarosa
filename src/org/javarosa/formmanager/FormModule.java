@@ -28,10 +28,10 @@ import org.javarosa.core.api.IModule;
  */
 public class FormModule implements IModule {
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
-	 */
-	public void registerModule() {
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
+     */
+    public void registerModule() {
+    }
 
 }

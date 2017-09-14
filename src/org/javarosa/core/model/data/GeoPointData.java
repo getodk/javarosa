@@ -43,10 +43,10 @@ import org.javarosa.xpath.IExprDataType;
  */
 public class GeoPointData implements IAnswerData, IExprDataType {
 
-	public static final int REQUIRED_ARRAY_SIZE = 2;
-	public static final double MISSING_VALUE = 0.0;
-	// value to be reported if we never captured a datapoint
-	public static final double NO_ACCURACY_VALUE = 9999999.0;
+    public static final int REQUIRED_ARRAY_SIZE = 2;
+    public static final double MISSING_VALUE = 0.0;
+    // value to be reported if we never captured a datapoint
+    public static final double NO_ACCURACY_VALUE = 9999999.0;
 
     private double[] gp = new double[4];
     private int len = REQUIRED_ARRAY_SIZE;
@@ -59,12 +59,12 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     public GeoPointData() {
         // reset missing data...
         for (int i = REQUIRED_ARRAY_SIZE ; i < gp.length ; ++i ) {
-        	this.gp[i] = MISSING_VALUE;
+            this.gp[i] = MISSING_VALUE;
         }
     }
 
     public GeoPointData(GeoPointData gpd) {
-    	this.fillArray(gpd.gp);
+        this.fillArray(gpd.gp);
     }
 
     public GeoPointData(double[] gp) {
@@ -79,7 +79,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
         }
         // make sure that any old data is removed...
         for (int i = len ; i < gp.length ; ++i ) {
-        	this.gp[i] = MISSING_VALUE;
+            this.gp[i] = MISSING_VALUE;
         }
     }
 
@@ -97,15 +97,15 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      */
     @Override
     public String getDisplayText() {
-    	if ( !toBoolean() ) {
-    		// it hasn't been set...
-    		return "";
-    	}
+        if ( !toBoolean() ) {
+            // it hasn't been set...
+            return "";
+        }
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < len; i++) {
             b.append(gp[i]);
             if ( i != len - 1) {
-            	b.append(" ");
+                b.append(" ");
             }
         }
         return b.toString();
@@ -120,8 +120,8 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      */
     @Override
     public Object getValue() {
-    	// clone()'ing to prevent some potential bad direct accesses
-    	// when these values are returned by GeoLine or GeoShape objects.
+        // clone()'ing to prevent some potential bad direct accesses
+        // when these values are returned by GeoLine or GeoShape objects.
         return gp.clone();
     }
 
@@ -144,7 +144,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
         }
         // make sure that any old data is removed...
         for (int i = len ; i < gp.length ; ++i ) {
-        	this.gp[i] = MISSING_VALUE;
+            this.gp[i] = MISSING_VALUE;
         }
     }
 
@@ -159,49 +159,49 @@ public class GeoPointData implements IAnswerData, IExprDataType {
 
 
     @Override
-	public UncastData uncast() {
-		return new UncastData(getDisplayText());
-	}
+    public UncastData uncast() {
+        return new UncastData(getDisplayText());
+    }
 
     @Override
-	public GeoPointData cast(UncastData data) throws IllegalArgumentException {
-		double[] ret = new double[4];
+    public GeoPointData cast(UncastData data) throws IllegalArgumentException {
+        double[] ret = new double[4];
         // make sure that missing data is flagged as absent...
         for (int i = REQUIRED_ARRAY_SIZE ; i < ret.length ; ++i ) {
-        	ret[i] = MISSING_VALUE;
+            ret[i] = MISSING_VALUE;
         }
 
       List<String> choices = DateUtils.split(data.value, " ", true);
-		int i = 0;
-		for(String s : choices) {
-			double d = Double.parseDouble(s);
-			ret[i] = d;
-			++i;
-		}
-		return new GeoPointData(ret);
-	}
+        int i = 0;
+        for(String s : choices) {
+            double d = Double.parseDouble(s);
+            ret[i] = d;
+            ++i;
+        }
+        return new GeoPointData(ret);
+    }
 
-	@Override
-	public Boolean toBoolean() {
-		// return whether or not the Geopoint has been set
-		return (gp[0] != 0.0 || gp[1] != 0.0 || gp[2] != 0.0 || gp[3] != 0.0);
-	}
+    @Override
+    public Boolean toBoolean() {
+        // return whether or not the Geopoint has been set
+        return (gp[0] != 0.0 || gp[1] != 0.0 || gp[2] != 0.0 || gp[3] != 0.0);
+    }
 
-	@Override
-	public Double toNumeric() {
-		// return accuracy...
-		if ( !toBoolean() ) {
-			// we have no captured geopoint...
-			// bigger than the radius of the earth (meters)...
-			return NO_ACCURACY_VALUE;
-		}
-		return gp[3];
-	}
+    @Override
+    public Double toNumeric() {
+        // return accuracy...
+        if ( !toBoolean() ) {
+            // we have no captured geopoint...
+            // bigger than the radius of the earth (meters)...
+            return NO_ACCURACY_VALUE;
+        }
+        return gp[3];
+    }
 
-	@Override
-	public String toString() {
-		return getDisplayText();
-	}
+    @Override
+    public String toString() {
+        return getDisplayText();
+    }
 
 
   public double getPart(int i) {

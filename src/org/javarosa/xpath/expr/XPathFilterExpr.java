@@ -34,70 +34,70 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathFilterExpr extends XPathExpression {
-	public XPathExpression x;
-	public XPathExpression[] predicates;
+    public XPathExpression x;
+    public XPathExpression[] predicates;
 
-	public XPathFilterExpr () { } //for deserialization
+    public XPathFilterExpr () { } //for deserialization
 
-	public XPathFilterExpr (XPathExpression x, XPathExpression[] predicates) {
-		this.x = x;
-		this.predicates = predicates;
-	}
+    public XPathFilterExpr (XPathExpression x, XPathExpression[] predicates) {
+        this.x = x;
+        this.predicates = predicates;
+    }
 
-	public Object eval(DataInstance model, EvaluationContext evalContext) {
-		throw new XPathUnsupportedException("filter expression");
-	}
+    public Object eval(DataInstance model, EvaluationContext evalContext) {
+        throw new XPathUnsupportedException("filter expression");
+    }
 
-	public String toString () {
-		StringBuilder sb = new StringBuilder();
+    public String toString () {
+        StringBuilder sb = new StringBuilder();
 
-		sb.append("{filt-expr:");
-		sb.append(x.toString());
-		sb.append(",{");
-		for (int i = 0; i < predicates.length; i++) {
-			sb.append(predicates[i].toString());
-			if (i < predicates.length - 1)
-				sb.append(",");
-		}
-		sb.append("}}");
+        sb.append("{filt-expr:");
+        sb.append(x.toString());
+        sb.append(",{");
+        for (int i = 0; i < predicates.length; i++) {
+            sb.append(predicates[i].toString());
+            if (i < predicates.length - 1)
+                sb.append(",");
+        }
+        sb.append("}}");
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	public boolean equals (Object o) {
-		if (o instanceof XPathFilterExpr) {
-			XPathFilterExpr fe = (XPathFilterExpr)o;
+    public boolean equals (Object o) {
+        if (o instanceof XPathFilterExpr) {
+            XPathFilterExpr fe = (XPathFilterExpr)o;
 
          List<XPathExpression> a = new ArrayList<XPathExpression>(predicates.length);
-			for (int i = 0; i < predicates.length; i++)
-				a.add(predicates[i]);
+            for (int i = 0; i < predicates.length; i++)
+                a.add(predicates[i]);
          List<XPathExpression> b = new ArrayList<XPathExpression>(fe.predicates.length);
-			for (int i = 0; i < fe.predicates.length; i++)
-				b.add(fe.predicates[i]);
+            for (int i = 0; i < fe.predicates.length; i++)
+                b.add(fe.predicates[i]);
 
-			return x.equals(fe.x) && ExtUtil.listEquals(a, b);
-		} else {
-			return false;
-		}
-	}
+            return x.equals(fe.x) && ExtUtil.listEquals(a, b);
+        } else {
+            return false;
+        }
+    }
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		x = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        x = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
         List<Object> v = (List<Object>)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 
-		predicates = new XPathExpression[v.size()];
-		for (int i = 0; i < predicates.length; i++)
-			predicates[i] = (XPathExpression)v.get(i);
-	}
+        predicates = new XPathExpression[v.size()];
+        for (int i = 0; i < predicates.length; i++)
+            predicates[i] = (XPathExpression)v.get(i);
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
+    public void writeExternal(DataOutputStream out) throws IOException {
       List<XPathExpression> v = Arrays.asList(predicates);
 
-		ExtUtil.write(out, new ExtWrapTagged(x));
-		ExtUtil.write(out, new ExtWrapListPoly(v));
-	}
+        ExtUtil.write(out, new ExtWrapTagged(x));
+        ExtUtil.write(out, new ExtWrapListPoly(v));
+    }
 
-	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
-		throw new UnpivotableExpressionException();
-	}
+    public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+        throw new UnpivotableExpressionException();
+    }
 }

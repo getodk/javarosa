@@ -11,20 +11,20 @@ import org.javarosa.core.model.data.UncastData;
  *
  */
 public class InvalidDataException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3780913062960321186L;
-	
-	UncastData standin;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3780913062960321186L;
 
-	public InvalidDataException(String message, UncastData standin) {
-		super(message);
-		this.standin = standin;
-	}
+    UncastData standin;
 
-	public IAnswerData getUncastStandin() {
-		return standin;
-	}
+    public InvalidDataException(String message, UncastData standin) {
+        super(message);
+        this.standin = standin;
+    }
+
+    public IAnswerData getUncastStandin() {
+        return standin;
+    }
 
 }

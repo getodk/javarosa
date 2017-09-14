@@ -31,5 +31,5 @@ import org.javarosa.core.model.instance.TreeElement;
  */
 public interface IAnswerResolver {
 
-	public IAnswerData resolveAnswer(String textVal, TreeElement treeElement, FormDef formDef);
+    public IAnswerData resolveAnswer(String textVal, TreeElement treeElement, FormDef formDef);
 }

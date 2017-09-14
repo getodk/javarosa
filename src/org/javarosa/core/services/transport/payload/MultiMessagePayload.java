@@ -38,85 +38,85 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class MultiMessagePayload implements IDataPayload {
-	/** IDataPayload **/
+    /** IDataPayload **/
    List<IDataPayload> payloads = new ArrayList<IDataPayload>(1);
 
-	/**
-	 * Note: Only useful for serialization.
-	 */
-	public MultiMessagePayload() {
-		//ONLY FOR SERIALIZATION
-	}
+    /**
+     * Note: Only useful for serialization.
+     */
+    public MultiMessagePayload() {
+        //ONLY FOR SERIALIZATION
+    }
 
-	/**
-	 * Adds a payload that should be sent as part of this
-	 * payload.
-	 * @param payload A payload that will be transmitted
-	 * after all previously added payloads.
-	 */
-	public void addPayload(IDataPayload payload) {
-		payloads.add(payload);
-	}
+    /**
+     * Adds a payload that should be sent as part of this
+     * payload.
+     * @param payload A payload that will be transmitted
+     * after all previously added payloads.
+     */
+    public void addPayload(IDataPayload payload) {
+        payloads.add(payload);
+    }
 
-	/**
-	 *  @return A vector object containing each IDataPayload in this payload.
-	 */
-	public List<IDataPayload> getPayloads() {
-		return payloads;
-	}
+    /**
+     *  @return A vector object containing each IDataPayload in this payload.
+     */
+    public List<IDataPayload> getPayloads() {
+        return payloads;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadStream()
-	 */
-	public InputStream getPayloadStream() throws IOException {
-		MultiInputStream bigStream = new MultiInputStream();
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.transport.IDataPayload#getPayloadStream()
+     */
+    public InputStream getPayloadStream() throws IOException {
+        MultiInputStream bigStream = new MultiInputStream();
       for (IDataPayload payload : payloads) {
          bigStream.addStream(payload.getPayloadStream());
       }
-		bigStream.prepare();
-		return bigStream;
-	}
+        bigStream.prepare();
+        return bigStream;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		payloads = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+     */
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        payloads = (List)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapListPoly(payloads));
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapListPoly(payloads));
+    }
 
-	public <T> T accept(IDataPayloadVisitor<T> visitor) {
-		return visitor.visit(this);
-	}
+    public <T> T accept(IDataPayloadVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
-	public String getPayloadId() {
-		return null;
-	}
+    public String getPayloadId() {
+        return null;
+    }
 
-	public int getPayloadType() {
-		return IDataPayload.PAYLOAD_TYPE_MULTI;
-	}
+    public int getPayloadType() {
+        return IDataPayload.PAYLOAD_TYPE_MULTI;
+    }
 
-	public int getTransportId() {
-		return -1;
-	}
+    public int getTransportId() {
+        return -1;
+    }
 
-	public long getLength() {
-		int len = 0;
+    public long getLength() {
+        int len = 0;
       for (IDataPayload payload : payloads) {
          len += payload.getLength();
       }
-		return len;
-	}
+        return len;
+    }
 }
 

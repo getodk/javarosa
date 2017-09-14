@@ -63,7 +63,7 @@ public class FormEntryModel {
 
 
     public FormEntryModel(FormDef form) {
-    	this(form, REPEAT_STRUCTURE_LINEAR);
+        this(form, REPEAT_STRUCTURE_LINEAR);
     }
 
     /**
@@ -78,20 +78,20 @@ public class FormEntryModel {
     public FormEntryModel(FormDef form, int repeatStructure) {
         this.form = form;
         if(repeatStructure != REPEAT_STRUCTURE_LINEAR && repeatStructure != REPEAT_STRUCTURE_NON_LINEAR) {
-        	throw new IllegalArgumentException(repeatStructure +": does not correspond to a valid repeat structure");
+            throw new IllegalArgumentException(repeatStructure +": does not correspond to a valid repeat structure");
         }
         //We need to see if there are any guessed repeat counts in the form, which prevents
         //us from being able to use the new repeat style
         //Unfortunately this is probably (A) slow and (B) might overflow the stack. It's not the only
         //recursive walk of the form, though, so (B) isn't really relevant
         if(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR && containsRepeatGuesses(form)) {
-        	repeatStructure = REPEAT_STRUCTURE_LINEAR;
+            repeatStructure = REPEAT_STRUCTURE_LINEAR;
         }
         this.repeatStructure = repeatStructure;
         this.currentFormIndex = FormIndex.createBeginningOfFormIndex();
     }
 
-	/**
+    /**
      * Given a FormIndex, returns the event this FormIndex represents.
      *
      * @see FormEntryController
@@ -115,7 +115,7 @@ public class FormEntryModel {
                 if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && form.getMainInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
                     return FormEntryController.EVENT_PROMPT_NEW_REPEAT;
                 } else if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
-                	return FormEntryController.EVENT_REPEAT_JUNCTURE;
+                    return FormEntryController.EVENT_REPEAT_JUNCTURE;
                 } else {
                     return FormEntryController.EVENT_REPEAT;
                 }
@@ -349,7 +349,7 @@ public class FormEntryModel {
 
         TreeReference ref = form.getChildInstanceRef(index);
         boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT ||
-        						  getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
+                                  getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
 
         if (isAskNewRepeat) {
             return false;
@@ -386,7 +386,7 @@ public class FormEntryModel {
             //repeat junctures are still relevant if no new repeat can be created; that option
             //is simply missing from the menu
         } else if (isRepeatJuncture) {
-        	relevant = form.isRepeatRelevant(ref);
+            relevant = form.isRepeatRelevant(ref);
         } else {
             TreeElement node = form.getMainInstance().resolveReference(ref);
             relevant = node != null && node.isRelevant(); // check instance flag first
@@ -447,9 +447,9 @@ public class FormEntryModel {
             if (e instanceof GroupDef) {
                 GroupDef g = (GroupDef) e;
                 if (g.getRepeat() && g.getCountReference() != null) {
-                	// Lu Gram: repeat count XPath needs to be contextualized for nested repeat groups
-                	TreeReference countRef = FormInstance.unpackReference(g.getCountReference());
-                	TreeReference contextualized = countRef.contextualize(index.getReference());
+                    // Lu Gram: repeat count XPath needs to be contextualized for nested repeat groups
+                    TreeReference countRef = FormInstance.unpackReference(g.getCountReference());
+                    TreeReference contextualized = countRef.contextualize(index.getReference());
                     IAnswerData count = getForm().getMainInstance().resolveReference(contextualized).getValue();
                     if (count != null) {
                         long fullcount = ((Integer) count.getValue()).intValue();
@@ -474,57 +474,57 @@ public class FormEntryModel {
 
 
     public boolean isIndexCompoundContainer() {
-    	return isIndexCompoundContainer(getFormIndex());
+        return isIndexCompoundContainer(getFormIndex());
     }
 
     public boolean isIndexCompoundContainer(FormIndex index) {
-    	FormEntryCaption caption = getCaptionPrompt(index);
-    	return getEvent(index) == FormEntryController.EVENT_GROUP &&
-    	      caption.getAppearanceHint() != null &&
-    	      caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
+        FormEntryCaption caption = getCaptionPrompt(index);
+        return getEvent(index) == FormEntryController.EVENT_GROUP &&
+              caption.getAppearanceHint() != null &&
+              caption.getAppearanceHint().toLowerCase(Locale.ENGLISH).equals("full");
     }
 
     public boolean isIndexCompoundElement() {
-    	return isIndexCompoundElement(getFormIndex());
+        return isIndexCompoundElement(getFormIndex());
     }
 
     public boolean isIndexCompoundElement(FormIndex index) {
-    	//Can't be a subquestion if it's not even a question!
-    	if(getEvent(index) != FormEntryController.EVENT_QUESTION) {
-    		return false;
-    	}
+        //Can't be a subquestion if it's not even a question!
+        if(getEvent(index) != FormEntryController.EVENT_QUESTION) {
+            return false;
+        }
 
-    	//get the set of nested groups that this question is in.
-    	FormEntryCaption[] captions = getCaptionHierarchy(index);
-    	for(FormEntryCaption caption : captions) {
+        //get the set of nested groups that this question is in.
+        FormEntryCaption[] captions = getCaptionHierarchy(index);
+        for(FormEntryCaption caption : captions) {
 
-    		//If one of this question's parents is a group, this question is inside of it.
-    		if(isIndexCompoundContainer(caption.getIndex())) {
-    			return true;
-    		}
-    	}
-    	return false;
+            //If one of this question's parents is a group, this question is inside of it.
+            if(isIndexCompoundContainer(caption.getIndex())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public FormIndex[] getCompoundIndices() {
-    	return getCompoundIndices(getFormIndex());
+        return getCompoundIndices(getFormIndex());
     }
 
     public FormIndex[] getCompoundIndices(FormIndex container) {
-    	//ArrayLists are a no-go for J2ME
+        //ArrayLists are a no-go for J2ME
        List<FormIndex> indices = new ArrayList<FormIndex>();
-    	FormIndex walker = incrementIndex(container);
-    	while(FormIndex.isSubElement(container, walker)) {
-    		if(isIndexRelevant(walker)) {
-    			indices.add(walker);
-    		}
-    		walker = incrementIndex(walker);
-    	}
-    	FormIndex[] array = new FormIndex[indices.size()];
-    	for(int i = 0 ; i < indices.size() ; ++i) {
-    		array[i] = indices.get(i);
-    	}
-    	return array;
+        FormIndex walker = incrementIndex(container);
+        while(FormIndex.isSubElement(container, walker)) {
+            if(isIndexRelevant(walker)) {
+                indices.add(walker);
+            }
+            walker = incrementIndex(walker);
+        }
+        FormIndex[] array = new FormIndex[indices.size()];
+        for(int i = 0 ; i < indices.size() ; ++i) {
+            array[i] = indices.get(i);
+        }
+        return array;
     }
 
 
@@ -532,249 +532,249 @@ public class FormEntryModel {
      * @return The Current Repeat style which should be used.
      */
     public int getRepeatStructure() {
-    	return this.repeatStructure;
+        return this.repeatStructure;
     }
 
     public FormIndex incrementIndex(FormIndex index) {
-		return incrementIndex(index, true);
-	}
+        return incrementIndex(index, true);
+    }
 
-	public FormIndex incrementIndex(FormIndex index, boolean descend) {
+    public FormIndex incrementIndex(FormIndex index, boolean descend) {
       List<Integer> indexes = new ArrayList<Integer>();
       List<Integer> multiplicities = new ArrayList<Integer>();
       List<IFormElement> elements = new ArrayList<IFormElement>();
 
-		if (index.isEndOfFormIndex()) {
-			return index;
-		} else if (index.isBeginningOfFormIndex()) {
-			if (form.getChildren() == null || form.getChildren().size() == 0) {
-				return FormIndex.createEndOfFormIndex();
-			}
-		} else {
-			form.collapseIndex(index, indexes, multiplicities, elements);
-		}
+        if (index.isEndOfFormIndex()) {
+            return index;
+        } else if (index.isBeginningOfFormIndex()) {
+            if (form.getChildren() == null || form.getChildren().size() == 0) {
+                return FormIndex.createEndOfFormIndex();
+            }
+        } else {
+            form.collapseIndex(index, indexes, multiplicities, elements);
+        }
 
-		incrementHelper(indexes, multiplicities, elements, descend);
+        incrementHelper(indexes, multiplicities, elements, descend);
 
-		if (indexes.size() == 0) {
-			return FormIndex.createEndOfFormIndex();
-		} else {
-			return form.buildIndex(indexes, multiplicities, elements);
-		}
-	}
+        if (indexes.size() == 0) {
+            return FormIndex.createEndOfFormIndex();
+        } else {
+            return form.buildIndex(indexes, multiplicities, elements);
+        }
+    }
 
-	private void incrementHelper(List<Integer> indexes, List<Integer> multiplicities,	List<IFormElement> elements, boolean descend) {
-		int i = indexes.size() - 1;
-		boolean exitRepeat = false; //if exiting a repetition? (i.e., go to next repetition instead of one level up)
+    private void incrementHelper(List<Integer> indexes, List<Integer> multiplicities,    List<IFormElement> elements, boolean descend) {
+        int i = indexes.size() - 1;
+        boolean exitRepeat = false; //if exiting a repetition? (i.e., go to next repetition instead of one level up)
 
-		if (i == -1 || elements.get(i) instanceof GroupDef) {
-			// current index is group or repeat or the top-level form
+        if (i == -1 || elements.get(i) instanceof GroupDef) {
+            // current index is group or repeat or the top-level form
 
-			if (i >= 0) {
-				// find out whether we're on a repeat, and if so, whether the
-				// specified instance actually exists
-				GroupDef group = (GroupDef) elements.get(i);
-				if (group.getRepeat()) {
-					if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+            if (i >= 0) {
+                // find out whether we're on a repeat, and if so, whether the
+                // specified instance actually exists
+                GroupDef group = (GroupDef) elements.get(i);
+                if (group.getRepeat()) {
+                    if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
 
-						if (((Integer)multiplicities.get(multiplicities.size() - 1)).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+                        if (((Integer)multiplicities.get(multiplicities.size() - 1)).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
 
-							descend = false;
-							exitRepeat = true;
+                            descend = false;
+                            exitRepeat = true;
 
-						}
+                        }
 
-					} else {
+                    } else {
 
-						if (form.getMainInstance().resolveReference(form.getChildInstanceRef(elements,	multiplicities)) == null) {
-							descend = false; // repeat instance does not exist; do not descend into it
-							exitRepeat = true;
-						}
+                        if (form.getMainInstance().resolveReference(form.getChildInstanceRef(elements,    multiplicities)) == null) {
+                            descend = false; // repeat instance does not exist; do not descend into it
+                            exitRepeat = true;
+                        }
 
-					}
-				}
-			}
+                    }
+                }
+            }
 
-			if (descend) {
-				IFormElement ife = (i == -1) ? null : elements.get(i);
-				if ((i == -1) || (ife != null && ife.getChildren() != null && ife.getChildren().size() > 0)) {
-					indexes.add(Integer.valueOf(0));
-					multiplicities.add(Integer.valueOf(0));
-					elements.add((i == -1 ? form : elements.get(i)).getChild(0));
+            if (descend) {
+                IFormElement ife = (i == -1) ? null : elements.get(i);
+                if ((i == -1) || (ife != null && ife.getChildren() != null && ife.getChildren().size() > 0)) {
+                    indexes.add(Integer.valueOf(0));
+                    multiplicities.add(Integer.valueOf(0));
+                    elements.add((i == -1 ? form : elements.get(i)).getChild(0));
 
-					if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
-						if (elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()) {
-							multiplicities.set(multiplicities.size() - 1, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
-						}
-					}
+                    if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+                        if (elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()) {
+                            multiplicities.set(multiplicities.size() - 1, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                        }
+                    }
 
-					return;
-				}
-			}
-		}
+                    return;
+                }
+            }
+        }
 
-		while (i >= 0) {
-			// if on repeat, increment to next repeat EXCEPT when we're on a
-			// repeat instance that does not exist and was not created
-			// (repeat-not-existing can only happen at lowest level; exitRepeat
-			// will be true)
-			if (!exitRepeat && elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i)).getRepeat()) {
-				if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+        while (i >= 0) {
+            // if on repeat, increment to next repeat EXCEPT when we're on a
+            // repeat instance that does not exist and was not created
+            // (repeat-not-existing can only happen at lowest level; exitRepeat
+            // will be true)
+            if (!exitRepeat && elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i)).getRepeat()) {
+                if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
 
-					multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                    multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
 
-				} else {
+                } else {
 
-					multiplicities.set(i, Integer.valueOf(((Integer) multiplicities.get(i)).intValue() + 1));
+                    multiplicities.set(i, Integer.valueOf(((Integer) multiplicities.get(i)).intValue() + 1));
 
-				}
-				return;
-			}
+                }
+                return;
+            }
 
-			IFormElement parent = (i == 0 ? form : elements.get(i - 1));
-			int curIndex = ((Integer) indexes.get(i)).intValue();
+            IFormElement parent = (i == 0 ? form : elements.get(i - 1));
+            int curIndex = ((Integer) indexes.get(i)).intValue();
 
-			// increment to the next element on the current level
-			if (curIndex + 1 >= parent.getChildren().size()) {
-				// at the end of the current level; move up one level and start
-				// over
-				indexes.remove(i);
-				multiplicities.remove(i);
-				elements.remove(i);
-				i--;
-				exitRepeat = false;
-			} else {
-				indexes.set(i, Integer.valueOf(curIndex + 1));
-				multiplicities.set(i, Integer.valueOf(0));
-				elements.set(i, parent.getChild(curIndex + 1));
+            // increment to the next element on the current level
+            if (curIndex + 1 >= parent.getChildren().size()) {
+                // at the end of the current level; move up one level and start
+                // over
+                indexes.remove(i);
+                multiplicities.remove(i);
+                elements.remove(i);
+                i--;
+                exitRepeat = false;
+            } else {
+                indexes.set(i, Integer.valueOf(curIndex + 1));
+                multiplicities.set(i, Integer.valueOf(0));
+                elements.set(i, parent.getChild(curIndex + 1));
 
-				if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
-					if (elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()) {
-						multiplicities.set(multiplicities.size() - 1, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
-					}
-				}
+                if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+                    if (elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()) {
+                        multiplicities.set(multiplicities.size() - 1, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                    }
+                }
 
-				return;
-			}
-		}
-	}
+                return;
+            }
+        }
+    }
 
-	public FormIndex decrementIndex(FormIndex index) {
+    public FormIndex decrementIndex(FormIndex index) {
       List<Integer> indexes = new ArrayList<Integer>();
       List<Integer> multiplicities = new ArrayList<Integer>();
       List<IFormElement> elements = new ArrayList<IFormElement>();
 
-		if (index.isBeginningOfFormIndex()) {
-			return index;
-		} else if (index.isEndOfFormIndex()) {
-			if (form.getChildren() == null || form.getChildren().size() == 0) {
-				return FormIndex.createBeginningOfFormIndex();
-			}
-		} else {
-			form.collapseIndex(index, indexes, multiplicities, elements);
-		}
+        if (index.isBeginningOfFormIndex()) {
+            return index;
+        } else if (index.isEndOfFormIndex()) {
+            if (form.getChildren() == null || form.getChildren().size() == 0) {
+                return FormIndex.createBeginningOfFormIndex();
+            }
+        } else {
+            form.collapseIndex(index, indexes, multiplicities, elements);
+        }
 
-		decrementHelper(indexes, multiplicities, elements);
+        decrementHelper(indexes, multiplicities, elements);
 
-		if (indexes.size() == 0) {
-			return FormIndex.createBeginningOfFormIndex();
-		} else {
-			return form.buildIndex(indexes, multiplicities, elements);
-		}
-	}
+        if (indexes.size() == 0) {
+            return FormIndex.createBeginningOfFormIndex();
+        } else {
+            return form.buildIndex(indexes, multiplicities, elements);
+        }
+    }
 
-	private void decrementHelper(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
-		int i = indexes.size() - 1;
+    private void decrementHelper(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
+        int i = indexes.size() - 1;
 
-		if (i != -1) {
-			int curIndex = indexes.get(i).intValue();
-			int curMult = multiplicities.get(i).intValue();
+        if (i != -1) {
+            int curIndex = indexes.get(i).intValue();
+            int curMult = multiplicities.get(i).intValue();
 
-			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
-				elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
-				multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
-				multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
-				return;
-			} else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
-				multiplicities.set(i, Integer.valueOf(curMult - 1));
-			} else if (curIndex > 0) {
-				// set node to previous element
-				indexes.set(i, Integer.valueOf(curIndex - 1));
-				multiplicities.set(i, Integer.valueOf(0));
-				elements.set(i, (i == 0 ? form : elements.get(i - 1)).getChild(curIndex - 1));
+            if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
+                elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
+                multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+                multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                return;
+            } else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
+                multiplicities.set(i, Integer.valueOf(curMult - 1));
+            } else if (curIndex > 0) {
+                // set node to previous element
+                indexes.set(i, Integer.valueOf(curIndex - 1));
+                multiplicities.set(i, Integer.valueOf(0));
+                elements.set(i, (i == 0 ? form : elements.get(i - 1)).getChild(curIndex - 1));
 
-				if (setRepeatNextMultiplicity(elements, multiplicities))
-					return;
-			} else {
-				// at absolute beginning of current level; index to parent
-				indexes.remove(i);
-				multiplicities.remove(i);
-				elements.remove(i);
-				return;
-			}
-		}
+                if (setRepeatNextMultiplicity(elements, multiplicities))
+                    return;
+            } else {
+                // at absolute beginning of current level; index to parent
+                indexes.remove(i);
+                multiplicities.remove(i);
+                elements.remove(i);
+                return;
+            }
+        }
 
-		IFormElement element = (i < 0 ? form : elements.get(i));
-		while (!(element instanceof QuestionDef)) {
-			if(element.getChildren() == null || element.getChildren().size() == 0) {
-				//if there are no children we just return the current index (the group itself)
-				return;
-			}
-			int subIndex = element.getChildren().size() - 1;
-			element = element.getChild(subIndex);
+        IFormElement element = (i < 0 ? form : elements.get(i));
+        while (!(element instanceof QuestionDef)) {
+            if(element.getChildren() == null || element.getChildren().size() == 0) {
+                //if there are no children we just return the current index (the group itself)
+                return;
+            }
+            int subIndex = element.getChildren().size() - 1;
+            element = element.getChild(subIndex);
 
-			indexes.add(Integer.valueOf(subIndex));
-			multiplicities.add(Integer.valueOf(0));
-			elements.add(element);
+            indexes.add(Integer.valueOf(subIndex));
+            multiplicities.add(Integer.valueOf(0));
+            elements.add(element);
 
-			if (setRepeatNextMultiplicity(elements, multiplicities))
-				return;
-		}
-	}
+            if (setRepeatNextMultiplicity(elements, multiplicities))
+                return;
+        }
+    }
 
-	private boolean setRepeatNextMultiplicity(List<IFormElement> elements, List<Integer> multiplicities) {
-		// find out if node is repeatable
-		TreeReference nodeRef = form.getChildInstanceRef(elements, multiplicities);
-		TreeElement node = form.getMainInstance().resolveReference(nodeRef);
-		if (node == null || node.isRepeatable()) { // node == null if there are no
-			// instances of the repeat
-			int mult;
-			if (node == null) {
-				mult = 0; // no repeats; next is 0
-			} else {
-				String name = node.getName();
-				TreeElement parentNode = form.getMainInstance().resolveReference(nodeRef.getParentRef());
-				mult = parentNode.getChildMultiplicity(name);
-			}
-			multiplicities.set(multiplicities.size() - 1, Integer.valueOf(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR ? TreeReference.INDEX_REPEAT_JUNCTURE : mult));
-			return true;
-		} else {
-			return false;
-		}
-	}
+    private boolean setRepeatNextMultiplicity(List<IFormElement> elements, List<Integer> multiplicities) {
+        // find out if node is repeatable
+        TreeReference nodeRef = form.getChildInstanceRef(elements, multiplicities);
+        TreeElement node = form.getMainInstance().resolveReference(nodeRef);
+        if (node == null || node.isRepeatable()) { // node == null if there are no
+            // instances of the repeat
+            int mult;
+            if (node == null) {
+                mult = 0; // no repeats; next is 0
+            } else {
+                String name = node.getName();
+                TreeElement parentNode = form.getMainInstance().resolveReference(nodeRef.getParentRef());
+                mult = parentNode.getChildMultiplicity(name);
+            }
+            multiplicities.set(multiplicities.size() - 1, Integer.valueOf(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR ? TreeReference.INDEX_REPEAT_JUNCTURE : mult));
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * This method does a recursive check of whether there are any repeat guesses
-	 * in the element or its subtree. This is a necessary step when initializing
-	 * the model to be able to identify whether new repeats can be used.
-	 *
-	 * @param parent The form element to begin checking
-	 * @return true if the element or any of its descendants is a repeat
-	 * which has a count guess, false otherwise.
-	 */
+    /**
+     * This method does a recursive check of whether there are any repeat guesses
+     * in the element or its subtree. This is a necessary step when initializing
+     * the model to be able to identify whether new repeats can be used.
+     *
+     * @param parent The form element to begin checking
+     * @return true if the element or any of its descendants is a repeat
+     * which has a count guess, false otherwise.
+     */
     private boolean containsRepeatGuesses(IFormElement parent) {
-		if(parent instanceof GroupDef) {
-			GroupDef g = (GroupDef)parent;
-			if (g.getRepeat() && g.getCountReference() != null) {
-				return true;
-			}
-		}
+        if(parent instanceof GroupDef) {
+            GroupDef g = (GroupDef)parent;
+            if (g.getRepeat() && g.getCountReference() != null) {
+                return true;
+            }
+        }
 
-    	List<IFormElement> children = parent.getChildren();
-    	if(children == null) { return false; }
+        List<IFormElement> children = parent.getChildren();
+        if(children == null) { return false; }
        for (IFormElement child : children) {
-    		if(containsRepeatGuesses(child)) {return true;}
-    	}
-    	return false;
-	}
+            if(containsRepeatGuesses(child)) {return true;}
+        }
+        return false;
+    }
 }

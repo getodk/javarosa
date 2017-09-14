@@ -49,7 +49,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class QuestionDef implements IFormElement, Localizable {
     private int id;
-    private IDataReference binding;	/** reference to a location in the model to store data in */
+    private IDataReference binding;    /** reference to a location in the model to store data in */
 
     private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
     private List<OSMTag> osmTags; // If it's an OSM Question, it might have tags.

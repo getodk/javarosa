@@ -40,387 +40,387 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class FormInstance extends DataInstance<TreeElement> implements Persistable, IMetaData {
 
-	public static final String STORAGE_KEY = "FORMDATA";
+    public static final String STORAGE_KEY = "FORMDATA";
 
-	/** The date that this model was taken and recorded */
-	private Date dateSaved;
+    /** The date that this model was taken and recorded */
+    private Date dateSaved;
 
-	public String schema;
-	public String formVersion;
-	public String uiVersion;
+    public String schema;
+    public String formVersion;
+    public String uiVersion;
 
-	private HashMap<String, Object> namespaces = new HashMap<String, Object>();
+    private HashMap<String, Object> namespaces = new HashMap<String, Object>();
 
-	/** The root of this tree */
-	protected TreeElement root = new TreeElement();
+    /** The root of this tree */
+    protected TreeElement root = new TreeElement();
 
-	public FormInstance() {
+    public FormInstance() {
 
-	}
+    }
 
-	public FormInstance(TreeElement root) {
-		this(root, null);
-	}
+    public FormInstance(TreeElement root) {
+        this(root, null);
+    }
 
-	/**
-	 * Creates a new data model using the root given.
-	 *
-	 * @param root
-	 *            The root of the tree for this data model.
-	 */
-	public FormInstance(TreeElement root, String id) {
-		super(id);
-		setID(-1);
-		setFormId(-1);
-		setRoot(root);
-	}
+    /**
+     * Creates a new data model using the root given.
+     *
+     * @param root
+     *            The root of the tree for this data model.
+     */
+    public FormInstance(TreeElement root, String id) {
+        super(id);
+        setID(-1);
+        setFormId(-1);
+        setRoot(root);
+    }
 
-	public TreeElement getBase() {
-		return root;
-	}
+    public TreeElement getBase() {
+        return root;
+    }
 
-	public TreeElement getRoot() {
+    public TreeElement getRoot() {
 
-		if (root.getNumChildren() == 0)
-			throw new RuntimeException("root node has no children");
+        if (root.getNumChildren() == 0)
+            throw new RuntimeException("root node has no children");
 
-		return root.getChildAt(0);
-	}
+        return root.getChildAt(0);
+    }
 
 
 
-	/**
-	 * Sets the root element of this Model's tree
-	 *
-	 * @param topLevel
-	 *            The root of the tree for this data model.
-	 */
-	public void setRoot(TreeElement topLevel) {
-		root = new TreeElement();
-		if(this.getName() != null) {
-			root.setInstanceName(this.getName());
-		}
-		if (topLevel != null) {
-			root.addChild(topLevel);
-		}
-	}
+    /**
+     * Sets the root element of this Model's tree
+     *
+     * @param topLevel
+     *            The root of the tree for this data model.
+     */
+    public void setRoot(TreeElement topLevel) {
+        root = new TreeElement();
+        if(this.getName() != null) {
+            root.setInstanceName(this.getName());
+        }
+        if (topLevel != null) {
+            root.addChild(topLevel);
+        }
+    }
 
-	public TreeReference copyNode(TreeReference from, TreeReference to) throws InvalidReferenceException {
-		if (!from.isAbsolute()) {
-			throw new InvalidReferenceException("Source reference must be absolute for copying", from);
-		}
+    public TreeReference copyNode(TreeReference from, TreeReference to) throws InvalidReferenceException {
+        if (!from.isAbsolute()) {
+            throw new InvalidReferenceException("Source reference must be absolute for copying", from);
+        }
 
-		TreeElement src = resolveReference(from);
-		if (src == null) {
-			throw new InvalidReferenceException("Null Source reference while attempting to copy node", from);
-		}
+        TreeElement src = resolveReference(from);
+        if (src == null) {
+            throw new InvalidReferenceException("Null Source reference while attempting to copy node", from);
+        }
 
-		return copyNode(src, to).getRef();
-	}
+        return copyNode(src, to).getRef();
+    }
 
-	// for making new repeat instances; 'from' and 'to' must be unambiguous
-	// references EXCEPT 'to' may be ambiguous at its final step
-	// return true is successfully copied, false otherwise
-	public TreeElement copyNode(TreeElement src, TreeReference to) throws InvalidReferenceException {
-		if (!to.isAbsolute())
-			throw new InvalidReferenceException("Destination reference must be absolute for copying", to);
+    // for making new repeat instances; 'from' and 'to' must be unambiguous
+    // references EXCEPT 'to' may be ambiguous at its final step
+    // return true is successfully copied, false otherwise
+    public TreeElement copyNode(TreeElement src, TreeReference to) throws InvalidReferenceException {
+        if (!to.isAbsolute())
+            throw new InvalidReferenceException("Destination reference must be absolute for copying", to);
 
-		// strip out dest node info and get dest parent
-		String dstName = to.getNameLast();
-		int dstMult = to.getMultLast();
-		TreeReference toParent = to.getParentRef();
+        // strip out dest node info and get dest parent
+        String dstName = to.getNameLast();
+        int dstMult = to.getMultLast();
+        TreeReference toParent = to.getParentRef();
 
-		TreeElement parent = resolveReference(toParent);
-		if (parent == null) {
-			throw new InvalidReferenceException("Null parent reference whle attempting to copy", toParent);
-		}
-		if (!parent.isChildable()) {
-			throw new InvalidReferenceException("Invalid Parent Node: cannot accept children.", toParent);
-		}
+        TreeElement parent = resolveReference(toParent);
+        if (parent == null) {
+            throw new InvalidReferenceException("Null parent reference whle attempting to copy", toParent);
+        }
+        if (!parent.isChildable()) {
+            throw new InvalidReferenceException("Invalid Parent Node: cannot accept children.", toParent);
+        }
 
-		if (dstMult == TreeReference.INDEX_UNBOUND) {
-			dstMult = parent.getChildMultiplicity(dstName);
-		} else if (parent.getChild(dstName, dstMult) != null) {
-			throw new InvalidReferenceException("Destination already exists!", to);
-		}
+        if (dstMult == TreeReference.INDEX_UNBOUND) {
+            dstMult = parent.getChildMultiplicity(dstName);
+        } else if (parent.getChild(dstName, dstMult) != null) {
+            throw new InvalidReferenceException("Destination already exists!", to);
+        }
 
-		TreeElement dest = src.deepCopy(false);
-		dest.setName(dstName);
-		dest.setMult(dstMult);
-		parent.addChild(dest);
-		return dest;
-	}
+        TreeElement dest = src.deepCopy(false);
+        dest.setName(dstName);
+        dest.setMult(dstMult);
+        parent.addChild(dest);
+        return dest;
+    }
 
-	public Date getDateSaved() {
-		return this.dateSaved;
-	}
+    public Date getDateSaved() {
+        return this.dateSaved;
+    }
 
-	public TreeReference addNode(TreeReference ambigRef) {
-		TreeReference ref = ambigRef.clone();
-		if (createNode(ref) != null) {
-			return ref;
-		} else {
-			return null;
-		}
-	}
+    public TreeReference addNode(TreeReference ambigRef) {
+        TreeReference ref = ambigRef.clone();
+        if (createNode(ref) != null) {
+            return ref;
+        } else {
+            return null;
+        }
+    }
 
-	public TreeReference addNode(TreeReference ambigRef, IAnswerData data, int dataType) {
-		TreeReference ref = ambigRef.clone();
-		TreeElement node = createNode(ref);
-		if (node != null) {
-			if (dataType >= 0) {
-				node.setDataType(dataType);
-			}
+    public TreeReference addNode(TreeReference ambigRef, IAnswerData data, int dataType) {
+        TreeReference ref = ambigRef.clone();
+        TreeElement node = createNode(ref);
+        if (node != null) {
+            if (dataType >= 0) {
+                node.setDataType(dataType);
+            }
 
-			node.setValue(data);
-			return ref;
-		} else {
-			return null;
-		}
-	}
+            node.setValue(data);
+            return ref;
+        } else {
+            return null;
+        }
+    }
 
-	/*
-	 * create the specified node in the tree, creating all intermediary nodes at
-	 * each step, if necessary. if specified node already exists, return null
-	 *
-	 * creating a duplicate node is only allowed at the final step. it will be
-	 * done if the multiplicity of the last step is ALL or equal to the count of
-	 * nodes already there
-	 *
-	 * at intermediate steps, the specified existing node is used; if
-	 * multiplicity is ALL: if no nodes exist, a new one is created; if one node
-	 * exists, it is used; if multiple nodes exist, it's an error
-	 *
-	 * return the newly-created node; modify ref so that it's an unambiguous ref
-	 * to the node
-	 */
-	private TreeElement createNode(TreeReference ref) {
+    /*
+     * create the specified node in the tree, creating all intermediary nodes at
+     * each step, if necessary. if specified node already exists, return null
+     *
+     * creating a duplicate node is only allowed at the final step. it will be
+     * done if the multiplicity of the last step is ALL or equal to the count of
+     * nodes already there
+     *
+     * at intermediate steps, the specified existing node is used; if
+     * multiplicity is ALL: if no nodes exist, a new one is created; if one node
+     * exists, it is used; if multiple nodes exist, it's an error
+     *
+     * return the newly-created node; modify ref so that it's an unambiguous ref
+     * to the node
+     */
+    private TreeElement createNode(TreeReference ref) {
 
-		TreeElement node = root;
+        TreeElement node = root;
 
-		for (int k = 0; k < ref.size(); k++) {
-			String name = ref.getName(k);
-			int count = node.getChildMultiplicity(name);
-			int mult = ref.getMultiplicity(k);
+        for (int k = 0; k < ref.size(); k++) {
+            String name = ref.getName(k);
+            int count = node.getChildMultiplicity(name);
+            int mult = ref.getMultiplicity(k);
 
-			TreeElement child;
-			if (k < ref.size() - 1) {
-				if (mult == TreeReference.INDEX_UNBOUND) {
-					if (count > 1) {
-						return null; // don't know which node to use
-					} else {
-						// will use existing (if one and only one) or create new
-						mult = 0;
-						ref.setMultiplicity(k, 0);
-					}
-				}
+            TreeElement child;
+            if (k < ref.size() - 1) {
+                if (mult == TreeReference.INDEX_UNBOUND) {
+                    if (count > 1) {
+                        return null; // don't know which node to use
+                    } else {
+                        // will use existing (if one and only one) or create new
+                        mult = 0;
+                        ref.setMultiplicity(k, 0);
+                    }
+                }
 
-				// fetch
-				child = node.getChild(name, mult);
-				if (child == null) {
-					if (mult == 0) {
-						// create
-						child = new TreeElement(name, count);
-						node.addChild(child);
-						ref.setMultiplicity(k, count);
-					} else {
-						return null; // intermediate node does not exist
-					}
-				}
-			} else {
-				if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
-					if (k == 0 && root.getNumChildren() != 0) {
-						return null; // can only be one top-level node, and it
-						// already exists
-					}
+                // fetch
+                child = node.getChild(name, mult);
+                if (child == null) {
+                    if (mult == 0) {
+                        // create
+                        child = new TreeElement(name, count);
+                        node.addChild(child);
+                        ref.setMultiplicity(k, count);
+                    } else {
+                        return null; // intermediate node does not exist
+                    }
+                }
+            } else {
+                if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
+                    if (k == 0 && root.getNumChildren() != 0) {
+                        return null; // can only be one top-level node, and it
+                        // already exists
+                    }
 
-					if (!node.isChildable()) {
-						return null; // current node can't have children
-					}
+                    if (!node.isChildable()) {
+                        return null; // current node can't have children
+                    }
 
-					// create new
-					child = new TreeElement(name, count);
-					node.addChild(child);
-					ref.setMultiplicity(k, count);
-				} else {
-					return null; // final node must be a newly-created node
-				}
-			}
+                    // create new
+                    child = new TreeElement(name, count);
+                    node.addChild(child);
+                    ref.setMultiplicity(k, count);
+                } else {
+                    return null; // final node must be a newly-created node
+                }
+            }
 
-			node = child;
-		}
+            node = child;
+        }
 
-		return node;
-	}
+        return node;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.instance.FormInstanceAdapter#addNamespace(java.lang.String, java.lang.String)
-	 */
-	public void addNamespace(String prefix, String URI) {
-		namespaces.put(prefix, URI);
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.instance.FormInstanceAdapter#addNamespace(java.lang.String, java.lang.String)
+     */
+    public void addNamespace(String prefix, String URI) {
+        namespaces.put(prefix, URI);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.instance.FormInstanceAdapter#getNamespacePrefixes()
-	 */
-	public String[] getNamespacePrefixes() {
-		String[] prefixes = new String[namespaces.size()];
-		int i = 0;
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.instance.FormInstanceAdapter#getNamespacePrefixes()
+     */
+    public String[] getNamespacePrefixes() {
+        String[] prefixes = new String[namespaces.size()];
+        int i = 0;
     for (String key : namespaces.keySet()) {
-			prefixes[i] = key;
-			++i;
-		}
-		return prefixes;
-	}
+            prefixes[i] = key;
+            ++i;
+        }
+        return prefixes;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.instance.FormInstanceAdapter#getNamespaceURI(java.lang.String)
-	 */
-	public String getNamespaceURI(String prefix) {
-		return (String)namespaces.get(prefix);
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.instance.FormInstanceAdapter#getNamespaceURI(java.lang.String)
+     */
+    public String getNamespaceURI(String prefix) {
+        return (String)namespaces.get(prefix);
+    }
 
-	public TreeElement processSaved(FormInstance template, FormDef f) {
-		TreeElement fixedInstanceRoot = template.getRoot().deepCopy(true);
-		TreeElement incomingRoot = root.getChildAt(0);
+    public TreeElement processSaved(FormInstance template, FormDef f) {
+        TreeElement fixedInstanceRoot = template.getRoot().deepCopy(true);
+        TreeElement incomingRoot = root.getChildAt(0);
 
-		if (!fixedInstanceRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
-			throw new RuntimeException("Saved form instance to restore does not match form definition");
-		}
+        if (!fixedInstanceRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
+            throw new RuntimeException("Saved form instance to restore does not match form definition");
+        }
 
-		fixedInstanceRoot.populate(incomingRoot, f);
-		return fixedInstanceRoot;
-	}
+        fixedInstanceRoot.populate(incomingRoot, f);
+        return fixedInstanceRoot;
+    }
 
 
-	public FormInstance clone() {
-		FormInstance cloned = new FormInstance(this.getRoot().deepCopy(true));
+    public FormInstance clone() {
+        FormInstance cloned = new FormInstance(this.getRoot().deepCopy(true));
 
-		cloned.setID(this.getID());
-		cloned.setFormId(this.getFormId());
-		cloned.setName(this.getName());
-		cloned.setDateSaved(this.getDateSaved());
-		cloned.schema = this.schema;
-		cloned.formVersion = this.formVersion;
-		cloned.uiVersion = this.uiVersion;
-		cloned.namespaces = new HashMap<String, Object>();
+        cloned.setID(this.getID());
+        cloned.setFormId(this.getFormId());
+        cloned.setName(this.getName());
+        cloned.setDateSaved(this.getDateSaved());
+        cloned.schema = this.schema;
+        cloned.formVersion = this.formVersion;
+        cloned.uiVersion = this.uiVersion;
+        cloned.namespaces = new HashMap<String, Object>();
     for (String key : namespaces.keySet()) {
-			cloned.namespaces.put(key, this.namespaces.get(key));
-		}
+            cloned.namespaces.put(key, this.namespaces.get(key));
+        }
 
-		return cloned;
-	}
+        return cloned;
+    }
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		super.readExternal(in, pf);
-		schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
-		dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        super.readExternal(in, pf);
+        schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
+        dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 
-		namespaces = (HashMap<String,Object>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
-		setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
+        namespaces = (HashMap<String,Object>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+        setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
 
-	}
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		super.writeExternal(out);
-		ExtUtil.write(out, new ExtWrapNullable(schema));
-		ExtUtil.write(out, new ExtWrapNullable(dateSaved));
-		ExtUtil.write(out, new ExtWrapMap(namespaces));
+    public void writeExternal(DataOutputStream out) throws IOException {
+        super.writeExternal(out);
+        ExtUtil.write(out, new ExtWrapNullable(schema));
+        ExtUtil.write(out, new ExtWrapNullable(dateSaved));
+        ExtUtil.write(out, new ExtWrapMap(namespaces));
 
-		ExtUtil.write(out, getRoot());
-	}
-
-
-	public void setDateSaved(Date dateSaved) {
-		this.dateSaved = dateSaved;
-	}
-
-	public void copyItemsetNode(TreeElement copyNode, TreeReference destRef, FormDef f)
-			throws InvalidReferenceException {
-		TreeElement templateNode = getTemplate(destRef);
-		TreeElement newNode = copyNode(templateNode, destRef);
-		newNode.populateTemplate(copyNode, f);
-	}
-
-	public void accept(IInstanceVisitor visitor) {
-		visitor.visit(this);
-
-		if (visitor instanceof ITreeVisitor) {
-			root.accept((ITreeVisitor) visitor);
-		}
-
-	}
+        ExtUtil.write(out, getRoot());
+    }
 
 
-	// determine if nodes are homogeneous, meaning their descendant structure is 'identical' for repeat purposes
-	// identical means all children match, and the children's children match, and so on
-	// repeatable children are ignored; as they do not have to exist in the same quantity for nodes to be homogeneous
-	// however, the child repeatable nodes MUST be verified amongst themselves for homogeneity later
-	// this function ignores the names of the two nodes
-	public static boolean isHomogeneous(TreeElement a, TreeElement b) {
-		if (a.isLeaf() && b.isLeaf()) {
-			return true;
-		} else if (a.isChildable() && b.isChildable()) {
-			// verify that every (non-repeatable) node in a exists in b and vice
-			// versa
-			for (int k = 0; k < 2; k++) {
-				TreeElement n1 = (k == 0 ? a : b);
-				TreeElement n2 = (k == 0 ? b : a);
+    public void setDateSaved(Date dateSaved) {
+        this.dateSaved = dateSaved;
+    }
 
-				for (int i = 0; i < n1.getNumChildren(); i++) {
-					TreeElement child1 = n1.getChildAt(i);
-					if (child1.isRepeatable())
-						continue;
-					TreeElement child2 = n2.getChild(child1.getName(), 0);
-					if (child2 == null)
-						return false;
-					if (child2.isRepeatable())
-						throw new RuntimeException("shouldn't happen");
-				}
-			}
+    public void copyItemsetNode(TreeElement copyNode, TreeReference destRef, FormDef f)
+            throws InvalidReferenceException {
+        TreeElement templateNode = getTemplate(destRef);
+        TreeElement newNode = copyNode(templateNode, destRef);
+        newNode.populateTemplate(copyNode, f);
+    }
 
-			// compare children
-			for (int i = 0; i < a.getNumChildren(); i++) {
-				TreeElement childA = a.getChildAt(i);
-				if (childA.isRepeatable())
-					continue;
-				TreeElement childB = b.getChild(childA.getName(), 0);
-				if (!isHomogeneous(childA, childB))
-					return false;
-			}
+    public void accept(IInstanceVisitor visitor) {
+        visitor.visit(this);
 
-			return true;
-		} else {
-			return false;
-		}
-	}
+        if (visitor instanceof ITreeVisitor) {
+            root.accept((ITreeVisitor) visitor);
+        }
 
-	public void initialize(InstanceInitializationFactory initializer, String instanceId) {
-		setInstanceId(instanceId);
-		root.setInstanceName(instanceId);
-	}
+    }
 
-	public static final String META_XMLNS = "XMLNS";
-	public static final String META_ID = "instance_id";
 
-	public String[] getMetaDataFields() {
-		return new String[] { META_XMLNS, META_ID };
-	}
+    // determine if nodes are homogeneous, meaning their descendant structure is 'identical' for repeat purposes
+    // identical means all children match, and the children's children match, and so on
+    // repeatable children are ignored; as they do not have to exist in the same quantity for nodes to be homogeneous
+    // however, the child repeatable nodes MUST be verified amongst themselves for homogeneity later
+    // this function ignores the names of the two nodes
+    public static boolean isHomogeneous(TreeElement a, TreeElement b) {
+        if (a.isLeaf() && b.isLeaf()) {
+            return true;
+        } else if (a.isChildable() && b.isChildable()) {
+            // verify that every (non-repeatable) node in a exists in b and vice
+            // versa
+            for (int k = 0; k < 2; k++) {
+                TreeElement n1 = (k == 0 ? a : b);
+                TreeElement n2 = (k == 0 ? b : a);
 
-	public HashMap<String,Object> getMetaData() {
-		HashMap<String,Object> data = new HashMap<String,Object>();
-		for(String key : getMetaDataFields()) {
-			data.put(key, getMetaData(key));
-		}
-		return data;
-	}
+                for (int i = 0; i < n1.getNumChildren(); i++) {
+                    TreeElement child1 = n1.getChildAt(i);
+                    if (child1.isRepeatable())
+                        continue;
+                    TreeElement child2 = n2.getChild(child1.getName(), 0);
+                    if (child2 == null)
+                        return false;
+                    if (child2.isRepeatable())
+                        throw new RuntimeException("shouldn't happen");
+                }
+            }
 
-	public Object getMetaData(String fieldName) {
-		if(META_XMLNS.equals(fieldName)) {
-			return ExtUtil.emptyIfNull(schema);
-		} else if(META_ID.equals(fieldName)) {
-			return ExtUtil.emptyIfNull(this.getInstanceId());
-		}
-		throw new IllegalArgumentException("No metadata field " + fieldName  + " in the form instance storage system");
-	}
+            // compare children
+            for (int i = 0; i < a.getNumChildren(); i++) {
+                TreeElement childA = a.getChildAt(i);
+                if (childA.isRepeatable())
+                    continue;
+                TreeElement childB = b.getChild(childA.getName(), 0);
+                if (!isHomogeneous(childA, childB))
+                    return false;
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void initialize(InstanceInitializationFactory initializer, String instanceId) {
+        setInstanceId(instanceId);
+        root.setInstanceName(instanceId);
+    }
+
+    public static final String META_XMLNS = "XMLNS";
+    public static final String META_ID = "instance_id";
+
+    public String[] getMetaDataFields() {
+        return new String[] { META_XMLNS, META_ID };
+    }
+
+    public HashMap<String,Object> getMetaData() {
+        HashMap<String,Object> data = new HashMap<String,Object>();
+        for(String key : getMetaDataFields()) {
+            data.put(key, getMetaData(key));
+        }
+        return data;
+    }
+
+    public Object getMetaData(String fieldName) {
+        if(META_XMLNS.equals(fieldName)) {
+            return ExtUtil.emptyIfNull(schema);
+        } else if(META_ID.equals(fieldName)) {
+            return ExtUtil.emptyIfNull(this.getInstanceId());
+        }
+        throw new IllegalArgumentException("No metadata field " + fieldName  + " in the form instance storage system");
+    }
 }

@@ -5,6 +5,6 @@ package org.javarosa.core.util;
  */
 public interface TrivialTransitionsWithErrors {
 
-	void done(boolean errors);
-	
+    void done(boolean errors);
+
 }

@@ -23,17 +23,17 @@ import java.util.LinkedHashMap;
 public class OrderedMap<K,V> extends LinkedHashMap<K,V> {
 
     public String toString () {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("[");
-    	for (Enumeration e = Collections.enumeration(keySet()); e.hasMoreElements(); ) {
-    		Object key = e.nextElement();
-    		sb.append(key.toString());
-    		sb.append(" => ");
-    		sb.append(get(key).toString());
-    		if (e.hasMoreElements())
-    			sb.append(", ");
-    	}
-    	sb.append("]");
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (Enumeration e = Collections.enumeration(keySet()); e.hasMoreElements(); ) {
+            Object key = e.nextElement();
+            sb.append(key.toString());
+            sb.append(" => ");
+            sb.append(get(key).toString());
+            if (e.hasMoreElements())
+                sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

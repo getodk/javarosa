@@ -26,93 +26,93 @@ import java.util.HashMap;
 //map of objects where elements are multiple types, keys are still assumed to be of a single (non-polymorphic) type
 //if elements are compound types (i.e., need wrappers), they must be pre-wrapped before invoking this wrapper, because... come on now.
 public class ExtWrapMapPoly extends ExternalizableWrapper {
-	public ExternalizableWrapper keyType;
-	public boolean ordered;
-	
-	/* serialization */
-	
-	public ExtWrapMapPoly (HashMap val) {
-		this(val, null);
-	}
-	
-	public ExtWrapMapPoly (HashMap val, ExternalizableWrapper keyType) {
-		if (val == null) {
-			throw new NullPointerException();
-		}
-		
-		this.val = val;
-		this.keyType = keyType;
-		this.ordered = (val instanceof OrderedMap);
-	}
+    public ExternalizableWrapper keyType;
+    public boolean ordered;
 
-	/* deserialization */
-	
-	public ExtWrapMapPoly () {
-		
-	}
+    /* serialization */
 
-	public ExtWrapMapPoly (Class keyType) {
-		this(keyType, false);
-	}
-	
-	public ExtWrapMapPoly (ExternalizableWrapper keyType) {
-		this(keyType, false);
-	}
-	
-	public ExtWrapMapPoly (Class keyType, boolean ordered) {
-		this(new ExtWrapBase(keyType), ordered);
-	}
-	
-	public ExtWrapMapPoly (ExternalizableWrapper keyType, boolean ordered) {
-		if (keyType == null) {
-			throw new NullPointerException();
-		}
-		
-		this.keyType = keyType;
-		this.ordered = ordered;
-	}
-	
-	public ExternalizableWrapper clone (Object val) {
-		return new ExtWrapMapPoly((HashMap)val, keyType);
-	}
-	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		HashMap h = ordered ? new OrderedMap() : new HashMap();
+    public ExtWrapMapPoly (HashMap val) {
+        this(val, null);
+    }
 
-		long size = ExtUtil.readNumeric(in);
-		for (int i = 0; i < size; i++) {
-			Object key = ExtUtil.read(in, keyType, pf);
-			Object elem = ExtUtil.read(in, new ExtWrapTagged(), pf);
-			h.put(key, elem);
-		}
-		
-		val = h;
-	}
+    public ExtWrapMapPoly (HashMap val, ExternalizableWrapper keyType) {
+        if (val == null) {
+            throw new NullPointerException();
+        }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		HashMap h = (HashMap)val;
+        this.val = val;
+        this.keyType = keyType;
+        this.ordered = (val instanceof OrderedMap);
+    }
 
-		ExtUtil.writeNumeric(out, h.size());
+    /* deserialization */
+
+    public ExtWrapMapPoly () {
+
+    }
+
+    public ExtWrapMapPoly (Class keyType) {
+        this(keyType, false);
+    }
+
+    public ExtWrapMapPoly (ExternalizableWrapper keyType) {
+        this(keyType, false);
+    }
+
+    public ExtWrapMapPoly (Class keyType, boolean ordered) {
+        this(new ExtWrapBase(keyType), ordered);
+    }
+
+    public ExtWrapMapPoly (ExternalizableWrapper keyType, boolean ordered) {
+        if (keyType == null) {
+            throw new NullPointerException();
+        }
+
+        this.keyType = keyType;
+        this.ordered = ordered;
+    }
+
+    public ExternalizableWrapper clone (Object val) {
+        return new ExtWrapMapPoly((HashMap)val, keyType);
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        HashMap h = ordered ? new OrderedMap() : new HashMap();
+
+        long size = ExtUtil.readNumeric(in);
+        for (int i = 0; i < size; i++) {
+            Object key = ExtUtil.read(in, keyType, pf);
+            Object elem = ExtUtil.read(in, new ExtWrapTagged(), pf);
+            h.put(key, elem);
+        }
+
+        val = h;
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        HashMap h = (HashMap)val;
+
+        ExtUtil.writeNumeric(out, h.size());
     for (Object key : h.keySet()) {
-			Object elem = h.get(key);
-			
-			ExtUtil.write(out, keyType == null ? key : keyType.clone(key));
-			ExtUtil.write(out, new ExtWrapTagged(elem));			
-		}		
-	}
+            Object elem = h.get(key);
 
-	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		ordered = ExtUtil.readBool(in);
-		keyType = ExtWrapTagged.readTag(in, pf);
-	}
+            ExtUtil.write(out, keyType == null ? key : keyType.clone(key));
+            ExtUtil.write(out, new ExtWrapTagged(elem));
+        }
+    }
 
-	public void metaWriteExternal (DataOutputStream out) throws IOException {
-		HashMap h = (HashMap)val;
-		Object keyTagObj;
-		
-		ExtUtil.writeBool(out, ordered);
-		
-		keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keySet().iterator().next()) : keyType);
-		ExtWrapTagged.writeTag(out, keyTagObj);
-	}
+    public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        ordered = ExtUtil.readBool(in);
+        keyType = ExtWrapTagged.readTag(in, pf);
+    }
+
+    public void metaWriteExternal (DataOutputStream out) throws IOException {
+        HashMap h = (HashMap)val;
+        Object keyTagObj;
+
+        ExtUtil.writeBool(out, ordered);
+
+        keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keySet().iterator().next()) : keyType);
+        ExtWrapTagged.writeTag(out, keyTagObj);
+    }
 }

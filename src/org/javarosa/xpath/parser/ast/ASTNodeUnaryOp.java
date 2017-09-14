@@ -25,22 +25,22 @@ import org.javarosa.xpath.parser.Token;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class ASTNodeUnaryOp extends ASTNode {
-	public ASTNode expr;
-	public int op;
-		
-	public Vector<ASTNode> getChildren () {
-		Vector<ASTNode> v = new Vector<ASTNode>();
-		v.addElement(expr);
-		return v;
-	}
+    public ASTNode expr;
+    public int op;
 
-	public XPathExpression build() throws XPathSyntaxException {
-		XPathUnaryOpExpr x;
-		if (op == Token.UMINUS) {
-			x = new XPathNumNegExpr(expr.build());
-		} else {
-			throw new XPathSyntaxException();
-		}
-		return x;
-	}
+    public Vector<ASTNode> getChildren () {
+        Vector<ASTNode> v = new Vector<ASTNode>();
+        v.addElement(expr);
+        return v;
+    }
+
+    public XPathExpression build() throws XPathSyntaxException {
+        XPathUnaryOpExpr x;
+        if (op == Token.UMINUS) {
+            x = new XPathNumNegExpr(expr.build());
+        } else {
+            throw new XPathSyntaxException();
+        }
+        return x;
+    }
 }

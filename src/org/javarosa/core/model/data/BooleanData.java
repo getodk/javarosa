@@ -33,88 +33,88 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class BooleanData implements IAnswerData {
 
-	boolean data;
+    boolean data;
 
-	/**
-	 * NOTE: ONLY FOR SERIALIZATION
-	 */
-	public BooleanData() {
+    /**
+     * NOTE: ONLY FOR SERIALIZATION
+     */
+    public BooleanData() {
 
-	}
+    }
 
-	public BooleanData(boolean data) {
-		this.data = data;
-	}
+    public BooleanData(boolean data) {
+        this.data = data;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IAnswerData#clone()
-	 */
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.data.IAnswerData#clone()
+     */
     @Override
-	public IAnswerData clone() {
-		return new BooleanData(data);
-	}
+    public IAnswerData clone() {
+        return new BooleanData(data);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-	 */
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
+     */
     @Override
-	public String getDisplayText() {
-		if(data) {
-			return "True";
-		} else {
-			return "False";
-		}
-	}
+    public String getDisplayText() {
+        if(data) {
+            return "True";
+        } else {
+            return "False";
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
-	 */
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.data.IAnswerData#getValue()
+     */
     @Override
-	public Object getValue() {
-		return new Boolean(data);
-	}
+    public Object getValue() {
+        return new Boolean(data);
+    }
 
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
-	 */
+    /* (non-Javadoc)
+     * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
+     */
     @Override
-	public void setValue(Object o) {
-		data = ((Boolean)o).booleanValue();
-	}
+    public void setValue(Object o) {
+        data = ((Boolean)o).booleanValue();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-	 */
+    /* (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+     */
     @Override
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		data = in.readBoolean();
-	}
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        data = in.readBoolean();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
+    /* (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
     @Override
-	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeBoolean(data);
-	}
-
-    @Override
-	public UncastData uncast() {
-		return new UncastData(data ? "1" : "0");
-	}
+    public void writeExternal(DataOutputStream out) throws IOException {
+        out.writeBoolean(data);
+    }
 
     @Override
-	public BooleanData cast(UncastData data) throws IllegalArgumentException {
-		if("1".equals(data)) {
-			return new BooleanData(true);
-		}
+    public UncastData uncast() {
+        return new UncastData(data ? "1" : "0");
+    }
 
-		if("0".equals(data)) {
-			return new BooleanData(false);
-		}
+    @Override
+    public BooleanData cast(UncastData data) throws IllegalArgumentException {
+        if("1".equals(data)) {
+            return new BooleanData(true);
+        }
 
-		throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Boolean");
-	}
+        if("0".equals(data)) {
+            return new BooleanData(false);
+        }
+
+        throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Boolean");
+    }
 }

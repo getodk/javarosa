@@ -17,31 +17,31 @@
             <value>Pierce County</value>
           </text>
         </translation>
-	  </itext>
+      </itext>
       <instance>
         <form id="SimplerCascadingSelect" version="1">
-			<county/>
+            <county/>
         </form>
       </instance>
-	  <instance id="choices">
-	    <counties>
-			<county>
-			  <value>king</value>
-			</county>
-			<county>
-			  <value>pierce</value>
-			</county>
-		</counties>
-	  </instance>
+      <instance id="choices">
+        <counties>
+            <county>
+              <value>king</value>
+            </county>
+            <county>
+              <value>pierce</value>
+            </county>
+        </counties>
+      </instance>
       <bind nodeset="/form/county" type="select1" />
     </model>
   </h:head>
   <h:body>
     <select1 ref="/form/county">
-	  <itemset nodeset="instance('choices')/counties/county">
-	    <label ref="jr:itext(value)"/>
-		<value ref="value"/>
-	  </itemset>
-	</select1>
+      <itemset nodeset="instance('choices')/counties/county">
+        <label ref="jr:itext(value)"/>
+        <value ref="value"/>
+      </itemset>
+    </select1>
   </h:body>
 </h:html>

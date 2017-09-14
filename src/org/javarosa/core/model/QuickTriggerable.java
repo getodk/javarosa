@@ -16,38 +16,38 @@ import org.javarosa.core.model.condition.Triggerable;
  */
 public final class QuickTriggerable {
 
-	public final Triggerable t;
-	private Integer hashCode = null;
+    public final Triggerable t;
+    private Integer hashCode = null;
 
-	public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
+    public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
 
-		@Override
-		public int compare(QuickTriggerable lhs, QuickTriggerable rhs) {
-			Triggerable lhst = lhs.t;
-			Triggerable rhst = rhs.t;
-			int cmp = Triggerable.triggerablesRootOrdering.compare(lhst, rhst);
-			return cmp;
-		}
-	};
+        @Override
+        public int compare(QuickTriggerable lhs, QuickTriggerable rhs) {
+            Triggerable lhst = lhs.t;
+            Triggerable rhst = rhs.t;
+            int cmp = Triggerable.triggerablesRootOrdering.compare(lhst, rhst);
+            return cmp;
+        }
+    };
 
-	@Override
-	public final int hashCode() {
-		if (hashCode == null) {
-			hashCode = System.identityHashCode(t);
-		}
-		return hashCode;
-	}
+    @Override
+    public final int hashCode() {
+        if (hashCode == null) {
+            hashCode = System.identityHashCode(t);
+        }
+        return hashCode;
+    }
 
-	@Override
-	public final boolean equals(Object obj) {
-		if (obj instanceof QuickTriggerable) {
-			QuickTriggerable other = (QuickTriggerable) obj;
-			return other.t == t;
-		}
-		return false;
-	}
+    @Override
+    public final boolean equals(Object obj) {
+        if (obj instanceof QuickTriggerable) {
+            QuickTriggerable other = (QuickTriggerable) obj;
+            return other.t == t;
+        }
+        return false;
+    }
 
-	QuickTriggerable(Triggerable t) {
-		this.t = t;
-	}
+    QuickTriggerable(Triggerable t) {
+        this.t = t;
+    }
 }

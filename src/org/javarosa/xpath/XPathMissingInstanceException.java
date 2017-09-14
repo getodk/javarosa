@@ -17,19 +17,19 @@
 package org.javarosa.xpath;
 
 public class XPathMissingInstanceException extends XPathException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6564322559371025199L;
-	
-	String instanceName;
-	public XPathMissingInstanceException (String instanceName) {
-		super("Instance " + instanceName + " is missing");
-		this.instanceName = instanceName;
-	}
-	
-	public XPathMissingInstanceException (String instanceName, String message) {
-		super(message);
-		this.instanceName = instanceName;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6564322559371025199L;
+
+    String instanceName;
+    public XPathMissingInstanceException (String instanceName) {
+        super("Instance " + instanceName + " is missing");
+        this.instanceName = instanceName;
+    }
+
+    public XPathMissingInstanceException (String instanceName, String message) {
+        super(message);
+        this.instanceName = instanceName;
+    }
 }

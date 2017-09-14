@@ -26,22 +26,22 @@ package org.javarosa.core.log;
  */
 public class FlatLogSerializer implements IFullLogSerializer<String> {
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.log.ILogSerializer#serializeLog(org.javarosa.core.log.IncidentLog)
-	 */
-	private String serializeLog(LogEntry log) {
-		return "[" + log.getType() + "] " +log.getTime().toString() + ": " +  log.message+ "\n";
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.log.ILogSerializer#serializeLog(org.javarosa.core.log.IncidentLog)
+     */
+    private String serializeLog(LogEntry log) {
+        return "[" + log.getType() + "] " +log.getTime().toString() + ": " +  log.message+ "\n";
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.log.ILogSerializer#serializeLogs(org.javarosa.core.log.IncidentLog[])
-	 */
-	public String serializeLogs(LogEntry[] logs) {
-		StringBuilder log = new StringBuilder();
-		for(int i = 0; i < logs.length; ++i ) {
-			log.append(this.serializeLog(logs[i]));
-		}
-		return log.toString();
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.log.ILogSerializer#serializeLogs(org.javarosa.core.log.IncidentLog[])
+     */
+    public String serializeLogs(LogEntry[] logs) {
+        StringBuilder log = new StringBuilder();
+        for(int i = 0; i < logs.length; ++i ) {
+            log.append(this.serializeLog(logs[i]));
+        }
+        return log.toString();
+    }
 
 }

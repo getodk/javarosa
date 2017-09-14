@@ -26,10 +26,10 @@ import org.javarosa.core.model.instance.FormInstance;
  *
  */
 public interface IInstanceVisitor {
-	/**
-	 * Performs any necessary operations on the IFormDataModel without
-	 * visiting any of the Model's potential children.
-	 * @param dataModel
-	 */
-	void visit(FormInstance instance);
+    /**
+     * Performs any necessary operations on the IFormDataModel without
+     * visiting any of the Model's potential children.
+     * @param dataModel
+     */
+    void visit(FormInstance instance);
 }

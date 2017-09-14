@@ -33,67 +33,67 @@ import java.io.Writer;
 
 public class XFormSerializer {
 
-	public static ByteArrayOutputStream getStream(Document doc) {
-		KXmlSerializer serializer = new KXmlSerializer();
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
-		try {
-			serializer.setOutput(dos, null);
-			doc.write(serializer);
-			serializer.flush();
-			return bos;
-		} catch (Exception e) {
-			Std.printStack(e);
-			return null;
-		}
-	}
+    public static ByteArrayOutputStream getStream(Document doc) {
+        KXmlSerializer serializer = new KXmlSerializer();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        try {
+            serializer.setOutput(dos, null);
+            doc.write(serializer);
+            serializer.flush();
+            return bos;
+        } catch (Exception e) {
+            Std.printStack(e);
+            return null;
+        }
+    }
 
-	public static String elementToString(Element e){
-		KXmlSerializer serializer = new KXmlSerializer();
+    public static String elementToString(Element e){
+        KXmlSerializer serializer = new KXmlSerializer();
 
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
-		String s=null;
-		try {
-			serializer.setOutput(dos, null);
-			e.write(serializer);
-			serializer.flush();
-			s = new String(bos.toByteArray(),"UTF-8");
-			return s;
-		}catch (UnsupportedEncodingException uce){
-			Std.printStack(uce);
-		} catch (Exception ex) {
-			Std.printStack(ex);
-			return null;
-		}
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        String s=null;
+        try {
+            serializer.setOutput(dos, null);
+            e.write(serializer);
+            serializer.flush();
+            s = new String(bos.toByteArray(),"UTF-8");
+            return s;
+        }catch (UnsupportedEncodingException uce){
+            Std.printStack(uce);
+        } catch (Exception ex) {
+            Std.printStack(ex);
+            return null;
+        }
 
-		return null;
+        return null;
 
-	}
+    }
 
-	public static String getString(Document doc) {
-		ByteArrayOutputStream bos = getStream(doc);
+    public static String getString(Document doc) {
+        ByteArrayOutputStream bos = getStream(doc);
 
-		byte[] byteArr = bos.toByteArray();
-		char[] charArray = new char[byteArr.length];
-		for (int i = 0; i < byteArr.length; i++)
-			charArray[i] = (char) byteArr[i];
+        byte[] byteArr = bos.toByteArray();
+        char[] charArray = new char[byteArr.length];
+        for (int i = 0; i < byteArr.length; i++)
+            charArray[i] = (char) byteArr[i];
 
-		return String.valueOf(charArray);
-	}
+        return String.valueOf(charArray);
+    }
 
-	public static byte[] getUtfBytes(Document doc) {
-		KXmlSerializer serializer = new KXmlSerializer();
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		try {
-			Writer osw = new OutputStreamWriter(bos, "UTF-8");
-			serializer.setOutput(osw);
-			doc.write(serializer);
-			serializer.flush();
-			return bos.toByteArray();
-		} catch (Exception e) {
-			Std.printStack(e);
-			return null;
-		}
-	}
+    public static byte[] getUtfBytes(Document doc) {
+        KXmlSerializer serializer = new KXmlSerializer();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            Writer osw = new OutputStreamWriter(bos, "UTF-8");
+            serializer.setOutput(osw);
+            doc.write(serializer);
+            serializer.flush();
+            return bos.toByteArray();
+        } catch (Exception e) {
+            Std.printStack(e);
+            return null;
+        }
+    }
 }

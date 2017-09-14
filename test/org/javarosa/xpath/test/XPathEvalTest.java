@@ -255,10 +255,10 @@ public class XPathEvalTest extends TestCase {
         testEval("date(true())", new XPathTypeMismatchException());
         testEval("date(convertible())", null, ec, new XPathTypeMismatchException());
         //note: there are lots of time and timezone-like issues with dates that should be tested (particularly DST changes),
-        //	but it's just too hard and client-dependent, so not doing it now
+        //    but it's just too hard and client-dependent, so not doing it now
         //  basically:
-        //		dates cannot reliably be compared/used across time zones (an issue with the code)
-        //		any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
+        //        dates cannot reliably be compared/used across time zones (an issue with the code)
+        //        any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
         /* other built-in functions */
 
         logTestCategory("boolean functions");
@@ -524,7 +524,7 @@ public class XPathEvalTest extends TestCase {
         ec.addFunctionHandler(new IFunctionHandler(){
 
             @Override
-            public String getName() { return "regex";	}
+            public String getName() { return "regex";    }
             @Override
             public Object eval(Object[] args, EvaluationContext ec) {
                 System.out.println("EVAL REGEX TESTS:");
@@ -545,7 +545,7 @@ public class XPathEvalTest extends TestCase {
             @Override
             public boolean rawArgs() { return false; }
             @Override
-            public boolean realTime() {	return false; }
+            public boolean realTime() {    return false; }
 
         });
 

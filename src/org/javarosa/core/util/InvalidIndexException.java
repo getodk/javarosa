@@ -10,13 +10,13 @@ package org.javarosa.core.util;
  *
  */
 public class InvalidIndexException extends RuntimeException {
-	String index;
-	public InvalidIndexException(String message, String index) {
-		super(message);
-		this.index = index;
-	}
-	
-	public String getIndex() {
-		return index;
-	}
+    String index;
+    public InvalidIndexException(String message, String index) {
+        super(message);
+        this.index = index;
+    }
+
+    public String getIndex() {
+        return index;
+    }
 }

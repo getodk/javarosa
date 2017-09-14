@@ -21,19 +21,19 @@ import java.util.HashMap;
 //unused for now
 
 public class NodeProcessingRule {
-	public String name;
-	public boolean allowUnknownChildren;
-	public boolean allowChildText;
-	public HashMap<String,ChildProcessingRule> childRules;
-	
-	public NodeProcessingRule (String name, boolean allowUnknownChildren, boolean allowChildText) {
-		this.name = name;
-		this.allowUnknownChildren = allowUnknownChildren;
-		this.allowChildText = allowChildText;
-		childRules = new HashMap<String,ChildProcessingRule>();
-	}
-	
-	public void addChild (ChildProcessingRule cpr) {
-		childRules.put(cpr.name, cpr);
-	}
+    public String name;
+    public boolean allowUnknownChildren;
+    public boolean allowChildText;
+    public HashMap<String,ChildProcessingRule> childRules;
+
+    public NodeProcessingRule (String name, boolean allowUnknownChildren, boolean allowChildText) {
+        this.name = name;
+        this.allowUnknownChildren = allowUnknownChildren;
+        this.allowChildText = allowChildText;
+        childRules = new HashMap<String,ChildProcessingRule>();
+    }
+
+    public void addChild (ChildProcessingRule cpr) {
+        childRules.put(cpr.name, cpr);
+    }
 }

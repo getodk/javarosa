@@ -34,36 +34,36 @@ import org.javarosa.core.util.Map;
  *
  */
 public class PrototypeFactoryDeprecated {
-	public Map prototypes = new Map();
-	
-	/**
-	 * Adds a new class to be able to retrieve instances of
-	 * @param name The name of the prototype. Generally prototype.getClass().getName()
-	 * @param prototype The class object to be used for instantiation. Should be a class
-	 * with a constructor that takes 0 arguments.
-	 */
-	public void addNewPrototype(String name, Class prototype) {
-		prototypes.put(name, prototype);
-	}
-	
-	/**
-	 * @param prototypeName The name of the prototype to be instantiated
-	 * @return a new object of the type linked to the name given in this factory. Null
-	 * if the name is not associated with any class in this factory.
-	 * @throws IllegalAccessException If the empty constructor of the class given is not
-	 * allowed to be accessed.
-	 * @throws InstantiationException
-	 */
-	public Object getNewInstance(String prototypeName) {
-		if(prototypes.get(prototypeName) == null) {
-			return null;
-		}
-		try {
-			return ((Class)prototypes.get(prototypeName)).newInstance();
-		} catch (InstantiationException e) {
-			throw new CannotCreateObjectException(prototypeName);
-		} catch (IllegalAccessException e) {
-			throw new CannotCreateObjectException(prototypeName);
-		}
-	}
+    public Map prototypes = new Map();
+
+    /**
+     * Adds a new class to be able to retrieve instances of
+     * @param name The name of the prototype. Generally prototype.getClass().getName()
+     * @param prototype The class object to be used for instantiation. Should be a class
+     * with a constructor that takes 0 arguments.
+     */
+    public void addNewPrototype(String name, Class prototype) {
+        prototypes.put(name, prototype);
+    }
+
+    /**
+     * @param prototypeName The name of the prototype to be instantiated
+     * @return a new object of the type linked to the name given in this factory. Null
+     * if the name is not associated with any class in this factory.
+     * @throws IllegalAccessException If the empty constructor of the class given is not
+     * allowed to be accessed.
+     * @throws InstantiationException
+     */
+    public Object getNewInstance(String prototypeName) {
+        if(prototypes.get(prototypeName) == null) {
+            return null;
+        }
+        try {
+            return ((Class)prototypes.get(prototypeName)).newInstance();
+        } catch (InstantiationException e) {
+            throw new CannotCreateObjectException(prototypeName);
+        } catch (IllegalAccessException e) {
+            throw new CannotCreateObjectException(prototypeName);
+        }
+    }
 }

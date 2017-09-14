@@ -532,7 +532,7 @@ public class XFormParser implements IXFormParserFunctions {
         } else {
             if (!validElementNames.contains(name)) {
                 reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP,
-                        "Unrecognized element [" + name	+ "]. Ignoring and processing children...",
+                        "Unrecognized element [" + name    + "]. Ignoring and processing children...",
                         getVagueLocation(e));
             }
             for (int i = 0; i < e.getChildCount(); i++) {
@@ -1972,7 +1972,7 @@ public class XFormParser implements IXFormParserFunctions {
         //   Localizer loc = f.getLocalizer();
         //   if (loc != null) {
         //       f.localeChanged(loc.getLocale(), loc);
-        //	 }
+        //     }
     }
 
     public static String getXMLText (Node n, boolean trim) {

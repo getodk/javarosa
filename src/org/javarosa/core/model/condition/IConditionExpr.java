@@ -41,64 +41,64 @@ import org.javarosa.core.util.externalizable.Externalizable;
  */
 public interface IConditionExpr extends Externalizable {
 
-	/**
-	 * Evaluate this expression against the current models and
-	 * context and provide a true or false value.
-	 *
-	 * @param model
-	 * @param evalContext
-	 * @return
-	 */
-	boolean eval (DataInstance model, EvaluationContext evalContext);
+    /**
+     * Evaluate this expression against the current models and
+     * context and provide a true or false value.
+     *
+     * @param model
+     * @param evalContext
+     * @return
+     */
+    boolean eval (DataInstance model, EvaluationContext evalContext);
 
-	/**
-	 * Evaluate this expression against the current models and
-	 * context and provide the final value of the expression, without
-	 * forcing a cast to a boolean value.
-	 *
-	 * @param model
-	 * @param evalContext
-	 * @return
-	 */
-	Object evalRaw (DataInstance model, EvaluationContext evalContext);
+    /**
+     * Evaluate this expression against the current models and
+     * context and provide the final value of the expression, without
+     * forcing a cast to a boolean value.
+     *
+     * @param model
+     * @param evalContext
+     * @return
+     */
+    Object evalRaw (DataInstance model, EvaluationContext evalContext);
 
-	/**
-	 * Used for itemsets. Fill this documentation in.
-	 *
-	 * @param model
-	 * @param evalContext
-	 * @return
-	 */
-	String evalReadable (DataInstance model, EvaluationContext evalContext);
+    /**
+     * Used for itemsets. Fill this documentation in.
+     *
+     * @param model
+     * @param evalContext
+     * @return
+     */
+    String evalReadable (DataInstance model, EvaluationContext evalContext);
 
-	/**
-	 * Used for itemsets. Fill this documentation in.
-	 *
-	 * @param model
-	 * @param evalContext
-	 * @return
-	 */
+    /**
+     * Used for itemsets. Fill this documentation in.
+     *
+     * @param model
+     * @param evalContext
+     * @return
+     */
    List<TreeReference> evalNodeset (DataInstance model, EvaluationContext evalContext);
 
-	/**
-	 * Provides a list of all of the references that this expression's value depends upon
-	 * directly. These values can't be contextualized fully (since these triggers are necessary
-	 * before runtime), but should only need to be contextualized to be a complete set.
-	 *
-	 * @return
-	 */
-	Set<TreeReference> getTriggers (TreeReference contextRef); /* unordered set of TreeReference */
+    /**
+     * Provides a list of all of the references that this expression's value depends upon
+     * directly. These values can't be contextualized fully (since these triggers are necessary
+     * before runtime), but should only need to be contextualized to be a complete set.
+     *
+     * @return
+     */
+    Set<TreeReference> getTriggers (TreeReference contextRef); /* unordered set of TreeReference */
 
-	/**
-	 * Provide a list of Pivots around which this Condition Expression depends.
-	 *
-	 * Optional to implement. If not implemented, throw an Unpivotable Expression exception
-	 * to signal that the expression cannot be statically evaluated.
-	 *
-	 * @param model
-	 * @param evalContext
-	 * @return
-	 * @throws UnpivotableExpressionException
-	 */
+    /**
+     * Provide a list of Pivots around which this Condition Expression depends.
+     *
+     * Optional to implement. If not implemented, throw an Unpivotable Expression exception
+     * to signal that the expression cannot be statically evaluated.
+     *
+     * @param model
+     * @param evalContext
+     * @return
+     * @throws UnpivotableExpressionException
+     */
    List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException;
 }

@@ -34,80 +34,80 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class BasicDataPointer implements IDataPointer {
 
-	private byte[] data;
-	private String name;
-	
-	/**
-	 * NOTE: Only for serialization use.
-	 */
-	public BasicDataPointer() {
-		//You shouldn't be calling this unless you are deserializing.
-	}
-	
-	public BasicDataPointer(String name, byte[] data) {
-		this.name = name;
-		this.data = data;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IDataPointer#deleteData()
-	 */
-	public boolean deleteData() {
-		
-		this.data = null;
-		return true;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IDataPointer#getData()
-	 */
-	public byte[] getData() {
-		return data;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IDataPointer#getDisplayText()
-	 */
-	public String getDisplayText() {
-		return name;
-	}
+    private byte[] data;
+    private String name;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IDataPointer#getDataStream()
-	 */
-	public InputStream getDataStream() {
-		ByteArrayInputStream bis = new ByteArrayInputStream(data);
-		return bis;
-	}
+    /**
+     * NOTE: Only for serialization use.
+     */
+    public BasicDataPointer() {
+        //You shouldn't be calling this unless you are deserializing.
+    }
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		int size = in.readInt();
-		if(size != -1) {
-			data = new byte[size];
-			in.read(data);
-		}
-		name = ExtUtil.readString(in);
-	}
+    public BasicDataPointer(String name, byte[] data) {
+        this.name = name;
+        this.data = data;
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		if(data == null || data.length < 0) {
-			out.writeInt(-1);
-		} else {
-			out.writeInt(data.length);
-			out.write(data);
-		}
-		ExtUtil.writeString(out, name);
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.model.data.IDataPointer#deleteData()
+     */
+    public boolean deleteData() {
 
-	public long getLength() {
-		// TODO Auto-generated method stub
-		return data.length;
-	} 
+        this.data = null;
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.model.data.IDataPointer#getData()
+     */
+    public byte[] getData() {
+        return data;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.model.data.IDataPointer#getDisplayText()
+     */
+    public String getDisplayText() {
+        return name;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.model.data.IDataPointer#getDataStream()
+     */
+    public InputStream getDataStream() {
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        return bis;
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        int size = in.readInt();
+        if(size != -1) {
+            data = new byte[size];
+            in.read(data);
+        }
+        name = ExtUtil.readString(in);
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        if(data == null || data.length < 0) {
+            out.writeInt(-1);
+        } else {
+            out.writeInt(data.length);
+            out.write(data);
+        }
+        ExtUtil.writeString(out, name);
+    }
+
+    public long getLength() {
+        // TODO Auto-generated method stub
+        return data.length;
+    }
 
 
 }

@@ -26,86 +26,86 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 
 public class SelectOneDataTests extends TestCase {
-	QuestionDef question;
-	
-	Selection one;
-	Selection two;
-	
-	private static int NUM_TESTS = 3;
-	
-	/* (non-Javadoc)
-	 * @see j2meunit.framework.TestCase#setUp()
-	 */
-	public void setUp() throws Exception {
-		super.setUp();
-		
-		question = new QuestionDef();
-		question.setID(57);
-		
-		for (int i = 0; i < 3; i++) {
-			question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false));
-		}	
-		
-		one = new Selection("Selection1");
-		one.attachChoice(question);
-		two = new Selection("Selection2");
-		two.attachChoice(question);
-	}
+    QuestionDef question;
 
-	public SelectOneDataTests(String name) {
-		super(name);
-		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
-	}
+    Selection one;
+    Selection two;
 
-	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+    private static int NUM_TESTS = 3;
 
-		for (int i = 1; i <= NUM_TESTS; i++) {
-			final int testID = i;
+    /* (non-Javadoc)
+     * @see j2meunit.framework.TestCase#setUp()
+     */
+    public void setUp() throws Exception {
+        super.setUp();
 
-			aSuite.addTest(new SelectOneDataTests(testMaster(testID)));
-		}
+        question = new QuestionDef();
+        question.setID(57);
 
-		return aSuite;
-	}
-	public static String testMaster (int testID) {
-		//System.out.println("running " + testID);
-		
-		switch (testID) {
-		case 1: return "testGetData";
-		case 2: return "testSetData";
-		case 3: return "testNullData";
-		}
-		throw new IllegalStateException("Unexpected index");
-	}
-	
-	public void testGetData() {
-		SelectOneData data = new SelectOneData(one);
-		assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
-		
-	}
-	public void testSetData() {
-		SelectOneData data = new SelectOneData(one);
-		data.setValue(two);
-		
-		assertTrue("SelectOneData did not set value properly. Maintained old value.", !(data.getValue().equals(one)));
-		assertEquals("SelectOneData did not properly set value ", data.getValue(), two);
-		
-		data.setValue(one);
-		assertTrue("SelectOneData did not set value properly. Maintained old value.", !(data.getValue().equals(two)));
-		assertEquals("SelectOneData did not properly reset value ", data.getValue(), one);
-		
-	}
-	public void testNullData() {
-		boolean exceptionThrown = false;
-		SelectOneData data = new SelectOneData();
-		data.setValue(one);
-		try { 
-			data.setValue(null);
-		} catch (NullPointerException e) {
-			exceptionThrown = true;
-		}
-		assertTrue("SelectOneData failed to throw an exception when setting null data", exceptionThrown);
-		assertTrue("SelectOneData overwrote existing value on incorrect input", data.getValue().equals(one));
-	}
+        for (int i = 0; i < 3; i++) {
+            question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false));
+        }
+
+        one = new Selection("Selection1");
+        one.attachChoice(question);
+        two = new Selection("Selection2");
+        two.attachChoice(question);
+    }
+
+    public SelectOneDataTests(String name) {
+        super(name);
+        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    }
+
+    public static Test suite() {
+        TestSuite aSuite = new TestSuite();
+
+        for (int i = 1; i <= NUM_TESTS; i++) {
+            final int testID = i;
+
+            aSuite.addTest(new SelectOneDataTests(testMaster(testID)));
+        }
+
+        return aSuite;
+    }
+    public static String testMaster (int testID) {
+        //System.out.println("running " + testID);
+
+        switch (testID) {
+        case 1: return "testGetData";
+        case 2: return "testSetData";
+        case 3: return "testNullData";
+        }
+        throw new IllegalStateException("Unexpected index");
+    }
+
+    public void testGetData() {
+        SelectOneData data = new SelectOneData(one);
+        assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
+
+    }
+    public void testSetData() {
+        SelectOneData data = new SelectOneData(one);
+        data.setValue(two);
+
+        assertTrue("SelectOneData did not set value properly. Maintained old value.", !(data.getValue().equals(one)));
+        assertEquals("SelectOneData did not properly set value ", data.getValue(), two);
+
+        data.setValue(one);
+        assertTrue("SelectOneData did not set value properly. Maintained old value.", !(data.getValue().equals(two)));
+        assertEquals("SelectOneData did not properly reset value ", data.getValue(), one);
+
+    }
+    public void testNullData() {
+        boolean exceptionThrown = false;
+        SelectOneData data = new SelectOneData();
+        data.setValue(one);
+        try {
+            data.setValue(null);
+        } catch (NullPointerException e) {
+            exceptionThrown = true;
+        }
+        assertTrue("SelectOneData failed to throw an exception when setting null data", exceptionThrown);
+        assertTrue("SelectOneData overwrote existing value on incorrect input", data.getValue().equals(one));
+    }
 }

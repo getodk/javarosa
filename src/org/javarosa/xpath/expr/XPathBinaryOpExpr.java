@@ -30,54 +30,54 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 public abstract class XPathBinaryOpExpr extends XPathOpExpr {
-	public XPathExpression a, b;
+    public XPathExpression a, b;
 
-	public XPathBinaryOpExpr () { } //for deserialization of children
-	
-	public XPathBinaryOpExpr (XPathExpression a, XPathExpression b) {
-		this.a = a;
-		this.b = b;
-	}
-	
-	public String toString (String op) {
-		return "{binop-expr:" + op + "," + a.toString() + "," + b.toString() + "}";
-	}
-	
-	public boolean equals (Object o) {
-		if (o instanceof XPathBinaryOpExpr) {
-			XPathBinaryOpExpr x = (XPathBinaryOpExpr)o;
-			return a.equals(x.a) && b.equals(x.b);
-		} else {
-			return false;
-		}
-	}
-	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		a = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		b = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
-	}
-	
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(a));
-		ExtUtil.write(out, new ExtWrapTagged(b));
-	}
-	
-	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
-		//Pivot both args
-		Object aval = a.pivot(model, evalContext, pivots, sentinal);
-		Object bval = b.pivot(model, evalContext, pivots, sentinal);
-		
-		//If either is the sentinal, we don't have a good way to represent the resulting expression, so fail
-		if(aval == sentinal || bval == sentinal) {
-			throw new UnpivotableExpressionException();
-		}
-		
-		//If either has added a pivot, this expression can't produce any more pivots, so signal that
-		if(aval == null || bval == null) {
-			return null;
-		}
-		
-		//Otherwise, return the value
-		return this.eval(model, evalContext);
-	}
+    public XPathBinaryOpExpr () { } //for deserialization of children
+
+    public XPathBinaryOpExpr (XPathExpression a, XPathExpression b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    public String toString (String op) {
+        return "{binop-expr:" + op + "," + a.toString() + "," + b.toString() + "}";
+    }
+
+    public boolean equals (Object o) {
+        if (o instanceof XPathBinaryOpExpr) {
+            XPathBinaryOpExpr x = (XPathBinaryOpExpr)o;
+            return a.equals(x.a) && b.equals(x.b);
+        } else {
+            return false;
+        }
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        a = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
+        b = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(a));
+        ExtUtil.write(out, new ExtWrapTagged(b));
+    }
+
+    public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+        //Pivot both args
+        Object aval = a.pivot(model, evalContext, pivots, sentinal);
+        Object bval = b.pivot(model, evalContext, pivots, sentinal);
+
+        //If either is the sentinal, we don't have a good way to represent the resulting expression, so fail
+        if(aval == sentinal || bval == sentinal) {
+            throw new UnpivotableExpressionException();
+        }
+
+        //If either has added a pivot, this expression can't produce any more pivots, so signal that
+        if(aval == null || bval == null) {
+            return null;
+        }
+
+        //Otherwise, return the value
+        return this.eval(model, evalContext);
+    }
 }

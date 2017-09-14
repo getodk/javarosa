@@ -17,16 +17,16 @@
 package org.javarosa.core.services;
 
 public class UnavailableServiceException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1443669274920467635L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -1443669274920467635L;
 
-	public UnavailableServiceException() {
-		
-	}
-	
-	public UnavailableServiceException(String message) {
-		super(message);
-	}
+    public UnavailableServiceException() {
+
+    }
+
+    public UnavailableServiceException(String message) {
+        super(message);
+    }
 }

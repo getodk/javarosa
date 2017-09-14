@@ -61,153 +61,153 @@ choice list
 */
 
 public class XFormAnswerDataParser {
-	//FIXME: the QuestionDef parameter is a hack until we find a better way to represent AnswerDatas for select questions
+    //FIXME: the QuestionDef parameter is a hack until we find a better way to represent AnswerDatas for select questions
 
-	public static IAnswerData getAnswerData (String text, int dataType) {
-		return getAnswerData(text, dataType, null);
-	}
-	public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
-		String trimmedText = text.trim();
-		if (trimmedText.length() == 0)
-			trimmedText = null;
+    public static IAnswerData getAnswerData (String text, int dataType) {
+        return getAnswerData(text, dataType, null);
+    }
+    public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
+        String trimmedText = text.trim();
+        if (trimmedText.length() == 0)
+            trimmedText = null;
 
-		switch (dataType) {
-		case Constants.DATATYPE_NULL:
-		case Constants.DATATYPE_UNSUPPORTED:
-		case Constants.DATATYPE_TEXT:
-	    case Constants.DATATYPE_BARCODE:
-	    case Constants.DATATYPE_BINARY:
+        switch (dataType) {
+        case Constants.DATATYPE_NULL:
+        case Constants.DATATYPE_UNSUPPORTED:
+        case Constants.DATATYPE_TEXT:
+        case Constants.DATATYPE_BARCODE:
+        case Constants.DATATYPE_BINARY:
 
-			return new StringData(text);
+            return new StringData(text);
 
-		case Constants.DATATYPE_INTEGER:
+        case Constants.DATATYPE_INTEGER:
 
-			try {
-				return (trimmedText == null ? null : new IntegerData(Integer.parseInt(trimmedText)));
-			} catch (NumberFormatException nfe) {
-				return null;
-			}
+            try {
+                return (trimmedText == null ? null : new IntegerData(Integer.parseInt(trimmedText)));
+            } catch (NumberFormatException nfe) {
+                return null;
+            }
 
-		case Constants.DATATYPE_LONG:
+        case Constants.DATATYPE_LONG:
 
-			try {
-				return (trimmedText == null ? null : new LongData(Long.parseLong(trimmedText)));
-			} catch (NumberFormatException nfe) {
-				return null;
-			}
+            try {
+                return (trimmedText == null ? null : new LongData(Long.parseLong(trimmedText)));
+            } catch (NumberFormatException nfe) {
+                return null;
+            }
 
-		case Constants.DATATYPE_DECIMAL:
+        case Constants.DATATYPE_DECIMAL:
 
-			try {
-				return (trimmedText == null ? null : new DecimalData(Double.parseDouble(trimmedText)));
-			} catch (NumberFormatException nfe) {
-				return null;
-			}
+            try {
+                return (trimmedText == null ? null : new DecimalData(Double.parseDouble(trimmedText)));
+            } catch (NumberFormatException nfe) {
+                return null;
+            }
 
-		case Constants.DATATYPE_CHOICE:
+        case Constants.DATATYPE_CHOICE:
 
             List<Selection> selections = getSelections(text, q);
-			return (selections.size() == 0 ? null : new SelectOneData(selections.get(0)));
+            return (selections.size() == 0 ? null : new SelectOneData(selections.get(0)));
 
-		case Constants.DATATYPE_CHOICE_LIST:
+        case Constants.DATATYPE_CHOICE_LIST:
 
-			return new SelectMultiData(getSelections(text, q));
+            return new SelectMultiData(getSelections(text, q));
 
-		case Constants.DATATYPE_DATE_TIME:
+        case Constants.DATATYPE_DATE_TIME:
 
-			Date dt = (trimmedText == null ? null : DateUtils.parseDateTime(trimmedText));
-			return (dt == null ? null : new DateTimeData(dt));
+            Date dt = (trimmedText == null ? null : DateUtils.parseDateTime(trimmedText));
+            return (dt == null ? null : new DateTimeData(dt));
 
-		case Constants.DATATYPE_DATE:
+        case Constants.DATATYPE_DATE:
 
-			Date d = (trimmedText == null ? null : DateUtils.parseDate(trimmedText));
-			return (d == null ? null : new DateData(d));
+            Date d = (trimmedText == null ? null : DateUtils.parseDate(trimmedText));
+            return (d == null ? null : new DateData(d));
 
-		case Constants.DATATYPE_TIME:
+        case Constants.DATATYPE_TIME:
 
-			Date t = (trimmedText == null ? null : DateUtils.parseTime(trimmedText));
-			return (t == null ? null : new TimeData(t));
+            Date t = (trimmedText == null ? null : DateUtils.parseTime(trimmedText));
+            return (t == null ? null : new TimeData(t));
 
-		case Constants.DATATYPE_BOOLEAN:
+        case Constants.DATATYPE_BOOLEAN:
 
-			if(trimmedText == null) {
-				return null;
-			} else {
-				if(trimmedText.equals("1")) { return new BooleanData(true); }
-				if(trimmedText.equals("0")) { return new BooleanData(false); }
-				return trimmedText.equals("t") ? new BooleanData(true) : new BooleanData(false);
-			}
+            if(trimmedText == null) {
+                return null;
+            } else {
+                if(trimmedText.equals("1")) { return new BooleanData(true); }
+                if(trimmedText.equals("0")) { return new BooleanData(false); }
+                return trimmedText.equals("t") ? new BooleanData(true) : new BooleanData(false);
+            }
 
-		case Constants.DATATYPE_GEOPOINT:
-			if ( trimmedText == null ) {
-				return new GeoPointData();
-			}
+        case Constants.DATATYPE_GEOPOINT:
+            if ( trimmedText == null ) {
+                return new GeoPointData();
+            }
 
-			try {
-				UncastData uncast = new UncastData(trimmedText);
-				// silly...
-				GeoPointData gp = new GeoPointData();
-				return gp.cast(uncast);
-			} catch (Exception e) {
-				return null;
-			}
+            try {
+                UncastData uncast = new UncastData(trimmedText);
+                // silly...
+                GeoPointData gp = new GeoPointData();
+                return gp.cast(uncast);
+            } catch (Exception e) {
+                return null;
+            }
 
-		case Constants.DATATYPE_GEOSHAPE:
-			if ( trimmedText == null ) {
-				return new GeoShapeData();
-			}
+        case Constants.DATATYPE_GEOSHAPE:
+            if ( trimmedText == null ) {
+                return new GeoShapeData();
+            }
 
-			try {
-				UncastData uncast = new UncastData(trimmedText);
-				// silly...
-				GeoShapeData gs = new GeoShapeData();
-				return gs.cast(uncast);
-			} catch (Exception e) {
-				return null;
-			}
+            try {
+                UncastData uncast = new UncastData(trimmedText);
+                // silly...
+                GeoShapeData gs = new GeoShapeData();
+                return gs.cast(uncast);
+            } catch (Exception e) {
+                return null;
+            }
 
-		case Constants.DATATYPE_GEOTRACE:
-			if ( trimmedText == null ) {
-				return new GeoTraceData();
-			}
+        case Constants.DATATYPE_GEOTRACE:
+            if ( trimmedText == null ) {
+                return new GeoTraceData();
+            }
 
-			try {
-				UncastData uncast = new UncastData(trimmedText);
-				// silly...
-				GeoTraceData gl = new GeoTraceData();
-				return gl.cast(uncast);
-			} catch (Exception e) {
-				return null;
-			}
+            try {
+                UncastData uncast = new UncastData(trimmedText);
+                // silly...
+                GeoTraceData gl = new GeoTraceData();
+                return gl.cast(uncast);
+            } catch (Exception e) {
+                return null;
+            }
 
-		default:
-			return new UncastData(trimmedText);
-		}
-	}
+        default:
+            return new UncastData(trimmedText);
+        }
+    }
 
-	private static List<Selection> getSelections (String text, QuestionDef q) {
+    private static List<Selection> getSelections (String text, QuestionDef q) {
 
       List<String> choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
       List<Selection> v = new ArrayList<Selection>(choices.size()); // assume they are all still valid...
-		for (int i = 0; i < choices.size(); i++) {
-			Selection s = getSelection((String)choices.get(i), q);
-			if (s != null)
-				v.add(s);
-		}
+        for (int i = 0; i < choices.size(); i++) {
+            Selection s = getSelection((String)choices.get(i), q);
+            if (s != null)
+                v.add(s);
+        }
 
-		return v;
-	}
+        return v;
+    }
 
-	private static Selection getSelection(String choiceValue, QuestionDef q) {
-		Selection s;
+    private static Selection getSelection(String choiceValue, QuestionDef q) {
+        Selection s;
 
-		if (q == null || q.getDynamicChoices() != null) {
-			s = new Selection(choiceValue);
-		} else {
-			SelectChoice choice = q.getChoiceForValue(choiceValue);
-			s = (choice != null ? choice.selection() : null);
-		}
+        if (q == null || q.getDynamicChoices() != null) {
+            s = new Selection(choiceValue);
+        } else {
+            SelectChoice choice = q.getChoiceForValue(choiceValue);
+            s = (choice != null ? choice.selection() : null);
+        }
 
-		return s;
-	}
+        return s;
+    }
 }
