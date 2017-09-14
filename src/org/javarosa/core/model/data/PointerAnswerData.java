@@ -35,61 +35,61 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class PointerAnswerData implements IAnswerData {
 
-	private IDataPointer data;
+    private IDataPointer data;
 
 
-	/**
-	 * NOTE: Only for serialization/deserialization
-	 */
-	public PointerAnswerData() {
-		//Only for serialization/deserialization
-	}
+    /**
+     * NOTE: Only for serialization/deserialization
+     */
+    public PointerAnswerData() {
+        //Only for serialization/deserialization
+    }
 
-	public PointerAnswerData(IDataPointer data) {
-		this.data = data;
-	}
-
-    @Override
-	public IAnswerData clone () {
-		return null; //not cloneable
-	}
+    public PointerAnswerData(IDataPointer data) {
+        this.data = data;
+    }
 
     @Override
-	public String getDisplayText() {
-		return data.getDisplayText();
-	}
+    public IAnswerData clone () {
+        return null; //not cloneable
+    }
 
     @Override
-	public Object getValue() {
-		return data;
-	}
+    public String getDisplayText() {
+        return data.getDisplayText();
+    }
 
     @Override
-	public void setValue(Object o) {
-		if(o == null) {
-			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
-		}
-		data = ((IDataPointer)o);
-	}
+    public Object getValue() {
+        return data;
+    }
 
     @Override
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		data = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
-	}
+    public void setValue(Object o) {
+        if(o == null) {
+            throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+        }
+        data = ((IDataPointer)o);
+    }
 
     @Override
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(data));
-	}
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        data = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
+    }
 
     @Override
-	public UncastData uncast() {
-		return new UncastData(data.getDisplayText());
-	}
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(data));
+    }
 
     @Override
-	public PointerAnswerData cast(UncastData data) throws IllegalArgumentException {
-		return null;
-	}
+    public UncastData uncast() {
+        return new UncastData(data.getDisplayText());
+    }
+
+    @Override
+    public PointerAnswerData cast(UncastData data) throws IllegalArgumentException {
+        return null;
+    }
 }

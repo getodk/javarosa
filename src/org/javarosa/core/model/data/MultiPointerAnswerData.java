@@ -33,79 +33,79 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class MultiPointerAnswerData implements IAnswerData {
 
-	private IDataPointer[] data;
+    private IDataPointer[] data;
 
-	/**
-	 * NOTE: Only for serialization/deserialization
-	 */
-	public MultiPointerAnswerData() {
-		//Only for serialization/deserialization
-	}
+    /**
+     * NOTE: Only for serialization/deserialization
+     */
+    public MultiPointerAnswerData() {
+        //Only for serialization/deserialization
+    }
 
-	public MultiPointerAnswerData (IDataPointer[] values) {
-		data = values;
-	}
-
-    @Override
-	public String getDisplayText() {
-		StringBuilder b = new StringBuilder();
-		for (int i=0; i < data.length; i++) {
-			if (i != 0) {
-				b.append(", ");
-			}
-			b.append(data[i].getDisplayText());
-		}
-		return b.toString();
-	}
+    public MultiPointerAnswerData (IDataPointer[] values) {
+        data = values;
+    }
 
     @Override
-	public Object getValue() {
-		return data;
-	}
+    public String getDisplayText() {
+        StringBuilder b = new StringBuilder();
+        for (int i=0; i < data.length; i++) {
+            if (i != 0) {
+                b.append(", ");
+            }
+            b.append(data[i].getDisplayText());
+        }
+        return b.toString();
+    }
 
     @Override
-	public void setValue(Object o) {
-		if(o == null) {
-			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
-		}
-		data = (IDataPointer[]) o;
-	}
+    public Object getValue() {
+        return data;
+    }
 
     @Override
-	public IAnswerData clone () {
-		return null; //not cloneable
-	}
+    public void setValue(Object o) {
+        if(o == null) {
+            throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+        }
+        data = (IDataPointer[]) o;
+    }
 
     @Override
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		int length = in.readInt();
-		data = new IDataPointer[length];
-		for(int i = 0; i < data.length; ++i) {
-			data[i] = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
-		}
-	}
+    public IAnswerData clone () {
+        return null; //not cloneable
+    }
 
     @Override
-	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(data.length);
-		for(int i = 0; i < data.length ; ++i ) {
-			ExtUtil.write(out, new ExtWrapTagged(data[i]));
-		}
-	}
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        int length = in.readInt();
+        data = new IDataPointer[length];
+        for(int i = 0; i < data.length; ++i) {
+            data[i] = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
+        }
+    }
 
     @Override
-	public UncastData uncast() {
-		StringBuilder b = new StringBuilder();
-		for(IDataPointer datum : data) {
-			b.append(datum.getDisplayText());
-			b.append(" ");
-		}
-		return new UncastData(b.toString().trim());
-	}
+    public void writeExternal(DataOutputStream out) throws IOException {
+        out.writeInt(data.length);
+        for(int i = 0; i < data.length ; ++i ) {
+            ExtUtil.write(out, new ExtWrapTagged(data[i]));
+        }
+    }
 
     @Override
-	public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
-		return null;
-	}
+    public UncastData uncast() {
+        StringBuilder b = new StringBuilder();
+        for(IDataPointer datum : data) {
+            b.append(datum.getDisplayText());
+            b.append(" ");
+        }
+        return new UncastData(b.toString().trim());
+    }
+
+    @Override
+    public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
+        return null;
+    }
 }

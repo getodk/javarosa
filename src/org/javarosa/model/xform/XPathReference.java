@@ -40,83 +40,83 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
  *
  */
 public class XPathReference implements IDataReference {
-	private TreeReference ref;
-	private String nodeset;
+    private TreeReference ref;
+    private String nodeset;
 
-	public XPathReference () {
+    public XPathReference () {
 
-	}
+    }
 
-	public XPathReference (String nodeset) {
-		ref = getPathExpr(nodeset).getReference();
-		this.nodeset = nodeset;
-	}
+    public XPathReference (String nodeset) {
+        ref = getPathExpr(nodeset).getReference();
+        this.nodeset = nodeset;
+    }
 
-	public static XPathPathExpr getPathExpr (String nodeset) {
-		XPathExpression path;
-		boolean validNonPathExpr = false;
+    public static XPathPathExpr getPathExpr (String nodeset) {
+        XPathExpression path;
+        boolean validNonPathExpr = false;
 
-		try {
-		path = XPathParseTool.parseXPath(nodeset);
-		if (!(path instanceof XPathPathExpr)) {
-			validNonPathExpr = true;
-			throw new XPathSyntaxException();
-		}
+        try {
+        path = XPathParseTool.parseXPath(nodeset);
+        if (!(path instanceof XPathPathExpr)) {
+            validNonPathExpr = true;
+            throw new XPathSyntaxException();
+        }
 
-		} catch (XPathSyntaxException xse) {
-			//make these checked exceptions?
-			if (validNonPathExpr) {
-				throw new XPathTypeMismatchException("Expected XPath path, got XPath expression: [" + nodeset + "]," + xse.getMessage());
-			} else {
-				Std.printStack(xse);
-				throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
-			}
-		}
+        } catch (XPathSyntaxException xse) {
+            //make these checked exceptions?
+            if (validNonPathExpr) {
+                throw new XPathTypeMismatchException("Expected XPath path, got XPath expression: [" + nodeset + "]," + xse.getMessage());
+            } else {
+                Std.printStack(xse);
+                throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
+            }
+        }
 
-		return (XPathPathExpr)path;
-	}
+        return (XPathPathExpr)path;
+    }
 
-	public XPathReference (XPathPathExpr path) {
-		ref = path.getReference();
-	}
+    public XPathReference (XPathPathExpr path) {
+        ref = path.getReference();
+    }
 
-	public XPathReference (TreeReference ref) {
-		this.ref = ref;
-	}
+    public XPathReference (TreeReference ref) {
+        this.ref = ref;
+    }
 
-	public Object getReference () {
-		return ref;
-	}
+    public Object getReference () {
+        return ref;
+    }
 
-	public void setReference (Object o) {
-		//do nothing
-	}
+    public void setReference (Object o) {
+        //do nothing
+    }
 
-	public boolean equals (Object o) {
-		if (o instanceof XPathReference) {
-			return ref.equals(((XPathReference)o).ref);
-		} else {
-			return false;
-		}
-	}
+    public boolean equals (Object o) {
+        if (o instanceof XPathReference) {
+            return ref.equals(((XPathReference)o).ref);
+        } else {
+            return false;
+        }
+    }
 
-	public int hashCode () {
-		return ref.hashCode();
-	}
+    public int hashCode () {
+        return ref.hashCode();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		nodeset = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
-		ref = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+     */
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        nodeset = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+        ref = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeString(out, ExtUtil.emptyIfNull(nodeset));
-		ExtUtil.write(out, ref);
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.writeString(out, ExtUtil.emptyIfNull(nodeset));
+        ExtUtil.write(out, ref);
+    }
 }

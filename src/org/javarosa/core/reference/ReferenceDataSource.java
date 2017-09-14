@@ -40,57 +40,57 @@ import java.io.InputStream;
  *
  */
 public class ReferenceDataSource implements LocaleDataSource {
-	
-	String referenceURI;
-	
-	/**
-	 * NOTE: FOR SERIALIZATION ONLY!
-	 */
-	public ReferenceDataSource() {
-		
-	}
-	
-	/**
-	 * Creates a new Data Source for Locale data with the given resource URI.
-	 * 
-	 * @param referenceURI a URI to the resource file from which data should be loaded
-	 * @throws NullPointerException if resourceURI is null
-	 */
-	public ReferenceDataSource(String referenceURI) {
-		if(referenceURI == null) {
-			throw new NullPointerException("Reference URI cannot be null when creating a Resource File Data Source");
-		}
-		this.referenceURI = referenceURI;
-	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.locale.LocaleDataSource#getLocalizedText()
-	 */
-	public OrderedMap<String, String> getLocalizedText() {
-		try {
-			InputStream is = ReferenceManager.instance().DeriveReference(referenceURI).getStream();
-			return LocalizationUtils.parseLocaleInput(is);
-		} catch (IOException e) {
-			Std.printStack(e);
-			throw new RuntimeException("IOException while getting localized text at reference " + referenceURI);
-		} catch (InvalidReferenceException e) {
-			Std.printStack(e);
-			throw new RuntimeException("Invalid Reference! " + referenceURI);
-		}
-	}
+    String referenceURI;
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		referenceURI = in.readUTF();
-	}
+    /**
+     * NOTE: FOR SERIALIZATION ONLY!
+     */
+    public ReferenceDataSource() {
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeUTF(referenceURI);
-	}
+    }
+
+    /**
+     * Creates a new Data Source for Locale data with the given resource URI.
+     *
+     * @param referenceURI a URI to the resource file from which data should be loaded
+     * @throws NullPointerException if resourceURI is null
+     */
+    public ReferenceDataSource(String referenceURI) {
+        if(referenceURI == null) {
+            throw new NullPointerException("Reference URI cannot be null when creating a Resource File Data Source");
+        }
+        this.referenceURI = referenceURI;
+    }
+
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.locale.LocaleDataSource#getLocalizedText()
+     */
+    public OrderedMap<String, String> getLocalizedText() {
+        try {
+            InputStream is = ReferenceManager.instance().DeriveReference(referenceURI).getStream();
+            return LocalizationUtils.parseLocaleInput(is);
+        } catch (IOException e) {
+            Std.printStack(e);
+            throw new RuntimeException("IOException while getting localized text at reference " + referenceURI);
+        } catch (InvalidReferenceException e) {
+            Std.printStack(e);
+            throw new RuntimeException("Invalid Reference! " + referenceURI);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+     */
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        referenceURI = in.readUTF();
+    }
+
+    /* (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    public void writeExternal(DataOutputStream out) throws IOException {
+        out.writeUTF(referenceURI);
+    }
 }

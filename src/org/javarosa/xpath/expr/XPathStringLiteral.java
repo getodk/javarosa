@@ -27,36 +27,36 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class XPathStringLiteral extends XPathExpression {
-	public String s;
+    public String s;
 
-	public XPathStringLiteral () { } //for deserialization
+    public XPathStringLiteral () { } //for deserialization
 
-	public XPathStringLiteral (String s) {
-		this.s = s;
-	}
-	
-	public Object eval (DataInstance model, EvaluationContext evalContext) {
-		return s;
-	}
+    public XPathStringLiteral (String s) {
+        this.s = s;
+    }
 
-	public String toString () {
-		return "{str:\'" + s + "\'}"; //TODO: s needs to be escaped (' -> \'; \ -> \\)
-	}
+    public Object eval (DataInstance model, EvaluationContext evalContext) {
+        return s;
+    }
 
-	public boolean equals (Object o) {
-		if (o instanceof XPathStringLiteral) {
-			XPathStringLiteral x = (XPathStringLiteral)o;
-			return s.equals(x.s);
-		} else {
-			return false;
-		}
-	}
+    public String toString () {
+        return "{str:\'" + s + "\'}"; //TODO: s needs to be escaped (' -> \'; \ -> \\)
+    }
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		s = ExtUtil.readString(in);
-	}
+    public boolean equals (Object o) {
+        if (o instanceof XPathStringLiteral) {
+            XPathStringLiteral x = (XPathStringLiteral)o;
+            return s.equals(x.s);
+        } else {
+            return false;
+        }
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeString(out, s);
-	}
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        s = ExtUtil.readString(in);
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.writeString(out, s);
+    }
 }

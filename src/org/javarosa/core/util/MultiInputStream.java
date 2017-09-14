@@ -40,81 +40,81 @@ import java.util.List;
  */
 public class MultiInputStream extends InputStream {
 
-	/** InputStream **/
+    /** InputStream **/
    List<InputStream> streams = new ArrayList<InputStream>(1);
 
-	int currentStream = -1;
+    int currentStream = -1;
 
-	public void addStream(InputStream stream) {
-		streams.add(stream);
-	}
+    public void addStream(InputStream stream) {
+        streams.add(stream);
+    }
 
-	/**
-	 * Finalize the stream and allow it to be read
-	 * from.
-	 *
-	 * @return True if the stream is ready to be read
-	 * from. False if the stream couldn't be prepared
-	 * because it was empty.
-	 */
-	public boolean prepare() {
-		if(streams.size() == 0) {
-			return false;
-		}
-		else {
-			currentStream = 0;
-		}
-		return true;
-	}
+    /**
+     * Finalize the stream and allow it to be read
+     * from.
+     *
+     * @return True if the stream is ready to be read
+     * from. False if the stream couldn't be prepared
+     * because it was empty.
+     */
+    public boolean prepare() {
+        if(streams.size() == 0) {
+            return false;
+        }
+        else {
+            currentStream = 0;
+        }
+        return true;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#read()
-	 */
-	public int read() throws IOException {
-		if(currentStream == -1) {
-			throw new IOException("Cannot read from unprepared MultiInputStream!");
-		}
-		InputStream cur = streams.get(currentStream);
-		int next = cur.read();
+    /* (non-Javadoc)
+     * @see java.io.InputStream#read()
+     */
+    public int read() throws IOException {
+        if(currentStream == -1) {
+            throw new IOException("Cannot read from unprepared MultiInputStream!");
+        }
+        InputStream cur = streams.get(currentStream);
+        int next = cur.read();
 
-		if(next != -1 ) {
-			return next;
-		}
+        if(next != -1 ) {
+            return next;
+        }
 
-		//Otherwise, end of Stream
+        //Otherwise, end of Stream
 
-		//Loop through the available streams until we read something that isn't
-		//an end of stream
-		while(next == -1 && currentStream + 1 < streams.size()) {
-			currentStream++;
-			cur = ((InputStream)streams.get(currentStream));
-			next = cur.read();
-		}
+        //Loop through the available streams until we read something that isn't
+        //an end of stream
+        while(next == -1 && currentStream + 1 < streams.size()) {
+            currentStream++;
+            cur = ((InputStream)streams.get(currentStream));
+            next = cur.read();
+        }
 
-		//Will be either a valid value or -1 if we've run out of streams.
-		return next;
-	}
+        //Will be either a valid value or -1 if we've run out of streams.
+        return next;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#available()
-	 */
-	public int available() throws IOException {
-		if(currentStream == -1) {
-			throw new IOException("Cannot read from unprepared MultiInputStream!");
-		}
-		return streams.get(currentStream).available();
-	}
+    /* (non-Javadoc)
+     * @see java.io.InputStream#available()
+     */
+    public int available() throws IOException {
+        if(currentStream == -1) {
+            throw new IOException("Cannot read from unprepared MultiInputStream!");
+        }
+        return streams.get(currentStream).available();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.io.InputStream#close()
-	 */
-	public void close() throws IOException {
-		if(currentStream == -1) {
-			throw new IOException("Cannot read from unprepared MultiInputStream!");
-		}
+    /* (non-Javadoc)
+     * @see java.io.InputStream#close()
+     */
+    public void close() throws IOException {
+        if(currentStream == -1) {
+            throw new IOException("Cannot read from unprepared MultiInputStream!");
+        }
       for (InputStream stream : streams) {
          stream.close();
       }
-	}
+    }
 
 }

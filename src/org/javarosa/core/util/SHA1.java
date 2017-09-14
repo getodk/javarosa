@@ -200,12 +200,12 @@ public class SHA1 {
           StringBuilder sb = new StringBuilder();
 
           for(int word : words) {
-        	  String hexWord = Integer.toHexString(word);
-        	  //Because to hexstring apparently doesn't pad?
-        	  while(hexWord.length() < 8) {
-        		  hexWord = "0" + hexWord;
-        	  }
-        	  sb.append(hexWord);
+              String hexWord = Integer.toHexString(word);
+              //Because to hexstring apparently doesn't pad?
+              while(hexWord.length() < 8) {
+                  hexWord = "0" + hexWord;
+              }
+              sb.append(hexWord);
           }
 
           return sb.toString();

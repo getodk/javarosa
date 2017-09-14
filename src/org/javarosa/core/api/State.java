@@ -15,6 +15,6 @@ import org.javarosa.core.util.TrivialTransitions;
  */
 public interface State {
 
-	public void start();
+    public void start();
 
 }

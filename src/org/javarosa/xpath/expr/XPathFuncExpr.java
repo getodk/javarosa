@@ -67,8 +67,8 @@ import static java.lang.Double.NaN;
  *
  */
 public class XPathFuncExpr extends XPathExpression {
-    public XPathQName id;			//name of the function
-    public XPathExpression[] args;	//argument list
+    public XPathQName id;            //name of the function
+    public XPathExpression[] args;    //argument list
 
     public XPathFuncExpr () { } //for deserialization
 

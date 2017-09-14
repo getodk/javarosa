@@ -33,131 +33,131 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathNodeset;
 
 public class XPathCmpExpr extends XPathBinaryOpExpr {
-	public static final int LT = 0;
-	public static final int GT = 1;
-	public static final int LTE = 2;
-	public static final int GTE = 3;
+    public static final int LT = 0;
+    public static final int GT = 1;
+    public static final int LTE = 2;
+    public static final int GTE = 3;
 
-	public int op;
+    public int op;
 
-	public XPathCmpExpr () { } //for deserialization
+    public XPathCmpExpr () { } //for deserialization
 
-	public XPathCmpExpr (int op, XPathExpression a, XPathExpression b) {
-		super(a, b);
-		this.op = op;
-	}
-	
-	public Object eval (DataInstance model, EvaluationContext evalContext) {
-		Object aval = a.eval(model, evalContext);
-		Object bval = b.eval(model, evalContext);
-		boolean result = false;
+    public XPathCmpExpr (int op, XPathExpression a, XPathExpression b) {
+        super(a, b);
+        this.op = op;
+    }
 
-		//xpath spec says comparisons only defined for numbers (not defined for strings)
-		aval = XPathFuncExpr.toNumeric(aval);
-		bval = XPathFuncExpr.toNumeric(bval);
-					
-		double fa = ((Double)aval).doubleValue();
-		double fb = ((Double)bval).doubleValue();
+    public Object eval (DataInstance model, EvaluationContext evalContext) {
+        Object aval = a.eval(model, evalContext);
+        Object bval = b.eval(model, evalContext);
+        boolean result = false;
 
-		switch (op) {
-		case LT: result = fa < fb; break;
-		case GT: result = fa > fb; break;
-		case LTE: result = fa <= fb; break;
-		case GTE: result = fa >= fb; break;
-		}
-		
-		return new Boolean(result);		
-	}
+        //xpath spec says comparisons only defined for numbers (not defined for strings)
+        aval = XPathFuncExpr.toNumeric(aval);
+        bval = XPathFuncExpr.toNumeric(bval);
 
-	public String toString () {
-		String sOp = null;
-		
-		switch (op) {
-		case LT: sOp = "<"; break;
-		case GT: sOp = ">"; break;
-		case LTE: sOp = "<="; break;
-		case GTE: sOp = ">="; break;
-		}
-		
-		return super.toString(sOp);
-	}
-	
-	public boolean equals (Object o) {
-		if (o instanceof XPathCmpExpr) {
-			XPathCmpExpr x = (XPathCmpExpr)o;
-			return super.equals(o) && op == x.op;
-		} else {
-			return false;
-		}
-	}
-	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		op = ExtUtil.readInt(in);
-		super.readExternal(in, pf);
-	}
+        double fa = ((Double)aval).doubleValue();
+        double fb = ((Double)bval).doubleValue();
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeNumeric(out, op);
-		super.writeExternal(out);
-	}
-	
+        switch (op) {
+        case LT: result = fa < fb; break;
+        case GT: result = fa > fb; break;
+        case LTE: result = fa <= fb; break;
+        case GTE: result = fa >= fb; break;
+        }
 
-	public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
-		Object aval = a.pivot(model, evalContext, pivots, sentinal);
-		Object bval = b.pivot(model, evalContext, pivots, sentinal);
-		if(bval instanceof XPathNodeset) {
-			bval = ((XPathNodeset)bval).unpack();
-		}
-		
-		if(handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) { return null; }
-		
-		return this.eval(model, evalContext);
-	}
-	
-	private boolean handled(Object a, Object b, Object sentinal, List<Object> pivots) throws UnpivotableExpressionException {
-		if(sentinal == a) {
-			if(b == null) {
-				//Can't pivot on an expression which is derived from pivoted expressions
-				throw new UnpivotableExpressionException();
-			} else if(sentinal == b) {
-				//WTF?
-				throw new UnpivotableExpressionException();
-			} else {
-				Double val = null;
-				//either of
-				if(b instanceof Double) {
-					val = (Double)b;
-				} else {
-					//These are probably the 
-					if(b instanceof Integer) {
-						val = new Double(((Integer) b).doubleValue());
-					} else if(b instanceof Long) {
-						val = new Double(((Long) b).doubleValue());
-					} else if(b instanceof Float) {
-						val = new Double(((Float) b).doubleValue());
-					} else if(b instanceof Short) {
-						val = new Double(((Short) b).shortValue());
-					} else if(b instanceof Byte) {
-						val = new Double(((Byte) b).byteValue());
-					} else {
-						if(b instanceof String) {
-							try {
-								//TODO: Too expensive?
-								val = (Double)new DecimalData().cast(new UncastData((String)b)).getValue();
-							} catch(Exception e) {
-								throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
-							}
-						} else {
-							throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
-						}
-					}
-				}
-				
-				
-				pivots.add(new CmpPivot(val.doubleValue(), op));
-				return true;
-			}
-		} 
-		return false;
-	}
+        return new Boolean(result);
+    }
+
+    public String toString () {
+        String sOp = null;
+
+        switch (op) {
+        case LT: sOp = "<"; break;
+        case GT: sOp = ">"; break;
+        case LTE: sOp = "<="; break;
+        case GTE: sOp = ">="; break;
+        }
+
+        return super.toString(sOp);
+    }
+
+    public boolean equals (Object o) {
+        if (o instanceof XPathCmpExpr) {
+            XPathCmpExpr x = (XPathCmpExpr)o;
+            return super.equals(o) && op == x.op;
+        } else {
+            return false;
+        }
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        op = ExtUtil.readInt(in);
+        super.readExternal(in, pf);
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.writeNumeric(out, op);
+        super.writeExternal(out);
+    }
+
+
+    public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+        Object aval = a.pivot(model, evalContext, pivots, sentinal);
+        Object bval = b.pivot(model, evalContext, pivots, sentinal);
+        if(bval instanceof XPathNodeset) {
+            bval = ((XPathNodeset)bval).unpack();
+        }
+
+        if(handled(aval, bval, sentinal, pivots) || handled(bval, aval, sentinal, pivots)) { return null; }
+
+        return this.eval(model, evalContext);
+    }
+
+    private boolean handled(Object a, Object b, Object sentinal, List<Object> pivots) throws UnpivotableExpressionException {
+        if(sentinal == a) {
+            if(b == null) {
+                //Can't pivot on an expression which is derived from pivoted expressions
+                throw new UnpivotableExpressionException();
+            } else if(sentinal == b) {
+                //WTF?
+                throw new UnpivotableExpressionException();
+            } else {
+                Double val = null;
+                //either of
+                if(b instanceof Double) {
+                    val = (Double)b;
+                } else {
+                    //These are probably the
+                    if(b instanceof Integer) {
+                        val = new Double(((Integer) b).doubleValue());
+                    } else if(b instanceof Long) {
+                        val = new Double(((Long) b).doubleValue());
+                    } else if(b instanceof Float) {
+                        val = new Double(((Float) b).doubleValue());
+                    } else if(b instanceof Short) {
+                        val = new Double(((Short) b).shortValue());
+                    } else if(b instanceof Byte) {
+                        val = new Double(((Byte) b).byteValue());
+                    } else {
+                        if(b instanceof String) {
+                            try {
+                                //TODO: Too expensive?
+                                val = (Double)new DecimalData().cast(new UncastData((String)b)).getValue();
+                            } catch(Exception e) {
+                                throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
+                            }
+                        } else {
+                            throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
+                        }
+                    }
+                }
+
+
+                pivots.add(new CmpPivot(val.doubleValue(), op));
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -39,25 +39,25 @@ import org.javarosa.xpath.IExprDataType;
  */
 public class GeoTraceData implements IAnswerData, IExprDataType {
 
-	/**
-	 * The data value contained in a GeoTraceData object is a GeoTrace
-	 *
-	 * @author mitchellsundt@gmail.com
-	 *
-	 */
-	public static class GeoTrace {
-		public ArrayList<double[]> points;
+    /**
+     * The data value contained in a GeoTraceData object is a GeoTrace
+     *
+     * @author mitchellsundt@gmail.com
+     *
+     */
+    public static class GeoTrace {
+        public ArrayList<double[]> points;
 
-		public GeoTrace() {
-			points = new ArrayList<double[]>();
-		}
+        public GeoTrace() {
+            points = new ArrayList<double[]>();
+        }
 
-		public GeoTrace(ArrayList<double[]> points) {
-			this.points = points;
-		}
-	};
+        public GeoTrace(ArrayList<double[]> points) {
+            this.points = points;
+        }
+    };
 
-	public final ArrayList<GeoPointData> points = new ArrayList<GeoPointData>();
+    public final ArrayList<GeoPointData> points = new ArrayList<GeoPointData>();
 
 
     /**
@@ -74,15 +74,15 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
      * @param data
      */
     public GeoTraceData(GeoTraceData data) {
-    	for ( GeoPointData p : data.points ) {
-    		points.add(new GeoPointData(p));
-    	}
+        for ( GeoPointData p : data.points ) {
+            points.add(new GeoPointData(p));
+        }
     }
 
     public GeoTraceData(GeoTrace atrace) {
-    	for ( double[] da : atrace.points ) {
-    		points.add(new GeoPointData(da));
-    	}
+        for ( double[] da : atrace.points ) {
+            points.add(new GeoPointData(da));
+        }
    }
 
     @Override
@@ -97,16 +97,16 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
      */
     @Override
     public String getDisplayText() {
-    	StringBuilder b = new StringBuilder();
-    	boolean first = true;
-    	for ( GeoPointData p : points ) {
-    		if ( !first ) {
-    			b.append("; ");
-    		}
-    		first = false;
-    		b.append(p.getDisplayText());
-    	}
-    	return b.toString();
+        StringBuilder b = new StringBuilder();
+        boolean first = true;
+        for ( GeoPointData p : points ) {
+            if ( !first ) {
+                b.append("; ");
+            }
+            first = false;
+            b.append(p.getDisplayText());
+        }
+        return b.toString();
     }
 
 
@@ -117,11 +117,11 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
      */
     @Override
     public Object getValue() {
-    	ArrayList<double[]> pts = new ArrayList<double[]>();
-    	for ( GeoPointData p : points ) {
-    		pts.add((double[])p.getValue());
-    	}
-    	GeoTrace gs = new GeoTrace(pts);
+        ArrayList<double[]> pts = new ArrayList<double[]>();
+        for ( GeoPointData p : points ) {
+            pts.add((double[])p.getValue());
+        }
+        GeoTrace gs = new GeoTrace(pts);
         return gs;
     }
 
@@ -132,14 +132,14 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
         if ( !(o instanceof GeoTrace) ) {
-        	GeoTraceData t = new GeoTraceData();
-        	GeoTraceData v = t.cast(new UncastData(o.toString()));
-        	o = v.getValue();
+            GeoTraceData t = new GeoTraceData();
+            GeoTraceData v = t.cast(new UncastData(o.toString()));
+            o = v.getValue();
         }
         GeoTrace gs = (GeoTrace) o;
         ArrayList<GeoPointData> temp = new ArrayList<GeoPointData>();
         for ( double[] da : gs.points ) {
-        	temp.add(new GeoPointData(da));
+            temp.add(new GeoPointData(da));
         }
         points.clear();
         points.addAll(temp);
@@ -149,12 +149,12 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException,
             DeserializationException {
-    	points.clear();
+        points.clear();
         int len = (int) ExtUtil.readNumeric(in);
         for ( int i = 0 ; i < len ; ++i ) {
-        	GeoPointData t = new GeoPointData();
-        	t.readExternal(in, pf);
-        	points.add(t);
+            GeoPointData t = new GeoPointData();
+            t.readExternal(in, pf);
+            points.add(t);
         }
     }
 
@@ -163,59 +163,59 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeNumeric(out, points.size());
         for ( int i = 0 ; i < points.size() ; ++i ) {
-        	GeoPointData t = points.get(i);
-        	t.writeExternal(out);
+            GeoPointData t = points.get(i);
+            t.writeExternal(out);
         }
     }
 
 
     @Override
-	public UncastData uncast() {
-		return new UncastData(getDisplayText());
-	}
+    public UncastData uncast() {
+        return new UncastData(getDisplayText());
+    }
 
     @Override
-	public GeoTraceData cast(UncastData data) throws IllegalArgumentException {
-		String[] parts = data.value.split(";");
+    public GeoTraceData cast(UncastData data) throws IllegalArgumentException {
+        String[] parts = data.value.split(";");
 
-		// silly...
-		GeoPointData t = new GeoPointData();
+        // silly...
+        GeoPointData t = new GeoPointData();
 
-		GeoTraceData d = new GeoTraceData();
-		for ( String part : parts ) {
-			// allow for arbitrary surrounding whitespace
-			d.points.add(t.cast(new UncastData(part.trim())));
-		}
-		return d;
-	}
+        GeoTraceData d = new GeoTraceData();
+        for ( String part : parts ) {
+            // allow for arbitrary surrounding whitespace
+            d.points.add(t.cast(new UncastData(part.trim())));
+        }
+        return d;
+    }
 
 
-	@Override
-	public Boolean toBoolean() {
-		// return whether or not any Geopoints have been set
-		if ( points.size() == 0 ) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public Boolean toBoolean() {
+        // return whether or not any Geopoints have been set
+        if ( points.size() == 0 ) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public Double toNumeric() {
-		if ( points.size() == 0 ) {
-			// we have no trace, so no accuracy...
-			return GeoPointData.NO_ACCURACY_VALUE;
-		}
-		// return the worst accuracy...
-		double maxValue = 0.0;
-		for ( GeoPointData p : points ) {
-			maxValue = Math.max(maxValue, p.toNumeric());
-		}
-		return maxValue;
-	}
+    @Override
+    public Double toNumeric() {
+        if ( points.size() == 0 ) {
+            // we have no trace, so no accuracy...
+            return GeoPointData.NO_ACCURACY_VALUE;
+        }
+        // return the worst accuracy...
+        double maxValue = 0.0;
+        for ( GeoPointData p : points ) {
+            maxValue = Math.max(maxValue, p.toNumeric());
+        }
+        return maxValue;
+    }
 
-	@Override
-	public String toString() {
-		return getDisplayText();
-	}
+    @Override
+    public String toString() {
+        return getDisplayText();
+    }
 
 }

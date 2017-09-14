@@ -25,12 +25,12 @@ package org.javarosa.core.util;
  *
  */
 public class UnregisteredLocaleException extends RuntimeException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4673466040747837288L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4673466040747837288L;
 
-	public UnregisteredLocaleException(String message) {
-		super(message);
-	}
+    public UnregisteredLocaleException(String message) {
+        super(message);
+    }
 }

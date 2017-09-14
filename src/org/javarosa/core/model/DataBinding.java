@@ -49,134 +49,134 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class DataBinding  implements Externalizable {
-	private String id;
-	private IDataReference ref;
-	private int dataType;
+    private String id;
+    private IDataReference ref;
+    private int dataType;
 
-	public Condition relevancyCondition;
-	public boolean relevantAbsolute;
-	public Condition requiredCondition;
-	public boolean requiredAbsolute;
-	public Condition readonlyCondition;
-	public boolean readonlyAbsolute;
-	public IConditionExpr constraint;
-	public Recalculate calculate;
+    public Condition relevancyCondition;
+    public boolean relevantAbsolute;
+    public Condition requiredCondition;
+    public boolean requiredAbsolute;
+    public Condition readonlyCondition;
+    public boolean readonlyAbsolute;
+    public IConditionExpr constraint;
+    public Recalculate calculate;
 
-	private String preload;
-	private String preloadParams;
-	public String constraintMessage;
+    private String preload;
+    private String preloadParams;
+    public String constraintMessage;
 
-	private List<TreeElement> additionalAttrs = new ArrayList<TreeElement>(0);
+    private List<TreeElement> additionalAttrs = new ArrayList<TreeElement>(0);
 
-	public DataBinding () {
-		relevantAbsolute = true;
-		requiredAbsolute = false;
-		readonlyAbsolute = false;
-	}
+    public DataBinding () {
+        relevantAbsolute = true;
+        requiredAbsolute = false;
+        readonlyAbsolute = false;
+    }
 
-	/**
-	 * @return The data reference
-	 */
-	public IDataReference getReference() {
-		return ref;
-	}
+    /**
+     * @return The data reference
+     */
+    public IDataReference getReference() {
+        return ref;
+    }
 
-	/**
-	 * @param ref the reference to set
-	 */
-	public void setReference(IDataReference ref) {
-		this.ref = ref;
-	}
+    /**
+     * @param ref the reference to set
+     */
+    public void setReference(IDataReference ref) {
+        this.ref = ref;
+    }
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	/**
-	 * @return the dataType
-	 */
-	public int getDataType() {
-		return dataType;
-	}
+    /**
+     * @return the dataType
+     */
+    public int getDataType() {
+        return dataType;
+    }
 
-	/**
-	 * @param dataType the dataType to set
-	 */
-	public void setDataType(int dataType) {
-		this.dataType = dataType;
-	}
+    /**
+     * @param dataType the dataType to set
+     */
+    public void setDataType(int dataType) {
+        this.dataType = dataType;
+    }
 
-	/**
-	 * @return the preload
-	 */
-	public String getPreload() {
-		return preload;
-	}
+    /**
+     * @return the preload
+     */
+    public String getPreload() {
+        return preload;
+    }
 
-	/**
-	 * @param preload the preload to set
-	 */
-	public void setPreload(String preload) {
-		this.preload = preload;
-	}
+    /**
+     * @param preload the preload to set
+     */
+    public void setPreload(String preload) {
+        this.preload = preload;
+    }
 
-	/**
-	 * @return the preloadParams
-	 */
-	public String getPreloadParams() {
-		return preloadParams;
-	}
+    /**
+     * @return the preloadParams
+     */
+    public String getPreloadParams() {
+        return preloadParams;
+    }
 
-	/**
-	 * @param preloadParams the preloadParams to set
-	 */
-	public void setPreloadParams(String preloadParams) {
-		this.preloadParams = preloadParams;
-	}
+    /**
+     * @param preloadParams the preloadParams to set
+     */
+    public void setPreloadParams(String preloadParams) {
+        this.preloadParams = preloadParams;
+    }
 
-	public void setAdditionalAttribute(String namespace, String name, String value) {
-		TreeElement.setAttribute(null, additionalAttrs, namespace, name, value);
-	}
+    public void setAdditionalAttribute(String namespace, String name, String value) {
+        TreeElement.setAttribute(null, additionalAttrs, namespace, name, value);
+    }
 
-	public List<TreeElement> getAdditionalAttributes() {
-		return additionalAttrs;
-	}
+    public List<TreeElement> getAdditionalAttributes() {
+        return additionalAttrs;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		setId((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
-		setDataType(ExtUtil.readInt(in));
-		setPreload((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
-		setPreloadParams((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
-		ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged());
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+     */
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        setId((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+        setDataType(ExtUtil.readInt(in));
+        setPreload((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+        setPreloadParams((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+        ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged());
 
-		//don't bother reading relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
-	}
+        //don't bother reading relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapNullable(getId()));
-		ExtUtil.writeNumeric(out, getDataType());
-		ExtUtil.write(out, new ExtWrapNullable(getPreload()));
-		ExtUtil.write(out, new ExtWrapNullable(getPreloadParams()));
-		ExtUtil.write(out, new ExtWrapTagged(ref));
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapNullable(getId()));
+        ExtUtil.writeNumeric(out, getDataType());
+        ExtUtil.write(out, new ExtWrapNullable(getPreload()));
+        ExtUtil.write(out, new ExtWrapNullable(getPreloadParams()));
+        ExtUtil.write(out, new ExtWrapTagged(ref));
 
-		//don't bother writing relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
-	}
+        //don't bother writing relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
+    }
 
 
 }

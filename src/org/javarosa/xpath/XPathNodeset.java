@@ -29,141 +29,141 @@ import java.util.List;
  */
 public class XPathNodeset {
 
-	private List<TreeReference> nodes;
-	protected DataInstance instance;
-	protected EvaluationContext ec;
-	// these are purely for improved error messages
-	private String pathEvaluated;
-	private String originalPath;
+    private List<TreeReference> nodes;
+    protected DataInstance instance;
+    protected EvaluationContext ec;
+    // these are purely for improved error messages
+    private String pathEvaluated;
+    private String originalPath;
 
-	private XPathNodeset() {
+    private XPathNodeset() {
 
-	}
+    }
 
-	/**
-	 * for lazy evaluation
-	 *
-	 * @param instance
-	 * @param ec
-	 */
-	protected XPathNodeset (DataInstance instance, EvaluationContext ec) {
-		this.instance = instance;
-		this.ec = ec;
-	}
-
-
-	/**
-	 * Construct an XPath nodeset.
-	 *
-	 * @param nodes
-	 * @param instance
-	 * @param ec
-	 */
-	public XPathNodeset (List<TreeReference> nodes, DataInstance instance, EvaluationContext ec) {
-		if(nodes == null) { throw new NullPointerException("Node list cannot be null when constructing a nodeset"); }
-		this.nodes = nodes;
-		this.instance = instance;
-		this.ec = ec;
-	}
-
-	public static XPathNodeset ConstructInvalidPathNodeset(String pathEvaluated, String originalPath) {
-		XPathNodeset nodeset = new XPathNodeset();
-		nodeset.nodes = null;
-		nodeset.instance = null;
-		nodeset.ec = null;
-		nodeset.pathEvaluated = pathEvaluated;
-		nodeset.originalPath = originalPath;
-		return nodeset;
-	}
-
-	protected void setReferences(List<TreeReference> nodes) {
-		this.nodes = nodes;
-	}
-
-	protected List<TreeReference> getReferences() {
-		return this.nodes;
-	}
+    /**
+     * for lazy evaluation
+     *
+     * @param instance
+     * @param ec
+     */
+    protected XPathNodeset (DataInstance instance, EvaluationContext ec) {
+        this.instance = instance;
+        this.ec = ec;
+    }
 
 
-	/**
-	 * @return The value represented by this xpath. Can only be evaluated when this xpath represents exactly one
-	 * reference, or when it represents 0 references after a filtering operation (a reference which _could_ have
-	 * existed, but didn't, rather than a reference which could not represent a real node).
-	 */
-	public Object unpack () {
-		if(nodes == null) {
-			throw getInvalidNodesetException();
-		}
+    /**
+     * Construct an XPath nodeset.
+     *
+     * @param nodes
+     * @param instance
+     * @param ec
+     */
+    public XPathNodeset (List<TreeReference> nodes, DataInstance instance, EvaluationContext ec) {
+        if(nodes == null) { throw new NullPointerException("Node list cannot be null when constructing a nodeset"); }
+        this.nodes = nodes;
+        this.instance = instance;
+        this.ec = ec;
+    }
 
-		if (size() == 0) {
-			return XPathPathExpr.unpackValue(null);
-		} else if (size() > 1) {
-			throw new XPathTypeMismatchException("This field is repeated: \n\n" + nodeContents() + "\n\nYou may need to use the indexed-repeat() function to specify which value you want.");
-		} else {
-			return getValAt(0);
-		}
-	}
+    public static XPathNodeset ConstructInvalidPathNodeset(String pathEvaluated, String originalPath) {
+        XPathNodeset nodeset = new XPathNodeset();
+        nodeset.nodes = null;
+        nodeset.instance = null;
+        nodeset.ec = null;
+        nodeset.pathEvaluated = pathEvaluated;
+        nodeset.originalPath = originalPath;
+        return nodeset;
+    }
 
-	public Object[] toArgList () {
-		if(nodes == null) {
-			throw getInvalidNodesetException();
-		}
+    protected void setReferences(List<TreeReference> nodes) {
+        this.nodes = nodes;
+    }
 
-		Object[] args = new Object[size()];
+    protected List<TreeReference> getReferences() {
+        return this.nodes;
+    }
 
-		for (int i = 0; i < size(); i++) {
-			Object val = getValAt(i);
 
-			//sanity check
-			if (val == null) {
-				throw new RuntimeException("retrived a null value out of a nodeset! shouldn't happen!");
-			}
+    /**
+     * @return The value represented by this xpath. Can only be evaluated when this xpath represents exactly one
+     * reference, or when it represents 0 references after a filtering operation (a reference which _could_ have
+     * existed, but didn't, rather than a reference which could not represent a real node).
+     */
+    public Object unpack () {
+        if(nodes == null) {
+            throw getInvalidNodesetException();
+        }
 
-			args[i] = val;
-		}
+        if (size() == 0) {
+            return XPathPathExpr.unpackValue(null);
+        } else if (size() > 1) {
+            throw new XPathTypeMismatchException("This field is repeated: \n\n" + nodeContents() + "\n\nYou may need to use the indexed-repeat() function to specify which value you want.");
+        } else {
+            return getValAt(0);
+        }
+    }
 
-		return args;
-	}
+    public Object[] toArgList () {
+        if(nodes == null) {
+            throw getInvalidNodesetException();
+        }
 
-	public int size () {
-		if(nodes == null) {
-			return 0;
-		}
-		return nodes.size();
-	}
+        Object[] args = new Object[size()];
 
-	public TreeReference getRefAt (int i) {
-		if(nodes == null) {
-			throw getInvalidNodesetException();
-		}
+        for (int i = 0; i < size(); i++) {
+            Object val = getValAt(i);
 
-		return nodes.get(i);
-	}
+            //sanity check
+            if (val == null) {
+                throw new RuntimeException("retrived a null value out of a nodeset! shouldn't happen!");
+            }
 
-	public Object getValAt (int i) {
-		return XPathPathExpr.getRefValue(instance, ec, getRefAt(i));
-	}
+            args[i] = val;
+        }
 
-	protected XPathTypeMismatchException getInvalidNodesetException() {
-		if(!pathEvaluated.equals(originalPath)) {
-			throw new XPathTypeMismatchException("The path " + originalPath + " refers to the location " + pathEvaluated + " which was not found");
-		} else {
-			throw new XPathTypeMismatchException("Location " + pathEvaluated + " was not found");
-		}
-	}
+        return args;
+    }
 
-	protected String nodeContents () {
-		if(nodes == null) {
-			return "Invalid Path: " + pathEvaluated;
-		}
+    public int size () {
+        if(nodes == null) {
+            return 0;
+        }
+        return nodes.size();
+    }
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < nodes.size(); i++) {
-			sb.append(nodes.get(i).toString());
-			if (i < nodes.size() - 1) {
+    public TreeReference getRefAt (int i) {
+        if(nodes == null) {
+            throw getInvalidNodesetException();
+        }
+
+        return nodes.get(i);
+    }
+
+    public Object getValAt (int i) {
+        return XPathPathExpr.getRefValue(instance, ec, getRefAt(i));
+    }
+
+    protected XPathTypeMismatchException getInvalidNodesetException() {
+        if(!pathEvaluated.equals(originalPath)) {
+            throw new XPathTypeMismatchException("The path " + originalPath + " refers to the location " + pathEvaluated + " which was not found");
+        } else {
+            throw new XPathTypeMismatchException("Location " + pathEvaluated + " was not found");
+        }
+    }
+
+    protected String nodeContents () {
+        if(nodes == null) {
+            return "Invalid Path: " + pathEvaluated;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < nodes.size(); i++) {
+            sb.append(nodes.get(i).toString());
+            if (i < nodes.size() - 1) {
                 sb.append(";");
-			}
-		}
-		return sb.toString();
-	}
+            }
+        }
+        return sb.toString();
+    }
 }

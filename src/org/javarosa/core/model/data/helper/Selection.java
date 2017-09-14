@@ -52,90 +52,90 @@ import org.javarosa.xpath.XPathTypeMismatchException;
  *
  */
 public class Selection implements Externalizable {
-	public String xmlValue = null;
-	public int index = -1;
+    public String xmlValue = null;
+    public int index = -1;
 
-	/* in order to get localizable captions for this selection, the choice object must be the
-	 * same object in the form model, or else it won't receive localization updates from form
-	 * entry session
-	 */
-	public SelectChoice choice;
+    /* in order to get localizable captions for this selection, the choice object must be the
+     * same object in the form model, or else it won't receive localization updates from form
+     * entry session
+     */
+    public SelectChoice choice;
 
-	/**
-	 * for deserialization only
-	 */
-	public Selection() {
+    /**
+     * for deserialization only
+     */
+    public Selection() {
 
-	}
+    }
 
-	public Selection (SelectChoice choice) {
-		attachChoice(choice);
-	}
+    public Selection (SelectChoice choice) {
+        attachChoice(choice);
+    }
 
-	public Selection (String xmlValue) {
-		this.xmlValue = xmlValue;
-	}
+    public Selection (String xmlValue) {
+        this.xmlValue = xmlValue;
+    }
 
-	public Selection (int index) {
-		this.index = index;
-	}
+    public Selection (int index) {
+        this.index = index;
+    }
 
-	public Selection clone () {
-		Selection s = new Selection();
-		s.choice = choice;
-		s.xmlValue = xmlValue;
-		s.index = index;
+    public Selection clone () {
+        Selection s = new Selection();
+        s.choice = choice;
+        s.xmlValue = xmlValue;
+        s.index = index;
 
-		return s;
-	}
+        return s;
+    }
 
-	public void attachChoice (SelectChoice choice) {
-		this.choice = choice;
-		this.xmlValue = choice.getValue();
-		this.index = choice.getIndex();
-	}
+    public void attachChoice (SelectChoice choice) {
+        this.choice = choice;
+        this.xmlValue = choice.getValue();
+        this.index = choice.getIndex();
+    }
 
-	public void attachChoice (QuestionDef q) {
-		if (q.getDynamicChoices() != null) //can't attach dynamic choices because they aren't guaranteed to exist yet
-			return;
+    public void attachChoice (QuestionDef q) {
+        if (q.getDynamicChoices() != null) //can't attach dynamic choices because they aren't guaranteed to exist yet
+            return;
 
-		SelectChoice choice = null;
+        SelectChoice choice = null;
 
-		if (index != -1 && index < q.getNumChoices()) {
-			choice = q.getChoice(index);
-		} else if (xmlValue != null && xmlValue.length() > 0) {
-			choice = q.getChoiceForValue(xmlValue);
-		}
+        if (index != -1 && index < q.getNumChoices()) {
+            choice = q.getChoice(index);
+        } else if (xmlValue != null && xmlValue.length() > 0) {
+            choice = q.getChoiceForValue(xmlValue);
+        }
 
-		if (choice != null) {
-			attachChoice(choice);
-		} else {
-			throw new XPathTypeMismatchException("value " + xmlValue + " could not be loaded into question " + q.getTextID()
-					+ ".  Check to see if value " + xmlValue + " is a valid option for question " + q.getTextID() + ".");
-		}
-	}
+        if (choice != null) {
+            attachChoice(choice);
+        } else {
+            throw new XPathTypeMismatchException("value " + xmlValue + " could not be loaded into question " + q.getTextID()
+                    + ".  Check to see if value " + xmlValue + " is a valid option for question " + q.getTextID() + ".");
+        }
+    }
 
-	public String getValue () {
-		if (xmlValue != null && xmlValue.length() > 0) {
-			return xmlValue;
-		} else {
-			throw new RuntimeException("don't know xml value! perhaps selection was stored as index only and has not yet been linked up to a formdef?");
-		}
-	}
+    public String getValue () {
+        if (xmlValue != null && xmlValue.length() > 0) {
+            return xmlValue;
+        } else {
+            throw new RuntimeException("don't know xml value! perhaps selection was stored as index only and has not yet been linked up to a formdef?");
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		xmlValue = ExtUtil.readString(in);
-		index = ExtUtil.readInt(in);
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+     */
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        xmlValue = ExtUtil.readString(in);
+        index = ExtUtil.readInt(in);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeString(out, getValue());
-		ExtUtil.writeNumeric(out, index);
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.writeString(out, getValue());
+        ExtUtil.writeNumeric(out, index);
+    }
 }

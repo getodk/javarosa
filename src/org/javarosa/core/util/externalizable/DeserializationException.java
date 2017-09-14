@@ -25,12 +25,12 @@ package org.javarosa.core.util.externalizable;
  *
  */
 public class DeserializationException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8431704386147851563L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8431704386147851563L;
 
-	public DeserializationException(String message) {
-		super(message);
-	}
+    public DeserializationException(String message) {
+        super(message);
+    }
 }

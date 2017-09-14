@@ -31,59 +31,59 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Constraint implements Externalizable {
-	public IConditionExpr constraint;
-	private String constraintMsg;
-	private XPathExpression xPathConstraintMsg;
-	
-	public Constraint () { }
-	
-	public Constraint (IConditionExpr constraint, String constraintMsg) {
-		this.constraint = constraint;
-		this.constraintMsg = constraintMsg;
-		attemptConstraintCompile();
-	}
-	
-	public String getConstraintMessage(EvaluationContext ec, FormInstance instance, String textForm) {
-		if(xPathConstraintMsg == null) {
-			//If the request is for getting a constraint message in a specific format (like audio) from 
-			//itext, and there's no xpath, we couldn't possibly fulfill it
-			return textForm == null ? constraintMsg : null;
-		} else{
-        	if(textForm != null) {
-        		ec.setOutputTextForm(textForm);
-        	} 
-			try{
-				Object value = xPathConstraintMsg.eval(instance, ec);
-				if(value != null && ((String) value).length() != 0) {
-					return (String)value;
-				}
-				return null;
-			} catch(Exception e) {
-				Logger.exception("Error evaluating a valid-looking constraint xpath ", e);
-				return constraintMsg;
-			}
-		}
-	}
-	
-	private void attemptConstraintCompile() {
-		xPathConstraintMsg = null;
-		try {
-			if(constraintMsg != null) {
-				xPathConstraintMsg = XPathParseTool.parseXPath("string(" + constraintMsg + ")");
-			}
-		} catch(Exception e) {
-			//Expected in probably most cases.
-		}
-	}
-	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		constraint = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		constraintMsg = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
-		attemptConstraintCompile();
-	}
+    public IConditionExpr constraint;
+    private String constraintMsg;
+    private XPathExpression xPathConstraintMsg;
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(constraint));
-		ExtUtil.writeString(out, ExtUtil.emptyIfNull(constraintMsg));
-	}
+    public Constraint () { }
+
+    public Constraint (IConditionExpr constraint, String constraintMsg) {
+        this.constraint = constraint;
+        this.constraintMsg = constraintMsg;
+        attemptConstraintCompile();
+    }
+
+    public String getConstraintMessage(EvaluationContext ec, FormInstance instance, String textForm) {
+        if(xPathConstraintMsg == null) {
+            //If the request is for getting a constraint message in a specific format (like audio) from
+            //itext, and there's no xpath, we couldn't possibly fulfill it
+            return textForm == null ? constraintMsg : null;
+        } else{
+            if(textForm != null) {
+                ec.setOutputTextForm(textForm);
+            }
+            try{
+                Object value = xPathConstraintMsg.eval(instance, ec);
+                if(value != null && ((String) value).length() != 0) {
+                    return (String)value;
+                }
+                return null;
+            } catch(Exception e) {
+                Logger.exception("Error evaluating a valid-looking constraint xpath ", e);
+                return constraintMsg;
+            }
+        }
+    }
+
+    private void attemptConstraintCompile() {
+        xPathConstraintMsg = null;
+        try {
+            if(constraintMsg != null) {
+                xPathConstraintMsg = XPathParseTool.parseXPath("string(" + constraintMsg + ")");
+            }
+        } catch(Exception e) {
+            //Expected in probably most cases.
+        }
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        constraint = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+        constraintMsg = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+        attemptConstraintCompile();
+    }
+
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(constraint));
+        ExtUtil.writeString(out, ExtUtil.emptyIfNull(constraintMsg));
+    }
 }

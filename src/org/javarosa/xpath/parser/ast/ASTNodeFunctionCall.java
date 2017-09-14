@@ -24,23 +24,23 @@ import org.javarosa.xpath.expr.XPathQName;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class ASTNodeFunctionCall extends ASTNode {
-	public XPathQName name;
-	public Vector<ASTNode> args;
-	
-	public ASTNodeFunctionCall (XPathQName name) {
-		this.name = name;
-		args = new Vector<ASTNode>();
-	}
-	
-	public Vector<ASTNode> getChildren () {
-		return args;
-	}
-	
-	public XPathExpression build() throws XPathSyntaxException {
-		XPathExpression[] xargs = new XPathExpression[args.size()];
-		for (int i = 0; i < args.size(); i++)
-			xargs[i] = args.elementAt(i).build();
-		
-		return new XPathFuncExpr(name, xargs);
-	}
+    public XPathQName name;
+    public Vector<ASTNode> args;
+
+    public ASTNodeFunctionCall (XPathQName name) {
+        this.name = name;
+        args = new Vector<ASTNode>();
+    }
+
+    public Vector<ASTNode> getChildren () {
+        return args;
+    }
+
+    public XPathExpression build() throws XPathSyntaxException {
+        XPathExpression[] xargs = new XPathExpression[args.size()];
+        for (int i = 0; i < args.size(); i++)
+            xargs[i] = args.elementAt(i).build();
+
+        return new XPathFuncExpr(name, xargs);
+    }
 }

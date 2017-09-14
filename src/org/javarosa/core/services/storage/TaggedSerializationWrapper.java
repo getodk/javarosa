@@ -20,46 +20,46 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class TaggedSerializationWrapper implements SerializationWrapper {
 
-	Externalizable e;
+    Externalizable e;
 
-	public TaggedSerializationWrapper() {
-	}
+    public TaggedSerializationWrapper() {
+    }
 
-	public Class baseType() {
-		return Externalizable.class;
-	}
+    public Class baseType() {
+        return Externalizable.class;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper#getData()
-	 */
-	public Externalizable getData() {
-		return e;
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper#getData()
+     */
+    public Externalizable getData() {
+        return e;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper#setData(org.javarosa.core.util.externalizable.Externalizable)
-	 */
-	public void setData(Externalizable e) {
-		this.e = e;
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper#setData(org.javarosa.core.util.externalizable.Externalizable)
+     */
+    public void setData(Externalizable e) {
+        this.e = e;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		e = (Externalizable)ExtUtil.read(in, new ExtWrapTagged());
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+     */
+    public void readExternal(DataInputStream in, PrototypeFactory pf)
+            throws IOException, DeserializationException {
+        e = (Externalizable)ExtUtil.read(in, new ExtWrapTagged());
+    }
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(e));
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(e));
+    }
 
-	public void clean() {
-		e = null;
-	}
+    public void clean() {
+        e = null;
+    }
 
 }

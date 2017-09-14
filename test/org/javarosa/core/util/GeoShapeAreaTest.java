@@ -39,7 +39,7 @@ public class GeoShapeAreaTest extends TestCase {
 
   public GeoShapeAreaTest(String name) {
     super(name);
-	System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
   }
 
   public static Test suite() {
@@ -52,10 +52,10 @@ public class GeoShapeAreaTest extends TestCase {
 
   public void testGeoShapeSupportForEnclosedArea() throws Exception {
     // Read the form definition
-	String FORM_NAME = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
-	InputStream is = null;
-	FormDef formDef = null;
-	is = new FileInputStream(new File(FORM_NAME));
+    String FORM_NAME = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
+    InputStream is = null;
+    FormDef formDef = null;
+    is = new FileInputStream(new File(FORM_NAME));
     formDef = XFormUtils.getFormFromInputStream(is);
 
     // trigger all calculations

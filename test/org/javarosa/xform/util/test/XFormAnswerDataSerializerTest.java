@@ -38,98 +38,98 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
  *
  */
 public class XFormAnswerDataSerializerTest extends TestCase {
-	final String stringDataValue = "String Data Value";
-	final Integer integerDataValue = new Integer(5);
-	final Date dateDataValue = new Date();
-	final Date timeDataValue = new Date();
-	
-	StringData stringData;
-	IntegerData integerData;
-	DateData dateData;
-	SelectOneData selectData;
-	TimeData timeData;
-	
-	TreeElement stringElement = new TreeElement();
-	TreeElement intElement = new TreeElement();
-	TreeElement dateElement = new TreeElement();
-	TreeElement selectElement = new TreeElement();
-	TreeElement timeElement = new TreeElement();
-	
-	XFormAnswerDataSerializer serializer;
-	
-	private static int NUM_TESTS = 5;
-	
-	public void setUp() throws Exception {
-		super.setUp();
-		stringData = new StringData(stringDataValue);
-		stringElement.setValue(stringData);
-		
-		integerData = new IntegerData(integerDataValue);
-		intElement.setValue(integerData);
-		
-		dateData = new DateData(dateDataValue); 
-		dateElement.setValue(dateData);
-		
-		timeData = new TimeData(timeDataValue); 
-		timeElement.setValue(timeData);
-		
-		serializer = new XFormAnswerDataSerializer();
-	}
+    final String stringDataValue = "String Data Value";
+    final Integer integerDataValue = new Integer(5);
+    final Date dateDataValue = new Date();
+    final Date timeDataValue = new Date();
 
-	public XFormAnswerDataSerializerTest(String name) {
-		super(name);
-		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
-	}
+    StringData stringData;
+    IntegerData integerData;
+    DateData dateData;
+    SelectOneData selectData;
+    TimeData timeData;
 
-	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
+    TreeElement stringElement = new TreeElement();
+    TreeElement intElement = new TreeElement();
+    TreeElement dateElement = new TreeElement();
+    TreeElement selectElement = new TreeElement();
+    TreeElement timeElement = new TreeElement();
 
-		for (int i = 1; i <= NUM_TESTS; i++) {
-			final int testID = i;
+    XFormAnswerDataSerializer serializer;
 
-			aSuite.addTest(new XFormAnswerDataSerializerTest(testMaster(testID)));
-		}
+    private static int NUM_TESTS = 5;
 
-		return aSuite;
-	}
-	public static String testMaster (int testID) {
-		switch (testID) {
-			case 1: return "testString";
-			case 2: return "testInteger";
-			case 3: return "testDate";
-			case 4: return "testTime";
-			case 5: return "testSelect";
-		}
-		throw new IllegalStateException("Unexpected index");
-	}
-	
-	public void testString() {
-		assertTrue("Serializer Incorrectly Reports Inability to Serializer String", serializer.canSerialize(stringElement.getValue()));
-		Object answerData = serializer.serializeAnswerData(stringData);
-		assertNotNull("Serializer returns Null for valid String Data", answerData);
-		assertEquals("Serializer returns incorrect string serialization", answerData, stringDataValue);
-	}
-	
-	public void testInteger() {
-		assertTrue("Serializer Incorrectly Reports Inability to Serializer Integer", serializer.canSerialize(intElement.getValue()));
-		Object answerData = serializer.serializeAnswerData(integerData);
-		assertNotNull("Serializer returns Null for valid Integer Data", answerData);
-		//assertEquals("Serializer returns incorrect Integer serialization", answerData, integerDataValue);
-	}
-	
-	public void testDate() {
-		assertTrue("Serializer Incorrectly Reports Inability to Serializer Date", serializer.canSerialize(dateElement.getValue()));
-		Object answerData = serializer.serializeAnswerData(dateData);
-		assertNotNull("Serializer returns Null for valid Date Data", answerData);
-	}
-	
-	public void testTime() {
-		assertTrue("Serializer Incorrectly Reports Inability to Serializer Time", serializer.canSerialize(timeElement.getValue()));
-		Object answerData = serializer.serializeAnswerData(timeData);
-		assertNotNull("Serializer returns Null for valid Time Data", answerData);
-	}
-	
-	public void testSelect() {
-		//No select tests yet.
-	}
+    public void setUp() throws Exception {
+        super.setUp();
+        stringData = new StringData(stringDataValue);
+        stringElement.setValue(stringData);
+
+        integerData = new IntegerData(integerDataValue);
+        intElement.setValue(integerData);
+
+        dateData = new DateData(dateDataValue);
+        dateElement.setValue(dateData);
+
+        timeData = new TimeData(timeDataValue);
+        timeElement.setValue(timeData);
+
+        serializer = new XFormAnswerDataSerializer();
+    }
+
+    public XFormAnswerDataSerializerTest(String name) {
+        super(name);
+        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    }
+
+    public static Test suite() {
+        TestSuite aSuite = new TestSuite();
+
+        for (int i = 1; i <= NUM_TESTS; i++) {
+            final int testID = i;
+
+            aSuite.addTest(new XFormAnswerDataSerializerTest(testMaster(testID)));
+        }
+
+        return aSuite;
+    }
+    public static String testMaster (int testID) {
+        switch (testID) {
+            case 1: return "testString";
+            case 2: return "testInteger";
+            case 3: return "testDate";
+            case 4: return "testTime";
+            case 5: return "testSelect";
+        }
+        throw new IllegalStateException("Unexpected index");
+    }
+
+    public void testString() {
+        assertTrue("Serializer Incorrectly Reports Inability to Serializer String", serializer.canSerialize(stringElement.getValue()));
+        Object answerData = serializer.serializeAnswerData(stringData);
+        assertNotNull("Serializer returns Null for valid String Data", answerData);
+        assertEquals("Serializer returns incorrect string serialization", answerData, stringDataValue);
+    }
+
+    public void testInteger() {
+        assertTrue("Serializer Incorrectly Reports Inability to Serializer Integer", serializer.canSerialize(intElement.getValue()));
+        Object answerData = serializer.serializeAnswerData(integerData);
+        assertNotNull("Serializer returns Null for valid Integer Data", answerData);
+        //assertEquals("Serializer returns incorrect Integer serialization", answerData, integerDataValue);
+    }
+
+    public void testDate() {
+        assertTrue("Serializer Incorrectly Reports Inability to Serializer Date", serializer.canSerialize(dateElement.getValue()));
+        Object answerData = serializer.serializeAnswerData(dateData);
+        assertNotNull("Serializer returns Null for valid Date Data", answerData);
+    }
+
+    public void testTime() {
+        assertTrue("Serializer Incorrectly Reports Inability to Serializer Time", serializer.canSerialize(timeElement.getValue()));
+        Object answerData = serializer.serializeAnswerData(timeData);
+        assertNotNull("Serializer returns Null for valid Time Data", answerData);
+    }
+
+    public void testSelect() {
+        //No select tests yet.
+    }
 }

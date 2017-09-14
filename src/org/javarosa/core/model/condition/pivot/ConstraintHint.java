@@ -12,6 +12,6 @@ import org.javarosa.core.model.instance.FormInstance;
  *
  */
 public interface ConstraintHint {
-	
-	public void init(EvaluationContext c, IConditionExpr conditional, FormInstance instance) throws UnpivotableExpressionException;
+
+    public void init(EvaluationContext c, IConditionExpr conditional, FormInstance instance) throws UnpivotableExpressionException;
 }

@@ -18,39 +18,39 @@ package org.javarosa.xpath;
 
 public class XPathException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1204382841959734320L;
-	
-	//A reference to the "Source" of this message helpful
-	//for tracking down where the invalid xpath was declared
-	String sourceRef;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1204382841959734320L;
 
-	public XPathException () {
+    //A reference to the "Source" of this message helpful
+    //for tracking down where the invalid xpath was declared
+    String sourceRef;
 
-	}
+    public XPathException () {
 
-	public XPathException (String s) {
-		super("XPath evaluation: " + s);
-	}
+    }
 
-	public void setSource(String source) {
-		this.sourceRef = source;
-	}
+    public XPathException (String s) {
+        super("XPath evaluation: " + s);
+    }
 
-	public String getSource() {
-		return sourceRef;
-	}
+    public void setSource(String source) {
+        this.sourceRef = source;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Throwable#getMessage()
-	 */
-	public String getMessage() {
-		if(sourceRef == null) {
-			return super.getMessage();
-		} else {
-			return "The problem was located in " + sourceRef + "\n" + super.getMessage();
-		}
-	}
+    public String getSource() {
+        return sourceRef;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Throwable#getMessage()
+     */
+    public String getMessage() {
+        if(sourceRef == null) {
+            return super.getMessage();
+        } else {
+            return "The problem was located in " + sourceRef + "\n" + super.getMessage();
+        }
+    }
 }

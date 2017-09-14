@@ -30,15 +30,15 @@ package org.javarosa.core.util;
  * was not the the original author of the code, although I did
  * optimize it (substantially) and fix some bugs.
  *
- * @author	Santeri Paavolainen <sjpaavol@cc.helsinki.fi>
- * @author	Timothy W Macinta (twm@alum.mit.edu) (optimizations and bug fixes)
+ * @author    Santeri Paavolainen <sjpaavol@cc.helsinki.fi>
+ * @author    Timothy W Macinta (twm@alum.mit.edu) (optimizations and bug fixes)
  **/
 
 class MD5State {
   /**
    * 128-bit state 
    */
-  int	state[];
+  int    state[];
   
   /**
    * 64-bit character count
@@ -48,7 +48,7 @@ class MD5State {
   /**
    * 64-byte buffer (512 bits) for storing to-be-hashed characters
    */
-  byte	buffer[];
+  byte    buffer[];
 
   public MD5State() {
     buffer = new byte[64];

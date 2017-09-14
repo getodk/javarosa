@@ -32,87 +32,87 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class DateData implements IAnswerData {
-	private Date d;
-	boolean init = false;
+    private Date d;
+    boolean init = false;
 
-	/**
-	 * Empty Constructor, necessary for dynamic construction during deserialization.
-	 * Shouldn't be used otherwise.
-	 */
-	public DateData() {
+    /**
+     * Empty Constructor, necessary for dynamic construction during deserialization.
+     * Shouldn't be used otherwise.
+     */
+    public DateData() {
 
-	}
+    }
 
-	public DateData (Date d) {
-		setValue(d);
-	}
+    public DateData (Date d) {
+        setValue(d);
+    }
 
-	private void init() {
-		if(!init) {
-			d = DateUtils.roundDate(d);
-			init = true;
-		}
-	}
-
-    @Override
-	public IAnswerData clone () {
-		init();
-		return new DateData(new Date(d.getTime()));
-	}
+    private void init() {
+        if(!init) {
+            d = DateUtils.roundDate(d);
+            init = true;
+        }
+    }
 
     @Override
-	public void setValue (Object o) {
-		//Should not ever be possible to set this to a null value
-		if(o == null) {
-			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
-		}
-		d = (Date)o;
-		init = false;
-	}
+    public IAnswerData clone () {
+        init();
+        return new DateData(new Date(d.getTime()));
+    }
 
     @Override
-	public Object getValue () {
-		init();
-		return new Date(d.getTime());
-	}
+    public void setValue (Object o) {
+        //Should not ever be possible to set this to a null value
+        if(o == null) {
+            throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+        }
+        d = (Date)o;
+        init = false;
+    }
 
     @Override
-	public String getDisplayText () {
-		init();
-		return DateUtils.formatDate(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-	 */
-    @Override
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		init();
-		setValue(ExtUtil.readDate(in));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-    @Override
-	public void writeExternal(DataOutputStream out) throws IOException {
-		init();
-		ExtUtil.writeDate(out, d);
-	}
+    public Object getValue () {
+        init();
+        return new Date(d.getTime());
+    }
 
     @Override
-	public UncastData uncast() {
-		init();
-		return new UncastData(DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601));
-	}
+    public String getDisplayText () {
+        init();
+        return DateUtils.formatDate(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
+    }
+
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+     */
+    @Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        init();
+        setValue(ExtUtil.readDate(in));
+    }
+
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        init();
+        ExtUtil.writeDate(out, d);
+    }
 
     @Override
-	public DateData cast(UncastData data) throws IllegalArgumentException {
-		Date ret = DateUtils.parseDate(data.value);
-		if(ret != null) {
-			return new DateData(ret);
-		}
+    public UncastData uncast() {
+        init();
+        return new UncastData(DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601));
+    }
 
-		throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Date");
-	}
+    @Override
+    public DateData cast(UncastData data) throws IllegalArgumentException {
+        Date ret = DateUtils.parseDate(data.value);
+        if(ret != null) {
+            return new DateData(ret);
+        }
+
+        throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Date");
+    }
 }

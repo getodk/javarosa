@@ -41,132 +41,132 @@ import org.javarosa.xpath.expr.XPathUnaryOpExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class XPathConditional implements IConditionExpr {
-	private XPathExpression expr;
-	public String xpath; //not serialized!
-	public boolean hasNow; //indicates whether this XpathConditional contains the now() function (used for timestamping)
+    private XPathExpression expr;
+    public String xpath; //not serialized!
+    public boolean hasNow; //indicates whether this XpathConditional contains the now() function (used for timestamping)
 
-	public XPathConditional (String xpath) throws XPathSyntaxException {
-		hasNow = false;
-		if(xpath.indexOf("now()") > -1) {
-			hasNow = true;
-		}
-		this.expr = XPathParseTool.parseXPath(xpath);
-		this.xpath = xpath;
-	}
+    public XPathConditional (String xpath) throws XPathSyntaxException {
+        hasNow = false;
+        if(xpath.indexOf("now()") > -1) {
+            hasNow = true;
+        }
+        this.expr = XPathParseTool.parseXPath(xpath);
+        this.xpath = xpath;
+    }
 
-	public XPathConditional (XPathExpression expr) {
-		this.expr = expr;
-	}
+    public XPathConditional (XPathExpression expr) {
+        this.expr = expr;
+    }
 
-	public XPathConditional () {
+    public XPathConditional () {
 
-	}
+    }
 
-	public XPathExpression getExpr () {
-		return expr;
-	}
+    public XPathExpression getExpr () {
+        return expr;
+    }
 
-	public Object evalRaw (DataInstance model, EvaluationContext evalContext) {
-		try{
-			return XPathFuncExpr.unpack(expr.eval(model, evalContext));
-		} catch(XPathUnsupportedException e){
-			if(xpath != null){
-				throw new XPathUnsupportedException(xpath);
-			}else{
-				throw e;
-			}
+    public Object evalRaw (DataInstance model, EvaluationContext evalContext) {
+        try{
+            return XPathFuncExpr.unpack(expr.eval(model, evalContext));
+        } catch(XPathUnsupportedException e){
+            if(xpath != null){
+                throw new XPathUnsupportedException(xpath);
+            }else{
+                throw e;
+            }
 
 
-		}
-	}
+        }
+    }
 
-	public boolean eval (DataInstance model, EvaluationContext evalContext) {
-		return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
-	}
+    public boolean eval (DataInstance model, EvaluationContext evalContext) {
+        return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
+    }
 
-	public String evalReadable (DataInstance model, EvaluationContext evalContext) {
-		return XPathFuncExpr.toString(evalRaw(model, evalContext));
-	}
+    public String evalReadable (DataInstance model, EvaluationContext evalContext) {
+        return XPathFuncExpr.toString(evalRaw(model, evalContext));
+    }
 
-	public List<TreeReference> evalNodeset (DataInstance model, EvaluationContext evalContext) {
-		if (expr instanceof XPathPathExpr) {
-			return ((XPathPathExpr)expr).eval(model, evalContext).getReferences();
-		} else {
-			throw new FatalException("evalNodeset: must be path expression");
-		}
-	}
+    public List<TreeReference> evalNodeset (DataInstance model, EvaluationContext evalContext) {
+        if (expr instanceof XPathPathExpr) {
+            return ((XPathPathExpr)expr).eval(model, evalContext).getReferences();
+        } else {
+            throw new FatalException("evalNodeset: must be path expression");
+        }
+    }
 
-	public Set<TreeReference> getTriggers (TreeReference contextRef) {
-		Set<TreeReference> triggers = new HashSet<TreeReference>();
-		getTriggers(expr, triggers, contextRef);
-		return triggers;
-	}
+    public Set<TreeReference> getTriggers (TreeReference contextRef) {
+        Set<TreeReference> triggers = new HashSet<TreeReference>();
+        getTriggers(expr, triggers, contextRef);
+        return triggers;
+    }
 
-	private static void getTriggers (XPathExpression x, Set<TreeReference> v, TreeReference contextRef) {
-		if (x instanceof XPathPathExpr) {
-			TreeReference ref = ((XPathPathExpr)x).getReference();
-			TreeReference contextualized = ref;
-			if(contextRef != null) {
-				contextualized = ref.contextualize(contextRef);
-			}
+    private static void getTriggers (XPathExpression x, Set<TreeReference> v, TreeReference contextRef) {
+        if (x instanceof XPathPathExpr) {
+            TreeReference ref = ((XPathPathExpr)x).getReference();
+            TreeReference contextualized = ref;
+            if(contextRef != null) {
+                contextualized = ref.contextualize(contextRef);
+            }
 
-			//TODO: It's possible we should just handle this the same way as "genericize". Not entirely clear.
-			if(contextualized.hasPredicates()) {
-				contextualized = contextualized.removePredicates();
-			}
+            //TODO: It's possible we should just handle this the same way as "genericize". Not entirely clear.
+            if(contextualized.hasPredicates()) {
+                contextualized = contextualized.removePredicates();
+            }
 
-			v.add(contextualized);
+            v.add(contextualized);
 
-			for(int i = 0; i < ref.size() ; i++) {
+            for(int i = 0; i < ref.size() ; i++) {
             List<XPathExpression> predicates = ref.getPredicate(i);
-				if(predicates == null) {
-					continue;
-				}
+                if(predicates == null) {
+                    continue;
+                }
 
-				//we can't generate this properly without an absolute reference
-				if(!ref.isAbsolute()) { throw new IllegalArgumentException("can't get triggers for relative references");}
-				TreeReference predicateContext = ref.getSubReference(i);
+                //we can't generate this properly without an absolute reference
+                if(!ref.isAbsolute()) { throw new IllegalArgumentException("can't get triggers for relative references");}
+                TreeReference predicateContext = ref.getSubReference(i);
 
-				for(XPathExpression predicate : predicates) {
-					getTriggers(predicate, v, predicateContext);
-				}
-			}
-		} else if (x instanceof XPathBinaryOpExpr) {
-			getTriggers(((XPathBinaryOpExpr)x).a, v, contextRef);
-			getTriggers(((XPathBinaryOpExpr)x).b, v, contextRef);
-		} else if (x instanceof XPathUnaryOpExpr) {
-			getTriggers(((XPathUnaryOpExpr)x).a, v, contextRef);
-		} else if (x instanceof XPathFuncExpr) {
-			XPathFuncExpr fx = (XPathFuncExpr)x;
-			for (int i = 0; i < fx.args.length; i++)
-				getTriggers(fx.args[i], v, contextRef);
-		}
-	}
+                for(XPathExpression predicate : predicates) {
+                    getTriggers(predicate, v, predicateContext);
+                }
+            }
+        } else if (x instanceof XPathBinaryOpExpr) {
+            getTriggers(((XPathBinaryOpExpr)x).a, v, contextRef);
+            getTriggers(((XPathBinaryOpExpr)x).b, v, contextRef);
+        } else if (x instanceof XPathUnaryOpExpr) {
+            getTriggers(((XPathUnaryOpExpr)x).a, v, contextRef);
+        } else if (x instanceof XPathFuncExpr) {
+            XPathFuncExpr fx = (XPathFuncExpr)x;
+            for (int i = 0; i < fx.args.length; i++)
+                getTriggers(fx.args[i], v, contextRef);
+        }
+    }
 
-	public boolean equals (Object o) {
-		if (o instanceof XPathConditional) {
-			XPathConditional cond = (XPathConditional)o;
-			return expr.equals(cond.expr);
-		} else {
-			return false;
-		}
-	}
+    public boolean equals (Object o) {
+        if (o instanceof XPathConditional) {
+            XPathConditional cond = (XPathConditional)o;
+            return expr.equals(cond.expr);
+        } else {
+            return false;
+        }
+    }
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		expr = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		hasNow = (boolean)ExtUtil.readBool(in);
-	}
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        expr = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
+        hasNow = (boolean)ExtUtil.readBool(in);
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(expr));
-		ExtUtil.writeBool(out, hasNow);
-	}
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(expr));
+        ExtUtil.writeBool(out, hasNow);
+    }
 
-	public String toString () {
-		return "xpath[" + expr.toString() + "]";
-	}
+    public String toString () {
+        return "xpath[" + expr.toString() + "]";
+    }
 
-	public List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
-		return expr.pivot(model, evalContext);
-	}
+    public List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+        return expr.pivot(model, evalContext);
+    }
 }

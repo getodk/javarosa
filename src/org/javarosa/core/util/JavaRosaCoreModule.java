@@ -31,15 +31,15 @@ import org.javarosa.core.services.PrototypeManager;
  */
 public class JavaRosaCoreModule implements IModule {
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
-	 */
-	public void registerModule() {
-		String[] classes = {
-				"org.javarosa.core.services.locale.ResourceFileDataSource",
-				"org.javarosa.core.services.locale.TableLocaleSource"
-		};		
-		PrototypeManager.registerPrototypes(classes);
-		ReferenceManager.instance().addReferenceFactory(new ResourceReferenceFactory());
-	}
+    /* (non-Javadoc)
+     * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
+     */
+    public void registerModule() {
+        String[] classes = {
+                "org.javarosa.core.services.locale.ResourceFileDataSource",
+                "org.javarosa.core.services.locale.TableLocaleSource"
+        };
+        PrototypeManager.registerPrototypes(classes);
+        ReferenceManager.instance().addReferenceFactory(new ResourceReferenceFactory());
+    }
 }

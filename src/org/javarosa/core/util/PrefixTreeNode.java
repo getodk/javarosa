@@ -20,112 +20,112 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrefixTreeNode {
-	private char[] prefix;
-	private boolean terminal;
-	private List<PrefixTreeNode> children;
-	private PrefixTreeNode parent;
+    private char[] prefix;
+    private boolean terminal;
+    private List<PrefixTreeNode> children;
+    private PrefixTreeNode parent;
 
-	public PrefixTreeNode (char[] prefix) {
-		this.prefix = prefix;
-		this.terminal = false;
-	}
+    public PrefixTreeNode (char[] prefix) {
+        this.prefix = prefix;
+        this.terminal = false;
+    }
 
-	public void decompose (List<String> v, String s) {
-		String stem = s + new String(prefix);
+    public void decompose (List<String> v, String s) {
+        String stem = s + new String(prefix);
 
-		if (terminal) {
-			v.add(stem);
-		}
+        if (terminal) {
+            v.add(stem);
+        }
 
-		if (children != null) {
+        if (children != null) {
          for (PrefixTreeNode child : children) {
             child.decompose(v, stem);
          }
-		}
-	}
+        }
+    }
 
-	public char[] getPrefix() {
-		return prefix;
-	}
+    public char[] getPrefix() {
+        return prefix;
+    }
 
-	public List<PrefixTreeNode> getChildren() {
-		return children;
-	}
+    public List<PrefixTreeNode> getChildren() {
+        return children;
+    }
 
-	public boolean equals (Object o) {
-		//uh... is this right?
-		return (o instanceof PrefixTreeNode ? prefix == ((PrefixTreeNode)o).prefix || ArrayUtilities.arraysEqual(prefix,0, ((PrefixTreeNode)o).prefix, 0) : false);
-	}
+    public boolean equals (Object o) {
+        //uh... is this right?
+        return (o instanceof PrefixTreeNode ? prefix == ((PrefixTreeNode)o).prefix || ArrayUtilities.arraysEqual(prefix,0, ((PrefixTreeNode)o).prefix, 0) : false);
+    }
 
-	public String toString () {
-		StringBuffer sb = new StringBuffer();
-		sb.append("{");
-		sb.append(prefix);
-		if (terminal)
-			sb.append("*");
-		if (children != null) {
+    public String toString () {
+        StringBuffer sb = new StringBuffer();
+        sb.append("{");
+        sb.append(prefix);
+        if (terminal)
+            sb.append("*");
+        if (children != null) {
          for (PrefixTreeNode child : children) {
             sb.append(child.toString());
          }
-		}
-		sb.append("}");
-		return sb.toString();
-	}
+        }
+        sb.append("}");
+        return sb.toString();
+    }
 
-	public String render() {
-		StringBuffer temp = new StringBuffer();
-		return render(temp);
-	}
+    public String render() {
+        StringBuffer temp = new StringBuffer();
+        return render(temp);
+    }
 
-	public String render(StringBuffer buffer) {
-		if(parent != null){
-			parent.render(buffer);
-		}
-		buffer.append(this.prefix);
-		return buffer.toString();
-	}
+    public String render(StringBuffer buffer) {
+        if(parent != null){
+            parent.render(buffer);
+        }
+        buffer.append(this.prefix);
+        return buffer.toString();
+    }
 
-	public void seal() {
-		if (children != null) {
+    public void seal() {
+        if (children != null) {
          for (PrefixTreeNode child : children) {
             child.seal();
          }
-		}
-		this.children = null;
-	}
+        }
+        this.children = null;
+    }
 
-	public void addChild(PrefixTreeNode node) {
-		if(children == null) {
-			children = new ArrayList<PrefixTreeNode>(1);
-		}
-		children.add(node);
-		node.parent = this;
-	}
+    public void addChild(PrefixTreeNode node) {
+        if(children == null) {
+            children = new ArrayList<PrefixTreeNode>(1);
+        }
+        children.add(node);
+        node.parent = this;
+    }
 
-	public void setTerminal() {
-		//This node is now terminal (we can use this fact to clean things up)
-		terminal = true;
-	}
+    public void setTerminal() {
+        //This node is now terminal (we can use this fact to clean things up)
+        terminal = true;
+    }
 
-	public PrefixTreeNode budChild(PrefixTreeNode node, char[] subPrefix, int subPrefixLen) {
-		//make a new child for the subprefix
-		PrefixTreeNode newChild = new PrefixTreeNode(subPrefix);
+    public PrefixTreeNode budChild(PrefixTreeNode node, char[] subPrefix, int subPrefixLen) {
+        //make a new child for the subprefix
+        PrefixTreeNode newChild = new PrefixTreeNode(subPrefix);
 
-		//remove the child from our tree (we'll re-add it later)
-		this.children.remove(node);
-		node.parent = null;
+        //remove the child from our tree (we'll re-add it later)
+        this.children.remove(node);
+        node.parent = null;
 
-		//cut out the middle part of the prefix (which is now this node's domain)
-		char[] old = node.prefix;
-		node.prefix = new char[old.length - subPrefixLen];
-		for(int i = 0 ; i < old.length - subPrefixLen; ++i) {
-			node.prefix[i] = old[subPrefixLen + i];
-		}
+        //cut out the middle part of the prefix (which is now this node's domain)
+        char[] old = node.prefix;
+        node.prefix = new char[old.length - subPrefixLen];
+        for(int i = 0 ; i < old.length - subPrefixLen; ++i) {
+            node.prefix[i] = old[subPrefixLen + i];
+        }
 
-		//replace the old child with the new one, and put it in the proper order
-		this.addChild(newChild);
-		newChild.addChild(node);
+        //replace the old child with the new one, and put it in the proper order
+        this.addChild(newChild);
+        newChild.addChild(node);
 
-		return newChild;
-	}
+        return newChild;
+    }
 }

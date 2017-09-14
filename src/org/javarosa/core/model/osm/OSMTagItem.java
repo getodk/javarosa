@@ -10,20 +10,20 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- *	Structure defining possible tag values that can be selected.
+ *    Structure defining possible tag values that can be selected.
  *  Created by Nicholas Hallahan nhallahan@spatialdev.com
  */
 public class OSMTagItem implements Externalizable {
-	public String label;
-	public String value;
+    public String label;
+    public String value;
 
-	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		label = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-		value = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
-	}
+    public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+        label = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+        value = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+    }
 
-	public void writeExternal(DataOutputStream dos) throws IOException {
-		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(label));
-		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(value));
-	}
+    public void writeExternal(DataOutputStream dos) throws IOException {
+        ExtUtil.writeString(dos, ExtUtil.emptyIfNull(label));
+        ExtUtil.writeString(dos, ExtUtil.emptyIfNull(value));
+    }
 }

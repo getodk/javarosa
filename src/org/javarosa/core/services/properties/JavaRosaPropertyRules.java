@@ -74,15 +74,15 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      *  @see org.javarosa.core.services.properties.IPropertyRules#allowableValues(String)
      */
     public ArrayList<String> allowableValues(String propertyName) {
-    	if(CURRENT_LOCALE.equals(propertyName)) {
-    		Localizer l = Localization.getGlobalLocalizerAdvanced();
-    		String[] locales = l.getAvailableLocales();
-    		ArrayList<String> v = new ArrayList<String>(locales.length);
-    		for ( String locale : locales ) {
-    		   v.add(locale);
-    		}
-    		return v;
-    	}
+        if(CURRENT_LOCALE.equals(propertyName)) {
+            Localizer l = Localization.getGlobalLocalizerAdvanced();
+            String[] locales = l.getAvailableLocales();
+            ArrayList<String> v = new ArrayList<String>(locales.length);
+            for ( String locale : locales ) {
+               v.add(locale);
+            }
+            return v;
+        }
       return rules.get(propertyName);
     }
 
@@ -90,10 +90,10 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      *  @see org.javarosa.core.services.properties.IPropertyRules#checkValueAllowed(String, String)
      */
     public boolean checkValueAllowed(String propertyName, String potentialValue) {
-    	if(CURRENT_LOCALE.equals(propertyName)) {
-    		return Localization.getGlobalLocalizerAdvanced().hasLocale(potentialValue);
-    	}
-    	ArrayList<String> prop = rules.get(propertyName);
+        if(CURRENT_LOCALE.equals(propertyName)) {
+            return Localization.getGlobalLocalizerAdvanced().hasLocale(potentialValue);
+        }
+        ArrayList<String> prop = rules.get(propertyName);
         if(prop.size() != 0) {
             //Check whether this is a dynamic property
             if(prop.size() == 1 && checkPropertyAllowed(prop.get(0))) {
@@ -112,8 +112,8 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      *  @see org.javarosa.core.services.properties.IPropertyRules#allowableProperties()
      */
     public ArrayList<String> allowableProperties() {
-    	Set<String> keys = rules.keySet();
-    	ArrayList<String> propList = new ArrayList<String>(keys);
+        Set<String> keys = rules.keySet();
+        ArrayList<String> propList = new ArrayList<String>(keys);
       return propList;
     }
 
@@ -136,16 +136,16 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
      */
     public String getHumanReadableDescription(String propertyName) {
-    	if(DEVICE_ID_PROPERTY.equals(propertyName)) {
-    		return "Unique Device ID";
-    	} else if(LOGS_ENABLED.equals(propertyName)) {
-    		return "Device Logging";
-    	} else if(CURRENT_LOCALE.equals(propertyName)) {
-    		return Localization.get("settings.language");
-    	} else if(OPENROSA_API_LEVEL.equals(propertyName)) {
-    		return "OpenRosa API Level";
-    	}
-    	return propertyName;
+        if(DEVICE_ID_PROPERTY.equals(propertyName)) {
+            return "Unique Device ID";
+        } else if(LOGS_ENABLED.equals(propertyName)) {
+            return "Device Logging";
+        } else if(CURRENT_LOCALE.equals(propertyName)) {
+            return Localization.get("settings.language");
+        } else if(OPENROSA_API_LEVEL.equals(propertyName)) {
+            return "OpenRosa API Level";
+        }
+        return propertyName;
     }
 
     /*
@@ -153,13 +153,13 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
      */
     public String getHumanReadableValue(String propertyName, String value) {
-    	if(CURRENT_LOCALE.equals(propertyName)) {
-    		String name = Localization.getGlobalLocalizerAdvanced().getText(value);
-    		if(name != null) {
-    			return name;
-    		}
-    	}
-    	return value;
+        if(CURRENT_LOCALE.equals(propertyName)) {
+            String name = Localization.getGlobalLocalizerAdvanced().getText(value);
+            if(name != null) {
+                return name;
+            }
+        }
+        return value;
     }
 
     /*
@@ -167,9 +167,9 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
      */
     public void handlePropertyChanges(String propertyName) {
-    	if(CURRENT_LOCALE.equals(propertyName)) {
-    		String locale = PropertyManager._().getSingularProperty(propertyName);
-    		Localization.setLocale(locale);
-    	}
+        if(CURRENT_LOCALE.equals(propertyName)) {
+            String locale = PropertyManager._().getSingularProperty(propertyName);
+            Localization.setLocale(locale);
+        }
     }
 }

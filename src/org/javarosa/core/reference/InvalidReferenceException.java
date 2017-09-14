@@ -16,25 +16,25 @@ package org.javarosa.core.reference;
  *
  */
 public class InvalidReferenceException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2062070187063973388L;
-	
-	private String reference;
-	
-	/**
-	 * A new exception implying that a URI could not be resolved to
-	 * a reference.
-	 * @param message The failure message for why the URI could not be
-	 * resolved.
-	 * @param reference The URI which was unable to be resolved.
-	 */
-	public InvalidReferenceException(String message, String reference) {
-		super(message);
-		this.reference = reference;
-	}
-	public String getReferenceString() {
-		return reference;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = -2062070187063973388L;
+
+    private String reference;
+
+    /**
+     * A new exception implying that a URI could not be resolved to
+     * a reference.
+     * @param message The failure message for why the URI could not be
+     * resolved.
+     * @param reference The URI which was unable to be resolved.
+     */
+    public InvalidReferenceException(String message, String reference) {
+        super(message);
+        this.reference = reference;
+    }
+    public String getReferenceString() {
+        return reference;
+    }
 }

@@ -33,64 +33,64 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class SelectOneData implements IAnswerData {
-	Selection s;
+    Selection s;
 
-	/**
-	 * Empty Constructor, necessary for dynamic construction during deserialization.
-	 * Shouldn't be used otherwise.
-	 */
-	public SelectOneData() {
+    /**
+     * Empty Constructor, necessary for dynamic construction during deserialization.
+     * Shouldn't be used otherwise.
+     */
+    public SelectOneData() {
 
-	}
+    }
 
-	public SelectOneData (Selection s) {
-		setValue(s);
-	}
-
-    @Override
-	public IAnswerData clone () {
-		return new SelectOneData(s.clone());
-	}
+    public SelectOneData (Selection s) {
+        setValue(s);
+    }
 
     @Override
-	public void setValue (Object o) {
-		if(o == null) {
-			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
-		}
-		s = (Selection)o;
-	}
+    public IAnswerData clone () {
+        return new SelectOneData(s.clone());
+    }
 
     @Override
-	public Object getValue () {
-		return s;
-	}
-
-	public String getDisplayText () {
-		return s.getValue();
-	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-	 */
-    @Override
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		s = (Selection)ExtUtil.read(in, Selection.class, pf);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-	 */
-    @Override
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, s);
-	}
+    public void setValue (Object o) {
+        if(o == null) {
+            throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+        }
+        s = (Selection)o;
+    }
 
     @Override
-	public UncastData uncast() {
-		return new UncastData(s.getValue());
-	}
+    public Object getValue () {
+        return s;
+    }
+
+    public String getDisplayText () {
+        return s.getValue();
+    }
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+     */
+    @Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        s = (Selection)ExtUtil.read(in, Selection.class, pf);
+    }
+
+    /* (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, s);
+    }
 
     @Override
-	public SelectOneData cast(UncastData data) throws IllegalArgumentException {
-		return new SelectOneData(new Selection(data.value));
-	}
+    public UncastData uncast() {
+        return new UncastData(s.getValue());
+    }
+
+    @Override
+    public SelectOneData cast(UncastData data) throws IllegalArgumentException {
+        return new SelectOneData(new Selection(data.value));
+    }
 }

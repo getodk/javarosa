@@ -39,31 +39,31 @@ import java.io.IOException;
  */
 
 public abstract class ExternalizableWrapper implements Externalizable {
-	/* core data that is being wrapped; will be null when shell wrapper is created for deserialization */
-	public Object val;
-	
-	/* create a copy of a wrapper, but with new val (but all the same type annotations */
-	public abstract ExternalizableWrapper clone (Object val);
-		
-	/* deserialize the state of the externalizable wrapper */
-	public abstract void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException;
-	
-	/* serialize the state of the externalizable wrapper (type information only, not value) */
-	public abstract void metaWriteExternal (DataOutputStream out) throws IOException;
+    /* core data that is being wrapped; will be null when shell wrapper is created for deserialization */
+    public Object val;
 
-	public abstract void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException;
-	
-	public abstract void writeExternal(DataOutputStream out) throws IOException;
-			
-	public Object baseValue () {
-		Object baseVal = val;
-		while (baseVal instanceof ExternalizableWrapper) {
-			baseVal = ((ExternalizableWrapper)baseVal).val;
-		}
-		return baseVal;
-	}
-	
-	public boolean isEmpty () {
-		return baseValue() == null;
-	}
+    /* create a copy of a wrapper, but with new val (but all the same type annotations */
+    public abstract ExternalizableWrapper clone (Object val);
+
+    /* deserialize the state of the externalizable wrapper */
+    public abstract void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException;
+
+    /* serialize the state of the externalizable wrapper (type information only, not value) */
+    public abstract void metaWriteExternal (DataOutputStream out) throws IOException;
+
+    public abstract void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException;
+
+    public abstract void writeExternal(DataOutputStream out) throws IOException;
+
+    public Object baseValue () {
+        Object baseVal = val;
+        while (baseVal instanceof ExternalizableWrapper) {
+            baseVal = ((ExternalizableWrapper)baseVal).val;
+        }
+        return baseVal;
+    }
+
+    public boolean isEmpty () {
+        return baseValue() == null;
+    }
 }

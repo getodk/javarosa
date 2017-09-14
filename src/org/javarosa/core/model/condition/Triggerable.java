@@ -81,27 +81,27 @@ public abstract class Triggerable implements Externalizable {
         return (lhsHash < rhsHash) ? -1 : ((lhsHash == rhsHash) ? 0 : 1);
       }
    };
-	/**
-	 * The expression which will be evaluated to produce a result
-	 */
-	private IConditionExpr expr;
+    /**
+     * The expression which will be evaluated to produce a result
+     */
+    private IConditionExpr expr;
 
-	/**
-	 * References to all of the (non-contextualized) nodes which should be
-	 * updated by the result of this triggerable
-	 *
-	 */
-	private List<TreeReference> targets;
+    /**
+     * References to all of the (non-contextualized) nodes which should be
+     * updated by the result of this triggerable
+     *
+     */
+    private List<TreeReference> targets;
 
-	/**
-	 * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
-	 * common root of all of the targets being evaluated.
-	 */
-	private TreeReference contextRef;  //generic ref used to turn triggers into absolute references
+    /**
+     * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
+     * common root of all of the targets being evaluated.
+     */
+    private TreeReference contextRef;  //generic ref used to turn triggers into absolute references
 
-	/**
-	 * The first context provided to this triggerable before reducing to the common root.
-	 */
+    /**
+     * The first context provided to this triggerable before reducing to the common root.
+     */
    private TreeReference originalContextRef;
 
    private int waveCount = 0;
@@ -116,9 +116,9 @@ public abstract class Triggerable implements Externalizable {
      return immediateCascades;
    }
    
-	public Triggerable () {
+    public Triggerable () {
 
-	}
+    }
 
    public Triggerable (IConditionExpr expr, TreeReference contextRef, ArrayList<TreeReference> targets) {
      this.expr = expr;
@@ -131,201 +131,201 @@ public abstract class Triggerable implements Externalizable {
      this(expr, contextRef, new ArrayList<TreeReference>(0));
    }
 
-	protected abstract Object eval (FormInstance instance, EvaluationContext ec);
+    protected abstract Object eval (FormInstance instance, EvaluationContext ec);
 
-	protected abstract void apply (TreeReference ref, Object result, FormInstance mainInstance);
+    protected abstract void apply (TreeReference ref, Object result, FormInstance mainInstance);
 
-	public abstract boolean canCascade ();
+    public abstract boolean canCascade ();
 
-	/**
-	 * Not for re-implementation, dispatches all of the evaluation
-	 * @param mainInstance
-	 * @param parentContext
-	 * @param context
-	 */
-	public final List<EvaluationResult> apply (FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
-		//The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
-		//for the actual expressions, so we need genericize that ref against the current context
-		TreeReference ungenericised = originalContextRef.contextualize(context);
-		EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
+    /**
+     * Not for re-implementation, dispatches all of the evaluation
+     * @param mainInstance
+     * @param parentContext
+     * @param context
+     */
+    public final List<EvaluationResult> apply (FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
+        //The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
+        //for the actual expressions, so we need genericize that ref against the current context
+        TreeReference ungenericised = originalContextRef.contextualize(context);
+        EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
 
-		Object result = eval(mainInstance, ec);
+        Object result = eval(mainInstance, ec);
 
-		List<EvaluationResult> affectedNodes = new ArrayList<EvaluationResult>(0);
-		for (TreeReference target : targets) {
-			TreeReference targetRef = target.contextualize(ec.getContextRef());
-			List<TreeReference> v = ec.expandReference(targetRef);
+        List<EvaluationResult> affectedNodes = new ArrayList<EvaluationResult>(0);
+        for (TreeReference target : targets) {
+            TreeReference targetRef = target.contextualize(ec.getContextRef());
+            List<TreeReference> v = ec.expandReference(targetRef);
 
-			for (TreeReference affectedRef : v) {
-				apply(affectedRef, result, mainInstance);
+            for (TreeReference affectedRef : v) {
+                apply(affectedRef, result, mainInstance);
 
-				affectedNodes.add(new EvaluationResult(affectedRef, result));
-			}
-		}
+                affectedNodes.add(new EvaluationResult(affectedRef, result));
+            }
+        }
 
-		return affectedNodes;
-	}
+        return affectedNodes;
+    }
 
-	public IConditionExpr getExpr() {
-		return expr;
-	}
-	
-	public void addTarget (TreeReference target) {
-		if (targets.indexOf(target) == -1) {
-			targets.add(target);
-		}
-	}
+    public IConditionExpr getExpr() {
+        return expr;
+    }
 
-	public List<TreeReference> getTargets () {
-		return targets;
-	}
+    public void addTarget (TreeReference target) {
+        if (targets.indexOf(target) == -1) {
+            targets.add(target);
+        }
+    }
 
-	public void setWaveCount(int waveCount) {
-	  this.waveCount = waveCount;
-	}
-	
-	/**
-	 * This should return true if this triggerable's targets will implicity modify the
-	 * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
-	 * expressions which care about the value of this node's children should be triggered.
-	 *
-	 * @return True if this condition should trigger expressions whose targets include
-	 * nodes which are the children of this node's targets.
-	 */
-	public boolean isCascadingToChildren() {
-		return false;
-	}
+    public List<TreeReference> getTargets () {
+        return targets;
+    }
 
-	public Set<TreeReference> getTriggers () {
-		Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
-		Set<TreeReference> absTriggers = new HashSet<TreeReference>();
-		for (TreeReference r : relTriggers ) {
-			absTriggers.add(r.anchor(originalContextRef));
-		}
-		return absTriggers;
-	}
+    public void setWaveCount(int waveCount) {
+      this.waveCount = waveCount;
+    }
 
-	Boolean evalPredicate(FormInstance model, EvaluationContext evalContext) {
-		try {
-			return new Boolean(expr.eval(model, evalContext));
-		} catch (XPathException e) {
-			e.setSource("Relevant expression for " + contextRef.toString(true));
-			throw e;
-		}
-	}
+    /**
+     * This should return true if this triggerable's targets will implicity modify the
+     * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
+     * expressions which care about the value of this node's children should be triggered.
+     *
+     * @return True if this condition should trigger expressions whose targets include
+     * nodes which are the children of this node's targets.
+     */
+    public boolean isCascadingToChildren() {
+        return false;
+    }
 
-	Object evalRaw(FormInstance model, EvaluationContext evalContext) {
-		try {
-			return expr.evalRaw(model, evalContext);
-		} catch (XPathException e) {
-			e.setSource("calculate expression for " + contextRef.toString(true));
-			throw e;
-		}
-	}
+    public Set<TreeReference> getTriggers () {
+        Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
+        Set<TreeReference> absTriggers = new HashSet<TreeReference>();
+        for (TreeReference r : relTriggers ) {
+            absTriggers.add(r.anchor(originalContextRef));
+        }
+        return absTriggers;
+    }
 
-	public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
-		contextRef = contextRef.intersect(t.contextRef);
-	}
+    Boolean evalPredicate(FormInstance model, EvaluationContext evalContext) {
+        try {
+            return new Boolean(expr.eval(model, evalContext));
+        } catch (XPathException e) {
+            e.setSource("Relevant expression for " + contextRef.toString(true));
+            throw e;
+        }
+    }
 
-	public TreeReference contextualizeContextRef(TreeReference anchorRef) {
-		// Contextualize the reference used by the triggerable against
-		// the anchor
-		return contextRef.contextualize(anchorRef);
-	}
+    Object evalRaw(FormInstance model, EvaluationContext evalContext) {
+        try {
+            return expr.evalRaw(model, evalContext);
+        } catch (XPathException e) {
+            e.setSource("calculate expression for " + contextRef.toString(true));
+            throw e;
+        }
+    }
 
-	public boolean equals (Object o) {
-		if (o instanceof Triggerable) {
-			Triggerable t = (Triggerable)o;
-			if (this == t)
-				return true;
+    public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
+        contextRef = contextRef.intersect(t.contextRef);
+    }
 
-			if (this.expr.equals(t.expr)) {
+    public TreeReference contextualizeContextRef(TreeReference anchorRef) {
+        // Contextualize the reference used by the triggerable against
+        // the anchor
+        return contextRef.contextualize(anchorRef);
+    }
 
-				// The original logic did not make any sense --
-				// the
-				try {
-					// resolved triggers should match...
-					Set<TreeReference> Atriggers = this.getTriggers();
-					Set<TreeReference> Btriggers = t.getTriggers();
+    public boolean equals (Object o) {
+        if (o instanceof Triggerable) {
+            Triggerable t = (Triggerable)o;
+            if (this == t)
+                return true;
 
-					return (Atriggers.size() == Btriggers.size()) &&
-							Atriggers.containsAll(Btriggers);
-				} catch (XPathException e) {
-					return false;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
+            if (this.expr.equals(t.expr)) {
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		originalContextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+                // The original logic did not make any sense --
+                // the
+                try {
+                    // resolved triggers should match...
+                    Set<TreeReference> Atriggers = this.getTriggers();
+                    Set<TreeReference> Btriggers = t.getTriggers();
+
+                    return (Atriggers.size() == Btriggers.size()) &&
+                            Atriggers.containsAll(Btriggers);
+                } catch (XPathException e) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+        contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+        originalContextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
       List<TreeReference> tlist = (List<TreeReference>)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
-		targets = new ArrayList<TreeReference>(tlist); 
-	}
+        targets = new ArrayList<TreeReference>(tlist);
+    }
 
-	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(expr));
-		ExtUtil.write(out, contextRef);
-		ExtUtil.write(out, originalContextRef);
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(expr));
+        ExtUtil.write(out, contextRef);
+        ExtUtil.write(out, originalContextRef);
       List<TreeReference> tlist = new ArrayList<TreeReference>(targets);
-		ExtUtil.write(out, new ExtWrapList(tlist));
-	}
+        ExtUtil.write(out, new ExtWrapList(tlist));
+    }
 
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < targets.size(); i++) {
-			sb.append(targets.get(i).toString());
-			if (i < targets.size() - 1)
-				sb.append(",");
-		}
-		return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
-	}
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < targets.size(); i++) {
+            sb.append(targets.get(i).toString());
+            if (i < targets.size() - 1)
+                sb.append(",");
+        }
+        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
+    }
 
-	public void print(OutputStreamWriter w) throws IOException {
-		w.write("   waveCount: " + Integer.toString(waveCount) + "\n");
-		w.write("   isCascading: "
-				+ (isCascadingToChildren() ? "true" : "false") + "\n");
-		w.write("   expr: " + expr.toString() + "\n");
-		w.write("   contextRef: "
-				+ ((contextRef != null) ? contextRef.toString(true) : "null")
-				+ "\n");
-		w.write("   originalContextRef: "
-				+ ((originalContextRef != null) ? originalContextRef
-						.toString(true) : "null") + "\n");
-		int j;
-		for (j = 0; j < getTargets().size(); ++j) {
-			TreeReference r = getTargets().get(j);
-			w.write("   targets[" + Integer.toString(j) + "] :"
-					+ r.toString(true) + "\n");
-		}
-	}
+    public void print(OutputStreamWriter w) throws IOException {
+        w.write("   waveCount: " + Integer.toString(waveCount) + "\n");
+        w.write("   isCascading: "
+                + (isCascadingToChildren() ? "true" : "false") + "\n");
+        w.write("   expr: " + expr.toString() + "\n");
+        w.write("   contextRef: "
+                + ((contextRef != null) ? contextRef.toString(true) : "null")
+                + "\n");
+        w.write("   originalContextRef: "
+                + ((originalContextRef != null) ? originalContextRef
+                        .toString(true) : "null") + "\n");
+        int j;
+        for (j = 0; j < getTargets().size(); ++j) {
+            TreeReference r = getTargets().get(j);
+            w.write("   targets[" + Integer.toString(j) + "] :"
+                    + r.toString(true) + "\n");
+        }
+    }
 
-	/**
-	 * Searches in the triggers of this Triggerable, trying to find the ones that are
-	 * contained in the given list of contextualized refs.
-	 *
-	 * @param firedAnchorsMap a map of absolute refs
-	 * @return a list of affected nodes.
-	 */
-	public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
-		List<TreeReference> affectedTriggers = new ArrayList<TreeReference>(0);
+    /**
+     * Searches in the triggers of this Triggerable, trying to find the ones that are
+     * contained in the given list of contextualized refs.
+     *
+     * @param firedAnchorsMap a map of absolute refs
+     * @return a list of affected nodes.
+     */
+    public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
+        List<TreeReference> affectedTriggers = new ArrayList<TreeReference>(0);
 
-		Set<TreeReference> triggers = this.getTriggers();
-		for (TreeReference trigger : triggers) {
-			List<TreeReference> firedAnchors = firedAnchorsMap.get(trigger.genericize());
-			if (firedAnchors == null) {
-				continue;
-			}
-			
-			affectedTriggers.addAll(firedAnchors);
-		}
+        Set<TreeReference> triggers = this.getTriggers();
+        for (TreeReference trigger : triggers) {
+            List<TreeReference> firedAnchors = firedAnchorsMap.get(trigger.genericize());
+            if (firedAnchors == null) {
+                continue;
+            }
 
-		return affectedTriggers;
-	}
+            affectedTriggers.addAll(firedAnchors);
+        }
+
+        return affectedTriggers;
+    }
 }

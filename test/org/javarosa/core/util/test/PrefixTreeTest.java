@@ -26,40 +26,40 @@ import org.javarosa.core.util.PrefixTree;
 
 public class PrefixTreeTest extends TestCase  {
 
-	public PrefixTreeTest(String name) {
-		super(name);
-		System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
-	}
+    public PrefixTreeTest(String name) {
+        super(name);
+        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    }
 
-	public static Test suite() {
-		TestSuite aSuite = new TestSuite();
-		aSuite.addTest(new PrefixTreeTest("doTests"));
-		return aSuite;
-	}
-	
-	public void doTests() {
-		
-		PrefixTree t = new PrefixTree();	
-		System.out.println(t.toString());
-		
-		add(t, "abcde");
-		add(t, "abcdefghij");
-		add(t, "abcdefghijklmno");
-		add(t, "abcde");
-		add(t, "abcdefg");
-		add(t, "xyz");
-		add(t, "abcdexyz");
-		add(t, "abcppppp");
-		
-	}
+    public static Test suite() {
+        TestSuite aSuite = new TestSuite();
+        aSuite.addTest(new PrefixTreeTest("doTests"));
+        return aSuite;
+    }
 
-	public void add (PrefixTree t, String s) {
-		t.addString(s);
-		System.out.println(t.toString());
-		
-		List<String> v = t.getStrings();
-		for (int i = 0; i < v.size(); i++) {
-			System.out.println((String)v.get(i));
-		}
-	}
+    public void doTests() {
+
+        PrefixTree t = new PrefixTree();
+        System.out.println(t.toString());
+
+        add(t, "abcde");
+        add(t, "abcdefghij");
+        add(t, "abcdefghijklmno");
+        add(t, "abcde");
+        add(t, "abcdefg");
+        add(t, "xyz");
+        add(t, "abcdexyz");
+        add(t, "abcppppp");
+
+    }
+
+    public void add (PrefixTree t, String s) {
+        t.addString(s);
+        System.out.println(t.toString());
+
+        List<String> v = t.getStrings();
+        for (int i = 0; i < v.size(); i++) {
+            System.out.println((String)v.get(i));
+        }
+    }
 }

@@ -59,7 +59,7 @@ public class Property implements Persistable, IMetaData {
         int nameindex = fullString.indexOf(",");
         value = new ArrayList<String>();
         if(nameindex == -1) {
-    		//#if debug.output==verbose
+            //#if debug.output==verbose
             Std.out.println("WARNING: Property in RMS with no value:"+fullString);
             //#endif
             name = fullString.substring(0, fullString.length());
@@ -109,27 +109,27 @@ public class Property implements Persistable, IMetaData {
     }
 
     public int getID () {
-    	return recordId;
+        return recordId;
     }
 
-	public HashMap<String,Object> getMetaData() {
-		HashMap<String,Object> metadata = new HashMap<String,Object>();
-		String[] fields = getMetaDataFields();
-		for (int i = 0; i < fields.length; i++) {
-			metadata.put(fields[i], getMetaData(fields[i]));
-		}
-		return metadata;
-	}
+    public HashMap<String,Object> getMetaData() {
+        HashMap<String,Object> metadata = new HashMap<String,Object>();
+        String[] fields = getMetaDataFields();
+        for (int i = 0; i < fields.length; i++) {
+            metadata.put(fields[i], getMetaData(fields[i]));
+        }
+        return metadata;
+    }
 
-	public Object getMetaData(String fieldName) {
-		if (fieldName.equals("NAME")) {
-			return name;
-		} else {
-			throw new IllegalArgumentException();
-		}
-	}
+    public Object getMetaData(String fieldName) {
+        if (fieldName.equals("NAME")) {
+            return name;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 
-	public String[] getMetaDataFields() {
-		return new String[] {"NAME"};
-	}
+    public String[] getMetaDataFields() {
+        return new String[] {"NAME"};
+    }
 }

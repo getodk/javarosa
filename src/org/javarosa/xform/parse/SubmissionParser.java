@@ -17,7 +17,7 @@ import java.util.HashMap;
  *
  */
 public class SubmissionParser {
-	
+
     public SubmissionProfile parseSubmission(String method, String action, IDataReference ref, Element element) {
         String mediatype = element.getAttributeValue(null,"mediatype");
         HashMap<String,String> attributeMap = new HashMap<String,String>();
@@ -33,8 +33,8 @@ public class SubmissionParser {
         }
         return new SubmissionProfile(ref, method, action, mediatype, attributeMap);
     }
-	
-	public boolean matchesCustomMethod(String method) {
-		 return false;
-	}
+
+    public boolean matchesCustomMethod(String method) {
+         return false;
+    }
 }

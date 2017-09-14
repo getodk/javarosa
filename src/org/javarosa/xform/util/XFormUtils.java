@@ -41,44 +41,44 @@ import org.kxml2.kdom.Element;
  *
  */
 public class XFormUtils {
-	private static IXFormParserFactory _factory = new XFormParserFactory();
+    private static IXFormParserFactory _factory = new XFormParserFactory();
 
-	public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
-		IXFormParserFactory oldFactory = _factory;
-		_factory = factory;
-		return oldFactory;
-	}
+    public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
+        IXFormParserFactory oldFactory = _factory;
+        _factory = factory;
+        return oldFactory;
+    }
 
-	public static FormDef getFormFromResource (String resource) {
-		InputStream is = System.class.getResourceAsStream(resource);
-		if (is == null) {
-			Std.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
-			return null;
-		}
+    public static FormDef getFormFromResource (String resource) {
+        InputStream is = System.class.getResourceAsStream(resource);
+        if (is == null) {
+            Std.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
+            return null;
+        }
 
-		return getFormFromInputStream(is);
-	}
+        return getFormFromInputStream(is);
+    }
 
 
-	public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException{
-		return _factory.getXFormParser(isr).parse();
-	}
+    public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException{
+        return _factory.getXFormParser(isr).parse();
+    }
 
-	/*
+    /*
      * This method throws XFormParseException when the form has errors.
      */
-	public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
+    public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
                 isr = new InputStreamReader(is, "UTF-8");
             } catch (UnsupportedEncodingException uee) {
-    			throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
+                throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
             }
 
             return _factory.getXFormParser(isr).parse();
-		} catch(IOException e) {
-			throw new XFormParseException("IO Exception during parse! " + e.getMessage());
+        } catch(IOException e) {
+            throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
             try {
                 if (isr != null) {
@@ -86,14 +86,14 @@ public class XFormUtils {
                 }
             } catch (IOException e) {
                 Std.err.println("IO Exception while closing stream.");
-				Std.printStack(e);
-			}
-		}
-	}
+                Std.printStack(e);
+            }
+        }
+    }
 
-	public static FormDef getFormFromSerializedResource(String resource) {
-		FormDef returnForm = null;
-		InputStream is = System.class.getResourceAsStream(resource);
+    public static FormDef getFormFromSerializedResource(String resource) {
+        FormDef returnForm = null;
+        InputStream is = System.class.getResourceAsStream(resource);
         DataInputStream dis = null;
         try {
             if (is != null) {
@@ -128,55 +128,55 @@ public class XFormUtils {
     }
 
 
-	/////Parser Attribute warning stuff
+    /////Parser Attribute warning stuff
 
-	public static List<String> getAttributeList(Element e){
-		List<String> atts = new ArrayList<String>(e.getAttributeCount());
-		for(int i=0;i<e.getAttributeCount();i++){
-			atts.add(e.getAttributeName(i));
-		}
+    public static List<String> getAttributeList(Element e){
+        List<String> atts = new ArrayList<String>(e.getAttributeCount());
+        for(int i=0;i<e.getAttributeCount();i++){
+            atts.add(e.getAttributeName(i));
+        }
 
-		return atts;
-	}
+        return atts;
+    }
 
-	public static List<String> getUnusedAttributes(Element e,List<String> usedAtts){
+    public static List<String> getUnusedAttributes(Element e,List<String> usedAtts){
       List<String> unusedAtts = getAttributeList(e);
-		for(int i=0;i<usedAtts.size();i++){
-			if(unusedAtts.contains(usedAtts.get(i))){
-				unusedAtts.remove(usedAtts.get(i));
-			}
-		}
+        for(int i=0;i<usedAtts.size();i++){
+            if(unusedAtts.contains(usedAtts.get(i))){
+                unusedAtts.remove(usedAtts.get(i));
+            }
+        }
 
-		return unusedAtts;
-	}
+        return unusedAtts;
+    }
 
-	public static String unusedAttWarning(Element e, List<String> usedAtts){
-		String warning = "Warning: ";
+    public static String unusedAttWarning(Element e, List<String> usedAtts){
+        String warning = "Warning: ";
       List<String> ua = getUnusedAttributes(e,usedAtts);
-		warning+=ua.size()+" Unrecognized attributes found in Element ["+e.getName()+"] and will be ignored: ";
-		warning+="[";
-		for(int i=0;i<ua.size();i++){
-			warning+=ua.get(i);
-			if(i!=ua.size()-1) warning+=",";
-		}
-		warning+="] ";
-		warning+="Location:\n"+XFormParser.getVagueLocation(e);
+        warning+=ua.size()+" Unrecognized attributes found in Element ["+e.getName()+"] and will be ignored: ";
+        warning+="[";
+        for(int i=0;i<ua.size();i++){
+            warning+=ua.get(i);
+            if(i!=ua.size()-1) warning+=",";
+        }
+        warning+="] ";
+        warning+="Location:\n"+XFormParser.getVagueLocation(e);
 
-		return warning;
-	}
+        return warning;
+    }
 
-	public static boolean showUnusedAttributeWarning(Element e, List<String> usedAtts){
-		return getUnusedAttributes(e,usedAtts).size()>0;
-	}
+    public static boolean showUnusedAttributeWarning(Element e, List<String> usedAtts){
+        return getUnusedAttributes(e,usedAtts).size()>0;
+    }
 
-	/**
-	 * Is this element an Output tag?
-	 * @param e
-	 * @return
-	 */
-	public static boolean isOutput(Element e){
-		if(e.getName().toLowerCase().equals("output")) return true;
-		else return false;
-	}
+    /**
+     * Is this element an Output tag?
+     * @param e
+     * @return
+     */
+    public static boolean isOutput(Element e){
+        if(e.getName().toLowerCase().equals("output")) return true;
+        else return false;
+    }
 
 }

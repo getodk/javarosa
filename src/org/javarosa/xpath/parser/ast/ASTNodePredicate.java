@@ -22,15 +22,15 @@ import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class ASTNodePredicate extends ASTNode {
-	public ASTNode expr;
-	
-	public Vector<ASTNode> getChildren () {
-		Vector<ASTNode> v = new Vector<ASTNode>();
-		v.addElement(expr);
-		return v;
-	}
-	
-	public XPathExpression build() throws XPathSyntaxException {
-		return expr.build();
-	}
+    public ASTNode expr;
+
+    public Vector<ASTNode> getChildren () {
+        Vector<ASTNode> v = new Vector<ASTNode>();
+        v.addElement(expr);
+        return v;
+    }
+
+    public XPathExpression build() throws XPathSyntaxException {
+        return expr.build();
+    }
 }

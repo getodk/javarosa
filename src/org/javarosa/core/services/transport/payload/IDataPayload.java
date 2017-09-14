@@ -31,46 +31,46 @@ import org.javarosa.core.util.externalizable.Externalizable;
  */
 public interface IDataPayload extends Externalizable {
 
-	/**
-	 * Data payload codes
-	 */
-	final public static int PAYLOAD_TYPE_TEXT = 0;
-	final public static int PAYLOAD_TYPE_XML = 1;
-	final public static int PAYLOAD_TYPE_JPG = 2;
-	final public static int PAYLOAD_TYPE_HEADER = 3;
-	final public static int PAYLOAD_TYPE_MULTI = 4;
-	final public static int PAYLOAD_TYPE_SMS = 5; // sms's are a variant of TEXT having a limit on length.
+    /**
+     * Data payload codes
+     */
+    final public static int PAYLOAD_TYPE_TEXT = 0;
+    final public static int PAYLOAD_TYPE_XML = 1;
+    final public static int PAYLOAD_TYPE_JPG = 2;
+    final public static int PAYLOAD_TYPE_HEADER = 3;
+    final public static int PAYLOAD_TYPE_MULTI = 4;
+    final public static int PAYLOAD_TYPE_SMS = 5; // sms's are a variant of TEXT having a limit on length.
 
-	/**
-	 * Gets the stream for this payload.
-	 *
-	 * @return A stream for the data in this payload.
-	 * @throws IOException
-	 */
-	public InputStream getPayloadStream() throws IOException;
+    /**
+     * Gets the stream for this payload.
+     *
+     * @return A stream for the data in this payload.
+     * @throws IOException
+     */
+    public InputStream getPayloadStream() throws IOException;
 
-	/**
-	 * @return A string identifying the contents of the payload
-	 */
-	public String getPayloadId();
+    /**
+     * @return A string identifying the contents of the payload
+     */
+    public String getPayloadId();
 
-	/**
-	 * @return The type of the data encapsulated by this
-	 * payload.
-	 */
-	public int getPayloadType();
+    /**
+     * @return The type of the data encapsulated by this
+     * payload.
+     */
+    public int getPayloadType();
 
-	/**
-	 * Visitor pattern accept method.
-	 * @param visitor The visitor to visit this payload.
-	 */
-	public <T> T accept(IDataPayloadVisitor<T> visitor);
+    /**
+     * Visitor pattern accept method.
+     * @param visitor The visitor to visit this payload.
+     */
+    public <T> T accept(IDataPayloadVisitor<T> visitor);
 
-	public long getLength();
+    public long getLength();
 
-	/**
-	 * @return A unique Id for the transport manager to use to be able to identify
-	 * the status of transmissions related to this payload
-	 */
-	public int getTransportId();
+    /**
+     * @return A unique Id for the transport manager to use to be able to identify
+     * the status of transmissions related to this payload
+     */
+    public int getTransportId();
 }
