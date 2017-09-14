@@ -97,23 +97,27 @@ public class XFormParserTest {
         assertEquals("us_east", dataSetChild.getValue().getDisplayText());
     }
 
-    @Test public void serAndDeserializeMultipleInstancesForm() throws IOException, DeserializationException {
+    @Test public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException {
         serAndDeserializeForm("Simpler_Cascading_Select_Form.xml");
     }
 
-    @Test public void serAndDeserializeExternalSecondaryInstanceForm() throws IOException, DeserializationException {
-        // todo test when working
-        if (false) {
-            serAndDeserializeForm(EXTERNAL_SECONDARY_INSTANCE_XML);
-        }
+    @Test public void externalSecondaryInstanceFormSavesAndRestores() throws IOException, DeserializationException {
+        serAndDeserializeForm(EXTERNAL_SECONDARY_INSTANCE_XML);
     }
 
     private void serAndDeserializeForm(String formName) throws IOException, DeserializationException {
         initSerialization();
         FormDef formDef = parse(formName).formDef;
         Path p = Files.createTempFile("serialized-form", null);
-        formDef.writeExternal(new DataOutputStream(Files.newOutputStream(p)));
-        formDef.readExternal(new DataInputStream(Files.newInputStream(p)), defaultPrototypes());
+
+        final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));
+        formDef.writeExternal(dos);
+        dos.close();
+
+        final DataInputStream dis = new DataInputStream(Files.newInputStream(p));
+        formDef.readExternal(dis, defaultPrototypes());
+        dis.close();
+
         Files.delete(p);
     }
 
@@ -126,6 +130,7 @@ public class XFormParserTest {
                 "org.javarosa.core.model.QuestionDef",
                 "org.javarosa.core.model.GroupDef",
                 "org.javarosa.core.model.instance.FormInstance",
+                "org.javarosa.core.model.instance.ExternalDataInstance", // Todo export this structure to Collect and remove from there.
                 "org.javarosa.core.model.data.MultiPointerAnswerData",
                 "org.javarosa.core.model.data.PointerAnswerData",
                 "org.javarosa.core.model.data.SelectMultiData",

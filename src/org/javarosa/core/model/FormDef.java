@@ -48,6 +48,7 @@ import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
@@ -1189,7 +1190,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 String.class, SubmissionProfile.class));
 
         formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
-                String.class, FormInstance.class));
+                String.class, new ExtWrapTagged()), pf);
 
         eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, new ExtWrapListPoly()), pf);
@@ -1256,7 +1257,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         // for support of multi-instance forms
 
-        ExtUtil.write(dos, new ExtWrapMap(formInstances));
+        ExtUtil.write(dos, new ExtWrapMap(formInstances, new ExtWrapTagged()));
         ExtUtil.write(dos, new ExtWrapMap(eventListeners, new ExtWrapListPoly()));
         ExtUtil.write(dos, new ExtWrapListPoly(extensions));
     }
