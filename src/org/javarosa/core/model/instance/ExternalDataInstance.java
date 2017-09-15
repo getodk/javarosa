@@ -46,7 +46,12 @@ public class ExternalDataInstance extends DataInstance {
     }
 
     private static String getPathPrefix() {
-        return System.getProperty("user.dir") + "/resources"; // ToDo find out how to get the actual location
+        return System.getProperty("user.dir") + "/resources";
+        /* ToDo find out how to get the actual location. Hélène says:
+        Other "stuff outside the form" uses `<odk-form-folder>/<form-name>-media/` as the root dir but
+        in this case all external secondary instances will go in the same folder. It would be good for
+        that folder to reside in the odk root folder. We can come back to it.
+        */
     }
 
     @Override
