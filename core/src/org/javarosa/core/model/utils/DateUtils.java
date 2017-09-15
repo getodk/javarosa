@@ -329,7 +329,7 @@ public class DateUtils {
 	}
 
 	public static Date parseTime (String str) {
-		DateFields fields = new DateFields();
+		DateFields fields = getFields(new Date());
 		if (!parseTime(str, fields)) {
 			return null;
 		}
