@@ -1,5 +1,6 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.data.StringData;
@@ -7,6 +8,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -176,27 +178,8 @@ public class XFormParserTest {
     }
 
     private void initSerialization() {
-        final String[] SERIALIZABLE_CLASSES = { // Copied from Collect application
-                "org.javarosa.core.services.locale.ResourceFileDataSource",
-                "org.javarosa.core.services.locale.TableLocaleSource",
-                "org.javarosa.core.model.FormDef",
-                "org.javarosa.core.model.SubmissionProfile",
-                "org.javarosa.core.model.QuestionDef",
-                "org.javarosa.core.model.GroupDef",
-                "org.javarosa.core.model.instance.FormInstance",
-                "org.javarosa.core.model.instance.ExternalDataInstance", // Todo export this structure to Collect and remove from there.
-                "org.javarosa.core.model.data.MultiPointerAnswerData",
-                "org.javarosa.core.model.data.PointerAnswerData",
-                "org.javarosa.core.model.data.SelectMultiData",
-                "org.javarosa.core.model.data.SelectOneData",
-                "org.javarosa.core.model.data.StringData",
-                "org.javarosa.core.model.data.TimeData",
-                "org.javarosa.core.model.data.UncastData",
-                "org.javarosa.core.model.data.helper.BasicDataPointer",
-                "org.javarosa.core.model.Action",
-                "org.javarosa.core.model.actions.SetValueAction"
-        };
-        PrototypeManager.registerPrototypes(SERIALIZABLE_CLASSES);
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
         new XFormsModule().registerModule();
     }
 
