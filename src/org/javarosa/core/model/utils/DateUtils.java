@@ -328,7 +328,9 @@ public class DateUtils {
     }
 
     public static Date parseTime (String str) {
-        DateFields fields = new DateFields();
+        DateFields fields = getFields(new Date());
+        fields.second = 0;
+        fields.secTicks = 0;
         if (!parseTime(str, fields)) {
             return null;
         }
