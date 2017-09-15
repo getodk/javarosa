@@ -464,7 +464,7 @@ public class XFormParser implements IXFormParserFunctions {
 
                 if (ediPath != null) {
                     try { /* todo implement better error handling */
-                        _f.addNonMainInstance(new ExternalDataInstance(ediPath, instanceId));
+                        _f.addNonMainInstance(ExternalDataInstance.buildFromPath(ediPath, instanceId));
                     } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
                         e.printStackTrace();
                     }
