@@ -68,7 +68,7 @@ public class XFormParserTest {
 
     @After
     public void tearDown() throws Exception {
-        FORM_INSTANCE_XML_FILE_NAME.toFile().delete();
+        Files.deleteIfExists(FORM_INSTANCE_XML_FILE_NAME);
     }
 
     @Test
