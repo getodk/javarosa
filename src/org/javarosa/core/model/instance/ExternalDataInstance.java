@@ -73,9 +73,9 @@ public class ExternalDataInstance extends DataInstance {
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-   		super.writeExternal(out);
-   		ExtUtil.write(out, path);
-   	}
+        super.writeExternal(out);
+        ExtUtil.write(out, path);
+    }
 
     /**
      * Returns the path of the URI at srcLocation if the scheme is <code>jr</code> and the host is
