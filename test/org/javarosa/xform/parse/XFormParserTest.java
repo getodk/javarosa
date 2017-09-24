@@ -19,12 +19,13 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,9 +44,15 @@ import static org.junit.Assert.assertNotNull;
 
 public class XFormParserTest {
 
-    private static final String FORM_INSTANCE_XML_FILE_NAME = "instance.xml";
-    private static final String EXTERNAL_SECONDARY_INSTANCE_XML = "external-secondary-instance.xml";
-    private static final String EXTERNAL_SECONDARY_INSTANCE_LARGE_XML = "external-secondary-instance-large.xml";
+    /** Makes a Path for a resource file */
+    private static Path r(String filename) {
+        return Paths.get("resources", filename);
+    }
+    private static final Path FORM_INSTANCE_XML_FILE_NAME           = r("instance.xml");
+    private static final Path SECONDARY_INSTANCE_XML                = r("secondary-instance.xml");
+    private static final Path SECONDARY_INSTANCE_LARGE_XML          = r("secondary-instance-large.xml");
+    private static final Path EXTERNAL_SECONDARY_INSTANCE_XML       = r("external-secondary-instance.xml");
+    private static final Path EXTERNAL_SECONDARY_INSTANCE_LARGE_XML = r("external-secondary-instance-large.xml");
 
     private static final String AUDIT_NODE = "audit";
     private static final String AUDIT_ANSWER = "audit111.csv";
@@ -61,18 +68,18 @@ public class XFormParserTest {
 
     @After
     public void tearDown() throws Exception {
-        new File(FORM_INSTANCE_XML_FILE_NAME).delete();
+        FORM_INSTANCE_XML_FILE_NAME.toFile().delete();
     }
 
     @Test
     public void parsesSimpleForm() throws IOException {
-        FormDef formDef = parse("simple-form.xml").formDef;
+        FormDef formDef = parse(r("simple-form.xml")).formDef;
         assertEquals(formDef.getTitle(), "Simple Form");
     }
 
     @Test
     public void parsesForm2() throws IOException {
-        FormDef formDef = parse("form2.xml").formDef;
+        FormDef formDef = parse(r("form2.xml")).formDef;
         assertEquals("My Survey", formDef.getTitle());
         assertEquals(3, formDef.getChildren().size());
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
@@ -80,8 +87,13 @@ public class XFormParserTest {
 
     @Test
     public void parsesPreloadForm() throws IOException {
-        FormDef formDef = parse("Sample-Preloading.xml").formDef;
+        FormDef formDef = parse(r("Sample-Preloading.xml")).formDef;
         assertEquals("Sample Form - Preloading", formDef.getTitle());
+    }
+
+    @Test public void parsesSecondaryInstanceForm() throws IOException, XPathSyntaxException {
+        FormDef formDef = parse(SECONDARY_INSTANCE_XML).formDef;
+        assertEquals("Form with secondary instance", formDef.getTitle());
     }
 
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
@@ -100,19 +112,33 @@ public class XFormParserTest {
         assertEquals("us_east", dataSetChild.getValue().getDisplayText());
     }
 
+    @Test public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
+        timeParsing(new LargeIsiFileGenerator(SECONDARY_INSTANCE_XML), SECONDARY_INSTANCE_LARGE_XML,
+                SECONDARY_INSTANCE_LARGE_XML);
+    }
+
+    @Test public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
+        timeParsing(new LargeEsiFileGenerator(), r("towns-large.xml"), EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
+    }
+
     /**
      * In a loop, parses forms with increasingly larger external secondary instance files. Writes timing results
      * to the console.
+     *
+     * @param lfg a file generator
+     * @param largeDataFilename the name to be given to the generated file
+     * @param parseFilename the name of the file to parse
+     * @throws IOException if there are problems reading or writing files
      */
-    @Test public void parsesLargeExternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
+    private void timeParsing(LargeInstanceFileGenerator lfg, Path largeDataFilename, Path parseFilename) throws IOException {
         NumberFormat nf = NumberFormat.getNumberInstance();
         List<String> results = new ArrayList<>(); // Collect and display at end
         results.add("Children\tSeconds");
-        for (double powerOfTen = 4; powerOfTen <= 6.0; powerOfTen += 0.1) {
+        for (double powerOfTen = 3; powerOfTen <= 6.0; powerOfTen += 0.1) {
             int numChildren = (int) Math.pow(10, powerOfTen);
-            createLargeInstanceSource(numChildren);
+            lfg.createLargeInstanceSource(largeDataFilename, numChildren);
             long startMs = System.currentTimeMillis();
-            parse(EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
+            parse(parseFilename);
             double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
             results.add(nf.format(numChildren) + "\t" + nf.format(elapsed));
             if (elapsed > 5.0) { // Make this larger if needed
@@ -122,17 +148,18 @@ public class XFormParserTest {
         for (String line : results) {
             System.out.println(line);
         }
+        Files.delete(largeDataFilename);
     }
 
     @Test public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException {
-        serAndDeserializeForm("Simpler_Cascading_Select_Form.xml");
+        serAndDeserializeForm(r("Simpler_Cascading_Select_Form.xml"));
     }
 
     @Test public void externalSecondaryInstanceFormSavesAndRestores() throws IOException, DeserializationException {
         serAndDeserializeForm(EXTERNAL_SECONDARY_INSTANCE_XML);
     }
 
-    private void serAndDeserializeForm(String formName) throws IOException, DeserializationException {
+    private void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
         initSerialization();
         FormDef formDef = parse(formName).formDef;
         Path p = Files.createTempFile("serialized-form", null);
@@ -146,16 +173,6 @@ public class XFormParserTest {
         dis.close();
 
         Files.delete(p);
-    }
-
-    private void createLargeInstanceSource(int numChildren) throws IOException {
-        PrintWriter os = new PrintWriter("resources/towns-large.xml");
-        os.println("<towndata>");
-        for (int i = 0; i < numChildren; ++i) {
-            os.println("<data_set>us_east</data_set>");
-        }
-        os.println("</towndata>");
-        os.close();
     }
 
     private void initSerialization() {
@@ -185,7 +202,7 @@ public class XFormParserTest {
 
     @Test
     public void parsesRangeForm() throws IOException {
-        FormDef formDef = parse("range-form.xml").formDef;
+        FormDef formDef = parse(r("range-form.xml")).formDef;
         RangeQuestion question = (RangeQuestion) formDef.getChild(0);
         assertEquals(CONTROL_RANGE, question.getControlType());
         assertEquals(-2.0d, question.getRangeStart().doubleValue(), 0);
@@ -195,12 +212,12 @@ public class XFormParserTest {
 
     @Test(expected = XFormParseException.class)
     public void throwsParseExceptionOnBadRangeForm() throws IOException {
-        parse("bad-range-form.xml");
+        parse(r("bad-range-form.xml"));
     }
 
     @Test
     public void parsesMetaNamespaceForm() throws IOException {
-        ParseResult parseResult = parse("meta-namespace-form.xml");
+        ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
         assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
     }
@@ -208,7 +225,7 @@ public class XFormParserTest {
     @Test
     public void serializeAndRestoreMetaNamespaceFormInstance() throws IOException {
         // Given
-        ParseResult parseResult = parse("meta-namespace-form.xml");
+        ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
         assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
 
@@ -238,10 +255,10 @@ public class XFormParserTest {
         // serialize the form instance
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
         ByteArrayPayload xml = (ByteArrayPayload) serializer.createSerializedPayload(formDef.getInstance());
-        copy(xml.getPayloadStream(), new File(FORM_INSTANCE_XML_FILE_NAME).toPath(), REPLACE_EXISTING);
+        copy(xml.getPayloadStream(), FORM_INSTANCE_XML_FILE_NAME, REPLACE_EXISTING);
 
         // restore (deserialize) the form instance
-        byte[] formInstanceBytes = readAllBytes(Paths.get(FORM_INSTANCE_XML_FILE_NAME));
+        byte[] formInstanceBytes = readAllBytes(FORM_INSTANCE_XML_FILE_NAME);
         FormInstance formInstance = XFormParser.restoreDataModel(formInstanceBytes, null);
 
         // Then
@@ -265,8 +282,8 @@ public class XFormParserTest {
         assertEquals(AUDIT_3_ANSWER, audit3.getValue().getValue());
     }
 
-    private ParseResult parse(String formName) throws IOException {
-        XFormParser parser = new XFormParser(new FileReader("resources/" + formName));
+    private ParseResult parse(Path formName) throws IOException {
+        XFormParser parser = new XFormParser(new FileReader(formName.toString()));
         final List<String> errorMessages = new ArrayList<>();
         parser.reporter = new XFormParserReporter() {
             @Override
@@ -308,5 +325,52 @@ public class XFormParserTest {
             }
         }
         return null;
+    }
+
+    /** Generates large versions of a secondary instance */
+    public interface LargeInstanceFileGenerator {
+        /** Creates a large instance file with the given name, and the given number of children */
+        void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException;
+    }
+
+    /** Generates large versions of an external secondary instance, from scratch */
+    class LargeEsiFileGenerator implements LargeInstanceFileGenerator {
+        @Override
+        public void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException {
+            PrintWriter pw = new PrintWriter(outputFilename.toString());
+            pw.println("<towndata>");
+            for (int i = 0; i < numChildren; ++i) {
+                pw.println("<data_set>us_east</data_set>");
+            }
+            pw.println("</towndata>");
+            pw.close();
+        }
+    }
+
+    /** Generates large versions of a file with an internal secondary instance, using a template */
+    class LargeIsiFileGenerator implements LargeInstanceFileGenerator {
+        private Path templateFilename;
+
+        LargeIsiFileGenerator(Path templateFilename) {
+            this.templateFilename = templateFilename;
+        }
+
+        @Override
+        public void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException {
+            BufferedReader br = Files.newBufferedReader(templateFilename, Charset.defaultCharset());
+            PrintWriter pw = new PrintWriter(outputFilename.toString());
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().startsWith("<data_set>")) {
+                    // The one instance of this in the template is replaced with multiple lines
+                    for (int i = 0; i < numChildren; ++i) {
+                        pw.println("<data_set>us_east</data_set>");
+                    }
+                } else {
+                    pw.println(line);
+                }
+            }
+            pw.close();
+        }
     }
 }
