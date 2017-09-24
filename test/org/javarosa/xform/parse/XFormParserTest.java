@@ -24,9 +24,11 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class XFormParserTest {
 
     private static final String FORM_INSTANCE_XML_FILE_NAME = "instance.xml";
     private static final String EXTERNAL_SECONDARY_INSTANCE_XML = "external-secondary-instance.xml";
+    private static final String EXTERNAL_SECONDARY_INSTANCE_LARGE_XML = "external-secondary-instance-large.xml";
 
     private static final String AUDIT_NODE = "audit";
     private static final String AUDIT_ANSWER = "audit111.csv";
@@ -97,6 +100,30 @@ public class XFormParserTest {
         assertEquals("us_east", dataSetChild.getValue().getDisplayText());
     }
 
+    /**
+     * In a loop, parses forms with increasingly larger external secondary instance files. Writes timing results
+     * to the console.
+     */
+    @Test public void parsesLargeExternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        List<String> results = new ArrayList<>(); // Collect and display at end
+        results.add("Children\tSeconds");
+        for (double powerOfTen = 4; powerOfTen <= 6.0; powerOfTen += 0.1) {
+            int numChildren = (int) Math.pow(10, powerOfTen);
+            createLargeInstanceSource(numChildren);
+            long startMs = System.currentTimeMillis();
+            parse(EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
+            double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
+            results.add(nf.format(numChildren) + "\t" + nf.format(elapsed));
+            if (elapsed > 5.0) { // Make this larger if needed
+                break;
+            }
+        }
+        for (String line : results) {
+            System.out.println(line);
+        }
+    }
+
     @Test public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException {
         serAndDeserializeForm("Simpler_Cascading_Select_Form.xml");
     }
@@ -119,6 +146,16 @@ public class XFormParserTest {
         dis.close();
 
         Files.delete(p);
+    }
+
+    private void createLargeInstanceSource(int numChildren) throws IOException {
+        PrintWriter os = new PrintWriter("resources/towns-large.xml");
+        os.println("<towndata>");
+        for (int i = 0; i < numChildren; ++i) {
+            os.println("<data_set>us_east</data_set>");
+        }
+        os.println("</towndata>");
+        os.close();
     }
 
     private void initSerialization() {
