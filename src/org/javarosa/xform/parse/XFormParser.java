@@ -81,7 +81,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExternalDataInstance;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
@@ -388,55 +387,7 @@ public class XFormParser implements IXFormParserFunctions {
             Std.out.println("Error closing reader");
             Std.printStack(e);
         }
-
-        //For escaped unicode strings we end up with a looooot of cruft,
-        //so we really want to go through and convert the kxml parsed
-        //text (which have lots of characters each as their own string)
-        //into one single string
-        Stack<Element> q = new Stack<>();
-
-        q.push(doc.getRootElement());
-        while(!q.isEmpty()) {
-            Element e = q.pop();
-            boolean[] toRemove = new boolean[e.getChildCount()*2];
-            String accumulate = "";
-            for(int i = 0 ; i < e.getChildCount(); ++i ){
-                int type = e.getType(i);
-                if(type == Element.TEXT) {
-                    String text = e.getText(i);
-                    accumulate += text;
-                    toRemove[i] = true;
-                } else {
-                    if(type ==Element.ELEMENT) {
-                        q.add(e.getElement(i));
-                    }
-                    String accumulatedString = accumulate.trim();
-                    if(accumulatedString.length() != 0) {
-                        if(stringCache == null) {
-                            e.addChild(i, Element.TEXT, accumulate);
-                        } else {
-                            e.addChild(i, Element.TEXT, stringCache.intern(accumulate));
-                        }
-                        accumulate = "";
-                        ++i;
-                    } else {
-                        accumulate = "";
-                    }
-                }
-            }
-            if(accumulate.trim().length() != 0) {
-                if(stringCache == null) {
-                    e.addChild(Element.TEXT, accumulate);
-                } else {
-                    e.addChild(Element.TEXT, stringCache.intern(accumulate));
-                }
-            }
-            for(int i = e.getChildCount() - 1; i >= 0 ; i-- ){
-                if(toRemove[i]) {
-                    e.removeChild(i);
-                }
-            }
-        }
+        XmlTextConsolidator.consolidateText(stringCache, doc.getRootElement());
 
         return doc;
     }
