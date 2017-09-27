@@ -55,8 +55,8 @@ class XmlTextConsolidator {
         }
     }
 
-    private static boolean nonBlank(String accumulate) {
-        return !accumulate.trim().isEmpty();
+    private static boolean nonBlank(String s) {
+        return !s.trim().isEmpty();
     }
 
     private static String maybeInternedString(CacheTable<String> stringCache, String accumulate) {

@@ -270,7 +270,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     /**
      * Returns the count of children with the given name, and optionally supplies the children themselves.
      * @param name the name to look for
-     * @param results a List into which to store the children
+     * @param results a List into which to store the children, or null
      * @return the number of children with the given name
      */
     private int findChildrenWithName(String name, List<TreeElement> results) {
