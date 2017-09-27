@@ -8,7 +8,7 @@
                 </data>
             </instance>
             <instance id="towns">
-                <towndata>
+                <towndata z="1">
                     <data_set>us_east</data_set>
                 </towndata>
             </instance>
