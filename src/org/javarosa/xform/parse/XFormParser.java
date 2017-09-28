@@ -1464,7 +1464,7 @@ public class XFormParser implements IXFormParserFunctions {
 
             if (group != null) {
                 if (!group.getRepeat() && group.getChildren().size() == 1) {
-                    IFormElement grandchild = (IFormElement)group.getChildren().get(0);
+                    IFormElement grandchild = group.getChildren().get(0);
                     GroupDef repeat = null;
                     if (grandchild instanceof GroupDef)
                         repeat = (GroupDef)grandchild;
@@ -1738,13 +1738,28 @@ public class XFormParser implements IXFormParserFunctions {
         return prefixes;
     }
 
-    public static TreeElement buildInstanceStructure (Element node, TreeElement parent, Map<String, String> namespacePrefixesByUri) {
-        return buildInstanceStructure(node, parent, null, node.getNamespace(), namespacePrefixesByUri);
+    public static TreeElement buildInstanceStructure (Element node, TreeElement parent, Map<String,
+            String> namespacePrefixesByUri, Integer multiplicityFromGroup) {
+        return buildInstanceStructure(node, parent, null, node.getNamespace(), namespacePrefixesByUri, multiplicityFromGroup);
     }
 
-    /** Parses instance hierarchy and turns into a skeleton model; ignoring data content, but respecting repeated nodes and 'template' flags */
-    public static TreeElement buildInstanceStructure (Element node, TreeElement parent, String instanceName, String docnamespace, Map<String, String> namespacePrefixesByUri) {
-        TreeElement element = null;
+    /**
+     * Parses instance hierarchy and turns into a skeleton model; ignoring data content,
+     * but respecting repeated nodes and 'template' flags
+     *
+     * @param node                   the input node
+     * @param parent                 the parent
+     * @param instanceName           the name of the instance
+     * @param docnamespace
+     * @param namespacePrefixesByUri namespace prefixes, by URI
+     * @param multiplicityFromGroup  if not null, the multiplicity to use. If present, a potentially
+     *                               expensive search can be avoided.
+     * @return a new TreeElement
+     */
+    public static TreeElement buildInstanceStructure (Element node, TreeElement parent,
+            String instanceName, String docnamespace, Map<String, String> namespacePrefixesByUri,
+            Integer multiplicityFromGroup) {
+        TreeElement element;
 
         //catch when text content is mixed with children
         int numChildren = node.getChildCount();
@@ -1765,15 +1780,16 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         //check for repeat templating
-        String name = node.getName();
-        int multiplicity;
+        final String name = node.getName();
+        final int multiplicity;
         if (node.getAttributeValue(NAMESPACE_JAVAROSA, "template") != null) {
             multiplicity = TreeReference.INDEX_TEMPLATE;
             if (parent != null && parent.getChild(name, TreeReference.INDEX_TEMPLATE) != null) {
                 throw new XFormParseException("More than one node declared as the template for the same repeated set [" + name + "]",node);
             }
         } else {
-            multiplicity = (parent == null ? 0 : parent.getChildMultiplicity(name));
+            multiplicity = multiplicityFromGroup != null ? multiplicityFromGroup :
+                    (parent == null ? 0 : parent.getChildMultiplicity(name));
         }
 
 
@@ -1786,7 +1802,7 @@ public class XFormParser implements IXFormParserFunctions {
             if( typeMappings.get(modelType) == null ){
                 throw new XFormParseException("ModelType " + modelType + " is not recognized.",node);
             }
-            element = (TreeElement)modelPrototypes.getNewInstance(((Integer)typeMappings.get(modelType)).toString());
+            element = (TreeElement)modelPrototypes.getNewInstance(typeMappings.get(modelType).toString());
             if(element == null) {
                 element = new TreeElement(name, multiplicity);
                 Std.out.println("No model type prototype available for " + modelType);
@@ -1806,9 +1822,15 @@ public class XFormParser implements IXFormParserFunctions {
 
 
         if (hasElements) {
+            Integer newMultiplicityFromGroup = allChildrenHaveTheSameName(node) ? 0 : null;
             for (int i = 0; i < numChildren; i++) {
                 if (node.getType(i) == Node.ELEMENT) {
-                    element.addChild(buildInstanceStructure(node.getElement(i), element, instanceName, docnamespace, namespacePrefixesByUri));
+                    TreeElement newChild = buildInstanceStructure(node.getElement(i), element,
+                            instanceName, docnamespace, namespacePrefixesByUri, newMultiplicityFromGroup);
+                    element.addChild(newChild);
+                    if (newMultiplicityFromGroup != null) {
+                        newMultiplicityFromGroup++;
+                    }
                 }
             }
         }
@@ -1830,6 +1852,16 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         return element;
+    }
+
+    private static boolean allChildrenHaveTheSameName(Element node) {
+        final String firstName = node.getElement(0).getName();
+        for (int i = 1; i < node.getChildCount(); i++) {
+            if (!node.getElement(i).getName().equals(firstName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     //TODO: hook here for turning sub-trees into complex IAnswerData objects (like for immunizations)
@@ -1969,7 +2001,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         Element e = doc.getRootElement();
 
-        TreeElement te = buildInstanceStructure(e, null, buildNamespacesMap(e));
+        TreeElement te = buildInstanceStructure(e, null, buildNamespacesMap(e), null);
         FormInstance dm = new FormInstance(te);
         loadNamespaces(e, dm);
         if (r != null) {
