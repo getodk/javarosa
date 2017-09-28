@@ -74,6 +74,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1540,8 +1541,8 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         TableLocaleSource source = new TableLocaleSource();
+        Collection<Integer> removeIndexes = new HashSet<>();
 
-        //source.startEditing();
         for (int j = 0; j < trans.getChildCount(); j++) {
             Element text = trans.getElement(j);
             if (text == null || !text.getName().equals("text")) {
@@ -1554,17 +1555,15 @@ public class XFormParser implements IXFormParserFunctions {
             //used. This is sketchy if anything else plans on touching the nodes.
             //This code can be removed once we're pull-parsing
             //#if org.javarosa.xform.stingy
-            trans.removeChild(j);
-            --j;
-            //#endif
+            removeIndexes.add(j);
         }
+        ElementChildDeleter.delete(trans, removeIndexes);
 
         //print unused attribute warning message for parent element
         if(XFormUtils.showUnusedAttributeWarning(trans, usedAtts)){
             reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(trans, usedAtts), getVagueLocation(trans));
         }
 
-        //source.stopEditing();
         l.registerLocaleResource(lang, source);
     }
 
