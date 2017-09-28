@@ -12,9 +12,6 @@ public interface TreeElementChildren extends Iterable<TreeElement> {
     @Override
     Iterator<TreeElement> iterator();
 
-    /** Adds a child at the end */
-    void add(TreeElement treeElement);
-
     /** Adds a child at the specified index */
     void add(int index, TreeElement treeElement);
 
@@ -27,8 +24,7 @@ public interface TreeElementChildren extends Iterable<TreeElement> {
     /** Removes all children */
     void clear();
 
-    /** Adds all children from the other TreeElementChildren object to this one */
-    void addAll(TreeElementChildren children);
+    void addAll(Iterable<TreeElement> childIterable);
 
     boolean isEmpty();
 
@@ -45,4 +41,5 @@ public interface TreeElementChildren extends Iterable<TreeElement> {
 
     /** Gets a count of all children with the specified name */
     int getCount(String name);
+
 }

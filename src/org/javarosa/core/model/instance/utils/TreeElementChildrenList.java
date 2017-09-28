@@ -21,18 +21,13 @@ public class TreeElementChildrenList implements TreeElementChildren {
     }
 
     @Override
-    public void add(TreeElement treeElement) {
-        children.add(treeElement);
-    }
-
-    @Override
     public void add(int index, TreeElement treeElement) {
         children.add(index, treeElement);
     }
 
     @Override
-    public void addAll(TreeElementChildren addingChildren) {
-        for (TreeElement addingChild: addingChildren) {
+    public void addAll(Iterable<TreeElement> childIterable) {
+        for (TreeElement addingChild: childIterable) {
             children.add(addingChild);
         }
     }
