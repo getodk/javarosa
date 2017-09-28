@@ -4,6 +4,7 @@ import org.javarosa.core.model.instance.TreeElement;
 
 import java.util.Iterator;
 
+/** All operations on children of TreeElement */
 public interface TreeElementChildren extends Iterable<TreeElement> {
     int size();
 
