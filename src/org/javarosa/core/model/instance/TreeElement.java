@@ -35,6 +35,8 @@ import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.instance.utils.TreeElementChildren;
+import org.javarosa.core.model.instance.utils.TreeElementChildrenList;
 import org.javarosa.core.model.instance.utils.TreeElementNameComparator;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
@@ -76,7 +78,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     private List<FormElementStateListener> observers;
     private List<TreeElement> attributes;
-    private List<TreeElement> children = new ArrayList<TreeElement>(0);
+    private final TreeElementChildren children = new TreeElementChildrenList();
 
     /* model properties */
     protected int dataType = Constants.DATATYPE_NULL; //TODO
@@ -188,12 +190,12 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     @Override
     public boolean isLeaf() {
-        return (children == null || children.size() == 0);
+        return children.isEmpty();
     }
 
     @Override
     public boolean isChildable() {
-        return (value == null);
+        return value == null;
     }
 
     @Override
@@ -237,8 +239,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     private ElementAndLoc getChildAndLoc(String name, int multiplicity) {
-        if(children == null) { return null; }
-
         if (name.equals(TreeReference.NAME_WILDCARD)) {
             if(multiplicity == TreeReference.INDEX_TEMPLATE || children.size() < multiplicity + 1) {
                 return null;
@@ -275,14 +275,12 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
      */
     private int findChildrenWithName(String name, List<TreeElement> results) {
         int count = 0;
-        if(children != null) {
-            for (TreeElement child : children) {
-                if ((child.multiplicity != TreeReference.INDEX_TEMPLATE) &&
-                        TreeElementNameComparator.elementMatchesName(child, name)) {
-                    ++count;
-                    if (results != null) {
-                        results.add(child);
-                    }
+        for (TreeElement child : children) {
+            if ((child.multiplicity != TreeReference.INDEX_TEMPLATE) &&
+                    TreeElementNameComparator.elementMatchesName(child, name)) {
+                ++count;
+                if (results != null) {
+                    results.add(child);
                 }
             }
         }
@@ -291,7 +289,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     @Override
     public int getNumChildren() {
-        return children == null ? 0 : children.size();
+        return children.size();
     }
 
     @Override
@@ -327,8 +325,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
             throw new RuntimeException("Cannot add child with an unbound index!");
         }
 
-        if(children == null) { children = new ArrayList<>(0);}
-
         addInOrder(child);
         child.setParent(this);
         child.setRelevant(isRelevant(), true);
@@ -353,7 +349,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     public void removeChild(TreeElement child) {
-        if(children == null) { return;}
         children.remove(child);
     }
 
@@ -407,19 +402,17 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
             newNode.value = value.clone();
         }
 
-        newNode.children = children;
+        newNode.children.addAll(children);
         return newNode;
     }
 
     public TreeElement deepCopy(boolean includeTemplates) {
         TreeElement newNode = shallowCopy();
 
-        if(children != null) {
-            newNode.children = new ArrayList<TreeElement>(children.size());
-            for (TreeElement child : children) {
-                if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
-                    newNode.addChild(child.deepCopy(includeTemplates));
-                }
+        newNode.children.clear();
+        for (TreeElement child : children) {
+            if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
+                newNode.addChild(child.deepCopy(includeTemplates));
             }
         }
 
@@ -489,10 +482,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                     attribute.setRelevant(newRelevant, true);
                 }
             }
-            if(children != null) {
-                for (TreeElement aChildren : children) {
-                    aChildren.setRelevant(newRelevant, true);
-                }
+            for (TreeElement aChildren : children) {
+                aChildren.setRelevant(newRelevant, true);
             }
             alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
         }
@@ -595,9 +586,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     public void accept(ITreeVisitor visitor) {
         visitor.visit(this);
 
-        if (children == null) {
-            return;
-        }
         for (TreeElement child : children) {
             child.accept(visitor);
         }
@@ -698,11 +686,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         // child
         if (!ExtUtil.readBool(in)) {
             // 1.
-            children = null;
+            children.clear(); // todo is this needed?
         } else {
             // 2.
             int numChildren = (int) ExtUtil.readNumeric(in);
-            children = new ArrayList<TreeElement>(numChildren);
+            children.clear();
             // 3.
             for (int i = 0; i < numChildren; ++i) {
                 boolean normal = ExtUtil.readBool(in);
@@ -754,7 +742,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         // directly.
         // 3.2 if child type != TreeElement, write boolean false, then tagged
         // child
-        if (children == null) {
+        if (children.isEmpty()) {
             // 1.
             ExtUtil.writeBool(out, false);
         } else {
@@ -763,7 +751,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
             // 2.
             ExtUtil.writeNumeric(out, children.size());
             // 3.
-         for (TreeElement child : children) {
+            for (TreeElement child : children) {
                 if (child.getClass() == TreeElement.class) {
                     // 3.1
                     ExtUtil.writeBool(out, true);
@@ -855,11 +843,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                     }
 
                     this.removeChildAt(j);
-                    if(children == null) { children = new ArrayList<TreeElement>(); }
                     this.children.add(i, child2);
                 }
             }
-            // java i hate you so much
 
             for (int i = 0; i < this.getNumChildren(); i++) {
                 TreeElement child = this.getChildAt(i);
@@ -869,7 +855,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                     for (int k = 0; k < newChildren.size(); k++) {
                         TreeElement newChild = child.deepCopy(true);
                         newChild.setMult(k);
-                        if(children == null) { children = new ArrayList<TreeElement>(); }
                         this.children.add(i + k + 1, newChild);
                         newChild.populate(newChildren.get(k), f);
                     }
@@ -927,7 +912,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                         TreeElement template = f.getMainInstance().getTemplate(child.getRef());
                         TreeElement newChild = template.deepCopy(false);
                         newChild.setMult(k);
-                        if(children == null) { children = new ArrayList<TreeElement>(); }
                         this.children.add(i + k + 1, newChild);
                         newChild.populateTemplate(newChildren.get(k), f);
                     }
@@ -1062,21 +1046,13 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         return value;
     }
 
-    public String toString()
-    {
+    public String toString() {
         String name = "NULL";
-        if(this.name != null)
-        {
+        if (this.name != null) {
             name = this.name;
         }
 
-        String childrenCount = "-1";
-        if(this.children != null)
-        {
-            childrenCount = Integer.toString(this.children.size());
-        }
-
-        return name + " - Children: " + childrenCount;
+        return name + " - Children: " + Integer.toString(this.children.size());
     }
 
     @Override
