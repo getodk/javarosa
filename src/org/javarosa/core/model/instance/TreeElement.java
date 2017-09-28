@@ -37,7 +37,6 @@ import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.instance.utils.TreeElementChildren;
 import org.javarosa.core.model.instance.utils.TreeElementChildrenList;
-import org.javarosa.core.model.instance.utils.TreeElementNameComparator;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -221,70 +220,16 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     @Override
     public TreeElement getChild(String name, int multiplicity) {
-        ElementAndLoc el = getChildAndLoc(name, multiplicity);
-        if (el == null) {
-            return null;
-        }
-        return el.treeElement;
-    }
-
-    class ElementAndLoc {
-        final TreeElement treeElement;
-        final int index;
-
-        ElementAndLoc(TreeElement treeElement, int index) {
-            this.treeElement = treeElement;
-            this.index = index;
-        }
-    }
-
-    private ElementAndLoc getChildAndLoc(String name, int multiplicity) {
-        if (name.equals(TreeReference.NAME_WILDCARD)) {
-            if(multiplicity == TreeReference.INDEX_TEMPLATE || children.size() < multiplicity + 1) {
-                return null;
-            }
-            return new ElementAndLoc(children.get(multiplicity), multiplicity); //droos: i'm suspicious of this
-        }
-
-        for (int i = 0; i < children.size(); i++) {
-            TreeElement child = children.get(i);
-            if (name.equals(child.getName()) && child.getMult() == multiplicity) {
-                return new ElementAndLoc(child, i);
-            }
-        }
-
-        return null;
+        return children.get(name, multiplicity);
     }
 
     @Override
     public List<TreeElement> getChildrenWithName(String name) {
-        List<TreeElement> children = new ArrayList<>();
-        findChildrenWithName(name, children);
-        return children;
+        return children.get(name);
     }
 
-    private long getNumChildrenWithName(String name) {
-        return findChildrenWithName(name, null);
-    }
-
-    /**
-     * Returns the count of children with the given name, and optionally supplies the children themselves.
-     * @param name the name to look for
-     * @param results a List into which to store the children, or null
-     * @return the number of children with the given name
-     */
-    private int findChildrenWithName(String name, List<TreeElement> results) {
-        int count = 0;
-        for (TreeElement child : children) {
-            if ((child.multiplicity != TreeReference.INDEX_TEMPLATE) &&
-                    TreeElementNameComparator.elementMatchesName(child, name)) {
-                ++count;
-                if (results != null) {
-                    results.add(child);
-                }
-            }
-        }
-        return count;
+    private int getNumChildrenWithName(String name) {
+        return children.getCount(name);
     }
 
     @Override
@@ -325,27 +270,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
             throw new RuntimeException("Cannot add child with an unbound index!");
         }
 
-        addInOrder(child);
+        children.addInOrder(child);
         child.setParent(this);
         child.setRelevant(isRelevant(), true);
         child.setEnabled(isEnabled(), true);
         child.setInstanceName(getInstanceName());
-    }
-
-    private void addInOrder(TreeElement child) {
-        final int childMultiplicity = child.getMult();
-        final int searchMultiplicity;
-        final int newIndexAdjustment;
-        if (childMultiplicity == TreeReference.INDEX_TEMPLATE) {
-            searchMultiplicity = 0;
-            newIndexAdjustment = 0;
-        } else {
-            searchMultiplicity = childMultiplicity == 0 ? TreeReference.INDEX_TEMPLATE : childMultiplicity - 1;
-            newIndexAdjustment = 1;
-        }
-        final ElementAndLoc el = getChildAndLoc(child.getName(), searchMultiplicity);
-        final int newIndex = el == null ? children.size() : el.index + newIndexAdjustment;
-        children.add(newIndex, child);
     }
 
     public void removeChild(TreeElement child) {
