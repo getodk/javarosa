@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TreeElementChildrenList implements TreeElementChildren {
-    private List<TreeElement> children = new ArrayList<>();
+    protected final List<TreeElement> children = new ArrayList<>();
 
     @Override
     public int size() {
@@ -28,6 +28,13 @@ public class TreeElementChildrenList implements TreeElementChildren {
     @Override
     public void add(int index, TreeElement treeElement) {
         children.add(index, treeElement);
+    }
+
+    @Override
+    public void addAll(TreeElementChildren addingChildren) {
+        for (TreeElement addingChild: addingChildren) {
+            children.add(addingChild);
+        }
     }
 
     @Override
@@ -106,11 +113,6 @@ public class TreeElementChildrenList implements TreeElementChildren {
     @Override
     public void clear() {
         children.clear();
-    }
-
-    @Override
-    public void addAll(TreeElementChildren children) {
-        this.children.addAll(((TreeElementChildrenList) children).children);
     }
 
     @Override
