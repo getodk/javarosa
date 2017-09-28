@@ -301,7 +301,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     @Override
     public int getChildMultiplicity(String name) {
-        return (int) getNumChildrenWithName(name);
+        return getNumChildrenWithName(name);
     }
 
     public TreeElement shallowCopy() {
