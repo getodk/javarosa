@@ -621,6 +621,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
             int numChildren = (int) ExtUtil.readNumeric(in);
             children.clear();
             // 3.
+            List<TreeElement> newChildren = new ArrayList<>(numChildren);
             for (int i = 0; i < numChildren; ++i) {
                 boolean normal = ExtUtil.readBool(in);
                 TreeElement child;
@@ -634,8 +635,9 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                     child = (TreeElement) ExtUtil.read(in, new ExtWrapTagged(), pf);
                 }
                 child.setParent(this);
-                children.add(child);
+                newChildren.add(child);
             }
+            children.addAll(newChildren);
         }
 
         // end Jan 22, 2009
