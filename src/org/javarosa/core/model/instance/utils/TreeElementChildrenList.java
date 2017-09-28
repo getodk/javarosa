@@ -51,7 +51,7 @@ public class TreeElementChildrenList implements TreeElementChildren {
 
     @Override
     public void addAll(TreeElementChildren children) {
-        children.addAll(children);
+        this.children.addAll(((TreeElementChildrenList) children).children);
     }
 
     @Override
