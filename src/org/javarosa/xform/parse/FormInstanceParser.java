@@ -634,6 +634,6 @@ class FormInstanceParser {
         }
 
         return (root.getNumChildren() == 0) ? null :
-                new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MUTLIPLICITY));
+                new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MULTIPLICITY));
     }
 }

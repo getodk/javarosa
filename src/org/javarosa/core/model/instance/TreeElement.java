@@ -35,7 +35,6 @@ import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.instance.utils.TreeElementChildren;
 import org.javarosa.core.model.instance.utils.TreeElementChildrenList;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
@@ -77,7 +76,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     private List<FormElementStateListener> observers;
     private List<TreeElement> attributes;
-    private final TreeElementChildren children = new TreeElementChildrenList();
+    private final TreeElementChildrenList children = new TreeElementChildrenList();
 
     /* model properties */
     protected int dataType = Constants.DATATYPE_NULL; //TODO
@@ -108,11 +107,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
      * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
      */
     public TreeElement() {
-        this(null, TreeReference.DEFAULT_MUTLIPLICITY);
+        this(null, TreeReference.DEFAULT_MULTIPLICITY);
     }
 
     public TreeElement(String name) {
-        this(name, TreeReference.DEFAULT_MUTLIPLICITY);
+        this(name, TreeReference.DEFAULT_MULTIPLICITY);
     }
 
     public TreeElement(String name, int multiplicity) {
@@ -282,17 +281,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     public void removeChild(String name, int multiplicity) {
-        TreeElement child = getChild(name, multiplicity);
-        if (child != null) {
-            removeChild(child);
-        }
+        children.remove(name, multiplicity);
     }
 
     public void removeChildren(String name) {
-        List<TreeElement> v = getChildrenWithName(name);
-        for (TreeElement aV : v) {
-            removeChild(aV);
-        }
+        children.removeAll(name);
     }
 
     public void removeChildAt(int i) {
@@ -757,7 +750,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
             for (int i = 0; i < this.getNumChildren(); i++) {
                 TreeElement child = this.getChildAt(i);
-                String expectedName = (String) names.get(i);
+                String expectedName = names.get(i);
 
                 if (!child.getName().equals(expectedName)) {
                     TreeElement child2 = null;
