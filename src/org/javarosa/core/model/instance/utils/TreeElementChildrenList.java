@@ -7,34 +7,43 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TreeElementChildrenList implements TreeElementChildren {
-    protected final List<TreeElement> children = new ArrayList<>();
+import static org.javarosa.core.model.instance.TreeReference.DEFAULT_MULTIPLICITY;
 
-    @Override
+/**
+ * A collection of {@link TreeElement} children. They are stored in an {@link ArrayList}.
+ * when all children have the same name and no special (< 0) multiplicities, elements can
+ * be retrieved in constant time.
+ */
+public class TreeElementChildrenList implements Iterable<TreeElement> {
+    private final List<TreeElement> children = new ArrayList<>();
+    /** If all children have the same name, and all multiplicities are ≥ 0, children can be located in constant time */
+    private boolean allHaveSameNameAndNormalMult = true;
+
+    /** Returns the number of children */
     public int size() {
         return children.size();
     }
 
-    @Override
-    public Iterator<TreeElement> iterator() {
+    @Override public Iterator<TreeElement> iterator() {
         return children.iterator();
     }
 
-    @Override
-    public void add(int index, TreeElement treeElement) {
-        children.add(index, treeElement);
+    /** Adds a child at the specified index */
+    public void add(int index, TreeElement child) {
+        checkAndSetSameNameAndNormalMult(child.getName(), child.getMultiplicity());
+        children.add(index, child);
     }
 
-    @Override
+    /** Adds all of the provided children */
     public void addAll(Iterable<TreeElement> childIterable) {
-        for (TreeElement addingChild: childIterable) {
-            children.add(addingChild);
+        for (TreeElement child: childIterable) {
+            checkAndSetSameNameAndNormalMult(child.getName(), child.getMultiplicity());
+            children.add(child);
         }
     }
 
-    @Override
     public void addInOrder(TreeElement child) {
-        final int childMultiplicity = child.getMult();
+        final int childMultiplicity = child.getMultiplicity();
         final int searchMultiplicity;
         final int newIndexAdjustment;
         if (childMultiplicity == TreeReference.INDEX_TEMPLATE) {
@@ -46,10 +55,23 @@ public class TreeElementChildrenList implements TreeElementChildren {
         }
         final ElementAndLoc el = getChildAndLoc(child.getName(), searchMultiplicity);
         final int newIndex = el == null ? children.size() : el.index + newIndexAdjustment;
+        checkAndSetSameNameAndNormalMult(child.getName(), child.getMultiplicity());
         children.add(newIndex, child);
     }
 
-    @Override
+    /** Gets the child at the specified index */
+    public TreeElement get(int index) {
+        return children.get(index);
+    }
+
+    /** Gets all children with the specified name */
+    public List<TreeElement> get(String name) {
+        List<TreeElement> children = new ArrayList<>();
+        findChildrenWithName(name, children);
+        return children;
+    }
+
+    /** Gets the child with the specified name and multiplicity */
     public TreeElement get(String name, int multiplicity) {
         TreeElementChildrenList.ElementAndLoc el = getChildAndLoc(name, multiplicity);
         if (el == null) {
@@ -58,13 +80,41 @@ public class TreeElementChildrenList implements TreeElementChildren {
         return el.treeElement;
     }
 
+    /** Gets a count of all children with the specified name */
+    public int getCount(String name) {
+        return findChildrenWithName(name, null);
+    }
+
+    /** Sets {@link #allHaveSameNameAndNormalMult} */
+    private void checkAndSetSameNameAndNormalMult(String name, int mult) {
+        allHaveSameNameAndNormalMult = sameNameAndNormalMult(name, mult);
+    }
+
     /**
-     * Returns the count of children with the given name, and optionally supplies the children themselves.
+     * Returns whether the constant time optimization described in {@link #allHaveSameNameAndNormalMult} can be applied.
+     *
+     * @param name the name of a child
+     * @param mult the multiplicity of a child
+     */
+    private boolean sameNameAndNormalMult(String name, int mult) {
+        return allHaveSameNameAndNormalMult && mult >= 0 &&
+                (children.isEmpty() || name.equals(children.get(0).getName()));
+    }
+
+    /**
+     * Returns the count of children with the given name, and if {@code results} is not null, stores the children there.
      * @param name the name to look for
      * @param results a List into which to store the children, or null
      * @return the number of children with the given name
      */
     private int findChildrenWithName(String name, List<TreeElement> results) {
+        if (sameNameAndNormalMult(name, DEFAULT_MULTIPLICITY)) {
+            if (results != null) {
+                results.addAll(children);
+            }
+            return children.size();
+        }
+
         int count = 0;
         for (TreeElement child : children) {
             if ((child.getMultiplicity() != TreeReference.INDEX_TEMPLATE) &&
@@ -78,39 +128,35 @@ public class TreeElementChildrenList implements TreeElementChildren {
         return count;
     }
 
-    @Override
-    public List<TreeElement> get(String name) {
-        List<TreeElement> children = new ArrayList<>();
-        findChildrenWithName(name, children);
-        return children;
-    }
-
-    @Override
-    public int getCount(String name) {
-        return findChildrenWithName(name, null);
-    }
-
-    @Override
+    /** Removes a child at the specified index */
     public TreeElement remove(int index) {
         return children.remove(index);
     }
 
-    @Override
+    /** Removes a specific child */
     public boolean remove(TreeElement treeElement) {
         return children.remove(treeElement);
     }
 
-    @Override
-    public TreeElement get(int index) {
-        return children.get(index);
+    /** Removes the first child with the given name and multiplicity, if one exists */
+    public void remove(String name, int multiplicity) {
+        TreeElement child = get(name, multiplicity);
+        if (child != null) {
+            remove(child);
+        }
     }
 
-    @Override
+    public void removeAll(String name) {
+        for (TreeElement child : get(name)) {
+            remove(child);
+        }
+    }
+
+    /** Removes all children */
     public void clear() {
         children.clear();
     }
 
-    @Override
     public boolean isEmpty() {
         return children.isEmpty();
     }
@@ -131,6 +177,13 @@ public class TreeElementChildrenList implements TreeElementChildren {
                 return null;
             }
             return new ElementAndLoc(children.get(multiplicity), multiplicity); //droos: i'm suspicious of this
+        }
+
+        if (sameNameAndNormalMult(name, multiplicity) && multiplicity < children.size()) { // A constant time path
+            TreeElement childAtMultPos = children.get(multiplicity);
+            if (childAtMultPos.getMultiplicity() == multiplicity) {
+                return new ElementAndLoc(childAtMultPos, multiplicity);
+            }
         }
 
         for (int i = 0; i < children.size(); i++) {

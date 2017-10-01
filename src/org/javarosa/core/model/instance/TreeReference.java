@@ -33,6 +33,9 @@ import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathExpression;
 
 public class TreeReference implements Externalizable, Serializable {
+    /** @deprecated replaced by {@link #DEFAULT_MULTIPLICITY} */
+    @Deprecated public static final int DEFAULT_MUTLIPLICITY = 0;
+
     /**
      * Multiplicity demarcates the position of a given element with respect to other elements
      * of the same name.
@@ -40,7 +43,7 @@ public class TreeReference implements Externalizable, Serializable {
      * Since users usually want to select the first instance from the nodeset
      * returned from a reference query, let the default multiplicity be selecting the first node.
      */
-    public static final int DEFAULT_MUTLIPLICITY = 0;
+    public static final int DEFAULT_MULTIPLICITY = 0;
 
     /** Refers to all instances of an element, e.g. /data/b[-1] refers to b[0] and b[1] */
     public static final int INDEX_UNBOUND = -1;
