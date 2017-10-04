@@ -134,7 +134,7 @@ public class XFormParserTest {
         NumberFormat nf = NumberFormat.getNumberInstance();
         List<String> results = new ArrayList<>(); // Collect and display at end
         results.add("Children\tSeconds");
-        for (double powerOfTen = 3; powerOfTen <= 6.0; powerOfTen += 0.1) {
+        for (double powerOfTen = 3; powerOfTen <= 4.0; powerOfTen += 0.1) {  // Raise this upper limit to really measure
             int numChildren = (int) Math.pow(10, powerOfTen);
             lfg.createLargeInstanceSource(largeDataFilename, numChildren);
             long startMs = System.currentTimeMillis();
