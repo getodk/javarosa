@@ -200,7 +200,7 @@ public class XPathFuncExpr extends XPathExpression {
                 places = 0;
             } else {
                 assertArgsCount(name, args, 2);
-                places = toNumeric(argVals[1]).intValue();
+                places = toNumeric(argVals[1]).intValue(); // non-standard Excel-style round(value,decimal place)
             }
             return round(toNumeric(argVals[0]), places);
         } else if (name.equals("string")) {
