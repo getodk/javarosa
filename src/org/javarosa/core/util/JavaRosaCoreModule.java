@@ -15,7 +15,7 @@
  */
 
 /**
- * 
+ *
  */
 package org.javarosa.core.util;
 
@@ -26,20 +26,18 @@ import org.javarosa.core.services.PrototypeManager;
 
 /**
  * @author Clayton Sims
- * @date Jun 1, 2009 
- *
+ * @date Jun 1, 2009
  */
 public class JavaRosaCoreModule implements IModule {
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
-     */
+    public static final String[] classNames = {
+            "org.javarosa.core.services.locale.ResourceFileDataSource",
+            "org.javarosa.core.services.locale.TableLocaleSource"
+    };
+
+    @Override
     public void registerModule() {
-        String[] classes = {
-                "org.javarosa.core.services.locale.ResourceFileDataSource",
-                "org.javarosa.core.services.locale.TableLocaleSource"
-        };
-        PrototypeManager.registerPrototypes(classes);
+        PrototypeManager.registerPrototypes(classNames);
         ReferenceManager.instance().addReferenceFactory(new ResourceReferenceFactory());
     }
 }
