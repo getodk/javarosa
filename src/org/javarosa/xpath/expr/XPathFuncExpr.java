@@ -194,9 +194,15 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("int")) { //non-standard
             assertArgsCount(name, args, 1);
             return toInt(argVals[0]);
-        } else if (name.equals("round")) { // non-standard Excel-style round(value,decimal place)
-            assertArgsCount(name, args, 2);
-            return round(toNumeric(argVals[0]), toNumeric(argVals[1]).intValue());
+        } else if (name.equals("round")) {
+            final int places;
+            if (args.length == 1) {
+                places = 0;
+            } else {
+                assertArgsCount(name, args, 2);
+                places = toNumeric(argVals[1]).intValue(); // non-standard Excel-style round(value,decimal place)
+            }
+            return round(toNumeric(argVals[0]), places);
         } else if (name.equals("string")) {
             assertArgsCount(name, args, 1);
             return toString(argVals[0]);

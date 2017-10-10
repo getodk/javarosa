@@ -318,6 +318,10 @@ public class XPathEvalTest extends TestCase {
 
         logTestCategory("math functions");
         testEval("abs(-3.5)", 3.5);
+        // round, with a single argument
+        testEval("round('14.29123456789')", 14.0);
+        testEval("round('14.6')",           15.0);
+        // round, with a two arguments
         testEval("round('14.29123456789', 0)", 14.0);
         testEval("round('14.29123456789', 1)", 14.3);
         testEval("round('14.29123456789', 1.5)", 14.3);
