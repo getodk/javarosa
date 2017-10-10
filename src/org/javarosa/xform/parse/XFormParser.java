@@ -350,7 +350,18 @@ public class XFormParser implements IXFormParserFunctions {
         return getXMLDocument(reader, null);
     }
 
-    public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache) throws IOException  {
+    /**
+     * Uses xkml to parse the provided XML content, and then consolidates text elements.
+     *
+     * @param reader      the XML content provider
+     * @param stringCache an optional string cache, whose presence will cause the use of
+     *                    {@link InterningKXmlParser} rather than {@link KXmlParser}.
+     * @return the parsed document
+     * @throws IOException
+     * @deprecated The InterningKXmlParser is not used.
+     */
+    @Deprecated public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
+            throws IOException {
         Document doc = new Document();
 
         try{
