@@ -318,6 +318,10 @@ public class XPathEvalTest extends TestCase {
 
         logTestCategory("math functions");
         testEval("abs(-3.5)", 3.5);
+        // round, with a single argument
+        testEval("round('14.29123456789')", 14.0);
+        testEval("round('14.6')",           15.0);
+        // round, with a two arguments
         testEval("round('14.29123456789', 0)", 14.0);
         testEval("round('14.29123456789', 1)", 14.3);
         testEval("round('14.29123456789', 1.5)", 14.3);
@@ -331,9 +335,20 @@ public class XPathEvalTest extends TestCase {
         testEval("round('12345.12345', -2)", 12300.0);
         testEval("round('12350.12345', -2)", 12400.0);
         testEval("round('12345.12345', -3)", 12000.0);
+        // XPath specification tests
         testEval("round('1 div 0', 0)", NaN);
-        // Todo: get round('12345.15', 1) and round('-12345.15', 1) working on Java 8
+        testEval("round('14.5')", 15.0);
+        testEval("round('NaN')", NaN);
+        testEval("round('-NaN')", -NaN);
+        testEval("round('0')", 0.0);
+        testEval("round('-0')", -0.0);
+        testEval("round('-0.5')", -0.0);
+        // non US format
+        testEval("round('14,6')", 15.0);
+        // Java 8 tests deprecated by XPath 3.0 specification
         // See discussion at https://github.com/opendatakit/javarosa/pull/42#issuecomment-299527754
+        testEval("round('12345.15',     1)", 12345.2);
+        testEval("round('-12345.15',    1)", -12345.1);
 
         logTestCategory("strange operators");
         testEval("true() + 8" , 9.0);
