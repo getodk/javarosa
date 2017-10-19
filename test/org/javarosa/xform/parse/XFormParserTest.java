@@ -3,18 +3,18 @@ package org.javarosa.xform.parse;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.RangeQuestion;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.AbstractTreeElement;
-import org.javarosa.core.model.instance.DataInstance;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -263,6 +263,24 @@ public class XFormParserTest {
         assertEquals(null, audit3.getNamespacePrefix());
         assertEquals(null, audit3.getNamespace());
         assertEquals(AUDIT_3_ANSWER, audit3.getValue().getValue());
+    }
+
+    /* todo restore when fixed @Test */ public void parseFormWithTemplateRepeat() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("template-repeat.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "Repeat with template");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+    }
+
+    @Test public void parseIMCIbyDTreeForm() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("eIMCI-by-D-Tree.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "eIMCI by D-Tree");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
     }
 
     private ParseResult parse(Path formName) throws IOException {

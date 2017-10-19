@@ -1833,7 +1833,7 @@ public class XFormParser implements IXFormParserFunctions {
 
 
         if (hasElements) {
-            Integer newMultiplicityFromGroup = allChildrenHaveTheSameName(node) ? 0 : null;
+            Integer newMultiplicityFromGroup = allChildrenAreElementsAndHaveTheSameName(node) ? 0 : null;
             for (int i = 0; i < numChildren; i++) {
                 if (node.getType(i) == Node.ELEMENT) {
                     TreeElement newChild = buildInstanceStructure(node.getElement(i), element,
@@ -1865,10 +1865,27 @@ public class XFormParser implements IXFormParserFunctions {
         return element;
     }
 
-    private static boolean allChildrenHaveTheSameName(Element node) {
-        final String firstName = node.getElement(0).getName();
-        for (int i = 1; i < node.getChildCount(); i++) {
-            if (!node.getElement(i).getName().equals(firstName)) {
+    /**
+     * If all children of {@code parent} are {@link Element}s ({@link Element#getElement} returns non-null),
+     * and the names of the children are all the same, more efficient methods may be used to build the
+     * collection of children. This method makes that determination.
+     *
+     * @param parent the parent whose children are to be examined
+     * @return true iff {@code parent} has children, all children are {@link Element}s,
+     * and their names are all the same
+     */
+    static boolean allChildrenAreElementsAndHaveTheSameName(Element parent) {
+        if (parent.getChildCount() == 0) {
+            return false;
+        }
+        final Element firstChild = parent.getElement(0);
+        if (firstChild == null) {
+            return false;
+        }
+        final String firstName = firstChild.getName();
+        for (int i = 1; i < parent.getChildCount(); i++) {
+            Element child = parent.getElement(i);
+            if (child == null || !child.getName().equals(firstName)) {
                 return false;
             }
         }

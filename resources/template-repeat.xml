@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Repeat with template</h:title>
+        <model>
+            <instance>
+                <data id="repeat-with-template">
+                    <person jr:template="" >
+                        <name>John Doe</name>
+                        <relationship>spouse</relationship>
+                    </person>
+                    <person>
+                        <name />
+                        <relationship />
+                    </person>
+                </data>
+            </instance>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/data/person">
+            <label>Person</label>
+            <repeat nodeset="/data/person">
+                <input ref="/data/person/name">
+                    <label>Enter name</label>
+                </input>
+                <input ref="/data/person/relationship">
+                    <label>Enter relationship</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
