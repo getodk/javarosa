@@ -20,7 +20,6 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
-import org.kxml2.kdom.Element;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -43,11 +42,7 @@ import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.kxml2.kdom.Node.COMMENT;
-import static org.kxml2.kdom.Node.ELEMENT;
 
 public class XFormParserTest {
 
