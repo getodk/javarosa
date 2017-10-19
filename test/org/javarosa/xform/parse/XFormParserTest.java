@@ -20,6 +20,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
+import org.kxml2.kdom.Element;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -42,7 +43,11 @@ import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.kxml2.kdom.Node.COMMENT;
+import static org.kxml2.kdom.Node.ELEMENT;
 
 public class XFormParserTest {
 
@@ -263,6 +268,24 @@ public class XFormParserTest {
         assertEquals(null, audit3.getNamespacePrefix());
         assertEquals(null, audit3.getNamespace());
         assertEquals(AUDIT_3_ANSWER, audit3.getValue().getValue());
+    }
+
+    /* todo restore when fixed @Test */ public void parseFormWithTemplateRepeat() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("template-repeat.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "Repeat with template");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+    }
+
+    @Test public void parseIMCIbyDTreeForm() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("eIMCI-by-D-Tree.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "eIMCI by D-Tree");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
     }
 
     private ParseResult parse(Path formName) throws IOException {
