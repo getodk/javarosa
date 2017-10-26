@@ -21,6 +21,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
+import org.kxml2.kdom.Element;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -298,6 +299,16 @@ public class XFormParserTest {
         assertEquals("form-data-post", submissionProfile.getMethod());
         assertNull(submissionProfile.getMediaType());
         assertEquals("/data/text", submissionProfile.getRef().getReference().toString());
+    }
+
+    /**
+     * Simple tests that documents assumption that the model has to come before the body tag.
+     * According to the comment above {@link XFormParser#parseModel(Element)} method,
+     * this is not mandated by the specs but has been implemented this way to keep parsing simpler.
+     */
+    @Test(expected = RuntimeException.class)
+    public void parseFormWithBodyBeforeModel() throws IOException {
+        parse(r("body-before-model.xml"));
     }
 
     private ParseResult parse(Path formName) throws IOException {
