@@ -1793,7 +1793,7 @@ public class XFormParser implements IXFormParserFunctions {
         //check for repeat templating
         final String name = node.getName();
         final int multiplicity;
-        if (node.getAttributeValue(NAMESPACE_JAVAROSA, "template") != null) {
+        if (isTemplate(node)) {
             multiplicity = TreeReference.INDEX_TEMPLATE;
             if (parent != null && parent.getChild(name, TreeReference.INDEX_TEMPLATE) != null) {
                 throw new XFormParseException("More than one node declared as the template for the same repeated set [" + name + "]",node);
@@ -1833,7 +1833,7 @@ public class XFormParser implements IXFormParserFunctions {
 
 
         if (hasElements) {
-            Integer newMultiplicityFromGroup = allChildrenAreElementsAndHaveTheSameName(node) ? 0 : null;
+            Integer newMultiplicityFromGroup = childOptimizationsOk(node) ? 0 : null;
             for (int i = 0; i < numChildren; i++) {
                 if (node.getType(i) == Node.ELEMENT) {
                     TreeElement newChild = buildInstanceStructure(node.getElement(i), element,
@@ -1865,27 +1865,31 @@ public class XFormParser implements IXFormParserFunctions {
         return element;
     }
 
+    private static boolean isTemplate(Element node) {
+        return node.getAttributeValue(NAMESPACE_JAVAROSA, "template") != null;
+    }
+
     /**
      * If all children of {@code parent} are {@link Element}s ({@link Element#getElement} returns non-null),
-     * and the names of the children are all the same, more efficient methods may be used to build the
-     * collection of children. This method makes that determination.
+     * and the names of the children are all the same, and none of the children contain the template
+     * attribute, more efficient methods may be used to build the collection of children. This method makes
+     * that determination.
      *
      * @param parent the parent whose children are to be examined
-     * @return true iff {@code parent} has children, all children are {@link Element}s,
-     * and their names are all the same
+     * @return the determination described above
      */
-    static boolean allChildrenAreElementsAndHaveTheSameName(Element parent) {
+    static boolean childOptimizationsOk(Element parent) {
         if (parent.getChildCount() == 0) {
             return false;
         }
         final Element firstChild = parent.getElement(0);
-        if (firstChild == null) {
+        if (firstChild == null || isTemplate(firstChild)) {
             return false;
         }
         final String firstName = firstChild.getName();
         for (int i = 1; i < parent.getChildCount(); i++) {
             Element child = parent.getElement(i);
-            if (child == null || !child.getName().equals(firstName)) {
+            if (child == null || isTemplate(child) || !child.getName().equals(firstName)) {
                 return false;
             }
         }
@@ -1914,7 +1918,7 @@ public class XFormParser implements IXFormParserFunctions {
 
                     String name = child.getName();
                     int index;
-                    boolean isTemplate = (child.getAttributeValue(NAMESPACE_JAVAROSA, "template") != null);
+                    boolean isTemplate = isTemplate(child);
 
                     if (isTemplate) {
                         index = TreeReference.INDEX_TEMPLATE;
