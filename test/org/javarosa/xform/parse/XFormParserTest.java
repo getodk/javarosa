@@ -265,7 +265,7 @@ public class XFormParserTest {
         assertEquals(AUDIT_3_ANSWER, audit3.getValue().getValue());
     }
 
-    /* todo restore when fixed @Test */ public void parseFormWithTemplateRepeat() throws IOException {
+    @Test public void parseFormWithTemplateRepeat() throws IOException {
         // Given & When
         ParseResult parseResult = parse(r("template-repeat.xml"));
 
