@@ -311,6 +311,27 @@ public class XFormParserTest {
         parse(r("body-before-model.xml"));
     }
 
+    @Test
+    public void parseFormWithTwoModels() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("two-models.xml"));
+
+        // Then
+        FormDef formDef = parseResult.formDef;
+        assertEquals(formDef.getTitle(), "Two Models");
+        assertEquals("Number of error messages", 1, parseResult.errorMessages.size());
+        assertEquals("Multiple models not supported. Ignoring subsequent models.", parseResult.errorMessages.get(0));
+        String firstModelInstanceId =
+                (String) formDef
+                        .getMainInstance()
+                        .getRoot()
+                        .getAttribute(null, "id")
+                        .getValue()
+                        .getValue();
+        assertEquals("first-model", firstModelInstanceId);
+    }
+
+
     private ParseResult parse(Path formName) throws IOException {
         XFormParser parser = new XFormParser(new FileReader(formName.toString()));
         final List<String> errorMessages = new ArrayList<>();

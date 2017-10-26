@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Two Models</h:title>
+        <model>
+            <instance>
+                <data id="first-model">
+                    <text/>
+                </data>
+            </instance>
+        </model>
+        <model>
+            <instance>
+                <data id="second-model">
+                    <text/>
+                </data>
+            </instance>
+        </model>
+    </h:head>
+    <h:body/>
+</h:html>
