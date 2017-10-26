@@ -3,6 +3,7 @@ package org.javarosa.xform.parse;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.RangeQuestion;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -43,6 +44,7 @@ import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
 
@@ -281,6 +283,21 @@ public class XFormParserTest {
         // Then
         assertEquals(parseResult.formDef.getTitle(), "eIMCI by D-Tree");
         assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+    }
+
+    @Test public void parseFormWithSubmissionElement() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("submission-element.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "Single Submission Element");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+
+        SubmissionProfile submissionProfile = parseResult.formDef.getSubmissionProfile();
+        assertEquals("http://some.destination.com", submissionProfile.getAction());
+        assertEquals("form-data-post", submissionProfile.getMethod());
+        assertNull(submissionProfile.getMediaType());
+        assertEquals("/data/text", submissionProfile.getRef().getReference().toString());
     }
 
     private ParseResult parse(Path formName) throws IOException {
