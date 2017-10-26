@@ -44,13 +44,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import static java.lang.Double.NaN;
@@ -194,9 +192,16 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("int")) { //non-standard
             assertArgsCount(name, args, 1);
             return toInt(argVals[0]);
-        } else if (name.equals("round")) { // non-standard Excel-style round(value,decimal place)
-            assertArgsCount(name, args, 2);
-            return round(toNumeric(argVals[0]), toNumeric(argVals[1]).intValue());
+        } else if (name.equals("round")) { // Proximate XPath 3.0 and Excel-style round(value,decimal place)
+            final int places;
+            if (args.length == 1) {
+                places = 0;
+             } else {
+                assertArgsCount(name, args, 2);
+                places = toNumeric(argVals[1]).intValue();
+            }
+            // Some locales use ',' instead of '.' as a decimal separator, but not supported by Decimal class.
+            return round(toNumeric(argVals[0].toString().replace(',','.')), places);
         } else if (name.equals("string")) {
             assertArgsCount(name, args, 1);
             return toString(argVals[0]);
@@ -1045,14 +1050,22 @@ public class XPathFuncExpr extends XPathExpression {
             return NaN;
         }
 
+        // Rounding with positive decimals
         if (numDecimals >= 0) {
-            // Some locales use ',' instead of '.' as a decimal separator. Since Double.valueOf
-            // doesn't handle comma as the decimal separator, we must ensure a dot will be used by
-            // forcing the US format locale.
-            final NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
-            nf.setMaximumFractionDigits(numDecimals);
-            nf.setGroupingUsed(false);
-            return Double.valueOf(nf.format(number));
+            try {
+                // Per XPath specification, round up or towards zero
+                int method = (number < 0) ? BigDecimal.ROUND_HALF_DOWN : BigDecimal.ROUND_HALF_UP;
+                return (new BigDecimal(
+                        Double.toString(number)))
+                        .setScale(numDecimals, method)
+                        .doubleValue();
+            } catch (NumberFormatException ex) {
+                if (Double.isInfinite(number)) {
+                    return number;
+                } else {
+                    return Double.NaN;
+                }
+             }
         }
 
         // we want to retain 100's or higher value
