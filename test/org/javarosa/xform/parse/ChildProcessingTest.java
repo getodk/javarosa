@@ -29,7 +29,7 @@ public class ChildProcessingTest {
         assertFalse(XFormParser.allChildrenAreElementsAndHaveTheSameName(el));
     }
 
-    @Test public void WorksWithNoChildren() {
+    @Test public void worksWithNoChildren() {
         Element el = new Element();
         assertFalse(XFormParser.allChildrenAreElementsAndHaveTheSameName(el));
     }
