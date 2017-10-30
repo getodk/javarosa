@@ -1,5 +1,6 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.model.Action;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.RangeQuestion;
@@ -9,6 +10,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
@@ -331,6 +333,25 @@ public class XFormParserTest {
         assertEquals("first-model", firstModelInstanceId);
     }
 
+    @Test
+    public void parseFormWithSetValueAction() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("form-with-setvalue-action.xml"));
+        FormDef formDef = parseResult.formDef;
+
+        // dispatch 'xforms-ready' action (Action.EVENT_XFORMS_READY)
+        formDef.initialize(true, new InstanceInitializationFactory());
+
+        // Then
+        assertEquals(formDef.getTitle(), "SetValue action");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertEquals(1, formDef.getEventListeners(Action.EVENT_XFORMS_READY).size());
+
+        TreeElement textNode =
+                formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);
+
+        assertEquals("Test Value", textNode.getValue().getValue());
+    }
 
     private ParseResult parse(Path formName) throws IOException {
         XFormParser parser = new XFormParser(new FileReader(formName.toString()));
