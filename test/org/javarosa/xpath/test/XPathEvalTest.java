@@ -136,6 +136,12 @@ public class XPathEvalTest extends TestCase {
 
         FormInstance instance = createTestInstance();
 
+        FormInstance countNonEmptyInstance = createCountNonEmptyTestInstance();
+
+        logTestCategory("counting");
+        testEval("count(/data)", countNonEmptyInstance, null, 1.0);
+        testEval("count-non-empty(/data/path)", countNonEmptyInstance, null, 3);
+
         logTestCategory("unsupporteds");
         testEval("/union | /expr", new XPathUnsupportedException());
         testEval("/descendant::blah", new XPathUnsupportedException());
@@ -567,6 +573,15 @@ public class XPathEvalTest extends TestCase {
     public FormInstance createTestInstance() {
         TreeElement data = new TreeElement("data");
         data.addChild(new TreeElement("path"));
+        return new FormInstance(data);
+    }
+
+    public FormInstance createCountNonEmptyTestInstance() {
+        TreeElement data = new TreeElement("data");
+        data.addChild(new TreeElement("path", 0));
+        data.addChild(new TreeElement("path", 1));
+        data.addChild(new TreeElement("path", 2));
+
         return new FormInstance(data);
     }
     

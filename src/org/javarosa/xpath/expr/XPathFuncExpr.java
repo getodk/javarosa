@@ -95,7 +95,7 @@ public class XPathFuncExpr extends XPathExpression {
         if (o instanceof XPathFuncExpr) {
             XPathFuncExpr x = (XPathFuncExpr)o;
 
-            //Shortcuts for very easily comprable values
+            //Shortcuts for very easily comparable values
             //We also only return "True" for methods we expect to return the same thing. This is not good
             //practice in Java, since o.equals(o) will return false. We should evaluate that differently.
             //Dec 8, 2011 - Added "uuid", since we should never assume one uuid equals another
@@ -305,6 +305,9 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("count")) {
             assertArgsCount(name, args, 1);
             return count(argVals[0]);
+        } else if (name.equals("count-non-empty")) {
+            assertArgsCount(name, args, 1);
+            return countNonEmpty(argVals[0]);
         } else if (name.equals("sum")) {
             assertArgsCount(name, args, 1);
             if (argVals[0] instanceof XPathNodeset) {
@@ -1022,6 +1025,21 @@ public class XPathFuncExpr extends XPathExpression {
             throw new XPathTypeMismatchException("not a nodeset");
         }
     }
+
+    /**
+     * A node is considered non-empty if it is convertible into a string with a greater-than-zero length.
+     *
+     * @param o NodeSet to evaluate. Throws if not a NodeSet
+     * @return the number of non-empty nodes in argument node-set.
+     */
+    private int countNonEmpty (Object o) {
+        if (o instanceof XPathNodeset) {
+            return ((XPathNodeset) o).getNonEmptySize();
+        }
+
+        throw new XPathTypeMismatchException("not a nodeset");
+    }
+
 
     /**
      * sum the values in a nodeset; each element is coerced to a numeric value
