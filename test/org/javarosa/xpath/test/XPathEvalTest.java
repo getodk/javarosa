@@ -335,6 +335,8 @@ public class XPathEvalTest extends TestCase {
         testEval("round('12345.12345', -2)", 12300.0);
         testEval("round('12350.12345', -2)", 12400.0);
         testEval("round('12345.12345', -3)", 12000.0);
+        // round, with a comma instead of a decimal point
+        testEval("round('4,6'            )", 5.0);
         // XPath specification tests
         testEval("round('1 div 0', 0)", NaN);
         testEval("round('14.5')", 15.0);

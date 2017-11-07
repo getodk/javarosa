@@ -200,8 +200,7 @@ public class XPathFuncExpr extends XPathExpression {
                 assertArgsCount(name, args, 2);
                 places = toNumeric(argVals[1]).intValue();
             }
-            // Some locales use ',' instead of '.' as a decimal separator, but not supported by Decimal class.
-            return round(toNumeric(argVals[0].toString().replace(',','.')), places);
+            return round(toNumeric(argVals[0]), places);
         } else if (name.equals("string")) {
             assertArgsCount(name, args, 1);
             return toString(argVals[0]);
@@ -656,18 +655,18 @@ public class XPathFuncExpr extends XPathExpression {
              * when converting a string to a number
              */
 
-            String s = (String)o;
-            double d;
+            final String s = ((String) o)
+                    .replace(',', '.') // Some locales use ',' instead of '.'
+                    .trim();
+
             try {
-                s = s.trim();
                 for (int i = 0; i < s.length(); i++) {
                     char c = s.charAt(i);
                     if (c != '-' && c != '.' && (c < '0' || c > '9'))
                         throw new NumberFormatException();
                 }
 
-                d = Double.parseDouble(s);
-                val = d;
+                val = Double.parseDouble(s);
             } catch (NumberFormatException nfe) {
                 val = NaN;
             }
@@ -679,9 +678,9 @@ public class XPathFuncExpr extends XPathExpression {
 
         if (val != null) {
             return val;
-        } else {
-            throw new XPathTypeMismatchException("converting to numeric");
         }
+
+        throw new XPathTypeMismatchException("converting to numeric");
     }
 
     /**
