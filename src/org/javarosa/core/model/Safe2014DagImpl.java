@@ -61,13 +61,20 @@ public class Safe2014DagImpl extends LatestDagBase {
          EvaluationContext evalContext, TreeReference deleteRef,
          TreeElement parentElement, TreeElement deletedElement) {
 
-      Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(
-            mainInstance, evalContext, deleteRef,
-            new HashSet<QuickTriggerable>(0));
-      publishSummary("Deleted", deleteRef, alreadyEvaluated);
+      // After a repeat group has been deleted, the following repeat groups position has changed.
+      // Evaluate triggerables which depend on the position of the following repeats or on their children.
+      final String repeatGroupName = deletedElement.getName();
+      for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
+         final TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
 
-      evaluateChildrenTriggerables(mainInstance, evalContext,
-            deletedElement, false, alreadyEvaluated);
+         Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(
+                 mainInstance, evalContext, repeatGroup.getRef(),
+                 new HashSet<QuickTriggerable>(0));
+         publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
+
+         evaluateChildrenTriggerables(mainInstance, evalContext,
+                 repeatGroup, false, alreadyEvaluated);
+      }
    }
 
    @Override
