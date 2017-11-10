@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>RepeatGroupWithPosition</h:title>
+        <model>
+            <instance>
+                <rgwp id="rgwp">
+                    <houseM>
+                        <no>1</no>
+                    </houseM>
+                    <houseM>
+                        <no>2</no>
+                    </houseM>
+                    <houseM>
+                        <no>3</no>
+                    </houseM>
+                    <houseM>
+                        <no>4</no>
+                    </houseM>
+                    <houseM>
+                        <no>5</no>
+                    </houseM>
+                </rgwp>
+            </instance>
+            <bind calculate="position(..)" nodeset="/rgwp/houseM/no" type="int"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/rgwp/houseM">
+            <label>members</label>
+            <repeat nodeset="/rgwp/houseM">
+                <input ref="/rgwp/houseM/no">
+                    <label>No</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
