@@ -17,6 +17,7 @@
 package org.javarosa.xpath.test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -27,11 +28,15 @@ import junit.framework.TestSuite;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathException;
+import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
@@ -93,6 +98,16 @@ public class XPathEvalTest extends TestCase {
                             expr, result, expected));
                 }
                 assertEquals((Double) expected, (Double) result, 1e-12);
+            } else if (result instanceof XPathNodeset && expected instanceof XPathNodeset) {
+                XPathNodeset expectedAsXPathNodeset = (XPathNodeset) expected;
+                XPathNodeset resultAsXPathNodeset = (XPathNodeset) result;
+                assertEquals(expectedAsXPathNodeset.size(), resultAsXPathNodeset.size());
+                assertEquals(expectedAsXPathNodeset.getRefAt(0), resultAsXPathNodeset.getRefAt(0));
+                assertEquals(expectedAsXPathNodeset.unpack(), resultAsXPathNodeset.unpack());
+                assertEquals(expectedAsXPathNodeset.toArgList().length, resultAsXPathNodeset.toArgList().length);
+                for (int i = 0; i < expectedAsXPathNodeset.toArgList().length; i++) {
+                    assertEquals(expectedAsXPathNodeset.toArgList()[i], resultAsXPathNodeset.toArgList()[i]);
+                }
             } else {
                 assertEquals(expected, result);
             }
@@ -478,6 +493,17 @@ public class XPathEvalTest extends TestCase {
         testEval("$var_int_five", null, varContext, 5.0);
         testEval("$var_double_five", null, varContext, 5.0);
 
+        logTestCategory("node referencing");
+        // happy flow scenario where the index node is not blank
+        FormInstance testInstance = createTestDataForIndexedRepeatFunction(1);
+        XPathNodeset expected = createExpectedNodesetFromIndexedRepeatFunction(testInstance, 1, "name");
+        testEval("indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )", testInstance, null, expected);
+
+        // situation where the referenced index node is blank and the default value (0 which means the first repeat group) is used
+        testInstance = createTestDataForIndexedRepeatFunction(null);
+        expected = createExpectedNodesetFromIndexedRepeatFunction(testInstance, 0, "name");
+        testEval("indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )", testInstance, null, expected);
+
         //Attribute XPath References
         //testEval("/@blah", new XPathUnsupportedException());
         //TODO: Need to test with model, probably in a different file
@@ -499,6 +525,43 @@ public class XPathEvalTest extends TestCase {
         testEval("write('testing-write')", null, ec, TRUE);
         if (!"testing-write".equals(write.val))
             fail("Custom function handler did not successfully send data to external source");
+    }
+
+    private XPathNodeset createExpectedNodesetFromIndexedRepeatFunction(FormInstance testInstance, int repeatIndex, String nodeName) {
+        TreeReference referencedNode =
+                testInstance.getRoot().getChildAt(repeatIndex).getChildrenWithName(nodeName).get(0).getRef();
+        return new XPathNodeset(
+                Collections.singletonList(referencedNode),
+                testInstance,
+                new EvaluationContext(new EvaluationContext(testInstance), referencedNode)
+        );
+    }
+
+    private FormInstance createTestDataForIndexedRepeatFunction(Integer indexNodeValue) {
+        TreeElement root = new TreeElement("data");
+        TreeElement repeat = new TreeElement("repeat");
+        TreeElement repeatChild = new TreeElement("name");
+        repeatChild.setAnswer(new StringData("A"));
+        repeat.addChild(repeatChild);
+        root.addChild(repeat);
+
+        repeat = new TreeElement("repeat");
+        repeatChild = new TreeElement("name");
+        repeatChild.setAnswer(new StringData("B"));
+        repeat.addChild(repeatChild);
+        root.addChild(repeat);
+
+        repeat = new TreeElement("repeat");
+        repeatChild = new TreeElement("name");
+        repeatChild.setAnswer(new StringData("C"));
+        repeat.addChild(repeatChild);
+        root.addChild(repeat);
+
+        TreeElement index = new TreeElement("index1");
+        if (indexNodeValue != null) {
+            index.setValue(new IntegerData(1));
+        }
+        return new FormInstance(root);
     }
 
     public FormInstance createTestInstance() {
