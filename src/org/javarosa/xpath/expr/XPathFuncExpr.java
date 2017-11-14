@@ -946,12 +946,14 @@ public class XPathFuncExpr extends XPathExpression {
             // process index (if valid)
             int groupIdx = toInt(args[idxargi].eval(model, ec)).intValue();
             if (groupIdx <= 0) {
-                // ignore invalid indexes (primarily happens during validation)
+                /*
+                   Don't allow invalid index otherwise an exception will be thrown later by XPathNodeset#unpack().
+                   This may happen if referenced node hadn't gotten a value yet but the calculation was fired. For example when adding a new repeat.
+                 */
+                groupIdx = 1;
             }
-            else {
-                // otherwise, add the index to the context reference
-                contextRef.setMultiplicity(groupRef.size()-1, groupIdx-1);
-            }
+            
+            contextRef.setMultiplicity(groupRef.size()-1, groupIdx-1);
         }
 
         // evaluate and return the XPath expression, in context
