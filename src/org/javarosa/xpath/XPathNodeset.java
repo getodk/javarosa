@@ -1,6 +1,7 @@
 package org.javarosa.xpath;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -142,8 +143,8 @@ public class XPathNodeset {
 
         int count = 0;
         for (TreeReference node : nodes) {
-            String value = node.toString();
-            if (value != null && !value.isEmpty()) {
+            AbstractTreeElement element = ec.getMainInstance().resolveReference(node);
+            if (element.getNumChildren() > 0 || element.getValue() != null) {
                 ++count;
             }
         }
