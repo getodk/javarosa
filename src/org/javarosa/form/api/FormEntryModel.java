@@ -540,9 +540,9 @@ public class FormEntryModel {
     }
 
     public FormIndex incrementIndex(FormIndex index, boolean descend) {
-      List<Integer> indexes = new ArrayList<>();
-      List<Integer> multiplicities = new ArrayList<>();
-      List<IFormElement> elements = new ArrayList<>();
+        List<Integer> indexes = new ArrayList<>();
+        List<Integer> multiplicities = new ArrayList<>();
+        List<IFormElement> elements = new ArrayList<>();
 
         if (index.isEndOfFormIndex()) {
             return index;
@@ -660,9 +660,9 @@ public class FormEntryModel {
     }
 
     public FormIndex decrementIndex(FormIndex index) {
-      List<Integer> indexes = new ArrayList<>();
-      List<Integer> multiplicities = new ArrayList<>();
-      List<IFormElement> elements = new ArrayList<>();
+        List<Integer> indexes = new ArrayList<>();
+        List<Integer> multiplicities = new ArrayList<>();
+        List<IFormElement> elements = new ArrayList<>();
 
         if (index.isBeginningOfFormIndex()) {
             return index;
@@ -691,8 +691,8 @@ public class FormEntryModel {
             int curMult = multiplicities.get(i);
 
             if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
-                elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
-                multiplicities.get(multiplicities.size() - 1) != TreeReference.INDEX_REPEAT_JUNCTURE) {
+                    elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef) elements.get(elements.size() - 1)).getRepeat() &&
+                    multiplicities.get(multiplicities.size() - 1) != TreeReference.INDEX_REPEAT_JUNCTURE) {
                 multiplicities.set(i, TreeReference.INDEX_REPEAT_JUNCTURE);
                 return;
             } else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
