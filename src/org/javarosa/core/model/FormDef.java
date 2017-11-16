@@ -1293,12 +1293,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             int ix = indexes.get(i);
             int mult = multiplicities.get(i);
 
-            // ----begin unclear why this is here... side effects???
-            // TODO: ... No words. Just fix it.
-            IFormElement ife = elements.get(i);
-            XPathReference xpr = (ife != null) ? (XPathReference) ife.getBind() : null;
-            TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
-            // ----end
             if (!(elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i))
                     .getRepeat())) {
                 mult = -1;
