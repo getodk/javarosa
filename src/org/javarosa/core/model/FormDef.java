@@ -1283,10 +1283,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public FormIndex buildIndex(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
         FormIndex cur = null;
-        List<Integer> curMultiplicities = new ArrayList<Integer>();
+        List<Integer> curMultiplicities = new ArrayList<>();
         curMultiplicities.addAll(multiplicities);
 
-        List<IFormElement> curElements = new ArrayList<IFormElement>();
+        List<IFormElement> curElements = new ArrayList<>();
         curElements.addAll(elements);
 
         for (int i = indexes.size() - 1; i >= 0; i--) {

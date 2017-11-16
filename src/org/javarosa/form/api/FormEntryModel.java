@@ -540,9 +540,9 @@ public class FormEntryModel {
     }
 
     public FormIndex incrementIndex(FormIndex index, boolean descend) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+      List<Integer> indexes = new ArrayList<>();
+      List<Integer> multiplicities = new ArrayList<>();
+      List<IFormElement> elements = new ArrayList<>();
 
         if (index.isEndOfFormIndex()) {
             return index;
@@ -660,9 +660,9 @@ public class FormEntryModel {
     }
 
     public FormIndex decrementIndex(FormIndex index) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+      List<Integer> indexes = new ArrayList<>();
+      List<Integer> multiplicities = new ArrayList<>();
+      List<IFormElement> elements = new ArrayList<>();
 
         if (index.isBeginningOfFormIndex()) {
             return index;
