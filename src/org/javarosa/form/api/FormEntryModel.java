@@ -540,9 +540,9 @@ public class FormEntryModel {
     }
 
     public FormIndex incrementIndex(FormIndex index, boolean descend) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+        List<Integer> indexes = new ArrayList<>();
+        List<Integer> multiplicities = new ArrayList<>();
+        List<IFormElement> elements = new ArrayList<>();
 
         if (index.isEndOfFormIndex()) {
             return index;
@@ -577,7 +577,7 @@ public class FormEntryModel {
                 if (group.getRepeat()) {
                     if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
 
-                        if (((Integer)multiplicities.get(multiplicities.size() - 1)).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+                        if (multiplicities.get(multiplicities.size() - 1) == TreeReference.INDEX_REPEAT_JUNCTURE) {
 
                             descend = false;
                             exitRepeat = true;
@@ -598,13 +598,13 @@ public class FormEntryModel {
             if (descend) {
                 IFormElement ife = (i == -1) ? null : elements.get(i);
                 if ((i == -1) || (ife != null && ife.getChildren() != null && ife.getChildren().size() > 0)) {
-                    indexes.add(Integer.valueOf(0));
-                    multiplicities.add(Integer.valueOf(0));
+                    indexes.add(0);
+                    multiplicities.add(0);
                     elements.add((i == -1 ? form : elements.get(i)).getChild(0));
 
                     if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
                         if (elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()) {
-                            multiplicities.set(multiplicities.size() - 1, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                            multiplicities.set(multiplicities.size() - 1, TreeReference.INDEX_REPEAT_JUNCTURE);
                         }
                     }
 
@@ -621,18 +621,18 @@ public class FormEntryModel {
             if (!exitRepeat && elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i)).getRepeat()) {
                 if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
 
-                    multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                    multiplicities.set(i, TreeReference.INDEX_REPEAT_JUNCTURE);
 
                 } else {
 
-                    multiplicities.set(i, Integer.valueOf(((Integer) multiplicities.get(i)).intValue() + 1));
+                    multiplicities.set(i, multiplicities.get(i) + 1);
 
                 }
                 return;
             }
 
             IFormElement parent = (i == 0 ? form : elements.get(i - 1));
-            int curIndex = ((Integer) indexes.get(i)).intValue();
+            int curIndex = indexes.get(i);
 
             // increment to the next element on the current level
             if (curIndex + 1 >= parent.getChildren().size()) {
@@ -644,13 +644,13 @@ public class FormEntryModel {
                 i--;
                 exitRepeat = false;
             } else {
-                indexes.set(i, Integer.valueOf(curIndex + 1));
-                multiplicities.set(i, Integer.valueOf(0));
+                indexes.set(i, curIndex + 1);
+                multiplicities.set(i, 0);
                 elements.set(i, parent.getChild(curIndex + 1));
 
                 if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
                     if (elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat()) {
-                        multiplicities.set(multiplicities.size() - 1, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                        multiplicities.set(multiplicities.size() - 1, TreeReference.INDEX_REPEAT_JUNCTURE);
                     }
                 }
 
@@ -660,9 +660,9 @@ public class FormEntryModel {
     }
 
     public FormIndex decrementIndex(FormIndex index) {
-      List<Integer> indexes = new ArrayList<Integer>();
-      List<Integer> multiplicities = new ArrayList<Integer>();
-      List<IFormElement> elements = new ArrayList<IFormElement>();
+        List<Integer> indexes = new ArrayList<>();
+        List<Integer> multiplicities = new ArrayList<>();
+        List<IFormElement> elements = new ArrayList<>();
 
         if (index.isBeginningOfFormIndex()) {
             return index;
@@ -687,20 +687,20 @@ public class FormEntryModel {
         int i = indexes.size() - 1;
 
         if (i != -1) {
-            int curIndex = indexes.get(i).intValue();
-            int curMult = multiplicities.get(i).intValue();
+            int curIndex = indexes.get(i);
+            int curMult = multiplicities.get(i);
 
             if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR &&
-                elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef)elements.get(elements.size() - 1)).getRepeat() &&
-                multiplicities.get(multiplicities.size() - 1).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
-                multiplicities.set(i, Integer.valueOf(TreeReference.INDEX_REPEAT_JUNCTURE));
+                    elements.get(elements.size() - 1) instanceof GroupDef && ((GroupDef) elements.get(elements.size() - 1)).getRepeat() &&
+                    multiplicities.get(multiplicities.size() - 1) != TreeReference.INDEX_REPEAT_JUNCTURE) {
+                multiplicities.set(i, TreeReference.INDEX_REPEAT_JUNCTURE);
                 return;
             } else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
-                multiplicities.set(i, Integer.valueOf(curMult - 1));
+                multiplicities.set(i, curMult - 1);
             } else if (curIndex > 0) {
                 // set node to previous element
-                indexes.set(i, Integer.valueOf(curIndex - 1));
-                multiplicities.set(i, Integer.valueOf(0));
+                indexes.set(i, curIndex - 1);
+                multiplicities.set(i, 0);
                 elements.set(i, (i == 0 ? form : elements.get(i - 1)).getChild(curIndex - 1));
 
                 if (setRepeatNextMultiplicity(elements, multiplicities))
@@ -723,8 +723,8 @@ public class FormEntryModel {
             int subIndex = element.getChildren().size() - 1;
             element = element.getChild(subIndex);
 
-            indexes.add(Integer.valueOf(subIndex));
-            multiplicities.add(Integer.valueOf(0));
+            indexes.add(subIndex);
+            multiplicities.add(0);
             elements.add(element);
 
             if (setRepeatNextMultiplicity(elements, multiplicities))
@@ -746,7 +746,7 @@ public class FormEntryModel {
                 TreeElement parentNode = form.getMainInstance().resolveReference(nodeRef.getParentRef());
                 mult = parentNode.getChildMultiplicity(name);
             }
-            multiplicities.set(multiplicities.size() - 1, Integer.valueOf(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR ? TreeReference.INDEX_REPEAT_JUNCTURE : mult));
+            multiplicities.set(multiplicities.size() - 1, repeatStructure == REPEAT_STRUCTURE_NON_LINEAR ? TreeReference.INDEX_REPEAT_JUNCTURE : mult);
             return true;
         } else {
             return false;

@@ -1283,22 +1283,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public FormIndex buildIndex(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
         FormIndex cur = null;
-        List<Integer> curMultiplicities = new ArrayList<Integer>();
+        List<Integer> curMultiplicities = new ArrayList<>();
         curMultiplicities.addAll(multiplicities);
 
-        List<IFormElement> curElements = new ArrayList<IFormElement>();
+        List<IFormElement> curElements = new ArrayList<>();
         curElements.addAll(elements);
 
         for (int i = indexes.size() - 1; i >= 0; i--) {
             int ix = indexes.get(i);
             int mult = multiplicities.get(i);
 
-            // ----begin unclear why this is here... side effects???
-            // TODO: ... No words. Just fix it.
-            IFormElement ife = elements.get(i);
-            XPathReference xpr = (ife != null) ? (XPathReference) ife.getBind() : null;
-            TreeReference ref = (xpr != null) ? (TreeReference) xpr.getReference() : null;
-            // ----end
             if (!(elements.get(i) instanceof GroupDef && ((GroupDef) elements.get(i))
                     .getRepeat())) {
                 mult = -1;
