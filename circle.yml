@@ -1,8 +1,0 @@
-test:
-  override:
-    - ./gradlew check test javadoc jar
-  post:
-    - cp -r build/libs $CIRCLE_ARTIFACTS
-    - cp -r build/reports/tests/test $CIRCLE_TEST_REPORTS/junit
-    - cp -r build/docs/javadoc $CIRCLE_TEST_REPORTS
-    - cp -r build/reports/checkstyle $CIRCLE_TEST_REPORTS
