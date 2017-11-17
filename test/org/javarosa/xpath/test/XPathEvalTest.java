@@ -25,7 +25,6 @@ import java.util.Locale;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.data.IntegerData;
@@ -135,6 +134,12 @@ public class XPathEvalTest extends TestCase {
         EvaluationContext ec = getFunctionHandlers();
 
         FormInstance instance = createTestInstance();
+
+        FormInstance countNonEmptyInstance = createCountNonEmptyTestInstance();
+
+        logTestCategory("counting");
+        testEval("count(/data/path)", countNonEmptyInstance, null, 5.0);
+        testEval("count-non-empty(/data/path)", countNonEmptyInstance, null, 3);
 
         logTestCategory("unsupporteds");
         testEval("/union | /expr", new XPathUnsupportedException());
@@ -569,6 +574,29 @@ public class XPathEvalTest extends TestCase {
         data.addChild(new TreeElement("path"));
         return new FormInstance(data);
     }
+
+    public FormInstance createCountNonEmptyTestInstance() {
+        TreeElement data = new TreeElement("data");
+
+        TreeElement path = new TreeElement("path", 0);
+        path.addChild(new TreeElement("child", 0));
+        path.addChild(new TreeElement("child", 1));
+        data.addChild(path);
+
+        data.addChild(new TreeElement("path", 1));
+
+        path = new TreeElement("path", 2);
+        path.setValue(new StringData("some value"));
+        data.addChild(path);
+
+        path = new TreeElement("path", 3);
+        path.addChild(new TreeElement("child", 0));
+        data.addChild(path);
+
+        data.addChild(new TreeElement("path", 4));
+
+        return new FormInstance(data);
+    }
     
     private void logTestCategory(String message) {
         System.out.println("Running " + this.getClass().getName() + " test: " + message);
@@ -725,7 +753,7 @@ public class XPathEvalTest extends TestCase {
             @Override
             public boolean realTime () { return false; }
             @Override
-            public Object eval (Object[] args, EvaluationContext ec) { return new IExprDataType () {
+            public Object eval (Object[] args, EvaluationContext ec) { return new IExprDataType() {
                     @Override
                     public Boolean toBoolean () { return TRUE; }
                     @Override
