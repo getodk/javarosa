@@ -207,7 +207,7 @@ public class XFormParserTest {
     public void parsesMetaNamespaceForm() throws IOException {
         ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
     }
 
     @Test
@@ -215,7 +215,7 @@ public class XFormParserTest {
         // Given
         ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
 
         FormDef formDef = parseResult.formDef;
         TreeElement audit = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_NODE);
@@ -276,7 +276,7 @@ public class XFormParserTest {
 
         // Then
         assertEquals(parseResult.formDef.getTitle(), "Repeat with template");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
     }
 
     @Test public void parseIMCIbyDTreeForm() throws IOException {
@@ -285,7 +285,7 @@ public class XFormParserTest {
 
         // Then
         assertEquals(parseResult.formDef.getTitle(), "eIMCI by D-Tree");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
     }
 
     @Test public void parseFormWithSubmissionElement() throws IOException {
@@ -294,7 +294,7 @@ public class XFormParserTest {
 
         // Then
         assertEquals(parseResult.formDef.getTitle(), "Single Submission Element");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
 
         SubmissionProfile submissionProfile = parseResult.formDef.getSubmissionProfile();
         assertEquals("http://some.destination.com", submissionProfile.getAction());
@@ -344,7 +344,7 @@ public class XFormParserTest {
 
         // Then
         assertEquals(formDef.getTitle(), "SetValue action");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
         assertEquals(1, formDef.getEventListeners(Action.EVENT_XFORMS_READY).size());
 
         TreeElement textNode =
@@ -396,6 +396,10 @@ public class XFormParserTest {
             }
         }
         return null;
+    }
+
+    private void assertNoParseErrors(ParseResult parseResult) {
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
     }
 
     /** Generates large versions of a secondary instance */
