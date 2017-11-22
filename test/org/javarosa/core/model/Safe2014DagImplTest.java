@@ -33,7 +33,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_evaluatesTriggerables_dependedOnFollowingRepeatGroupSiblings() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("org/javarosa/core/model/repeat-group-with-position-calculation.xml")).formDef;
+                parse(r("repeat-group-with-position-calculation.xml")).formDef;
 
         assertIDagImplUnderTest(formDef);
         formDef.setEventNotifier(eventNotifier);
