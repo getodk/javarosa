@@ -3,6 +3,9 @@ package org.javarosa.xform.parse;
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -20,6 +23,7 @@ import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.FormParserHelper.ParseResult;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -43,10 +47,13 @@ import java.util.List;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -355,6 +362,28 @@ public class XFormParserTest {
                 formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);
 
         assertEquals("Test Value", textNode.getValue().getValue());
+    }
+
+    @Test public void parseGroupWithNodesetAttrForm() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("group-with-nodeset-attr.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "group with nodeset attribute");
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+
+        final TreeReference expectedTreeReference = new TreeReference();
+        expectedTreeReference.setRefLevel(-1); // absolute reference
+        expectedTreeReference.add("data", -1); // the instance root
+        expectedTreeReference.add("R1", -1); // the outer repeat
+        expectedTreeReference.add("G2", -1); // the inner group
+        final IDataReference expectedXPathReference = new XPathReference(expectedTreeReference);
+
+        IFormElement groupElement = parseResult.formDef.getChild(0).getChild(0);
+
+        assertThat(groupElement, instanceOf(GroupDef.class));
+        assertThat(((GroupDef) groupElement).getRepeat(), is(false));
+        assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
     private TreeElement findDepthFirst(TreeElement parent, String name) {
