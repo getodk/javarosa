@@ -1,13 +1,16 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.model.Action;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.RangeQuestion;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
@@ -20,6 +23,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Test;
+import org.kxml2.kdom.Element;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -43,6 +47,7 @@ import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
 
@@ -202,7 +207,7 @@ public class XFormParserTest {
     public void parsesMetaNamespaceForm() throws IOException {
         ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
     }
 
     @Test
@@ -210,7 +215,7 @@ public class XFormParserTest {
         // Given
         ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
 
         FormDef formDef = parseResult.formDef;
         TreeElement audit = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_NODE);
@@ -271,7 +276,7 @@ public class XFormParserTest {
 
         // Then
         assertEquals(parseResult.formDef.getTitle(), "Repeat with template");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
     }
 
     @Test public void parseIMCIbyDTreeForm() throws IOException {
@@ -280,7 +285,72 @@ public class XFormParserTest {
 
         // Then
         assertEquals(parseResult.formDef.getTitle(), "eIMCI by D-Tree");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertNoParseErrors(parseResult);
+    }
+
+    @Test public void parseFormWithSubmissionElement() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("submission-element.xml"));
+
+        // Then
+        assertEquals(parseResult.formDef.getTitle(), "Single Submission Element");
+        assertNoParseErrors(parseResult);
+
+        SubmissionProfile submissionProfile = parseResult.formDef.getSubmissionProfile();
+        assertEquals("http://some.destination.com", submissionProfile.getAction());
+        assertEquals("form-data-post", submissionProfile.getMethod());
+        assertNull(submissionProfile.getMediaType());
+        assertEquals("/data/text", submissionProfile.getRef().getReference().toString());
+    }
+
+    /**
+     * Simple tests that documents assumption that the model has to come before the body tag.
+     * According to the comment above {@link XFormParser#parseModel(Element)} method,
+     * this is not mandated by the specs but has been implemented this way to keep parsing simpler.
+     */
+    @Test(expected = RuntimeException.class)
+    public void parseFormWithBodyBeforeModel() throws IOException {
+        parse(r("body-before-model.xml"));
+    }
+
+    @Test
+    public void parseFormWithTwoModels() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("two-models.xml"));
+
+        // Then
+        FormDef formDef = parseResult.formDef;
+        assertEquals(formDef.getTitle(), "Two Models");
+        assertEquals("Number of error messages", 1, parseResult.errorMessages.size());
+        assertEquals("Multiple models not supported. Ignoring subsequent models.", parseResult.errorMessages.get(0));
+        String firstModelInstanceId =
+                (String) formDef
+                        .getMainInstance()
+                        .getRoot()
+                        .getAttribute(null, "id")
+                        .getValue()
+                        .getValue();
+        assertEquals("first-model", firstModelInstanceId);
+    }
+
+    @Test
+    public void parseFormWithSetValueAction() throws IOException {
+        // Given & When
+        ParseResult parseResult = parse(r("form-with-setvalue-action.xml"));
+        FormDef formDef = parseResult.formDef;
+
+        // dispatch 'xforms-ready' action (Action.EVENT_XFORMS_READY)
+        formDef.initialize(true, new InstanceInitializationFactory());
+
+        // Then
+        assertEquals(formDef.getTitle(), "SetValue action");
+        assertNoParseErrors(parseResult);
+        assertEquals(1, formDef.getEventListeners(Action.EVENT_XFORMS_READY).size());
+
+        TreeElement textNode =
+                formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);
+
+        assertEquals("Test Value", textNode.getValue().getValue());
     }
 
     private ParseResult parse(Path formName) throws IOException {
@@ -326,6 +396,10 @@ public class XFormParserTest {
             }
         }
         return null;
+    }
+
+    private void assertNoParseErrors(ParseResult parseResult) {
+        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
     }
 
     /** Generates large versions of a secondary instance */

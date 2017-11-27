@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>SetValue action</h:title>
+        <model>
+            <instance>
+                <data id="setvalue-action">
+                    <text/>
+                </data>
+            </instance>
+            <bind id="text-data-binding" nodeset="/data/text" type="string"/>
+            <setvalue bind="text-data-binding" event="xforms-ready" >Test Value</setvalue>
+        </model>
+    </h:head>
+    <h:body />
+</h:html>
