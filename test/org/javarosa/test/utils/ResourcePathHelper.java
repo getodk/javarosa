@@ -6,8 +6,6 @@ import java.nio.file.Paths;
 
 public class ResourcePathHelper {
 
-    private static final int CALLER_CLASS_INDEX_IN_STACKTRACE = 3;
-
     /** Makes a Path for a resource file */
     public static Path r(String filename) {
         final String resourceFileParentPath = inferResourceFileParentPath();
@@ -26,10 +24,15 @@ public class ResourcePathHelper {
      * @return Caller test class package as a path
      */
     private static String inferResourceFileParentPath() {
-        final StackTraceElement callingClass =  Thread.currentThread().getStackTrace()[CALLER_CLASS_INDEX_IN_STACKTRACE];
-        final String callerPackage = callingClass.getClassName();
-        return callerPackage
-                .substring(0, callerPackage.lastIndexOf(".")) // strip the class name
-                .replaceAll("\\.", "\\" + File.separator); // change all '.' to '/' ('\' on Windows)
+        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        int callerStackIndex = 2; // 0 is getStackTrace, 1 is this method, 2 is immediate caller
+        while (callerStackIndex < stackTrace.length &&
+                stackTrace[callerStackIndex].getClassName().equals(ResourcePathHelper.class.getName())) {
+            ++callerStackIndex;
+        }
+        final String callerClassName = stackTrace[callerStackIndex].getClassName();
+        return callerClassName
+                .substring(0, callerClassName.lastIndexOf(".")) // strip the class name
+                .replace(".", File.separator);  // change all '.' to '/' ('\' on Windows)
     }
 }
