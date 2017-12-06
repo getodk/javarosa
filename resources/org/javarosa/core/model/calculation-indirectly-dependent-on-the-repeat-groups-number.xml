@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Calculation indirectly dependent on the repeat groups number</h:title>
+        <model>
+            <instance>
+                <rgwp id="rgwp">
+                    <houseM>
+                        <name>A</name>
+                    </houseM>
+                    <houseM>
+                        <name>B</name>
+                    </houseM>
+                    <houseM>
+                        <name>C</name>
+                    </houseM>
+                    <houseM>
+                        <name>D</name>
+                    </houseM>
+                    <houseM>
+                        <name>E</name>
+                    </houseM>
+                    <summary/>
+                </rgwp>
+            </instance>
+            <bind nodeset="/rgwp/houseM/name" type="string"/>
+            <bind calculate="concat(/rgwp/houseM/name)" nodeset="/rgwp/summary" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/rgwp/houseM">
+            <label>members</label>
+            <repeat nodeset="/rgwp/houseM">
+                <input ref="/rgwp/houseM/name">
+                    <label>No</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
