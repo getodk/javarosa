@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <h:head>
-        <h:title>RepeatGroupWithPosition</h:title>
+        <h:title>Repeat group with position calculation</h:title>
         <model>
             <instance>
                 <rgwp id="rgwp">
                     <houseM>
-                        <no>1</no>
+                        <no/>
                     </houseM>
                     <houseM>
-                        <no>2</no>
+                        <no/>
                     </houseM>
                     <houseM>
-                        <no>3</no>
+                        <no/>
                     </houseM>
                     <houseM>
-                        <no>4</no>
+                        <no/>
                     </houseM>
                     <houseM>
-                        <no>5</no>
+                        <no/>
                     </houseM>
                 </rgwp>
             </instance>

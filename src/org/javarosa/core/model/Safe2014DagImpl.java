@@ -61,8 +61,9 @@ public class Safe2014DagImpl extends LatestDagBase {
          EvaluationContext evalContext, TreeReference deleteRef,
          TreeElement parentElement, TreeElement deletedElement) {
 
-      // After a repeat group has been deleted, the following repeat groups position has changed.
-      // Evaluate triggerables which depend on the position of the following repeats or on their children.
+      /* After a repeat group has been deleted, the following repeat groups position has changed.
+         Evaluate triggerables which depend on the repeat group reference. Directly or indirectly.
+       */
       final String repeatGroupName = deletedElement.getName();
       for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
          final TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
@@ -72,8 +73,17 @@ public class Safe2014DagImpl extends LatestDagBase {
                  new HashSet<QuickTriggerable>(0));
          publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
 
-         evaluateChildrenTriggerables(mainInstance, evalContext,
-                 repeatGroup, false, alreadyEvaluated);
+         if (repeatGroup.getRef().equals(deleteRef)) {
+            /* Evaluate the children triggerables only once, for the deleted repeat group.
+               Only children of the deleted repeat group have actually changed (they're gone) and thus calculations depend
+               on the must be re-evaluated, the following repeat groups have been shifted along with their children.
+               If there are calculations - regardless if inside the repeat or outside - that depend on the following
+               repeat group positions, they will fired cascade by the above code anyway.
+               Unit test for this scenario:
+               Safe2014DagImplTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
+             */
+            evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
+         }
       }
    }
 

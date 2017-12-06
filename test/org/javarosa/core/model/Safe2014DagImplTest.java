@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.debug.Event;
@@ -30,13 +31,15 @@ public class Safe2014DagImplTest {
     };
 
     @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependedOnFollowingRepeatGroupSiblings() throws Exception {
+    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnFollowingRepeatGroupSiblings() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-position-calculation.xml")).formDef;
+                parse(r("repeat-group-with-children-position-calculation.xml")).formDef;
 
         assertIDagImplUnderTest(formDef);
-        formDef.setEventNotifier(eventNotifier);
+
+        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
+        formDef.setEventNotifier(eventNotifier); // it's important to set the test event notifier now to avoid storing events from the above initialization
 
         final FormInstance mainInstance = formDef.getMainInstance();
 
@@ -60,18 +63,19 @@ public class Safe2014DagImplTest {
         assertThat(repeats.get(2).getChildAt(0).getValue().getDisplayText(), equalTo("3"));
         assertThat(repeats.get(3).getChildAt(0).getValue().getDisplayText(), equalTo("4"));
 
-        // check that calculations have not been triggered for the repeat group prior to the deleted one
+        // check that correct calculations were triggered
         final String[] expectedMessages = {
                 "Processing 'Recalculate' for no [2_1] (2.0)",
                 "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
                 "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
                 "Processing 'Recalculate' for no [3_1] (3.0)",
                 "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
-                "Processing 'Deleted: no [3_1]: 1 triggerables were fired.' for ",
                 "Processing 'Recalculate' for no [4_1] (4.0)",
                 "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for ",
-                "Processing 'Deleted: no [4_1]: 1 triggerables were fired.' for "
         };
+
+        assertThat(dagEvents.size(), equalTo(expectedMessages.length));
+
         int messageIndex = 0;
         for (String expectedMessage : expectedMessages) {
             assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
