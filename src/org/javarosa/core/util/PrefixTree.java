@@ -79,7 +79,7 @@ public class PrefixTree {
         while (currentIndex < chars.length) {
 
             //The length of the string we've incorporated into the tree
-            int len = 0;
+            int incorporatedLen = 0;
 
             //The (potential) next node in the tree which prefixes the rest of the string
             PrefixTreeNode node = null;
@@ -94,20 +94,21 @@ public class PrefixTree {
                         return node;
                     }
 
-                    len = sharedPrefixLength(chars, currentIndex, prefix);
-                    if (len > minimumPrefixLength) {
-                        //See if we have any breaks which might make more heuristic sense than simply grabbing the biggest
-                        //difference
+                    incorporatedLen = sharedPrefixLength(chars, currentIndex, prefix);
+                    if (incorporatedLen > minimumPrefixLength) {
+                        //See if we have any breaks which might make more heuristic sense than simply grabbing the
+                        //biggest difference
                         for (char c : DELIMITERS) {
                             int sepLen = -1;
-                            for (int i = currentIndex + len - 1; i >= currentIndex; i--) {
+                            for (int i = currentIndex + incorporatedLen - 1; i >= currentIndex; i--) {
                                 if (chars[i] == c) {
                                     sepLen = i - currentIndex;
                                     break;
                                 }
                             }
-                            if (sepLen != -1 && len - sepLen < DEL_SACRIFICE && sepLen > minimumHeuristicLength) {
-                                len = sepLen;
+                            if (sepLen != -1 && incorporatedLen - sepLen < DEL_SACRIFICE &&
+                                    sepLen > minimumHeuristicLength) {
+                                incorporatedLen = sepLen;
                                 break;
                             }
                         }
@@ -130,20 +131,20 @@ public class PrefixTree {
                 }
                 node = new PrefixTreeNode(newArray);
 
-                len = chars.length - currentIndex;
+                incorporatedLen = chars.length - currentIndex;
 
                 //Add this to the highest level prefix we've found
                 current.addChild(node);
             }
             //Otherwise check to see if we are going to split the current prefix
-            else if (len < node.getPrefix().length) {
-                final char[] newPrefix = new char[len];
-                System.arraycopy(chars, currentIndex, newPrefix, 0, len);
-                node = current.budChild(node, newPrefix, len);
+            else if (incorporatedLen < node.getPrefix().length) {
+                final char[] newPrefix = new char[incorporatedLen];
+                System.arraycopy(chars, currentIndex, newPrefix, 0, incorporatedLen);
+                node = current.budChild(node, newPrefix, incorporatedLen);
             }
 
             current = node;
-            currentIndex += len;
+            currentIndex += incorporatedLen;
         }
 
         current.setTerminal();

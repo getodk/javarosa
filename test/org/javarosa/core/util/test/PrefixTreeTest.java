@@ -16,28 +16,12 @@
 
 package org.javarosa.core.util.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import java.util.List;
-
 import org.javarosa.core.util.PrefixTree;
+import org.junit.Test;
 
-public class PrefixTreeTest extends TestCase  {
+public class PrefixTreeTest {
 
-    public PrefixTreeTest(String name) {
-        super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-        aSuite.addTest(new PrefixTreeTest("doTests"));
-        return aSuite;
-    }
-
-    public void doTests() {
+    @Test public void doTests() {
 
         PrefixTree t = new PrefixTree();
         System.out.println(t.toString());
@@ -53,13 +37,12 @@ public class PrefixTreeTest extends TestCase  {
 
     }
 
-    public void add (PrefixTree t, String s) {
-        t.addString(s);
+    public void add (PrefixTree t, String newString) {
+        t.addString(newString);
         System.out.println(t.toString());
 
-        List<String> v = t.getStrings();
-        for (int i = 0; i < v.size(); i++) {
-            System.out.println((String)v.get(i));
+        for (String string : t.getStrings()) {
+            System.out.println(string);
         }
     }
 }
