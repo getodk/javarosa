@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.io.Std;
 import org.javarosa.core.util.NoLocalizedTextException;
@@ -259,8 +260,8 @@ public class Localizer implements Externalizable {
      *                    destination
      */
     private void loadTable(OrderedMap<String, PrefixTreeNode> destination, OrderedMap<String, String> source) {
-        for (String key : source.keySet()) {
-            destination.put(key, stringTree.addString(source.get(key)));
+        for (Map.Entry<String, String> entry : source.entrySet()) {
+            destination.put(entry.getKey(), stringTree.addString(entry.getValue()));
         }
     }
 
@@ -302,6 +303,7 @@ public class Localizer implements Externalizable {
      * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
      */
     public OrderedMap<String, PrefixTreeNode> getLocaleData(String locale) {
+        final long startTime = System.nanoTime();
         if (locale == null || !this.locales.contains(locale)) {
             return null;
         }
@@ -357,6 +359,7 @@ public class Localizer implements Externalizable {
             }
         }
 
+        System.out.printf("getLocaleData finished in %.3f ms\n", (System.nanoTime() - startTime) / 1e6);
         return data;
     }
 
