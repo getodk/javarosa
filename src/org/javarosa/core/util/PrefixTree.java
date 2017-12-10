@@ -31,27 +31,27 @@ public class PrefixTree {
     int minimumPrefixLength;
     int minimumHeuristicLength;
 
-    //Common delimeters which we'd prefer as prefix breaks rather than
+    //Common delimiters which we'd prefer as prefix breaks rather than
     //maximum string space
-    private static final char[] delimiters = {'\\', '/', '.'};
-    private static final int delSacrifice = 3;
+    private static final char[] DELIMITERS = {'\\', '/', '.'};
+    private static final int DEL_SACRIFICE = 3;
     boolean finalized = false;
 
-    public PrefixTree () {
+    public PrefixTree() {
         this(0);
     }
 
-    public PrefixTree (int minimumPrefixLength) {
+    public PrefixTree(int minimumPrefixLength) {
         root = new PrefixTreeNode(new char[0]);
         this.minimumPrefixLength = Math.max(minimumPrefixLength++, 0);
-        this.minimumHeuristicLength = Math.max((int)(minimumPrefixLength / 2), 3);
+        this.minimumHeuristicLength = Math.max(minimumPrefixLength / 2, 3);
     }
 
-    public static int sharedPrefixLength (char[] a, int aStart, char[] b) {
+    public static int sharedPrefixLength(char[] a, int aStart, char[] b) {
         int len;
         int minLength = Math.min(a.length - aStart, b.length);
 
-        for (len = 0; len < minLength;len++) {
+        for (len = 0; len < minLength; len++) {
             if (a[len + aStart] != b[len])
                 break;
         }
@@ -59,12 +59,12 @@ public class PrefixTree {
         return len;
     }
 
-    public PrefixTreeNode addString (String newString) {
-        if(finalized) {
+    public PrefixTreeNode addString(String newString) {
+        if (finalized) {
             throw new RuntimeException("Can't manipulate a finalized Prefix Tree");
         }
 
-        if(disablePrefixing) {
+        if (disablePrefixing) {
             PrefixTreeNode newNode = new PrefixTreeNode(newString.toCharArray());
             newNode.setTerminal();
             root.addChild(newNode);
@@ -73,7 +73,7 @@ public class PrefixTree {
 
         PrefixTreeNode current = root;
 
-        char[] chars = newString.toCharArray();
+        final char[] chars = newString.toCharArray();
         int currentIndex = 0;
 
         while (currentIndex < chars.length) {
@@ -86,12 +86,11 @@ public class PrefixTree {
 
             //TODO: This would be way faster if we sorted upon insertion....
             if (current.getChildren() != null) {
-            for (PrefixTreeNode prefixTreeNode : current.getChildren()) {
-               node = prefixTreeNode;
+                for (PrefixTreeNode prefixTreeNode : current.getChildren()) {
+                    node = prefixTreeNode;
 
-                    char[] prefix = node.getPrefix();
-                    //if(prefix.equals(s)) {
-                    if(ArrayUtilities.arraysEqual(prefix, 0, chars, currentIndex)) {
+                    final char[] prefix = node.getPrefix();
+                    if (ArrayUtilities.arraysEqual(prefix, 0, chars, currentIndex)) {
                         return node;
                     }
 
@@ -99,15 +98,15 @@ public class PrefixTree {
                     if (len > minimumPrefixLength) {
                         //See if we have any breaks which might make more heuristic sense than simply grabbing the biggest
                         //difference
-                        for(char c : delimiters) {
+                        for (char c : DELIMITERS) {
                             int sepLen = -1;
-                            for(int i = currentIndex + len -1; i >= currentIndex; i--) {
-                                if(chars[i] == c) {
+                            for (int i = currentIndex + len - 1; i >= currentIndex; i--) {
+                                if (chars[i] == c) {
                                     sepLen = i - currentIndex;
                                     break;
                                 }
                             }
-                            if(sepLen != -1 && len - sepLen < delSacrifice && sepLen > minimumHeuristicLength) {
+                            if (sepLen != -1 && len - sepLen < DEL_SACRIFICE && sepLen > minimumHeuristicLength) {
                                 len = sepLen;
                                 break;
                             }
@@ -122,12 +121,12 @@ public class PrefixTree {
             //If we didn't find anything that shared any common roots
             if (node == null) {
                 //Create a placeholder for the rest of the string
-                char[] newArray;
-                if(currentIndex == 0) {
+                final char[] newArray;
+                if (currentIndex == 0) {
                     newArray = chars;
                 } else {
                     newArray = new char[chars.length - currentIndex];
-                    for(int i = 0 ; i < chars.length - currentIndex; ++i) { newArray[i] = chars[i + currentIndex];}
+                    System.arraycopy(chars, currentIndex, newArray, 0, chars.length - currentIndex);
                 }
                 node = new PrefixTreeNode(newArray);
 
@@ -138,29 +137,24 @@ public class PrefixTree {
             }
             //Otherwise check to see if we are going to split the current prefix
             else if (len < node.getPrefix().length) {
-                char[] newPrefix = new char[len];
-                for(int i = 0; i < len ; ++i) {
-                    newPrefix[i] = chars[currentIndex + i];
-                }
-
-                PrefixTreeNode interimNode = current.budChild(node, newPrefix, len);
-
-                node = interimNode;
+                final char[] newPrefix = new char[len];
+                System.arraycopy(chars, currentIndex, newPrefix, 0, len);
+                node = current.budChild(node, newPrefix, len);
             }
 
             current = node;
-            currentIndex = currentIndex + len;
+            currentIndex += len;
         }
 
         current.setTerminal();
         return current;
     }
 
-    public List<String> getStrings () {
-        if(finalized) {
+    public List<String> getStrings() {
+        if (finalized) {
             throw new RuntimeException("Can't get the strings from a finalized Prefix Tree");
         }
-      List<String> v = new ArrayList<String>(1);
+        List<String> v = new ArrayList<>(1);
         root.decompose(v, "");
         return v;
     }
@@ -168,6 +162,7 @@ public class PrefixTree {
     public String toString() {
         return root.toString();
     }
+
     public void seal() {
         root.seal();
         finalized = true;
