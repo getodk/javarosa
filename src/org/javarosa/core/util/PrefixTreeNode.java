@@ -44,6 +44,23 @@ public class PrefixTreeNode {
         }
     }
 
+    /** Provides information about the space used by this node and its children */
+    public PrefixTree.Info getInfo() {
+        PrefixTree.Info info = new PrefixTree.Info();
+        if (children != null) {
+            for (PrefixTreeNode child : children) {
+                PrefixTree.Info childInfo = child.getInfo();
+                info.nodeCount += childInfo.nodeCount;
+                info.stringSpace += childInfo.stringSpace;
+            }
+        }
+        ++info.nodeCount;
+        if (prefix != null) {
+            info.stringSpace += prefix.length;
+        }
+        return info;
+    }
+
     public char[] getPrefix() {
         return prefix;
     }

@@ -76,6 +76,7 @@ public class Localizer implements Externalizable {
     public Localizer(boolean fallbackDefaultLocale, boolean fallbackDefaultForm) {
         this.fallbackDefaultLocale = fallbackDefaultLocale;
         this.fallbackDefaultForm = fallbackDefaultForm;
+        stringTree.enablePrefixing(true);
     }
 
     public boolean equals(Object o) {
@@ -333,6 +334,9 @@ public class Localizer implements Externalizable {
         for (LocaleDataSource resource : localeResources.get(locale)) {
             loadTable(data, resource.getLocalizedText());
         }
+
+        PrefixTree.Info i = stringTree.getInfo();
+        System.out.printf("Nodes: %d, total string length: %d\n", i.nodeCount, i.stringSpace);
 
         //Strings are now immutable
         stringTree.seal();
