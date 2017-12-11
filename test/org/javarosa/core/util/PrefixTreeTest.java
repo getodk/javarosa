@@ -14,9 +14,8 @@
  * the License.
  */
 
-package org.javarosa.core.util.test;
+package org.javarosa.core.util;
 
-import org.javarosa.core.util.PrefixTree;
 import org.junit.Test;
 
 public class PrefixTreeTest {
