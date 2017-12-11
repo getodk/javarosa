@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.javarosa.core.io.Std;
+import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.PrefixTree;
@@ -304,7 +305,7 @@ public class Localizer implements Externalizable {
      * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
      */
     public OrderedMap<String, PrefixTreeNode> getLocaleData(String locale) {
-        final long startTime = System.nanoTime();
+        final CodeTimer codeTimer = new CodeTimer("getLocaleData");
         if (locale == null || !this.locales.contains(locale)) {
             return null;
         }
@@ -363,7 +364,7 @@ public class Localizer implements Externalizable {
             }
         }
 
-        System.out.printf("getLocaleData finished in %.3f ms\n", (System.nanoTime() - startTime) / 1e6);
+        codeTimer.logDone();
         return data;
     }
 
