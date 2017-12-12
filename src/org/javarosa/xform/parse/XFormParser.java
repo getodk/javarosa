@@ -45,6 +45,7 @@ import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
+import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.PrefixTreeNode;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -362,6 +363,7 @@ public class XFormParser implements IXFormParserFunctions {
      */
     @Deprecated public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
             throws IOException {
+        final CodeTimer ctParse = new CodeTimer("Reading XML and parsing with kXML2");
         Document doc = new Document();
 
         try{
@@ -399,12 +401,17 @@ public class XFormParser implements IXFormParserFunctions {
             Std.out.println("Error closing reader");
             Std.printStack(e);
         }
+        ctParse.logDone();
+
+        final CodeTimer ctConsolidate = new CodeTimer("Consolidating text");
         XmlTextConsolidator.consolidateText(stringCache, doc.getRootElement());
+        ctConsolidate.logDone();
 
         return doc;
     }
 
     private void parseDoc(Map<String, String> namespacePrefixesByUri) {
+        final CodeTimer codeTimer = new CodeTimer("Creating FormDef from parsed XML");
         _f = new FormDef();
 
         initState();
@@ -468,6 +475,8 @@ public class XFormParser implements IXFormParserFunctions {
         }
         _f.getMainInstance().getRoot().clearChildrenCaches();
         _f.getMainInstance().getRoot().clearCaches();
+
+        codeTimer.logDone();
     }
 
     private final Set<String> validElementNames = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(

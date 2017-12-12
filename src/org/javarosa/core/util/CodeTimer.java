@@ -20,7 +20,7 @@ import org.javarosa.core.io.Std;
 
 import java.io.PrintStream;
 
-/** Helps with timing and operation and logging the time */
+/** Helps with timing an operation and logging the time */
 public class CodeTimer {
     private final long startTime = System.nanoTime();
     private final String operation;
