@@ -24,6 +24,7 @@ import java.io.PrintStream;
 public class CodeTimer {
     private final long startTime = System.nanoTime();
     private final String operation;
+    private boolean enabled = false;
 
     /**
      * Creates a CodeTimer for the specified operation
@@ -43,6 +44,12 @@ public class CodeTimer {
      * @param stream the PrintStream onto which to log the message
      */
     public void logDone(PrintStream stream) {
-        stream.printf("%s finished in %.3f ms\n", operation, (System.nanoTime() - startTime) / 1e6);
+        if (enabled) {
+            stream.printf("%s finished in %.3f ms\n", operation, (System.nanoTime() - startTime) / 1e6);
+        }
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

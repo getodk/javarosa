@@ -42,7 +42,6 @@ public class PrefixTree {
     }
 
     public PrefixTree(int minimumPrefixLength) {
-        logMessageAndHashCode("creating");
         root = new PrefixTreeNode(new char[0]);
         this.minimumPrefixLength = Math.max(minimumPrefixLength++, 0);
         this.minimumHeuristicLength = Math.max(minimumPrefixLength / 2, 3);
@@ -185,12 +184,7 @@ public class PrefixTree {
     }
 
     public void clear() {
-        logMessageAndHashCode("clearing");
         finalized = false;
         root = new PrefixTreeNode(new char[0]);
-    }
-
-    private void logMessageAndHashCode(String message) {
-        System.out.printf("PrefixTree %s %s\n", System.identityHashCode(this), message);
     }
 }
