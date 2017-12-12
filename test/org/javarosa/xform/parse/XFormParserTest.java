@@ -20,6 +20,7 @@ import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.xform.parse.FormParserHelper.ParseResult;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
@@ -30,13 +31,11 @@ import org.kxml2.kdom.Element;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +45,8 @@ import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -53,10 +54,6 @@ import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
 
-    /** Makes a Path for a resource file */
-    private static Path r(String filename) {
-        return Paths.get("resources", filename);
-    }
     private static final Path FORM_INSTANCE_XML_FILE_NAME           = r("instance.xml");
     private static final Path SECONDARY_INSTANCE_XML                = r("secondary-instance.xml");
     private static final Path SECONDARY_INSTANCE_LARGE_XML          = r("secondary-instance-large.xml");
@@ -358,35 +355,6 @@ public class XFormParserTest {
                 formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);
 
         assertEquals("Test Value", textNode.getValue().getValue());
-    }
-
-    private ParseResult parse(Path formName) throws IOException {
-        XFormParser parser = new XFormParser(new FileReader(formName.toString()));
-        final List<String> errorMessages = new ArrayList<>();
-        parser.reporter = new XFormParserReporter() {
-            @Override
-            public void warning(String type, String message, String xmlLocation) {
-                errorMessages.add(message);
-                super.warning(type, message, xmlLocation);
-            }
-
-            @Override
-            public void error(String message) {
-                errorMessages.add(message);
-                super.error(message);
-            }
-        };
-        return new ParseResult(parser.parse(), errorMessages);
-    }
-
-    class ParseResult {
-        final FormDef formDef;
-        final List<String> errorMessages;
-
-        ParseResult(FormDef formDef, List<String> errorMessages) {
-            this.formDef = formDef;
-            this.errorMessages = errorMessages;
-        }
     }
 
     private TreeElement findDepthFirst(TreeElement parent, String name) {

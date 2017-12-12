@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Calculation dependent on the repeat groups number</h:title>
+        <model>
+            <instance>
+                <rgwp id="rgwp">
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <houseM>
+                        <no/>
+                    </houseM>
+                    <summary/>
+                </rgwp>
+            </instance>
+            <bind calculate= "position(..)" nodeset="/rgwp/houseM/no" type="string"/>
+            <bind calculate="sum(/rgwp/houseM/no)" nodeset="/rgwp/summary" type="int"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/rgwp/houseM">
+            <label>members</label>
+            <repeat nodeset="/rgwp/houseM">
+                <input ref="/rgwp/houseM/no">
+                    <label>No</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
