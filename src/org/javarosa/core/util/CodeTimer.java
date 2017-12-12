@@ -24,7 +24,7 @@ import java.io.PrintStream;
 public class CodeTimer {
     private final long startTime = System.nanoTime();
     private final String operation;
-    private boolean enabled = false;
+    private static boolean enabled = false;
 
     /**
      * Creates a CodeTimer for the specified operation
@@ -49,7 +49,7 @@ public class CodeTimer {
         }
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public static void setEnabled(boolean enabled) {
+        CodeTimer.enabled = enabled;
     }
 }

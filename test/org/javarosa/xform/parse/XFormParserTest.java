@@ -15,6 +15,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
@@ -22,6 +23,7 @@ import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.kxml2.kdom.Element;
 
@@ -72,6 +74,11 @@ public class XFormParserTest {
 
     private static final String ORX_2_NAMESPACE_PREFIX = "orx2";
     private static final String ORX_2_NAMESPACE_URI = "http://openrosa.org/xforms";
+
+    @Before
+    public void setUp() {
+        CodeTimer.setEnabled(true);
+    }
 
     @After
     public void tearDown() throws Exception {
