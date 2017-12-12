@@ -25,12 +25,12 @@ public class PrefixTreeNode {
     private List<PrefixTreeNode> children;
     private PrefixTreeNode parent;
 
-    public PrefixTreeNode (char[] prefix) {
+    public PrefixTreeNode(char[] prefix) {
         this.prefix = prefix;
         this.terminal = false;
     }
 
-    public void decompose (List<String> v, String s) {
+    public void decompose(List<String> v, String s) {
         String stem = s + new String(prefix);
 
         if (terminal) {
@@ -38,10 +38,27 @@ public class PrefixTreeNode {
         }
 
         if (children != null) {
-         for (PrefixTreeNode child : children) {
-            child.decompose(v, stem);
-         }
+            for (PrefixTreeNode child : children) {
+                child.decompose(v, stem);
+            }
         }
+    }
+
+    /** Provides information about the space used by this node and its children */
+    public PrefixTree.Info getInfo() {
+        PrefixTree.Info info = new PrefixTree.Info();
+        if (children != null) {
+            for (PrefixTreeNode child : children) {
+                PrefixTree.Info childInfo = child.getInfo();
+                info.nodeCount += childInfo.nodeCount;
+                info.stringSpace += childInfo.stringSpace;
+            }
+        }
+        ++info.nodeCount;
+        if (prefix != null) {
+            info.stringSpace += prefix.length;
+        }
+        return info;
     }
 
     public char[] getPrefix() {
@@ -52,21 +69,23 @@ public class PrefixTreeNode {
         return children;
     }
 
-    public boolean equals (Object o) {
+    public boolean equals(Object o) {
         //uh... is this right?
-        return (o instanceof PrefixTreeNode ? prefix == ((PrefixTreeNode)o).prefix || ArrayUtilities.arraysEqual(prefix,0, ((PrefixTreeNode)o).prefix, 0) : false);
+        return o instanceof PrefixTreeNode &&
+                (prefix == ((PrefixTreeNode) o).prefix ||
+                        ArrayUtilities.arraysEqual(prefix, 0, ((PrefixTreeNode) o).prefix, 0));
     }
 
-    public String toString () {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
         sb.append(prefix);
         if (terminal)
             sb.append("*");
         if (children != null) {
-         for (PrefixTreeNode child : children) {
-            sb.append(child.toString());
-         }
+            for (PrefixTreeNode child : children) {
+                sb.append(child.toString());
+            }
         }
         sb.append("}");
         return sb.toString();
@@ -78,7 +97,7 @@ public class PrefixTreeNode {
     }
 
     public String render(StringBuffer buffer) {
-        if(parent != null){
+        if (parent != null) {
             parent.render(buffer);
         }
         buffer.append(this.prefix);
@@ -87,16 +106,16 @@ public class PrefixTreeNode {
 
     public void seal() {
         if (children != null) {
-         for (PrefixTreeNode child : children) {
-            child.seal();
-         }
+            for (PrefixTreeNode child : children) {
+                child.seal();
+            }
         }
         this.children = null;
     }
 
     public void addChild(PrefixTreeNode node) {
-        if(children == null) {
-            children = new ArrayList<PrefixTreeNode>(1);
+        if (children == null) {
+            children = new ArrayList<>(1);
         }
         children.add(node);
         node.parent = this;
@@ -118,9 +137,7 @@ public class PrefixTreeNode {
         //cut out the middle part of the prefix (which is now this node's domain)
         char[] old = node.prefix;
         node.prefix = new char[old.length - subPrefixLen];
-        for(int i = 0 ; i < old.length - subPrefixLen; ++i) {
-            node.prefix[i] = old[subPrefixLen + i];
-        }
+        System.arraycopy(old, subPrefixLen, node.prefix, 0, old.length - subPrefixLen);
 
         //replace the old child with the new one, and put it in the proper order
         this.addChild(newChild);

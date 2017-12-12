@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.io.Std;
+import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.PrefixTree;
@@ -44,23 +46,22 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * locales.
  *
  * @author Drew Roos/Clayton Sims
- *
  */
 public class Localizer implements Externalizable {
-    private List<String> locales; /* List<String> */
-    private OrderedMap<String, List<LocaleDataSource>> localeResources; /* String -> List<LocaleDataSource> */
-    private OrderedMap<String, PrefixTreeNode> currentLocaleData; /* HashMap{ String -> String } */
-    private PrefixTree stringTree;
-    private String defaultLocale;
-    private String currentLocale;
+    private List<String> locales = new ArrayList<>(0);
+    private OrderedMap<String, List<LocaleDataSource>> localeResources = new OrderedMap<>();
+    private OrderedMap<String, PrefixTreeNode> currentLocaleData = new OrderedMap<>();
+    private final PrefixTree stringTree = new PrefixTree(10);
+    private String defaultLocale = null;
+    private String currentLocale = null;
     private boolean fallbackDefaultLocale;
     private boolean fallbackDefaultForm;
-    private List<Localizable> observers;
+    private List<Localizable> observers = new ArrayList<>(0);
 
     /**
      * Default constructor. Disables all fallback modes.
      */
-    public Localizer () {
+    public Localizer() {
         this(false, false);
     }
 
@@ -68,25 +69,20 @@ public class Localizer implements Externalizable {
      * Full constructor.
      *
      * @param fallbackDefaultLocale If true, search the default locale when no translation for a particular text handle
-     * is found in the current locale.
-     * @param fallbackDefaultForm If true, search the default text form when no translation is available for the
-     * specified text form ('long', 'short', etc.). Note: form is specified by appending ';[form]' onto the text ID.
+     *                              is found in the current locale.
+     * @param fallbackDefaultForm   If true, search the default text form when no translation is available for the
+     *                              specified text form ('long', 'short', etc.). Note: form is specified by appending
+     *                              ';[form]' onto the text ID.
      */
-    public Localizer (boolean fallbackDefaultLocale, boolean fallbackDefaultForm) {
-        stringTree = new PrefixTree(10);
-        localeResources = new OrderedMap<String, List<LocaleDataSource>>();
-        currentLocaleData = new OrderedMap<String, PrefixTreeNode>();
-        locales = new ArrayList<String>(0);
-        defaultLocale = null;
-        currentLocale = null;
-        observers = new ArrayList<Localizable>(0);
+    public Localizer(boolean fallbackDefaultLocale, boolean fallbackDefaultForm) {
         this.fallbackDefaultLocale = fallbackDefaultLocale;
         this.fallbackDefaultForm = fallbackDefaultForm;
+        stringTree.enablePrefixing(true);
     }
 
-    public boolean equals (Object o) {
+    public boolean equals(Object o) {
         if (o instanceof Localizer) {
-            Localizer l = (Localizer)o;
+            Localizer l = (Localizer) o;
 
             //TODO: Compare all resources
             return (ExtUtil.equals(locales, locales) &&
@@ -105,7 +101,7 @@ public class Localizer implements Externalizable {
      *
      * @return default locale fallback mode
      */
-    public boolean getFallbackLocale () {
+    public boolean getFallbackLocale() {
         return fallbackDefaultLocale;
     }
 
@@ -114,7 +110,7 @@ public class Localizer implements Externalizable {
      *
      * @return default form fallback mode
      */
-    public boolean getFallbackForm () {
+    public boolean getFallbackForm() {
         return fallbackDefaultForm;
     }
 
@@ -127,8 +123,8 @@ public class Localizer implements Externalizable {
      * @return True if the locale was not already defined.
      * @throws NullPointerException if locale is null
      */
-    public boolean addAvailableLocale (String locale) {
-        if ( locale == null ) {
+    public boolean addAvailableLocale(String locale) {
+        if (locale == null) {
             throw new NullPointerException("unexpected null locale");
         }
         if (hasLocale(locale)) {
@@ -145,7 +141,7 @@ public class Localizer implements Externalizable {
      *
      * @return Array of defined locales, in order they were created.
      */
-    public String[] getAvailableLocales () {
+    public String[] getAvailableLocales() {
         String[] data = new String[locales.size()];
         return locales.toArray(data);
     }
@@ -156,8 +152,8 @@ public class Localizer implements Externalizable {
      * @param locale Locale
      * @return Whether the locale is defined. False if null
      */
-    public boolean hasLocale (String locale) {
-        return (locale == null ? false : locales.contains(locale));
+    public boolean hasLocale(String locale) {
+        return locale != null && locales.contains(locale);
     }
 
     /**
@@ -166,9 +162,9 @@ public class Localizer implements Externalizable {
      * @return Next locale following the current locale (if the current locale is the last, cycle back to the beginning).
      * If the current locale is not set, return the default locale. If the default locale is not set, return null.
      */
-    public String getNextLocale () {
+    public String getNextLocale() {
         return currentLocale == null ? defaultLocale
-                                     : locales.get((locales.indexOf(currentLocale) + 1) % locales.size());
+                : locales.get((locales.indexOf(currentLocale) + 1) % locales.size());
     }
 
     /* === MANAGING CURRENT AND DEFAULT LOCALES === */
@@ -178,7 +174,7 @@ public class Localizer implements Externalizable {
      *
      * @return Current locale.
      */
-    public String getLocale () {
+    public String getLocale() {
         return currentLocale;
     }
 
@@ -188,9 +184,10 @@ public class Localizer implements Externalizable {
      * @param currentLocale Locale. Must be defined and not null.
      * @throws UnregisteredLocaleException If locale is null or not defined.
      */
-    public void setLocale (String currentLocale) {
+    public void setLocale(String currentLocale) {
         if (!hasLocale(currentLocale)) {
-            throw new UnregisteredLocaleException("Attempted to set to a locale that is not defined. Attempted Locale: " + currentLocale);
+            throw new UnregisteredLocaleException(
+                    "Attempted to set to a locale that is not defined. Attempted Locale: " + currentLocale);
         }
 
         boolean alert = false;
@@ -199,7 +196,7 @@ public class Localizer implements Externalizable {
             alert = true;
         }
         loadCurrentLocaleResources();
-        if(alert) {
+        if (alert) {
             alertLocalizables();
         }
     }
@@ -209,7 +206,7 @@ public class Localizer implements Externalizable {
      *
      * @return Default locale.
      */
-    public String getDefaultLocale () {
+    public String getDefaultLocale() {
         return defaultLocale;
     }
 
@@ -219,7 +216,7 @@ public class Localizer implements Externalizable {
      * @param defaultLocale Default locale. Must be defined. May be null, in which case there will be no default locale.
      * @throws UnregisteredLocaleException If locale is not defined.
      */
-    public void setDefaultLocale (String defaultLocale) {
+    public void setDefaultLocale(String defaultLocale) {
         if (defaultLocale != null && !hasLocale(defaultLocale))
             throw new UnregisteredLocaleException("Attempted to set default to a locale that is not defined");
 
@@ -231,7 +228,7 @@ public class Localizer implements Externalizable {
      *
      * @throws IllegalStateException If default locale is not set.
      */
-    public void setToDefault () {
+    public void setToDefault() {
         if (defaultLocale == null)
             throw new IllegalStateException("Attempted to set to default locale when default locale not set");
 
@@ -240,14 +237,14 @@ public class Localizer implements Externalizable {
 
     /**
      * Constructs a body of local resources to be the set of Current Locale Data.
-     *
+     * <p>
      * After loading, the current locale data will contain definitions for each
      * entry defined by the current locale resources, as well as definitions for any
      * entry present in the fallback resources but not in those of the current locale.
-     *
+     * <p>
      * The procedure to accomplish this set is as follows, with overwritting occuring
      * when a collision occurs:
-     *
+     * <p>
      * 1. Load all of the in memory definitions for the default locale if fallback is enabled
      * 2. For each resource file for the default locale, load each definition if fallback is enabled
      * 3. Load all of the in memory definitions for the current locale
@@ -259,13 +256,14 @@ public class Localizer implements Externalizable {
 
     /**
      * Moves all relevant entries in the source dictionary into the destination dictionary
+     *
      * @param destination A dictionary of key/value locale pairs that will be modified
-     * @param source A dictionary of key/value locale pairs that will be copied into
-     * destination
+     * @param source      A dictionary of key/value locale pairs that will be copied into
+     *                    destination
      */
     private void loadTable(OrderedMap<String, PrefixTreeNode> destination, OrderedMap<String, String> source) {
-    for (String key : source.keySet()) {
-            destination.put(key, stringTree.addString(source.get(key)));
+        for (Map.Entry<String, String> entry : source.entrySet()) {
+            destination.put(entry.getKey(), stringTree.addString(entry.getValue()));
         }
     }
 
@@ -275,27 +273,27 @@ public class Localizer implements Externalizable {
      * Registers a resource file as a source of locale data for the specified
      * locale.
      *
-     * @param locale The locale of the definitions provided.
+     * @param locale   The locale of the definitions provided.
      * @param resource A LocaleDataSource containing string data for the locale provided
      * @throws NullPointerException if resource or locale are null
      */
-    public void registerLocaleResource (String locale, LocaleDataSource resource) {
-        if(locale == null) {
+    public void registerLocaleResource(String locale, LocaleDataSource resource) {
+        if (locale == null) {
             throw new NullPointerException("Attempt to register a data source to a null locale in the localizer");
         }
-        if(resource == null) {
+        if (resource == null) {
             throw new NullPointerException("Attempt to register a null data source in the localizer");
         }
-      List<LocaleDataSource> resources;
-        if(localeResources.containsKey(locale)) {
+        List<LocaleDataSource> resources;
+        if (localeResources.containsKey(locale)) {
             resources = localeResources.get(locale);
         } else {
-            resources = new ArrayList<LocaleDataSource>(1);
+            resources = new ArrayList<>(1);
         }
         resources.add(resource);
         localeResources.put(locale, resources);
 
-        if(locale.equals(currentLocale) || locale.equals(defaultLocale)) {
+        if (locale.equals(currentLocale) || locale.equals(defaultLocale)) {
             loadCurrentLocaleResources();
         }
     }
@@ -306,8 +304,9 @@ public class Localizer implements Externalizable {
      * @param locale Locale
      * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
      */
-    public OrderedMap<String, PrefixTreeNode> getLocaleData (String locale) {
-        if(locale == null || !this.locales.contains(locale)) {
+    public OrderedMap<String, PrefixTreeNode> getLocaleData(String locale) {
+        final CodeTimer codeTimer = new CodeTimer("getLocaleData");
+        if (locale == null || !this.locales.contains(locale)) {
             return null;
         }
         stringTree.clear();
@@ -316,28 +315,29 @@ public class Localizer implements Externalizable {
         //for any possible language. As such, we'll keep around a table with only the default locale keys to
         //ensure that there are no localizations which are only present in another locale, which causes ugly
         //and difficult to trace errors.
-        OrderedMap<String, Boolean> defaultLocaleKeys = new OrderedMap<String, Boolean>();
+        final OrderedMap<String, Boolean> defaultLocaleKeys = new OrderedMap<>();
 
         //This table will be loaded with the default values first (when applicable), and then with any
         //language specific translations overwriting the existing values.
-        OrderedMap<String, PrefixTreeNode> data = new OrderedMap<String, PrefixTreeNode>();
+        final OrderedMap<String, PrefixTreeNode> data = new OrderedMap<>();
 
         // If there's a default locale, we load all of its elements into memory first, then allow
         // the current locale to overwrite any differences between the two.
         if (fallbackDefaultLocale && defaultLocale != null) {
-         List<LocaleDataSource> defaultResources = localeResources.get(defaultLocale);
-            for (int i = 0; i < defaultResources.size(); ++i) {
-                loadTable(data,((LocaleDataSource)defaultResources.get(i)).getLocalizedText());
+            for (LocaleDataSource defaultResource : localeResources.get(defaultLocale)) {
+                loadTable(data, defaultResource.getLocalizedText());
             }
-      for (String key : data.keySet()) {
+            for (String key : data.keySet()) {
                 defaultLocaleKeys.put(key, Boolean.TRUE);
             }
         }
 
-      List<LocaleDataSource> resources = localeResources.get(locale);
-        for(int i = 0 ; i < resources.size() ; ++i ) {
-            loadTable(data,((LocaleDataSource)resources.get(i)).getLocalizedText());
+        for (LocaleDataSource resource : localeResources.get(locale)) {
+            loadTable(data, resource.getLocalizedText());
         }
+
+        PrefixTree.Info i = stringTree.getInfo();
+        System.out.printf("Nodes: %d, total string length: %d\n", i.nodeCount, i.stringSpace);
 
         //Strings are now immutable
         stringTree.seal();
@@ -345,25 +345,26 @@ public class Localizer implements Externalizable {
         //If we're using a default locale, now we want to make sure that it has all of the keys
         //that the locale we want to use does. Otherwise, the app will crash when we switch to
         //a locale that doesn't contain the key.
-        if(fallbackDefaultLocale && defaultLocale != null) {
-            String missingKeys = "";
-            int keysmissing = 0;
-      for (String key : data.keySet()) {
-                if(!defaultLocaleKeys.containsKey(key)) {
-                    missingKeys += key + ",";
-                    keysmissing++;
+        if (fallbackDefaultLocale && defaultLocale != null) {
+            StringBuilder missingKeys = new StringBuilder();
+            int keysMissing = 0;
+            for (String key : data.keySet()) {
+                if (!defaultLocaleKeys.containsKey(key)) {
+                    missingKeys.append(key).append(",");
+                    keysMissing++;
                 }
             }
-            if(keysmissing > 0) {
+            if (keysMissing > 0) {
                 //Is there a good way to localize these exceptions?
                 throw new NoLocalizedTextException("Error loading locale " + locale +
-                        ". There were " + keysmissing + " keys which were contained in this locale, but were not " +
+                        ". There were " + keysMissing + " keys which were contained in this locale, but were not " +
                         "properly registered in the default Locale. Any keys which are added to a locale should always " +
                         "be added to the default locale to ensure appropriate functioning.\n" +
-                        "The missing translations were for the keys: " + missingKeys,missingKeys, defaultLocale);
+                        "The missing translations were for the keys: " + missingKeys, missingKeys.toString(), defaultLocale);
             }
         }
 
+        codeTimer.logDone();
         return data;
     }
 
@@ -374,10 +375,11 @@ public class Localizer implements Externalizable {
      * @return Text mappings for locale.
      * @throws UnregisteredLocaleException If locale is not defined or null.
      */
-    public OrderedMap<String, PrefixTreeNode> getLocaleMap (String locale) {
+    public OrderedMap<String, PrefixTreeNode> getLocaleMap(String locale) {
         OrderedMap<String, PrefixTreeNode> mapping = getLocaleData(locale);
-        if (mapping == null)
+        if (mapping == null) {
             throw new UnregisteredLocaleException("Attempted to access an undefined locale.");
+        }
         return mapping;
     }
 
@@ -390,16 +392,17 @@ public class Localizer implements Externalizable {
      * @return True if a mapping exists for the text handle in the given locale.
      * @throws UnregisteredLocaleException If locale is not defined.
      */
-    public boolean hasMapping (String locale, String textID) {
+    public boolean hasMapping(String locale, String textID) {
         if (locale == null || !locales.contains(locale)) {
-            throw new UnregisteredLocaleException("Attempted to access an undefined locale (" + locale + ") while checking for a mapping for  " + textID);
+            throw new UnregisteredLocaleException(
+                    "Attempted to access an undefined locale (" + locale + ") while checking for a mapping for  " +
+                            textID);
         }
-        List<LocaleDataSource> resources = localeResources.get(locale);
-      for (LocaleDataSource source : resources) {
-         if(source.getLocalizedText().containsKey(textID)) {
-            return true;
-         }
-      }
+        for (LocaleDataSource source : localeResources.get(locale)) {
+            if (source.getLocalizedText().containsKey(textID)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -410,9 +413,9 @@ public class Localizer implements Externalizable {
      * @param locale Locale to remove. Must not be null. Need not be defined. Must not be the current locale.
      * @return Whether the locale existed in the first place.
      * @throws IllegalArgumentException If locale is the current locale.
-     * @throws NullPointerException if locale is null
+     * @throws NullPointerException     if locale is null
      */
-    public boolean destroyLocale (String locale) {
+    public boolean destroyLocale(String locale) {
         if (locale.equals(currentLocale))
             throw new IllegalArgumentException("Attempted to destroy the current locale");
 
@@ -434,9 +437,9 @@ public class Localizer implements Externalizable {
      * @param textID Text handle (text ID appended with optional text form). Must not be null.
      * @return Localized text. If no text is found after using all fallbacks, return null.
      * @throws UnregisteredLocaleException If current locale is not set.
-     * @throws NullPointerException if textID is null
+     * @throws NullPointerException        if textID is null
      */
-    public String getText (String textID) {
+    public String getText(String textID) {
         return getText(textID, currentLocale);
     }
 
@@ -444,39 +447,42 @@ public class Localizer implements Externalizable {
      * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
      *
      * @param textID Text handle (text ID appended with optional text form). Must not be null.
-     * @param args arguments for string variables.
+     * @param args   arguments for string variables.
      * @return Localized text
      * @throws UnregisteredLocaleException If current locale is not set.
-     * @throws NullPointerException if textID is null
-      * @throws NoLocalizedTextException If there is no text for the specified id
+     * @throws NullPointerException        if textID is null
+     * @throws NoLocalizedTextException    If there is no text for the specified id
      */
-    public String getText (String textID, String[] args) {
+    public String getText(String textID, String[] args) {
         String text = getText(textID, currentLocale);
-        if(text != null) {
-            text = processArguments(text, args);
-        } else {
-            throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.", textID, currentLocale);
+        if (text != null) {
+            return processArguments(text, args);
         }
-        return text;
+        throw newNoLocalizedTextException(textID);
     }
+
     /**
      * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
      *
      * @param textID Text handle (text ID appended with optional text form). Must not be null.
-     * @param args arguments for string variables.
-     * @return Localized text. If no text is found after using all fallbacks, return null.
+     * @param args   arguments for string variables.
+     * @return Localized text
      * @throws UnregisteredLocaleException If current locale is not set.
-     * @throws NullPointerException if textID is null
-     * @throws NoLocalizedTextException If there is no text for the specified id
+     * @throws NullPointerException        if textID is null
+     * @throws NoLocalizedTextException    If there is no text for the specified id
      */
-    public String getText (String textID, HashMap<String,String> args) {
+    public String getText(String textID, HashMap<String, String> args) {
         String text = getText(textID, currentLocale);
-        if(text != null) {
-            text = processArguments(text, args);
-        } else {
-            throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.",textID, currentLocale);
+        if (text != null) {
+            return processArguments(text, args);
         }
-        return text;
+        throw newNoLocalizedTextException(textID);
+    }
+
+    private NoLocalizedTextException newNoLocalizedTextException(String textID) {
+        return new NoLocalizedTextException(
+                "The Localizer could not find a definition for ID: " + textID + " in the '" +
+                        currentLocale + "' locale.", textID, currentLocale);
     }
 
     /**
@@ -485,14 +491,15 @@ public class Localizer implements Externalizable {
      *
      * @param textID Text handle (text ID appended with optional text form). Must not be null.
      * @return Localized text
-     * @throws NoLocalizedTextException If there is no text for the specified id
+     * @throws NoLocalizedTextException    If there is no text for the specified id
      * @throws UnregisteredLocaleException If current locale is not set
-     * @throws NullPointerException if textID is null
+     * @throws NullPointerException        if textID is null
      */
-    public String getLocalizedText (String textID) {
+    public String getLocalizedText(String textID) {
         String text = getText(textID);
-        if (text == null)
-            throw new NoLocalizedTextException("Can't find localized text for current locale! text id: [" + textID + "] locale: ["+currentLocale+"]", textID, currentLocale);
+        if (text == null) {
+            throw newNoLocalizedTextException(textID);
+        }
         return text;
     }
 
@@ -509,27 +516,31 @@ public class Localizer implements Externalizable {
      * (1) and (3) are only searched if a text form ('long', 'short', etc.) is specified.
      * If a text form is specified, (2) and (4) are only searched if default-form-fallback mode is enabled.
      * (3) and (4) are only searched if default-locale-fallback mode is enabled. It is not an error in this situation
-     *   if no default locale is set; (3) and (4) will simply not be searched.
+     * if no default locale is set; (3) and (4) will simply not be searched.
      *
      * @param textID Text handle (text ID appended with optional text form). Must not be null.
      * @param locale Locale. Must be defined and not null.
      * @return Localized text. If no text is found after using all fallbacks, return null.
      * @throws UnregisteredLocaleException If the locale is not defined or null.
-     * @throws NullPointerException if textID is null
+     * @throws NullPointerException        if textID is null
      */
-    public String getText (String textID, String locale) {
+    public String getText(String textID, String locale) {
         String text = getRawText(locale, textID);
-        if (text == null && fallbackDefaultForm && textID.indexOf(";") != -1)
+        if (text == null && fallbackDefaultForm && textID.contains(";")) {
             text = getRawText(locale, textID.substring(0, textID.indexOf(";")));
-        //Update: We handle default text without forms without needing to do this. We still need it for default text with default forms, though
-        if (text == null && fallbackDefaultLocale && !locale.equals(defaultLocale) && defaultLocale != null && fallbackDefaultForm)
+        }
+        //Update: We handle default text without forms without needing to do this. We still need it for default
+        //text with default forms, though
+        if (text == null && fallbackDefaultLocale && !locale.equals(defaultLocale) &&
+                defaultLocale != null && fallbackDefaultForm) {
             text = getText(textID, defaultLocale);
+        }
         return text;
     }
 
     /**
      * Get text for locale and exact text ID only, not using any fallbacks.
-     *
+     * <p>
      * NOTE: This call will only return the full compliment of available strings if and
      * only if the requested locale is current. Otherwise it will only retrieve strings
      * declared at runtime.
@@ -538,16 +549,16 @@ public class Localizer implements Externalizable {
      * @param textID Text handle (text ID appended with optional text form). Must not be null.
      * @return Localized text. Return null if none found.
      * @throws UnregisteredLocaleException If the locale is not defined or null.
-     * @throws NullPointerException if textID is null
+     * @throws NullPointerException        if textID is null
      */
-    public String getRawText (String locale, String textID) {
-        if(locale == null) {
+    public String getRawText(String locale, String textID) {
+        if (locale == null) {
             throw new UnregisteredLocaleException("Null locale when attempting to fetch text id: " + textID);
         }
-        if(textID == null) {
+        if (textID == null) {
             throw new NullPointerException("Null textId passed to localizer");
         }
-        if(locale.equals(currentLocale)) {
+        if (locale.equals(currentLocale)) {
             PrefixTreeNode data = currentLocaleData.get(textID);
             return data == null ? null : data.render();
         } else {
@@ -565,7 +576,7 @@ public class Localizer implements Externalizable {
      *
      * @param l Localizable to register.
      */
-    public void registerLocalizable (Localizable l) {
+    public void registerLocalizable(Localizable l) {
         if (!observers.contains(l)) {
             observers.add(l);
             if (currentLocale != null) {
@@ -580,24 +591,24 @@ public class Localizer implements Externalizable {
      *
      * @param l Localizable to unregister.
      */
-    public void unregisterLocalizable (Localizable l) {
+    public void unregisterLocalizable(Localizable l) {
         observers.remove(l);
     }
 
     /**
      * Unregister all ILocalizables.
      */
-    public void unregisterAll () {
+    public void unregisterAll() {
         observers.clear();
     }
 
     /**
      * Send a locale change update to all registered ILocalizables.
      */
-    private void alertLocalizables () {
-      for (Localizable observer : observers) {
-         observer.localeChanged(currentLocale, this);
-      }
+    private void alertLocalizables() {
+        for (Localizable observer : observers) {
+            observer.localeChanged(currentLocale, this);
+        }
     }
 
     /* === Managing Arguments === */
@@ -606,8 +617,8 @@ public class Localizer implements Externalizable {
         return "${" + in + "}";
     }
 
-    public static List<String> getArgs (String text) {
-      List<String> args = new ArrayList<String>();
+    public static List<String> getArgs(String text) {
+        final List<String> args = new ArrayList<>();
         int i = text.indexOf("${");
         while (i != -1) {
             int j = text.indexOf("}", i);
@@ -626,7 +637,7 @@ public class Localizer implements Externalizable {
         return args;
     }
 
-    public static String processArguments(String text, HashMap<String,String> args) {
+    public static String processArguments(String text, HashMap<String, String> args) {
         int i = text.indexOf("${");
         while (i != -1) {
             int j = text.indexOf("}", i);
@@ -653,26 +664,25 @@ public class Localizer implements Externalizable {
 
     // enhanced to not re-process substituted text
     public static String processArguments(String text, String[] args, int currentArg) {
-        String working = text;
-        if(working.indexOf("${") != -1 && args.length > currentArg) {
-            int index = extractNextIndex(working, args);
-            if(index == -1) {
+        if (text.contains("${") && args.length > currentArg) {
+            int index = extractNextIndex(text, args);
+            if (index == -1) {
                 index = currentArg;
                 currentArg++;
             }
             String value = args[index];
-            String[] replaced = replaceFirstValue(working, value);
+            String[] replaced = replaceFirstValue(text, value);
             return replaced[0] + processArguments(replaced[1], args, currentArg);
         } else {
-            return working;
+            return text;
         }
     }
 
 
     public static String clearArguments(String text) {
-      List<String> v = getArgs(text);
+        List<String> v = getArgs(text);
         String[] empty = new String[v.size()];
-        for(int i =0 ; i < empty.length ; ++i) {
+        for (int i = 0; i < empty.length; ++i) {
             empty[i] = "";
         }
         return processArguments(text, empty);
@@ -682,14 +692,14 @@ public class Localizer implements Externalizable {
         int start = text.indexOf("${");
         int end = text.indexOf("}", start);
 
-        if(start != -1 && end != -1 ) {
+        if (start != -1 && end != -1) {
             String val = text.substring(start + "${".length(), end);
             try {
                 int index = Integer.parseInt(val);
-                if(index >= 0 && index < args.length) {
+                if (index >= 0 && index < args.length) {
                     return index;
                 }
-            } catch(NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return -1;
             }
         }
@@ -701,30 +711,35 @@ public class Localizer implements Externalizable {
         int start = text.indexOf("${");
         int end = text.indexOf("}", start);
 
-        return new String[] {text.substring(0,start) + value, text.substring(end + 1, text.length())};
+        return new String[] {
+                text.substring(0, start) + value,
+                text.substring(end + 1, text.length())
+        };
     }
 
     /* === (DE)SERIALIZATION === */
 
     /**
-     * Read the object from stream.
+     * Reads the object from a stream.
      */
-    public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+    @Override public void readExternal(DataInputStream dis, PrototypeFactory pf) throws
+            IOException, DeserializationException {
         fallbackDefaultLocale = ExtUtil.readBool(dis);
         fallbackDefaultForm = ExtUtil.readBool(dis);
-        localeResources = (OrderedMap<String,List<LocaleDataSource>>)ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapListPoly(), ExtWrapMap.TYPE_ORDERED),    pf);;
-        locales = (List<String>)ExtUtil.read(dis, new ExtWrapList(String.class));
-        setDefaultLocale((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-        String currentLocale = (String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf);
+        localeResources = (OrderedMap<String, List<LocaleDataSource>>)
+                ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapListPoly(), ExtWrapMap.TYPE_ORDERED), pf);
+        locales = (List<String>) ExtUtil.read(dis, new ExtWrapList(String.class));
+        setDefaultLocale((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+        String currentLocale = (String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf);
         if (currentLocale != null) {
             setLocale(currentLocale);
         }
     }
 
     /**
-     * Write the object to stream.
+     * Writes the object to a stream.
      */
-    public void writeExternal(DataOutputStream dos) throws IOException {
+    @Override public void writeExternal(DataOutputStream dos) throws IOException {
         ExtUtil.writeBool(dos, fallbackDefaultLocale);
         ExtUtil.writeBool(dos, fallbackDefaultForm);
         ExtUtil.write(dos, new ExtWrapMap(localeResources, new ExtWrapListPoly()));
