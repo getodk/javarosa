@@ -93,6 +93,10 @@ public abstract class Triggerable implements Externalizable {
      */
     private List<TreeReference> targets;
 
+    public TreeReference getContextRef() {
+        return contextRef;
+    }
+
     /**
      * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
      * common root of all of the targets being evaluated.

@@ -56,6 +56,15 @@ public class Safe2014DagImpl extends LatestDagBase {
       return conditionRepeatTargetIndex.get(repeatRef.genericize());
    }
 
+   private void collectExcluded(TreeReference trigger, QuickTriggerable cascade, Set<QuickTriggerable> exclude) {
+      if (!trigger.isParentOf(cascade.t.getContextRef(), true)) {
+         exclude.add(cascade);
+      }
+      for (QuickTriggerable nextCascade : cascade.t.getImmediateCascades()) {
+         collectExcluded(trigger, nextCascade, exclude);
+      }
+   }
+
    @Override
    public void deleteRepeatGroup(FormInstance mainInstance,
          EvaluationContext evalContext, TreeReference deleteRef,
@@ -65,12 +74,29 @@ public class Safe2014DagImpl extends LatestDagBase {
          Evaluate triggerables which depend on the repeat group reference. Directly or indirectly.
        */
       final String repeatGroupName = deletedElement.getName();
+
+      /*
+         Exclude calculations targeting nodes outside of the repeat.
+       */
+
+      TreeReference genericRepeatGroupRef = deleteRef.genericize();
+
+      // get triggerables which are activated by the generic reference
+      ArrayList<QuickTriggerable> triggered = triggerIndex.get(genericRepeatGroupRef);
+      Set<QuickTriggerable> excluded = new HashSet<>();
+
+      if (triggered != null) {
+         for (QuickTriggerable triggerable : triggered) {
+            collectExcluded(genericRepeatGroupRef, triggerable, excluded);
+         }
+      }
+
       for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
          final TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
 
          Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(
                  mainInstance, evalContext, repeatGroup.getRef(),
-                 new HashSet<QuickTriggerable>(0));
+                 excluded);
          publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
 
          if (repeatGroup.getRef().equals(deleteRef)) {
@@ -85,6 +111,14 @@ public class Safe2014DagImpl extends LatestDagBase {
             evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
          }
       }
+
+      /*
+        Time to evaluate excluded, but once
+       */
+      Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(
+              mainInstance, evalContext, deleteRef,
+              Collections.<QuickTriggerable>emptySet());
+      publishSummary("Deleted", deleteRef, alreadyEvaluated);
    }
 
    @Override
