@@ -1,0 +1,25 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:title>group with nodeset attribute</h:title>
+    <model>
+      <instance>
+        <data id="group-with-nodeset-attr">
+            <R1>
+                <G2>
+                    <Q3/>
+                </G2>
+            </R1>
+        </data>
+      </instance>
+    </model>
+  </h:head>
+  <h:body>
+    <group>
+      <repeat nodeset="/data/R1">
+        <group nodeset="/data/R1/G2">
+          <input ref="/data/R1/G2/Q3"/>
+        </group>
+      </repeat>
+    </group>
+  </h:body>
+</h:html>

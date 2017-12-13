@@ -1383,7 +1383,10 @@ public class XFormParser implements IXFormParserFunctions {
             } else {
                 if (ref != null) {
                     dataRef = new XPathReference(ref);
-                } //<group> not required to have a binding
+                } else if (nodeset != null) {
+                    dataRef = new XPathReference(nodeset);
+                }
+                //<group> not required to have a binding so no exception thrown
             }
         }
 
