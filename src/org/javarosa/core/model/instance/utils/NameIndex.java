@@ -4,24 +4,19 @@ import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
+import static org.javarosa.core.model.instance.utils.NameIndexInvalidationReason.*;
+
 /**
  * An index for a group of {@link TreeElement}s that all have the same name, used to
  * provide direct access within a list of children to a specific name and multiplicity value.
  * Before using a NameIndex, call isValid to see if the index is valid for the pattern
  * of children present. If it isn’t, use sequential search methods.
- *
- * Indexes will become invalid under at least these conditions:
- * <ul>
- *     <li>A child is added with a multiplicity out of order</li>
- *     <li>More than one template child (INDEX_TEMPLATE) is added</li>
- *     <li>A template is added after other elements with the same name</li>
- * </ul>
  */
 class NameIndex {
     private int numTemplates;
     private Integer sequenceStartIndexIncludingAnyTemplate;
     private int sequenceLengthIncludingTemplateIfPresent;
-    private String invalidReason;
+    private NameIndexInvalidationReason invalidReason;
     private Boolean valid;
     public static boolean logWhenSetInvalid = true;
 
@@ -42,16 +37,16 @@ class NameIndex {
             return;
         }
         if (mult < 0 && mult != TreeReference.INDEX_TEMPLATE) {
-            setInvalid("Special multiplicity types other than INDEX_TEMPLATE are not supported");
+            setInvalid(MULT_TYPE_NOT_SUPPORTED);
             return;
         }
         if (mult == TreeReference.INDEX_TEMPLATE) {
             if (numTemplates > 0) {
-                setInvalid("Was requested to add a second template");
+                setInvalid(SECOND_TEMPLATE);
                 return;
             }
             if (sequenceLengthIncludingTemplateIfPresent > 0) {
-                setInvalid("Was requested to add a template after other elements");
+                setInvalid(TEMPLATE_AFTER_OTHER);
                 return;
             }
             ++numTemplates;
@@ -61,7 +56,7 @@ class NameIndex {
             if (mult == 0 && sequenceStartIndexIncludingAnyTemplate == null) {
                 sequenceStartIndexIncludingAnyTemplate = index;
             } else if (mult != sequenceLengthIncludingTemplateIfPresent - numTemplates) {
-                setInvalid("Out of order multiplicity");
+                setInvalid(ORDER);
                 return;
             }
         }
@@ -70,7 +65,7 @@ class NameIndex {
     }
 
     /** Sets this index invalid and records the reason */
-    void setInvalid(String reason) {
+    void setInvalid(NameIndexInvalidationReason reason) {
         valid = false;
         invalidReason = reason;
         if (logWhenSetInvalid) {
@@ -100,7 +95,7 @@ class NameIndex {
             if (sequenceLengthIncludingTemplateIfPresent > 0) {
                 --sequenceLengthIncludingTemplateIfPresent;
             } else {
-                setInvalid("Attempted to decrement sequence length below zero");
+                setInvalid(DECREMENT_BELOW_ZERO);
             }
         }
     }

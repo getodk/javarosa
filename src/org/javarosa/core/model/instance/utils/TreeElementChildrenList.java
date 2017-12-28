@@ -143,7 +143,7 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
         TreeElement remove = children.remove(index);
         NameIndex ni = nameToNameIndex.get(remove.getName());
         if (ni != null) {
-            ni.setInvalid("Element removed");
+            ni.setInvalid(NameIndexInvalidationReason.ELEMENT_REMOVED);
         }
     }
 
