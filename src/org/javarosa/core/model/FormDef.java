@@ -465,20 +465,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         TreeReference parentRef = deleteRef.getParentRef();
         TreeElement parentElement = mainInstance.resolveReference(parentRef);
 
-        int childMult = deleteElement.getMult();
-        parentElement.removeChild(deleteElement);
-
-        // update multiplicities of other child nodes
-        for (int i = 0; i < parentElement.getNumChildren(); i++) {
-            TreeElement child = parentElement.getChildAt(i);
-            if (child.getName().equals(deleteElement.getName()) && child.getMult() > childMult) {
-                child.setMult(child.getMult() - 1);
-
-                // When a group changes it multiplicity, then all caches of its
-                // children must clear.
-                child.clearChildrenCaches();
-            }
-        }
+        parentElement.removeChildAndAdjustSiblingMults(deleteElement);
 
         dagImpl.deleteRepeatGroup(getMainInstance(), getEvaluationContext(), deleteRef, parentElement, deleteElement);
 

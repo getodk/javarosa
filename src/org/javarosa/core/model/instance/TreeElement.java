@@ -280,6 +280,10 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         children.remove(child);
     }
 
+    public void removeChildAndAdjustSiblingMults(TreeElement child) {
+        children.removeChildAndAdjustSiblingMults(child);
+    }
+
     public void removeChild(String name, int multiplicity) {
         children.remove(name, multiplicity);
     }
