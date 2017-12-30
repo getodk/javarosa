@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Nafundi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.javarosa.core.model.instance.utils;
 
 import org.javarosa.core.model.instance.TreeElement;
@@ -5,7 +21,6 @@ import org.javarosa.core.model.instance.TreeReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,7 +30,7 @@ import java.util.List;
 public class TreeElementChildrenList implements Iterable<TreeElement> {
     private final List<TreeElement> children = new ArrayList<>();
     /** A map of child names to {@link NameIndex}es */
-    private final HashMap<String, NameIndex> nameToNameIndex = new HashMap<>();
+    final NameToNameIndex nameToNameIndex = new NameToNameIndex();
 
     /** Returns the number of children */
     public int size() {
@@ -84,11 +99,11 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
         final NameIndex nameIndex = nameToNameIndex.get(name);
         if (nameIndex != null) {
             if (nameIndex.isValid()) {
-                final int seqLen = nameIndex.sizeWithoutTemplate();
+                final int seqLen = nameIndex.size(false);
                 if (seqLen == 0) {
                     return Collections.emptyList();
                 }
-                int fromIndex = nameIndex.startingIndexWithoutTemplate();
+                int fromIndex = nameIndex.startingIndex(false);
                 int toIndex = fromIndex + seqLen; // subList toIndex is exclusive
                 return children.subList(fromIndex, toIndex);
             }
@@ -187,8 +202,17 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
     }
 
     public void removeAll(String name) {
-        for (TreeElement child : get(name)) {
-            remove(child);
+        final NameIndex nameIndex = nameToNameIndex.get(name);
+        if (nameIndex != null && nameIndex.isValid()) {
+            final int startingIndex = nameIndex.startingIndex(true);
+            int size = nameIndex.size(true);
+            children.subList(startingIndex, startingIndex + size).clear();
+            nameToNameIndex.remove(name);
+            nameToNameIndex.shiftIndexes(startingIndex, -size);
+        } else {
+            for (TreeElement child : get(name)) {
+                remove(child);
+            }
         }
     }
 
