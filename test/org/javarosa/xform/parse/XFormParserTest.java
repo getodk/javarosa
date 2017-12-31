@@ -218,6 +218,10 @@ public class XFormParserTest {
     public void parsesMetaNamespaceForm() throws IOException {
         ParseResult parseResult = parse(r("meta-namespace-form.xml"));
         assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
+        TreeElement root = parseResult.formDef.getMainInstance().getRoot();
+        assertNotNull(root.getChild("meta", 0));
+        assertNotNull(root.getChild("orx2:meta", 0));
+        assertEquals("meta", root.getChildAt(0).getName());
         assertNoParseErrors(parseResult);
     }
 

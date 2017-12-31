@@ -19,6 +19,7 @@ package org.javarosa.core.model.instance.utils;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -38,7 +40,9 @@ public class TreeElementChildrenListTest {
     private TreeElement a1With0Mult;
     private TreeElement b0;
     private TreeElement b1;
-    private List<TreeElement> abList;
+    private TreeElement c0;
+    private TreeElement c1;
+    private List<TreeElement> teList;
 
     @Before public void setUp() {
         NameIndex.logWhenSetInvalid = true;
@@ -47,8 +51,14 @@ public class TreeElementChildrenListTest {
         a1 = new TreeElement("a", 1);
         b0 = new TreeElement("b");
         b1 = new TreeElement("b", 1);
+        c0 = new TreeElement("c");
+        c1 = new TreeElement("c", 1);
+        for (TreeElement nsTe : Arrays.asList(c0, c1)) {
+            nsTe.setNamespace("http://openrosa.org/xforms");
+            nsTe.setNamespacePrefix("orx");
+        }
         a1With0Mult = new TreeElement("a", 0);
-        abList = Arrays.asList(a0, a1, b0, b1);
+        teList = Arrays.asList(a0, a1, b0, b1, c0, c1);
     }
 
     @Test public void canAdd() {
@@ -115,33 +125,30 @@ public class TreeElementChildrenListTest {
     }
 
     @Test public void canRemoveByNameAndMult() {
-        cl.addAll(abList);
+        cl.addAll(teList);
         cl.remove("b", 0);
-        assertEquals(3, cl.size());
+        assertEquals(teList.size() - 1, cl.size());
         assertSame(b1, cl.get("b", 1));
         assertTrue(cl.indexIsValid("a"));
         assertFalse(cl.indexIsValid("b"));
     }
 
     @Test public void canRemoveAll() {
-        cl.addAll(abList);
-        assertEquals(4, cl.size());
-        assertEquals(2, cl.nameToNameIndex.size());
+        cl.addAll(teList);
+        assertEquals(3, cl.nameToNameIndex.size());
 
         cl.removeAll("a");
-        assertEquals(2, cl.size());
-        assertEquals(1, cl.nameToNameIndex.size());
+        assertEquals(teList.size() - 2, cl.size());
+        assertEquals(2, cl.nameToNameIndex.size());
 
         assertTrue(cl.indexIsValid("b"));
-        assertEquals(1, cl.nameToNameIndex.size());
         NameIndex ni = cl.nameToNameIndex.get("b");
         assertEquals(0, ni.startingIndex(true));
         assertEquals(2, ni.size(true));
     }
 
     @Test public void canClear() {
-        cl.addAll(abList);
-        assertEquals(4, cl.size());
+        cl.addAll(teList);
         cl.clear();
         assertEquals(0, cl.size());
         assertTrue(cl.isEmpty());
@@ -156,16 +163,52 @@ public class TreeElementChildrenListTest {
     }
 
     @Test public void canAddAll() {
-        cl.addAll(abList);
-        assertEquals(4, cl.size());
+        cl.addAll(teList);
         assertTrue(cl.indexIsValid("a"));
         assertTrue(cl.indexIsValid("b"));
     }
 
     @Test public void canGetWithWildcard() {
-        cl.addAll(abList);
+        cl.addAll(teList);
         List<TreeElement> elements = cl.get(TreeReference.NAME_WILDCARD);
-        assertEquals(abList, elements);
+        assertEquals(teList, elements);
     }
 
+    @Test public void canGetEmptyListWhenNoNameMatch() {
+        cl.addAll(teList);
+        assertEquals(0, cl.get("not-present-name").size());
+    }
+
+    @Test public void canGetAndCountUsingNamespaces() {
+        cl.addInOrder(a0);
+        cl.addInOrder(c0);
+        cl.addInOrder(c1);
+
+        assertEquals(2, cl.get("c").size());
+        assertEquals(2, cl.get("orx:c").size());
+
+        assertSame(c0, cl.get("c", 0));
+        assertSame(c0, cl.get("orx:c", 0));
+        assertSame(c1, cl.get("c", 1));
+        assertSame(c1, cl.get("orx:c", 1));
+
+        assertEquals(2, cl.getCount("c"));
+        assertEquals(2, cl.getCount("orx:c"));
+
+        assertEquals(0, cl.get("wrong:c").size());
+    }
+
+    @Test public void canRemoveNamespacedElementWithoutPrefix() {
+        cl.addAll(teList);
+        cl.removeAll("c");
+        assertEquals(teList.size() - 2, cl.size());
+        assertEquals(2, cl.nameToNameIndex.size());
+    }
+
+    @Test @Ignore public void canRemoveNamespacedElementWithPrefix() {
+        cl.addAll(teList);
+        cl.removeAll("orx:c");
+        assertEquals(teList.size() - 2, cl.size());
+        assertEquals(2, cl.nameToNameIndex.size());
+    }
 }

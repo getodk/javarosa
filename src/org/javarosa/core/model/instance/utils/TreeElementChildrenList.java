@@ -25,7 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A collection of {@link TreeElement} children. They are stored in an {@link ArrayList}.
+ * Stores and manages access to {@link TreeElement} children. They are stored in an {@link ArrayList}, and a
+ * {@link NameToNameIndex} is used to speed access to them. Supports finding children using wildcards, and by
+ * name with and without namespace prefixes (such as “orx:meta”).
  */
 public class TreeElementChildrenList implements Iterable<TreeElement> {
     private final List<TreeElement> children = new ArrayList<>();
@@ -100,9 +102,6 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
         if (nameIndex != null) {
             if (nameIndex.isValid()) {
                 final int seqLen = nameIndex.size(false);
-                if (seqLen == 0) {
-                    return Collections.emptyList();
-                }
                 int fromIndex = nameIndex.startingIndex(false);
                 int toIndex = fromIndex + seqLen; // subList toIndex is exclusive
                 return children.subList(fromIndex, toIndex);
@@ -125,11 +124,15 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
 
     /** Gets a count of all non-template children with the specified name */
     public int getCount(String name) {
-        NameIndex multToIndex = nameToNameIndex.get(name);
-        if (multToIndex != null && multToIndex.isValid()) {
-            return multToIndex.numNonTemplateChildren();
+        NameIndex nameIndex = nameToNameIndex.get(name);
+        if (validNameIndex(nameIndex)) {
+            return nameIndex.numNonTemplateChildren();
         }
         return findChildrenWithNameWithoutIndex(name, null);
+    }
+
+    private boolean validNameIndex(NameIndex nameIndex) {
+        return nameIndex != null && nameIndex.isValid();
     }
 
     /**
@@ -203,7 +206,7 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
 
     public void removeAll(String name) {
         final NameIndex nameIndex = nameToNameIndex.get(name);
-        if (nameIndex != null && nameIndex.isValid()) {
+        if (validNameIndex(nameIndex)) {
             final int startingIndex = nameIndex.startingIndex(true);
             int size = nameIndex.size(true);
             children.subList(startingIndex, startingIndex + size).clear();
@@ -228,7 +231,7 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
 
     public boolean indexIsValid(String name) { // For teting
         NameIndex nameIndex = nameToNameIndex.get(name);
-        return nameIndex != null && nameIndex.isValid();
+        return validNameIndex(nameIndex);
     }
 
     private class ElementAndLoc {
@@ -250,27 +253,20 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
         }
 
         NameIndex nameIndex = nameToNameIndex.get(name);
-        if (nameIndex == null) {
+        if (nameIndex == null || !nameIndex.isValid()) {
+            for (int i = 0; i < children.size(); i++) {
+                TreeElement child = children.get(i);
+                if (TreeElementNameComparator.elementMatchesName(child, name) && child.getMult() == multiplicity) {
+                    return new ElementAndLoc(child, i);
+                }
+            }
             return null;
         }
-        if (nameIndex.isValid()) {
-            Integer index = nameIndex.indexOf(multiplicity);
-            if (index == null) {
-                return null;
-            }
-            if (index < children.size()) {
-                return new ElementAndLoc(children.get(index), index);
-            }
-        }
 
-        // NameIndex is invalid. Do a sequential search instead.
-        for (int i = 0; i < children.size(); i++) {
-            TreeElement child = children.get(i);
-            if (name.equals(child.getName()) && child.getMult() == multiplicity) {
-                return new ElementAndLoc(child, i);
-            }
+        Integer index = nameIndex.indexOf(multiplicity);
+        if (index != null && index < children.size()) {
+            return new ElementAndLoc(children.get(index), index);
         }
-
         return null;
     }
 }
