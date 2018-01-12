@@ -1709,7 +1709,8 @@ public class XFormParser implements IXFormParserFunctions {
             "constraintMsg",
             "calculate",
             "preload",
-            "preloadParams"
+            "preloadParams",
+            "rows"
     ));
 
     protected void parseBind(Element element) {

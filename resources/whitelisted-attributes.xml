@@ -1,0 +1,26 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml">
+
+    <h:head>
+        <h:title>Simple Form</h:title>
+        <model>
+            <instance>
+                <data id="collect197test">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:',uuid())"/>
+        </model>
+    </h:head>
+
+    <h:body>
+        <group appearance="field-list">
+            <input ref="/data/meta/instanceID" rows="2">
+                <label>Instance ID:</label>
+            </input>
+        </group>
+    </h:body>
+
+</h:html>
