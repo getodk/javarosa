@@ -386,6 +386,11 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
+    @Test public void parseWithWhitelistedAttributes() throws IOException {
+      ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
+      assertThat(parseResult.errorMessages.size(), is(0));
+    }
+
     private TreeElement findDepthFirst(TreeElement parent, String name) {
         int len = parent.getNumChildren();
         for (int i = 0; i < len; ++i) {
