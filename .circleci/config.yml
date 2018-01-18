@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}
-      - run: ./gradlew check test javadoc jar
+      - run: ./gradlew check javadoc jar
       - save_cache:
           paths:
             - ~/.gradle
