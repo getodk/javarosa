@@ -1,18 +1,19 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/code
+    working_directory: ~/work
     docker:
       - image: circleci/openjdk:latest
     steps:
       - checkout
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}
-      - run: ./gradlew check javadoc jar
+      - run: ./gradlew check jacocoTestReport javadoc jar
+      - run: bash <(curl -s https://codecov.io/bash)
       - save_cache:
           paths:
             - ~/.gradle
-            - ~/code/.gradle
+            - ~/work/.gradle
           key: jars-{{ checksum "build.gradle" }}
       - store_artifacts:
           path: build/reports

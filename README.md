@@ -2,6 +2,7 @@
 ![Platform](https://img.shields.io/badge/platform-Java-blue.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build status](https://circleci.com/gh/opendatakit/javarosa.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/opendatakit/javarosa)
+[![codecov.io](https://codecov.io/github/opendatakit/javarosa/branch/master/graph/badge.svg)](https://codecov.io/github/opendatakit/javarosa)
 [![Slack status](http://slack.opendatakit.org/badge.svg)](http://slack.opendatakit.org)
 
 JavaRosa is a Java library for rendering forms that are compliant with [ODK XForms spec](http://opendatakit.github.io/xforms-spec). It is at the heart of many of the ODK tools. ODK JavaRosa is a fork of [JavaRosa](https://bitbucket.org/javarosa/javarosa/wiki/Home) 1.0 that has been modified to NOT run on J2ME devices. The key differences are:
