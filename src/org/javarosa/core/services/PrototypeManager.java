@@ -1,15 +1,17 @@
 package org.javarosa.core.services;
 
-import org.javarosa.core.util.PrefixTree;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PrototypeManager {
-    private static PrefixTree prototypes;
+    private static List<String> prototypes;
     private static PrototypeFactory staticDefault;
 
     public static void registerPrototype (String className) {
-        getPrototypes().addString(className);
+        getPrototypes().add(className);
 
         try {
             PrototypeFactory.getInstance(Class.forName(className));
@@ -20,13 +22,14 @@ public class PrototypeManager {
     }
 
     public static void registerPrototypes (String[] classNames) {
-        for (int i = 0; i < classNames.length; i++)
-            registerPrototype(classNames[i]);
+        for (String className : classNames) {
+            registerPrototype(className);
+        }
     }
 
-    public static PrefixTree getPrototypes () {
+    public static List<String> getPrototypes () {
         if (prototypes == null) {
-            prototypes = new PrefixTree();
+            prototypes = new ArrayList<>();
         }
         return prototypes;
     }
@@ -47,5 +50,4 @@ public class PrototypeManager {
             staticDefault = new PrototypeFactory(getPrototypes());
         }
     }
-
 }
