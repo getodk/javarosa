@@ -386,7 +386,7 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
-    @Test public void parseWithWhitelistedAttributes() throws IOException {
+    @Test public void parsesWithWhitelistedAttributes() throws IOException {
       ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
       assertThat(parseResult.errorMessages.size(), is(0));
     }
