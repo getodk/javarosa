@@ -1676,8 +1676,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
         //Otherwise this sucks and we have to test the keys
-        OrderedMap<String, String> table = localizer.getLocaleData(locale);
-        for (String key : table.keySet()) {
+        for (String key : localizer.getLocaleData(locale).keySet()) {
             if(key.startsWith(textID + ";")) {
                 //A key is found, pull it out, add it to the list of guesses, and return positive
                 String textForm = key.substring(key.indexOf(";") + 1, key.length());
