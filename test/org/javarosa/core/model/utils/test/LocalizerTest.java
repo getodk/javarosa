@@ -27,7 +27,6 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.PrefixTreeNode;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
@@ -130,7 +129,7 @@ public class LocalizerTest extends TestCase  {
         if (!l.hasLocale(TEST_LOCALE)) {
             fail("Localizer reports it does not contain newly added locale");
         }
-        OrderedMap<String,PrefixTreeNode> localeData = l.getLocaleData(TEST_LOCALE);
+        OrderedMap<String,String> localeData = l.getLocaleData(TEST_LOCALE);
         if (localeData == null || localeData.size() != 0) {
             fail("Newly created locale not empty (or undefined)");
         }
@@ -168,14 +167,14 @@ public class LocalizerTest extends TestCase  {
         table.setLocaleMapping("textID", "text");
         l.registerLocaleResource(TEST_LOCALE, table);
 
-        OrderedMap<String,PrefixTreeNode> localeData = l.getLocaleData(TEST_LOCALE);
+        OrderedMap<String,String> localeData = l.getLocaleData(TEST_LOCALE);
 
         boolean result = l.addAvailableLocale(TEST_LOCALE);
         if (result) {
             fail("Localizer overwrote existing locale");
         }
 
-        OrderedMap<String,PrefixTreeNode> newLocaleData = l.getLocaleData(TEST_LOCALE);
+        OrderedMap<String,String> newLocaleData = l.getLocaleData(TEST_LOCALE);
         if (!localeData.equals(newLocaleData)) {
             fail("Localizer overwrote existing locale");
         }
@@ -444,7 +443,7 @@ public class LocalizerTest extends TestCase  {
         if (!l.hasMapping(TEST_LOCALE, "textID")) {
             fail("Localizer does not contain newly added text mapping");
         }
-        if (!"text".equals(l.getLocaleData(TEST_LOCALE).get("textID").render())) {
+        if (!"text".equals(l.getLocaleData(TEST_LOCALE).get("textID"))) {
             fail("Newly added text mapping does not match source");
         }
     }
@@ -466,7 +465,7 @@ public class LocalizerTest extends TestCase  {
         if (!l.hasMapping(TEST_LOCALE, "textID")) {
             fail("Localizer does not contain overwritten text mapping");
         }
-        if (!"newText".equals(l.getLocaleData(TEST_LOCALE).get("textID").render())) {
+        if (!"newText".equals(l.getLocaleData(TEST_LOCALE).get("textID"))) {
             fail("Newly overwritten text mapping does not match source");
         }
     }

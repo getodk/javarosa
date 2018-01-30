@@ -22,23 +22,22 @@ import java.util.Vector;
 
 import org.javarosa.core.io.Std;
 import org.javarosa.core.util.MD5;
-import org.javarosa.core.util.PrefixTree;
 
 public class PrototypeFactory {
     public final static int CLASS_HASH_SIZE = 4;
 
-    private Vector classes;
-    private Vector hashes;
+    private final Vector<Class> classes = new Vector<>();
+    private final Vector<byte[]> hashes = new Vector<>();
 
     //lazy evaluation
-    private PrefixTree classNames;
+    private List<String> classNames;
     private boolean initialized;
 
     public PrototypeFactory () {
         this(null);
     }
 
-    public PrototypeFactory (PrefixTree classNames) {
+    public PrototypeFactory (List<String> classNames) {
         this.classNames = classNames;
         initialized = false;
     }
@@ -46,20 +45,14 @@ public class PrototypeFactory {
     private void lazyInit () {
         initialized = true;
 
-        classes = new Vector();
-        hashes = new Vector();
-
         addDefaultClasses();
 
         if (classNames != null) {
-            List<String> vClasses = classNames.getStrings();
-
-            for (int i = 0; i < vClasses.size(); i++) {
-                String name = (String)vClasses.get(i);
+            for (String className : classNames) {
                 try {
-                    addClass(Class.forName(name));
+                    addClass(Class.forName(className));
                 } catch (ClassNotFoundException cnfe) {
-                    throw new CannotCreateObjectException(name + ": not found");
+                    throw new CannotCreateObjectException(className + ": not found");
                 }
             }
             classNames = null;
@@ -81,8 +74,8 @@ public class PrototypeFactory {
                 Date.class
         };
 
-        for (int i = 0; i < baseTypes.length; i++) {
-            addClass(baseTypes[i]);
+        for (Class baseType : baseTypes) {
+            addClass(baseType);
         }
     }
 
@@ -112,8 +105,8 @@ public class PrototypeFactory {
         }
 
         for (int i = 0; i < classes.size(); i++) {
-            if (compareHash(hash, (byte[])hashes.elementAt(i))) {
-                return (Class)classes.elementAt(i);
+            if (compareHash(hash, hashes.elementAt(i))) {
+                return classes.elementAt(i);
             }
         }
 
@@ -138,8 +131,7 @@ public class PrototypeFactory {
         byte[] hash = new byte[CLASS_HASH_SIZE];
         byte[] md5 = MD5.hash(type.getName().getBytes()); //add support for a salt, in case of collision?
 
-        for (int i = 0; i < hash.length; i++)
-            hash[i] = md5[i];
+        System.arraycopy(md5, 0, hash, 0, hash.length);
         byte[] badHash = new byte[] {0,4,78,97};
         if(PrototypeFactory.compareHash(badHash, hash)) {
             Std.out.println("BAD CLASS: " + type.getName());

@@ -28,8 +28,6 @@ import org.javarosa.core.io.Std;
 import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.PrefixTree;
-import org.javarosa.core.util.PrefixTreeNode;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -50,8 +48,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class Localizer implements Externalizable {
     private List<String> locales = new ArrayList<>(0);
     private OrderedMap<String, List<LocaleDataSource>> localeResources = new OrderedMap<>();
-    private OrderedMap<String, PrefixTreeNode> currentLocaleData = new OrderedMap<>();
-    private final PrefixTree stringTree = new PrefixTree(10);
+    private OrderedMap<String, String> currentLocaleData = new OrderedMap<>();
     private String defaultLocale = null;
     private String currentLocale = null;
     private boolean fallbackDefaultLocale;
@@ -77,7 +74,6 @@ public class Localizer implements Externalizable {
     public Localizer(boolean fallbackDefaultLocale, boolean fallbackDefaultForm) {
         this.fallbackDefaultLocale = fallbackDefaultLocale;
         this.fallbackDefaultForm = fallbackDefaultForm;
-        stringTree.enablePrefixing(true);
     }
 
     public boolean equals(Object o) {
@@ -261,9 +257,9 @@ public class Localizer implements Externalizable {
      * @param source      A dictionary of key/value locale pairs that will be copied into
      *                    destination
      */
-    private void loadTable(OrderedMap<String, PrefixTreeNode> destination, OrderedMap<String, String> source) {
+    private void loadTable(OrderedMap<String, String> destination, OrderedMap<String, String> source) {
         for (Map.Entry<String, String> entry : source.entrySet()) {
-            destination.put(entry.getKey(), stringTree.addString(entry.getValue()));
+            destination.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -304,12 +300,11 @@ public class Localizer implements Externalizable {
      * @param locale Locale
      * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
      */
-    public OrderedMap<String, PrefixTreeNode> getLocaleData(String locale) {
+    public OrderedMap<String, String> getLocaleData(String locale) {
         final CodeTimer codeTimer = new CodeTimer("getLocaleData");
         if (locale == null || !this.locales.contains(locale)) {
             return null;
         }
-        stringTree.clear();
 
         //It's very important that any default locale contain the appropriate strings to localize the interface
         //for any possible language. As such, we'll keep around a table with only the default locale keys to
@@ -319,7 +314,7 @@ public class Localizer implements Externalizable {
 
         //This table will be loaded with the default values first (when applicable), and then with any
         //language specific translations overwriting the existing values.
-        final OrderedMap<String, PrefixTreeNode> data = new OrderedMap<>();
+        final OrderedMap<String, String> data = new OrderedMap<>();
 
         // If there's a default locale, we load all of its elements into memory first, then allow
         // the current locale to overwrite any differences between the two.
@@ -335,12 +330,6 @@ public class Localizer implements Externalizable {
         for (LocaleDataSource resource : localeResources.get(locale)) {
             loadTable(data, resource.getLocalizedText());
         }
-
-        PrefixTree.Info i = stringTree.getInfo();
-        System.out.printf("Nodes: %d, total string length: %d\n", i.nodeCount, i.stringSpace);
-
-        //Strings are now immutable
-        stringTree.seal();
 
         //If we're using a default locale, now we want to make sure that it has all of the keys
         //that the locale we want to use does. Otherwise, the app will crash when we switch to
@@ -375,8 +364,8 @@ public class Localizer implements Externalizable {
      * @return Text mappings for locale.
      * @throws UnregisteredLocaleException If locale is not defined or null.
      */
-    public OrderedMap<String, PrefixTreeNode> getLocaleMap(String locale) {
-        OrderedMap<String, PrefixTreeNode> mapping = getLocaleData(locale);
+    public OrderedMap<String, String> getLocaleMap(String locale) {
+        OrderedMap<String, String> mapping = getLocaleData(locale);
         if (mapping == null) {
             throw new UnregisteredLocaleException("Attempted to access an undefined locale.");
         }
@@ -558,13 +547,8 @@ public class Localizer implements Externalizable {
         if (textID == null) {
             throw new NullPointerException("Null textId passed to localizer");
         }
-        if (locale.equals(currentLocale)) {
-            PrefixTreeNode data = currentLocaleData.get(textID);
-            return data == null ? null : data.render();
-        } else {
-            PrefixTreeNode data = getLocaleMap(locale).get(textID);
-            return data == null ? null : data.render();
-        }
+        return locale.equals(currentLocale) ? currentLocaleData.get(textID) :
+                getLocaleMap(locale).get(textID);
     }
 
     /* === MANAGING LOCALIZABLE OBSERVERS === */

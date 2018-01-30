@@ -46,8 +46,6 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.CodeTimer;
-import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.PrefixTreeNode;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
@@ -1677,8 +1675,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
         //Otherwise this sucks and we have to test the keys
-        OrderedMap<String, PrefixTreeNode> table = localizer.getLocaleData(locale);
-        for (String key : table.keySet()) {
+        for (String key : localizer.getLocaleData(locale).keySet()) {
             if(key.startsWith(textID + ";")) {
                 //A key is found, pull it out, add it to the list of guesses, and return positive
                 String textForm = key.substring(key.indexOf(";") + 1, key.length());
