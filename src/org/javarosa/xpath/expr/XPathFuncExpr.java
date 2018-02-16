@@ -19,6 +19,7 @@ package org.javarosa.xpath.expr;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import javax.xml.bind.DatatypeConverter;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -1364,6 +1365,12 @@ public class XPathFuncExpr extends XPathExpression {
                 for (byte aResult : bytes)
                     stringBuffer.append(Integer.toString((aResult & 0xff) + 0x100, 16).substring(1));
                 return stringBuffer.toString();
+            }
+        },
+        BASE64("base64") {
+            @Override
+            String encode(byte[] bytes) {
+                return DatatypeConverter.printBase64Binary(bytes);
             }
         };
 
