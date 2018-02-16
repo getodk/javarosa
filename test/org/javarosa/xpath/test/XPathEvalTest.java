@@ -509,6 +509,9 @@ public class XPathEvalTest extends TestCase {
         expected = createExpectedNodesetFromIndexedRepeatFunction(testInstance, 0, "name");
         testEval("indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )", testInstance, null, expected);
 
+        logTestCategory("crypto functions");
+        testEval("digest('some text', 'MD5', 'hex')", "552e21cd4cd9918678e3c1a0df491bc3");
+
         //Attribute XPath References
         //testEval("/@blah", new XPathUnsupportedException());
         //TODO: Need to test with model, probably in a different file
