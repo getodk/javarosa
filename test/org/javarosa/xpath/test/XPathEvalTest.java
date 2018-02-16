@@ -516,6 +516,10 @@ public class XPathEvalTest extends TestCase {
         testEval("digest('some text', 'MD5', 'base64')", "VS4hzUzZkYZ448Gg30kbww==");
         testEval("digest('some text', 'SHA-1', 'base64')", "N6pjx3OY2VRHMmLhoAV8HmMu2nc=");
         testEval("digest('some text', 'SHA-256', 'base64')", "uU9vElx546X/qoJvWEwQ1SraZp5nYgUbgmtVd20FrtI=");
+        testEval("digest('abc', 'SHA-1', 'hex')", "a9993e364706816aba3e25717850c26c9cd0d89d");
+        testEval("digest('abc', 'MD5', 'hex')", "900150983cd24fb0d6963f7d28e17f72");
+        testEval("digest('abc', 'SHA-256', 'hex')", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+
 
         //Attribute XPath References
         //testEval("/@blah", new XPathUnsupportedException());
