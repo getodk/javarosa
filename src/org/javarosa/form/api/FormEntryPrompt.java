@@ -217,7 +217,9 @@ public class FormEntryPrompt extends FormEntryCaption {
                 ec.isConstraint = true;
                 ec.candidateValue = attemptedValue;
             }
-            return mTreeElement.getConstraint().getConstraintMessage(ec, form.getMainInstance(), textForm);
+            String constraintMessage = mTreeElement.getConstraint().getConstraintMessage(ec, form.getMainInstance(), textForm);
+
+            return substituteStringArgs(constraintMessage);
         }
     }
 
