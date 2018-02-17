@@ -470,7 +470,7 @@ public class XPathFuncExpr extends XPathExpression {
             try {
                 digest = MessageDigest.getInstance((String) argVals[1]);
             } catch (NoSuchAlgorithmException e) {
-                throw new XPathTypeMismatchException("The function digest received a non supported cryptographic hashing algorithm '"+ argVals[0] +"'. Valid values are MD5, SHA-1, SHA-256");
+                throw new XPathTypeMismatchException("The function digest received a non supported cryptographic hashing algorithm '" + argVals[1] + "'. Valid values are MD5, SHA-1, SHA-256");
             }
 
             // Use UTF-8 encoding when reading data to be hashed by default
@@ -980,7 +980,7 @@ public class XPathFuncExpr extends XPathExpression {
                  */
                 groupIdx = 1;
             }
-            
+
             contextRef.setMultiplicity(groupRef.size()-1, groupIdx-1);
         }
 
@@ -1388,7 +1388,7 @@ public class XPathFuncExpr extends XPathExpression {
             for(HashEncodingMethod candidate : values())
                 if (candidate.value.equals(value))
                     return candidate;
-            throw new XPathTypeMismatchException("Unsupported hash encoding algorithm \"\". Supported values are: \"hex\", \"base64\"");
+            throw new XPathTypeMismatchException("Unsupported hash encoding algorithm \"" + value + "\". Supported values are: \"hex\", \"base64\"");
         }
 
         abstract String encode(byte[] bytes);
