@@ -465,7 +465,7 @@ public class XPathFuncExpr extends XPathExpression {
             }
 
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
-        } else if (name.equals("digest") && (args.length == 3)) {
+        } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             MessageDigest digest;
             try {
                 digest = MessageDigest.getInstance((String) argVals[1]);
@@ -481,7 +481,11 @@ public class XPathFuncExpr extends XPathExpression {
                 throw new XPathTypeMismatchException("The function digest failed to use UTF-8 encoding");
             }
 
-            return HashEncodingMethod.from((String) argVals[2]).encode(result);
+            // Hash encoding method defaults to base64 if no third arg is received
+            HashEncodingMethod encodingMethod = args.length == 3
+                ? HashEncodingMethod.from((String) argVals[2])
+                : HashEncodingMethod.BASE64;
+            return encodingMethod.encode(result);
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
