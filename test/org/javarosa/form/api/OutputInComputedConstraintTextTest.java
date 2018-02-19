@@ -1,4 +1,4 @@
-package org.javarosa.core.form.api.test;
+package org.javarosa.form.api;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,10 +13,6 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.test.FormParseInit;
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
 import org.junit.Test;
 
