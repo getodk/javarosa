@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>constraintMessageError</h:title>
+    <model>
+      <itext>
+        <translation lang="English">
+          <text id="/constraintMessageError/age:jr:constraintMsg">
+            <value>Child's age must be between <output value=" /constraintMessageError/ageSet "/> months</value>
+          </text>
+          <text id="/constraintMessageError/age:label">
+            <value>Child's age in months</value>
+          </text>
+          <text id="/constraintMessageError/ageSetNote:label">
+            <value>Please only conduct this survey with children aged <output value=" /constraintMessageError/ageSet "/> MONTHS.</value>
+          </text>
+          <text id="/constraintMessageError/village:label">
+            <value>Village</value>
+          </text>
+        </translation>
+      </itext>
+      <instance>
+        <constraintMessageError id="constraintMessageError">
+          <village/>
+          <ageSet/>
+          <monthsUpper/>
+          <ageSetNote/>
+          <age/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </constraintMessageError>
+      </instance>
+      <bind nodeset="/constraintMessageError/village" type="select1"/>
+
+      <bind calculate="if( /constraintMessageError/village &lt;5, &quot;6 TO 24&quot;, &quot;6 TO 59&quot;)" nodeset="/constraintMessageError/ageSet" type="string"/>
+
+      <bind calculate="if( /constraintMessageError/ageSet =&quot;6 TO 24&quot;, 24, 59)" nodeset="/constraintMessageError/monthsUpper" type="int"/>
+
+      <bind nodeset="/constraintMessageError/ageSetNote" readonly="true()" type="string"/>
+
+      <bind constraint=".&gt;=6 and .&lt;= /constraintMessageError/monthsUpper " jr:constraintMsg="jr:itext('/constraintMessageError/ageSetNote:label')" nodeset="/constraintMessageError/age" type="int"/>
+
+      <bind calculate="concat('uuid:', uuid())" nodeset="/constraintMessageError/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <select1 ref="/constraintMessageError/village">
+      <label ref="jr:itext('/constraintMessageError/village:label')"/>
+      <hint>Depending on which village is chosen, the child's age will be accepted either between 6-24 months or 6-59 months.</hint>
+      <item>
+        <label>Village 1</label>
+        <value>1</value>
+      </item>
+      <item>
+        <label>Village 2</label>
+        <value>2</value>
+      </item>
+      <item>
+        <label>Village 3</label>
+        <value>3</value>
+      </item>
+      <item>
+        <label>Village 4</label>
+        <value>4</value>
+      </item>
+      <item>
+        <label>Village 5</label>
+        <value>5</value>
+      </item>
+      <item>
+        <label>Village 6</label>
+        <value>6</value>
+      </item>
+      <item>
+        <label>Village 7</label>
+        <value>7</value>
+      </item>
+      <item>
+        <label>Village 8</label>
+        <value>8</value>
+      </item>
+    </select1>
+    <input ref="/constraintMessageError/ageSetNote">
+      <label ref="jr:itext('/constraintMessageError/ageSetNote:label')"/>
+      <hint>This displays the age range correctly in a note.</hint>
+    </input>
+    <input ref="/constraintMessageError/age">
+      <label ref="jr:itext('/constraintMessageError/age:label')"/>
+      <hint>(Enter e.g. 60 to see constraint message with error)</hint>
+    </input>
+  </h:body>
+</h:html>
