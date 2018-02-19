@@ -510,17 +510,16 @@ public class XPathEvalTest extends TestCase {
         testEval("indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )", testInstance, null, expected);
 
         logTestCategory("crypto functions");
-        testEval("digest('some text', 'MD5', 'hex')", "552e21cd4cd9918678e3c1a0df491bc3");
-        testEval("digest('some text', 'SHA-1', 'hex')", "37aa63c77398d954473262e1a0057c1e632eda77");
-        testEval("digest('some text', 'SHA-256', 'hex')", "b94f6f125c79e3a5ffaa826f584c10d52ada669e6762051b826b55776d05aed2");
+        // Support for all 5 supported digest algorithms (required and optional) and default base64 encoding
         testEval("digest('some text', 'MD5', 'base64')", "VS4hzUzZkYZ448Gg30kbww==");
         testEval("digest('some text', 'SHA-1', 'base64')", "N6pjx3OY2VRHMmLhoAV8HmMu2nc=");
         testEval("digest('some text', 'SHA-256', 'base64')", "uU9vElx546X/qoJvWEwQ1SraZp5nYgUbgmtVd20FrtI=");
-        testEval("digest('abc', 'SHA-1', 'hex')", "a9993e364706816aba3e25717850c26c9cd0d89d");
-        testEval("digest('abc', 'MD5', 'hex')", "900150983cd24fb0d6963f7d28e17f72");
-        testEval("digest('abc', 'SHA-256', 'hex')", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
-        // Third arg is optional and defaults to 'base64'
-        testEval("digest('some text', 'SHA-1')", "N6pjx3OY2VRHMmLhoAV8HmMu2nc=");
+        testEval("digest('some text', 'SHA-384', 'base64')", "zJTsPphzwLmnJIZEKVj2cQZ833e5QnQW0DFEDMYgQeLuE0RJhEfsDO2fcENGG9Hz");
+        testEval("digest('some text', 'SHA-512', 'base64')", "4nMrrtyj6sFAeChjfeHbynAsP8ns4Wz1Nt241hOc2F3+dGS4I1spgm9gjM9KxkPimxnGN4WKPYcQpZER30LdtQ==");
+        // Support for hexadecimal encoding
+        testEval("digest('some text', 'MD5', 'hex')", "552e21cd4cd9918678e3c1a0df491bc3");
+        // Support for optional third argument (defaults to 'base64')
+        testEval("digest('some text', 'MD5')", "VS4hzUzZkYZ448Gg30kbww==");
 
         //Attribute XPath References
         //testEval("/@blah", new XPathUnsupportedException());
