@@ -1,11 +1,10 @@
 package org.javarosa.form.api;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
@@ -29,7 +28,7 @@ public class OutputInComputedConstraintTextTest {
   @Before
   public void setUp() {
     FormParseInit fpi = new FormParseInit();
-    fpi.setFormToParse((new File(PathConst.getTestResourcePath(), "constraint-message-error.xml")).getAbsolutePath());
+    fpi.setFormToParse(r("constraint-message-error.xml").toString());
     formDef = fpi.getFormDef();
     formDef.getLocalizer().setLocale("English");
     ctrl = fpi.getFormEntryController();
