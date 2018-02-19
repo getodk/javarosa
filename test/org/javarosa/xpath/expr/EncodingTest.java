@@ -29,7 +29,9 @@ public class EncodingTest {
   public static Iterable<Object[]> data() {
     return Arrays.asList(new Object[][]{
         {"Hexadecimal", HEX, "some text", "736f6d652074657874"},
+        {"Hexadecimal (empty string)", HEX, "", ""},
         {"Base64", BASE64, "some text", "c29tZSB0ZXh0"},
+        {"Base64 (empty string)", BASE64, "", ""},
     });
   }
 
