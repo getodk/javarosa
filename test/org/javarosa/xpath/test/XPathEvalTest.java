@@ -509,6 +509,18 @@ public class XPathEvalTest extends TestCase {
         expected = createExpectedNodesetFromIndexedRepeatFunction(testInstance, 0, "name");
         testEval("indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )", testInstance, null, expected);
 
+        logTestCategory("crypto functions");
+        // Support for all 5 supported digest algorithms (required and optional) and default base64 encoding
+        testEval("digest('some text', 'MD5', 'base64')", "VS4hzUzZkYZ448Gg30kbww==");
+        testEval("digest('some text', 'SHA-1', 'base64')", "N6pjx3OY2VRHMmLhoAV8HmMu2nc=");
+        testEval("digest('some text', 'SHA-256', 'base64')", "uU9vElx546X/qoJvWEwQ1SraZp5nYgUbgmtVd20FrtI=");
+        testEval("digest('some text', 'SHA-384', 'base64')", "zJTsPphzwLmnJIZEKVj2cQZ833e5QnQW0DFEDMYgQeLuE0RJhEfsDO2fcENGG9Hz");
+        testEval("digest('some text', 'SHA-512', 'base64')", "4nMrrtyj6sFAeChjfeHbynAsP8ns4Wz1Nt241hOc2F3+dGS4I1spgm9gjM9KxkPimxnGN4WKPYcQpZER30LdtQ==");
+        // Support for hexadecimal encoding
+        testEval("digest('some text', 'MD5', 'hex')", "552e21cd4cd9918678e3c1a0df491bc3");
+        // Support for optional third argument (defaults to 'base64')
+        testEval("digest('some text', 'MD5')", "VS4hzUzZkYZ448Gg30kbww==");
+
         //Attribute XPath References
         //testEval("/@blah", new XPathUnsupportedException());
         //TODO: Need to test with model, probably in a different file

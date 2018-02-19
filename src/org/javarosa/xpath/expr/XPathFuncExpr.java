@@ -461,6 +461,11 @@ public class XPathFuncExpr extends XPathExpression {
             }
 
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+        } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
+            return DigestAlgorithm.from((String) argVals[1]).digest(
+                (String) argVals[0],
+                args.length == 3 ? Encoding.from((String)argVals[2]) : Encoding.BASE64
+            );
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
@@ -955,7 +960,7 @@ public class XPathFuncExpr extends XPathExpression {
                  */
                 groupIdx = 1;
             }
-            
+
             contextRef.setMultiplicity(groupRef.size()-1, groupIdx-1);
         }
 
@@ -1335,4 +1340,5 @@ public class XPathFuncExpr extends XPathExpression {
         return eval(model, evalContext);
 
     }
+
 }
