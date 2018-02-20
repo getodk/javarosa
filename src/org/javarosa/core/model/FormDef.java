@@ -1685,4 +1685,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public final void printTriggerables(String path) {
         dagImpl.printTriggerables(path);
     }
+
+    /** (Not in the public API) Gets form complexity metrics */
+    public FormComplexityMetrics getFormComplexityMetrics() {
+        return new FormComplexityMetrics(dagImpl.triggerablesDAG.size());
+    }
 }
