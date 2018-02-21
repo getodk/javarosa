@@ -13,6 +13,9 @@ import java.util.Set;
 class RangeParser {
     static void populateQuestionWithRangeAttributes(RangeQuestion question, Element e) {
         final Set<String> rangeAttributeNames = Collections.unmodifiableSet(
+                new HashSet<>(Arrays.asList("start", "end", "step", "start-label", "end-label")));
+
+        final Set<String> numericRangeAttributeNames = Collections.unmodifiableSet(
                 new HashSet<>(Arrays.asList("start", "end", "step")));
 
         for (int i = 0; i < e.getAttributeCount(); i++) {
@@ -22,7 +25,7 @@ class RangeParser {
                 final String attrStringValue = e.getAttributeValue(i);
                 final BigDecimal attrDecimalValue = getDecimalValue(attrStringValue);
 
-                if (attrDecimalValue == null) {
+                if (attrDecimalValue == null && numericRangeAttributeNames.contains(attrName)) {
                     throw new XFormParseException(String.format(
                             "Value %s of range attribute %s can't be parsed as a decimal number",
                             attrStringValue, attrName));
@@ -37,6 +40,12 @@ class RangeParser {
                         break;
                     case "step":
                         question.setRangeStep(attrDecimalValue);
+                        break;
+                    case "start-label":
+                        question.setRangeStartLabel(attrStringValue);
+                        break;
+                    case "end-label":
+                        question.setRangeEndLabel(attrStringValue);
                         break;
                 }
             }

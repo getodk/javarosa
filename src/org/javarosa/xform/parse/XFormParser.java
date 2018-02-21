@@ -188,7 +188,7 @@ public class XFormParser implements IXFormParserFunctions {
             put("range", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
                     p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE,
-                            Arrays.asList("start", "end", "step") // Prevent warning about unexpected attributes
+                            Arrays.asList("start", "end", "step", "start-label", "end-label") // Prevent warning about unexpected attributes
                     );
                 }
             });

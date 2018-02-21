@@ -8,6 +8,8 @@ public class RangeQuestion extends QuestionDef {
     private BigDecimal rangeStart;
     private BigDecimal rangeEnd;
     private BigDecimal rangeStep;
+    private String rangeStartLabel;
+    private String rangeEndLabel;
 
     public void setRangeStart(BigDecimal rangeStart) {
         this.rangeStart = rangeStart;
@@ -31,5 +33,21 @@ public class RangeQuestion extends QuestionDef {
 
     public BigDecimal getRangeStep() {
         return rangeStep;
+    }
+
+    public String getRangeStartLabel() {
+        return rangeStartLabel;
+    }
+
+    public void setRangeStartLabel(String rangeStartLabel) {
+        this.rangeStartLabel = rangeStartLabel;
+    }
+
+    public String getRangeEndLabel() {
+        return rangeEndLabel;
+    }
+
+    public void setRangeEndLabel(String rangeEndLabel) {
+        this.rangeEndLabel = rangeEndLabel;
     }
 }
