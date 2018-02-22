@@ -16,12 +16,13 @@
 
 package org.javarosa.core.util.externalizable;
 
+import static org.javarosa.xpath.expr.DigestAlgorithm.MD5;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import org.javarosa.core.io.Std;
-import org.javarosa.core.util.MD5;
 
 public class PrototypeFactory {
     public final static int CLASS_HASH_SIZE = 4;
@@ -129,7 +130,7 @@ public class PrototypeFactory {
 
     public static byte[] getClassHash (Class type) {
         byte[] hash = new byte[CLASS_HASH_SIZE];
-        byte[] md5 = MD5.hash(type.getName().getBytes()); //add support for a salt, in case of collision?
+        byte[] md5 = MD5.digest(type.getName());
 
         System.arraycopy(md5, 0, hash, 0, hash.length);
         byte[] badHash = new byte[] {0,4,78,97};

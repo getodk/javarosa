@@ -54,7 +54,11 @@ public enum DigestAlgorithm {
   }
 
   public String digest(String payload, Encoding encoding) {
-    return encoding.encode(getDigestInstance().digest(uncheckedGetUtf8Bytes(payload)));
+    return encoding.encode(digest(payload));
+  }
+
+  public byte[] digest(String payload) {
+    return getDigestInstance().digest(uncheckedGetUtf8Bytes(payload));
   }
 
   private byte[] uncheckedGetUtf8Bytes(String payload) {
