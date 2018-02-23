@@ -224,7 +224,7 @@ public class XPathFuncExpr extends XPathExpression {
             return boolStr(argVals[0]);
         } else if (name.equals("format-date")) {
             assertArgsCount(name, args, 2);
-            return dateStr(argVals[0], argVals[1], false);
+            return dateStr(argVals[0], argVals[1], true);
         } else if (name.equals("abs")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return Math.abs(toDouble(argVals[0]));
