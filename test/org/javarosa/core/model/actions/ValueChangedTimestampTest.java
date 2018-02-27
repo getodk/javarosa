@@ -18,7 +18,7 @@ import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class NestedSetValueActionTest {
+public class ValueChangedTimestampTest {
 
     private static final long DATE_NOW = 1_500_000_000_000L;
     private static final long DAY_OFFSET = 86_400_000L;
@@ -60,6 +60,46 @@ public class NestedSetValueActionTest {
         IAnswerData expectedValue = new DateTimeData(new Date(DATE_NOW));
 
         assertEquals(expectedValue.getValue(), targetValue.getValue());
+    }
+
+    @Test
+    public void when_triggerNodeIsUpdatedWithinRepeat_targetNodeCalculation_isEvaluated() throws IOException {
+        // Given
+        final FormDef formDef =
+                parse(r("nested-setvalue-action-with-repeats.xml")).formDef;
+
+        TreeReference[] triggerRefs = new TreeReference[3];
+        TreeReference[] targetRefs = new TreeReference[3];
+
+        for (int i = 0; i < 3; i++) {
+            TreeReference triggerRef = new TreeReference();
+            triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
+            triggerRef.add("data", 0);
+            triggerRef.add("repeat", i);
+            triggerRef.add("cost", 0);
+
+            TreeReference targetRef = new TreeReference();
+            targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
+            targetRef.add("data", 0);
+            targetRef.add("repeat", i);
+            targetRef.add("cost_timestamp", 0);
+
+            triggerRefs[i] = triggerRef;
+            targetRefs[i] = targetRef;
+        }
+
+        // When
+        for (int i = 0; i < 3; i++) {
+            DateTimeUtils.setCurrentMillisFixed(DATE_NOW + i * DAY_OFFSET);
+            formDef.setValue(new DecimalData(i+1), triggerRefs[i], true);
+        }
+
+        // Then
+        for (int i = 0; i < 3; i++) {
+            IAnswerData targetValue = formDef.getMainInstance().resolveReference(targetRefs[i]).getValue();
+            IAnswerData expectedValue = new DateTimeData(new Date(DATE_NOW + i * DAY_OFFSET));
+            assertEquals(expectedValue.getValue(), targetValue.getValue());
+        }
     }
 
     @Test
