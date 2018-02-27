@@ -3,10 +3,11 @@
  */
 package org.javarosa.core.util;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.TreeReferenceLevel;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xpath.expr.XPathStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * J2ME suffers from major disparities in the effective use of memory. This
@@ -20,6 +21,7 @@ import org.javarosa.xpath.expr.XPathStep;
  *
  */
 public class MemoryUtils {
+    private static final Logger logger = LoggerFactory.getLogger(MemoryUtils.class);
 
     //These 3 are used to hold the profile of the heapspace, only relevant
     //if you are doing deep memory profiling
@@ -102,10 +104,11 @@ public class MemoryUtils {
         long total = r.totalMemory();
 
         if(tag != null) {
-            Std.out.println("=== Memory Evaluation: " + tag + " ===");
+            logger.info("=== Memory Evaluation: {} ===", tag);
         }
 
-        Std.out.println("Total: " +total + "\nFree: " + free);
+        logger.info("Total: {}", total);
+        logger.info("Free: {}", free);
 
         int chunk = 100;
         int lastSuccess = 100;
@@ -138,15 +141,16 @@ public class MemoryUtils {
 
         int availPercent = (int)Math.floor((lastSuccess * 1.0 / total) * 100);
         int fragmentation = (int)Math.floor((lastSuccess * 1.0 / free) * 100);
-        Std.out.println("Usable Memory: " +lastSuccess + "\n" + availPercent + "% of available memory");
-        Std.out.println("Fragmentation: " + fragmentation + "%");
+        logger.info("Usable Memory: {}", lastSuccess);
+        logger.info("{}% of available memory", availPercent);
+        logger.info("Fragmentation: {}%", fragmentation);
 
         if(pause != -1) {
             try {
                 Thread.sleep(pause);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
-                Std.printStack(e);
+                logger.error("Error", e);
             }
         }
     }
@@ -161,7 +165,7 @@ public class MemoryUtils {
      */
     public static void profileMemory() {
         if(memoryProfile == null) {
-            Std.out.println("You must initialize the memory profiler before it can be used!");
+            logger.info("You must initialize the memory profiler before it can be used!");
             return;
         }
         currentCount = 0;
@@ -180,7 +184,7 @@ public class MemoryUtils {
         //on the type of fragmentation you are concerned about.
         while(true) {
             if(currentCount >= MEMORY_PROFILE_SIZE) {
-                Std.out.println("Memory profile is too small for this device's usage!");
+                logger.info("Memory profile is too small for this device's usage!");
                 break;
             }
             if(chunkSize < threshold) { succeeded = true; break;}
@@ -202,9 +206,9 @@ public class MemoryUtils {
 
         //For now, just print out the profile. Eventually we should compress it and output it in a useful format.
         if(succeeded) {
-            Std.out.println("Acquired memory profile for " + memoryAccountedFor + " of the " + memory + " available bytes, with " + currentCount + " traces");
+            logger.info("Acquired memory profile for {} of the {} available bytes, with {} traces", memoryAccountedFor, memory, currentCount);
             for(int i = 0 ; i < currentCount * 2 ; i+=2) {
-                Std.out.println("Address: " + memoryProfile[i] + " -> " + memoryProfile[i + 1]);
+                logger.info("Address: {} -> {}", memoryProfile[i], memoryProfile[i + 1]);
             }
         }
     }

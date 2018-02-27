@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -32,6 +31,8 @@ import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Static Utility methods pertaining to XForms.
@@ -40,6 +41,8 @@ import org.kxml2.kdom.Element;
  *
  */
 public class XFormUtils {
+    private static final Logger logger = LoggerFactory.getLogger(XFormUtils.class);
+
     private static IXFormParserFactory _factory = new XFormParserFactory();
 
     public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
@@ -51,7 +54,7 @@ public class XFormUtils {
     public static FormDef getFormFromResource (String resource) {
         InputStream is = System.class.getResourceAsStream(resource);
         if (is == null) {
-            Std.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
+            logger.error("Can't find form resource {}. Is it in the JAR?", resource);
             return null;
         }
 
@@ -84,8 +87,7 @@ public class XFormUtils {
                     isr.close();
                 }
             } catch (IOException e) {
-                Std.err.println("IO Exception while closing stream.");
-                Std.printStack(e);
+                logger.error("IO Exception while closing stream.", e);
             }
         }
     }
@@ -100,26 +102,26 @@ public class XFormUtils {
                 returnForm = (FormDef) ExtUtil.read(dis, FormDef.class);
             } else {
                 //#if debug.output==verbose
-                Std.out.println("ResourceStream NULL");
+                logger.info("ResourceStream NULL");
                 //#endif
             }
         } catch (IOException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
         } catch (DeserializationException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    Std.printStack(e);
+                    logger.error("Error", e);
                 }
             }
             if (dis != null) {
                 try {
                     dis.close();
                 } catch (IOException e) {
-                    Std.printStack(e);
+                    logger.error("Error", e);
                 }
             }
         }

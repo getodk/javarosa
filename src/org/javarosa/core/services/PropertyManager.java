@@ -20,13 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.externalizable.Externalizable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * PropertyManager is a class that is used to set and retrieve name/value pairs
@@ -41,6 +42,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
  *
  */
 public class PropertyManager implements IPropertyManager {
+    private static final Logger logger = LoggerFactory.getLogger(PropertyManager.class);
 
     ///// manage global property manager /////
 
@@ -104,7 +106,7 @@ public class PropertyManager implements IPropertyManager {
         }
         if(retVal == null) {
             //#if debug.output==verbose
-            Std.out.println("Warning: Singular property request failed for property " + propertyName);
+            logger.warn("Singular property request failed for property {}", propertyName);
             //#endif
         }
         return retVal;
@@ -172,7 +174,7 @@ public class PropertyManager implements IPropertyManager {
             }
             //#if debug.output==verbose
             else {
-                Std.out.println("Property Manager: Unable to write value (" + propertyValue + ") to " + propertyName);
+                logger.info("Property Manager: Unable to write value ({}) to {}", propertyValue, propertyName);
             }
             //#endif
         }

@@ -16,20 +16,21 @@
 
 package org.javarosa.core.model.data.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SelectMultiDataTests extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(SelectMultiDataTests.class);
     QuestionDef question;
 
     Selection one;
@@ -77,7 +78,7 @@ public class SelectMultiDataTests extends TestCase {
 
     public SelectMultiDataTests(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -91,9 +92,8 @@ public class SelectMultiDataTests extends TestCase {
 
         return aSuite;
     }
-    public static String testMaster (int testID) {
-        //System.out.println("running " + testID);
 
+    public static String testMaster(int testID) {
         switch (testID) {
         case 1: return "testGetData";
         case 2: return "testSetData";
@@ -109,6 +109,7 @@ public class SelectMultiDataTests extends TestCase {
         assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
 
     }
+
     public void testSetData() {
         SelectMultiData data = new SelectMultiData(firstTwo);
         data.setValue(lastTwo);
@@ -121,6 +122,7 @@ public class SelectMultiDataTests extends TestCase {
         assertEquals("SelectMultiData did not properly reset value ", data.getValue(), firstTwo);
 
     }
+
     public void testNullData() {
         boolean exceptionThrown = false;
         SelectMultiData data = new SelectMultiData();

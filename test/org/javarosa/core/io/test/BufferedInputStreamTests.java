@@ -27,8 +27,11 @@ import junit.framework.TestSuite;
 
 import org.javarosa.core.io.BufferedInputStream;
 import org.javarosa.core.util.ArrayUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BufferedInputStreamTests extends TestCase{
+    private static final Logger logger = LoggerFactory.getLogger(BufferedInputStreamTests.class);
 
     byte[] bytes;
 
@@ -52,7 +55,7 @@ public class BufferedInputStreamTests extends TestCase{
 
     public BufferedInputStreamTests(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -67,8 +70,6 @@ public class BufferedInputStreamTests extends TestCase{
         return aSuite;
     }
     public static String testMaster (int testID) {
-        //System.out.println("running " + testID);
-
         switch (testID) {
         case 1: return "testBuffered";
         case 2: return "testIndividual";

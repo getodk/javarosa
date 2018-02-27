@@ -3,18 +3,21 @@
  */
 package org.javarosa.core.services.locale;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.util.OrderedMap;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ctsims
  *
  */
 public class LocalizationUtils {
+    private static final Logger logger = LoggerFactory.getLogger(LocalizationUtils.class);
+
     /**
      * @param is A path to a resource file provided in the current environment
      *
@@ -84,7 +87,7 @@ public class LocalizationUtils {
                 if(line.trim().equals("")) {
                     //Empty Line
                 } else {
-                    Std.out.println("Invalid line (#" + curline + ") read: " + line);
+                    logger.info("Invalid line (#{}) read: {}", curline, line);
                 }
             } else {
                 //Check to see if there's anything after the '=' first. Otherwise there
@@ -94,7 +97,7 @@ public class LocalizationUtils {
                     locale.put(line.substring(0, line.indexOf('=')), value);
                 }
                  else {
-                    Std.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+                    logger.info("Invalid line (#{}) read: '{}'. No value follows the '='.", curline, line);
                 }
             }
         }

@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -21,8 +20,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.expr.XPathPathExpr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemsetBinding implements Externalizable, Localizable {
+    private static final Logger logger = LoggerFactory.getLogger(ItemsetBinding.class);
 
     /**
      * note that storing both the ref and expr for everything is kind of redundant, but we're forced
@@ -56,7 +58,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
     public void setChoices (List<SelectChoice> choices, Localizer localizer) {
         if (this.choices != null) {
-            Std.out.println("warning: previous choices not cleared out");
+            logger.warn("previous choices not cleared out");
             clearChoices();
         }
         this.choices = choices;

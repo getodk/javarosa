@@ -19,16 +19,18 @@ package org.javarosa.core.util.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.util.externalizable.ExtWrapIntEncoding;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingSmall;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingUniform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class NumericEncodingTest extends TestCase  {
+public class NumericEncodingTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(NumericEncodingTest.class);
 
     public NumericEncodingTest(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {

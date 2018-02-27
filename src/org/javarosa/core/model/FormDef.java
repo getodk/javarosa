@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.IDag.EventNotifierAccessor;
 import org.javarosa.core.model.condition.Condition;
@@ -72,6 +71,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -80,6 +81,8 @@ import java.util.NoSuchElementException;
  * @author Daniel Kayiwa, Drew Roos
  */
 public class FormDef implements IFormElement, Localizable, Persistable, IMetaData {
+    private static final Logger logger = LoggerFactory.getLogger(FormDef.class);
+
     public static final String STORAGE_KEY = "FORMDEF";
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
@@ -926,7 +929,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                     try {
                         ix = Integer.parseInt(argName);
                     } catch (NumberFormatException nfe) {
-                        Std.err.println("Warning: expect arguments to be numeric [" + argName + "]");
+                        logger.warn("expect arguments to be numeric [{}]", argName);
                     }
 
                     if (ix < 0 || ix >= outputFragments.size())
@@ -1033,10 +1036,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             // to chose from if the user hasn't filled them out. So I'm just going
             // to make a note of this
             // and not throw an exception.
-            Std.out
-                    .println("Dynamic select question has no choices! ["
-                            + itemset.nodesetRef
-                            + "]. If this occurs while filling out a form (and not while saving an incomplete form), the filter condition may have eliminated all the choices. Is that what you intended?\n");
+            logger.info("Dynamic select question has no choices! [{}]. If this occurs while " +
+                "filling out a form (and not while saving an incomplete form), the filter " +
+                "condition may have eliminated all the choices. Is that what you intended?"
+                , itemset.nodesetRef);
 
         }
 
@@ -1428,8 +1431,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 metadata.put(field, getMetaData(field));
             } catch (NullPointerException npe) {
                 if (getMetaData(field) == null) {
-                    Std.err.println("ERROR! XFORM MUST HAVE A NAME!");
-                    Std.printStack(npe);
+                    logger.error("ERROR! XFORM MUST HAVE A NAME!", npe);
                 }
             }
         }

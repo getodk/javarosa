@@ -3,18 +3,20 @@
  */
 package org.javarosa.core.util;
 
-import org.javarosa.core.io.Std;
-
 import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ctsims
  *
  */
 public class CacheTable<K> {
+    private static final Logger logger = LoggerFactory.getLogger(CacheTable.class);
+
     int totalAdditions = 0;
 
     // Object is actually K...
@@ -72,10 +74,10 @@ public class CacheTable<K> {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
-                        Std.printStack(e);
+                        logger.error("Error", e);
                     }
                 } catch (Exception e) {
-                    Std.printStack(e);
+                    logger.error("Error", e);
                 }
             }
 

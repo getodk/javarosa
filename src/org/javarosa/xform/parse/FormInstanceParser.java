@@ -1,6 +1,5 @@
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -24,11 +23,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
 import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
 
 class FormInstanceParser {
+    private static final Logger logger = LoggerFactory.getLogger(FormInstanceParser.class);
+
     private final FormDef formDef;
     private final String defaultNamespace;
     private final XFormParserReporter reporter;
@@ -86,7 +89,8 @@ class FormInstanceParser {
 
         //print unused attribute warning message for parent element
         if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-            reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(e, usedAtts), getVagueLocation(e));
+            String xmlLocation = getVagueLocation(e);
+            logger.warn("XForm Parse Warning: {}{}", XFormUtils.unusedAttWarning(e, usedAtts), (xmlLocation == null ? "" : xmlLocation));
         }
 
         return instanceModel;
@@ -137,13 +141,14 @@ class FormInstanceParser {
             TreeReference ref = FormInstance.unpackReference(bind.getReference());
 
             if (ref.size() == 0) {
-                Std.out.println("Cannot bind to '/'; ignoring bind...");
+                logger.info("Cannot bind to '/'; ignoring bind...");
                 bindings.remove(i);
                 i--;
             } else {
                 List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
                 if (nodes.size() == 0) {
-                    reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "<bind> defined for a node that doesn't exist [" + ref.toString() + "]. The node's name was probably changed and the bind should be updated. ", null);
+                    logger.warn("XForm Parse Warning: <bind> defined for a node that doesn't exist " +
+                        "[{}]. The node's name was probably changed and the bind should be updated.", ref.toString());
                 }
             }
         }
@@ -189,7 +194,9 @@ class FormInstanceParser {
         int mult = node.getMult();
         if (mult > 0) { //repeated node
             if (!node.isRepeatable()) {
-                Std.out.println("Warning: repeated nodes [" + node.getName() + "] detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
+                logger.warn("repeated nodes [{}] detected that have no repeat binding " +
+                    "in the form; DO NOT bind questions to these nodes or their children!",
+                    node.getName());
                 //we could do a more comprehensive safety check in the future
             }
         }
@@ -212,7 +219,7 @@ class FormInstanceParser {
                     template = instance.getTemplate(nref);
 
                 if (!FormInstance.isHomogeneous(template, node)) {
-                    reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Not all repeated nodes for a given repeat binding [" + nref.toString() + "] are homogeneous! This will cause serious problems!", null);
+                    logger.warn("XForm Parse Warning: Not all repeated nodes for a given repeat binding [{}] are homogeneous! This will cause serious problems!", nref.toString());
                 }
             }
         }
@@ -238,13 +245,12 @@ class FormInstanceParser {
 
             if (child instanceof QuestionDef && tref.size() == 0) {
                 //group can bind to '/'; repeat can't, but that's checked above
-                reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Cannot bind control to '/'",null);
+                logger.warn("XForm Parse Warning: Cannot bind control to '/'");
             } else {
                 List<TreeReference> nodes = new EvaluationContext(instance).expandReference(tref, true);
                 if (nodes.size() == 0) {
-                    String error = type+ " bound to non-existent node: [" + tref.toString() + "]";
-                    reporter.error(error);
-                    errors.add(error);
+                    logger.error("XForm Parse Error: {} bound to non-existent node: [{}]", type, tref.toString());
+                    errors.add(type + " bound to non-existent node: [" + tref.toString() + "]");
                 }
                 //we can't check whether questions map to the right kind of node ('data' node vs. 'sub-tree' node) as that depends
                 //on the question's data type, which we don't know yet
@@ -358,9 +364,8 @@ class FormInstanceParser {
                 TreeElement dstNode = instance.getTemplate(itemset.getDestRef());
 
                 if (!FormInstance.isHomogeneous(srcNode, dstNode)) {
-                    reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                            "Your itemset source [" + srcNode.getRef().toString() + "] and dest [" + dstNode.getRef().toString() +
-                                    "] of appear to be incompatible!", null);
+                    logger.warn("XForm Parse Warning: Your itemset source [{}] and dest [{}] of appear " +
+                        "to be incompatible!", srcNode.getRef().toString(), dstNode.getRef().toString());
                 }
 
                 //TODO: i feel like, in theory, i should additionally check that the repeatable children of src and dst
@@ -466,10 +471,12 @@ class FormInstanceParser {
 
         if (mult == TreeReference.INDEX_TEMPLATE) {
             if (!templateAllowed) {
-                reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Template nodes for sub-repeats must be located within the template node of the parent repeat; ignoring template... [" + instanceNode.getName() + "]", null);
+                logger.warn("XForm Parse Warning: Template nodes for sub-repeats must be located within " +
+                    "the template node of the parent repeat; ignoring template... [{}]", instanceNode.getName());
                 return true;
             } else if (!repeatable) {
-                reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE, "Warning: template node found for ref that is not repeatable; ignoring... [" + instanceNode.getName() + "]", null);
+                logger.warn("XForm Parse Warning: Warning: template node found for ref that is not repeatable; " +
+                    "ignoring... [{}]" + instanceNode.getName());
                 return true;
             }
         }
@@ -512,9 +519,8 @@ class FormInstanceParser {
             try {
                 instance.copyNode(firstMatch, templRef);
             } catch (InvalidReferenceException e) {
-                reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                        "Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on " +
-                                templRef.toString() + ")", null);
+                logger.warn("XForm Parse Warning: Could not create a default repeat template; this is " +
+                    "almost certainly a homogeneity error! Your form will not work! (Failed on {})", templRef.toString());
             }
             trimRepeatChildren(instance.resolveReference(templRef));
         }
@@ -554,8 +560,8 @@ class FormInstanceParser {
                     } else if (node.getDataType() == org.javarosa.core.model.Constants.DATATYPE_NULL || node.getDataType() == Constants.DATATYPE_TEXT) {
                         node.setDataType(type);
                     } else {
-                        reporter.warning(XFormParserReporter.TYPE_INVALID_STRUCTURE,
-                                "Select question " + ref.toString() + " appears to have data type that is incompatible with selection", null);
+                        logger.warn("XForm Parse Warning: Select question {} appears to have data type that " +
+                            "is incompatible with selection", ref.toString());
                     }
                 }
             }

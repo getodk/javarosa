@@ -30,12 +30,15 @@ import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalizerTest extends TestCase  {
+    private static final Logger logger = LoggerFactory.getLogger(LocalizerTest.class);
 
     public LocalizerTest(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -53,8 +56,6 @@ public class LocalizerTest extends TestCase  {
     public static final int NUM_TESTS = 31;
 
     public static String testMaster (int testID) {
-        //System.out.println("running " + testID);
-
         switch (testID) {
         case 1: return "testEmpty";
         case 2: return "testAddLocale";
@@ -511,8 +512,6 @@ public class LocalizerTest extends TestCase  {
     }
 
     public void testGetText (int i, int j, int k, String ourLocale, String otherLocale, String textID, int localeCase, int formCase) {
-        //System.out.println("testing getText: "+localeCase+","+formCase+","+i+","+j+","+k);
-
         Localizer l = buildLocalizer(i, j, k, ourLocale, otherLocale);
         String expected = expectedText(textID, l);
         String text, text2;

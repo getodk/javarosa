@@ -16,18 +16,21 @@
 
 package org.javarosa.form.api;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to navigate through an xform and appropriately manipulate
  * the FormEntryModel's state.
  */
 public class FormEntryController {
+    private static final Logger logger = LoggerFactory.getLogger(FormEntryController.class);
+
     public static final int ANSWER_OK = 0;
     public static final int ANSWER_REQUIRED_BUT_EMPTY = 1;
     public static final int ANSWER_CONSTRAINT_VIOLATED = 2;
@@ -99,7 +102,7 @@ public class FormEntryController {
             try {
                 model.getForm().copyItemsetAnswer(q, element, data, midSurvey);
             } catch (InvalidReferenceException ire) {
-                Std.printStack(ire);
+                logger.error("Error", ire);
                 throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
             }
             return ANSWER_OK;

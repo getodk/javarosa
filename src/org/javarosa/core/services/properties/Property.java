@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Property is an encapsulation of a record containing a property in the J2ME
@@ -38,6 +39,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class Property implements Persistable, IMetaData {
+    private static final Logger logger = LoggerFactory.getLogger(Property.class);
+
     public String name;
     public List<String> value;
     public int recordId = -1;
@@ -60,7 +63,7 @@ public class Property implements Persistable, IMetaData {
         value = new ArrayList<String>();
         if(nameindex == -1) {
             //#if debug.output==verbose
-            Std.out.println("WARNING: Property in RMS with no value:"+fullString);
+            logger.warn("Property in RMS with no value: {}", fullString);
             //#endif
             name = fullString.substring(0, fullString.length());
         }

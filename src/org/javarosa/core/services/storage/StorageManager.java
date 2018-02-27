@@ -16,7 +16,8 @@
 
 package org.javarosa.core.services.storage;
 
-import org.javarosa.core.services.Logger;
+import static org.javarosa.core.services.ProgramFlow.die;
+
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
 import org.javarosa.core.util.externalizable.Externalizable;
 
@@ -59,7 +60,7 @@ public class StorageManager {
             storageFactory = fact;
         } else {
             if(mustWork) {
-                Logger.die("A Storage Factory had already been set when storage factory " + fact.getClass().getName()
+                die("A Storage Factory had already been set when storage factory " + fact.getClass().getName()
                                            + " attempted to become the only storage factory", new RuntimeException("Duplicate Storage Factory set"));
             } else {
                 //Not an issue

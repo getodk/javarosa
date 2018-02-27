@@ -16,6 +16,13 @@
 
 package org.javarosa.core.util.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -31,20 +38,15 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableWrapper;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExternalizableTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(ExternalizableTest.class);
 
     public ExternalizableTest(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -293,7 +295,7 @@ public class ExternalizableTest extends TestCase {
 
     private static void print (String s) {
         //#if javarosa.dev.serializationtest.verbose
-        System.out.println(s);
+        logger.info(s);
         //#endif
     }
 }

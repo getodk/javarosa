@@ -16,7 +16,6 @@
 
 package org.javarosa.xform.util;
 
-import org.javarosa.core.io.Std;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -26,12 +25,15 @@ import java.io.DataOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /* this is just a big dump of serialization-related code */
 
 /* basically, anything that didn't belong in XFormParser */
 
 public class XFormSerializer {
+    private static final Logger logger = LoggerFactory.getLogger(XFormSerializer.class);
 
     public static ByteArrayOutputStream getStream(Document doc) {
         KXmlSerializer serializer = new KXmlSerializer();
@@ -43,7 +45,7 @@ public class XFormSerializer {
             serializer.flush();
             return bos;
         } catch (Exception e) {
-            Std.printStack(e);
+            logger.error("Error", e);
             return null;
         }
     }
@@ -61,9 +63,9 @@ public class XFormSerializer {
             s = new String(bos.toByteArray(),"UTF-8");
             return s;
         }catch (UnsupportedEncodingException uce){
-            Std.printStack(uce);
+            logger.error("Error", uce);
         } catch (Exception ex) {
-            Std.printStack(ex);
+            logger.error("Error", ex);
             return null;
         }
 
@@ -92,7 +94,7 @@ public class XFormSerializer {
             serializer.flush();
             return bos.toByteArray();
         } catch (Exception e) {
-            Std.printStack(e);
+            logger.error("Error", e);
             return null;
         }
     }

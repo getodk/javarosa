@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -31,6 +30,8 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The data model used during form entry. Represents the current state of the
@@ -38,6 +39,8 @@ import org.javarosa.core.model.instance.TreeReference;
  * controller.
  */
 public class FormEntryModel {
+    private static final Logger logger = LoggerFactory.getLogger(FormEntryModel.class);
+
     private FormDef form;
     private FormIndex currentFormIndex;
 
@@ -461,8 +464,8 @@ public class FormEntryModel {
                               try {
                                 getForm().createNewRepeat(index);
                               } catch (InvalidReferenceException ire) {
-                                Std.printStack(ire);
-                                throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
+                                  logger.error("Error", ire);
+                                  throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
                               }
                             }
                         }

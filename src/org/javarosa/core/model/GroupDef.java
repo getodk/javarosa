@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -35,6 +34,8 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** The definition of a group in a form or questionaire.
  *
@@ -42,6 +43,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class GroupDef implements IFormElement, Localizable {
+    private static final Logger logger = LoggerFactory.getLogger(GroupDef.class);
+
     private List<IFormElement> children;    /** A list of questions on a group. */
     private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
     private int id;    /** The group number. */
@@ -264,7 +267,7 @@ public class GroupDef implements IFormElement, Localizable {
             return;
         }
         if(DateUtils.stringContains(textID,";")){
-            Std.err.println("Warning: TextID contains ;form modifier:: \""+textID.substring(textID.indexOf(";"))+"\"... will be stripped.");
+            logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(textID.indexOf(";")));
             textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }
         this.textID = textID;

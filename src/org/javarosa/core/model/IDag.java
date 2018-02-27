@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -30,7 +29,6 @@ import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.xform.parse.XFormParserReporter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +42,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.javarosa.xform.parse.XFormParserReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract interface of the DAG management and triggerable processing logic.
@@ -55,6 +56,7 @@ import java.util.Set;
  *
  */
 public abstract class IDag {
+    private static final Logger logger = LoggerFactory.getLogger(IDag.class);
 
     public interface EventNotifierAccessor {
         public EventNotifier getEventNotifier();
@@ -316,18 +318,18 @@ public abstract class IDag {
                 qt.t.print(w);
             }
         } catch (UnsupportedEncodingException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
         } catch (FileNotFoundException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
         } catch (IOException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
         } finally {
             if (w != null) {
                 try {
                     w.flush();
                     w.close();
                 } catch (IOException e) {
-                    Std.printStack(e);
+                    logger.error("Error", e);
                 }
             }
         }
@@ -467,9 +469,9 @@ public abstract class IDag {
             TreeReference[] edge = edges.get(i);
             b.append(edge[0].toString()).append(" => ").append(edge[1].toString()).append("\n");
          }
-         reporter.error(b.toString());
+          logger.error("XForm Parse Error: {}", b.toString());
 
-         throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
+          throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
       }
    }
 
