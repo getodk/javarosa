@@ -376,12 +376,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                          boolean midSurvey) {
         IAnswerData oldValue = node.getValue();
         IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
+        boolean valueChanged = !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
+                answerDataSerializer.serializeAnswerData(data));
         if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer()
-                && objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
-                answerDataSerializer.serializeAnswerData(data))) {
+                && !valueChanged) {
             return;
         }
         setAnswer(data, node);
+        if (valueChanged) {
+            dispatchFormEvent(Action.EVENT_XFORMS_VALUE_CHANGED, ref);
+        }
         Collection<QuickTriggerable> qts = triggerTriggerables(ref, midSurvey);
         dagImpl.publishSummary("New value", ref, qts);
         // TODO: pre-populate fix-count repeats here?
@@ -1633,10 +1637,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         this.eventListeners.put(event, actions);
     }
 
-    public void dispatchFormEvent(String event) {
+    public void dispatchFormEvent(String event, TreeReference context) {
         for (Action action : getEventListeners(event)) {
-            action.processAction(this, null);
+            action.processAction(this, context);
         }
+    }
+
+    public void dispatchFormEvent(String event) {
+        dispatchFormEvent(event, null);
     }
 
     public <X extends XFormExtension> X getExtension(Class<X> extension) {
