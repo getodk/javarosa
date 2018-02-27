@@ -405,7 +405,7 @@ public class XFormParser implements IXFormParserFunctions {
         try {
             reader.close();
         } catch (IOException e) {
-            Std.out.println("Error closing reader");
+            Std.err.println("Error closing reader");
             Std.printStack(e);
         }
         ctParse.logDone();
