@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
+import org.javarosa.core.util.StopWatch;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -304,7 +304,7 @@ public class Localizer implements Externalizable {
      * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
      */
     public OrderedMap<String, String> getLocaleData(String locale) {
-        final CodeTimer codeTimer = new CodeTimer("getLocaleData");
+        final StopWatch codeTimer = StopWatch.start();
         if (locale == null || !this.locales.contains(locale)) {
             return null;
         }
@@ -356,7 +356,7 @@ public class Localizer implements Externalizable {
             }
         }
 
-        codeTimer.logDone();
+        logger.info(codeTimer.logLine("getLocaleData"));
         return data;
     }
 

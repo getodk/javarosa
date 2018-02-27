@@ -43,7 +43,7 @@ import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
-import org.javarosa.core.util.CodeTimer;
+import org.javarosa.core.util.StopWatch;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
@@ -368,7 +368,7 @@ public class XFormParser implements IXFormParserFunctions {
      */
     @Deprecated public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
         throws IOException {
-        final CodeTimer ctParse = new CodeTimer("Reading XML and parsing with kXML2");
+        final StopWatch ctParse = StopWatch.start();
         Document doc = new Document();
 
         try{
@@ -403,17 +403,17 @@ public class XFormParser implements IXFormParserFunctions {
             logger.info("Error closing reader");
             logger.error("Error", e);
         }
-        ctParse.logDone();
+        logger.info(ctParse.logLine("Reading XML and parsing with kXML2"));
 
-        final CodeTimer ctConsolidate = new CodeTimer("Consolidating text");
+        StopWatch ctConsolidate = StopWatch.start();
         XmlTextConsolidator.consolidateText(stringCache, doc.getRootElement());
-        ctConsolidate.logDone();
+        logger.info(ctConsolidate.logLine("Consolidating text"));
 
         return doc;
     }
 
     private void parseDoc(Map<String, String> namespacePrefixesByUri) {
-        final CodeTimer codeTimer = new CodeTimer("Creating FormDef from parsed XML");
+        final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
 
         initState();
@@ -478,7 +478,7 @@ public class XFormParser implements IXFormParserFunctions {
         _f.getMainInstance().getRoot().clearChildrenCaches();
         _f.getMainInstance().getRoot().clearCaches();
 
-        codeTimer.logDone();
+        logger.info(codeTimer.logLine("Creating FormDef from parsed XML"));
     }
 
     private final Set<String> validElementNames = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
