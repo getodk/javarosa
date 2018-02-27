@@ -400,8 +400,7 @@ public class XFormParser implements IXFormParserFunctions {
         try {
             reader.close();
         } catch (IOException e) {
-            logger.info("Error closing reader");
-            logger.error("Error", e);
+            logger.error("Error closing reader", e);
         }
         logger.info(ctParse.logLine("Reading XML and parsing with kXML2"));
 
@@ -1057,9 +1056,9 @@ public class XFormParser implements IXFormParserFunctions {
                     sb.append(XFormSerializer.elementToString(child));
                 } else {
                     //Otherwise, ignore it.
-                    logger.info("Unrecognized tag inside of text: <"  + child.getName() + ">. " +
-                        "Did you intend to use HTML markup? If so, ensure that the element is defined in " +
-                        "the HTML namespace.");
+                    logger.info("Unrecognized tag inside of text: <{}>. Did you intend to " +
+                        "use HTML markup? If so, ensure that the element is defined in " +
+                        "the HTML namespace.", child.getName());
                 }
             }else{
                 sb.append(e.getText(i));
@@ -1702,7 +1701,7 @@ public class XFormParser implements IXFormParserFunctions {
                 //for the other locale, but isn't super good.
                 //TODO: Clean up being able to get here
                 if(!itextKnownForms.contains(textForm)) {
-                    logger.info("adding unexpected special itext form: " + textForm + " to list of expected forms");
+                    logger.info("adding unexpected special itext form: {} to list of expected forms", textForm);
                     itextKnownForms.add(textForm);
                 }
                 return true;
@@ -1829,7 +1828,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
         if (hasElements && hasText) {
-            logger.info("Warning: instance node '" + node.getName() + "' contains both elements and text as children; text ignored");
+            logger.warn("instance node '{}' contains both elements and text as children; text ignored", node.getName());
         }
 
         //check for repeat templating
@@ -1858,7 +1857,7 @@ public class XFormParser implements IXFormParserFunctions {
             element = (TreeElement)modelPrototypes.getNewInstance(typeMappings.get(modelType).toString());
             if(element == null) {
                 element = new TreeElement(name, multiplicity);
-                logger.info("No model type prototype available for " + modelType);
+                logger.info("No model type prototype available for {}", modelType);
             } else {
                 element.setName(name);
                 element.setMult(multiplicity);
