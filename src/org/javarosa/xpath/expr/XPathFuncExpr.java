@@ -224,7 +224,7 @@ public class XPathFuncExpr extends XPathExpression {
             return boolStr(argVals[0]);
         } else if (name.equals("format-date")) {
             assertArgsCount(name, args, 2);
-            return dateStr(argVals[0], argVals[1], true);
+            return formatDateTime(argVals[0], argVals[1]);
         } else if (name.equals("abs")) { //XPath 3.0
             checkArity(name, 1, args.length);
             return Math.abs(toDouble(argVals[0]));
@@ -269,7 +269,7 @@ public class XPathFuncExpr extends XPathExpression {
             return Math.tan(toDouble(argVals[0]));
         } else if (name.equals("format-date-time")) { // non-standard
             assertArgsCount(name, args, 2);
-            return dateStr(argVals[0], argVals[1], true);
+            return formatDateTime(argVals[0], argVals[1]);
         } else if ((name.equals("selected") || name.equals("is-selected"))) { //non-standard
             assertArgsCount(name, args, 2);
             return multiSelected(argVals[0], argVals[1], name);
@@ -758,27 +758,37 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * convert a value to a date. note that xpath has no intrinsic representation of dates, so this
-     * is off-spec. dates convert to strings as 'yyyy-mm-dd', convert to numbers as # of days since
-     * the unix epoch, and convert to booleans always as 'true'
+     * Convert a value to a {@link Date}. note that xpath has no intrinsic representation of dates, so this
+     * is off-spec.
      *
-     * string and int conversions are reversable, however:
-     *   * cannot convert bool to date
-     *   * empty string and NaN (xpath's 'null values') go unchanged, instead of being converted
-     *     into a date (which would cause an error, since Date has no null value (other than java
-     *     null, which the xpath engine can't handle))
-     *   * note, however, than non-empty strings that aren't valid dates _will_ cause an error
-     *     during conversion
+     * Dates convert to strings as 'yyyy-mm-dd', convert to numbers as # of days since
+     * the unix epoch, and convert to booleans always as 'true'.
      *
-     * @param o
-     * @return
+     * This function parses input values to dates. Input values can be:
+     *   * A well formatted ISO8601 string representation of a date, with or without time.
+     *     Examples: '2018-01-01', '2018-01-01T10:20:30.400', '2018-01-01T10:20:30.400+02'
+     *   * An epoch integer measured in days (Days since 1970-01-01, negative values are allowed)
+     *
+     * Some values won't get parsed and will be returned as is without throwing an exception:
+     *   * Empty string
+     *   * Double.NaN (used by xpath as 'null value')
+     *   * A value that is already a Date
+     *
+     * Any other value will throw an exception. Specifically:
+     *   * Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY
+     *   * A double value less than Integer.MIN_VALUE or greater than Integer.MAX_VALUE
+     *   * A non parseable string
+     *
+     * @param input an Object containing a well formatted Date string, an epoch integer (in days)
+     *              or a {@link Date} instance
+     * @return a {@link Date} instance
      */
-    public static Object toDate (Object o, boolean preserveTime) {
-        o = unpack(o);
+    public static Object toDate (Object input, boolean preserveTime) {
+        input = unpack(input);
 
-        if (o instanceof Double) {
+        if (input instanceof Double) {
             if (preserveTime) {
-                Double n = (Double) o;
+                Double n = (Double) input;
 
                 if (n.isNaN()) {
                     return n;
@@ -793,7 +803,7 @@ public class XPathFuncExpr extends XPathExpression {
                 Date d = new Date(timeMillis);
                 return d;
             } else {
-                Double n = toInt(o);
+                Double n = toInt(input);
 
                 if (n.isNaN()) {
                     return n;
@@ -805,8 +815,8 @@ public class XPathFuncExpr extends XPathExpression {
 
                 return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
             }
-        } else if (o instanceof String) {
-            String s = (String)o;
+        } else if (input instanceof String) {
+            String s = (String)input;
 
             if (s.length() == 0) {
                 return s;
@@ -818,11 +828,11 @@ public class XPathFuncExpr extends XPathExpression {
             } else {
                 return d;
             }
-        } else if (o instanceof Date) {
+        } else if (input instanceof Date) {
             if ( preserveTime ) {
-                return (Date) o;
+                return (Date) input;
             } else {
-                return DateUtils.roundDate((Date)o);
+                return DateUtils.roundDate((Date)input);
             }
         } else {
             throw new XPathTypeMismatchException("converting to date");
@@ -894,13 +904,11 @@ public class XPathFuncExpr extends XPathExpression {
             return Boolean.FALSE;
     }
 
-    public static String dateStr (Object od, Object of, boolean preserveTime) {
-        od = toDate(od, preserveTime);
-        if (od instanceof Date) {
-            return DateUtils.format((Date)od, toString(of));
-        } else {
-            return "";
-        }
+    public static String formatDateTime(Object inputValue, Object format) {
+        Object parseResult = toDate(inputValue, true);
+        return parseResult instanceof Date
+            ? DateUtils.format((Date) parseResult, toString(format))
+            : "";
     }
 
     private Double position(TreeReference refAt) {
