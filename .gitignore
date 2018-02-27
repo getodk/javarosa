@@ -12,3 +12,7 @@ out
 # mvn
 target
 secrets.xml
+
+# logging
+logback.xml
+logback-test.xml
