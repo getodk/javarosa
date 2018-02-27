@@ -106,8 +106,8 @@ public class XFormAnswerDataParser {
 
         case Constants.DATATYPE_CHOICE:
 
-            List<Selection> selections = getSelections(text, q);
-            return (selections.size() == 0 ? null : new SelectOneData(selections.get(0)));
+            Selection selection = getSelection(text, q);
+            return (selection == null ? null : new SelectOneData(selection));
 
         case Constants.DATATYPE_CHOICE_LIST:
 
