@@ -280,6 +280,7 @@ public class XPathEvalTest extends TestCase {
         //        dates cannot reliably be compared/used across time zones (an issue with the code)
         //        any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
         /* other built-in functions */
+        testEval("format-date('2018-01-02T10:20:30.123', \"%Y-%m-%e %H:%M:%S\")", "2018-01-2 10:20:30");
 
         logTestCategory("boolean functions");
         testEval("not(true())", FALSE);
