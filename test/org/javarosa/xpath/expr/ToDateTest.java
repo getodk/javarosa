@@ -51,14 +51,13 @@ public class ToDateTest {
     assertEquals(expectedDate.withTimeAtStartOfDay().toDate(), toDate(days, true));
   }
 
-  // Test fails on some machines and succeeds on others. Needs investigation.
-  // @Test
-  // public void datesGoUnchanged() {
-  //   // We need to account for the offset, because this test could be affected by other tests manipulating the Calendar
-  //   DateTime testDate = new DateTime(2018, 1, 1, 10, 20, 30, 400, UTC);
-  //   assertEquals(testDate.withTimeAtStartOfDay().toDate(), toDate(testDate.toDate(), false));
-  //   assertEquals(testDate.toDate(), toDate(testDate.toDate(), true));
-  // }
+  @Test
+  public void datesGoUnchanged() {
+    // We need to account for the offset, because this test could be affected by other tests manipulating the Calendar
+    DateTime testDate = new DateTime(2018, 1, 1, 10, 20, 30, 400, UTC);
+    assertEquals(testDate.withTimeAtStartOfDay().toDate(), toDate(testDate.toDate(), false));
+    assertEquals(testDate.toDate(), toDate(testDate.toDate(), true));
+  }
 
   @Test
   public void emptyStringsGoUnchanged() {
