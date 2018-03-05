@@ -7,6 +7,7 @@ import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.Calendar;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -51,14 +52,13 @@ public class ToDateTest {
     assertEquals(expectedDate.withTimeAtStartOfDay().toDate(), toDate(days, true));
   }
 
-  // Test fails on some machines and succeeds on others. Needs investigation.
-  // @Test
-  // public void datesGoUnchanged() {
-  //   // We need to account for the offset, because this test could be affected by other tests manipulating the Calendar
-  //   DateTime testDate = new DateTime(2018, 1, 1, 10, 20, 30, 400, UTC);
-  //   assertEquals(testDate.withTimeAtStartOfDay().toDate(), toDate(testDate.toDate(), false));
-  //   assertEquals(testDate.toDate(), toDate(testDate.toDate(), true));
-  // }
+  @Test
+  public void datesGoUnchanged() {
+    // We need to account for the offset, because this test could be affected by other tests manipulating the Calendar
+    DateTime testDate = new DateTime(2018, 1, 1, 10, 20, 30, 400, DateTimeZone.forTimeZone(Calendar.getInstance().getTimeZone()));
+    assertEquals(testDate.withTimeAtStartOfDay().toDate(), toDate(testDate.toDate(), false));
+    assertEquals(testDate.toDate(), toDate(testDate.toDate(), true));
+  }
 
   @Test
   public void emptyStringsGoUnchanged() {
