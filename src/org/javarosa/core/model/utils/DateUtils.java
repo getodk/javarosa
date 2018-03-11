@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
 
+import org.javarosa.xpath.XPathTypeMismatchException;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -305,211 +307,32 @@ public class DateUtils {
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
 
     public static Date parseDateTime (String str) {
-        DateFields fields = new DateFields();
-        int i = str.indexOf("T");
-        if (i != -1) {
-            if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
-                return null;
-            }
-        } else {
-            if (!parseDate(str, fields)) {
-                return null;
-            }
+        try {
+            return DateTime.parse(str).toDate();
+        } catch(IllegalArgumentException e) {
+            throw new XPathTypeMismatchException(e.getMessage());
         }
-        return getDate(fields);
     }
 
     public static Date parseDate (String str) {
-        DateFields fields = new DateFields();
-        if (!parseDate(str, fields)) {
-            return null;
+        try {
+            return DateTime.parse(str).toDate();
+        } catch(IllegalArgumentException e) {
+            throw new XPathTypeMismatchException(e.getMessage());
         }
-        return getDate(fields);
     }
 
     public static Date parseTime (String str) {
-        DateFields fields = getFields(new Date());
-        fields.second = 0;
-        fields.secTicks = 0;
-        if (!parseTime(str, fields)) {
-            return null;
-        }
-        // time zone may wrap time across midnight. Clear that.
-        fields.year = 1970;
-        fields.month = 1;
-        fields.day = 1;
-        return getDate(fields);
-    }
-
-    private static boolean parseDate (String dateStr, DateFields f) {
-      List<String> pieces = split(dateStr, "-", false);
-        if (pieces.size() != 3)
-            return false;
-
-        try {
-            f.year = Integer.parseInt((String)pieces.get(0));
-            f.month = Integer.parseInt((String)pieces.get(1));
-            f.day = Integer.parseInt((String)pieces.get(2));
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-
-        return f.check();
-    }
-
-    private static boolean parseTime (String timeStr, DateFields f) {
-        //get timezone information first. Make a Datefields set for the possible offset
-        //NOTE: DO NOT DO DIRECT COMPUTATIONS AGAINST THIS. It's a holder for hour/minute
-        //data only, but has data in other fields
-        DateFields timeOffset = null;
-
-        if(timeStr.charAt(timeStr.length() -1) == 'Z') {
-            //UTC!
-
-            //Clean up string for later processing
-            timeStr = timeStr.substring(0, timeStr.length() -1);
-            timeOffset = new DateFields();
-        } else if(timeStr.indexOf("+") != -1 || timeStr.indexOf("-") != -1) {
-            timeOffset = new DateFields();
-
-         List<String> pieces = split(timeStr, "+", false);
-
-            //We're going to add the Offset straight up to get UTC
-            //so we need to invert the sign on the offset string
-            int offsetSign = -1;
-
-            if(pieces.size() > 1) {
-                //offsetSign is already correct
-            } else {
-                pieces = split(timeStr, "-", false);
-                offsetSign = 1;
-            }
-
-            timeStr = pieces.get(0);
-
-            String offset = pieces.get(1);
-            String hours = offset;
-            if(offset.indexOf(":") != -1) {
-            List<String> tzPieces = split(offset, ":", false);
-                hours = tzPieces.get(0);
-                int mins = Integer.parseInt(tzPieces.get(1));
-                timeOffset.minute = mins * offsetSign;
-            }
-            timeOffset.hour = Integer.parseInt(hours) * offsetSign;
-        }
-
-        //Do the actual parse for the real time values;
-        if(!parseRawTime(timeStr, f)) {
-            return false;
-        }
-
-        if(!(f.check())) {
-            return false;
-        }
-
-        //Time is good, if there was no timezone info, just return that;
-        if(timeOffset == null) {
-            return true;
-        }
-
-        //Now apply any relevant offsets from the timezone.
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-
-        long msecOffset = (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
-        c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
-
-        //c is now in the timezone of the parsed value, so put
-        //it in the local timezone.
-
-        c.setTimeZone(TimeZone.getDefault());
-        long four = c.get(Calendar.HOUR);
-
-        DateFields adjusted = getFields(c.getTime());
-
-        // time zone adjustment may +/- across midnight
-        // which can result in +/- across a year
-        f.year = adjusted.year;
-        f.month = adjusted.month;
-        f.day = adjusted.day;
-        f.dow = adjusted.dow;
-        f.hour = adjusted.hour;
-        f.minute = adjusted.minute;
-        f.second = adjusted.second;
-        f.secTicks = adjusted.secTicks;
-
-        return f.check();
-    }
-
-    /**
-     * Parse the raw components of time (hh:mm:ss) with no timezone information
-     *
-     * @param timeStr
-     * @param f
-     * @return
-     */
-    private static boolean parseRawTime (String timeStr, DateFields f) {
-      List<String> pieces = split(timeStr, ":", false);
-        if (pieces.size() != 2 && pieces.size() != 3)
-            return false;
-
-        try {
-            f.hour = Integer.parseInt((String)pieces.get(0));
-            f.minute = Integer.parseInt((String)pieces.get(1));
-
-            if (pieces.size() == 3) {
-                String secStr = (String)pieces.get(2);
-                int i;
-                for (i = 0; i < secStr.length(); i++) {
-                    char c = secStr.charAt(i);
-                    if (!Character.isDigit(c) && c != '.')
-                        break;
-                }
-                secStr = secStr.substring(0, i);
-
-                int idxDec = secStr.indexOf('.');
-                if ( idxDec == -1 ) {
-                    if ( secStr.length() == 0 ) {
-                        f.second = 0;
-                    } else {
-                        f.second = Integer.parseInt(secStr);
-                    }
-                    f.secTicks = 0;
-                } else {
-                    String secPart = secStr.substring(0,idxDec);
-                    if ( secPart.length() == 0 ) {
-                        f.second = 0;
-                    } else {
-                        f.second = Integer.parseInt(secPart);
-                    }
-                    String secTickStr = secStr.substring(idxDec+1);
-                    if ( secTickStr.length() > 0 ) {
-                        f.secTicks = Integer.parseInt(secTickStr);
-                    } else {
-                        f.secTicks = 0;
-                    }
-                }
-
-                double fsec = Double.parseDouble(secStr);
-                f.second = (int)fsec;
-                f.secTicks = (int)(1000.0 * fsec - 1000.0 * f.second);
-            }
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-
-        return f.check();
+        return parseDate("1970-01-01T" + str);
     }
 
 
     /* ==== DATE UTILITY FUNCTIONS ==== */
 
     public static Date getDate (int year, int month, int day) {
-        DateFields f = new DateFields();
-        f.year = year;
-        f.month = month;
-        f.day = day;
-        return (f.check() ? getDate(f) : null);
+        return new LocalDate(year, month, day).toDate();
     }
+
 
     /**
      *
