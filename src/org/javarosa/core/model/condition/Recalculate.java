@@ -17,7 +17,6 @@
 package org.javarosa.core.model.condition;
 
 import java.util.Date;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
@@ -142,14 +141,11 @@ public class Recalculate extends Triggerable {
         } else if (val instanceof String) {
             return new StringData((String)val);
         } else if (val instanceof Date) {
-            if ( dataType == Constants.DATATYPE_DATE_TIME) {
-                return new DateTimeData((Date)val);
-            }
-            else if ( dataType == Constants.DATATYPE_TIME ) {
-                return new TimeData((Date)val);
-            } else {
-                return new DateData((Date)val);
-            }
+            if (dataType == Constants.DATATYPE_TIME)
+                return new TimeData((Date) val);
+            if (dataType == Constants.DATATYPE_DATE)
+                return new DateData((Date) val);
+            return new DateTimeData((Date) val);
         } else {
             throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
         }
