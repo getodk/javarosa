@@ -60,11 +60,7 @@ public class MemoryUtils {
         memoryHolders = new byte[MEMORY_PROFILE_SIZE][];
     }
 
-    //#if javarosa.memory.print
-    //# private static boolean MEMORY_PRINT_ENABLED = true;
-    //#else
     private static boolean MEMORY_PRINT_ENABLED = false;
-    //#endif
 
     /**
      * Prints a memory test debug statement to stdout.

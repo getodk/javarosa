@@ -34,9 +34,7 @@ public class PropertyUtils {
             propVal = new ArrayList<String>(1);
             propVal.add(defaultValue);
             PropertyManager._().setProperty(propName, propVal);
-            //#if debug.output==verbose
             logger.info("No default value for [{}]; setting to [{}]", propName, defaultValue); // debug
-            //#endif
             return defaultValue;
         }
         return propVal.get(0);

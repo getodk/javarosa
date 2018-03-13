@@ -101,9 +101,7 @@ public class XFormUtils {
                 dis = new DataInputStream(is);
                 returnForm = (FormDef) ExtUtil.read(dis, FormDef.class);
             } else {
-                //#if debug.output==verbose
                 logger.info("ResourceStream NULL");
-                //#endif
             }
         } catch (IOException e) {
             logger.error("Error", e);

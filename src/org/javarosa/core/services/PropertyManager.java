@@ -105,9 +105,7 @@ public class PropertyManager implements IPropertyManager {
             }
         }
         if(retVal == null) {
-            //#if debug.output==verbose
             logger.warn("Singular property request failed for property {}", propertyName);
-            //#endif
         }
         return retVal;
     }
@@ -171,12 +169,9 @@ public class PropertyManager implements IPropertyManager {
             if(valid) {
                 writeValue(propertyName, propertyValue);
                 notifyChanges(propertyName);
-            }
-            //#if debug.output==verbose
-            else {
+            } else {
                 logger.info("Property Manager: Unable to write value ({}) to {}", propertyValue, propertyName);
             }
-            //#endif
         }
 
     }

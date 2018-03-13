@@ -62,9 +62,7 @@ public class Property implements Persistable, IMetaData {
         int nameindex = fullString.indexOf(",");
         value = new ArrayList<String>();
         if(nameindex == -1) {
-            //#if debug.output==verbose
             logger.warn("Property in RMS with no value: {}", fullString);
-            //#endif
             name = fullString.substring(0, fullString.length());
         }
         else {

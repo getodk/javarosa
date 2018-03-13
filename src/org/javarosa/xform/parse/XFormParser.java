@@ -391,10 +391,8 @@ public class XFormParser implements IXFormParserFunctions {
             //CTS - 12/09/2012 - Stop swallowing IO Exceptions
             throw e;
         } catch(Exception e){
-            //#if debug.output==verbose || debug.output==exception
             logger.error("Unhandled Exception while Parsing XForm", e);
             throw new XFormParseException("Unhandled Exception while Parsing XForm");
-            //#endif
         }
 
         try {
@@ -600,10 +598,8 @@ public class XFormParser implements IXFormParserFunctions {
                 //is set for the build. It dynamically wipes out old model nodes once they're
                 //used. This is sketchy if anything else plans on touching the nodes.
                 //This code can be removed once we're pull-parsing
-                //#if org.javarosa.xform.stingy
                 e.removeChild(i);
                 --i;
-                //#endif
             }
         }
 
@@ -1595,7 +1591,6 @@ public class XFormParser implements IXFormParserFunctions {
             //is set for the build. It dynamically wipes out old model nodes once they're
             //used. This is sketchy if anything else plans on touching the nodes.
             //This code can be removed once we're pull-parsing
-            //#if org.javarosa.xform.stingy
             removeIndexes.add(j);
         }
         ElementChildDeleter.delete(trans, removeIndexes);

@@ -294,8 +294,6 @@ public class ExternalizableTest extends TestCase {
     }
 
     private static void print (String s) {
-        //#if javarosa.dev.serializationtest.verbose
         logger.info(s);
-        //#endif
     }
 }
