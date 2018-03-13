@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>data</h:title>
+    <model>
+      <instance>
+        <data id="data">
+          <now/>
+          <now_format/>
+          <now_note/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <!-- time component not populated because value type is string -->
+      <bind calculate="date('2018-01-01T10:20:30.400')" nodeset="/data/now" type="string"/>
+      <bind calculate="format-date-time(/data/now, '%Y-%m-%dT%H:%M:%S.%3')" nodeset="/data/now_format" type="string"/>
+      <bind nodeset="/data/now_note" readonly="true()" type="string"/>
+
+      <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/now_note">
+      <label><output value="/data/now_format"/></label>
+    </input>
+  </h:body>
+</h:html>

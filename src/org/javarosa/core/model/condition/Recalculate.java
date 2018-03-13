@@ -17,7 +17,6 @@
 package org.javarosa.core.model.condition;
 
 import java.util.Date;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
@@ -39,6 +38,8 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
 public class Recalculate extends Triggerable {
+
+    @SuppressWarnings("unused")
     public Recalculate () {
 
     }
@@ -47,32 +48,25 @@ public class Recalculate extends Triggerable {
         super(expr, contextRef);
     }
 
-    public Recalculate (IConditionExpr expr, TreeReference target, TreeReference contextRef) {
-        super(expr, contextRef);
-        addTarget(target);
+    public Object eval(FormInstance model, EvaluationContext ec) {
+        return evalRaw(model, ec);
     }
 
-    public Object eval (FormInstance model, EvaluationContext ec) {
-      return evalRaw(model, ec);
-    }
-
-    public void apply (TreeReference ref, Object result, FormInstance mainInstance) {
+    public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
         int dataType = element.getDataType();
         element.setAnswer(wrapData(result, dataType));
     }
 
-    public boolean canCascade () {
+    public boolean canCascade() {
         return true;
     }
 
-    public boolean equals (Object o) {
+    public boolean equals(Object o) {
         if (o instanceof Recalculate) {
-            Recalculate r = (Recalculate)o;
-            if (this == r)
-                return true;
+            Recalculate r = (Recalculate) o;
+            return this == r || super.equals(r);
 
-            return super.equals(r);
         } else {
             return false;
         }
@@ -87,14 +81,14 @@ public class Recalculate extends Triggerable {
     // if numeric data, convert to int if node type is int OR data is an integer; else convert to double
     // if string data or date data, keep as is
     // if NaN or empty string, null
+
     /**
      * convert the data object returned by the xpath expression into an IAnswerData suitable for
      * storage in the FormInstance
-     *
      */
-    public static IAnswerData wrapData (Object val, int dataType) {
-        if ((val instanceof String && ((String)val).length() == 0) ||
-            (val instanceof Double && ((Double)val).isNaN())) {
+    public static IAnswerData wrapData(Object val, int dataType) {
+        if ((val instanceof String && ((String) val).length() == 0) ||
+                (val instanceof Double && ((Double) val).isNaN())) {
             return null;
         }
 
@@ -105,12 +99,12 @@ public class Recalculate extends Triggerable {
             boolean b;
 
             if (val instanceof Boolean) {
-                b = ((Boolean)val).booleanValue();
+                b = (Boolean) val;
             } else if (val instanceof Double) {
-                Double d = (Double)val;
-                b = Math.abs(d.doubleValue()) > 1.0e-12 && !Double.isNaN(d);
+                Double d = (Double) val;
+                b = Math.abs(d) > 1.0e-12 && !Double.isNaN(d);
             } else if (val instanceof String) {
-                String s = (String)val;
+                String s = (String) val;
                 b = s.length() > 0;
             } else {
                 throw new RuntimeException("unrecognized data representation while trying to convert to BOOLEAN");
@@ -118,14 +112,14 @@ public class Recalculate extends Triggerable {
 
             return new BooleanData(b);
         } else if (val instanceof Double) {
-            double d = ((Double)val).doubleValue();
+            double d = (Double) val;
             long l = (long) d;
             boolean isIntegral = Math.abs(d - l) < 1.0e-9;
-            if(Constants.DATATYPE_INTEGER == dataType ||
-                       (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
-                return new IntegerData((int)d);
-            } else if(Constants.DATATYPE_LONG == dataType || isIntegral) {
-                return new LongData((long)d);
+            if (Constants.DATATYPE_INTEGER == dataType ||
+                    (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
+                return new IntegerData((int) d);
+            } else if (Constants.DATATYPE_LONG == dataType || isIntegral) {
+                return new LongData((long) d);
             } else {
                 return new DecimalData(d);
             }
@@ -140,16 +134,13 @@ public class Recalculate extends Triggerable {
         } else if (dataType == Constants.DATATYPE_CHOICE_LIST) {
             return new SelectMultiData().cast(new UncastData(String.valueOf(val)));
         } else if (val instanceof String) {
-            return new StringData((String)val);
+            return new StringData((String) val);
         } else if (val instanceof Date) {
-            if ( dataType == Constants.DATATYPE_DATE_TIME) {
-                return new DateTimeData((Date)val);
-            }
-            else if ( dataType == Constants.DATATYPE_TIME ) {
-                return new TimeData((Date)val);
-            } else {
-                return new DateData((Date)val);
-            }
+            if (dataType == Constants.DATATYPE_TIME)
+                return new TimeData((Date) val);
+            if (dataType == Constants.DATATYPE_DATE)
+                return new DateData((Date) val);
+            return new DateTimeData((Date) val);
         } else {
             throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
         }
