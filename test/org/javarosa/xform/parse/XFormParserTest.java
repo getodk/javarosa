@@ -386,9 +386,38 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
+    /** No warnings should be produced when bind attributes known to clients are used. **/
     @Test public void parsesWithWhitelistedAttributes() throws IOException {
       ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
       assertThat(parseResult.errorMessages.size(), is(0));
+    }
+
+    /**
+     * Attributes that started being used by clients without being added as fields to DataBinding should be passed
+     * through and made available in the bindAttributes list.
+     */
+    @Test public void passedThroughAttributesHaveExpectedValues() throws IOException {
+        ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
+
+        TreeElement instanceIDElement = parseResult.formDef
+                .getMainInstance()
+                .getRoot()
+                .getChildAt(0)
+                .getChildAt(0);
+
+        String requiredMsg = instanceIDElement
+                .getBindAttribute("", "requiredMsg")
+                .getValue()
+                .getDisplayText();
+
+        assertEquals(requiredMsg, "this is required");
+
+        String saveIncomplete = instanceIDElement
+                .getBindAttribute("", "saveIncomplete")
+                .getValue()
+                .getDisplayText();
+
+        assertEquals(saveIncomplete, "false");
     }
 
     private TreeElement findDepthFirst(TreeElement parent, String name) {
