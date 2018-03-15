@@ -29,7 +29,8 @@ class StandardBindAttributesProcessor {
     private Map<String, Integer> typeMappings;
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
-                              Collection<String> usedAttributes, Element element) {
+                              Collection<String> usedAttributes, Collection<String> passedThroughAttributes,
+                              Element element) {
         final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
@@ -116,7 +117,7 @@ class StandardBindAttributesProcessor {
         binding.setPreload(element.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
         binding.setPreloadParams(element.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
-        saveUnusedAttributes(binding, element, usedAttributes);
+        saveUnusedAttributes(binding, element, usedAttributes, passedThroughAttributes);
 
         return binding;
     }
@@ -184,10 +185,11 @@ class StandardBindAttributesProcessor {
         return dataType;
     }
 
-    private void saveUnusedAttributes(DataBinding binding, Element element, Collection<String> usedAttributes) {
+    private void saveUnusedAttributes(DataBinding binding, Element element, Collection<String> usedAttributes,
+                                      Collection<String> passedThroughAttributes) {
         for (int i = 0; i < element.getAttributeCount(); i++) {
             String name = element.getAttributeName(i);
-            if (! usedAttributes.contains(name)) {
+            if (!usedAttributes.contains(name) || passedThroughAttributes.contains(name)) {
                 binding.setAdditionalAttribute(element.getAttributeNamespace(i), name, element.getAttributeValue(i));
             }
         }

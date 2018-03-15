@@ -1692,11 +1692,12 @@ public class XFormParser implements IXFormParserFunctions {
         return false;
     }
 
-    protected DataBinding processStandardBindAttributes(List<String> usedAtts, Element element) {
+    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element) {
         return new StandardBindAttributesProcessor(reporter, typeMappings).
-                createBinding(this, _f, usedAtts, element);
+                createBinding(this, _f, usedAtts, passedThroughAtts, element);
     }
 
+    /** Attributes that are read into DataBinding fields **/
     private final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList(
             ID_ATTR,
             NODESET_ATTR,
@@ -1713,8 +1714,17 @@ public class XFormParser implements IXFormParserFunctions {
             "saveIncomplete"
     ));
 
-    protected void parseBind(Element element) {
-        final DataBinding binding = processStandardBindAttributes(usedAtts, element);
+    /**
+     * Attributes that are passed through to additionalAttrs but shouldn't lead to warnings.
+     * These are consistently used by clients but are expected in additionalAttrs for historical reasons.
+     **/
+    private final List<String> passedThroughAtts = Collections.unmodifiableList(Arrays.asList(
+            "requiredMsg",
+            "saveIncomplete"
+    ));
+
+    private void parseBind(Element element) {
+        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element);
 
         // Warn of unused attributes of parent element
         if (XFormUtils.showUnusedAttributeWarning(element, usedAtts)) {
@@ -1725,7 +1735,7 @@ public class XFormParser implements IXFormParserFunctions {
         addBinding(binding);
     }
 
-    protected void addBinding(DataBinding binding) {
+    private void addBinding(DataBinding binding) {
         bindings.add(binding);
 
         if (binding.getId() != null) {
