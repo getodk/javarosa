@@ -386,12 +386,6 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
-    /** No warnings should be produced when bind attributes known to clients are used. **/
-    @Test public void parsesWithWhitelistedAttributes() throws IOException {
-      ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
-      assertThat(parseResult.errorMessages.size(), is(0));
-    }
-
     /**
      * Attributes that started being used by clients without being added as fields to DataBinding should be passed
      * through and made available in the bindAttributes list.
