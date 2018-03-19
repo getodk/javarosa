@@ -17,7 +17,7 @@
 
     <h:body>
         <group appearance="field-list">
-            <input ref="/data/meta/instanceID" rows="2">
+            <input ref="/data/meta/instanceID" rows="2" query="instance('fake')/root/item[fake2 = /data/meta/instanceID">
                 <label>Instance ID:</label>
             </input>
         </group>
