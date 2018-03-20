@@ -180,9 +180,16 @@ public class XFormParser implements IXFormParserFunctions {
         groupLevelHandlers = new HashMap<String, IElementHandler>() {{
             put("input", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT,
-                            Arrays.asList("rows") // Prevent warning about unexpected attributes
-                    );
+                    // Attributes that are passed through to additionalAttributes but shouldn't lead to warnings.
+                    // These are consistently used by clients but are expected in additionalAttributes for historical
+                    // reasons.
+                    final List<String> passedThroughInputAtts = Collections.unmodifiableList(Arrays.asList(
+                            "rows",
+                            "query"
+                    ));
+
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT, passedThroughInputAtts,
+                            passedThroughInputAtts);
                 }
             });
             put("range", new IElementHandler() {
@@ -758,15 +765,17 @@ public class XFormParser implements IXFormParserFunctions {
         instanceNodeIdStrs.add(instanceId);
     }
 
-    protected void processAdditionalAttributes(QuestionDef question, Element e, List<String> usedAtts) {
+    private void processAdditionalAttributes(QuestionDef question, Element e, List<String> usedAtts,
+                                             List<String> passedThroughAtts) {
         // save all the unused attributes verbatim...
-        for(int i=0;i<e.getAttributeCount();i++){
+        for (int i = 0; i < e.getAttributeCount(); i++) {
             String name = e.getAttributeName(i);
-            if ( usedAtts.contains(name) ) continue;
-            question.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
+            if (!usedAtts.contains(name) || passedThroughAtts != null && passedThroughAtts.contains(name)) {
+                question.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
+            }
         }
 
-        if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+        if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)) {
             reporter.warning(XFormParserReporter.TYPE_UNKNOWN_MARKUP, XFormUtils.unusedAttWarning(e, usedAtts), getVagueLocation(e));
         }
     }
@@ -869,11 +878,27 @@ public class XFormParser implements IXFormParserFunctions {
         return tags;
     }
 
-    protected QuestionDef parseControl(IFormElement parent, Element e, int controlType) {
-        return parseControl (parent, e, controlType, null);
+    private QuestionDef parseControl(IFormElement parent, Element e, int controlType) {
+        return parseControl(parent, e, controlType, null, null);
     }
 
-    protected QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
+    private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
+        return parseControl(parent, e, controlType, additionalUsedAtts, null);
+    }
+
+    /**
+     * Parses a form control element into a {@link org.javarosa.core.model.QuestionDef} and attaches it to its parent.
+     *
+     * @param parent                the form control element's parent
+     * @param e                     the form control element to parse
+     * @param controlType           one of the control types defined in {@link org.javarosa.core.model.Constants}
+     * @param additionalUsedAtts    attributes specific to the control type
+     * @param passedThroughAtts     attributes specific to the control type that should be passed through to
+     *                              additionalAttributes for historical reasons
+     * @return                      a {@link org.javarosa.core.model.QuestionDef} representing the form control element
+     */
+    private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts,
+                                     List<String> passedThroughAtts) {
         final QuestionDef question = questionForControlType(controlType);
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
@@ -957,7 +982,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         parent.addChild(question);
 
-        processAdditionalAttributes(question, e, usedAtts);
+        processAdditionalAttributes(question, e, usedAtts, passedThroughAtts);
 
         return question;
     }
