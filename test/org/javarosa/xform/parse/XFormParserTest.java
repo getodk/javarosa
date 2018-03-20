@@ -6,6 +6,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -386,9 +387,43 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
-    @Test public void parsesWithWhitelistedAttributes() throws IOException {
-      ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
-      assertThat(parseResult.errorMessages.size(), is(0));
+    /**
+     * Attributes that started being used by clients without being added as fields to DataBinding or QuestionDef should
+     * be passed through and made available in the bindAttributes or additionalAttributes list.
+     */
+    @Test public void passedThroughAttributesHaveExpectedValues() throws IOException {
+        ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
+
+        TreeElement instanceIDElement = parseResult.formDef
+                .getMainInstance()
+                .getRoot()
+                .getChildAt(0)
+                .getChildAt(0);
+
+        // Bind attributes
+        String requiredMsg = instanceIDElement
+                .getBindAttribute("", "requiredMsg")
+                .getValue()
+                .getDisplayText();
+
+        assertEquals(requiredMsg, "this is required");
+
+        String saveIncomplete = instanceIDElement
+                .getBindAttribute("", "saveIncomplete")
+                .getValue()
+                .getDisplayText();
+
+        assertEquals(saveIncomplete, "false");
+
+        // Attributes specific to input form controls
+        QuestionDef question = FormDef.findQuestionByRef(instanceIDElement.getRef(), parseResult.formDef);
+        String rows = question
+                .getAdditionalAttribute("", "rows");
+        assertEquals(rows, "2");
+
+        String query = question
+                .getAdditionalAttribute("", "query");
+        assertEquals(query, "instance('fake')/root/item[fake2 = /data/meta/instanceID");
     }
 
     private TreeElement findDepthFirst(TreeElement parent, String name) {

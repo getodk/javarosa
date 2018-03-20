@@ -30,7 +30,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
 
@@ -150,17 +149,17 @@ public class XFormUtils {
         return unusedAtts;
     }
 
-    public static String unusedAttWarning(Element e, List<String> usedAtts){
+    public static String unusedAttWarning(Element e, List<String> usedAtts) {
         String warning = "Warning: ";
-      List<String> ua = getUnusedAttributes(e,usedAtts);
-        warning+=ua.size()+" Unrecognized attributes found in Element ["+e.getName()+"] and will be ignored: ";
-        warning+="[";
-        for(int i=0;i<ua.size();i++){
-            warning+=ua.get(i);
-            if(i!=ua.size()-1) warning+=",";
+        List<String> unusedAttributes = getUnusedAttributes(e, usedAtts);
+        warning += unusedAttributes.size() + " Unrecognized attributes found in Element [" + e.getName() +
+                "] and will be ignored: ";
+        warning += "[";
+        for (int i=0; i < unusedAttributes.size(); i++) {
+            warning += unusedAttributes.get(i);
+            if (i != unusedAttributes.size() - 1) warning += ",";
         }
-        warning+="] ";
-        warning+="Location:\n"+XFormParser.getVagueLocation(e);
+        warning += "] ";
 
         return warning;
     }
