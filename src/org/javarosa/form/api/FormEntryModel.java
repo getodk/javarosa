@@ -736,8 +736,11 @@ public class FormEntryModel {
         // find out if node is repeatable
         TreeReference nodeRef = form.getChildInstanceRef(elements, multiplicities);
         TreeElement node = form.getMainInstance().resolveReference(nodeRef);
-        if (node == null || node.isRepeatable()) { // node == null if there are no
-            // instances of the repeat
+        if (node == null || node.isRepeatable()) { // node == null if there are no instances of the repeat
+            IFormElement lastElement = elements.get(elements.size() - 1);
+            if (lastElement instanceof GroupDef && !((GroupDef) lastElement).getRepeat()) {
+                return false; // it's a regular group inside a repeatable group
+            }
             int mult;
             if (node == null) {
                 mult = 0; // no repeats; next is 0

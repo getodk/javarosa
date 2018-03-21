@@ -1,0 +1,45 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>simpleFormWithThreeQuestions</h:title>
+        <model>
+            <instance>
+                <data id="build_simpleFormWithThreeQuestions_1521541979">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                    <text/>
+                    <numeric/>
+                    <barcode/>
+                </data>
+            </instance>
+            <itext>
+                <translation lang="English">
+                    <text id="/data/text:label">
+                        <value>text</value>
+                    </text>
+                    <text id="/data/numeric:label">
+                        <value>numeric</value>
+                    </text>
+                    <text id="/data/barcode:label">
+                        <value>barcode</value>
+                    </text>
+                </translation>
+            </itext>
+            <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+            <bind nodeset="/data/text" type="string"/>
+            <bind nodeset="/data/numeric" type="int"/>
+            <bind nodeset="/data/barcode" type="barcode"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/data/text">
+            <label ref="jr:itext('/data/text:label')"/>
+        </input>
+        <input ref="/data/numeric">
+            <label ref="jr:itext('/data/numeric:label')"/>
+        </input>
+        <input ref="/data/barcode">
+            <label ref="jr:itext('/data/barcode:label')"/>
+        </input>
+    </h:body>
+</h:html>

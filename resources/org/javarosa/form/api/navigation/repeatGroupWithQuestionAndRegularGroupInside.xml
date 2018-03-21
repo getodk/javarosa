@@ -1,0 +1,63 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>repeatGroupWithQuestionAndRegularGroupInside</h:title>
+        <model>
+            <instance>
+                <data id="build_repeatGroupWithQuestionAndregularGroupInside_1521539265">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                    <g1 jr:template="">
+                        <text/>
+                        <g2>
+                            <numeric/>
+                            <barcode/>
+                        </g2>
+                    </g1>
+                </data>
+            </instance>
+            <itext>
+                <translation lang="English">
+                    <text id="/data/g1:label">
+                        <value>g1</value>
+                    </text>
+                    <text id="/data/g1/text:label">
+                        <value>text</value>
+                    </text>
+                    <text id="/data/g1/g2:label">
+                        <value></value>
+                    </text>
+                    <text id="/data/g1/g2/numeric:label">
+                        <value>numeric</value>
+                    </text>
+                    <text id="/data/g1/g2/barcode:label">
+                        <value>barcode</value>
+                    </text>
+                </translation>
+            </itext>
+            <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+            <bind nodeset="/data/g1/text" type="string"/>
+            <bind nodeset="/data/g1/g2/numeric" type="int"/>
+            <bind nodeset="/data/g1/g2/barcode" type="barcode"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group>
+            <label ref="jr:itext('/data/g1:label')"/>
+            <repeat nodeset="/data/g1">
+                <input ref="/data/g1/text">
+                    <label ref="jr:itext('/data/g1/text:label')"/>
+                </input>
+                <group>
+                    <label ref="jr:itext('/data/g1/g2:label')"/>
+                    <input ref="/data/g1/g2/numeric">
+                        <label ref="jr:itext('/data/g1/g2/numeric:label')"/>
+                    </input>
+                    <input ref="/data/g1/g2/barcode">
+                        <label ref="jr:itext('/data/g1/g2/barcode:label')"/>
+                    </input>
+                </group>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
