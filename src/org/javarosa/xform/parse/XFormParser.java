@@ -189,10 +189,12 @@ public class XFormParser implements IXFormParserFunctions {
                     // These are consistently used by clients but are expected in additionalAttributes for historical
                     // reasons.
                     final List<String> passedThroughInputAtts = Collections.unmodifiableList(Arrays.asList(
-                            "rows",
-                            "query"
-                    ));p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT,passedThroughInputAtts,
-                            passedThroughInputAtts
+                        "rows",
+                        "query"
+                    ));
+                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT,
+                        passedThroughInputAtts,
+                        passedThroughInputAtts
                     );
                 }
             });
