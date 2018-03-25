@@ -17,7 +17,6 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.Action;
-import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -72,9 +71,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,6 +79,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
+import static org.javarosa.core.model.Constants.CONTROL_INPUT;
+import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_SECRET;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
+import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
+import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
+import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST;
+import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
 import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExternalDataInstance;
 import static org.javarosa.core.services.ProgramFlow.die;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
@@ -188,36 +203,30 @@ public class XFormParser implements IXFormParserFunctions {
                     // Attributes that are passed through to additionalAttributes but shouldn't lead to warnings.
                     // These are consistently used by clients but are expected in additionalAttributes for historical
                     // reasons.
-                    final List<String> passedThroughInputAtts = Collections.unmodifiableList(Arrays.asList(
-                        "rows",
-                        "query"
-                    ));
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_INPUT,
-                        passedThroughInputAtts,
-                        passedThroughInputAtts
-                    );
+                    List<String> passedThroughInputAtts = unmodifiableList(asList("rows", "query"));
+                    p.parseControl((IFormElement) parent, e, CONTROL_INPUT, passedThroughInputAtts, passedThroughInputAtts);
                 }
             });
             put("range", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_RANGE,
-                        Arrays.asList("start", "end", "step") // Prevent warning about unexpected attributes
+                    p.parseControl((IFormElement) parent, e, CONTROL_RANGE,
+                        asList("start", "end", "step") // Prevent warning about unexpected attributes
                     );
                 }
             });
             put("secret", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SECRET);
+                    p.parseControl((IFormElement) parent, e, CONTROL_SECRET);
                 }
             });
             put(SELECT, new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_MULTI);
+                    p.parseControl((IFormElement) parent, e, CONTROL_SELECT_MULTI);
                 }
             });
             put(SELECTONE, new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_SELECT_ONE);
+                    p.parseControl((IFormElement) parent, e, CONTROL_SELECT_ONE);
                 }
             });
             put("group", new IElementHandler() {
@@ -232,12 +241,12 @@ public class XFormParser implements IXFormParserFunctions {
             });
             put("trigger", new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseControl((IFormElement) parent, e, Constants.CONTROL_TRIGGER);
+                    p.parseControl((IFormElement) parent, e, CONTROL_TRIGGER);
                 }
             }); //multi-purpose now; need to dig deeper
-            put(Constants.XFTAG_UPLOAD, new IElementHandler() {
+            put(XFTAG_UPLOAD, new IElementHandler() {
                 @Override public void handle(XFormParser p, Element e, Object parent) {
-                    p.parseUpload((IFormElement) parent, e, Constants.CONTROL_UPLOAD);
+                    p.parseUpload((IFormElement) parent, e, CONTROL_UPLOAD);
                 }
             });
             put(LABEL_ELEMENT, new IElementHandler() {
@@ -480,7 +489,7 @@ public class XFormParser implements IXFormParserFunctions {
         logger.info(codeTimer.logLine("Creating FormDef from parsed XML"));
     }
 
-    private final Set<String> validElementNames = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+    private final Set<String> validElementNames = unmodifiableSet(new HashSet<>(asList(
         "html",
         "head",
         "body",
@@ -775,24 +784,24 @@ public class XFormParser implements IXFormParserFunctions {
         // get media type value
         String mediaType = e.getAttributeValue(null, "mediatype");
         // parse the control
-        QuestionDef question = parseControl(parent, e, controlUpload, Arrays.asList("mediatype"));
+        QuestionDef question = parseControl(parent, e, controlUpload, asList("mediatype"));
 
         // apply the media type value to the returned question def.
         if ("image/*".equals(mediaType)) {
             // NOTE: this could be further expanded.
-            question.setControlType(Constants.CONTROL_IMAGE_CHOOSE);
+            question.setControlType(CONTROL_IMAGE_CHOOSE);
         } else if("audio/*".equals(mediaType)) {
-            question.setControlType(Constants.CONTROL_AUDIO_CAPTURE);
+            question.setControlType(CONTROL_AUDIO_CAPTURE);
         } else if ("video/*".equals(mediaType)) {
-            question.setControlType(Constants.CONTROL_VIDEO_CAPTURE);
+            question.setControlType(CONTROL_VIDEO_CAPTURE);
         } else if ("osm/*".equals(mediaType)) {
-            question.setControlType(Constants.CONTROL_OSM_CAPTURE);
+            question.setControlType(CONTROL_OSM_CAPTURE);
             List<OSMTag> tags = parseOsmTags(e);
             question.setOsmTags(tags);
         } else {
             // everything else.
             // Presumably, the appearance attribute would govern how this is handled.
-            question.setControlType(Constants.CONTROL_FILE_CAPTURE);
+            question.setControlType(CONTROL_FILE_CAPTURE);
         }
         return question;
     }
@@ -893,7 +902,7 @@ public class XFormParser implements IXFormParserFunctions {
         final QuestionDef question = questionForControlType(controlType);
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
-        final List<String> usedAtts = new ArrayList<>(Arrays.asList(REF_ATTR, BIND_ATTR, APPEARANCE_ATTR));
+        final List<String> usedAtts = new ArrayList<>(asList(REF_ATTR, BIND_ATTR, APPEARANCE_ATTR));
         if (additionalUsedAtts != null) {
             usedAtts.addAll(additionalUsedAtts);
         }
@@ -920,7 +929,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         } else {
             //noinspection StatementWithEmptyBody
-            if (controlType == Constants.CONTROL_TRIGGER) {
+            if (controlType == CONTROL_TRIGGER) {
                 //TODO: special handling for triggers? also, not all triggers created equal
             } else {
                 throw new XFormParseException("XForm Parse: input control with neither 'ref' nor 'bind'",e);
@@ -933,14 +942,14 @@ public class XFormParser implements IXFormParserFunctions {
             }
             question.setBind(dataRef);
 
-            if (controlType == Constants.CONTROL_SELECT_ONE) {
+            if (controlType == CONTROL_SELECT_ONE) {
                 selectOnes.add((TreeReference) dataRef.getReference());
-            } else if (controlType == Constants.CONTROL_SELECT_MULTI) {
+            } else if (controlType == CONTROL_SELECT_MULTI) {
                 selectMultis.add((TreeReference) dataRef.getReference());
             }
         }
 
-        boolean isSelect = (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE);
+        boolean isSelect = (controlType == CONTROL_SELECT_MULTI || controlType == CONTROL_SELECT_ONE);
         question.setControlType(controlType);
         question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
 
@@ -979,7 +988,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private QuestionDef questionForControlType(int controlType) {
-        return controlType == Constants.CONTROL_RANGE ? new RangeQuestion() : new QuestionDef();
+        return controlType == CONTROL_RANGE ? new RangeQuestion() : new QuestionDef();
     }
 
     private void parseQuestionLabel (QuestionDef q, Element e) {
@@ -1208,7 +1217,7 @@ public class XFormParser implements IXFormParserFunctions {
                         char c = value.charAt(k);
 
                         if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
-                            boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
+                            boolean isMultiSelect = (q.getControlType() == CONTROL_SELECT_MULTI);
                             triggerWarning(
                                 (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] " +
                                     (isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks",
@@ -1713,7 +1722,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     /** Attributes that are read into DataBinding fields **/
-    private final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList(
+    private final List<String> usedAtts = unmodifiableList(asList(
         ID_ATTR,
         NODESET_ATTR,
         "type",
@@ -1733,7 +1742,7 @@ public class XFormParser implements IXFormParserFunctions {
      * Attributes that are passed through to additionalAttrs but shouldn't lead to warnings.
      * These are consistently used by clients but are expected in additionalAttrs for historical reasons.
      **/
-    private final List<String> passedThroughAtts = Collections.unmodifiableList(Arrays.asList(
+    private final List<String> passedThroughAtts = unmodifiableList(asList(
             "requiredMsg",
             "saveIncomplete"
     ));
@@ -1981,7 +1990,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     /** Finds a questiondef that binds to ref, if the data type is a 'select' question type */
     public static QuestionDef ghettoGetQuestionDef (int dataType, FormDef f, TreeReference ref) {
-        if (dataType == Constants.DATATYPE_CHOICE || dataType == Constants.DATATYPE_CHOICE_LIST) {
+        if (dataType == DATATYPE_CHOICE || dataType == DATATYPE_CHOICE_LIST) {
             return FormDef.findQuestionByRef(ref, f);
         } else {
             return null;
