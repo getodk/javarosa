@@ -39,6 +39,7 @@ import org.javarosa.xpath.XPathArityException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
+import org.joda.time.DateTime;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -332,7 +333,7 @@ public class XPathFuncExpr extends XPathExpression {
             return DateUtils.roundDate(new Date());
         } else if (name.equals("now")) {
             assertArgsCount(name, args, 0);
-            return new Date();
+            return new DateTime().toDate();
         } else if (name.equals("concat")) {
             if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
                 return join("", ((XPathNodeset) argVals[0]).toArgList());

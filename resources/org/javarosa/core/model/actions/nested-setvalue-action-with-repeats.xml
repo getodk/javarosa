@@ -1,0 +1,32 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Nested setvalue action</h:title>
+        <model>
+            <instance>
+                <data id="data-id">
+                    <repeat>
+                        <cost/>
+                        <cost_timestamp/>
+                    </repeat>
+                    <repeat>
+                        <cost/>
+                        <cost_timestamp/>
+                    </repeat>
+                    <repeat>
+                        <cost/>
+                        <cost_timestamp/>
+                    </repeat>
+                </data>
+            </instance>
+            <bind nodeset="/data/repeat/cost" type="decimal" />
+            <bind nodeset="/data/repeat/cost_timestamp" type="dateTime" />
+        </model>
+    </h:head>
+    <h:body>
+        <repeat nodeset="/data/repeat">
+            <input ref="/data/repeat/cost">
+                <setvalue event="xforms-value-changed" ref="/data/repeat/cost_timestamp" value="now()" />
+            </input>
+        </repeat>
+    </h:body>
+</h:html>

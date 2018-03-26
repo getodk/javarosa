@@ -87,6 +87,7 @@ import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.Constants.SETVALUE;
 import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 
@@ -292,7 +293,7 @@ public class XFormParser implements IXFormParserFunctions {
 
 
         structuredActions = new HashMap<>();
-        structuredActions.put("setvalue", new IElementHandler() {
+        structuredActions.put(SETVALUE, new IElementHandler() {
                 public void handle (XFormParser p, Element e, Object parent) { p.parseSetValueAction((FormDef)parent, e);}
         });
     }
@@ -634,6 +635,10 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private void parseSetValueAction(FormDef form, Element e) {
+        parseSetValueAction(form, e, null);
+    }
+
+    private void parseSetValueAction(FormDef form, Element e, TreeReference trigger) {
         String ref = e.getAttributeValue(null, REF_ATTR);
         String bind = e.getAttributeValue(null, BIND_ATTR);
 
@@ -668,15 +673,16 @@ public class XFormParser implements IXFormParserFunctions {
         TreeReference treeref = FormInstance.unpackReference(dataRef);
 
         actionTargets.add(treeref);
+
         if(valueRef == null) {
             if(e.getChildCount() == 0 || !e.isText(0)) {
                 throw new XFormParseException("No 'value' attribute and no inner value set in <setvalue> associated with: " + treeref, e);
             }
             //Set expression
-            action = new SetValueAction(treeref, e.getText(0));
+            action = new SetValueAction(treeref, trigger, e.getText(0));
         } else {
             try {
-                action = new SetValueAction(treeref, XPathParseTool.parseXPath(valueRef));
+                action = new SetValueAction(treeref, trigger, XPathParseTool.parseXPath(valueRef));
             } catch (XPathSyntaxException e1) {
                 Std.printStack(e1);
                 throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueRef + "'", e);
@@ -966,6 +972,8 @@ public class XFormParser implements IXFormParserFunctions {
                 parseItem(question, child);
             } else if (isSelect && "itemset".equals(childName)) {
                 parseItemset(question, child, parent);
+            } else if (SETVALUE.equals(childName)) {
+                parseSetValueAction(_f, child, FormInstance.unpackReference(dataRef));
             }
         }
         if (isSelect) {
