@@ -24,6 +24,14 @@ sourceSets {
     }
 }
 
+compileJava {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+compileTestJava {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
 targetCompatibility = '1.7'
 sourceCompatibility = '1.7'
 
