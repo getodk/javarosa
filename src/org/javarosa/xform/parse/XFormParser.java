@@ -429,7 +429,7 @@ public class XFormParser implements IXFormParserFunctions {
         parseElement(_xmldoc.getRootElement(), _f, topLevelHandlers);
         collapseRepeatGroups(_f);
 
-        final FormInstanceParser instanceParser = new FormInstanceParser(_f, defaultNamespace, null,
+        final FormInstanceParser instanceParser = new FormInstanceParser(_f, defaultNamespace,
             bindings, repeats, itemsets, selectOnes, selectMultis, actionTargets);
 
         //parse the non-main instance nodes first
@@ -1717,7 +1717,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element) {
-        return new StandardBindAttributesProcessor(null, typeMappings).
+        return new StandardBindAttributesProcessor(typeMappings).
             createBinding(this, _f, usedAtts, passedThroughAtts, element);
     }
 
@@ -1998,7 +1998,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private void checkDependencyCycles () {
-        _f.reportDependencyCycles(null);
+        _f.reportDependencyCycles();
     }
 
     private void loadXmlInstance(FormDef f, Reader xmlReader) throws IOException {

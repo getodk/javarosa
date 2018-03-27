@@ -17,7 +17,6 @@
 package org.javarosa.core.util;
 
 import java.io.PrintStream;
-import org.javarosa.core.io.Std;
 
 /**
  * <b>Warning:</b> This class is unused and should remain that way. It will be removed in a future release.
@@ -50,7 +49,7 @@ public class CodeTimer {
      */
     @Deprecated
     public void logDone() {
-        logDone(Std.out);
+        logDone(System.out);
     }
 
     /**

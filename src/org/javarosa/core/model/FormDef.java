@@ -57,7 +57,6 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParserReporter;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
 
@@ -650,10 +649,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * Report any dependency cycles based upon the triggerIndex array.
      * (Does not require that the DAG be finalized).
      *
-     * @param reporter
      */
-    public void reportDependencyCycles(XFormParserReporter reporter) {
-        dagImpl.reportDependencyCycles(reporter);
+    public void reportDependencyCycles() {
+        dagImpl.reportDependencyCycles();
     }
 
     /**

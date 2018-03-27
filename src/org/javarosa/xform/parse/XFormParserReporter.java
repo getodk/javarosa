@@ -4,7 +4,8 @@
 package org.javarosa.xform.parse;
 
 import java.io.PrintStream;
-import org.javarosa.core.io.Std;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <b>Warning:</b> This class is unused and should remain that way. It will be removed in a future release.
@@ -17,6 +18,7 @@ import org.javarosa.core.io.Std;
  */
 @Deprecated
 public class XFormParserReporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XFormParseException.class);
     @Deprecated
     public static final String TYPE_UNKNOWN_MARKUP = "markup";
     @Deprecated
@@ -36,7 +38,6 @@ public class XFormParserReporter {
      */
     @Deprecated
     public XFormParserReporter() {
-        this(Std.err);
     }
 
     /**
@@ -52,7 +53,7 @@ public class XFormParserReporter {
      */
     @Deprecated
     public void warning(String type, String message, String xmlLocation) {
-        errorStream.println("XForm Parse Warning: " + message + (xmlLocation == null ? "" : xmlLocation));
+        LOGGER.warn("XForm Parse Warning: {} {}", message, xmlLocation == null ? "" : xmlLocation);
     }
 
     /**
@@ -60,6 +61,6 @@ public class XFormParserReporter {
      */
     @Deprecated
     public void error(String message) {
-        errorStream.println("XForm Parse Error: " + message);
+        LOGGER.error("XForm Parse Error: {}", message);
     }
 }

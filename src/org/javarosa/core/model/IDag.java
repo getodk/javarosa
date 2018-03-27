@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.javarosa.xform.parse.XFormParserReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -403,7 +402,7 @@ public abstract class IDag {
       return recalculates;
    }
 
-   public final void reportDependencyCycles (XFormParserReporter reporter) {
+   public final void reportDependencyCycles() {
       HashSet<TreeReference> vertices = new HashSet<TreeReference>();
       ArrayList<TreeReference[]> edges = new ArrayList<TreeReference[]>();
 

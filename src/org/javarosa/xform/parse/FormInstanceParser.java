@@ -34,7 +34,6 @@ class FormInstanceParser {
 
     private final FormDef formDef;
     private final String defaultNamespace;
-    private final XFormParserReporter reporter;
     private final List<DataBinding> bindings;
     private final List<TreeReference> repeats;
     private final List<ItemsetBinding> itemsets;
@@ -44,13 +43,12 @@ class FormInstanceParser {
     /** pseudo-data model tree that describes the repeat structure of the instance; useful during instance processing and validation */
     private FormInstance repeatTree;
 
-    FormInstanceParser(FormDef formDef, String defaultNamespace, XFormParserReporter reporter,
+    FormInstanceParser(FormDef formDef, String defaultNamespace,
                        List<DataBinding> bindings, List<TreeReference> repeats, List<ItemsetBinding> itemsets,
                        List<TreeReference> selectOnes, List<TreeReference> selectMultis, List<TreeReference> actionTargets) {
         // Todo: additional refactoring should shorten this too-long argument list
         this.formDef = formDef;
         this.defaultNamespace = defaultNamespace;
-        this.reporter = reporter;
         this.bindings = bindings;
         this.repeats = repeats;
         this.itemsets = itemsets;

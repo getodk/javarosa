@@ -23,12 +23,10 @@ import static org.javarosa.xform.parse.XFormParser.NAMESPACE_JAVAROSA;
 
 class StandardBindAttributesProcessor {
     private static final Logger logger = LoggerFactory.getLogger(StandardBindAttributesProcessor.class);
-    StandardBindAttributesProcessor(XFormParserReporter reporter, Map<String, Integer> typeMappings) {
-        this.reporter = reporter;
+    StandardBindAttributesProcessor(Map<String, Integer> typeMappings) {
         this.typeMappings = typeMappings;
     }
 
-    private XFormParserReporter reporter;
     private Map<String, Integer> typeMappings;
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,

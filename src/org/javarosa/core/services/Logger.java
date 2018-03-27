@@ -1,41 +1,43 @@
 package org.javarosa.core.services;
 
-import java.util.Date;
-import org.javarosa.core.api.ILogger;
-import org.javarosa.core.io.Std;
 import org.javarosa.core.log.FatalException;
-import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
+import org.slf4j.LoggerFactory;
 
 /**
  * <b>Warning:</b> This class is unused and should remain that way. It will be removed in a future release.
  *
+ * This class depends on ILogger, which is also deprecated. We need to ignore any
+ * deprecation warnings in order to avoid making breaking changes to this class
+ * before removing it on a next release
+ *
  * @deprecated Use {@link org.slf4j.LoggerFactory#getLogger(Class)} instead
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class Logger {
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Logger.class);
     /**
      * @deprecated Use {@link org.slf4j.LoggerFactory#getLogger(Class)} instead
      */
     @Deprecated
     public static final int MAX_MSG_LENGTH = 2048;
 
-    private static ILogger logger;
 
     /**
      * @deprecated Use {@link org.slf4j.LoggerFactory#getLogger(Class)} instead
      */
     @Deprecated
-    public static void registerLogger(ILogger theLogger) {
-        logger = theLogger;
+    public static void registerLogger(org.javarosa.core.api.ILogger theLogger) {
+        LOGGER.warn("Using deprecated ILogger class. All logs will be redirected to SLF4J. Please migrate your code to SLF4J");
     }
 
     /**
      * @deprecated Use {@link org.slf4j.LoggerFactory#getLogger(Class)} instead
      */
     @Deprecated
-    public static ILogger _() {
-        return logger;
+    public static org.javarosa.core.api.ILogger __() {
+        return null;
     }
 
     /**
@@ -58,23 +60,7 @@ public class Logger {
 
     @Deprecated
     protected static void logForce(String type, String message) {
-        Std.err.println("logger> " + type + ": " + message);
-        if (message.length() > MAX_MSG_LENGTH)
-            Std.err.println("  (message truncated)");
-
-        message = message.substring(0, Math.min(message.length(), MAX_MSG_LENGTH));
-        if (logger != null) {
-            try {
-                logger.log(type, message, new Date());
-            } catch (RuntimeException e) {
-                //do not catch exceptions here; if this fails, we want the exception to propogate
-                Std.err.println("exception when trying to write log message! " + WrappedException.printException(e));
-                logger.panic();
-
-                //be conservative for now
-                //throw e;
-            }
-        }
+        LOGGER.error("{}: {}", type, message);
     }
 
     @Deprecated
@@ -109,17 +95,12 @@ public class Logger {
      */
     @Deprecated
     public static void exception(String info, Exception e) {
-        Std.printStack(e);
-        log("exception", (info != null ? info + ": " : "") + WrappedException.printException(e));
+        LOGGER.error(info, e);
     }
 
     @Deprecated
     public static void die(String thread, Exception e) {
-        //log exception
-        exception("unhandled exception at top level", e);
-
-        //print stacktrace
-        Std.printStack(e);
+        LOGGER.error("unhandled exception at top level", e);
 
         //crash
         final FatalException crashException = new FatalException("unhandled exception in " + thread, e);
@@ -147,9 +128,6 @@ public class Logger {
 
     @Deprecated
     public static void halt() {
-        if (logger != null) {
-            logger.halt();
-        }
     }
 }
 
