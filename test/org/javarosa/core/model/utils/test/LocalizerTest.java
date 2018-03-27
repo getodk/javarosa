@@ -884,7 +884,6 @@ public class LocalizerTest extends TestCase  {
 
         }
         if(t.isAlive()) {
-            t.stop();
             throw new RuntimeException("Failed to return from recursive argument processing");
         }
     }

@@ -29,11 +29,11 @@ public class PropertyUtils {
 
     //need 'addpropery' too.
     public static String initializeProperty(String propName, String defaultValue) {
-        List<String> propVal = PropertyManager._().getProperty(propName);
+        List<String> propVal = PropertyManager.__().getProperty(propName);
         if (propVal == null || propVal.size() == 0) {
             propVal = new ArrayList<String>(1);
             propVal.add(defaultValue);
-            PropertyManager._().setProperty(propName, propVal);
+            PropertyManager.__().setProperty(propName, propVal);
             logger.info("No default value for [{}]; setting to [{}]", propName, defaultValue); // debug
             return defaultValue;
         }

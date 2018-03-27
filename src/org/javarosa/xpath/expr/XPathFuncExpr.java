@@ -410,7 +410,7 @@ public class XPathFuncExpr extends XPathExpression {
             // i.e., does not work with 'start' or 'end' property.
             assertArgsCount(name, args, 1);
             String s = toString(argVals[0]);
-            return PropertyManager._().getSingularProperty(s);
+            return PropertyManager.__().getSingularProperty(s);
         } else if (name.equals("pow") && (args.length == 2)) { //XPath 3.0
             double a = toDouble(argVals[0]);
             double b = toDouble(argVals[1]);
