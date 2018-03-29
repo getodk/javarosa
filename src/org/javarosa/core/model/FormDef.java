@@ -19,6 +19,7 @@ package org.javarosa.core.model;
 import org.javarosa.core.io.Std;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.IDag.EventNotifierAccessor;
+import org.javarosa.core.model.actions.NestedSetValueAction;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -655,6 +656,37 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public void reportDependencyCycles(XFormParserReporter reporter) {
         dagImpl.reportDependencyCycles(reporter);
+    }
+
+
+    public void reportDependencyCycles() {
+        final EventNotifierAccessor ia = new EventNotifierAccessor() {
+
+            @Override
+            public EventNotifier getEventNotifier() {
+                return FormDef.this.getEventNotifier();
+            }
+        };
+        final IDag dag = new Safe2014DagImpl(ia);
+
+        for (final String event : eventListeners.keySet()) {
+            for (final Action action : getEventListeners(event)) {
+                if (!(action instanceof NestedSetValueAction)) {
+                    // Ignore;
+                    continue;
+                }
+
+                final NestedSetValueAction nestedAction = (NestedSetValueAction) action;
+
+                if (nestedAction.getValue() == null) {
+                    // No XPath expression, ignore
+                    continue;
+                }
+
+//                dag.addTriggerable(new Recalculate(nestedAction.getValue(), nestedAction.getTarget()));
+            }
+        }
+//        for (final Action action : getEventListeners())
     }
 
     /**

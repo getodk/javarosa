@@ -89,6 +89,23 @@ public class NestedSetValueAction extends Action {
         model.setValue(val == null ? null: AnswerDataFactory.templateByDataType(dataType).cast(val.uncast()), qualifiedReference, true);
     }
 
+    public TreeReference getTarget() {
+        return target;
+    }
+
+    public TreeReference getTrigger() {
+        return trigger;
+    }
+
+    public XPathExpression getValue() {
+        return value;
+    }
+
+    public String getExplicitValue() {
+        return explicitValue;
+    }
+
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         target = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         trigger = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
@@ -99,6 +116,7 @@ public class NestedSetValueAction extends Action {
 
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.write(out, target);
         ExtUtil.write(out, trigger);

@@ -1,0 +1,23 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Nested setvalue action</h:title>
+        <model>
+            <instance>
+                <data id="data-id">
+                    <cost/>
+                    <cost2/>
+                </data>
+            </instance>
+            <bind nodeset="/data/cost" type="decimal" />
+            <bind nodeset="/data/cost2" type="decimal" />
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/data/cost">
+            <setvalue event="xforms-value-changed" ref="/data/cost2" value="pow(/data/cost, 2)" />
+        </input>
+        <input ref="/data/cost2">
+            <setvalue event="xforms-value-changed" ref="/data/cost" value="pow(/data/cost2, 2)" />
+        </input>
+    </h:body>
+</h:html>

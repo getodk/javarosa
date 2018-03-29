@@ -144,6 +144,58 @@ public class NestedSetValueActionTest {
     }
 
     @Test
+    public void when_thereAreDependencyCyclesBetweenSetValueActionExpressions_returnError() throws IOException {
+        // Given
+        final FormDef formDef =
+        parse(r("nested-setvalue-action-dependency-cycles.xml")).formDef;
+
+        TreeReference triggerRef = new TreeReference();
+        triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
+        triggerRef.add("data", 0);
+        triggerRef.add("cost", 0);
+
+        // When
+        DecimalData decimalValue = new DecimalData(6.0);
+        formDef.setValue(decimalValue, triggerRef, true);
+
+        // Then
+        TreeReference targetRef = new TreeReference();
+        targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
+        targetRef.add("data", 0);
+        targetRef.add("cost2", 0);
+        IAnswerData targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
+        IAnswerData expectedValue = new DecimalData(36.0);
+
+        assertEquals(expectedValue.getValue(), targetValue.getValue());
+    }
+
+    @Test
+    public void when_thereAreDependencyCyclesBetweenExpressionsInSetValueActionsAndInstance_returnError() throws IOException {
+        // Given
+        final FormDef formDef =
+                parse(r("nested-setvalue-action-dependency-cycles.xml")).formDef;
+
+        TreeReference triggerRef = new TreeReference();
+        triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
+        triggerRef.add("data", 0);
+        triggerRef.add("cost", 0);
+
+        // When
+        DecimalData decimalValue = new DecimalData(6.0);
+        formDef.setValue(decimalValue, triggerRef, true);
+
+        // Then
+        TreeReference targetRef = new TreeReference();
+        targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
+        targetRef.add("data", 0);
+        targetRef.add("cost2", 0);
+        IAnswerData targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
+        IAnswerData expectedValue = new DecimalData(36.0);
+
+        assertEquals(expectedValue.getValue(), targetValue.getValue());
+    }
+
+    @Test
     public void testSerializationAndDeserialization() throws IOException, DeserializationException {
         PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
         PrototypeManager.registerPrototypes(CoreModelModule.classNames);
