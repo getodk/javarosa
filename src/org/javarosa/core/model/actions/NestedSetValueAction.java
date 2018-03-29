@@ -1,11 +1,4 @@
-/**
- *
- */
 package org.javarosa.core.model.actions;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.FormDef;
@@ -22,32 +15,40 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 
-/**
- * @author ctsims
- *
- */
-public class SetValueAction extends Action {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+public class NestedSetValueAction extends Action {
     private TreeReference target;
+    private TreeReference trigger;
     private XPathExpression value;
     private String explicitValue;
 
-    public SetValueAction() {
+    public NestedSetValueAction() {
 
     }
 
-    public SetValueAction(TreeReference target, XPathExpression value) {
+    public NestedSetValueAction(TreeReference target,  TreeReference trigger, XPathExpression value) {
         super("setvalue");
         this.target = target;
         this.value = value;
+        this.trigger = trigger;
     }
 
-    public SetValueAction(TreeReference target, String explicitValue) {
+    public NestedSetValueAction(TreeReference target, TreeReference trigger, String explicitValue) {
         super("setvalue");
         this.target = target;
         this.explicitValue = explicitValue;
+        this.trigger = trigger;
     }
 
     public void processAction(FormDef model, TreeReference contextRef) {
+
+        // If the trigger was specified then check if the context ref is not null and actually equals the trigger.
+        if (trigger != null && (contextRef == null || !trigger.equals(contextRef.genericize()))) {
+            return;
+        }
 
         //Qualify the reference if necessary
         TreeReference qualifiedReference = contextRef == null ? target : target.contextualize(contextRef);
@@ -55,7 +56,10 @@ public class SetValueAction extends Action {
         //For now we only process setValue actions which are within the
         //context if a context is provided. This happens for repeats where
         //insert events should only trigger on the right nodes
-        if(contextRef != null){
+        //If the trigger is specified then it means it's Action.EVENT_XFORMS_VALUE_CHANGED and thus
+        //it's not important if the target is withing the context. Context points to the node which value has changed and the target
+        //to be updated may be at any position within the form (instance).
+        if(contextRef != null && trigger == null) {
 
             //Note: right now we're qualifying then testing parentage to see wheter
             //there was a conflict, but it's not super clear whether this is a perfect
@@ -86,7 +90,8 @@ public class SetValueAction extends Action {
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        target = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+        target = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        trigger = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         explicitValue = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
         if(explicitValue == null) {
             value = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
@@ -96,7 +101,7 @@ public class SetValueAction extends Action {
 
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.write(out, target);
-
+        ExtUtil.write(out, trigger);
         ExtUtil.write(out, ExtUtil.emptyIfNull(explicitValue));
         if(explicitValue == null) {
             ExtUtil.write(out, new ExtWrapTagged(value));

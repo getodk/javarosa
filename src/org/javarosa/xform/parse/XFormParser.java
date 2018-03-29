@@ -29,6 +29,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
+import org.javarosa.core.model.actions.NestedSetValueAction;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
@@ -672,10 +673,14 @@ public class XFormParser implements IXFormParserFunctions {
                 throw new XFormParseException("No 'value' attribute and no inner value set in <setvalue> associated with: " + treeref, e);
             }
             //Set expression
-            action = new SetValueAction(treeref, trigger, e.getText(0));
+            action = trigger != null ?
+                    new NestedSetValueAction(treeref, trigger, e.getText(0)) :
+                    new SetValueAction(treeref, e.getText(0));
         } else {
             try {
-                action = new SetValueAction(treeref, trigger, XPathParseTool.parseXPath(valueRef));
+                action = trigger != null ?
+                        new NestedSetValueAction(treeref, trigger, XPathParseTool.parseXPath(valueRef)) :
+                        new SetValueAction(treeref, XPathParseTool.parseXPath(valueRef));
             } catch (XPathSyntaxException e1) {
                 Std.printStack(e1);
                 throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueRef + "'", e);

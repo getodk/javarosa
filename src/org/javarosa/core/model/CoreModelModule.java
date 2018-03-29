@@ -48,7 +48,8 @@ public class CoreModelModule implements IModule {
             "org.javarosa.core.model.data.UncastData",
             "org.javarosa.core.model.data.helper.BasicDataPointer",
             "org.javarosa.core.model.Action",
-            "org.javarosa.core.model.actions.SetValueAction"
+            "org.javarosa.core.model.actions.SetValueAction",
+            "org.javarosa.core.model.actions.NestedSetValueAction"
     };
 
     @Override
