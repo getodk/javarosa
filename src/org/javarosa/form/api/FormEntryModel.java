@@ -739,7 +739,7 @@ public class FormEntryModel {
         if (node == null || node.isRepeatable()) { // node == null if there are no instances of the repeat
             IFormElement lastElement = elements.get(elements.size() - 1);
             if (lastElement instanceof GroupDef && !((GroupDef) lastElement).getRepeat()) {
-                return false; // it's a regular group inside a repeatable group
+                return false; // It's a regular group inside a repeatable group. This case takes place when the nested group doesn't have the ref attribute.
             }
             int mult;
             if (node == null) {
