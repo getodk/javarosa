@@ -1,6 +1,7 @@
 package org.javarosa.xml;
 
-import org.javarosa.core.services.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.io.KXmlParser;
@@ -25,6 +26,8 @@ import java.io.InputStream;
  * @author ctsims
  */
 public abstract class ElementParser<T> {
+    private static final Logger logger = LoggerFactory.getLogger(ElementParser.class);
+
     protected final KXmlParser parser;
 
     /**
@@ -63,7 +66,7 @@ public abstract class ElementParser<T> {
             return parser;
         } catch (XmlPullParserException e) {
             // TODO Auto-generated catch block
-            Logger.exception("Element Parser", e);
+            logger.error("Element Parser", e);
             throw new IOException(e.getMessage());
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

@@ -5,22 +5,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * <b>Warning</b>: This class is unused and should remain that way. It will be removed in a future release.
+ *
+ * @deprecated
+ */
+@Deprecated
 public class StreamsUtil {
 
     private StreamsUtil() {
-        // private constructor
     }
 
     /**
-     *
      * Write everything from input stream to output stream, byte by byte then
      * close the streams
-     *
-     *
-     * @param in
-     * @param out
-     * @throws IOException
      */
+    @Deprecated
     public static void writeFromInputToOutput(InputStream in, OutputStream out, long[] tally) throws IOException {
         int val = in.read();
         while (val != -1) {
@@ -31,18 +31,15 @@ public class StreamsUtil {
         in.close();
     }
 
+    @Deprecated
     public static void writeFromInputToOutput(InputStream in, OutputStream out) throws IOException {
         writeFromInputToOutput(in, out, null);
     }
 
     /**
-     *
      * Write the byte array to the output stream
-     *
-     * @param bytes
-     * @param out
-     * @throws IOException
      */
+    @Deprecated
     public static void writeToOutput(byte[] bytes, OutputStream out, long[] tally) throws IOException {
 
         for (int i = 0; i < bytes.length; i++) {
@@ -52,6 +49,7 @@ public class StreamsUtil {
 
     }
 
+    @Deprecated
     public static void writeToOutput(byte[] bytes, OutputStream out) throws IOException {
         writeToOutput(bytes, out, null);
     }
@@ -63,15 +61,10 @@ public class StreamsUtil {
     }
 
     /**
-     *
      * Read bytes from an input stream into a byte array then close the input
      * stream
-     *
-     * @param in
-     * @param len
-     * @return
-     * @throws IOException
      */
+    @Deprecated
     public static byte[] readFromStream(InputStream in, int len)
             throws IOException {
 

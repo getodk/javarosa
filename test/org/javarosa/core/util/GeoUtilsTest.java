@@ -16,19 +16,21 @@
 
 package org.javarosa.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class GeoUtilsTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(GeoUtilsTest.class);
 
   public GeoUtilsTest(String name) {
     super(name);
-    System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    logger.info("Running {} test: {}...", this.getClass().getName(), name);
   }
 
   public static Test suite() {
@@ -139,7 +141,7 @@ public class GeoUtilsTest extends TestCase {
 
     double area = GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
 
-    System.out.println("Area in m2: " + area);
+    logger.info("Area in m2: {}", area);
 
     assertTrue((int)Math.rint(area) == expectedArea);
   }

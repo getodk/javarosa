@@ -20,14 +20,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.DataInstance;
-import org.javarosa.core.services.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 public abstract class XPathExpression implements Externalizable, Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(XPathExpression.class);
 
     public Object eval (EvaluationContext evalContext) {
         return this.eval(evalContext.getMainInstance(), evalContext);
@@ -46,7 +46,7 @@ public abstract class XPathExpression implements Externalizable, Serializable {
         } catch(Exception e) {
             //Pivots aren't critical, if there was a problem getting one, log the exception
             //so we can fix it, and then just report that.
-            Logger.exception(e);
+            logger.error("Error while pivoting", e);
             throw new UnpivotableExpressionException(e.getMessage());
         }
     }
@@ -76,9 +76,10 @@ public abstract class XPathExpression implements Externalizable, Serializable {
     int indent;
 
     private void printStr (String s) {
+        StringBuilder padding = new StringBuilder();
         for (int i = 0; i < 2 * indent; i++)
-            Std.out.print(" ");
-        Std.out.println(s);
+            padding.append(" ");
+        logger.info("{}{}", padding, s);
     }
 
     public void printParseTree () {

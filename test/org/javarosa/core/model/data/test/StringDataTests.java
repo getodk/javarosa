@@ -21,8 +21,11 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.javarosa.core.model.data.StringData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StringDataTests extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(StringDataTests.class);
     String stringA;
     String stringB;
 
@@ -40,7 +43,7 @@ public class StringDataTests extends TestCase {
 
     public StringDataTests(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -55,8 +58,6 @@ public class StringDataTests extends TestCase {
         return aSuite;
     }
     public static String testMaster (int testID) {
-        //System.out.println("running " + testID);
-
         switch (testID) {
         case 1: return "testGetData";
         case 2: return "testSetData";

@@ -29,6 +29,8 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Note that this is just a start and doesn't cover direct comparisons
@@ -38,6 +40,8 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
  *
  */
 public class XFormAnswerDataSerializerTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(XFormAnswerDataSerializerTest.class);
+
     final String stringDataValue = "String Data Value";
     final Integer integerDataValue = new Integer(5);
     final Date dateDataValue = new Date();
@@ -78,7 +82,7 @@ public class XFormAnswerDataSerializerTest extends TestCase {
 
     public XFormAnswerDataSerializerTest(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {

@@ -16,20 +16,18 @@ public final class FormParserHelper {
     public static ParseResult parse(Path formName) throws IOException {
         XFormParser parser = new XFormParser(new FileReader(formName.toString()));
         final List<String> errorMessages = new ArrayList<>();
-        parser.attachReporter(new XFormParserReporter() {
+        parser.onWarning(new XFormParser.WarningCallback() {
             @Override
-            public void warning(String type, String message, String xmlLocation) {
+            public void accept(String message, String xmlLocation) {
                 errorMessages.add(message);
-                super.warning(type, message, xmlLocation);
-            }
-
-            @Override
-            public void error(String message) {
-                errorMessages.add(message);
-                super.error(message);
             }
         });
-
+        parser.onError(new XFormParser.ErrorCallback() {
+            @Override
+            public void accept(String message) {
+                errorMessages.add(message);
+            }
+        });
         return new ParseResult(parser.parse(), errorMessages);
     }
 

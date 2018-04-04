@@ -17,7 +17,8 @@
 package org.javarosa.core.model.condition;
 
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.services.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
@@ -31,6 +32,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Constraint implements Externalizable {
+    private static final Logger logger = LoggerFactory.getLogger(Constraint.class);
     public IConditionExpr constraint;
     private String constraintMsg;
     private XPathExpression xPathConstraintMsg;
@@ -59,7 +61,7 @@ public class Constraint implements Externalizable {
                 }
                 return null;
             } catch(Exception e) {
-                Logger.exception("Error evaluating a valid-looking constraint xpath ", e);
+                logger.error("Error evaluating a valid-looking constraint xpath ", e);
                 return constraintMsg;
             }
         }

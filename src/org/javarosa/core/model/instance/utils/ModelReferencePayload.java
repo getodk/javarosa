@@ -24,7 +24,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -33,6 +32,8 @@ import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.services.transport.payload.IDataPayloadVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ModelReferencePayload essentially provides a wrapper functionality
@@ -45,6 +46,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class ModelReferencePayload implements IDataPayload {
+    private static final Logger logger = LoggerFactory.getLogger(ModelReferencePayload.class);
 
     int recordId;
     IDataPayload payload;
@@ -131,7 +133,7 @@ public class ModelReferencePayload implements IDataPayload {
                 payload = serializer.createSerializedPayload(tree);
             } catch (IOException e) {
                 //Assertion, do not catch!
-                Std.printStack(e);
+                logger.error("Error", e);
                 throw new RuntimeException("ModelReferencePayload failed to retrieve its model from rms [" + e.getMessage() + "]");
             }
         }

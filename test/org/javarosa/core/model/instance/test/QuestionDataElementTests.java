@@ -34,8 +34,11 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QuestionDataElementTests extends TestCase{
+    private static final Logger logger = LoggerFactory.getLogger(QuestionDataElementTests.class);
     private final String stringElementName = "String Data Element";
 
     StringData stringData;
@@ -135,7 +138,7 @@ public class QuestionDataElementTests extends TestCase{
 
     public QuestionDataElementTests(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -150,8 +153,6 @@ public class QuestionDataElementTests extends TestCase{
         return aSuite;
     }
     public static String testMaster (int testID) {
-        //System.out.println("running " + testID);
-
         switch (testID) {
             case 1: return "testIsLeaf";
             case 2: return "testGetName";

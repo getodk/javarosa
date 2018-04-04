@@ -19,7 +19,6 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
@@ -29,7 +28,6 @@ import org.javarosa.xform.parse.FormParserHelper.ParseResult;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kxml2.kdom.Element;
 
@@ -44,6 +42,8 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
@@ -61,6 +61,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
+    private static final Logger logger = LoggerFactory.getLogger(XFormParserTest.class);
 
     private static final Path FORM_INSTANCE_XML_FILE_NAME           = r("instance.xml");
     private static final Path SECONDARY_INSTANCE_XML                = r("secondary-instance.xml");
@@ -79,11 +80,6 @@ public class XFormParserTest {
 
     private static final String ORX_2_NAMESPACE_PREFIX = "orx2";
     private static final String ORX_2_NAMESPACE_URI = "http://openrosa.org/xforms";
-
-    @Before
-    public void setUp() {
-        CodeTimer.setEnabled(true);
-    }
 
     @After
     public void tearDown() throws Exception {
@@ -165,7 +161,7 @@ public class XFormParserTest {
             }
         }
         for (String line : results) {
-            System.out.println(line);
+            logger.info(line);
         }
         Files.delete(largeDataFilename);
     }

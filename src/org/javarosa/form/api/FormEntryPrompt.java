@@ -19,7 +19,6 @@ package org.javarosa.form.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -36,7 +35,7 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.services.Logger;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
@@ -50,6 +49,7 @@ import org.javarosa.formmanager.view.IQuestionWidget;
  * @author Yaw Anokwa
  */
 public class FormEntryPrompt extends FormEntryCaption {
+    private static final Logger logger = LoggerFactory.getLogger(FormEntryPrompt.class);
 
     TreeElement mTreeElement;
     boolean dynamicChoicesPopulated = false;
@@ -306,10 +306,9 @@ public class FormEntryPrompt extends FormEntryCaption {
         }catch(NoLocalizedTextException nlt){
             //use fallback helptext
         }catch(UnregisteredLocaleException ule){
-            Std.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
+            logger.warn("No Locale set yet (while attempting to getHelpText())");
         }catch(Exception e){
-            Logger.exception("FormEntryPrompt.getHelpText", e);
-            Std.printStack(e);
+            logger.error("FormEntryPrompt.getHelpText", e);
         }
 
         return helpText;

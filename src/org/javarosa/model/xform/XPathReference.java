@@ -23,7 +23,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -35,11 +34,15 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class XPathReference implements IDataReference {
+    private static final Logger logger = LoggerFactory.getLogger(XPathReference.class);
+
     private TreeReference ref;
     private String nodeset;
 
@@ -68,7 +71,7 @@ public class XPathReference implements IDataReference {
             if (validNonPathExpr) {
                 throw new XPathTypeMismatchException("Expected XPath path, got XPath expression: [" + nodeset + "]," + xse.getMessage());
             } else {
-                Std.printStack(xse);
+                logger.error("Error", xse);
                 throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
             }
         }

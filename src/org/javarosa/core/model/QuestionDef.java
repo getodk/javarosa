@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.osm.OSMTag;
@@ -34,6 +33,8 @@ import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The definition of a Question to be presented to users when
@@ -48,6 +49,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class QuestionDef implements IFormElement, Localizable {
+    private static final Logger logger = LoggerFactory.getLogger(QuestionDef.class);
+
     private int id;
     private IDataReference binding;    /** reference to a location in the model to store data in */
 
@@ -371,7 +374,7 @@ public class QuestionDef implements IFormElement, Localizable {
     @Override
     public void setTextID(String textID) {
         if(DateUtils.stringContains(textID,";")){
-            Std.err.println("Warning: TextID contains ;form modifier:: \""+textID.substring(textID.indexOf(";"))+"\"... will be stripped.");
+            logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(textID.indexOf(";")));
             textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }
         this.textID = textID;

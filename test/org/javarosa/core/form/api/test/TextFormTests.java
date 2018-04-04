@@ -17,8 +17,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TextFormTests extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(TextFormTests.class);
 
     QuestionDef q = null;
     FormEntryPrompt fep = null;
@@ -34,7 +37,7 @@ public class TextFormTests extends TestCase {
 
     public TextFormTests(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public void setUp(){
@@ -47,7 +50,7 @@ public class TextFormTests extends TestCase {
 
     public static Test suite() {
         TestSuite aSuite = new TestSuite();
-        System.out.println("Running TextFormTests...");
+        logger.info("Running TextFormTests...");
         for (int i = 1; i <= NUM_TESTS; i++) {
             final int testID = i;
             aSuite.addTest(new TextFormTests(doTest(testID)));

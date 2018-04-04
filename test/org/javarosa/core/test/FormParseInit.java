@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /* TODO
  * Priority: Top priority is getting the localizations tested so that test coverage isn't lost
@@ -26,8 +28,8 @@ import java.util.List;
  * This class sets up everything you need to perform tests on the models and form elements found in JR (such
  * as QuestionDef, FormDef, Selections, etc).  It exposes hooks to the FormEntryController,FormEntryModel and
  * FormDef (all the toys you need to test IFormElements, provide answers to questions and test constraints, etc)
- * 
- * REMEMBER to set the 
+ *
+ * REMEMBER to set the
  */
 
 
@@ -36,6 +38,7 @@ import java.util.List;
 
 
 public class FormParseInit {
+    private static final Logger logger = LoggerFactory.getLogger(FormParseInit.class);
     private String FORM_NAME = (new File(PathConst.getTestResourcePath(), "ImageSelectTester.xhtml")).getAbsolutePath();
     private FormDef xform;
     private FormEntryController fec;
@@ -63,10 +66,8 @@ public class FormParseInit {
         try {
             is = new FileInputStream(xf_name);
         } catch (FileNotFoundException e) {
-            System.err.println("Error: the file '" + xf_name
-                    + "' could not be found!");
-            throw new RuntimeException("Error: the file '" + xf_name
-                    + "' could not be found!");
+            logger.error("Error: the file '{}' could not be found!", xf_name);
+            throw new RuntimeException("Error: the file '" + xf_name + "' could not be found!");
         }
 
         // Parse the form
@@ -76,8 +77,7 @@ public class FormParseInit {
         fec = new FormEntryController(femodel);
 
         if( xform == null ) {
-            System.out.println("\n\n==================================\nERROR: XForm has failed validation!!");
-        } else {
+            logger.error("ERROR: XForm has failed validation!!");
         }
     }
 

@@ -22,9 +22,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import org.javarosa.core.io.Std;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PrototypeFactory {
+    private static final Logger logger = LoggerFactory.getLogger(PrototypeFactory.class);
+
     public final static int CLASS_HASH_SIZE = 4;
 
     private final Vector<Class> classes = new Vector<>();
@@ -135,7 +138,7 @@ public class PrototypeFactory {
         System.arraycopy(md5, 0, hash, 0, hash.length);
         byte[] badHash = new byte[] {0,4,78,97};
         if(PrototypeFactory.compareHash(badHash, hash)) {
-            Std.out.println("BAD CLASS: " + type.getName());
+            logger.info("BAD CLASS: {}", type.getName());
         }
 
         return hash;

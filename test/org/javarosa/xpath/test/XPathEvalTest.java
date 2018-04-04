@@ -43,6 +43,8 @@ import org.javarosa.xpath.XPathUnsupportedException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -51,6 +53,7 @@ import static java.lang.Double.NaN;
 import static java.lang.Double.POSITIVE_INFINITY;
 
 public class XPathEvalTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(XPathEvalTest.class);
 
     public XPathEvalTest(String name) {
         super(name);
@@ -79,7 +82,7 @@ public class XPathEvalTest extends TestCase {
         try {
             xpe = XPathParseTool.parseXPath(expr);
         } catch (XPathSyntaxException xpse) {
-            System.out.println("Parsing " + expr + " failed with " + xpse.toString());
+            logger.info("Parsing {} failed with {}", expr, xpse.toString());
         }
 
         if (xpe == null) {
@@ -93,7 +96,7 @@ public class XPathEvalTest extends TestCase {
                 fail("Expected exception, expression : " + expr);
             } else if ((result instanceof Double && expected instanceof Double)) {
                 if (! expected.equals(result)) {
-                    System.out.println(String.format("%s result %s differed from expected %s",
+                    logger.info(String.format("%s result %s differed from expected %s",
                             expr, result, expected));
                 }
                 assertEquals((Double) expected, (Double) result, 1e-12);
@@ -612,7 +615,7 @@ public class XPathEvalTest extends TestCase {
     }
     
     private void logTestCategory(String message) {
-        System.out.println("Running " + this.getClass().getName() + " test: " + message);
+        logger.info("Running {} test: {}", this.getClass().getName(), message);
     } 
 
     private EvaluationContext getFunctionHandlers () {
@@ -648,9 +651,9 @@ public class XPathEvalTest extends TestCase {
             public String getName() { return "regex";    }
             @Override
             public Object eval(Object[] args, EvaluationContext ec) {
-                System.out.println("EVAL REGEX TESTS:");
+                logger.info("EVAL REGEX TESTS:");
                 for (Object arg : args) {
-                    System.out.println("REGEX ARGS: " + arg.toString());
+                    logger.info("REGEX ARGS: {}", arg.toString());
                 }
 
 

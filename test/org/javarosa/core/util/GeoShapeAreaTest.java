@@ -19,16 +19,16 @@ package org.javarosa.core.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.xform.util.XFormUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Author: Meletis Margaritis
@@ -36,10 +36,11 @@ import org.javarosa.xform.util.XFormUtils;
  * Time: 3:40 PM
  */
 public class GeoShapeAreaTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(GeoShapeAreaTest.class);
 
   public GeoShapeAreaTest(String name) {
     super(name);
-    System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+    logger.info("Running {} test: {}...", this.getClass().getName(), name);
   }
 
   public static Test suite() {
