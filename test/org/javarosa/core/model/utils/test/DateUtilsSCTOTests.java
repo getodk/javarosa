@@ -6,40 +6,59 @@
 
 package org.javarosa.core.model.utils.test;
 
-import junit.framework.TestCase;
-import org.javarosa.core.model.utils.DateUtils;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import org.javarosa.core.model.utils.DateUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class DateUtilsSCTOTests extends TestCase {
+public class DateUtilsSCTOTests {
 
-    public void testParseDateTime() throws Exception {
-        TimeZone timeZone = clearDST("GMT+02");
+    private Locale backupLocale;
+    private TimeZone backupZone;
+
+    @Before
+    public void setUp() {
+        backupLocale = Locale.getDefault();
+        backupZone = TimeZone.getDefault();
+    }
+
+    @After
+    public void tearDown() {
+        TimeZone.setDefault(backupZone);
+        Locale.setDefault(backupLocale);
+    }
+
+    @Test
+    public void testParseDateTime() {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+02"));
 
         Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
         String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
 
         assertEquals("2014-10-04T23:03:05.244+02", str);
-
-        restoreTimeZone(timeZone);
     }
 
-    public void testParseDateTime_withDST() throws Exception {
-        TimeZone timeZone = applyDST();
+    @Test
+    public void testParseDateTime_withDST() {
+        applyDST();
 
         Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
         String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
 
         assertEquals("2014-10-05T00:03:05.244+03", str);
-
-        restoreTimeZone(timeZone);
     }
 
-    public void testParseTime() throws Exception {
-        TimeZone timeZone = clearDST("GMT+02");
+    @Test
+    public void testParseTime() {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+02"));
 
         String time = "12:03:05.011+03";
 
@@ -48,12 +67,17 @@ public class DateUtilsSCTOTests extends TestCase {
         String formatted = DateUtils.formatTime(date, DateUtils.FORMAT_ISO8601);
 
         assertEquals("11:03:05.011+02", formatted);
-
-        restoreTimeZone(timeZone);
     }
 
-    public void testParseTime_withDST() throws Exception {
-        TimeZone timeZone = applyDST();
+    @Test
+    @Ignore
+    // This test doesn't make sense:
+    // - A time has no offset nor zone. It can only have one
+    //   when bound to a date, which is not the case
+    // - We're effectively binding all times to the EPOCH date
+    //   (1970-01-01, UTC), which has no DST
+    public void testParseTime_withDST() {
+        applyDST();
 
         String time = "12:03:05.011+03";
 
@@ -62,36 +86,18 @@ public class DateUtilsSCTOTests extends TestCase {
         String formatted = DateUtils.formatTime(date, DateUtils.FORMAT_ISO8601);
 
         assertEquals("12:03:05.011+03", formatted);
-
-        restoreTimeZone(timeZone);
     }
 
-    protected TimeZone clearDST(String id) {
-        TimeZone backupZone = TimeZone.getDefault();
-
-        TimeZone.setDefault(TimeZone.getTimeZone(id));
-
-        return backupZone;
-    }
-
-    protected TimeZone applyDST() {
-        TimeZone backupZone = TimeZone.getDefault();
-
+    private void applyDST() {
         // this is a timezone that operates DST every day of the year!
         SimpleTimeZone dstTimezone = new SimpleTimeZone(
-                2*60*60*1000,
+                2 * 60 * 60 * 1000,
                 "Europe/Athens",
                 Calendar.JANUARY, 1, 0,
                 0, SimpleTimeZone.UTC_TIME,
                 Calendar.DECEMBER, 31, 0,
-                24*60*60*1000, SimpleTimeZone.UTC_TIME,
-                60*60*1000);
+                24 * 60 * 60 * 1000, SimpleTimeZone.UTC_TIME,
+                60 * 60 * 1000);
         TimeZone.setDefault(dstTimezone);
-
-        return backupZone;
-    }
-
-    private void restoreTimeZone(TimeZone backupZone) {
-        TimeZone.setDefault(backupZone);
     }
 }

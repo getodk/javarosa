@@ -83,6 +83,26 @@ public class DateUtils {
 //        public String tzStr;
 //        public int tzOffset; //s ahead of UTC
 
+        DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+            this.hour = hour;
+            this.minute = minute;
+            this.second = second;
+            this.secTicks = secTicks;
+            this.dow = dow;
+        }
+
+        public static DateFields of(int year, int month, int day, int hour, int minute, int second, int secTicks) {
+            // The official API returns an ISO 8601 day of week
+            // with a range of values from 1 for Monday to 7 for Sunday].
+            // TODO migrate dow field to a DayOfWeek type to avoid any possible interpretation errors
+            int iso8601Dow = java.time.LocalDateTime.of(year, month, day, hour, minute, second, secTicks * 1_000_000).getDayOfWeek().getValue();
+            int dow = iso8601Dow == 7 ? 0 : iso8601Dow;
+            return new DateFields(year, month, day, hour, minute, second, secTicks, dow);
+        }
+
         public boolean check () {
             return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year)) &&
                     inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999));
