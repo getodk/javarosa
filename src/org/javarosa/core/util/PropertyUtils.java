@@ -20,22 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.services.PropertyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertyUtils {
+    private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
 
     //need 'addpropery' too.
     public static String initializeProperty(String propName, String defaultValue) {
-        List<String> propVal = PropertyManager._().getProperty(propName);
+        List<String> propVal = PropertyManager.__().getProperty(propName);
         if (propVal == null || propVal.size() == 0) {
             propVal = new ArrayList<String>(1);
             propVal.add(defaultValue);
-            PropertyManager._().setProperty(propName, propVal);
-            //#if debug.output==verbose
-            Std.out.println("No default value for [" + propName
-                    + "]; setting to [" + defaultValue + "]"); // debug
-            //#endif
+            PropertyManager.__().setProperty(propName, propVal);
+            logger.info("No default value for [{}]; setting to [{}]", propName, defaultValue); // debug
             return defaultValue;
         }
         return propVal.get(0);

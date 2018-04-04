@@ -15,11 +15,10 @@
  */
 
 /**
- * 
+ *
  */
 package org.javarosa.core.services.locale;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -29,13 +28,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Clayton Sims
- * @date Jun 1, 2009 
+ * @date Jun 1, 2009
  *
  */
 public class ResourceFileDataSource implements LocaleDataSource {
+    private static final Logger logger = LoggerFactory.getLogger(ResourceFileDataSource.class);
 
     String resourceURI;
 
@@ -139,13 +141,14 @@ public class ResourceFileDataSource implements LocaleDataSource {
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            Std.printStack(e);
+            logger.error("Error", e);
         } finally {
             try {
                 is.close();
             } catch (IOException e) {
-                Std.out.println("Input Stream for resource file " + resourceURI + " failed to close. This will eat up your memory! Fix Problem! [" + e.getMessage() + "]");
-                Std.printStack(e);
+                logger.info("Input Stream for resource file {} failed to close. This will eat up " +
+                    "your memory! Fix Problem! [{}]", resourceURI, e.getMessage());
+                logger.error("Error", e);
             }
         }
         return locale;
@@ -166,7 +169,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
             if(line.trim().equals("")) {
                 //Empty Line
             } else {
-                Std.out.println("Invalid line (#" + curline + ") read: " + line);
+                logger.info("Invalid line (#{}) read: {}", curline, line);
             }
         } else {
             //Check to see if there's anything after the '=' first. Otherwise there
@@ -176,7 +179,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
                 locale.put(line.substring(0, line.indexOf('=')), value);
             }
              else {
-                Std.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+                logger.info("Invalid line (#{}) read: '{}'. No value follows the '='.", curline, line);
             }
         }
     }

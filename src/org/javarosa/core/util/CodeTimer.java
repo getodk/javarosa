@@ -16,11 +16,16 @@
 
 package org.javarosa.core.util;
 
-import org.javarosa.core.io.Std;
-
 import java.io.PrintStream;
 
-/** Helps with timing an operation and logging the time */
+/**
+ * <b>Warning:</b> This class is unused and should remain that way. It will be removed in a future release.
+ *
+ * Helps with timing an operation and logging the time
+ *
+ * @deprecated Use {@link StopWatch} instead
+ */
+@Deprecated
 public class CodeTimer {
     private final long startTime = System.nanoTime();
     private final String operation;
@@ -28,27 +33,42 @@ public class CodeTimer {
 
     /**
      * Creates a CodeTimer for the specified operation
+     *
      * @param operation the name of the operation, such as “parsing form”
+     * @deprecated Use {@link StopWatch} instead
      */
+    @Deprecated
     public CodeTimer(String operation) {
         this.operation = operation;
     }
 
-    /** Calculates and logs the time since this object was constructed. */
+    /**
+     * Calculates and logs the time since this object was constructed.
+     *
+     * @deprecated Use {@link StopWatch} instead
+     */
+    @Deprecated
     public void logDone() {
-        logDone(Std.out);
+        logDone(System.out);
     }
 
     /**
      * Calculates and logs the time since this object was constructed.
+     *
      * @param stream the PrintStream onto which to log the message
+     * @deprecated Use {@link StopWatch} instead
      */
+    @Deprecated
     public void logDone(PrintStream stream) {
         if (enabled) {
             stream.printf("%s finished in %.3f ms\n", operation, (System.nanoTime() - startTime) / 1e6);
         }
     }
 
+    /**
+     * @deprecated Use {@link StopWatch} instead
+     */
+    @Deprecated
     public static void setEnabled(boolean enabled) {
         CodeTimer.enabled = enabled;
     }

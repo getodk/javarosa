@@ -28,9 +28,12 @@ import org.javarosa.core.util.test.ExternalizableTest;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class XPathParseTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(XPathParseTest.class);
     public static String[][] parseTestCases = {
         /* no null expressions */
         {"", null},
@@ -210,7 +213,7 @@ public class XPathParseTest extends TestCase {
 
     public XPathParseTest(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -225,21 +228,15 @@ public class XPathParseTest extends TestCase {
             final String expr = parseTestCases[i][0];
             final String expected = parseTestCases[i][1];
 
-            System.out.print("XPath Parsing Test [" + expr + "]");
+            logger.info("XPath Parsing Test [{}]", expr);
             testParse(expr, expected);
         }
     }
 
     private void testXPathValid (String expr, String expected) {
-        //debug
-        //System.out.println("+[ " + expr + " ]");
-
         try {
             XPathExpression xpe = XPathParseTool.parseXPath(expr);
             String result = (xpe != null ? xpe.toString() : null);
-
-            //debug
-            //System.out.println("[ " + result + " ]");
 
             if (result == null || !result.equals(expected)) {
                 fail("XPath Parse Failed! Incorrect parse tree." +
@@ -257,9 +254,6 @@ public class XPathParseTest extends TestCase {
     }
 
     private void testXPathInvalid (String expr) {
-        //debug
-        //System.out.println("+[ " + expr + " ]");
-
         try {
             XPathExpression xpe = XPathParseTool.parseXPath(expr);
             String result = (xpe != null ? xpe.toString() : null);

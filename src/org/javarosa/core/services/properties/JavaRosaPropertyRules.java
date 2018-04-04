@@ -98,7 +98,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
             //Check whether this is a dynamic property
             if(prop.size() == 1 && checkPropertyAllowed(prop.get(0))) {
                 // If so, get its list of available values, and see whether the potentival value is acceptable.
-                return PropertyManager._().getProperty(prop.get(0)).contains(potentialValue);
+                return PropertyManager.__().getProperty(prop.get(0)).contains(potentialValue);
             }
             else {
                 return rules.get(propertyName).contains(potentialValue);
@@ -168,7 +168,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      */
     public void handlePropertyChanges(String propertyName) {
         if(CURRENT_LOCALE.equals(propertyName)) {
-            String locale = PropertyManager._().getSingularProperty(propertyName);
+            String locale = PropertyManager.__().getSingularProperty(propertyName);
             Localization.setLocale(locale);
         }
     }

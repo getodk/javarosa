@@ -24,8 +24,11 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SelectOneDataTests extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(SelectOneDataTests.class);
     QuestionDef question;
 
     Selection one;
@@ -54,7 +57,7 @@ public class SelectOneDataTests extends TestCase {
 
     public SelectOneDataTests(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public static Test suite() {
@@ -69,8 +72,6 @@ public class SelectOneDataTests extends TestCase {
         return aSuite;
     }
     public static String testMaster (int testID) {
-        //System.out.println("running " + testID);
-
         switch (testID) {
         case 1: return "testGetData";
         case 2: return "testSetData";

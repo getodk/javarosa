@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
@@ -55,8 +54,12 @@ import org.javarosa.xpath.XPathMissingInstanceException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnsupportedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XPathPathExpr extends XPathExpression {
+    private static final Logger logger = LoggerFactory.getLogger(XPathPathExpr.class);
+
     public static final int INIT_CONTEXT_ROOT = 0;
     public static final int INIT_CONTEXT_RELATIVE = 1;
     public static final int INIT_CONTEXT_EXPR = 2;
@@ -319,7 +322,7 @@ public class XPathPathExpr extends XPathExpression {
             // we have no access fns that interact with GeoTrace objects (the getValue() data type)...
             return val.getDisplayText();
         } else {
-            Std.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
+            logger.warn("unrecognized data type in xpath expr: " + val.getClass().getName());
             return val.getValue(); //is this a good idea?
         }
     }

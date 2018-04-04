@@ -61,7 +61,7 @@ public class ReferenceManager {
      * @see ReferenceManager#instance
      */
     @Deprecated
-    public static ReferenceManager _() {
+    public static ReferenceManager __() {
         return instance();
     }
 

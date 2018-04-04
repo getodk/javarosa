@@ -19,7 +19,6 @@
  */
 package org.javarosa.core.reference;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.core.services.locale.LocaleDataSource;
 import org.javarosa.core.services.locale.LocalizationUtils;
 import org.javarosa.core.util.OrderedMap;
@@ -30,6 +29,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ReferenceDataSource is a source of locale data which
@@ -40,6 +41,7 @@ import java.io.InputStream;
  *
  */
 public class ReferenceDataSource implements LocaleDataSource {
+    private static final Logger logger = LoggerFactory.getLogger(ReferenceDataSource.class);
 
     String referenceURI;
 
@@ -71,10 +73,10 @@ public class ReferenceDataSource implements LocaleDataSource {
             InputStream is = ReferenceManager.instance().DeriveReference(referenceURI).getStream();
             return LocalizationUtils.parseLocaleInput(is);
         } catch (IOException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
             throw new RuntimeException("IOException while getting localized text at reference " + referenceURI);
         } catch (InvalidReferenceException e) {
-            Std.printStack(e);
+            logger.error("Error", e);
             throw new RuntimeException("Invalid Reference! " + referenceURI);
         }
     }

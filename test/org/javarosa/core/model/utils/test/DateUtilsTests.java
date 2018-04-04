@@ -30,9 +30,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DateUtilsTests extends TestCase {
-
+    private static final Logger logger = LoggerFactory.getLogger(DateUtilsTests.class);
     private static int NUM_TESTS = 8;
 
     Date currentTime;
@@ -40,7 +42,7 @@ public class DateUtilsTests extends TestCase {
 
     public DateUtilsTests(String name){
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public void setUp() throws Exception{

@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.javarosa.core.io.Std;
-import org.javarosa.core.util.CodeTimer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
+import org.javarosa.core.util.StopWatch;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -37,6 +36,8 @@ import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Localizer object maintains mappings for locale ID's and Object
@@ -46,6 +47,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author Drew Roos/Clayton Sims
  */
 public class Localizer implements Externalizable {
+    private static final Logger logger = LoggerFactory.getLogger(Localizer.class);
+
     private List<String> locales = new ArrayList<>(0);
     private OrderedMap<String, List<LocaleDataSource>> localeResources = new OrderedMap<>();
     private OrderedMap<String, String> currentLocaleData = new OrderedMap<>();
@@ -301,7 +304,7 @@ public class Localizer implements Externalizable {
      * @returns HashMap representing text mappings for this locale. Returns null if locale not defined or null.
      */
     public OrderedMap<String, String> getLocaleData(String locale) {
-        final CodeTimer codeTimer = new CodeTimer("getLocaleData");
+        final StopWatch codeTimer = StopWatch.start();
         if (locale == null || !this.locales.contains(locale)) {
             return null;
         }
@@ -353,7 +356,7 @@ public class Localizer implements Externalizable {
             }
         }
 
-        codeTimer.logDone();
+        logger.info(codeTimer.logLine("getLocaleData"));
         return data;
     }
 
@@ -607,7 +610,7 @@ public class Localizer implements Externalizable {
         while (i != -1) {
             int j = text.indexOf("}", i);
             if (j == -1) {
-                Std.err.println("Warning: unterminated ${...} arg");
+                logger.warn("unterminated ${...} arg");
                 break;
             }
 
@@ -626,7 +629,7 @@ public class Localizer implements Externalizable {
         while (i != -1) {
             int j = text.indexOf("}", i);
             if (j == -1) {
-                Std.err.println("Warning: unterminated ${...} arg");
+                logger.warn("unterminated ${...} arg");
                 break;
             }
 

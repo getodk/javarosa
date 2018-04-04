@@ -14,18 +14,19 @@ import org.kxml2.kdom.Element;
 
 import java.util.Collection;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.XFormParser.NAMESPACE_JAVAROSA;
 
 class StandardBindAttributesProcessor {
-    StandardBindAttributesProcessor(XFormParserReporter reporter, Map<String, Integer> typeMappings) {
-        this.reporter = reporter;
+    private static final Logger logger = LoggerFactory.getLogger(StandardBindAttributesProcessor.class);
+    StandardBindAttributesProcessor(Map<String, Integer> typeMappings) {
         this.typeMappings = typeMappings;
     }
 
-    private XFormParserReporter reporter;
     private Map<String, Integer> typeMappings;
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
@@ -151,10 +152,9 @@ class StandardBindAttributesProcessor {
         try {
             xPathConditional = new XPathConditional(xpath);
         } catch (XPathSyntaxException xse) {
-            String errorMessage = "Encountered a problem with " + prettyType + " condition for node ["  + 
-                    contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage();
-            reporter.error(errorMessage);
-            throw new XFormParseException(errorMessage);
+            logger.error("XForm Parse Error: Encountered a problem with {} condition for node [{}] at line: {}{}", prettyType, contextRef.getReference().toString(), xpath, xse.getMessage());
+            throw new XFormParseException("Encountered a problem with " + prettyType + " condition for node ["  +
+                    contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage());
         }
 
         return new Condition(xPathConditional, trueAction, falseAction, FormInstance.unpackReference(contextRef));
@@ -178,7 +178,7 @@ class StandardBindAttributesProcessor {
                 dataType = typeMappings.get(type);
             } else {
                 dataType = org.javarosa.core.model.Constants.DATATYPE_UNSUPPORTED;
-                reporter.warning(XFormParserReporter.TYPE_ERROR_PRONE, "unrecognized data type [" + type + "]", null);
+                logger.warn("XForm Parse Warning: unrecognized data type [{}]", type);
             }
         }
 

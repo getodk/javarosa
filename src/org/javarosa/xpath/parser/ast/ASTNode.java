@@ -19,13 +19,16 @@ package org.javarosa.xpath.parser.ast;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.io.Std;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.Parser;
 import org.javarosa.xpath.parser.Token;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ASTNode {
+    private static final Logger logger = LoggerFactory.getLogger(ASTNode.class);
+
     public abstract Vector<ASTNode> getChildren();
     public abstract XPathExpression build() throws XPathSyntaxException;
 
@@ -34,9 +37,10 @@ public abstract class ASTNode {
     int indent;
 
     private void printStr (String s) {
+        StringBuilder padding = new StringBuilder();
         for (int i = 0; i < 2 * indent; i++)
-            Std.out.print(" ");
-        Std.out.println(s);
+            padding.append(" ");
+        logger.info("{}{}", padding, s);
     }
 
     public void print () {

@@ -29,6 +29,8 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * See testAnswerConstraint() for an example of how to write the 
@@ -37,13 +39,14 @@ import org.javarosa.form.api.FormEntryPrompt;
  *
  */
 public class FormDefTest extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(FormDefTest.class);
     QuestionDef q = null;
     FormEntryPrompt fep = null;
     FormParseInit fpi = null;
 
     public FormDefTest(String name) {
         super(name);
-        System.out.println("Running " + this.getClass().getName() + " test: " + name + "...");
+        logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
 
     public void setUp(){

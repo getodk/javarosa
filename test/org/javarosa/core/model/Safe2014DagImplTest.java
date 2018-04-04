@@ -12,6 +12,8 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -20,6 +22,7 @@ import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertThat;
 
 public class Safe2014DagImplTest {
+    private static final Logger logger = LoggerFactory.getLogger(Safe2014DagImplTest.class);
 
     private final List<Event> dagEvents = new ArrayList<>();
 
@@ -374,12 +377,12 @@ public class Safe2014DagImplTest {
             long currentIterationStart = System.nanoTime();
             formDef.deleteRepeat(firstRepeatIndex);
             double tookMs = (System.nanoTime() - currentIterationStart) / 1000000D;
-            System.out.printf("%d\t%.3f\n", i, tookMs);
+            logger.info(String.format("%d\t%.3f\n", i, tookMs));
         }
 
         // Then
         final String elapsedFormatted = LocalTime.fromMillisOfDay(System.currentTimeMillis() - startMs).toString();
-        System.out.println("Deletion of " + numberOfRepeats + " repeats took " + elapsedFormatted);
+        logger.info("Deletion of {} repeats took {}", numberOfRepeats, elapsedFormatted);
     }
 
     /**
