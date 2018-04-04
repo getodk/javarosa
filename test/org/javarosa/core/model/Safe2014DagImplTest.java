@@ -1,12 +1,12 @@
 package org.javarosa.core.model;
 
+import java.time.LocalTime;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
-import org.joda.time.LocalTime;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -371,7 +371,7 @@ public class Safe2014DagImplTest {
         final FormIndex firstRepeatIndex = new FormIndex(0, 0, firstRepeatRef);
 
         // When
-        long startMs = System.currentTimeMillis();
+        long start = System.nanoTime();
 
         for (int i = 0; i < numberOfRepeats; i++) {
             long currentIterationStart = System.nanoTime();
@@ -381,8 +381,8 @@ public class Safe2014DagImplTest {
         }
 
         // Then
-        final String elapsedFormatted = LocalTime.fromMillisOfDay(System.currentTimeMillis() - startMs).toString();
-        logger.info("Deletion of {} repeats took {}", numberOfRepeats, elapsedFormatted);
+        LocalTime duration = LocalTime.ofNanoOfDay(System.nanoTime() - start);
+        logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
     }
 
     /**

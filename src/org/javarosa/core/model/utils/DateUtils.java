@@ -16,18 +16,16 @@
 
 package org.javarosa.core.model.utils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.List;
-import java.util.ArrayList;
-
+import java.util.TimeZone;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
 
 /**
  * Static utility methods for Dates in j2me
@@ -138,16 +136,23 @@ public class DateUtils {
     }
 
     public static Date getDate (DateFields f, String timezone) {
-        LocalDateTime ldt = new LocalDateTime()
-                .withYear(f.year)
-                .withMonthOfYear(f.month)
-                .withDayOfMonth(f.day)
-                .withHourOfDay(f.hour)
-                .withMinuteOfHour(f.minute)
-                .withSecondOfMinute(f.second)
-                .withMillisOfSecond(f.secTicks);
+        ZoneId zone = timezone != null
+            ? ZoneId.of(timezone)
+            : ZoneId.systemDefault();
+        return Date.from(getLocalDateTime(f).atZone(zone).toInstant());
+    }
 
-        return timezone == null ? ldt.toDate() : ldt.toDate(TimeZone.getTimeZone(timezone));
+    private static LocalDateTime getLocalDateTime(DateFields f) {
+        return LocalDateTime.of(
+            f.year,
+            f.month,
+            f.day,
+            f.hour,
+            f.minute,
+            f.second,
+            // LocalDateTimes use nanoseconds instead of milliseconds
+            f.secTicks * 1_000_000
+        );
     }
 
     /* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
@@ -292,7 +297,7 @@ public class DateUtils {
                 } else if (c == 'n') {    //numeric month
                     sb.append(f.month);
                 } else if (c == 'b') {    //short text month
-                    sb.append(DateTimeFormat.forPattern("MMM").print(new DateTime(DateUtils.getDate(f))));
+                    sb.append(getLocalDateTime(f).format(DateTimeFormatter.ofPattern("MMM")));
                 } else if (c == 'd') {    //0-padded day of month
                     sb.append(intPad(f.day, 2));
                 } else if (c == 'e') {    //day of month
@@ -308,7 +313,7 @@ public class DateUtils {
                 } else if (c == '3') {    //0-padded millisecond ticks (000-999)
                     sb.append(intPad(f.secTicks, 3));
                 } else if (c == 'a') {    //Three letter short text day
-                    sb.append(DateTimeFormat.forPattern("EEE").print(new DateTime(DateUtils.getDate(f))));
+                    sb.append(getLocalDateTime(f).format(DateTimeFormatter.ofPattern("EEE")));
                 } else if (c == 'Z' || c == 'A' || c == 'B') {
                     throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
                 } else {
