@@ -472,7 +472,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
         case Constants.DATATYPE_TIME: return TimeData.class;
         case Constants.DATATYPE_DATE_TIME: return DateTimeData.class;
         case Constants.DATATYPE_CHOICE: return SelectOneData.class;
-        case Constants.DATATYPE_CHOICE_LIST: return MultipleItemsData.class;
+        case Constants.DATATYPE_MULTIPLE_ITEMS: return MultipleItemsData.class;
         case Constants.DATATYPE_GEOPOINT: return GeoPointData.class;
         case Constants.DATATYPE_GEOSHAPE: return GeoShapeData.class;
         case Constants.DATATYPE_GEOTRACE: return GeoTraceData.class;

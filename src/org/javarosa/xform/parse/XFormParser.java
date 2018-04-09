@@ -1983,7 +1983,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     /** Finds a questiondef that binds to ref, if the data type is a 'select' question type */
     public static QuestionDef ghettoGetQuestionDef (int dataType, FormDef f, TreeReference ref) {
-        if (dataType == DATATYPE_CHOICE || dataType == DATATYPE_CHOICE_LIST) {
+        if (dataType == DATATYPE_CHOICE || dataType == DATATYPE_MULTIPLE_ITEMS) {
             return FormDef.findQuestionByRef(ref, f);
         } else {
             return null;

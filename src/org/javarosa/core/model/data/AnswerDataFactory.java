@@ -49,7 +49,7 @@ public class AnswerDataFactory {
         switch(datatype) {
             case Constants.DATATYPE_CHOICE:
                 return new SelectOneData();
-            case Constants.DATATYPE_CHOICE_LIST:
+            case Constants.DATATYPE_MULTIPLE_ITEMS:
                 return new MultipleItemsData();
             case Constants.DATATYPE_BOOLEAN:
                 return new BooleanData();

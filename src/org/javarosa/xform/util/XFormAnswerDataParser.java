@@ -109,7 +109,7 @@ public class XFormAnswerDataParser {
             Selection selection = getSelection(text, q);
             return (selection == null ? null : new SelectOneData(selection));
 
-        case Constants.DATATYPE_CHOICE_LIST:
+        case Constants.DATATYPE_MULTIPLE_ITEMS:
 
             return new MultipleItemsData(getSelections(text, q));
 

@@ -547,13 +547,13 @@ class FormInstanceParser {
      */
     private void applyControlProperties(FormInstance instance) {
         for (int h = 0; h < 2; h++) {
-            int type = (h == 0 ? org.javarosa.core.model.Constants.DATATYPE_CHOICE : org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST);
+            int type = (h == 0 ? org.javarosa.core.model.Constants.DATATYPE_CHOICE : org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS);
 
             for (TreeReference ref : (h == 0 ? selectOnes : selectMultis)) {
                 for (TreeReference treeRef : new EvaluationContext(instance).expandReference(ref, true)) {
                     TreeElement node = instance.resolveReference(treeRef);
                     //noinspection StatementWithEmptyBody
-                    if (node.getDataType() == org.javarosa.core.model.Constants.DATATYPE_CHOICE || node.getDataType() == org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST) {
+                    if (node.getDataType() == org.javarosa.core.model.Constants.DATATYPE_CHOICE || node.getDataType() == org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS) {
                         //do nothing
                     } else if (node.getDataType() == org.javarosa.core.model.Constants.DATATYPE_NULL || node.getDataType() == Constants.DATATYPE_TEXT) {
                         node.setDataType(type);

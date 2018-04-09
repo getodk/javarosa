@@ -118,7 +118,7 @@ public class Recalculate extends Triggerable {
             return new GeoTraceData().cast(new UncastData(String.valueOf(val)));
         } else if (dataType == Constants.DATATYPE_CHOICE) {
             return new SelectOneData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == Constants.DATATYPE_CHOICE_LIST) {
+        } else if (dataType == Constants.DATATYPE_MULTIPLE_ITEMS) {
             return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
         } else if (val instanceof String) {
             return new StringData((String) val);

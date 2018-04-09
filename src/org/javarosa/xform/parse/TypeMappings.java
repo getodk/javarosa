@@ -7,7 +7,7 @@ import static org.javarosa.core.model.Constants.DATATYPE_BARCODE;
 import static org.javarosa.core.model.Constants.DATATYPE_BINARY;
 import static org.javarosa.core.model.Constants.DATATYPE_BOOLEAN;
 import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST;
+import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
 import static org.javarosa.core.model.Constants.DATATYPE_DATE;
 import static org.javarosa.core.model.Constants.DATATYPE_DATE_TIME;
 import static org.javarosa.core.model.Constants.DATATYPE_DECIMAL;
@@ -50,12 +50,12 @@ class TypeMappings {
 
         //xforms
         put("listItem",     DATATYPE_CHOICE);
-        put("listItems",    DATATYPE_CHOICE_LIST);
+        put("listItems", DATATYPE_MULTIPLE_ITEMS);
 
         //non-standard
         put(SELECTONE,      DATATYPE_CHOICE);
-        put(SELECT,         DATATYPE_CHOICE_LIST);
-        put(RANK,           DATATYPE_CHOICE_LIST);
+        put(SELECT, DATATYPE_MULTIPLE_ITEMS);
+        put(RANK, DATATYPE_MULTIPLE_ITEMS);
         put("geopoint",     DATATYPE_GEOPOINT);
         put("geoshape",     DATATYPE_GEOSHAPE);
         put("geotrace",     DATATYPE_GEOTRACE);
