@@ -37,7 +37,7 @@ public class AnswerDataFactory {
         }
 
         if(controlType == Constants.CONTROL_SELECT_MULTI) {
-            return new SelectMultiData();
+            return new MultipleItemsData();
         }
 
         //That's actually it for now, we might have more in the future
@@ -50,7 +50,7 @@ public class AnswerDataFactory {
             case Constants.DATATYPE_CHOICE:
                 return new SelectOneData();
             case Constants.DATATYPE_CHOICE_LIST:
-                return new SelectMultiData();
+                return new MultipleItemsData();
             case Constants.DATATYPE_BOOLEAN:
                 return new BooleanData();
             case Constants.DATATYPE_DATE:

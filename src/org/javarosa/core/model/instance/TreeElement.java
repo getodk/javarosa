@@ -28,7 +28,7 @@ import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
@@ -818,7 +818,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
                 if (classType == null) {
                     throw new RuntimeException("data type [" + value.getClass().getName() + "] not supported inside itemset");
                 } else if (classType.isAssignableFrom(value.getClass()) &&
-                            !(value instanceof SelectOneData || value instanceof SelectMultiData)) {
+                            !(value instanceof SelectOneData || value instanceof MultipleItemsData)) {
                     this.setValue(value);
                 } else {
                     String textVal = RestoreUtils.xfFact.serializeData(value);

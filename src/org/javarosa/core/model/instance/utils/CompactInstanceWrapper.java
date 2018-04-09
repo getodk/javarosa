@@ -25,20 +25,8 @@ import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.data.BooleanData;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoPointData;
-import org.javarosa.core.model.data.GeoShapeData;
-import org.javarosa.core.model.data.GeoTraceData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.*;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -314,7 +302,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
                     } else {
                         val = getSelectOne(ExtUtil.read(in, Integer.class));
                     }
-                } else if (answerType == SelectMultiData.class) {
+                } else if (answerType == MultipleItemsData.class) {
                     if ( CHOICE_MODE == CHOICE_VALUE ) {
                         val = getSelectMulti((List<Object>)ExtUtil.read(in, new ExtWrapList(String.class)));
                     } else {
@@ -346,8 +334,8 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
                     serEntity = new ExtWrapTagged(val);
                 } else if (val instanceof SelectOneData) {
                     serEntity = new ExtWrapBase(compactSelectOne((SelectOneData)val));
-                } else if (val instanceof SelectMultiData) {
-                    serEntity = new ExtWrapList(compactSelectMulti((SelectMultiData)val));
+                } else if (val instanceof MultipleItemsData) {
+                    serEntity = new ExtWrapList(compactSelectMulti((MultipleItemsData)val));
                 } else {
                     serEntity = (IAnswerData)val;
 
@@ -398,11 +386,11 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
     }
 
     /**
-     * reduce a SelectMultiData to a list of integers (index mode) or strings (value mode)
+     * reduce a MultipleItemsData to a list of integers (index mode) or strings (value mode)
      * @param data
      * @return
      */
-    private List<Object> compactSelectMulti (SelectMultiData data) {
+    private List<Object> compactSelectMulti (MultipleItemsData data) {
        List<Selection> val = (List<Selection>)data.getValue();
         List<Object> choices = new ArrayList<Object>(val.size());
         for (int i = 0; i < val.size(); i++) {
@@ -419,14 +407,14 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
     }
 
     /**
-     * create a SelectMultiData from a list of integers (index mode) or strings (value mode)
+     * create a MultipleItemsData from a list of integers (index mode) or strings (value mode)
      */
-    private SelectMultiData getSelectMulti (List<Object> v) {
+    private MultipleItemsData getSelectMulti (List<Object> v) {
        List<Selection> choices = new ArrayList<Selection>(v.size());
         for (int i = 0; i < v.size(); i++) {
             choices.add(makeSelection(v.get(i)));
         }
-        return new SelectMultiData(choices);
+        return new MultipleItemsData(choices);
     }
 
     /**
@@ -484,7 +472,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
         case Constants.DATATYPE_TIME: return TimeData.class;
         case Constants.DATATYPE_DATE_TIME: return DateTimeData.class;
         case Constants.DATATYPE_CHOICE: return SelectOneData.class;
-        case Constants.DATATYPE_CHOICE_LIST: return SelectMultiData.class;
+        case Constants.DATATYPE_CHOICE_LIST: return MultipleItemsData.class;
         case Constants.DATATYPE_GEOPOINT: return GeoPointData.class;
         case Constants.DATATYPE_GEOSHAPE: return GeoShapeData.class;
         case Constants.DATATYPE_GEOTRACE: return GeoTraceData.class;

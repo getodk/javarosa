@@ -21,15 +21,8 @@ import java.util.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.*;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -108,7 +101,7 @@ public class RestoreUtils {
         case Constants.DATATYPE_DATE: val = new DateData((Date)data); break;
         case Constants.DATATYPE_DATE_TIME: val = new DateTimeData((Date)data); break;
         case Constants.DATATYPE_TIME: val = new TimeData((Date)data); break;
-        case Constants.DATATYPE_CHOICE_LIST: val = (SelectMultiData)data; break;
+        case Constants.DATATYPE_CHOICE_LIST: val = (MultipleItemsData)data; break;
         default: throw new IllegalArgumentException("Don't know how to handle data type [" + dataType + "]");
         }
 
@@ -133,7 +126,7 @@ public class RestoreUtils {
             dataType = Constants.DATATYPE_DATE;
         } else if (o instanceof Boolean) {
             dataType = Constants.DATATYPE_BOOLEAN; //booleans are serialized as a literal 't'/'f'
-        } else if (o instanceof SelectMultiData) {
+        } else if (o instanceof MultipleItemsData) {
             dataType = Constants.DATATYPE_CHOICE_LIST;
         }
         return dataType;

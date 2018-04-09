@@ -26,7 +26,7 @@ import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
@@ -578,7 +578,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
 
         List<Selection> selections = null;
-        if (data instanceof SelectMultiData) {
+        if (data instanceof MultipleItemsData) {
             selections = (List<Selection>) data.getValue();
         } else if (data instanceof SelectOneData) {
             selections = new ArrayList<Selection>(1);
@@ -1494,7 +1494,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         if (val instanceof SelectOneData) {
             selections = new ArrayList<Selection>();
             selections.add((Selection) val.getValue());
-        } else if (val instanceof SelectMultiData) {
+        } else if (val instanceof MultipleItemsData) {
             selections = (List<Selection>) val.getValue();
         }
 

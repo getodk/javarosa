@@ -36,18 +36,18 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author Drew Roos
  *
  */
-public class SelectMultiData implements IAnswerData {
+public class MultipleItemsData implements IAnswerData {
    List<Selection> vs; //List of Selection
 
     /**
      * Empty Constructor, necessary for dynamic construction during deserialization.
      * Shouldn't be used otherwise.
      */
-    public SelectMultiData() {
+    public MultipleItemsData() {
 
     }
 
-    public SelectMultiData (List<Selection> vs) {
+    public MultipleItemsData(List<Selection> vs) {
         setValue(vs);
     }
 
@@ -57,7 +57,7 @@ public class SelectMultiData implements IAnswerData {
         for (int i = 0; i < vs.size(); i++) {
             v.add(vs.get(i).clone());
         }
-        return new SelectMultiData(v);
+        return new MultipleItemsData(v);
     }
 
     /*
@@ -138,7 +138,7 @@ public class SelectMultiData implements IAnswerData {
     }
 
     @Override
-    public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
+    public MultipleItemsData cast(UncastData data) throws IllegalArgumentException {
 
        List<String> choices = DateUtils.split(data.value, " ", true);
        List<Selection> v = new ArrayList<Selection>(choices.size());
@@ -146,6 +146,6 @@ public class SelectMultiData implements IAnswerData {
         for(String s : choices) {
             v.add(new Selection(s));
         }
-        return new SelectMultiData(v);
+        return new MultipleItemsData(v);
     }
 }

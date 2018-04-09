@@ -23,14 +23,14 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SelectMultiDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(SelectMultiDataTests.class);
+public class MultipleItemsDataTests extends TestCase {
+    private static final Logger logger = LoggerFactory.getLogger(MultipleItemsDataTests.class);
     QuestionDef question;
 
     Selection one;
@@ -76,7 +76,7 @@ public class SelectMultiDataTests extends TestCase {
         invalid.add(one);
     }
 
-    public SelectMultiDataTests(String name) {
+    public MultipleItemsDataTests(String name) {
         super(name);
         logger.info("Running {} test: {}...", this.getClass().getName(), name);
     }
@@ -87,7 +87,7 @@ public class SelectMultiDataTests extends TestCase {
         for (int i = 1; i <= NUM_TESTS; i++) {
             final int testID = i;
 
-            aSuite.addTest(new SelectMultiDataTests(testMaster(testID)));
+            aSuite.addTest(new MultipleItemsDataTests(testMaster(testID)));
         }
 
         return aSuite;
@@ -111,33 +111,33 @@ public class SelectMultiDataTests extends TestCase {
     }
 
     public void testSetData() {
-        SelectMultiData data = new SelectMultiData(firstTwo);
+        MultipleItemsData data = new MultipleItemsData(firstTwo);
         data.setValue(lastTwo);
 
-        assertTrue("SelectMultiData did not set value properly. Maintained old value.", !(data.getValue().equals(firstTwo)));
-        assertEquals("SelectMultiData did not properly set value ", data.getValue(), lastTwo);
+        assertTrue("MultipleItemsData did not set value properly. Maintained old value.", !(data.getValue().equals(firstTwo)));
+        assertEquals("MultipleItemsData did not properly set value ", data.getValue(), lastTwo);
 
         data.setValue(firstTwo);
-        assertTrue("SelectMultiData did not set value properly. Maintained old value.", !(data.getValue().equals(lastTwo)));
-        assertEquals("SelectMultiData did not properly reset value ", data.getValue(), firstTwo);
+        assertTrue("MultipleItemsData did not set value properly. Maintained old value.", !(data.getValue().equals(lastTwo)));
+        assertEquals("MultipleItemsData did not properly reset value ", data.getValue(), firstTwo);
 
     }
 
     public void testNullData() {
         boolean exceptionThrown = false;
-        SelectMultiData data = new SelectMultiData();
+        MultipleItemsData data = new MultipleItemsData();
         data.setValue(firstTwo);
         try {
             data.setValue(null);
         } catch (NullPointerException e) {
             exceptionThrown = true;
         }
-        assertTrue("SelectMultiData failed to throw an exception when setting null data", exceptionThrown);
-        assertTrue("SelectMultiData overwrote existing value on incorrect input", data.getValue().equals(firstTwo));
+        assertTrue("MultipleItemsData failed to throw an exception when setting null data", exceptionThrown);
+        assertTrue("MultipleItemsData overwrote existing value on incorrect input", data.getValue().equals(firstTwo));
     }
 
     public void testVectorImmutability() {
-        SelectMultiData data = new SelectMultiData(firstTwo);
+        MultipleItemsData data = new MultipleItemsData(firstTwo);
         Selection[] copy = new Selection[firstTwo.size()];
         firstTwo.toArray(copy);
         firstTwo.set(0, two);
@@ -161,26 +161,26 @@ public class SelectMultiDataTests extends TestCase {
 
     private void assertVectorIdentity(String messageHeader, List<Selection> v, Selection[] a) {
 
-        assertEquals(messageHeader + "SelectMultiData's internal representation was violated. Vector size changed.",v.size(),a.length);
+        assertEquals(messageHeader + "MultipleItemsData's internal representation was violated. Vector size changed.",v.size(),a.length);
 
         for(int i = 0 ; i < v.size(); ++i) {
             Selection internalValue = v.get(i);
             Selection copyValue = a[i];
 
-            assertEquals(messageHeader + "SelectMultiData's internal representation was violated. Element " + i + "changed.",internalValue,copyValue);
+            assertEquals(messageHeader + "MultipleItemsData's internal representation was violated. Element " + i + "changed.",internalValue,copyValue);
         }
     }
 
     public void testBadDataTypes() {
         boolean failure = false;
-        SelectMultiData data = new SelectMultiData(firstTwo);
+        MultipleItemsData data = new MultipleItemsData(firstTwo);
         try {
             data.setValue(invalid);
-            data = new SelectMultiData(invalid);
+            data = new MultipleItemsData(invalid);
         } catch(Exception e) {
             failure = true;
         }
-        assertTrue("SelectMultiData did not throw a proper exception while being set to invalid data.",failure);
+        assertTrue("MultipleItemsData did not throw a proper exception while being set to invalid data.",failure);
 
         Selection[] values = new Selection[firstTwo.size()];
         firstTwo.toArray(values);

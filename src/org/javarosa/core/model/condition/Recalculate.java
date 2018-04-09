@@ -18,21 +18,8 @@ package org.javarosa.core.model.condition;
 
 import java.util.Date;
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.data.BooleanData;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoPointData;
-import org.javarosa.core.model.data.GeoShapeData;
-import org.javarosa.core.model.data.GeoTraceData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.data.UncastData;
+import org.javarosa.core.model.data.*;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -132,7 +119,7 @@ public class Recalculate extends Triggerable {
         } else if (dataType == Constants.DATATYPE_CHOICE) {
             return new SelectOneData().cast(new UncastData(String.valueOf(val)));
         } else if (dataType == Constants.DATATYPE_CHOICE_LIST) {
-            return new SelectMultiData().cast(new UncastData(String.valueOf(val)));
+            return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
         } else if (val instanceof String) {
             return new StringData((String) val);
         } else if (val instanceof Date) {
