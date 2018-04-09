@@ -31,7 +31,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A response to a question requesting a selection of
- * any number of items from a list.
+ * any number of items from a list or ordering them.
  *
  * @author Drew Roos
  *

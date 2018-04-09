@@ -58,7 +58,7 @@ public class Constants {
     public static final int DATATYPE_DATE_TIME = 6;    /** Date and Time question type. This has both the date and time components*/
     public static final int DATATYPE_CHOICE = 7;    /** This is a question with alist of options where not more than one option can be selected at a time. */
     public static final int DATATYPE_MULTIPLE_ITEMS = 8;    /** This is a question with a list of items used form selecting multiple answers or ordering them. */
-    public static final int DATATYPE_CHOICE_LIST = 8;    /** The same as above but exists only for backwards compatibility */
+    public static final int DATATYPE_CHOICE_LIST = 8;    /** The same as above but exists only for backwards compatibility. */
     public static final int DATATYPE_BOOLEAN = 9;    /** Question with true and false answers. */
     public static final int DATATYPE_GEOPOINT = 10; /** Question with location answer. */
     public static final int DATATYPE_BARCODE = 11; /** Question with barcode string answer. */
