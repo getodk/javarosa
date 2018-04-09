@@ -19,6 +19,7 @@ import static org.javarosa.core.model.Constants.DATATYPE_LONG;
 import static org.javarosa.core.model.Constants.DATATYPE_TEXT;
 import static org.javarosa.core.model.Constants.DATATYPE_TIME;
 import static org.javarosa.core.model.Constants.DATATYPE_UNSUPPORTED;
+import static org.javarosa.xform.parse.Constants.RANK;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
 
@@ -54,6 +55,7 @@ class TypeMappings {
         //non-standard
         put(SELECTONE,      DATATYPE_CHOICE);
         put(SELECT,         DATATYPE_CHOICE_LIST);
+        put(RANK,           DATATYPE_CHOICE_LIST);
         put("geopoint",     DATATYPE_GEOPOINT);
         put("geoshape",     DATATYPE_GEOSHAPE);
         put("geotrace",     DATATYPE_GEOTRACE);

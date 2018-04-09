@@ -36,7 +36,7 @@ public class AnswerDataFactory {
             return new SelectOneData();
         }
 
-        if(controlType == Constants.CONTROL_SELECT_MULTI) {
+        if (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_RANK) {
             return new MultipleItemsData();
         }
 

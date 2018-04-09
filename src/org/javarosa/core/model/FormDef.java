@@ -815,8 +815,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
                         QuestionDef q = findQuestionByRef(ref, f);
                         if (q == null
-                                || (q.getControlType() != Constants.CONTROL_SELECT_ONE && q
-                                .getControlType() != Constants.CONTROL_SELECT_MULTI)) {
+                            || (q.getControlType() != Constants.CONTROL_SELECT_ONE
+                            && q.getControlType() != Constants.CONTROL_SELECT_MULTI
+                            && q.getControlType() != Constants.CONTROL_RANK)) {
                             return "";
                         }
 

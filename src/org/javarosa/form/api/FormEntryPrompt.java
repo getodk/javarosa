@@ -146,7 +146,7 @@ public class FormEntryPrompt extends FormEntryCaption {
                 //convert to IAnswerData
                 if (selection.size() == 0) {
                     return null;
-                } else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
+                } else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI || q.getControlType() == Constants.CONTROL_RANK) {
                     return new MultipleItemsData(selection);
                 } else if (q.getControlType() == Constants.CONTROL_SELECT_ONE) {
                     return new SelectOneData(selection.get(0)); //do something if more than one selected?
