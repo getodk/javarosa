@@ -40,6 +40,8 @@ import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
+import static org.javarosa.xform.parse.RandomizeHelper.parseSeed;
 import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 import java.io.ByteArrayInputStream;
@@ -1297,6 +1299,13 @@ public class XFormParser implements IXFormParserFunctions {
         String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
         if (nodesetStr == null)
             throw new RuntimeException("No nodeset attribute in element: [" + e.getName() + "]. This is required. (Element Printout:" + XFormSerializer.elementToString(e) + ")");
+
+        if (nodesetStr.startsWith("randomize(")) {
+            itemset.randomize = true;
+            itemset.randomSeed = parseSeed(nodesetStr);
+            nodesetStr = cleanNodesetDefinition(nodesetStr);
+        }
+
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
         itemset.nodesetExpr = new XPathConditional(path);
         itemset.contextRef = getFormElementRef(qparent);
