@@ -1,14 +1,12 @@
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Test;
 
-import java.nio.file.Paths;
-
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -19,8 +17,7 @@ public class AttributesTestCase {
 
     @Test
     public void testBindAttributes() {
-        FormParseInit fpi = new FormParseInit();
-        fpi.setFormToParse(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "form_with_bind_attributes.xml").toString());
+        FormParseInit fpi = new FormParseInit(r("form_with_bind_attributes.xml"));
         FormEntryModel formEntryModel = fpi.getFormEntryModel();
         FormDef formDef = fpi.getFormDef();
         FormEntryPrompt formEntryPrompt;
@@ -42,8 +39,7 @@ public class AttributesTestCase {
 
     @Test
     public void testAdditionalAttributes() {
-        FormParseInit fpi = new FormParseInit();
-        fpi.setFormToParse(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "form_with_additional_attributes.xml").toString());
+        FormParseInit fpi = new FormParseInit(r("form_with_additional_attributes.xml"));
         FormEntryModel formEntryModel = fpi.getFormEntryModel();
         FormDef formDef = fpi.getFormDef();
         FormEntryPrompt formEntryPrompt;

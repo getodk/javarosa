@@ -56,8 +56,7 @@ public class XPathFuncExprRandomizeTest {
         // Take a look to the form file:
         //  - The first pair of fields use randomize without a seed.
         //  - The second pair of fields use randomize with a seed.
-        FormParseInit fpi = new FormParseInit();
-        fpi.setFormToParse(r("randomize.xml").toString());
+        FormParseInit fpi = new FormParseInit(r("randomize.xml"));
         formDef = fpi.getFormDef();
     }
 
