@@ -1306,7 +1306,7 @@ public class XFormParser implements IXFormParserFunctions {
         );
         itemset.contextRef = getFormElementRef(qparent);
         // this is not valid yet...
-        itemset.nodesetRef = null;
+//        itemset.nodesetRef = null;
         // itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), itemset.contextRef));
         itemset.copyMode = false;
 
@@ -1335,7 +1335,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
 
                 XPathPathExpr labelPath = XPathReference.getPathExpr(labelXpath);
-                itemset.labelRef = null;
+//                itemset.labelRef = null;
                 // itemset.labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelPath), itemset.nodesetRef));
                 itemset.labelExpr = new XPathConditional(labelPath);
                 itemset.labelIsItext = labelItext;
@@ -1352,7 +1352,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
 
                 XPathPathExpr copyPath = XPathReference.getPathExpr(copyXpath);
-                itemset.copyRef = null;
+//                itemset.copyRef = null;
                 // itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyPath), itemset.nodesetRef));
                 itemset.copyExpr = new XPathConditional(copyPath);
                 itemset.copyMode = true;
@@ -1369,7 +1369,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
 
                 XPathPathExpr valuePath = XPathReference.getPathExpr(valueXpath);
-                itemset.valueRef = null;
+//                itemset.valueRef = null;
                 // itemset.valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valuePath), itemset.nodesetRef));
                 itemset.valueExpr = new XPathConditional(valuePath);
             }

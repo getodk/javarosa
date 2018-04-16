@@ -94,7 +94,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 
         ItemsetBinding itemset = q.getDynamicChoices();
         if (itemset != null) {
-            if (itemset.valueRef != null) {
+            if (itemset.getValueRef() != null) {
             List<SelectChoice> choices = getSelectChoices();
             List<String> preselectedValues = new ArrayList<String>();
 
