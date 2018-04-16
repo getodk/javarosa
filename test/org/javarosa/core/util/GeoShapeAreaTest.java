@@ -19,39 +19,26 @@ package org.javarosa.core.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.xform.util.XFormUtils;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Author: Meletis Margaritis
  * Date: 8/4/14
  * Time: 3:40 PM
  */
-public class GeoShapeAreaTest extends TestCase {
+public class GeoShapeAreaTest {
     private static final Logger logger = LoggerFactory.getLogger(GeoShapeAreaTest.class);
 
-  public GeoShapeAreaTest(String name) {
-    super(name);
-    logger.info("Running {} test: {}...", this.getClass().getName(), name);
-  }
-
-  public static Test suite() {
-    TestSuite aSuite = new TestSuite();
-
-    aSuite.addTest(new GeoShapeAreaTest("testGeoShapeSupportForEnclosedArea"));
-
-    return aSuite;
-  }
-
-  public void testGeoShapeSupportForEnclosedArea() throws Exception {
+  @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
     // Read the form definition
     String FORM_NAME = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
     InputStream is = null;
@@ -65,6 +52,6 @@ public class GeoShapeAreaTest extends TestCase {
     // get the calculated area
     IAnswerData areaResult = formDef.getMainInstance().getRoot().getChildAt(1).getValue();
 
-    assertTrue((int) Math.rint((Double) areaResult.getValue()) == 151452);
+    assertEquals(151452, (int) Math.rint((Double) areaResult.getValue()));
   }
 }

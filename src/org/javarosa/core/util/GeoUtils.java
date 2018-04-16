@@ -21,8 +21,13 @@
 
 package org.javarosa.core.util;
 
+import net.sf.geographiclib.Geodesic;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.sf.geographiclib.Constants.WGS84_a;
+import static net.sf.geographiclib.Constants.WGS84_f;
 
 /**
  * Author: Meletis Margaritis
@@ -34,7 +39,7 @@ public final class GeoUtils {
   private static final double EARTH_EQUATOR_RADIUS = 6_378_100; // Todo find where this value came from. Perhaps it should be 6_378_137.
   private static final double EARTH_CIRCUMFERENCE = 2 * Math.PI * EARTH_EQUATOR_RADIUS;
 
-  /**
+    /**
    * Calculates the enclosed area that is defined by a list of gps coordinates on earth.
    *
    * @param latLongs the list of coordinates.
@@ -67,9 +72,18 @@ public final class GeoUtils {
     return Math.abs(areasSum); // Area can‘t be negative
   }
 
-  public static double calculateDistance(List<LatLong> latLongList) {
-    throw new UnsupportedOperationException(); // Not yet implemented
-  }
+    public static double calculateDistance(List<LatLong> points) {
+        double distance = 0;
+        if (points.size() > 1) {
+            Geodesic geod = new Geodesic(WGS84_a, WGS84_f);
+            for (int i = 1; i < points.size(); i++) {
+                LatLong p1 = points.get(i - 1);
+                LatLong p2 = points.get(i);
+                distance += geod.Inverse(p1.latitude, p1.longitude, p2.latitude, p2.longitude).s12;
+            }
+        }
+        return distance;
+    }
 
   private static Double calculateAreaInSquareMeters(double x1, double x2, double y1, double y2) {
     return (y1 * x2 - x1 * y2) / 2;
