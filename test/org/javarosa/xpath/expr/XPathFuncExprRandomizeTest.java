@@ -15,6 +15,10 @@
  */
 package org.javarosa.xpath.expr;
 
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
@@ -22,15 +26,24 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.test.FormParseInit;
+import org.javarosa.core.util.JavaRosaCoreModule;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormsModule;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -86,6 +99,40 @@ public class XPathFuncExprRandomizeTest {
         List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/seededFruit2");
 
         assertTrue(nodesEqualInOrder(choices1, choices2));
+    }
+
+    @Test
+    public void the_same_seeded_field_in_different_instances_from_deserialized_forms_gets_the_same_order_of_choices() throws IOException, DeserializationException {
+        initializeNewInstance(formDef);
+        List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/seededFruit2");
+
+        FormDef formDefAfterSerialization = serializeAndDeserializeForm(formDef);
+
+        initializeNewInstance(formDefAfterSerialization);
+        List<SelectChoice> choices2 = getSelectChoices(formDefAfterSerialization, "/randomize/seededFruit2");
+
+        assertTrue(nodesEqualInOrder(choices1, choices2));
+    }
+
+    private FormDef serializeAndDeserializeForm(FormDef formDef) throws IOException, DeserializationException {
+        // Initialize serialization
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+        new XFormsModule().registerModule();
+
+        // Serialize form in a temp file
+        Path tempFile = createTempFile("javarosa", "test");
+        formDef.writeExternal(new DataOutputStream(newOutputStream(tempFile)));
+
+        // Create an empty FormDef and deserialize the form into it
+        FormDef deserializedFormDef = new FormDef();
+        deserializedFormDef.readExternal(
+            new DataInputStream(newInputStream(tempFile)),
+            PrototypeManager.getDefault()
+        );
+
+        delete(tempFile);
+        return deserializedFormDef;
     }
 
     private static void initializeNewInstance(FormDef formDef) {
