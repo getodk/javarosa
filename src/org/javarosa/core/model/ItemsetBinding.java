@@ -1,13 +1,12 @@
 package org.javarosa.core.model;
 
-import static org.javarosa.core.model.instance.FormInstance.*;
+import static org.javarosa.core.model.instance.FormInstance.unpackReference;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
@@ -104,15 +103,32 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public void initReferences(QuestionDef q) {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
-        nodesetRef = unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference(true)), contextRef));
+        XPathConditional nodesetExpr = (XPathConditional) this.nodesetExpr;
+        XPathPathExpr expr = (XPathPathExpr) nodesetExpr.getExpr();
+        TreeReference reference = expr.getReference(true);
+        XPathReference ref = new XPathReference(reference);
+        IDataReference absRef = FormDef.getAbsRef(ref, contextRef);
+        nodesetRef = unpackReference(absRef);
         if (labelExpr != null) {
-            labelRef = unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) labelExpr).getExpr())), nodesetRef));
+            XPathConditional labelExpr = (XPathConditional) this.labelExpr;
+            XPathPathExpr expr1 = (XPathPathExpr) labelExpr.getExpr();
+            XPathReference ref1 = new XPathReference(expr1);
+            IDataReference absRef1 = FormDef.getAbsRef(ref1, nodesetRef);
+            labelRef = unpackReference(absRef1);
         }
         if (copyExpr != null) {
-            copyRef = unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) copyExpr).getExpr())), nodesetRef));
+            XPathConditional copyExpr = (XPathConditional) this.copyExpr;
+            XPathPathExpr expr1 = (XPathPathExpr) copyExpr.getExpr();
+            XPathReference ref1 = new XPathReference(expr1);
+            IDataReference absRef1 = FormDef.getAbsRef(ref1, nodesetRef);
+            copyRef = unpackReference(absRef1);
         }
         if (valueExpr != null) {
-            valueRef = unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) valueExpr).getExpr())), nodesetRef));
+            XPathConditional valueExpr = (XPathConditional) this.valueExpr;
+            XPathPathExpr expr1 = (XPathPathExpr) valueExpr.getExpr();
+            XPathReference ref1 = new XPathReference(expr1);
+            IDataReference absRef1 = FormDef.getAbsRef(ref1, nodesetRef);
+            valueRef = unpackReference(absRef1);
         }
 
         if (q != null) {
