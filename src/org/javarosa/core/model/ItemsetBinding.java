@@ -148,6 +148,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         copyExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
         labelIsItext = ExtUtil.readBool(in);
         copyMode = ExtUtil.readBool(in);
+        randomize = ExtUtil.readBool(in);
+        randomSeed = (Long)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()));
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -158,6 +160,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         ExtUtil.write(out, new ExtWrapNullable(copyExpr == null ? null : new ExtWrapTagged(copyExpr)));
         ExtUtil.writeBool(out, labelIsItext);
         ExtUtil.writeBool(out, copyMode);
+        ExtUtil.writeBool(out, randomize);
+        ExtUtil.write(out, new ExtWrapNullable(randomSeed == null ? null : new ExtWrapTagged(randomSeed)));
     }
 
 }
