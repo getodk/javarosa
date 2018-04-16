@@ -1,11 +1,15 @@
 package org.javarosa.core.model;
 
+import static java.util.stream.Collectors.toMap;
 import static org.javarosa.core.model.instance.FormInstance.unpackReference;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -20,6 +24,9 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.XPathNodeset;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,11 +112,24 @@ public class ItemsetBinding implements Externalizable, Localizable {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
         XPathConditional nodesetExpr = (XPathConditional) this.nodesetExpr;
-        XPathPathExpr expr = (XPathPathExpr) nodesetExpr.getExpr();
-        TreeReference reference = expr.getReference(true);
-        XPathReference ref = new XPathReference(reference);
-        IDataReference absRef = FormDef.getAbsRef(ref, contextRef);
-        nodesetRef = unpackReference(absRef);
+        XPathExpression expr = nodesetExpr.getExpr();
+        if (expr instanceof XPathPathExpr) {
+            TreeReference reference = ((XPathPathExpr)expr).getReference(true);
+            XPathReference ref = new XPathReference(reference);
+            IDataReference absRef = FormDef.getAbsRef(ref, contextRef);
+            nodesetRef = unpackReference(absRef);
+        }
+        if (expr instanceof XPathFuncExpr) {
+            XPathFuncExpr f = (XPathFuncExpr) expr;
+            Stream<DataInstance> stream = nonMainInstances.stream();
+            Map<String, DataInstance> nmis = stream.collect(toMap(
+                DataInstance::getName,
+                di -> di
+            ));
+            EvaluationContext ec = new EvaluationContext(instanceModel, nmis);
+            XPathNodeset nodeset = (XPathNodeset) f.eval(ec);
+            nodesetRef = nodeset.getRefAt(0);
+        }
         if (labelExpr != null) {
             XPathConditional labelExpr = (XPathConditional) this.labelExpr;
             XPathPathExpr expr1 = (XPathPathExpr) labelExpr.getExpr();
