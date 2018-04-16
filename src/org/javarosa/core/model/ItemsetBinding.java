@@ -1,7 +1,5 @@
 package org.javarosa.core.model;
 
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -54,9 +52,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
                                    //not serialized -- set by QuestionDef.setDynamicChoices()
     private List<SelectChoice> choices; //dynamic choices -- not serialized, obviously
 
-    public boolean randomize = false;
-    public Long randomSeed = null;
-
     public List<SelectChoice> getChoices () {
         return choices;
     }
@@ -66,13 +61,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
             logger.warn("previous choices not cleared out");
             clearChoices();
         }
-        this.choices = randomize ? shuffle(choices, randomSeed) : choices;
-
-        if (randomize) {
-            // Match indices to new positions
-            for (int i = 0; i < choices.size(); i++)
-                choices.get(i).setIndex(i);
-        }
+        this.choices = choices;
 
         //init localization
         if (localizer != null) {
@@ -148,8 +137,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         copyExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
         labelIsItext = ExtUtil.readBool(in);
         copyMode = ExtUtil.readBool(in);
-        randomize = ExtUtil.readBool(in);
-        randomSeed = (Long)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()));
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -160,8 +147,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         ExtUtil.write(out, new ExtWrapNullable(copyExpr == null ? null : new ExtWrapTagged(copyExpr)));
         ExtUtil.writeBool(out, labelIsItext);
         ExtUtil.writeBool(out, copyMode);
-        ExtUtil.writeBool(out, randomize);
-        ExtUtil.write(out, new ExtWrapNullable(randomSeed == null ? null : new ExtWrapTagged(randomSeed)));
     }
 
 }
