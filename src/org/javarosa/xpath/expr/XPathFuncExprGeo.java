@@ -13,14 +13,14 @@ import java.util.List;
 
 /** XPath function expression geographic logic */
 class XPathFuncExprGeo {
-    List<GeoUtils.GPSCoordinates> getGpsCoordinatesFromNodeset(String name, Object argVal) {
+    List<GeoUtils.LatLong> getGpsCoordinatesFromNodeset(String name, Object argVal) {
         if (!(argVal instanceof XPathNodeset)) {
             throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
         }
         Object[] argList = ((XPathNodeset) argVal).toArgList();
         int repeatSize = argList.length;
 
-        final List<GeoUtils.GPSCoordinates> gpsCoordinatesList = new ArrayList<>();
+        final List<GeoUtils.LatLong> latLongs = new ArrayList<>();
 
         if (repeatSize == 1) {
             // Try to determine if the argument is of type GeoShapeData
@@ -28,7 +28,7 @@ class XPathFuncExprGeo {
                 GeoShapeData geoShapeData = new GeoShapeData().cast(new UncastData(XPathFuncExpr.toString(argList[0])));
                 if (geoShapeData.points.size() > 2) {
                     for (GeoPointData point : geoShapeData.points) {
-                        gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(point.getPart(0), point.getPart(1)));
+                        latLongs.add(new GeoUtils.LatLong(point.getPart(0), point.getPart(1)));
                     }
                 }
             } catch (Exception e) {
@@ -40,12 +40,12 @@ class XPathFuncExprGeo {
             for (Object arg : argList) {
                 try {
                     GeoPointData geoPointData = new GeoPointData().cast(new UncastData(XPathFuncExpr.toString(arg)));
-                    gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
+                    latLongs.add(new GeoUtils.LatLong(geoPointData.getPart(0), geoPointData.getPart(1)));
                 } catch (Exception e) {
                     throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
                 }
             }
         }
-        return gpsCoordinatesList;
+        return latLongs;
     }
 }
