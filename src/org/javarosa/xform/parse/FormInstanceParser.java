@@ -312,39 +312,39 @@ class FormInstanceParser {
     private void verifyItemsetBindings (FormInstance instance) {
         for (ItemsetBinding itemset : itemsets) {
             //check proper parent/child relationship
-            if (!itemset.nodesetRef.isParentOf(itemset.labelRef, false)) {
-                throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
-            } else if (itemset.copyRef != null && !itemset.nodesetRef.isParentOf(itemset.copyRef, false)) {
-                throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
-            } else if (itemset.valueRef != null && !itemset.nodesetRef.isParentOf(itemset.valueRef, false)) {
-                throw new XFormParseException("itemset nodeset ref is not a parent of value ref");
-            }
+//            if (!itemset.nodesetRef.isParentOf(itemset.labelRef, false)) {
+//                throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
+//            } else if (itemset.copyRef != null && !itemset.nodesetRef.isParentOf(itemset.copyRef, false)) {
+//                throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
+//            } else if (itemset.valueRef != null && !itemset.nodesetRef.isParentOf(itemset.valueRef, false)) {
+//                throw new XFormParseException("itemset nodeset ref is not a parent of value ref");
+//            }
 
-            if (itemset.copyRef != null && itemset.valueRef != null) {
-                if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
-                    throw new XFormParseException("itemset <copy> is not a parent of <value>");
-                }
-            }
+//            if (itemset.copyRef != null && itemset.valueRef != null) {
+//                if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
+//                    throw new XFormParseException("itemset <copy> is not a parent of <value>");
+//                }
+//            }
 
             //make sure the labelref is tested against the right instance
             //check if it's not the main instance
             DataInstance fi = null;
-            if (itemset.labelRef.getInstanceName() != null) {
-                fi = formDef.getNonMainInstance(itemset.labelRef.getInstanceName());
+            if (itemset.getLabelInstanceName() != null) {
+                fi = formDef.getNonMainInstance(itemset.getLabelInstanceName());
                 if (fi == null) {
-                    throw new XFormParseException("Instance: " + itemset.labelRef.getInstanceName() + " Does not exists");
+                    throw new XFormParseException("Instance: " + itemset.getLabelInstanceName() + " Does not exists");
                 }
             } else {
                 fi = instance;
             }
 
 
-            if (fi.getTemplatePath(itemset.labelRef) == null) {
-                throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
+            if (fi.getTemplatePath(itemset.getLabelRef()) == null) {
+                throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.getLabelRef() + "]");
             }
             //check value nodes exist
-            else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
-                throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
+            else if (itemset.getValueRef() != null && fi.getTemplatePath(itemset.getValueRef()) == null) {
+                throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.getValueRef() + "]");
             }
         }
     }
@@ -358,7 +358,7 @@ class FormInstanceParser {
                 }
 
                 //validate homogeneity between src and dst nodes
-                TreeElement srcNode = instance.getTemplatePath(itemset.copyRef);
+                TreeElement srcNode = instance.getTemplatePath(itemset.getCopyRef());
                 TreeElement dstNode = instance.getTemplate(itemset.getDestRef());
 
                 if (!FormInstance.isHomogeneous(srcNode, dstNode)) {
@@ -570,7 +570,7 @@ class FormInstanceParser {
         List<TreeReference> refs = new ArrayList<>(repeats);
 
         for (ItemsetBinding itemset : itemsets) {
-            TreeReference srcRef = itemset.nodesetRef;
+            TreeReference srcRef = itemset.getNodesetRef();
             if (!refs.contains(srcRef)) {
                 //CTS: Being an itemset root is not sufficient to mark
                 //a node as repeatable. It has to be nonstatic (which it

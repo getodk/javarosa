@@ -31,9 +31,9 @@ import java.util.List;
  */
 public class XPathNodeset {
 
-    private List<TreeReference> nodes;
-    protected DataInstance instance;
-    protected EvaluationContext ec;
+    public List<TreeReference> nodes;
+    public DataInstance instance;
+    public EvaluationContext ec;
     // these are purely for improved error messages
     private String pathEvaluated;
     private String originalPath;
