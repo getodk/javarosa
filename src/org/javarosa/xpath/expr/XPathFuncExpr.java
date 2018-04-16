@@ -16,6 +16,7 @@
 
 package org.javarosa.xpath.expr;
 
+import java.util.Map;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -147,7 +148,7 @@ public class XPathFuncExpr extends XPathExpression {
         String name = id.toString();
         Object[] argVals = new Object[args.length];
 
-        HashMap<String, IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
+        Map<String, IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
 
         //TODO: Func handlers should be able to declare the desire for short circuiting as well
         if (name.equals("if")) {
