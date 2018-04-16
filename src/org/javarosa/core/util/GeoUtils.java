@@ -40,22 +40,11 @@ public final class GeoUtils {
    * @return the enclosed area in square meters (with a double precision).
    */
   public static double calculateAreaOfGPSPolygonOnEarthInSquareMeters(final List<GPSCoordinates> gpsCoordinatesList) {
-    return calculateAreaOfGPSPolygonOnSphereInSquareMeters(gpsCoordinatesList, EARTH_RADIUS);
-  }
-
-  /**
-   * Calculates the enclosed area that is defined by a list of gps coordinates on a sphere.
-   *
-   * @param gpsCoordinatesList the list of coordinates.
-   * @param radius the radius of the sphere in meters.
-   * @return the enclosed area in square meters (with a double precision).
-   */
-  private static double calculateAreaOfGPSPolygonOnSphereInSquareMeters(final List<GPSCoordinates> gpsCoordinatesList, final double radius) {
     if (gpsCoordinatesList.size() < 3) {
       return 0;
     }
 
-    final double diameter = radius * 2;
+    final double diameter = EARTH_RADIUS * 2;
     final double circumference = diameter * Math.PI;
     final List<Double> listY = new ArrayList<Double>();
     final List<Double> listX = new ArrayList<Double>();
@@ -90,7 +79,7 @@ public final class GeoUtils {
     return Math.abs(areasSum);// Math.sqrt(areasSum * areasSum);
   }
 
-  private static Double calculateAreaInSquareMeters(final double x1, final double x2, final double y1, final double y2) {
+    private static Double calculateAreaInSquareMeters(final double x1, final double x2, final double y1, final double y2) {
     return (y1 * x2 - x1 * y2) / 2;
   }
 
@@ -102,7 +91,7 @@ public final class GeoUtils {
     return (longitude - longitudeRef) * circumference * Math.cos(Math.toRadians(latitude)) / 360.0;
   }
 
-  public static class GPSCoordinates {
+    public static class GPSCoordinates {
 
     private double latitude;
     private double longitude;
