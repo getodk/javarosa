@@ -425,16 +425,13 @@ public class XPathFuncExpr extends XPathExpression {
             Object[] argList = ((XPathNodeset) argVal).toArgList();
             int repeatSize = argList.length;
 
-            List<GeoUtils.GPSCoordinates> gpsCoordinatesList;
+            final List<GeoUtils.GPSCoordinates> gpsCoordinatesList = new ArrayList<>();
 
             if (repeatSize == 1) {
                 // Try to determine if the argument is of type GeoShapeData
                 try {
                     GeoShapeData geoShapeData = new GeoShapeData().cast(new UncastData(toString(argList[0])));
-                    if (geoShapeData.points.size() <= 2) {
-                        return 0d;
-                    } else {
-                        gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
+                    if (geoShapeData.points.size() > 2) {
                         for (GeoPointData point : geoShapeData.points) {
                             gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(point.getPart(0), point.getPart(1)));
                         }
@@ -442,25 +439,21 @@ public class XPathFuncExpr extends XPathExpression {
                 } catch (Exception e) {
                     throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
                 }
-            } else {
-                if (repeatSize <= 2) {
-                    return 0d;
-                } else {
-                    // treat the input as a series of GeoPointData
+            } else if (repeatSize > 2) {
+                // treat the input as a series of GeoPointData
 
-                    gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
-                    for (Object arg : argList) {
-                        try {
-                            GeoPointData geoPointData = new GeoPointData().cast(new UncastData(toString(arg)));
-                            gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
-                        } catch (Exception e) {
-                            throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
-                        }
+                for (Object arg : argList) {
+                    try {
+                        GeoPointData geoPointData = new GeoPointData().cast(new UncastData(toString(arg)));
+                        gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
+                    } catch (Exception e) {
+                        throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
                     }
                 }
             }
 
-            return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+            return gpsCoordinatesList.isEmpty() ?
+                0d : GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from((String) argVals[1]).digest(
                 (String) argVals[0],
