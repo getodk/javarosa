@@ -248,7 +248,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // construct the references in all the question itemsets
         // now so that the entire main instance is available
         // for term resolution.
-        updateItemsetReferences(getChildren());
+        updateItemsetReferences(fi, Collections.emptyList(), getChildren());
 
         attachControlsToInstanceData();
     }
@@ -1459,17 +1459,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * dynamic ItemsetBindings.  We need to do this late in the process so that
      * we have the entire main instance assembled.
      */
-    public static void updateItemsetReferences(List<IFormElement> children) {
+    public static void updateItemsetReferences(DataInstance instance, List<DataInstance> nonMainInstances, List<IFormElement> children) {
         if (children != null) {
             for (IFormElement child : children) {
                 if (child instanceof QuestionDef) {
                     QuestionDef q = (QuestionDef) child;
                     ItemsetBinding itemset = q.getDynamicChoices();
                     if (itemset != null) {
-                        itemset.initReferences(q);
+                        itemset.initReferences(instance, nonMainInstances, q);
                     }
                 } else {
-                    updateItemsetReferences(child.getChildren());
+                    updateItemsetReferences(instance, nonMainInstances, child.getChildren());
                 }
             }
         }

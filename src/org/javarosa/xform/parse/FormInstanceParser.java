@@ -78,7 +78,7 @@ class FormInstanceParser {
             // The first time is here because they are needed before these
             // validation steps can be performed.
             // It is then done again during the call to _f.setInstance().
-            FormDef.updateItemsetReferences(formDef.getChildren());
+            FormDef.updateItemsetReferences(instanceModel, Collections.list(formDef.getNonMainInstances()), formDef.getChildren());
             processRepeats(instanceModel);
             verifyBindings(instanceModel, e.getName());
             verifyActions(instanceModel);
