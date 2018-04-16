@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
@@ -100,7 +101,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
         return relRef != null ? RestoreUtils.xfFact.refToPathExpr(relRef) : null;
     }
 
-    public void initReferences(QuestionDef q) {
+    public void initReferences(DataInstance instanceModel, List<DataInstance> nonMainInstances, QuestionDef q) {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
         XPathConditional nodesetExpr = (XPathConditional) this.nodesetExpr;
