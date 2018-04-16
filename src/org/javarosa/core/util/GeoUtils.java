@@ -30,9 +30,9 @@ import java.util.List;
  * Time: 1:38 PM
  */
 public final class GeoUtils {
-
-  private static final double EARTH_RADIUS = 6378100; // in meters
-  private static final double EARTH_CIRCUMFERENCE = 2 * Math.PI * EARTH_RADIUS;
+  // Units are meters
+  private static final double EARTH_EQUATOR_RADIUS = 6_378_100; // Todo find where this value came from. Perhaps it should be 6_378_137.
+  private static final double EARTH_CIRCUMFERENCE = 2 * Math.PI * EARTH_EQUATOR_RADIUS;
 
   /**
    * Calculates the enclosed area that is defined by a list of gps coordinates on earth.
