@@ -22,6 +22,8 @@
 package org.javarosa.core.util;
 
 import net.sf.geographiclib.Geodesic;
+import net.sf.geographiclib.PolygonArea;
+import net.sf.geographiclib.PolygonResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ import static net.sf.geographiclib.Constants.WGS84_f;
  */
 public final class GeoUtils {
   // Units are meters
-  private static final double EARTH_EQUATOR_RADIUS = 6_378_100; // Todo find where this value came from. Perhaps it should be 6_378_137.
+  private static final double EARTH_EQUATOR_RADIUS = 6_378_100; // Todo find where this value came from (Enketo?). Perhaps it should be 6_378_137.
   private static final double EARTH_CIRCUMFERENCE = 2 * Math.PI * EARTH_EQUATOR_RADIUS;
 
     /**
@@ -73,16 +75,16 @@ public final class GeoUtils {
   }
 
     public static double calculateDistance(List<LatLong> points) {
-        double distance = 0;
-        if (points.size() > 1) {
-            Geodesic geod = new Geodesic(WGS84_a, WGS84_f);
-            for (int i = 1; i < points.size(); i++) {
-                LatLong p1 = points.get(i - 1);
-                LatLong p2 = points.get(i);
-                distance += geod.Inverse(p1.latitude, p1.longitude, p2.latitude, p2.longitude).s12;
-            }
+        return points.size() < 3 ? 0 : getPolygonResult(points).perimeter;
+    }
+
+    private static PolygonResult getPolygonResult(List<LatLong> points) {
+        Geodesic geod = new Geodesic(WGS84_a, WGS84_f);
+        PolygonArea poly = new PolygonArea(geod, true);
+        for (LatLong point : points) {
+            poly.AddPoint(point.latitude, point.longitude);
         }
-        return distance;
+        return poly.Compute(false, true);
     }
 
   private static Double calculateAreaInSquareMeters(double x1, double x2, double y1, double y2) {

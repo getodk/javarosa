@@ -19,7 +19,6 @@ package org.javarosa.core.util;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertEquals;
 
 public class GeoShapeDistanceTest {
-    @Ignore @Test public void geoShapeDistanceIsCorrectlyCalculated() throws IOException {
+    @Test public void geoShapeDistanceIsCorrectlyCalculated() throws IOException {
         final FormDef formDef = parse(r("distance.xml")).formDef;
         formDef.initialize(true, new InstanceInitializationFactory());
         IAnswerData distanceResult = formDef.getMainInstance().getRoot().getChildAt(1).getValue();
