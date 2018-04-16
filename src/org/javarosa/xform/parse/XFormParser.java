@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.DataBinding;
@@ -93,6 +94,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
@@ -1297,8 +1299,11 @@ public class XFormParser implements IXFormParserFunctions {
         String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
         if (nodesetStr == null)
             throw new RuntimeException("No nodeset attribute in element: [" + e.getName() + "]. This is required. (Element Printout:" + XFormSerializer.elementToString(e) + ")");
-        XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
-        itemset.nodesetExpr = new XPathConditional(path);
+        Optional<XPathPathExpr> path = XPathReference.getPathExpr2(nodesetStr);
+        Optional<XPathFuncExpr> func = XPathReference.getFuncExpr(nodesetStr);
+        itemset.nodesetExpr = new XPathConditional(
+            path.isPresent() ? path.get() : func.get()
+        );
         itemset.contextRef = getFormElementRef(qparent);
         // this is not valid yet...
         itemset.nodesetRef = null;
