@@ -79,7 +79,11 @@ public final class GeoUtils {
     return Math.abs(areasSum);// Math.sqrt(areasSum * areasSum);
   }
 
-    private static Double calculateAreaInSquareMeters(final double x1, final double x2, final double y1, final double y2) {
+  public static double calculateDistance(List<GPSCoordinates> gpsCoordinatesList) {
+    throw new UnsupportedOperationException(); // Not yet implemented
+  }
+
+  private static Double calculateAreaInSquareMeters(final double x1, final double x2, final double y1, final double y2) {
     return (y1 * x2 - x1 * y2) / 2;
   }
 

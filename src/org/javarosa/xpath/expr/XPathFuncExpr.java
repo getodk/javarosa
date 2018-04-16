@@ -416,6 +416,11 @@ public class XPathFuncExpr extends XPathExpression {
             List<GeoUtils.GPSCoordinates> gpsCoordinatesList = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
             return gpsCoordinatesList.isEmpty() ?
                 0d : GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+        } else if (name.equals("distance")) {
+            assertArgsCount(name, args, 1);
+            List<GeoUtils.GPSCoordinates> gpsCoordinatesList = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
+            return gpsCoordinatesList.isEmpty() ?
+                0d : GeoUtils.calculateDistance(gpsCoordinatesList);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from((String) argVals[1]).digest(
                 (String) argVals[0],
