@@ -32,8 +32,9 @@ import java.util.List;
 public final class GeoUtils {
 
   private static final double EARTH_RADIUS = 6378100; // in meters
+  private static final double EARTH_CIRCUMFERENCE = 2 * Math.PI * EARTH_RADIUS;
 
-  /**
+    /**
    * Calculates the enclosed area that is defined by a list of gps coordinates on earth.
    *
    * @param gpsCoordinatesList the list of coordinates.
@@ -44,54 +45,41 @@ public final class GeoUtils {
       return 0;
     }
 
-    final double diameter = EARTH_RADIUS * 2;
-    final double circumference = diameter * Math.PI;
-    final List<Double> listY = new ArrayList<Double>();
-    final List<Double> listX = new ArrayList<Double>();
-    final List<Double> listArea = new ArrayList<Double>();
+    final List<Double> listY = new ArrayList<>();
+    final List<Double> listX = new ArrayList<>();
 
     // calculate segment x and y in degrees for each point
     final double latitudeRef = gpsCoordinatesList.get(0).getLatitude();
     final double longitudeRef = gpsCoordinatesList.get(0).getLongitude();
     for (int i = 1; i < gpsCoordinatesList.size(); i++) {
-      final double latitude = gpsCoordinatesList.get(i).getLatitude();
-      final double longitude = gpsCoordinatesList.get(i).getLongitude();
-      listY.add(calculateYSegment(latitudeRef, latitude, circumference));
-      listX.add(calculateXSegment(longitudeRef, longitude, latitude, circumference));
-    }
-
-    // calculate areas for each triangle segment
-    for (int i = 1; i < listX.size(); i++) {
-      final double x1 = listX.get(i - 1);
-      final double y1 = listY.get(i - 1);
-      final double x2 = listX.get(i);
-      final double y2 = listY.get(i);
-      listArea.add(calculateAreaInSquareMeters(x1, x2, y1, y2));
+      double latitude = gpsCoordinatesList.get(i).getLatitude();
+      double longitude = gpsCoordinatesList.get(i).getLongitude();
+      listY.add(calculateYSegment(latitudeRef, latitude));
+      listX.add(calculateXSegment(longitudeRef, longitude, latitude));
     }
 
     // sum areas of all triangle segments
     double areasSum = 0;
-    for (final Double area : listArea) {
-      areasSum = areasSum + area;
+    for (int i = 1; i < listX.size(); i++) {
+      areasSum += calculateAreaInSquareMeters(listX.get(i - 1), listX.get(i), listY.get(i - 1), listY.get(i));
     }
 
-    // get absolute value of area, it can't be negative
-    return Math.abs(areasSum);// Math.sqrt(areasSum * areasSum);
+    return Math.abs(areasSum); // Area can‘t be negative
   }
 
-    private static Double calculateAreaInSquareMeters(final double x1, final double x2, final double y1, final double y2) {
+  private static Double calculateAreaInSquareMeters(double x1, double x2, double y1, double y2) {
     return (y1 * x2 - x1 * y2) / 2;
   }
 
-  private static double calculateYSegment(final double latitudeRef, final double latitude, final double circumference) {
-    return (latitude - latitudeRef) * circumference / 360.0;
+  private static double calculateYSegment(double latitudeRef, double latitude) {
+    return (latitude - latitudeRef) * EARTH_CIRCUMFERENCE / 360.0;
   }
 
-  private static double calculateXSegment(final double longitudeRef, final double longitude, final double latitude, final double circumference) {
-    return (longitude - longitudeRef) * circumference * Math.cos(Math.toRadians(latitude)) / 360.0;
+  private static double calculateXSegment(double longitudeRef, double longitude, double latitude) {
+    return (longitude - longitudeRef) * EARTH_CIRCUMFERENCE * Math.cos(Math.toRadians(latitude)) / 360.0;
   }
 
-    public static class GPSCoordinates {
+  public static class GPSCoordinates {
 
     private double latitude;
     private double longitude;
@@ -101,11 +89,11 @@ public final class GeoUtils {
       this.longitude = longitude;
     }
 
-    public double getLatitude() {
+    double getLatitude() {
       return latitude;
     }
 
-    public double getLongitude() {
+    double getLongitude() {
       return longitude;
     }
   }
