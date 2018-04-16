@@ -63,8 +63,7 @@ public class FormNavigationTestCase {
     // form and then decreasing until the beginning of the form.
     // Verify the expected indices before and after each operation.
     public void testIndices() {
-        FormParseInit fpi = new FormParseInit();
-        fpi.setFormToParse(r("navigation/" + formName).toString());
+        FormParseInit fpi = new FormParseInit(r("navigation/" + formName));
         FormEntryController formEntryController = fpi.getFormEntryController();
         FormEntryModel formEntryModel = fpi.getFormEntryModel();
 
