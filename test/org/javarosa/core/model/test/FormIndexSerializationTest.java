@@ -6,15 +6,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.nio.file.Paths;
 
-import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.junit.Test;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
 public class FormIndexSerializationTest {
@@ -54,8 +53,7 @@ public class FormIndexSerializationTest {
 
     @Test
     public void testOnFormController() throws IOException, ClassNotFoundException {
-        FormParseInit formParseInit = new FormParseInit();
-        formParseInit.setFormToParse(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "formindex-serialization.xml").toString());
+        FormParseInit formParseInit = new FormParseInit(r("formindex-serialization.xml"));
         FormEntryController formEntryController = formParseInit.getFormEntryController();
 
         FormIndex formIndex = formEntryController.getModel().getFormIndex();
