@@ -34,14 +34,14 @@ public final class GeoUtils {
   private static final double EARTH_RADIUS = 6378100; // in meters
   private static final double EARTH_CIRCUMFERENCE = 2 * Math.PI * EARTH_RADIUS;
 
-    /**
+  /**
    * Calculates the enclosed area that is defined by a list of gps coordinates on earth.
    *
-   * @param gpsCoordinatesList the list of coordinates.
+   * @param latLongs the list of coordinates.
    * @return the enclosed area in square meters (with a double precision).
    */
-  public static double calculateAreaOfGPSPolygonOnEarthInSquareMeters(final List<GPSCoordinates> gpsCoordinatesList) {
-    if (gpsCoordinatesList.size() < 3) {
+  public static double calculateAreaOfGPSPolygonOnEarthInSquareMeters(final List<LatLong> latLongs) {
+    if (latLongs.size() < 3) {
       return 0;
     }
 
@@ -49,11 +49,11 @@ public final class GeoUtils {
     final List<Double> listX = new ArrayList<>();
 
     // calculate segment x and y in degrees for each point
-    final double latitudeRef = gpsCoordinatesList.get(0).getLatitude();
-    final double longitudeRef = gpsCoordinatesList.get(0).getLongitude();
-    for (int i = 1; i < gpsCoordinatesList.size(); i++) {
-      double latitude = gpsCoordinatesList.get(i).getLatitude();
-      double longitude = gpsCoordinatesList.get(i).getLongitude();
+    final double latitudeRef = latLongs.get(0).latitude;
+    final double longitudeRef = latLongs.get(0).longitude;
+    for (int i = 1; i < latLongs.size(); i++) {
+      double latitude = latLongs.get(i).latitude;
+      double longitude = latLongs.get(i).longitude;
       listY.add(calculateYSegment(latitudeRef, latitude));
       listX.add(calculateXSegment(longitudeRef, longitude, latitude));
     }
@@ -67,7 +67,7 @@ public final class GeoUtils {
     return Math.abs(areasSum); // Area can‘t be negative
   }
 
-  public static double calculateDistance(List<GPSCoordinates> gpsCoordinatesList) {
+  public static double calculateDistance(List<LatLong> latLongList) {
     throw new UnsupportedOperationException(); // Not yet implemented
   }
 
@@ -83,22 +83,13 @@ public final class GeoUtils {
     return (longitude - longitudeRef) * EARTH_CIRCUMFERENCE * Math.cos(Math.toRadians(latitude)) / 360.0;
   }
 
-  public static class GPSCoordinates {
+  public static class LatLong {
+    private final double latitude;
+    private final double longitude;
 
-    private double latitude;
-    private double longitude;
-
-    public GPSCoordinates(double latitude, double longitude) {
+    public LatLong(double latitude, double longitude) {
       this.latitude = latitude;
       this.longitude = longitude;
-    }
-
-    double getLatitude() {
-      return latitude;
-    }
-
-    double getLongitude() {
-      return longitude;
     }
   }
 }

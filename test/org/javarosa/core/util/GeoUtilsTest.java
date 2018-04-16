@@ -134,12 +134,12 @@ public class GeoUtilsTest extends TestCase {
   }
 
   private void runTestWith(double[][] points, int expectedArea) {
-    List<GeoUtils.GPSCoordinates> gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
+    List<GeoUtils.LatLong> latLongs = new ArrayList<>();
     for (double[] point : points) {
-      gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(point[0], point[1]));
+      latLongs.add(new GeoUtils.LatLong(point[0], point[1]));
     }
 
-    double area = GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+    double area = GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
 
     logger.info("Area in m2: {}", area);
 
