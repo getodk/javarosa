@@ -1,0 +1,57 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa"
+        xmlns:orx="http://openrosa.org/xforms">
+    <h:head>
+        <h:title>form_with_additional_attributes</h:title>
+        <model>
+            <instance>
+                <data id="build_form_with_additional_attributes_1521761701">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                    <group>
+                        <text/>
+                        <geopoint/>
+                        <itemset/>
+                    </group>
+                </data>
+            </instance>
+            <itext>
+                <translation lang="English">
+                    <text id="/data/group:label">
+                        <value>group</value>
+                    </text>
+                    <text id="/data/group/text:label">
+                        <value>text</value>
+                    </text>
+                    <text id="/data/group/geopoint:label">
+                        <value>geopoint</value>
+                    </text>
+                    <text id="/data/group/itemset:label">
+                        <value>itemset</value>
+                    </text>
+                </translation>
+            </itext>
+            <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+            <bind nodeset="/data/group/text" type="string" required="true()" jr:requiredMsg="Custom required message" saveIncomplete="true()"/>
+            <bind nodeset="/data/group/geopoint" type="geopoint"/>
+            <bind nodeset="/data/group/itemset" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group appearance="field-list" intent="org.mycompany.myapp(my_text='Some text',uuid=/myform/meta/instanceID)">
+            <label ref="jr:itext('/data/group:label')"/>
+            <input ref="/data/group/text" rows="5" autoplay="audio" playColor="red">
+                <label ref="jr:itext('/data/group/text:label')"/>
+            </input>
+            <input ref="/data/group/geopoint" accuracyThreshold="4">
+                <label ref="jr:itext('/data/group/geopoint:label')"/>
+            </input>
+            <input ref="/data/group/itemset" query="instance('counties')/root/item[state= /new_cascading_select/state ]">
+                <label ref="jr:itext('/data/group/itemset:label')"/>
+            </input>
+        </group>
+    </h:body>
+</h:html>
