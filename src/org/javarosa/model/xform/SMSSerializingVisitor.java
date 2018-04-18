@@ -164,7 +164,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     public void serializeTree(TreeElement root) {
         for (int j = 0; j < root.getNumChildren(); j++) {
             TreeElement tee = root.getChildAt(j);
-            if (tee.isLeaf()) {
+            if (tee.isLeaf() && tee.getAttribute("", "tag") != null) {
                 String e = serializeNode(tee);
                 if (e != null) {
                     theSmsStr += e;
@@ -193,7 +193,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
                     + serializedAnswer);
             } else if (serializedAnswer instanceof String) {
                 Element e = new Element();
-                e.addChild(Node.TEXT, (String) serializedAnswer);
+                e.addChild(Node.TEXT, serializedAnswer);
 
                 String tag = instanceNode.getAttributeValue("", "tag");
                 if (tag != null) {
