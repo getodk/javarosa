@@ -15,10 +15,7 @@
  */
 package org.javarosa.xform.parse;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * This class contains all the code needed to implement the xform randomize()
@@ -68,7 +65,7 @@ public final class RandomizeHelper {
      * @return a new {@link List} with the same input elements reordered
      */
     public static <T> List<T> shuffle(List<T> elements) {
-        return shuffle(elements, null);
+        return FisherYates.shuffle(elements);
     }
 
     /**
@@ -81,9 +78,7 @@ public final class RandomizeHelper {
      * @return a new {@link List} with the same input elements reordered
      */
     public static <T> List<T> shuffle(List<T> elements, Long seed) {
-        List<T> output = new ArrayList<>(elements);
-        FisherYates.shuffle(output, seed != null ? new ParkMiller(seed) : new Random());
-        return output;
+        return seed == null ? FisherYates.shuffle(elements) : FisherYates.shuffle(elements, seed);
     }
 
     private static String[] getArgs(String nodesetStr) {
