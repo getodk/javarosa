@@ -81,10 +81,8 @@ public final class RandomizeHelper {
      * @return a new {@link List} with the same input elements reordered
      */
     public static <T> List<T> shuffle(List<T> elements, Long seed) {
-        List<T> output = new ArrayList<>(elements.size());
-        output.addAll(elements);
-
-        Collections.shuffle(output, seed != null ? new Random(seed) : new Random());
+        List<T> output = new ArrayList<>(elements);
+        FisherYates.shuffle(output, seed != null ? new ParkMiller(seed) : new Random());
         return output;
     }
 
