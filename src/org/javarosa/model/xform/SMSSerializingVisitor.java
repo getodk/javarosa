@@ -56,12 +56,9 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     /** The schema to be used to serialize answer data */
     FormDef schema; // not used
 
-    private List<IDataPointer> dataPointers;
-
     private void init() {
         theSmsStr = null;
         schema = null;
-        dataPointers = new ArrayList<IDataPointer>(0);
         theSmsStr = "";
     }
 
@@ -70,7 +67,6 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
         this.schema = formDef;
         return serializeInstance(model);
     }
-
 
     /*
      * (non-Javadoc)
@@ -148,9 +144,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
         delimiter = (delimiter != null ) ? delimiter : " ";
         prefix = (prefix != null) ? prefix : " ";
 
-        //Don't bother adding any delimiters, yet. Delimiters are
-        //added before tags/data
-        theSmsStr = prefix;
+        theSmsStr = prefix.concat(delimiter);
 
         // serialize each node to get it's answers
         for (int j = 0; j < root.getNumChildren(); j++) {
@@ -164,7 +158,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     }
 
     public String serializeNode(TreeElement instanceNode) {
-        StringBuilder b = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         // don't serialize template nodes or non-relevant nodes
         if (!instanceNode.isRelevant()
                 || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
@@ -180,36 +174,27 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
                         + instanceNode.getValue().toString() + ", "
                         + serializedAnswer);
             } else if (serializedAnswer instanceof String) {
-                Element e = new Element();
-                e.addChild(Node.TEXT, (String) serializedAnswer);
+                Element element = new Element();
+                element.addChild(Node.TEXT, serializedAnswer);
 
                 String tag = instanceNode.getAttributeValue("", "tag");
-                if ( tag != null ) {
-                    b.append(tag);
-                }
-                b.append(delimiter);
 
-                for (int k = 0; k < e.getChildCount(); k++) {
-                    b.append(e.getChild(k).toString());
-                    b.append(delimiter);
-                }
+                stringBuilder.append("+").append(tag);
 
+                stringBuilder.append(delimiter);
+
+                for (int k = 0; k < element.getChildCount(); k++) {
+                    stringBuilder.append(element.getChild(k).toString().replace("\\", "\\\\").replace(delimiter, "\\" + delimiter));
+                    stringBuilder.append(delimiter);
+                }
+                stringBuilder.append(delimiter);
             } else {
                 throw new RuntimeException("Can't handle serialized output for "
                         + instanceNode.getValue().toString() + ", "
                         + serializedAnswer);
             }
-
-            if (serializer.containsExternalData(instanceNode.getValue())
-                    .booleanValue()) {
-                IDataPointer[] pointer = serializer
-                        .retrieveExternalDataPointer(instanceNode.getValue());
-                for (int i = 0; i < pointer.length; ++i) {
-                    dataPointers.add(pointer[i]);
-                }
-            }
         }
-        return b.toString();
+        return stringBuilder.toString();
     }
 
     /*
