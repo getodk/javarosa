@@ -15,6 +15,7 @@ package org.javarosa.model.xform;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,6 @@ import org.kxml2.kdom.Node;
  * SMS's.
  *
  * @author Munaf Sheikh, Cell-Life
- *
  */
 public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
@@ -50,10 +50,14 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     private String method = null;
     private TreeReference rootRef;
 
-    /** The serializer to be used in constructing XML for AnswerData elements */
+    /**
+     * The serializer to be used in constructing XML for AnswerData elements
+     */
     IAnswerDataSerializer serializer;
 
-    /** The schema to be used to serialize answer data */
+    /**
+     * The schema to be used to serialize answer data
+     */
     FormDef schema; // not used
 
     private List<IDataPointer> dataPointers;
@@ -108,7 +112,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     }
 
     public IDataPayload createSerializedPayload(FormInstance model, IDataReference ref)
-            throws IOException {
+        throws IOException {
         init();
         rootRef = FormInstance.unpackReference(ref);
         if (this.serializer == null) {
@@ -116,7 +120,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
         }
         model.accept(this);
         if (theSmsStr != null) {
-            byte[] form = theSmsStr.getBytes("UTF-16");
+            byte[] form = theSmsStr.getBytes("UTF-8");
             return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_SMS);
         } else {
             return null;
@@ -133,77 +137,85 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     public void visit(FormInstance tree) {
         nodeSet = new String();
 
-        //TreeElement root = tree.getRoot();
-        TreeElement root = tree.resolveReference(rootRef);
+        TreeElement root = tree.getRoot();
+        // TreeElement root = tree.resolveReference(rootRef);
 
         xmlns = root.getAttributeValue("", "xmlns");
         delimiter = root.getAttributeValue("", "delimiter");
-        if ( delimiter == null ) {
+        if (delimiter == null) {
             // for the spelling-impaired...
             delimiter = root.getAttributeValue("", "delimeter");
         }
         prefix = root.getAttributeValue("", "prefix");
 
-        xmlns = (xmlns != null)? xmlns : " ";
-        delimiter = (delimiter != null ) ? delimiter : " ";
+        xmlns = (xmlns != null) ? xmlns : " ";
+        delimiter = (delimiter != null) ? delimiter : " ";
         prefix = (prefix != null) ? prefix : " ";
 
         //Don't bother adding any delimiters, yet. Delimiters are
         //added before tags/data
         theSmsStr = prefix;
 
-        // serialize each node to get it's answers
+        // serialize each node (and it's children) to get it's answers
+        serializeTree(root);
+        theSmsStr = theSmsStr.trim();
+    }
+
+    public void serializeTree(TreeElement root) {
         for (int j = 0; j < root.getNumChildren(); j++) {
             TreeElement tee = root.getChildAt(j);
-            String e = serializeNode(tee);
-            if(e != null) {
-                theSmsStr += e;
+            if (tee.isLeaf()) {
+                String e = serializeNode(tee);
+                if (e != null) {
+                    theSmsStr += e;
+                }
+            } else {
+                serializeTree(tee);
             }
         }
-        theSmsStr = theSmsStr.trim();
     }
 
     public String serializeNode(TreeElement instanceNode) {
         StringBuilder b = new StringBuilder();
         // don't serialize template nodes or non-relevant nodes
         if (!instanceNode.isRelevant()
-                || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
+            || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
             return null;
 
         if (instanceNode.getValue() != null) {
             Object serializedAnswer = serializer.serializeAnswerData(
-                    instanceNode.getValue(), instanceNode.getDataType());
+                instanceNode.getValue(), instanceNode.getDataType());
 
             if (serializedAnswer instanceof Element) {
                 // DON"T handle this.
                 throw new RuntimeException("Can't handle serialized output for "
-                        + instanceNode.getValue().toString() + ", "
-                        + serializedAnswer);
+                    + instanceNode.getValue().toString() + ", "
+                    + serializedAnswer);
             } else if (serializedAnswer instanceof String) {
                 Element e = new Element();
                 e.addChild(Node.TEXT, (String) serializedAnswer);
 
                 String tag = instanceNode.getAttributeValue("", "tag");
-                if ( tag != null ) {
+                if (tag != null) {
                     b.append(tag);
                 }
                 b.append(delimiter);
 
                 for (int k = 0; k < e.getChildCount(); k++) {
-                    b.append(e.getChild(k).toString());
+                    b.append(e.getChild(k).toString().replace("\\", "\\\\").replace(delimiter, "\\" + delimiter));
                     b.append(delimiter);
                 }
 
             } else {
                 throw new RuntimeException("Can't handle serialized output for "
-                        + instanceNode.getValue().toString() + ", "
-                        + serializedAnswer);
+                    + instanceNode.getValue().toString() + ", "
+                    + serializedAnswer);
             }
 
             if (serializer.containsExternalData(instanceNode.getValue())
-                    .booleanValue()) {
+                .booleanValue()) {
                 IDataPointer[] pointer = serializer
-                        .retrieveExternalDataPointer(instanceNode.getValue());
+                    .retrieveExternalDataPointer(instanceNode.getValue());
                 for (int i = 0; i < pointer.length; ++i) {
                     dataPointers.add(pointer[i]);
                 }
