@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.javarosa.core.util.GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters;
+import static org.javarosa.core.util.GeoUtils.calculateDistance;
 import static org.junit.Assert.assertEquals;
 
 public class GeoUtilsTest {
@@ -48,10 +50,10 @@ public class GeoUtilsTest {
   @Test public void testCalculateAreaOfGPSPolygonOnEarthInSquareMeters_1st_Route() {
     double[][] points = {
             {38.253094215699576,21.756382658677467},
-            {38.25021274773806,21.756382658677467},
-            {38.25007793942195,21.763892843919166},
-            {38.25290886154963,21.763935759263404},
-            {38.25146813817506,21.758421137528785}
+            {38.25021274773806, 21.756382658677467},
+            {38.25007793942195, 21.763892843919166},
+            {38.25290886154963, 21.763935759263404},
+            {38.25146813817506, 21.758421137528785}
     };
 
     runTestWith(points, 151452);
@@ -115,16 +117,75 @@ public class GeoUtilsTest {
     runTestWith(points, 93912);
   }
 
-  private void runTestWith(double[][] points, int expectedArea) {
-    List<GeoUtils.LatLong> latLongs = new ArrayList<>();
-    for (double[] point : points) {
-      latLongs.add(new GeoUtils.LatLong(point[0], point[1]));
+  @Test public void area1() {
+    double[][] points = {
+            {0, 0},
+            {0, -1},
+            {-1, -1},
+            {-1, 0},
+            {0, 0}
+    };
+
+    runTestWith(points, 93912);
+  }
+
+  @Test public void oneDegreeLatChgAtEquator() {
+      assertEquals(110_574, calculateDistance(getLatLongs(new double[][]{
+          {0, 0},
+          {1, 0},
+      })), 1);
+  }
+
+  @Test public void oneDegreeLongChgAtEquator() {
+      assertEquals(111_320, calculateDistance(getLatLongs(new double[][]{
+          {0, 0},
+          {0, 1},
+      })), 1);
+  }
+
+  @Test public void oneDegreeLatChgAt15Lat() {
+      assertEquals(110_649, calculateDistance(getLatLongs(new double[][]{
+          {14.5, 0},
+          {15.5, 0},
+      })), 1);
+  }
+
+  @Test public void oneDegreeLongChgAt15Lat() {
+      assertEquals(107_551, calculateDistance(getLatLongs(new double[][]{
+          {15, 0},
+          {15, 1},
+      })), 1);
+  }
+
+  @Test public void oneDegreeLatChgAt75Lat() {
+      assertEquals(110_618, calculateDistance(getLatLongs(new double[][]{
+          {74.5, 0},
+          {75.5, 0},
+      })), 1);
+  }
+
+    @Test public void oneDegreeLongChgAt90Lat() {
+        assertEquals(0, calculateDistance(getLatLongs(new double[][]{
+            {90, 0},
+            {90, 1},
+        })), 0.1);
     }
 
-    double area = GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
+  private void runTestWith(double[][] points, long expectedArea) {
+      List<GeoUtils.LatLong> latLongs = getLatLongs(points);
+
+    double area = calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
 
     logger.info("Area in m2: {}", area);
 
-    assertEquals((int) Math.rint(area), expectedArea);
+    assertEquals(expectedArea, area, 1);
   }
+
+    private List<GeoUtils.LatLong> getLatLongs(double[][] points) {
+        List<GeoUtils.LatLong> latLongs = new ArrayList<>();
+        for (double[] point : points) {
+          latLongs.add(new GeoUtils.LatLong(point[0], point[1]));
+        }
+        return latLongs;
+    }
 }
