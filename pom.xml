@@ -56,6 +56,11 @@
       <version>1.7.25</version>
     </dependency>
     <dependency>
+      <groupId>net.sf.geographiclib</groupId>
+      <artifactId>GeographicLib-Java</artifactId>
+      <version>1.49</version>
+    </dependency>
+    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
