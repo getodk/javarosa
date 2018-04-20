@@ -1,0 +1,157 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:title>SMS Tester Form</h:title>
+    <model>
+      <instance>
+        <data id="build_SMS-Tester-Form_1524097605" xmlns="http://openrosa.org/smsdata" prefix="FORM232">
+          <meta>
+            <instanceID/>
+          </meta>
+          <first_name tag="FN">
+            John
+          </first_name>
+          <last_name tag="LN">
+            Doe
+          </last_name>
+          <address>
+            39 Reed Street
+          </address>
+          <country tag="CTY"/>
+          <dob tag="DOB">
+            2015-08-05
+          </dob>
+          <gender>
+            male
+          </gender>
+          <maiden_name>
+           Placeholder
+          </maiden_name>
+          <children>
+            <child_full_name tag="CN">Mary Doe</child_full_name>
+            <child_country>Jamaica</child_country>
+            <child_full_name tag="CN">Sara Doe</child_full_name>
+            <child_country>Jamaica</child_country>
+            <child_full_name tag="CN">Jim Doe</child_full_name>
+            <child_country>America</child_country>
+          </children>
+          <picture tag="PIC">test_image.jpg</picture>
+        </data>
+      </instance>
+      <itext>
+        <translation lang="English">
+          <text id="/data/first_name:label">
+            <value>First Name</value>
+          </text>
+          <text id="/data/first_name:hint">
+            <value>What's your first name?</value>
+          </text>
+          <text id="/data/last_name:label">
+            <value>What's your last name?</value>
+          </text>
+          <text id="/data/address:label">
+            <value>Street Address</value>
+          </text>
+          <text id="/data/address:hint">
+            <value>Which street do you live on?</value>
+          </text>
+          <text id="/data/country:label">
+            <value>Which country do you currently reside in?</value>
+          </text>
+          <text id="/data/dob:label">
+            <value>When were you born?</value>
+          </text>
+          <text id="/data/gender:label">
+            <value>What's your gender?</value>
+          </text>
+          <text id="/data/gender:option0">
+            <value>Male</value>
+          </text>
+          <text id="/data/gender:option1">
+            <value>Female</value>
+          </text>
+          <text id="/data/maiden_name:label">
+            <value>What's your maiden name?</value>
+          </text>
+          <text id="/data/maiden_name:hint">
+            <value>Only state this if you are married.</value>
+          </text>
+          <text id="/data/children:label">
+            <value>State the name of your children</value>
+          </text>
+          <text id="/data/children/child_full_name:label">
+            <value>Full Name</value>
+          </text>
+          <text id="/data/children/child_full_name:hint">
+            <value>Put the full name of the child. Exclude the middle name.</value>
+          </text>
+          <text id="/data/children/child_country:label">
+            <value>Which country do they live in?</value>
+          </text>
+           <text id="/data/picture:label">
+            <value>Take a picture of yourself.</value>
+          </text>
+        </translation>
+      </itext>
+      <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+      <bind nodeset="/data/first_name" type="string"/>
+      <bind nodeset="/data/last_name" type="string"/>
+      <bind nodeset="/data/address" type="string"/>
+      <bind nodeset="/data/country" type="string"/>
+      <bind nodeset="/data/dob" type="date"/>
+      <bind nodeset="/data/gender" type="select1"/>
+      <bind nodeset="/data/maiden_name" type="string" relevant="(selected(data/gender,'female'))"/>
+      <bind nodeset="/data/children/child_full_name" type="string"/>
+      <bind nodeset="/data/children/child_country" type="string"/>
+      <bind nodeset="/data/picture" type="binary"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/first_name">
+      <label ref="jr:itext('/data/first_name:label')"/>
+      <hint ref="jr:itext('/data/first_name:hint')"/>
+    </input>
+    <input ref="/data/last_name">
+      <label ref="jr:itext('/data/last_name:label')"/>
+    </input>
+    <input ref="/data/address">
+      <label ref="jr:itext('/data/address:label')"/>
+      <hint ref="jr:itext('/data/address:hint')"/>
+    </input>
+    <input ref="/data/country">
+      <label ref="jr:itext('/data/country:label')"/>
+    </input>
+    <input ref="/data/dob">
+      <label ref="jr:itext('/data/dob:label')"/>
+    </input>
+    <select1 ref="/data/gender">
+      <label ref="jr:itext('/data/gender:label')"/>
+      <item>
+        <label ref="jr:itext('/data/gender:option0')"/>
+        <value>male</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/gender:option1')"/>
+        <value>female</value>
+      </item>
+    </select1>
+    <input ref="/data/maiden_name">
+      <label ref="jr:itext('/data/maiden_name:label')"/>
+      <hint ref="jr:itext('/data/maiden_name:hint')"/>
+    </input>
+    <group>
+    <label ref="jr:itext('/data/children:label')"/>
+    <repeat nodeset="/data/children">
+      <input ref="/data/children/child_full_name">
+        <label ref="jr:itext('/data/children/child_full_name:label')"/>
+        <hint ref="jr:itext('/data/children/child_full_name:hint')"/>
+      </input>
+      <input ref="/data/children/child_country">
+        <label ref="jr:itext('/data/children/child_country:label')"/>
+      </input>
+    </repeat>
+    </group>
+     <upload ref="/data/picture" mediatype="image/*">
+      <label ref="jr:itext('/data/picture:label')"/>
+    </upload>
+  </h:body>
+</h:html>

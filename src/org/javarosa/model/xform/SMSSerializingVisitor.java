@@ -15,11 +15,7 @@ package org.javarosa.model.xform;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IDataReference;
@@ -32,6 +28,8 @@ import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
+
+import java.io.IOException;
 
 /**
  * A modified version of Clayton's XFormSerializingVisitor that constructs
@@ -47,8 +45,6 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     private String xmlns = null;
     private String delimiter = null;
     private String prefix = null;
-    private String method = null;
-    private TreeReference rootRef;
 
     /** The serializer to be used in constructing XML for AnswerData elements */
     IAnswerDataSerializer serializer;
@@ -82,7 +78,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
      */
     public byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException {
         init();
-        rootRef = FormInstance.unpackReference(ref);
+
         if (this.serializer == null) {
             this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
         }
@@ -106,7 +102,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     public IDataPayload createSerializedPayload(FormInstance model, IDataReference ref)
             throws IOException {
         init();
-        rootRef = FormInstance.unpackReference(ref);
+
         if (this.serializer == null) {
             this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
         }
@@ -129,8 +125,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     public void visit(FormInstance tree) {
         nodeSet = new String();
 
-        //TreeElement root = tree.getRoot();
-        TreeElement root = tree.resolveReference(rootRef);
+        TreeElement root = tree.getRoot();
 
         xmlns = root.getAttributeValue("", "xmlns");
         delimiter = root.getAttributeValue("", "delimiter");
@@ -148,10 +143,14 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
         // serialize each node to get it's answers
         for (int j = 0; j < root.getNumChildren(); j++) {
-            TreeElement tee = root.getChildAt(j);
-            String e = serializeNode(tee);
-            if(e != null) {
-                theSmsStr += e;
+            TreeElement treeElement = root.getChildAt(j);
+            if (treeElement.isLeaf() && treeElement.getAttribute("", "tag") != null) {
+                String result = serializeNode(treeElement);
+                if (result != null) {
+                    theSmsStr += result;
+                }
+            } else {
+                serializeTree(treeElement);
             }
         }
         theSmsStr = theSmsStr.trim();
@@ -161,8 +160,9 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
         StringBuilder stringBuilder = new StringBuilder();
         // don't serialize template nodes or non-relevant nodes
         if (!instanceNode.isRelevant()
-                || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
+            || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE) {
             return null;
+        }
 
         if (instanceNode.getValue() != null) {
             Object serializedAnswer = serializer.serializeAnswerData(
@@ -179,7 +179,12 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
                 String tag = instanceNode.getAttributeValue("", "tag");
 
-                stringBuilder.append("+").append(tag);
+                //checks to see if someone included a + inside their tag.
+                if (tag.substring(0, 1) == "+") {
+                    stringBuilder.append(tag);
+                } else {
+                    stringBuilder.append("+").append(tag);
+                }
 
                 stringBuilder.append(delimiter);
 
