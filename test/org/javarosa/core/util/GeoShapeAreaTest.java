@@ -16,17 +16,16 @@
 
 package org.javarosa.core.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.core.model.instance.TreeElement;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -39,15 +38,18 @@ public class GeoShapeAreaTest {
 
   @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
     // Read the form definition
-    String FORM_NAME = (new File(PathConst.getTestResourcePath(), "area.xml")).getAbsolutePath();
-    FormDef formDef = XFormUtils.getFormFromInputStream(new FileInputStream(new File(FORM_NAME)));
+    final FormDef formDef = parse(r("area.xml")).formDef;
 
-    // trigger all calculations
+    // Trigger all calculations
     formDef.initialize(true, new InstanceInitializationFactory());
 
-    // get the calculated area
-    IAnswerData areaResult = formDef.getMainInstance().getRoot().getChildAt(1).getValue();
+    // Check the results. The data and expected results come from GeoUtilsTest.
+    TreeElement root = formDef.getMainInstance().getRoot();
 
-    assertEquals(151452D, (Double) areaResult.getValue(), 1);
+    IAnswerData area = root.getChildAt(1).getValue();
+    assertEquals(151_452, (Double) area.getValue(), 0.5);
+
+    IAnswerData distance = root.getChildAt(2).getValue();
+    assertEquals(1_801, (Double) distance.getValue(), 0.5);
   }
 }

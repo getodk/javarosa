@@ -415,6 +415,10 @@ public class XPathFuncExpr extends XPathExpression {
             assertArgsCount(name, args, 1);
             List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
+        } else if (name.equals("distance")) {
+            assertArgsCount(name, args, 1);
+            List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
+            return GeoUtils.calculateDistance(latLongs);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from((String) argVals[1]).digest(
                 (String) argVals[0],
