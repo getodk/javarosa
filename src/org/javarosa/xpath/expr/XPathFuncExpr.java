@@ -414,8 +414,7 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("enclosed-area") || name.equals("area")) {
             assertArgsCount(name, args, 1);
             List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
-            return latLongs.isEmpty() ?
-                0d : GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
+            return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from((String) argVals[1]).digest(
                 (String) argVals[0],
