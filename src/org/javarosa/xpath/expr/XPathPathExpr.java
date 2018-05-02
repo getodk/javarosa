@@ -58,7 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XPathPathExpr extends XPathExpression {
-    private static final Logger logger = LoggerFactory.getLogger(XPathPathExpr.class);
+    private static final Logger logger = LoggerFactory.getLogger(XPathPathExpr.class.getSimpleName());
 
     public static final int INIT_CONTEXT_ROOT = 0;
     public static final int INIT_CONTEXT_RELATIVE = 1;
@@ -275,16 +275,24 @@ public class XPathPathExpr extends XPathExpression {
     public static Object getRefValue (DataInstance model, EvaluationContext ec, TreeReference ref) {
         if (ec.isConstraint && ref.equals(ec.getContextRef())) {
             //ITEMSET TODO: need to update this; for itemset/copy constraints, need to simulate a whole xml sub-tree here
-            return unpackValue(ec.candidateValue);
-        } else {
-            AbstractTreeElement node = model.resolveReference(ref);
-            if (node == null) {
-                //shouldn't happen -- only existent nodes should be in nodeset
-                throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
-            }
-
-            return unpackValue(node.isRelevant() ? node.getValue() : null);
+            Object result = unpackValue(ec.candidateValue);
+            logger.trace("getRefValue returning candidate value {} for {}", result, ref);
+            return result;
         }
+        AbstractTreeElement node = model.resolveReference(ref);
+        if (node == null) {
+            //shouldn't happen -- only existent nodes should be in nodeset
+            throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
+        }
+
+        IAnswerData maybeNodeValue = node.isRelevant() ? node.getValue() : null;
+        Object result = unpackValue(maybeNodeValue);
+        if (maybeNodeValue == null) {
+            logger.trace("getRefValue returning empty node value for {}", ref);
+        } else {
+            logger.trace("getRefValue returning node value {} for {}", result, ref);
+        }
+        return result;
     }
 
     public static Object unpackValue (IAnswerData val) {
@@ -293,9 +301,9 @@ public class XPathPathExpr extends XPathExpression {
         } else if (val instanceof UncastData) {
             return val.getValue();
         } else if (val instanceof IntegerData) {
-            return new Double(((Integer)val.getValue()).doubleValue());
+            return ((Integer) val.getValue()).doubleValue();
         } else if (val instanceof LongData) {
-            return new Double(((Long)val.getValue()).doubleValue());
+            return ((Long) val.getValue()).doubleValue();
         } else if (val instanceof DecimalData) {
             return val.getValue();
         } else if (val instanceof StringData) {
