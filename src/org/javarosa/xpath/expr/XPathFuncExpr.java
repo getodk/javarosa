@@ -16,6 +16,7 @@
 
 package org.javarosa.xpath.expr;
 
+import java.util.Map;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -43,7 +44,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -143,7 +143,7 @@ public class XPathFuncExpr extends XPathExpression {
         String name = id.toString();
         Object[] argVals = new Object[args.length];
 
-        HashMap<String, IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
+        Map<String, IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
 
         //TODO: Func handlers should be able to declare the desire for short circuiting as well
         if (name.equals("if")) {
@@ -424,6 +424,17 @@ public class XPathFuncExpr extends XPathExpression {
                 (String) argVals[0],
                 args.length == 3 ? Encoding.from((String)argVals[2]) : Encoding.BASE64
             );
+        } else if (name.equals("randomize")) {
+            if (!(argVals[0] instanceof XPathNodeset))
+                throw new XPathTypeMismatchException("First argument to randomize must be a nodeset");
+
+            if (args.length == 1)
+                return XPathNodeset.shuffle((XPathNodeset) argVals[0]);
+
+            if (args.length == 2)
+                return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumeric(argVals[1]).longValue());
+
+            throw new XPathUnhandledException("function \'randomize\' requires 1 or 2 arguments. " + args.length + " provided.");
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);

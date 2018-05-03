@@ -1,6 +1,8 @@
 package org.javarosa.core.test;
 
-import org.javarosa.core.PathConst;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+
+import java.nio.file.Path;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -11,7 +13,6 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.xform.util.XFormUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -39,28 +40,23 @@ import org.slf4j.LoggerFactory;
 
 public class FormParseInit {
     private static final Logger logger = LoggerFactory.getLogger(FormParseInit.class);
-    private String FORM_NAME = (new File(PathConst.getTestResourcePath(), "ImageSelectTester.xhtml")).getAbsolutePath();
+    private final String FORM_NAME;
     private FormDef xform;
     private FormEntryController fec;
     private FormEntryModel femodel;
 
 
     public FormParseInit(){
+        FORM_NAME = r("ImageSelectTester.xhtml").toString();
         this.init();
     }
 
-    /**
-     * Set a new form to be parsed (instead of the default), and calls
-     * init() immediately to parse it.  It is uneccessary to call init() again after
-     * using this method.
-     * @param uri URI pointing to the xform.
-     */
-    public void setFormToParse(String uri){
-        FORM_NAME = uri;
+    public FormParseInit(Path form){
+        FORM_NAME = form.toString();
         this.init();
     }
 
-    public void init(){
+    private void init(){
         String xf_name = FORM_NAME;
         FileInputStream is;
         try {

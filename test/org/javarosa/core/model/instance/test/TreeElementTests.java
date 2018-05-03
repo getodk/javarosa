@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -22,9 +23,7 @@ public class TreeElementTests {
     @Test
     public void testPopulate_withNodesAttributes() {
         // Given
-        FormParseInit formParseInit = new FormParseInit();
-        formParseInit.setFormToParse(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(),
-                "populate-nodes-attributes.xml").toString());
+        FormParseInit formParseInit = new FormParseInit(r("populate-nodes-attributes.xml"));
 
         FormEntryController formEntryController = formParseInit.getFormEntryController();
 

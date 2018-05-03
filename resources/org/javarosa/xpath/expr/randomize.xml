@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Randomize Test</h:title>
+        <model>
+            <instance>
+                <randomize id="randomize">
+                    <fruit1/>
+                    <fruit2/>
+                    <seededFruit1/>
+                    <seededFruit2/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </randomize>
+            </instance>
+
+            <instance id="fruit">
+                <root>
+                    <item>
+                        <label>Apple</label>
+                        <name>apple</name>
+                    </item>
+                    <item>
+                        <label>Banana</label>
+                        <name>banana</name>
+                    </item>
+                    <item>
+                        <label>Cherimoya</label>
+                        <name>cherimoya</name>
+                    </item>
+                    <item>
+                        <label>Durian</label>
+                        <name>durian</name>
+                    </item>
+                    <item>
+                        <label>Elderberry</label>
+                        <name>elderberry</name>
+                    </item>
+                    <item>
+                        <label>Fig</label>
+                        <name>fig</name>
+                    </item>
+                </root>
+            </instance>
+            <bind nodeset="/randomize/fruit1" type="select1"/>
+            <bind nodeset="/randomize/fruit2" type="select1"/>
+            <bind nodeset="/randomize/seededFruit1" type="select1"/>
+            <bind nodeset="/randomize/seededFruit2" type="select1"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/randomize/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/randomize/fruit1">
+            <label>Fruit #1</label>
+            <itemset nodeset="randomize(instance('fruit')/root/item)">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select1>
+        <select1 ref="/randomize/fruit2">
+            <label>Fruit #2</label>
+            <itemset nodeset="randomize(instance('fruit')/root/item)">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select1>
+        <select1 ref="/randomize/seededFruit1">
+            <label>Seeded fruit #1</label>
+            <itemset nodeset="randomize(instance('fruit')/root/item, 42)">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select1>
+        <select1 ref="/randomize/seededFruit2">
+            <label>Seeded fruit #2</label>
+            <itemset nodeset="randomize(instance('fruit')/root/item, 42)">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select1>
+    </h:body>
+</h:html>

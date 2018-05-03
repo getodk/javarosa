@@ -23,6 +23,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.util.Optional;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -32,6 +33,7 @@ import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.slf4j.Logger;
@@ -77,6 +79,30 @@ public class XPathReference implements IDataReference {
         }
 
         return (XPathPathExpr)path;
+    }
+
+    public static Optional<XPathPathExpr> getPathExpr2(String nodeset) {
+        try {
+            XPathExpression path = XPathParseTool.parseXPath(nodeset);
+            if (path instanceof XPathPathExpr)
+                return Optional.of((XPathPathExpr) path);
+            else
+                return Optional.empty();
+        } catch (XPathSyntaxException xse) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<XPathFuncExpr> getFuncExpr(String nodeset) {
+        try {
+            XPathExpression path = XPathParseTool.parseXPath(nodeset);
+            if (path instanceof XPathFuncExpr)
+                return Optional.of((XPathFuncExpr) path);
+            else
+                return Optional.empty();
+        } catch (XPathSyntaxException xse) {
+            return Optional.empty();
+        }
     }
 
     public XPathReference (XPathPathExpr path) {

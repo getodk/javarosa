@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
@@ -36,8 +37,8 @@ import org.javarosa.xpath.expr.XPathExpression;
 public class EvaluationContext {
     /** Unambiguous anchor reference for relative paths */
     private TreeReference contextNode;
-    private HashMap<String, IFunctionHandler> functionHandlers;
-    private HashMap<String, Object> variables;
+    private Map<String, IFunctionHandler> functionHandlers;
+    private Map<String, Object> variables;
 
     public boolean isConstraint; //true if we are evaluating a constraint
     public IAnswerData candidateValue; //if isConstraint, this is the value being validated
@@ -46,7 +47,7 @@ public class EvaluationContext {
 
     private String outputTextForm = null; //Responsible for informing itext what form is requested if relevant
 
-    private HashMap<String, DataInstance> formInstances;
+    private Map<String, DataInstance> formInstances;
 
     private TreeReference original;
     /**
@@ -86,12 +87,12 @@ public class EvaluationContext {
         this.contextNode = context;
     }
 
-    public EvaluationContext (EvaluationContext base, HashMap<String, DataInstance> formInstances, TreeReference context) {
+    public EvaluationContext (EvaluationContext base, Map<String, DataInstance> formInstances, TreeReference context) {
         this(base, context);
         this.formInstances = formInstances;
     }
 
-    public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances, EvaluationContext base) {
+    public EvaluationContext (DataInstance instance, Map<String, DataInstance> formInstances, EvaluationContext base) {
         this(base);
         this.formInstances = formInstances;
         this.instance = instance;
@@ -101,7 +102,7 @@ public class EvaluationContext {
         this(instance, new HashMap<String, DataInstance>());
     }
 
-    public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances) {
+    public EvaluationContext (DataInstance instance, Map<String, DataInstance> formInstances) {
         this.formInstances = formInstances;
         this.instance = instance;
         this.contextNode = TreeReference.rootRef();
@@ -131,7 +132,7 @@ public class EvaluationContext {
         functionHandlers.put(fh.getName(), fh);
     }
 
-    public HashMap<String, IFunctionHandler> getFunctionHandlers () {
+    public Map<String, IFunctionHandler> getFunctionHandlers () {
         return functionHandlers;
     }
 
@@ -143,7 +144,7 @@ public class EvaluationContext {
         return outputTextForm;
     }
 
-    public void setVariables(HashMap<String, ?> variables) {
+    public void setVariables(Map<String, ?> variables) {
         for (String var : variables.keySet()) {
             setVariable(var, variables.get(var));
         }

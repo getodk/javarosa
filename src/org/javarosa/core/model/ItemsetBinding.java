@@ -1,11 +1,18 @@
 package org.javarosa.core.model;
 
+import static java.util.stream.Collectors.toMap;
+import static org.javarosa.core.model.instance.FormInstance.unpackReference;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
@@ -19,6 +26,9 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.XPathNodeset;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,31 +42,37 @@ public class ItemsetBinding implements Externalizable, Localizable {
      * xform/xpath classes, which we don't from the core model project
      */
 
-    public TreeReference nodesetRef;   //absolute ref of itemset source nodes
     public IConditionExpr nodesetExpr; //path expression for source nodes; may be relative, may contain predicates
     public TreeReference contextRef;   //context ref for nodesetExpr; ref of the control parent (group/formdef) of itemset question
-       //note: this is only here because its currently impossible to both (a) get a form control's parent, and (b)
-       //convert expressions into refs while preserving predicates. once these are fixed, this field can go away
+    //note: this is only here because its currently impossible to both (a) get a form control's parent, and (b)
+    //convert expressions into refs while preserving predicates. once these are fixed, this field can go away
 
-    public TreeReference labelRef;     //absolute ref of label
     public IConditionExpr labelExpr;   //path expression for label; may be relative, no predicates
     public boolean labelIsItext;       //if true, content of 'label' is an itext id
 
     public boolean copyMode;           //true = copy subtree; false = copy string value
     public IConditionExpr copyExpr;    // path expression for copy; may be relative, no predicates
-    public TreeReference copyRef;      //absolute ref to copy
-    public TreeReference valueRef;     //absolute ref to value
     public IConditionExpr valueExpr;   //path expression for value; may be relative, no predicates (must be relative if copy mode)
 
     private TreeReference destRef; //ref that identifies the repeated nodes resulting from this itemset
-                                   //not serialized -- set by QuestionDef.setDynamicChoices()
+    //not serialized -- set by QuestionDef.setDynamicChoices()
     private List<SelectChoice> choices; //dynamic choices -- not serialized, obviously
 
-    public List<SelectChoice> getChoices () {
+    private DataInstance instanceModel;
+    private Optional<XPathNodeset> nodeset;
+    private Optional<TreeReference> nodesetRef;
+    private Optional<TreeReference> labelRef;
+    private Optional<TreeReference> valueRef;
+    private Optional<TreeReference> copyRef;
+
+    public ItemsetBinding() {
+    }
+
+    public List<SelectChoice> getChoices() {
         return choices;
     }
 
-    public void setChoices (List<SelectChoice> choices, Localizer localizer) {
+    public void setChoices(List<SelectChoice> choices, Localizer localizer) {
         if (this.choices != null) {
             logger.warn("previous choices not cleared out");
             clearChoices();
@@ -72,7 +88,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
         }
     }
 
-    public void clearChoices () {
+    public void clearChoices() {
         this.choices = null;
     }
 
@@ -84,57 +100,90 @@ public class ItemsetBinding implements Externalizable, Localizable {
         }
     }
 
-    public TreeReference getDestRef () {
+    public TreeReference getDestRef() {
         return destRef;
     }
 
-    public IConditionExpr getRelativeValue () {
+    public IConditionExpr getRelativeValue() {
         TreeReference relRef = null;
 
-        if (copyRef == null) {
-            relRef = valueRef; //must be absolute in this case
-        } else if (valueRef != null) {
-            relRef = valueRef.relativize(copyRef);
+        if (getCopyRef() == null) {
+            relRef = getValueRef(); //must be absolute in this case
+        } else if (getValueRef() != null) {
+            relRef = getValueRef().relativize(getCopyRef());
         }
 
         return relRef != null ? RestoreUtils.xfFact.refToPathExpr(relRef) : null;
     }
 
-    public void initReferences(QuestionDef q) {
+    public void initReferences(DataInstance instanceModel, List<DataInstance> nonMainInstances, QuestionDef q) {
+
+        Stream<DataInstance> stream = nonMainInstances.stream();
+        Map<String, DataInstance> nmis = stream.collect(toMap(
+            DataInstance::getName,
+            di -> di
+        ));
+        initReferences(instanceModel, nmis, q);
+    }
+
+    public void initReferences(DataInstance instanceModel, Map<String, DataInstance> nonMainInstances, QuestionDef q) {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
-        nodesetRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(
-                ((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference(true)), contextRef));
-        if ( labelExpr != null ) {
-            labelRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) labelExpr).getExpr())),
-                    nodesetRef));
+        this.instanceModel = instanceModel;
+        XPathConditional nodesetExpr = (XPathConditional) this.nodesetExpr;
+        XPathExpression expr = nodesetExpr.getExpr();
+        if (expr instanceof XPathPathExpr) {
+            TreeReference reference = ((XPathPathExpr) expr).getReference(true);
+            XPathReference ref = new XPathReference(reference);
+            IDataReference absRef = FormDef.getAbsRef(ref, contextRef);
+            TreeReference localNodesetRef = unpackReference(absRef);
+            nodeset = Optional.empty();
+            nodesetRef = Optional.of(localNodesetRef);
+            labelRef = computeRef(localNodesetRef, labelExpr);
+            valueRef = computeRef(localNodesetRef, valueExpr);
+            copyRef = computeRef(localNodesetRef, copyExpr);
         }
-        if ( copyExpr != null ) {
-            copyRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) copyExpr).getExpr())),
-                    nodesetRef));
-        }
-        if ( valueExpr != null ) {
-            valueRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) valueExpr).getExpr())),
-                    nodesetRef));
+        if (expr instanceof XPathFuncExpr) {
+            XPathFuncExpr f = (XPathFuncExpr) expr;
+
+            EvaluationContext ec = new EvaluationContext(instanceModel, nonMainInstances);
+            XPathNodeset localNodeset = (XPathNodeset) f.eval(ec);
+            for (int i = 0; i < localNodeset.size(); i++)
+                localNodeset.getRefAt(i).setInstanceName(localNodeset.instance.getName());
+            nodeset = Optional.of(localNodeset);
+            nodesetRef = Optional.empty();
+            labelRef = Optional.empty();
+            valueRef = Optional.empty();
+            copyRef = Optional.empty();
         }
 
-        if ( q != null ) {
+        if (q != null) {
             // When loading from XML, the first time through, during verification, q will be null.
             // The second time through, q will be non-null.
             // Otherwise, when loading from binary, this will be called only once with a non-null q.
-            destRef = FormInstance.unpackReference(q.getBind()).clone();
+            destRef = unpackReference(q.getBind()).clone();
             if (copyMode) {
-                destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
+                destRef.add(getCopyRef().getNameLast(), TreeReference.INDEX_UNBOUND);
             }
         }
     }
 
+    private static Optional<TreeReference> computeRef(TreeReference nodesetRef, IConditionExpr conditionalExpression) {
+        return Optional.ofNullable(conditionalExpression).map(ce -> {
+            XPathConditional valueExpr = (XPathConditional) ce;
+            XPathPathExpr expr1 = (XPathPathExpr) valueExpr.getExpr();
+            XPathReference ref1 = new XPathReference(expr1);
+            IDataReference absRef1 = FormDef.getAbsRef(ref1, nodesetRef);
+            return unpackReference(absRef1);
+        });
+    }
+
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        nodesetExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-        contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-        labelExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-        valueExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
-        copyExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
+        nodesetExpr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        labelExpr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        valueExpr = (IConditionExpr) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
+        copyExpr = (IConditionExpr) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
         labelIsItext = ExtUtil.readBool(in);
         copyMode = ExtUtil.readBool(in);
     }
@@ -149,4 +198,54 @@ public class ItemsetBinding implements Externalizable, Localizable {
         ExtUtil.writeBool(out, copyMode);
     }
 
+    public TreeReference getNodesetRef() {
+        return nodeset
+            .map(ns -> {
+                TreeReference refAt = ns.getRefAt(0);
+                refAt.setInstanceName(ns.instance.getName());
+                return refAt;
+            })
+            .orElseGet(() -> nodesetRef.orElse(null));
+    }
+
+    public TreeReference getLabelRef() {
+        return nodeset
+            .map(ns -> computeRef(ns.getRefAt(0), labelExpr).get())
+            .orElseGet(() -> valueRef.orElse(null));
+    }
+
+    public TreeReference getValueRef() {
+        return nodeset
+            .map(ns -> computeRef(ns.getRefAt(0), valueExpr).get())
+            .orElseGet(() -> valueRef.orElse(null));
+    }
+
+    public TreeReference getCopyRef() {
+        return nodeset
+            .map(ns -> computeRef(ns.getRefAt(0), copyExpr).get())
+            .orElseGet(() -> valueRef.orElse(null));
+    }
+
+    public String getNodesetInstanceName() {
+        return nodeset
+            .map(ns -> ns.instance.getName())
+            .orElseGet(() -> nodesetRef.map(TreeReference::getInstanceName).orElse(null));
+    }
+
+    public String getLabelInstanceName() {
+        return nodeset
+            .map(ns -> ns.instance.getName())
+            .orElseGet(() -> labelRef.map(TreeReference::getInstanceName).orElse(null));
+    }
+
+    public List<TreeReference> getNodeset(FormInstance mainInstance, EvaluationContext evaluationContext) {
+        return nodeset
+            .map(ns -> ns.nodes)
+            .orElseGet(() -> {
+                XPathConditional expr = (XPathConditional) this.nodesetExpr;
+                XPathFuncExpr func = (XPathFuncExpr) expr.getExpr();
+                XPathNodeset nodeset = (XPathNodeset) func.eval(mainInstance, evaluationContext);
+                return nodeset.nodes;
+            });
+    }
 }
