@@ -53,7 +53,6 @@ public class SMSSerializingVisitorTest {
 
     @Test
     public void testTagsAreBeingSerialized() {
-
         for (String tag : getAnswerTags()) {
             assertTrue(SMS.contains(tag));
         }
@@ -116,7 +115,6 @@ public class SMSSerializingVisitorTest {
      * @return true if  an answer exists after a tag.
      */
     private static boolean taggedAnswerExists(String tag, String sms) {
-
         if (!sms.contains(tag)) {
             return false;
         }
