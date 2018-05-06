@@ -29,12 +29,15 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A collection of objects that affect the evaluation of an expression, like
  * function handlers and (not supported) variable bindings.
  */
 public class EvaluationContext {
+    private static final Logger logger = LoggerFactory.getLogger(EvaluationContext.class);
     /** Unambiguous anchor reference for relative paths */
     private TreeReference contextNode;
     private Map<String, IFunctionHandler> functionHandlers;
@@ -112,6 +115,10 @@ public class EvaluationContext {
 
     public DataInstance getInstance(String id) {
         DataInstance formInstance = formInstances.get(id);
+        logger.debug("getInstance({}) found {}", id, formInstance);
+        if (formInstance == null) {
+            logger.debug("formInstances: {}; instance: {}", formInstances, instance);
+        }
         return formInstance != null ? formInstance :
             (instance != null && id.equals(instance.getName()) ? instance : null);
     }

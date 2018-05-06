@@ -46,9 +46,12 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XPathFuncExprRandomizeTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(XPathFuncExprRandomizeTest.class);
     private FormDef formDef;
 
     @Before
@@ -125,6 +128,7 @@ public class XPathFuncExprRandomizeTest {
 
         // Create an empty FormDef and deserialize the form into it
         FormDef deserializedFormDef = new FormDef();
+        logger.debug("Calling readExternal on new FormDef");
         deserializedFormDef.readExternal(
             new DataInputStream(newInputStream(tempFile)),
             PrototypeManager.getDefault()
