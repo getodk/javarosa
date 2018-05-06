@@ -50,8 +50,6 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
-import org.javarosa.xpath.XPathException;
-import org.javarosa.xpath.XPathMissingInstanceException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnsupportedException;

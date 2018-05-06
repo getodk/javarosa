@@ -22,14 +22,18 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathMissingInstanceException;
 import org.javarosa.xpath.XPathNodeset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 /** The eval operation of XPathPathExpr */
 public class XPathPathExprEval {
+    private static final Logger logger = LoggerFactory.getLogger(XPathPathExprEval.class.getSimpleName());
 
     public XPathNodeset eval(TreeReference reference, EvaluationContext ec) {
         TreeReference ref = getContextualizedTreeReference(reference, ec);
+        logger.debug("eval called for {}. contextualized ref is {}.", reference, ref);
         DataInstance dataInstance = getDataInstance(ec, ref);
         List<TreeReference> nodesetRefs = ec.expandReference(ref);
         removeIrrelevantNodesets(dataInstance, nodesetRefs);
@@ -51,6 +55,7 @@ public class XPathPathExprEval {
 
         if (refersToNonMainInstance(ref)) {
             final DataInstance nonMainInstance = ec.getInstance(ref.getInstanceName());
+            logger.debug("ref refers to non-main instance {}", nonMainInstance);
             if (nonMainInstance != null) {
                 dataInstance = nonMainInstance;
             } else {
