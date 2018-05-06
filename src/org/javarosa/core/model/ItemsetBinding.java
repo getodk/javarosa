@@ -115,7 +115,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
         nodesetRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(
-                ((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference(true)), contextRef));
+                ((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference()), contextRef));
         if ( labelExpr != null ) {
             labelRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) labelExpr).getExpr())),
                     nodesetRef));
