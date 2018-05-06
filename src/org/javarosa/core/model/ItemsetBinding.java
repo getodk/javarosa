@@ -133,7 +133,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
         XPathConditional nodesetExpr = (XPathConditional) this.nodesetExpr;
         XPathExpression expr = nodesetExpr.getExpr();
         if (expr instanceof XPathPathExpr) {
-            TreeReference reference = ((XPathPathExpr) expr).getReference(true);
+            TreeReference reference = ((XPathPathExpr) expr).getReference();
             XPathReference ref = new XPathReference(reference);
             IDataReference absRef = FormDef.getAbsRef(ref, contextRef);
             TreeReference localNodesetRef = unpackReference(absRef);
