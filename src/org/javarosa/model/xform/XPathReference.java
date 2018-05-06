@@ -23,7 +23,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import java.util.Optional;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -81,27 +80,27 @@ public class XPathReference implements IDataReference {
         return (XPathPathExpr)path;
     }
 
-    public static Optional<XPathPathExpr> getPathExpr2(String nodeset) {
+    public static XPathPathExpr getPathExpr2(String nodeset) {
         try {
             XPathExpression path = XPathParseTool.parseXPath(nodeset);
             if (path instanceof XPathPathExpr)
-                return Optional.of((XPathPathExpr) path);
+                return (XPathPathExpr) path;
             else
-                return Optional.empty();
+                return null;
         } catch (XPathSyntaxException xse) {
-            return Optional.empty();
+            return null;
         }
     }
 
-    public static Optional<XPathFuncExpr> getFuncExpr(String nodeset) {
+    public static XPathFuncExpr getFuncExpr(String nodeset) {
         try {
             XPathExpression path = XPathParseTool.parseXPath(nodeset);
             if (path instanceof XPathFuncExpr)
-                return Optional.of((XPathFuncExpr) path);
+                return (XPathFuncExpr) path;
             else
-                return Optional.empty();
+                return null;
         } catch (XPathSyntaxException xse) {
-            return Optional.empty();
+            return null;
         }
     }
 

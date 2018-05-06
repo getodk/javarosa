@@ -54,7 +54,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.javarosa.core.model.Action;
 import org.javarosa.core.model.DataBinding;
@@ -1299,10 +1298,10 @@ public class XFormParser implements IXFormParserFunctions {
         String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
         if (nodesetStr == null)
             throw new RuntimeException("No nodeset attribute in element: [" + e.getName() + "]. This is required. (Element Printout:" + XFormSerializer.elementToString(e) + ")");
-        Optional<XPathPathExpr> path = XPathReference.getPathExpr2(nodesetStr);
-        Optional<XPathFuncExpr> func = XPathReference.getFuncExpr(nodesetStr);
+        XPathPathExpr path = XPathReference.getPathExpr2(nodesetStr);
+        XPathFuncExpr func = XPathReference.getFuncExpr(nodesetStr);
         itemset.nodesetExpr = new XPathConditional(
-            path.isPresent() ? path.get() : func.get()
+            path != null ? path : func
         );
         itemset.contextRef = getFormElementRef(qparent);
         // this is not valid yet...
