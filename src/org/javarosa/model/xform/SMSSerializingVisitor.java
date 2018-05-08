@@ -1,5 +1,4 @@
 package org.javarosa.model.xform;
-
 /*
  * Copyright (C) 2009 JavaRosa
  *
@@ -36,7 +35,6 @@ import java.io.IOException;
  * SMS's.
  *
  * @author Munaf Sheikh, Cell-Life
- *
  */
 public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
@@ -46,10 +44,14 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     private String delimiter = null;
     private String prefix = null;
 
-    /** The serializer to be used in constructing XML for AnswerData elements */
+    /**
+     * The serializer to be used in constructing XML for AnswerData elements
+     */
     IAnswerDataSerializer serializer;
 
-    /** The schema to be used to serialize answer data */
+    /**
+     * The schema to be used to serialize answer data
+     */
     FormDef schema; // not used
 
     private void init() {
@@ -100,7 +102,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
     }
 
     public IDataPayload createSerializedPayload(FormInstance model, IDataReference ref)
-            throws IOException {
+        throws IOException {
         init();
 
         if (this.serializer == null) {
@@ -108,7 +110,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
         }
         model.accept(this);
         if (theSmsStr != null) {
-            byte[] form = theSmsStr.getBytes("UTF-16");
+            byte[] form = theSmsStr.getBytes("UTF-8");
             return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_SMS);
         } else {
             return null;
@@ -129,19 +131,24 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
         xmlns = root.getAttributeValue("", "xmlns");
         delimiter = root.getAttributeValue("", "delimiter");
-        if ( delimiter == null ) {
+        if (delimiter == null) {
             // for the spelling-impaired...
             delimiter = root.getAttributeValue("", "delimeter");
         }
         prefix = root.getAttributeValue("", "prefix");
 
-        xmlns = (xmlns != null)? xmlns : " ";
-        delimiter = (delimiter != null ) ? delimiter : " ";
+        xmlns = (xmlns != null) ? xmlns : " ";
+        delimiter = (delimiter != null) ? delimiter : " ";
         prefix = (prefix != null) ? prefix : " ";
 
         theSmsStr = prefix.concat(delimiter);
 
-        // serialize each node to get it's answers
+        // serialize each node (and it's children) to get it's answers
+        serializeTree(root);
+        theSmsStr = theSmsStr.trim();
+    }
+
+    public void serializeTree(TreeElement root) {
         for (int j = 0; j < root.getNumChildren(); j++) {
             TreeElement treeElement = root.getChildAt(j);
             if (treeElement.isLeaf() && treeElement.getAttribute("", "tag") != null) {
@@ -153,7 +160,6 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
                 serializeTree(treeElement);
             }
         }
-        theSmsStr = theSmsStr.trim();
     }
 
     public String serializeNode(TreeElement instanceNode) {
@@ -166,13 +172,13 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
         if (instanceNode.getValue() != null) {
             Object serializedAnswer = serializer.serializeAnswerData(
-                    instanceNode.getValue(), instanceNode.getDataType());
+                instanceNode.getValue(), instanceNode.getDataType());
 
             if (serializedAnswer instanceof Element) {
                 // DON"T handle this.
                 throw new RuntimeException("Can't handle serialized output for "
-                        + instanceNode.getValue().toString() + ", "
-                        + serializedAnswer);
+                    + instanceNode.getValue().toString() + ", "
+                    + serializedAnswer);
             } else if (serializedAnswer instanceof String) {
                 Element element = new Element();
                 element.addChild(Node.TEXT, serializedAnswer);
@@ -195,8 +201,8 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
                 stringBuilder.append(delimiter);
             } else {
                 throw new RuntimeException("Can't handle serialized output for "
-                        + instanceNode.getValue().toString() + ", "
-                        + serializedAnswer);
+                    + instanceNode.getValue().toString() + ", "
+                    + serializedAnswer);
             }
         }
         return stringBuilder.toString();
