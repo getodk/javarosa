@@ -16,8 +16,7 @@ public class RecalculateTest {
 
     @Before
     public void setUp() {
-        FormParseInit fpi = new FormParseInit();
-        fpi.setFormToParse(r("calculate-now.xml").toString());
+        FormParseInit fpi = new FormParseInit(r("calculate-now.xml"));
         formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());
     }

@@ -4,6 +4,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xform.parse.RandomizeHelper;
 import org.javarosa.xpath.expr.XPathPathExpr;
 
 import java.util.List;
@@ -75,6 +76,33 @@ public class XPathNodeset {
         nodeset.pathEvaluated = pathEvaluated;
         nodeset.originalPath = originalPath;
         return nodeset;
+    }
+
+    /**
+     * Builds and returns a copy of a XPathNodeset with nodes in a randomized order.
+     *
+     * @return      a copy of this nodeset with nodes in a randomized order
+     */
+    public static XPathNodeset shuffle(XPathNodeset input) {
+        return new XPathNodeset(
+            RandomizeHelper.shuffle(input.nodes),
+            input.instance,
+            input.ec
+        );
+    }
+
+    /**
+     * Builds and returns a copy of a XPathNodeset with nodes in a randomized order.
+     *
+     * @param seed  the seed used when building a Random object to get reproducible results. If null, no seed is used
+     * @return      a copy of this nodeset with nodes in a randomized order
+     */
+    public static XPathNodeset shuffle(XPathNodeset input, long seed) {
+        return new XPathNodeset(
+            RandomizeHelper.shuffle(input.nodes, seed),
+            input.instance,
+            input.ec
+        );
     }
 
     protected void setReferences(List<TreeReference> nodes) {
