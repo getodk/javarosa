@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa"
+        xmlns:orx="http://openrosa.org/xforms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>Distance of a geoshape, geotrace, or set of geopoints</h:title>
+        <model>
+            <instance>
+                <distance id="distance" version="2018042401">
+                    <geoshape>0 0; 0 1; 0 91</geoshape>
+                    <geotrace>0 0; 0 1; 0 91</geotrace>
+                    <points>
+                        <point>0 0</point>
+                        <point>0 1</point>
+                        <point>0 91</point>
+                    </points>
+                    <shape-result/>
+                    <trace-result/>
+                    <point-result/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </distance>
+            </instance>
+            <bind nodeset="/distance/geoshape" type="geoshape"/>
+            <bind nodeset="/distance/geotrace" type="geotrace"/>
+            <bind nodeset="/distance/points/point" type="geopoint"/>
+            <bind calculate="distance( /distance/geoshape     )" nodeset="/distance/shape-result" type="string"/>
+            <bind calculate="distance( /distance/geotrace     )" nodeset="/distance/trace-result" type="string"/>
+            <bind calculate="distance( /distance/points/point )" nodeset="/distance/point-result" type="string"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/distance/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <repeat nodeset="/distance/points/point"/>
+    </h:body>
+</h:html>
