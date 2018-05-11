@@ -23,6 +23,7 @@ import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -113,6 +114,20 @@ public class XPathFuncExprRandomizeTest {
         assertTrue(nodesEqualInOrder(choices1, choices2));
     }
 
+    @Test
+    public void randomize_function_can_be_used_outside_itemset_nodeset_definitions() {
+        initializeNewInstance(formDef);
+        // The ref /randomize/randomValue is the max from a randomized nodeset of numbers from 1 to 6
+        assertEquals(6, getAnswerValue(formDef, "/randomize/randomValue"));
+    }
+
+    @Test
+    public void seeded_randomize_function_can_be_used_outside_itemset_nodeset_definitions() {
+        initializeNewInstance(formDef);
+        // The ref /randomize/seededRandomValue is the max from a randomized nodeset of numbers from 1 to 6
+        assertEquals(6, getAnswerValue(formDef, "/randomize/seededRandomValue"));
+    }
+
     private FormDef serializeAndDeserializeForm(FormDef formDef) throws IOException, DeserializationException {
         // Initialize serialization
         PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
@@ -142,6 +157,12 @@ public class XPathFuncExprRandomizeTest {
         FormIndex formIndex = getFormIndex(formDef, absoluteRef(ref));
         FormEntryPrompt formEntryPrompt = new FormEntryPrompt(formDef, formIndex);
         return formEntryPrompt.getSelectChoices();
+    }
+
+    private Object getAnswerValue(FormDef formDef, String ref) {
+        FormIndex formIndex = getFormIndex(formDef, absoluteRef(ref));
+        FormEntryPrompt formEntryPrompt = new FormEntryPrompt(formDef, formIndex);
+        return formEntryPrompt.getAnswerValue().getValue();
     }
 
     private FormIndex getFormIndex(FormDef formDef, TreeReference ref) {
