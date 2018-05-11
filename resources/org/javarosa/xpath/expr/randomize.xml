@@ -59,8 +59,8 @@
             <bind nodeset="/randomize/fruit2" type="select1"/>
             <bind nodeset="/randomize/seededFruit1" type="select1"/>
             <bind nodeset="/randomize/seededFruit2" type="select1"/>
-            <bind nodeset="/randomize/randomValue" calculate="max(randomize(instance('numbers')/root/value))"/>
-            <bind nodeset="/randomize/seededRandomValue" calculate="max(randomize(instance('numbers')/root/value, 42))"/>
+            <bind nodeset="/randomize/randomValue" calculate="max(randomize(instance('numbers')/root/item))"/>
+            <bind nodeset="/randomize/seededRandomValue" calculate="max(randomize(instance('numbers')/root/item, 42))"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/randomize/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>
