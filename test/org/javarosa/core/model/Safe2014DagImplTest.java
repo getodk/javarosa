@@ -357,7 +357,7 @@ public class Safe2014DagImplTest {
 
         // Construct the required amount of repeats
         final TreeElement templateRepeat = mainInstance.getRoot().getChildAt(0);
-        final int numberOfRepeats = 200; // Raise this value to really measure
+        final int numberOfRepeats = 10; // Raise this value to really measure
         for (int i = 0; i < numberOfRepeats; i++) {
             final TreeReference refToNewRepeat = templateRepeat.getRef();
             refToNewRepeat.setMultiplicity(1, i); // set the correct multiplicity
