@@ -34,7 +34,7 @@ class XPathFuncExprGeo {
             } catch (Exception e) {
                 throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
             }
-        } else if (repeatSize > 2) {
+        } else if (repeatSize >= 2) {
             // treat the input as a series of GeoPointData
 
             for (Object arg : argList) {
