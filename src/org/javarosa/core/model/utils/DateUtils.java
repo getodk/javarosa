@@ -16,9 +16,6 @@
 
 package org.javarosa.core.model.utils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,6 +23,8 @@ import java.util.List;
 import java.util.TimeZone;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  * Static utility methods for Dates in j2me
@@ -96,7 +95,7 @@ public class DateUtils {
             // The official API returns an ISO 8601 day of week
             // with a range of values from 1 for Monday to 7 for Sunday].
             // TODO migrate dow field to a DayOfWeek type to avoid any possible interpretation errors
-            int iso8601Dow = java.time.LocalDateTime.of(year, month, day, hour, minute, second, secTicks * 1_000_000).getDayOfWeek().getValue();
+            int iso8601Dow = new LocalDateTime(year, month, day, hour, minute, second, secTicks).getDayOfWeek();
             int dow = iso8601Dow == 7 ? 0 : iso8601Dow;
             return new DateFields(year, month, day, hour, minute, second, secTicks, dow);
         }
@@ -136,22 +135,19 @@ public class DateUtils {
     }
 
     public static Date getDate (DateFields f, String timezone) {
-        ZoneId zone = timezone != null
-            ? ZoneId.of(timezone)
-            : ZoneId.systemDefault();
-        return Date.from(getLocalDateTime(f).atZone(zone).toInstant());
+        LocalDateTime ldt = getLocalDateTime(f);
+        return timezone == null ? ldt.toDate() : ldt.toDate(TimeZone.getTimeZone(timezone));
     }
 
     private static LocalDateTime getLocalDateTime(DateFields f) {
-        return LocalDateTime.of(
+        return new LocalDateTime(
             f.year,
             f.month,
             f.day,
             f.hour,
             f.minute,
             f.second,
-            // LocalDateTimes use nanoseconds instead of milliseconds
-            f.secTicks * 1_000_000
+            f.secTicks
         );
     }
 
@@ -297,7 +293,7 @@ public class DateUtils {
                 } else if (c == 'n') {    //numeric month
                     sb.append(f.month);
                 } else if (c == 'b') {    //short text month
-                    sb.append(getLocalDateTime(f).format(DateTimeFormatter.ofPattern("MMM")));
+                    sb.append(getLocalDateTime(f).toString(DateTimeFormat.forPattern("MMM")));
                 } else if (c == 'd') {    //0-padded day of month
                     sb.append(intPad(f.day, 2));
                 } else if (c == 'e') {    //day of month
@@ -313,7 +309,7 @@ public class DateUtils {
                 } else if (c == '3') {    //0-padded millisecond ticks (000-999)
                     sb.append(intPad(f.secTicks, 3));
                 } else if (c == 'a') {    //Three letter short text day
-                    sb.append(getLocalDateTime(f).format(DateTimeFormatter.ofPattern("EEE")));
+                    sb.append(getLocalDateTime(f).toString(DateTimeFormat.forPattern("EEE")));
                 } else if (c == 'Z' || c == 'A' || c == 'B') {
                     throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
                 } else {

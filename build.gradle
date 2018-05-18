@@ -37,6 +37,7 @@ sourceCompatibility = '1.8'
 
 dependencies {
     // Be sure to update dependencies in pom.xml to match
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
     testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'

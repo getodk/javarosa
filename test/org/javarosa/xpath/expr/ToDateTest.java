@@ -2,45 +2,32 @@ package org.javarosa.xpath.expr;
 
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.POSITIVE_INFINITY;
-import static java.time.Instant.EPOCH;
-import static java.time.ZoneId.SHORT_IDS;
-import static java.time.ZoneOffset.UTC;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
 import static org.junit.Assert.assertEquals;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.function.Consumer;
 import org.javarosa.xpath.XPathTypeMismatchException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ToDateTest {
+    private static final DateTime EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
 
-    public static final TimeZone TIME_ZONE = TimeZone.getTimeZone(ZoneOffset.UTC);
+    public static final TimeZone TIME_ZONE = TimeZone.getTimeZone(DateTimeZone.UTC.getID());
     private static TimeZone backupTimeZone;
 
     private static Date date(int year, int month, int day) {
-        return date(LocalDate.of(year, month, day).atStartOfDay().atZone(ZoneId.systemDefault()));
+        return new LocalDateTime(year, month, day, 0, 0, 0, 0).toDate();
     }
 
     private static Date date(int year, int month, int day, int hour, int minute, int second, int milli) {
-        return date(LocalDateTime.of(year, month, day, hour, minute, second, milli * 1_000_000).atZone(ZoneId.systemDefault()));
-    }
-
-    private static Date date(ZonedDateTime zonedDateTime) {
-        return Date.from(zonedDateTime.toInstant());
-    }
-
-    private static Date date(OffsetDateTime offsetDateTime) {
-        return Date.from(offsetDateTime.toInstant());
+        return new LocalDateTime(year, month, day, hour, minute, second, milli).toDate();
     }
 
     @BeforeClass
@@ -74,7 +61,7 @@ public class ToDateTest {
     @Test
     public void convertsISO8601DatesWithOffsetPreservingTime() {
         assertEquals(
-            date(OffsetDateTime.of(2018, 1, 1, 10, 20, 30, 400_000_000, ZoneOffset.ofHours(2))),
+            new DateTime(2018, 1, 1, 10, 20, 30, 400, DateTimeZone.forOffsetHours(2)).toDate(),
             toDate("2018-01-01T10:20:30.400+02", true)
         );
     }
@@ -82,7 +69,7 @@ public class ToDateTest {
     @Test
     public void convertsTimestampsWithoutPreservingTime() {
         assertEquals(
-            date(EPOCH.atZone(ZoneId.systemDefault()).plusDays(365)),
+            EPOCH.withZone(DateTimeZone.getDefault()).plusDays(365).toDate(),
             toDate(365d, false)
         );
     }
@@ -90,10 +77,10 @@ public class ToDateTest {
     @Test
     public void convertsTimestampsWithoutPreservingTimeOnLocalTimeZone() {
         runOnTimeZone(
-            ZoneId.of("PST", SHORT_IDS),
+            DateTimeZone.forID("America/Los_Angeles"), // a.k.a. PST (joda doesn't like the short ids)
             zoneId -> {
-                ZonedDateTime utcEpoch = EPOCH.atZone(UTC); // 1970-01-01T00:00:00 UTC
-                ZonedDateTime properExpectedDate = utcEpoch.plusDays(365); // 1971-01-01T00:00:00 UTC
+                DateTime utcEpoch = EPOCH.withZone(DateTimeZone.UTC); // 1970-01-01T00:00:00 UTC
+                DateTime properExpectedDate = utcEpoch.plusDays(365); // 1971-01-01T00:00:00 UTC
                 // Explanation for all this:
                 //
                 // Since our current implementation is based on java.util.Date, we are forced to
@@ -105,9 +92,9 @@ public class ToDateTest {
                 // the same local datetime in our target zone.
                 // 1971-01-01T00:00:00 PST (or 1971-01-01T06:00:00 UTC which is the EPOCH plus
                 // 365 days *and 6 hours*, but will make our code work)
-                ZonedDateTime expectedDate = properExpectedDate.withZoneSameLocal(zoneId);
+                DateTime expectedDate = properExpectedDate.withZoneRetainFields(zoneId);
                 assertEquals(
-                    date(expectedDate),
+                    expectedDate.toDate(),
                     toDate(365d, false)
                 );
             }
@@ -116,9 +103,9 @@ public class ToDateTest {
 
     @Test
     public void convertsTimestampsToDatesAtMidnightUTC() {
-        OffsetDateTime expectedDate = EPOCH.atOffset(UTC).plusDays(365);
+        DateTime expectedDate = EPOCH.withZone(DateTimeZone.UTC).plusDays(365);
         assertEquals(
-            date(expectedDate),
+            expectedDate.toDate(),
             toDate(365d, true)
         );
     }
@@ -182,9 +169,9 @@ public class ToDateTest {
         toDate(2L, false);
     }
 
-    private void runOnTimeZone(ZoneId zoneId, Consumer<ZoneId> block) {
+    private void runOnTimeZone(DateTimeZone zoneId, Consumer<DateTimeZone> block) {
         TimeZone backup = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone(zoneId.getId()));
+        TimeZone.setDefault(TimeZone.getTimeZone(zoneId.getID()));
         block.accept(zoneId);
         TimeZone.setDefault(backup);
     }
