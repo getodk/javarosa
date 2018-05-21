@@ -196,7 +196,7 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
                 stringBuilder.append(delimiter);
 
                 for (int k = 0; k < element.getChildCount(); k++) {
-                    stringBuilder.append(element.getChild(k).toString().replace("\\", "\\\\").replace(delimiter, "\\" + delimiter));
+                    stringBuilder.append(element.getChild(k).toString().replace("\\", "\\\\"));
                     stringBuilder.append(delimiter);
                 }
                 stringBuilder.append(delimiter);
