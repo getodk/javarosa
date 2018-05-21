@@ -1,5 +1,4 @@
 package org.javarosa.model.xform;
-
 /*
  * Copyright (C) 2009 JavaRosa
  *
