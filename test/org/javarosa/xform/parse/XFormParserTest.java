@@ -6,7 +6,6 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -17,6 +16,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
@@ -391,45 +392,6 @@ public class XFormParserTest {
         assertThat(groupElement, instanceOf(GroupDef.class));
         assertThat(((GroupDef) groupElement).getRepeat(), is(false));
         assertThat(groupElement.getBind(), is(expectedXPathReference));
-    }
-
-    /**
-     * Attributes that started being used by clients without being added as fields to DataBinding or QuestionDef should
-     * be passed through and made available in the bindAttributes or additionalAttributes list.
-     */
-    @Test public void passedThroughAttributesHaveExpectedValues() throws IOException {
-        ParseResult parseResult = parse(r("whitelisted-attributes.xml"));
-
-        TreeElement instanceIDElement = parseResult.formDef
-                .getMainInstance()
-                .getRoot()
-                .getChildAt(0)
-                .getChildAt(0);
-
-        // Bind attributes
-        String requiredMsg = instanceIDElement
-                .getBindAttribute("", "requiredMsg")
-                .getValue()
-                .getDisplayText();
-
-        assertEquals(requiredMsg, "this is required");
-
-        String saveIncomplete = instanceIDElement
-                .getBindAttribute("", "saveIncomplete")
-                .getValue()
-                .getDisplayText();
-
-        assertEquals(saveIncomplete, "false");
-
-        // Attributes specific to input form controls
-        QuestionDef question = FormDef.findQuestionByRef(instanceIDElement.getRef(), parseResult.formDef);
-        String rows = question
-                .getAdditionalAttribute("", "rows");
-        assertEquals(rows, "2");
-
-        String query = question
-                .getAdditionalAttribute("", "query");
-        assertEquals(query, "instance('fake')/root/item[fake2 = /data/meta/instanceID");
     }
 
     private TreeElement findDepthFirst(TreeElement parent, String name) {

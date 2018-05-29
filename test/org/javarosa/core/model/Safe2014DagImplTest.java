@@ -357,7 +357,7 @@ public class Safe2014DagImplTest {
 
         // Construct the required amount of repeats
         final TreeElement templateRepeat = mainInstance.getRoot().getChildAt(0);
-        final int numberOfRepeats = 200; // Raise this value to really measure
+        final int numberOfRepeats = 10; // Raise this value to really measure
         for (int i = 0; i < numberOfRepeats; i++) {
             final TreeReference refToNewRepeat = templateRepeat.getRef();
             refToNewRepeat.setMultiplicity(1, i); // set the correct multiplicity
@@ -371,7 +371,7 @@ public class Safe2014DagImplTest {
         final FormIndex firstRepeatIndex = new FormIndex(0, 0, firstRepeatRef);
 
         // When
-        long startMs = System.currentTimeMillis();
+        long start = System.nanoTime();
 
         for (int i = 0; i < numberOfRepeats; i++) {
             long currentIterationStart = System.nanoTime();
@@ -381,8 +381,8 @@ public class Safe2014DagImplTest {
         }
 
         // Then
-        final String elapsedFormatted = LocalTime.fromMillisOfDay(System.currentTimeMillis() - startMs).toString();
-        logger.info("Deletion of {} repeats took {}", numberOfRepeats, elapsedFormatted);
+        LocalTime duration = LocalTime.fromMillisOfDay((System.nanoTime() - start) / 1_000_000);
+        logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
     }
 
     /**

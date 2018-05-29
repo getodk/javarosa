@@ -19,9 +19,6 @@ package org.javarosa.xpath.expr;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
-import org.javarosa.core.model.data.GeoPointData;
-import org.javarosa.core.model.data.GeoShapeData;
-import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -44,7 +41,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -417,55 +413,28 @@ public class XPathFuncExpr extends XPathExpression {
             return Math.pow(a, b);
         } else if (name.equals("enclosed-area") || name.equals("area")) {
             assertArgsCount(name, args, 1);
-
-            Object argVal = argVals[0];
-            if (!(argVal instanceof XPathNodeset)) {
-                throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
-            }
-            Object[] argList = ((XPathNodeset) argVal).toArgList();
-            int repeatSize = argList.length;
-
-            List<GeoUtils.GPSCoordinates> gpsCoordinatesList;
-
-            if (repeatSize == 1) {
-                // Try to determine if the argument is of type GeoShapeData
-                try {
-                    GeoShapeData geoShapeData = new GeoShapeData().cast(new UncastData(toString(argList[0])));
-                    if (geoShapeData.points.size() <= 2) {
-                        return 0d;
-                    } else {
-                        gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
-                        for (GeoPointData point : geoShapeData.points) {
-                            gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(point.getPart(0), point.getPart(1)));
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
-                }
-            } else {
-                if (repeatSize <= 2) {
-                    return 0d;
-                } else {
-                    // treat the input as a series of GeoPointData
-
-                    gpsCoordinatesList = new ArrayList<GeoUtils.GPSCoordinates>();
-                    for (Object arg : argList) {
-                        try {
-                            GeoPointData geoPointData = new GeoPointData().cast(new UncastData(toString(arg)));
-                            gpsCoordinatesList.add(new GeoUtils.GPSCoordinates(geoPointData.getPart(0), geoPointData.getPart(1)));
-                        } catch (Exception e) {
-                            throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
-                        }
-                    }
-                }
-            }
-
-            return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(gpsCoordinatesList);
+            List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
+            return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
+        } else if (name.equals("distance")) {
+            assertArgsCount(name, args, 1);
+            List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
+            return GeoUtils.calculateDistance(latLongs);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from((String) argVals[1]).digest(
                 (String) argVals[0],
                 args.length == 3 ? Encoding.from((String)argVals[2]) : Encoding.BASE64
             );
+        } else if (name.equals("randomize")) {
+            if (!(argVals[0] instanceof XPathNodeset))
+                throw new XPathTypeMismatchException("First argument to randomize must be a nodeset");
+
+            if (args.length == 1)
+                return XPathNodeset.shuffle((XPathNodeset) argVals[0]);
+
+            if (args.length == 2)
+                return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumeric(argVals[1]).longValue());
+
+            throw new XPathUnhandledException("function \'randomize\' requires 1 or 2 arguments. " + args.length + " provided.");
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);

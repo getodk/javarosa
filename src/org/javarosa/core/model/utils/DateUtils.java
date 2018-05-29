@@ -16,16 +16,13 @@
 
 package org.javarosa.core.model.utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.List;
-import java.util.ArrayList;
-
+import java.util.TimeZone;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
-
-import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -83,6 +80,26 @@ public class DateUtils {
 //        public String tzStr;
 //        public int tzOffset; //s ahead of UTC
 
+        DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+            this.hour = hour;
+            this.minute = minute;
+            this.second = second;
+            this.secTicks = secTicks;
+            this.dow = dow;
+        }
+
+        public static DateFields of(int year, int month, int day, int hour, int minute, int second, int secTicks) {
+            // The official API returns an ISO 8601 day of week
+            // with a range of values from 1 for Monday to 7 for Sunday].
+            // TODO migrate dow field to a DayOfWeek type to avoid any possible interpretation errors
+            int iso8601Dow = new LocalDateTime(year, month, day, hour, minute, second, secTicks).getDayOfWeek();
+            int dow = iso8601Dow == 7 ? 0 : iso8601Dow;
+            return new DateFields(year, month, day, hour, minute, second, secTicks, dow);
+        }
+
         public boolean check () {
             return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year)) &&
                     inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999));
@@ -118,16 +135,20 @@ public class DateUtils {
     }
 
     public static Date getDate (DateFields f, String timezone) {
-        LocalDateTime ldt = new LocalDateTime()
-                .withYear(f.year)
-                .withMonthOfYear(f.month)
-                .withDayOfMonth(f.day)
-                .withHourOfDay(f.hour)
-                .withMinuteOfHour(f.minute)
-                .withSecondOfMinute(f.second)
-                .withMillisOfSecond(f.secTicks);
-
+        LocalDateTime ldt = getLocalDateTime(f);
         return timezone == null ? ldt.toDate() : ldt.toDate(TimeZone.getTimeZone(timezone));
+    }
+
+    private static LocalDateTime getLocalDateTime(DateFields f) {
+        return new LocalDateTime(
+            f.year,
+            f.month,
+            f.day,
+            f.hour,
+            f.minute,
+            f.second,
+            f.secTicks
+        );
     }
 
     /* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
@@ -272,7 +293,7 @@ public class DateUtils {
                 } else if (c == 'n') {    //numeric month
                     sb.append(f.month);
                 } else if (c == 'b') {    //short text month
-                    sb.append(DateTimeFormat.forPattern("MMM").print(new DateTime(DateUtils.getDate(f))));
+                    sb.append(getLocalDateTime(f).toString(DateTimeFormat.forPattern("MMM")));
                 } else if (c == 'd') {    //0-padded day of month
                     sb.append(intPad(f.day, 2));
                 } else if (c == 'e') {    //day of month
@@ -288,7 +309,7 @@ public class DateUtils {
                 } else if (c == '3') {    //0-padded millisecond ticks (000-999)
                     sb.append(intPad(f.secTicks, 3));
                 } else if (c == 'a') {    //Three letter short text day
-                    sb.append(DateTimeFormat.forPattern("EEE").print(new DateTime(DateUtils.getDate(f))));
+                    sb.append(getLocalDateTime(f).toString(DateTimeFormat.forPattern("EEE")));
                 } else if (c == 'Z' || c == 'A' || c == 'B') {
                     throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
                 } else {

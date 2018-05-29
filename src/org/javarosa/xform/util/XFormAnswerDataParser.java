@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataType;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.BooleanData;
@@ -66,70 +66,60 @@ public class XFormAnswerDataParser {
     public static IAnswerData getAnswerData (String text, int dataType) {
         return getAnswerData(text, dataType, null);
     }
-    public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
+    public static IAnswerData getAnswerData (String text, int intDataType, QuestionDef q) {
         String trimmedText = text.trim();
         if (trimmedText.length() == 0)
             trimmedText = null;
 
-        switch (dataType) {
-        case Constants.DATATYPE_NULL:
-        case Constants.DATATYPE_UNSUPPORTED:
-        case Constants.DATATYPE_TEXT:
-        case Constants.DATATYPE_BARCODE:
-        case Constants.DATATYPE_BINARY:
-
+        switch (DataType.from(intDataType)) {
+        case NULL:
+        case UNSUPPORTED:
+        case TEXT:
+        case BARCODE:
+        case BINARY:
             return new StringData(text);
 
-        case Constants.DATATYPE_INTEGER:
-
+        case INTEGER:
             try {
                 return (trimmedText == null ? null : new IntegerData(Integer.parseInt(trimmedText)));
             } catch (NumberFormatException nfe) {
                 return null;
             }
 
-        case Constants.DATATYPE_LONG:
-
+        case LONG:
             try {
                 return (trimmedText == null ? null : new LongData(Long.parseLong(trimmedText)));
             } catch (NumberFormatException nfe) {
                 return null;
             }
 
-        case Constants.DATATYPE_DECIMAL:
-
+        case DECIMAL:
             try {
                 return (trimmedText == null ? null : new DecimalData(Double.parseDouble(trimmedText)));
             } catch (NumberFormatException nfe) {
                 return null;
             }
 
-        case Constants.DATATYPE_CHOICE:
-
+        case CHOICE:
             Selection selection = getSelection(text, q);
             return (selection == null ? null : new SelectOneData(selection));
-
-        case Constants.DATATYPE_MULTIPLE_ITEMS:
-
+            
+        case MULTIPLE_ITEMS:
             return new MultipleItemsData(getSelections(text, q));
 
-        case Constants.DATATYPE_DATE_TIME:
-
+        case DATE_TIME:
             Date dt = (trimmedText == null ? null : DateUtils.parseDateTime(trimmedText));
             return (dt == null ? null : new DateTimeData(dt));
 
-        case Constants.DATATYPE_DATE:
-
+        case DATE:
             Date d = (trimmedText == null ? null : DateUtils.parseDate(trimmedText));
             return (d == null ? null : new DateData(d));
 
-        case Constants.DATATYPE_TIME:
-
+        case TIME:
             Date t = (trimmedText == null ? null : DateUtils.parseTime(trimmedText));
             return (t == null ? null : new TimeData(t));
 
-        case Constants.DATATYPE_BOOLEAN:
-
+        case BOOLEAN:
             if(trimmedText == null) {
                 return null;
             } else {
@@ -138,7 +128,7 @@ public class XFormAnswerDataParser {
                 return trimmedText.equals("t") ? new BooleanData(true) : new BooleanData(false);
             }
 
-        case Constants.DATATYPE_GEOPOINT:
+        case GEOPOINT:
             if ( trimmedText == null ) {
                 return new GeoPointData();
             }
@@ -152,7 +142,7 @@ public class XFormAnswerDataParser {
                 return null;
             }
 
-        case Constants.DATATYPE_GEOSHAPE:
+        case GEOSHAPE:
             if ( trimmedText == null ) {
                 return new GeoShapeData();
             }
@@ -166,7 +156,7 @@ public class XFormAnswerDataParser {
                 return null;
             }
 
-        case Constants.DATATYPE_GEOTRACE:
+        case GEOTRACE:
             if ( trimmedText == null ) {
                 return new GeoTraceData();
             }

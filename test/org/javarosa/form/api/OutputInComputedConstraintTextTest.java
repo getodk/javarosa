@@ -42,8 +42,7 @@ public class OutputInComputedConstraintTextTest {
 
   @Before
   public void setUp() {
-    FormParseInit fpi = new FormParseInit();
-    fpi.setFormToParse(r("constraint-message-error.xml").toString());
+    FormParseInit fpi = new FormParseInit(r("constraint-message-error.xml"));
     formDef = fpi.getFormDef();
     formDef.getLocalizer().setLocale("English");
     ctrl = fpi.getFormEntryController();

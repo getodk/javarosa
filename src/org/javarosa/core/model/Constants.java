@@ -16,18 +16,16 @@
 
 package org.javarosa.core.model;
 
-
 /**
- * Constants shared throught classes in the containing package.
- *
- * @version ,
+ * Constants shared throughout classes in the containing package.
+ * <p/>
+ * Where possible use {@link DataType} instead of the DATATYPE_*
+ * “int enum” fields.
  */
 public class Constants {
 
-    /** Empty strig representation */
     public static final String EMPTY_STRING = "";
 
-    /** Index for no selection */
     public static final int NO_SELECTION = -1;
 
     /** ID not set to a value */
@@ -42,30 +40,47 @@ public class Constants {
     /** Bluetooth connection */
     public static final int CONNECTION_BLUETOOTH = 2;
 
-    /** Data cable connection. Can be USB or Serial */
+    /** Data cable connection. Can be USB or Serial. */
     public static final int CONNECTION_CABLE = 3;
 
     /** Over The Air or HTTP Connection */
     public static final int CONNECTION_OTA = 4;
 
     public static final int DATATYPE_UNSUPPORTED = -1;
-    public static final int DATATYPE_NULL = 0;  /* for nodes that have no data, or data type otherwise unknown */
-    public static final int DATATYPE_TEXT = 1;    /** Text question type. */
-    public static final int DATATYPE_INTEGER = 2;    /** Numeric question type. These are numbers without decimal points*/
-    public static final int DATATYPE_DECIMAL = 3;    /** Decimal question type. These are numbers with decimals */
-    public static final int DATATYPE_DATE = 4;    /** Date question type. This has only date component without time. */
-    public static final int DATATYPE_TIME = 5;    /** Time question type. This has only time element without date*/
-    public static final int DATATYPE_DATE_TIME = 6;    /** Date and Time question type. This has both the date and time components*/
-    public static final int DATATYPE_CHOICE = 7;    /** This is a question with alist of options where not more than one option can be selected at a time. */
-    public static final int DATATYPE_MULTIPLE_ITEMS = 8;    /** This is a question with a list of items used form selecting multiple answers or ordering them. */
-    public static final int DATATYPE_CHOICE_LIST = 8;    /** The same as above but exists only for backwards compatibility. */
-    public static final int DATATYPE_BOOLEAN = 9;    /** Question with true and false answers. */
-    public static final int DATATYPE_GEOPOINT = 10; /** Question with location answer. */
-    public static final int DATATYPE_BARCODE = 11; /** Question with barcode string answer. */
-    public static final int DATATYPE_BINARY = 12; /** Question with external binary answer. */
-    public static final int DATATYPE_LONG = 13; /** Question with external binary answer. */
-    public static final int DATATYPE_GEOSHAPE = 14; /** Question with GeoShape answer. */
-    public static final int DATATYPE_GEOTRACE = 15; /** Question with GeoTrace answer. */
+    /** For nodes that have no data, or data type otherwise unknown */
+    public static final int DATATYPE_NULL = 0;
+    /** Text question type. */
+    public static final int DATATYPE_TEXT = 1;
+    /** Numeric question type. These are numbers without decimal points. */
+    public static final int DATATYPE_INTEGER = 2;
+    /** Decimal question type. These are numbers with decimals. */
+    public static final int DATATYPE_DECIMAL = 3;
+    /** Date question type. This has only date component without time. */
+    public static final int DATATYPE_DATE = 4;
+    /** Time question type. This has only time element without date. */
+    public static final int DATATYPE_TIME = 5;
+    /** Date and Time question type. This has both the date and time components */
+    public static final int DATATYPE_DATE_TIME = 6;
+    /** This is a question with a list of options where not more than one option can be selected at a time. */
+    public static final int DATATYPE_CHOICE = 7;
+    /** This is a question with a list of items used for selecting multiple answers or ordering them. */
+    public static final int DATATYPE_MULTIPLE_ITEMS = 8;
+    /** The same as above but exists only for backwards compatibility. */
+    public static final int DATATYPE_CHOICE_LIST = 8;
+    /** Question with true and false answers. */
+    public static final int DATATYPE_BOOLEAN = 9;
+    /** Question with location answer. */
+    public static final int DATATYPE_GEOPOINT = 10;
+    /** Question with barcode string answer. */
+    public static final int DATATYPE_BARCODE = 11;
+    /** Question with external binary answer. */
+    public static final int DATATYPE_BINARY = 12;
+    /** Question with external binary answer. */
+    public static final int DATATYPE_LONG = 13;
+    /** Question with GeoShape answer. */
+    public static final int DATATYPE_GEOSHAPE = 14;
+    /** Question with GeoTrace answer. */
+    public static final int DATATYPE_GEOTRACE = 15;
 
     public static final int CONTROL_UNTYPED = -1;
     public static final int CONTROL_INPUT = 1;
@@ -82,12 +97,10 @@ public class Constants {
     public static final int CONTROL_AUDIO_CAPTURE = 12;
     public static final int CONTROL_VIDEO_CAPTURE = 13;
     public static final int CONTROL_OSM_CAPTURE = 14;
-    public static final int CONTROL_FILE_CAPTURE = 15; // generic upload
+    /** generic upload */
+    public static final int CONTROL_FILE_CAPTURE = 15;
     public static final int CONTROL_RANK = 16;
 
-    /** constants for xform tags */
+    /* constants for xform tags */
     public static final String XFTAG_UPLOAD = "upload";
-
-
 }
-
