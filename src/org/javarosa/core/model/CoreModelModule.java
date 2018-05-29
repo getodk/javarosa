@@ -41,6 +41,7 @@ public class CoreModelModule implements IModule {
             "org.javarosa.core.model.data.LongData",
             "org.javarosa.core.model.data.MultiPointerAnswerData",
             "org.javarosa.core.model.data.PointerAnswerData",
+            "org.javarosa.core.model.data.SelectMultiData",
             "org.javarosa.core.model.data.MultipleItemsData",
             "org.javarosa.core.model.data.SelectOneData",
             "org.javarosa.core.model.data.StringData",
