@@ -20,7 +20,6 @@ import static org.javarosa.core.model.Constants.DATATYPE_BARCODE;
 import static org.javarosa.core.model.Constants.DATATYPE_BINARY;
 import static org.javarosa.core.model.Constants.DATATYPE_BOOLEAN;
 import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST;
 import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
 import static org.javarosa.core.model.Constants.DATATYPE_DATE;
 import static org.javarosa.core.model.Constants.DATATYPE_DATE_TIME;
