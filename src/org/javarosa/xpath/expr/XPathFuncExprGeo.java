@@ -26,10 +26,8 @@ class XPathFuncExprGeo {
             // Try to determine if the argument is of type GeoShapeData
             try {
                 GeoShapeData geoShapeData = new GeoShapeData().cast(new UncastData(XPathFuncExpr.toString(argList[0])));
-                if (geoShapeData.points.size() > 2) {
-                    for (GeoPointData point : geoShapeData.points) {
-                        latLongs.add(new GeoUtils.LatLong(point.getPart(0), point.getPart(1)));
-                    }
+                for (GeoPointData point : geoShapeData.points) {
+                    latLongs.add(new GeoUtils.LatLong(point.getPart(0), point.getPart(1)));
                 }
             } catch (Exception e) {
                 throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
