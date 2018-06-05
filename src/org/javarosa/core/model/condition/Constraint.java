@@ -31,6 +31,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static org.javarosa.xform.parse.XFormParser.ITEXT_CLOSE;
+import static org.javarosa.xform.parse.XFormParser.ITEXT_OPEN;
+
 public class Constraint implements Externalizable {
     private static final Logger logger = LoggerFactory.getLogger(Constraint.class);
     public IConditionExpr constraint;
@@ -41,7 +44,7 @@ public class Constraint implements Externalizable {
 
     public Constraint (IConditionExpr constraint, String constraintMsg) {
         this.constraint = constraint;
-        this.constraintMsg = constraintMsg;
+        this.constraintMsg = constraintMsg == null ? null : constraintMsg.trim();
         attemptConstraintCompile();
     }
 
@@ -70,7 +73,7 @@ public class Constraint implements Externalizable {
     private void attemptConstraintCompile() {
         xPathConstraintMsg = null;
         try {
-            if(constraintMsg != null) {
+            if (constraintMsg != null && constraintMsg.startsWith(ITEXT_OPEN) && constraintMsg.endsWith(ITEXT_CLOSE)) {
                 xPathConstraintMsg = XPathParseTool.parseXPath("string(" + constraintMsg + ")");
             }
         } catch(Exception e) {
@@ -81,6 +84,9 @@ public class Constraint implements Externalizable {
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         constraint = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
         constraintMsg = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+        if (constraintMsg != null) {
+            constraintMsg = constraintMsg.trim();
+        }
         attemptConstraintCompile();
     }
 
