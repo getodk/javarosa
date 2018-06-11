@@ -135,7 +135,7 @@ public class SMSSerializingVisitorTest {
             currentIndex = delimiterSize + matcher.end();
 
             // loops while the next set of characters isn't a delimiter and the start of a next tag
-            while (!sms.substring(currentIndex, currentIndex + 2).equals(delimiter + "+")) {
+            while (!sms.substring(currentIndex, currentIndex + 2).equals(delimiter)) {
                 answer += sms.substring(currentIndex, currentIndex + 1);
 
                 currentIndex++;

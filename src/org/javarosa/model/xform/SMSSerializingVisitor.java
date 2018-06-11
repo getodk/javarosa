@@ -185,17 +185,15 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
                 String tag = instanceNode.getAttributeValue("", "tag");
 
-                //checks to see if someone included a + inside their tag.
-                if (tag.substring(0, 1) == "+") {
-                    stringBuilder.append(tag);
-                } else {
-                    stringBuilder.append("+").append(tag);
-                }
+                stringBuilder.append(tag);
 
                 stringBuilder.append(delimiter);
 
                 for (int k = 0; k < element.getChildCount(); k++) {
-                    stringBuilder.append(element.getChild(k).toString().replace("\\", "\\\\").replace(delimiter, "\\" + delimiter));
+                    stringBuilder.append(element.getChild(k).toString().
+                        replace("\\", "\\\\")
+                        .replace(delimiter, "\\" + delimiter)
+                        .replace(tag, "\\" + tag));
                     stringBuilder.append(delimiter);
                 }
                 stringBuilder.append(delimiter);
