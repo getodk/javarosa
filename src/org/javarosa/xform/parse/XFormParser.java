@@ -25,6 +25,7 @@ import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
 import static org.javarosa.core.model.Constants.CONTROL_INPUT;
 import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.core.model.Constants.CONTROL_SECRET;
 import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
 import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
@@ -32,13 +33,14 @@ import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
 import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
 import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
 import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST;
+import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
 import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
 import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExternalDataInstance;
 import static org.javarosa.core.services.ProgramFlow.die;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.Constants.SELECT;
+import static org.javarosa.xform.parse.Constants.RANK;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
 import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
 import static org.javarosa.xform.parse.RandomizeHelper.parseSeed;
@@ -106,7 +108,6 @@ import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
 /**
@@ -158,7 +159,7 @@ public class XFormParser implements IXFormParserFunctions {
     private List<TreeReference> repeats;
     private List<ItemsetBinding> itemsets;
     private List<TreeReference> selectOnes;
-    private List<TreeReference> selectMultis;
+    private List<TreeReference> multipleItems;
     private Element mainInstanceNode; //top-level data node of the instance; saved off so it can be processed after the <bind>s
     private List<Element> instanceNodes;
     private List<String> instanceNodeIdStrs;
@@ -226,6 +227,11 @@ public class XFormParser implements IXFormParserFunctions {
                 @Override
                 public void handle(XFormParser p, Element e, Object parent) {
                     p.parseControl((IFormElement) parent, e, CONTROL_SELECT_MULTI);
+                }
+            });
+            put(RANK, new IElementHandler() {
+                @Override public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseControl((IFormElement) parent, e, CONTROL_RANK);
                 }
             });
             put(SELECTONE, new IElementHandler() {
@@ -300,7 +306,7 @@ public class XFormParser implements IXFormParserFunctions {
         repeats = new ArrayList<>();
         itemsets = new ArrayList<>();
         selectOnes = new ArrayList<>();
-        selectMultis = new ArrayList<>();
+        multipleItems = new ArrayList<>();
         mainInstanceNode = null;
         instanceNodes = new ArrayList<>();
         instanceNodeIdStrs = new ArrayList<>();
@@ -449,7 +455,7 @@ public class XFormParser implements IXFormParserFunctions {
         collapseRepeatGroups(_f);
 
         final FormInstanceParser instanceParser = new FormInstanceParser(_f, defaultNamespace,
-            bindings, repeats, itemsets, selectOnes, selectMultis, actionTargets);
+            bindings, repeats, itemsets, selectOnes, multipleItems, actionTargets);
 
         //parse the non-main instance nodes first
         //we assume that the non-main instances won't
@@ -963,12 +969,16 @@ public class XFormParser implements IXFormParserFunctions {
 
             if (controlType == CONTROL_SELECT_ONE) {
                 selectOnes.add((TreeReference) dataRef.getReference());
-            } else if (controlType == CONTROL_SELECT_MULTI) {
-                selectMultis.add((TreeReference) dataRef.getReference());
+            } else if (controlType == CONTROL_SELECT_MULTI || controlType == CONTROL_RANK) {
+                multipleItems.add((TreeReference) dataRef.getReference());
             }
         }
 
-        boolean isSelect = (controlType == CONTROL_SELECT_MULTI || controlType == CONTROL_SELECT_ONE);
+        boolean isItem =
+            controlType == CONTROL_SELECT_MULTI
+            || controlType == CONTROL_RANK
+            || controlType == CONTROL_SELECT_ONE;
+
         question.setControlType(controlType);
         question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
 
@@ -981,13 +991,13 @@ public class XFormParser implements IXFormParserFunctions {
                 parseQuestionLabel(question, child);
             } else if ("hint".equals(childName)) {
                 parseHint(question, child);
-            } else if (isSelect && "item".equals(childName)) {
+            } else if (isItem && "item".equals(childName)) {
                 parseItem(question, child);
-            } else if (isSelect && "itemset".equals(childName)) {
+            } else if (isItem && "itemset".equals(childName)) {
                 parseItemset(question, child, parent);
             }
         }
-        if (isSelect) {
+        if (isItem) {
             if (question.getNumChoices() > 0 && question.getDynamicChoices() != null) {
                 throw new XFormParseException("Select question contains both literal choices and <itemset>");
             } else if (question.getNumChoices() == 0 && question.getDynamicChoices() == null) {
@@ -1242,10 +1252,11 @@ public class XFormParser implements IXFormParserFunctions {
                         char c = value.charAt(k);
 
                         if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
-                            boolean isMultiSelect = (q.getControlType() == CONTROL_SELECT_MULTI);
-                            triggerWarning(
-                                (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] " +
-                                    (isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks",
+                            boolean isMultipleItems = q.getControlType() == CONTROL_SELECT_MULTI || q.getControlType() == CONTROL_RANK;
+                            String questionType = !isMultipleItems ? SELECTONE :
+                                (q.getControlType() == CONTROL_SELECT_MULTI ? SELECT : RANK);
+                            triggerWarning(questionType + " question <value>s [" + value + "] " +
+                                    (isMultipleItems ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks",
                                 getVagueLocation(child));
                             break;
                         }
@@ -2034,7 +2045,7 @@ public class XFormParser implements IXFormParserFunctions {
      * Finds a questiondef that binds to ref, if the data type is a 'select' question type
      */
     public static QuestionDef ghettoGetQuestionDef(int dataType, FormDef f, TreeReference ref) {
-        if (dataType == DATATYPE_CHOICE || dataType == DATATYPE_CHOICE_LIST) {
+        if (dataType == DATATYPE_CHOICE || dataType == DATATYPE_MULTIPLE_ITEMS) {
             return FormDef.findQuestionByRef(ref, f);
         } else {
             return null;

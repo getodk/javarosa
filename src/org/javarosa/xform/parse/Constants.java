@@ -5,4 +5,5 @@ public class Constants {
     static final String NODESET_ATTR = "nodeset";
     static final String SELECTONE = "select1";
     static final String SELECT = "select";
+    static final String RANK = "rank";
 }

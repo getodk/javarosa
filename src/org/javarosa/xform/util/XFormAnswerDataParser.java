@@ -33,7 +33,7 @@ import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
@@ -103,9 +103,9 @@ public class XFormAnswerDataParser {
         case CHOICE:
             Selection selection = getSelection(text, q);
             return (selection == null ? null : new SelectOneData(selection));
-
-        case CHOICE_LIST:
-            return new SelectMultiData(getSelections(text, q));
+            
+        case MULTIPLE_ITEMS:
+            return new MultipleItemsData(getSelections(text, q));
 
         case DATE_TIME:
             Date dt = (trimmedText == null ? null : DateUtils.parseDateTime(trimmedText));

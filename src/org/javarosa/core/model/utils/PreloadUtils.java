@@ -27,7 +27,7 @@ import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 
@@ -62,7 +62,7 @@ public class PreloadUtils {
         } else if (o instanceof Double) {
             return new DecimalData((Double)o);
         } else if(o instanceof List) {
-            return new SelectMultiData((List<Selection>)o);
+            return new MultipleItemsData((List<Selection>)o);
         } else if(o instanceof IAnswerData) {
             return (IAnswerData)o;
         }

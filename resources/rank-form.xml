@@ -1,0 +1,78 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/">
+    <h:head>
+        <h:title>Rank Form</h:title>
+        <model>
+            <instance>
+                <data id="build_rankWidget_1522956588">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                    <rankWidget/>
+                </data>
+            </instance>
+            <itext>
+                <translation lang="English">
+                    <text id="/data/rankWidget:label">
+                        <value>Rank</value>
+                    </text>
+                    <text id="/data/rankWidget:option0">
+                        <value>a</value>
+                    </text>
+                    <text id="/data/rankWidget:option1">
+                        <value>b</value>
+                    </text>
+                    <text id="/data/rankWidget:option2">
+                        <value>c</value>
+                    </text>
+                    <text id="/data/rankWidget:option3">
+                        <value>d</value>
+                    </text>
+                    <text id="/data/rankWidget:option4">
+                        <value>e</value>
+                    </text>
+                    <text id="/data/rankWidget:option5">
+                        <value>f</value>
+                    </text>
+                    <text id="/data/rankWidget:option6">
+                        <value>g</value>
+                    </text>
+                </translation>
+            </itext>
+            <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+            <bind nodeset="/data/rankWidget" type="rank"/>
+        </model>
+    </h:head>
+    <h:body>
+        <orx:rank ref="/data/rankWidget">
+            <label ref="jr:itext('/data/rankWidget:label')"/>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option0')"/>
+                <value>A</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option1')"/>
+                <value>B</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option2')"/>
+                <value>C</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option3')"/>
+                <value>D</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option4')"/>
+                <value>E</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option5')"/>
+                <value>F</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/data/rankWidget:option6')"/>
+                <value>G</value>
+            </item>
+        </orx:rank>
+    </h:body>
+</h:html>

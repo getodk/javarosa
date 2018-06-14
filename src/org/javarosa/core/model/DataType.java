@@ -20,7 +20,7 @@ import static org.javarosa.core.model.Constants.DATATYPE_BARCODE;
 import static org.javarosa.core.model.Constants.DATATYPE_BINARY;
 import static org.javarosa.core.model.Constants.DATATYPE_BOOLEAN;
 import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE_LIST;
+import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
 import static org.javarosa.core.model.Constants.DATATYPE_DATE;
 import static org.javarosa.core.model.Constants.DATATYPE_DATE_TIME;
 import static org.javarosa.core.model.Constants.DATATYPE_DECIMAL;
@@ -38,23 +38,23 @@ import static org.javarosa.core.model.Constants.DATATYPE_UNSUPPORTED;
  * The model data types.
  */
 public enum DataType {
-    UNSUPPORTED (DATATYPE_UNSUPPORTED),
-    NULL        (DATATYPE_NULL),
-    TEXT        (DATATYPE_TEXT),
-    INTEGER     (DATATYPE_INTEGER),
-    DECIMAL     (DATATYPE_DECIMAL),
-    DATE        (DATATYPE_DATE),
-    TIME        (DATATYPE_TIME),
-    DATE_TIME   (DATATYPE_DATE_TIME),
-    CHOICE      (DATATYPE_CHOICE),
-    CHOICE_LIST (DATATYPE_CHOICE_LIST),
-    BOOLEAN     (DATATYPE_BOOLEAN),
-    GEOPOINT    (DATATYPE_GEOPOINT),
-    BARCODE     (DATATYPE_BARCODE),
-    BINARY      (DATATYPE_BINARY),
-    LONG        (DATATYPE_LONG),
-    GEOSHAPE    (DATATYPE_GEOSHAPE),
-    GEOTRACE    (DATATYPE_GEOTRACE);
+    UNSUPPORTED     (DATATYPE_UNSUPPORTED),
+    NULL            (DATATYPE_NULL),
+    TEXT            (DATATYPE_TEXT),
+    INTEGER         (DATATYPE_INTEGER),
+    DECIMAL         (DATATYPE_DECIMAL),
+    DATE            (DATATYPE_DATE),
+    TIME            (DATATYPE_TIME),
+    DATE_TIME       (DATATYPE_DATE_TIME),
+    CHOICE          (DATATYPE_CHOICE),
+    MULTIPLE_ITEMS  (DATATYPE_MULTIPLE_ITEMS),
+    BOOLEAN         (DATATYPE_BOOLEAN),
+    GEOPOINT        (DATATYPE_GEOPOINT),
+    BARCODE         (DATATYPE_BARCODE),
+    BINARY          (DATATYPE_BINARY),
+    LONG            (DATATYPE_LONG),
+    GEOSHAPE        (DATATYPE_GEOSHAPE),
+    GEOTRACE        (DATATYPE_GEOTRACE);
 
     public final int value;
 

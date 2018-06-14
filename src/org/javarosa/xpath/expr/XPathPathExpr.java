@@ -36,7 +36,7 @@ import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
@@ -234,7 +234,7 @@ public class XPathPathExpr extends XPathExpression {
             return val.getValue();
         } else if (val instanceof SelectOneData) {
             return ((Selection) val.getValue()).getValue();
-        } else if (val instanceof SelectMultiData) {
+        } else if (val instanceof MultipleItemsData) {
             return (new XFormAnswerDataSerializer()).serializeAnswerData(val);
         } else if (val instanceof DateData) {
             return val.getValue();

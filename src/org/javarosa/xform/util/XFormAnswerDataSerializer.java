@@ -34,7 +34,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
 import org.javarosa.core.model.data.PointerAnswerData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
@@ -48,7 +48,7 @@ import org.kxml2.kdom.Element;
  * an XForms compliant (String or Element) representation of that AnswerData.
  *
  * By default, this serializer can properly operate on StringData, DateData
- * SelectMultiData, and SelectOneData AnswerData objects. This list can be
+ * MultipleItemsData, and SelectOneData AnswerData objects. This list can be
  * extended by registering appropriate XForm serializing AnswerDataSerializers
  * with this class.
  *
@@ -67,7 +67,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 
     public boolean canSerialize(IAnswerData data) {
         if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
-            data instanceof SelectMultiData || data instanceof SelectOneData ||
+            data instanceof MultipleItemsData || data instanceof SelectOneData ||
             data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData    ||
             data instanceof MultiPointerAnswerData ||
             data instanceof GeoPointData || data instanceof GeoTraceData || data instanceof GeoShapeData ||
@@ -165,7 +165,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
      * for a <select> tag, a string containing a list of answers
      * separated by space characters.
      */
-    public Object serializeAnswerData(SelectMultiData data) {
+    public Object serializeAnswerData(MultipleItemsData data) {
       List<Selection> selections = (List<Selection>)data.getValue();
         StringBuilder selectString = new StringBuilder();
 
@@ -235,8 +235,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
     public Object serializeAnswerData(IAnswerData data) {
         if (data instanceof StringData) {
             return serializeAnswerData((StringData)data);
-        } else if (data instanceof SelectMultiData) {
-            return serializeAnswerData((SelectMultiData)data);
+        } else if (data instanceof MultipleItemsData) {
+            return serializeAnswerData((MultipleItemsData)data);
         } else if (data instanceof SelectOneData) {
             return serializeAnswerData((SelectOneData)data);
         } else if (data instanceof IntegerData){

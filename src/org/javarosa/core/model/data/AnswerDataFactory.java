@@ -36,8 +36,8 @@ public class AnswerDataFactory {
             return new SelectOneData();
         }
 
-        if(controlType == Constants.CONTROL_SELECT_MULTI) {
-            return new SelectMultiData();
+        if (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_RANK) {
+            return new MultipleItemsData();
         }
 
         //That's actually it for now, we might have more in the future
@@ -49,8 +49,8 @@ public class AnswerDataFactory {
         switch(datatype) {
             case Constants.DATATYPE_CHOICE:
                 return new SelectOneData();
-            case Constants.DATATYPE_CHOICE_LIST:
-                return new SelectMultiData();
+            case Constants.DATATYPE_MULTIPLE_ITEMS:
+                return new MultipleItemsData();
             case Constants.DATATYPE_BOOLEAN:
                 return new BooleanData();
             case Constants.DATATYPE_DATE:

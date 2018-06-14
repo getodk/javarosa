@@ -63,7 +63,9 @@ public class Constants {
     public static final int DATATYPE_DATE_TIME = 6;
     /** This is a question with a list of options where not more than one option can be selected at a time. */
     public static final int DATATYPE_CHOICE = 7;
-    /** This is a question with a list of options where more than one option can be selected at a time. */
+    /** This is a question with a list of items used for selecting multiple answers or ordering them. */
+    public static final int DATATYPE_MULTIPLE_ITEMS = 8;
+    /** The same as above but exists only for backwards compatibility. */
     public static final int DATATYPE_CHOICE_LIST = 8;
     /** Question with true and false answers. */
     public static final int DATATYPE_BOOLEAN = 9;
@@ -97,6 +99,7 @@ public class Constants {
     public static final int CONTROL_OSM_CAPTURE = 14;
     /** generic upload */
     public static final int CONTROL_FILE_CAPTURE = 15;
+    public static final int CONTROL_RANK = 16;
 
     /* constants for xform tags */
     public static final String XFTAG_UPLOAD = "upload";

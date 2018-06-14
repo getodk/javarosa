@@ -16,6 +16,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
@@ -44,6 +45,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -51,6 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -193,6 +196,15 @@ public class XFormParserTest {
         PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
         PrototypeManager.registerPrototypes(CoreModelModule.classNames);
         new XFormsModule().registerModule();
+    }
+
+    @Test
+    public void parsesRankForm() throws IOException {
+        ParseResult parseResult = parse(r("rank-form.xml"));
+        assertEquals(parseResult.formDef.getTitle(), "Rank Form");
+        assertEquals(1, parseResult.formDef.getChildren().size());
+        assertEquals(CONTROL_RANK, ((QuestionDef) parseResult.formDef.getChild(0)).getControlType());
+        assertNoParseErrors(parseResult);
     }
 
     @Test

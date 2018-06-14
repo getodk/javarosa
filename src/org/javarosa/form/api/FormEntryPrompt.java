@@ -30,7 +30,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.ConstraintHint;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
@@ -110,7 +110,7 @@ public class FormEntryPrompt extends FormEntryCaption {
                 } else {
                List<Selection> sels;
                     IAnswerData data = mTreeElement.getValue();
-                    if (data instanceof SelectMultiData) {
+                    if (data instanceof MultipleItemsData) {
                         sels = (List<Selection>)data.getValue();
                     } else if (data instanceof SelectOneData) {
                         sels = new ArrayList<Selection>(1);
@@ -146,8 +146,8 @@ public class FormEntryPrompt extends FormEntryCaption {
                 //convert to IAnswerData
                 if (selection.size() == 0) {
                     return null;
-                } else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
-                    return new SelectMultiData(selection);
+                } else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI || q.getControlType() == Constants.CONTROL_RANK) {
+                    return new MultipleItemsData(selection);
                 } else if (q.getControlType() == Constants.CONTROL_SELECT_ONE) {
                     return new SelectOneData(selection.get(0)); //do something if more than one selected?
                 } else {
@@ -175,7 +175,7 @@ public class FormEntryPrompt extends FormEntryCaption {
             //and multi-selects.
             if(data instanceof SelectOneData) {
                 text = this.getSelectItemText((Selection)data.getValue());
-            } else if(data  instanceof SelectMultiData) {
+            } else if(data  instanceof MultipleItemsData) {
                 StringBuilder b = new StringBuilder();
             List<Selection> values = (List<Selection>)data.getValue();
                 for(Selection value : values) {
