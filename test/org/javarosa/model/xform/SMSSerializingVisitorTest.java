@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.javarosa.test.utils.Utils.convertToString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
@@ -42,8 +41,7 @@ public class SMSSerializingVisitorTest {
 
         ByteArrayPayload payload = (ByteArrayPayload) serializer.createSerializedPayload(formInstance);
 
-        sms = convertToString(payload.getPayloadBytes());
-        sms = sms.replace("\\", "").replace("\\\\", "\\");
+        sms = new String(payload.getPayloadBytes(), "UTF-8").replace("\\", "").replace("\\\\", "\\");
     }
 
     @Test

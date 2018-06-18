@@ -102,6 +102,10 @@ public class ByteArrayPayload implements IDataPayload {
         return visitor.visit(this);
     }
 
+    public byte[] getPayloadBytes() {
+        return payload;
+    }
+
     @Override
     public String getPayloadId() {
         return id;
