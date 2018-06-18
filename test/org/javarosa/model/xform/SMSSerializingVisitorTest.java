@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class SMSSerializingVisitorTest {
     private FormParseInit formParser;
-    private String SMS;
+    private String sms;
     private static final String delimiter = " ";
     private FormEntryController formEntryController;
     private FormInstance formInstance;
@@ -42,19 +42,19 @@ public class SMSSerializingVisitorTest {
 
         ByteArrayPayload payload = (ByteArrayPayload) serializer.createSerializedPayload(formInstance);
 
-        SMS = convertToString(payload.getPayloadStream());
-        SMS = SMS.replace("\\", "").replace("\\\\", "\\");
+        sms = convertToString(payload.getPayloadBytes());
+        sms = sms.replace("\\", "").replace("\\\\", "\\");
     }
 
     @Test
     public void SmsNotNull() {
-        assertNotNull(SMS);
+        assertNotNull(sms);
     }
 
     @Test
     public void testTagsAreBeingSerialized() {
         for (String tag : getAnswerTags()) {
-            assertTrue(SMS.contains(tag));
+            assertTrue(sms.contains(tag));
         }
     }
 
@@ -66,7 +66,7 @@ public class SMSSerializingVisitorTest {
     @Test
     public void testTaggedAnswers() {
         for (String tag : getAnswerTags()) {
-            assertTrue(taggedAnswerExists(tag, SMS));
+            assertTrue(taggedAnswerExists(tag, sms));
         }
     }
 
@@ -76,7 +76,7 @@ public class SMSSerializingVisitorTest {
      */
     @Test
     public void testAnswerWithoutATag() {
-        assertFalse(SMS.contains("Placeholder"));
+        assertFalse(sms.contains("Placeholder"));
     }
 
     /***
@@ -86,7 +86,7 @@ public class SMSSerializingVisitorTest {
      */
     @Test
     public void testTagWithNoAnswer() {
-        assertFalse(SMS.contains("CTY"));
+        assertFalse(sms.contains("CTY"));
     }
 
     /**
