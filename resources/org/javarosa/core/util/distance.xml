@@ -7,11 +7,10 @@
         <model>
             <instance>
                 <distance id="distance" version="2018042401">
-                    <geoshape>0 0; 0 1; 0 91</geoshape>
-                    <geotrace>0 0; 0 1; 0 91</geotrace>
+                    <geoshape>0 0; 0 91</geoshape>
+                    <geotrace>0 0; 0 91</geotrace>
                     <points>
                         <point>0 0</point>
-                        <point>0 1</point>
                         <point>0 91</point>
                     </points>
                     <shape-result/>

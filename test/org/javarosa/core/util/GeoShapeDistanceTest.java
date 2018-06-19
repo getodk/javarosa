@@ -56,7 +56,8 @@ public class GeoShapeDistanceTest {
         formDef.initialize(true, new InstanceInitializationFactory());
         TreeElement root = formDef.getMainInstance().getRoot();
         IAnswerData distance = root.getChild(geoType + "-result", DEFAULT_MULTIPLICITY).getValue();
-        assertEquals(EARTH_EQUATORIAL_CIRCUMFERENCE_METERS / 360 + EARTH_EQUATORIAL_CIRCUMFERENCE_METERS / 4,
-            (Double) distance.getValue(), 1e-7);
+        double oneDegreeOnEquatorKm = EARTH_EQUATORIAL_CIRCUMFERENCE_METERS / 360;
+        double ninetyDegreesOnEquatorKm = EARTH_EQUATORIAL_CIRCUMFERENCE_METERS / 4;
+        assertEquals(oneDegreeOnEquatorKm + ninetyDegreesOnEquatorKm, (Double) distance.getValue(), 1e-7);
     }
 }
