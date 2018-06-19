@@ -24,18 +24,15 @@ import static org.junit.Assert.assertNotNull;
  * being serialized to the SMS format.
  */
 public class SMSSerializingVisitorTest {
-    private FormParseInit formParser;
     private String sms;
     private static final String delimiter = " ";
-    private FormEntryController formEntryController;
-    private FormInstance formInstance;
 
     @Before
     public void setup() throws IOException {
-        formParser = new FormParseInit();
+        FormParseInit formParser = new FormParseInit();
         formParser.setFormToParse(new File(PathConst.getTestResourcePath(), "sms_form.xml").toString());
-        formEntryController = formParser.getFormEntryController();
-        formInstance = formEntryController.getModel().getForm().getInstance();
+        FormEntryController formEntryController = formParser.getFormEntryController();
+        FormInstance formInstance = formEntryController.getModel().getForm().getInstance();
 
         SMSSerializingVisitor serializer = new SMSSerializingVisitor();
 
