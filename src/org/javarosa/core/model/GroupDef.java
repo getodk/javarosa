@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -160,6 +161,11 @@ public class GroupDef implements IFormElement, Localizable {
 
     public void setAppearanceAttr (String appearanceAttr) {
         this.appearanceAttr = appearanceAttr;
+    }
+
+    @Override
+    public ActionController getActionController() {
+        return null;
     }
 
     public void localeChanged(String locale, Localizer localizer) {

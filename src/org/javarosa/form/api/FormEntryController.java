@@ -18,6 +18,7 @@ package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -94,6 +95,7 @@ public class FormEntryController {
             return ANSWER_CONSTRAINT_VIOLATED;
         } else if (!complexQuestion) {
             commitAnswer(element, index, data, midSurvey);
+            q.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, model.getForm());
             return ANSWER_OK;
         } else if (complexQuestion && hasConstraints) {
             //TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
@@ -105,6 +107,7 @@ public class FormEntryController {
                 logger.error("Error", ire);
                 throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
             }
+            q.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, model.getForm());
             return ANSWER_OK;
         }
     }

@@ -18,6 +18,7 @@ package org.javarosa.core.model;
 
 import java.util.List;
 
+import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -94,29 +95,31 @@ public interface IFormElement extends Localizable, Externalizable {
      *
      * @param qsl
      */
-    public void registerStateObserver (FormElementStateListener qsl);
+    void registerStateObserver (FormElementStateListener qsl);
 
     /**
      * Unregisters a state observer for this element.
      *
      * @param qsl
      */
-    public void unregisterStateObserver (FormElementStateListener qsl);
+    void unregisterStateObserver (FormElementStateListener qsl);
 
     /**
      * This method returns the regular
      * innertext betweem label tags (if present) (&ltlabel&gtinnertext&lt/label&gt).
      * @return &ltlabel&gt innertext or null (if innertext is not present).
      */
-    public String getLabelInnerText();
+    String getLabelInnerText();
 
 
     /**
      * @return
      */
-    public String getAppearanceAttr();
+    String getAppearanceAttr();
 
-    public void setAppearanceAttr (String appearanceAttr);
+    void setAppearanceAttr (String appearanceAttr);
+
+    ActionController getActionController();
 
     /**
      * Capture additional attributes on a Question or Group
@@ -125,7 +128,7 @@ public interface IFormElement extends Localizable, Externalizable {
      * @param name
      * @param value
      */
-    public void setAdditionalAttribute(String namespace, String name, String value);
+    void setAdditionalAttribute(String namespace, String name, String value);
 
     /**
      * Retrieve the value of an additional attribute on a Question or Group
@@ -133,13 +136,13 @@ public interface IFormElement extends Localizable, Externalizable {
      * @param name
      * @return
      */
-    public String getAdditionalAttribute(String namespace, String name);
+    String getAdditionalAttribute(String namespace, String name);
 
     /**
      * Retrieve all additional attributes on a Question or Group
      *
      * @return
      */
-    public List<TreeElement> getAdditionalAttributes();
+    List<TreeElement> getAdditionalAttributes();
 
 }

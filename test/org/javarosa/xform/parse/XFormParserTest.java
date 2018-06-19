@@ -1,6 +1,6 @@
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.Action;
+import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -364,7 +364,7 @@ public class XFormParserTest {
         // Then
         assertEquals(formDef.getTitle(), "SetValue action");
         assertNoParseErrors(parseResult);
-        assertEquals(1, formDef.getEventListeners(Action.EVENT_XFORMS_READY).size());
+        assertEquals(1, formDef.getActionController().getListenersForEvent(Action.EVENT_XFORMS_READY).size());
 
         TreeElement textNode =
                 formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);
