@@ -10,20 +10,20 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Performs a comprehensive suite of tests on the results of a form
  * being serialized to the SMS format.
  */
-public class SMSSerializingVisitorTest {
+public class SmsSerializingVisitorTest {
     private String sms;
     private static final String delimiter = " ";
 
@@ -54,7 +54,7 @@ public class SMSSerializingVisitorTest {
     }
 
     /**
-     * Checks to see if all answers for the selected tags exist. This
+     * Checks to see if all answers for the selected tags exist.This
      * targets answers of various data types  and structures such as
      * groups.
      */
@@ -66,8 +66,8 @@ public class SMSSerializingVisitorTest {
     }
 
     /***
-     * Checks to see an answer that doesn't have a tag is present .
-     * Placeholder  is an answer bounded to the <maiden_name> tag
+     * Checks to see than an answer doesn't have a tag is present.
+     * Placeholder is an answer bounded to the <maiden_name> tag
      */
     @Test
     public void testAnswerWithoutATag() {
@@ -77,7 +77,7 @@ public class SMSSerializingVisitorTest {
     /***
      * Checks to see a tag that doesn't have an answer exists within
      * the SMS.
-     * the CTY tag is attached to  the country  question.
+     * the CTY tag is attached to the country question.
      */
     @Test
     public void testTagWithNoAnswer() {
@@ -89,39 +89,31 @@ public class SMSSerializingVisitorTest {
      * nodes that have answers.
      */
     private static List<String> getAnswerTags() {
-        List<String> tags = new ArrayList<>();
-
-        tags.add("FN");
-        tags.add("LN");
-        tags.add("DOB");
-        tags.add("CN");
-        tags.add("PIC");
-
-        return tags;
+        return Arrays.asList("FN", "LN", "DOB", "CN", "PIC");
     }
 
     /**
-     * This function  checks to see if  a  tagged node within the
+     * This function checks to see if a tagged node within the
      * SMS has a corresponding answer by counting characters until the
      * delimiter is reached.
      *
      * @param tag
      * @param sms
-     * @return true if  an answer exists after a tag.
+     * @return true if an answer exists after a tag.
      */
     private static boolean taggedAnswerExists(String tag, String sms) {
         if (!sms.contains(tag)) {
             return false;
         }
 
-        String answer = "";
+        final StringBuilder answer = new StringBuilder();
         int currentIndex;
         int delimiterSize = 1;
 
         Pattern pattern = Pattern.compile(tag);
         Matcher matcher = pattern.matcher(sms);
 
-        /**
+        /*
          * Check for  all occurrences of a tag. A matcher is used because
          *  a tag can be reused multiple times so each instance of that tag
          *  is discovered and the answer  it has gets checked.
@@ -131,7 +123,7 @@ public class SMSSerializingVisitorTest {
 
             // loops while the next set of characters isn't a delimiter and the start of a next tag
             while (!sms.substring(currentIndex, currentIndex + 2).equals(delimiter)) {
-                answer += sms.substring(currentIndex, currentIndex + 1);
+                answer.append(sms.substring(currentIndex, currentIndex + 1));
 
                 currentIndex++;
 
@@ -140,17 +132,14 @@ public class SMSSerializingVisitorTest {
 
                     //appends the final character since the substring method
                     //of while condition  checks 2 indexes ahead.
-                    answer += sms.substring(sms.length() - 1, sms.length());
+                    answer.append(sms.substring(sms.length() - 1, sms.length()));
 
                     break;
                 }
             }
         }
 
-        //Prints each tagged answer to the console.
-        //System.out.println(answer);
-
         // returns true once the answer extracted from a tag is present.
-        return answer.trim().length() > 0;
+        return answer.toString().trim().length() > 0;
     }
 }
