@@ -8,15 +8,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Performs a comprehensive suite of tests on the results of a form
@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class SmsSerializingVisitorTest {
     private String sms;
-    private static final String delimiter = " ";
 
     @Before
     public void setup() throws IOException {
@@ -46,22 +45,19 @@ public class SmsSerializingVisitorTest {
     }
 
     @Test
-    public void testTagsAreBeingSerialized() {
-        for (String tag : getAnswerTags()) {
-            assertTrue(sms.contains(tag));
+    public void ensureAllTagsArePresentAndHaveValues() {
+        Set<String> tagsFound = new HashSet<>();
+        String tags = "FN|LN|DOB|CN|PIC";
+        Pattern p = Pattern.compile("(" + tags + ")\\s*(\\S+)");
+        Matcher m = p.matcher(sms);
+        while (m.find()) {
+            if (m.groupCount() == 2) {
+                tagsFound.add(m.group(1));
+            }
         }
-    }
+        assertEquals("Only these tags were found: " + tagsFound,
+            tags.split("\\|").length, tagsFound.size());
 
-    /**
-     * Checks to see if all answers for the selected tags exist.This
-     * targets answers of various data types  and structures such as
-     * groups.
-     */
-    @Test
-    public void testTaggedAnswers() {
-        for (String tag : getAnswerTags()) {
-            assertTrue(taggedAnswerExists(tag, sms));
-        }
     }
 
     /***
@@ -81,64 +77,5 @@ public class SmsSerializingVisitorTest {
     @Test
     public void testTagWithNoAnswer() {
         assertFalse(sms.contains("CTY"));
-    }
-
-    /**
-     * returns a list of all the tags that are bounded to
-     * nodes that have answers.
-     */
-    private static List<String> getAnswerTags() {
-        return Arrays.asList("FN", "LN", "DOB", "CN", "PIC");
-    }
-
-    /**
-     * This function checks to see if a tagged node within the
-     * SMS has a corresponding answer by counting characters until the
-     * delimiter is reached.
-     *
-     * @param tag
-     * @param sms
-     * @return true if an answer exists after a tag.
-     */
-    private static boolean taggedAnswerExists(String tag, String sms) {
-        if (!sms.contains(tag)) {
-            return false;
-        }
-
-        final StringBuilder answer = new StringBuilder();
-        int currentIndex;
-        int delimiterSize = 1;
-
-        Pattern pattern = Pattern.compile(tag);
-        Matcher matcher = pattern.matcher(sms);
-
-        /*
-         * Check for  all occurrences of a tag. A matcher is used because
-         *  a tag can be reused multiple times so each instance of that tag
-         *  is discovered and the answer  it has gets checked.
-         */
-        while (matcher.find()) {
-            currentIndex = delimiterSize + matcher.end();
-
-            // loops while the next set of characters isn't a delimiter and the start of a next tag
-            while (!sms.substring(currentIndex, currentIndex + 2).equals(delimiter)) {
-                answer.append(sms.substring(currentIndex, currentIndex + 1));
-
-                currentIndex++;
-
-                //breaks once we have almost reached the end of the sms
-                if (currentIndex == sms.length() - 1) {
-
-                    //appends the final character since the substring method
-                    //of while condition  checks 2 indexes ahead.
-                    answer.append(sms.substring(sms.length() - 1, sms.length()));
-
-                    break;
-                }
-            }
-        }
-
-        // returns true once the answer extracted from a tag is present.
-        return answer.toString().trim().length() > 0;
     }
 }
