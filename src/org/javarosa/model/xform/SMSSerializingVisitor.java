@@ -143,21 +143,26 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
         theSmsStr = prefix.concat(delimiter);
 
-        // serialize each node (and it's children) to get it's answers
-        serializeTree(root);
-        theSmsStr = theSmsStr.trim();
+        // serialize each node (and its children) to get its answers
+        theSmsStr = serializeTreeToString(root);
     }
 
-    public void serializeTree(TreeElement root) {
+    private String serializeTreeToString(TreeElement root) {
+        StringBuilder sb = new StringBuilder();
+        serializeTree(root, sb);
+        return sb.toString().trim();
+    }
+
+    private void serializeTree(TreeElement root, StringBuilder sb) {
         for (int j = 0; j < root.getNumChildren(); j++) {
             TreeElement treeElement = root.getChildAt(j);
             if (treeElement.isLeaf() && treeElement.getAttribute("", "tag") != null) {
                 String result = serializeNode(treeElement);
                 if (result != null) {
-                    theSmsStr += result;
+                    sb.append(result);
                 }
             } else {
-                serializeTree(treeElement);
+                serializeTree(treeElement, sb);
             }
         }
     }
