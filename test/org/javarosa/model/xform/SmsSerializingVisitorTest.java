@@ -1,6 +1,5 @@
 package org.javarosa.model.xform;
 
-import org.javarosa.core.PathConst;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.test.FormParseInit;
@@ -8,13 +7,13 @@ import org.javarosa.form.api.FormEntryController;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -30,7 +29,7 @@ public class SmsSerializingVisitorTest {
     @Before
     public void setup() throws IOException {
         FormParseInit formParser = new FormParseInit();
-        formParser.setFormToParse(new File(PathConst.getTestResourcePath(), "sms_form.xml").toString());
+        formParser.setFormToParse(r("sms_form.xml").toString());
         FormEntryController formEntryController = formParser.getFormEntryController();
         FormInstance formInstance = formEntryController.getModel().getForm().getInstance();
 
