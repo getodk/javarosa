@@ -137,6 +137,6 @@ public class ByteArrayPayload implements IDataPayload {
             logger.error("The encoding being utilized isn't supported.", e);
         }
 
-        return null;
+        return "";
     }
 }
