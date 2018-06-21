@@ -1,6 +1,7 @@
 package org.javarosa.model.xform;
 
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
@@ -14,9 +15,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.XFormParser.NAMESPACE_ODK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Performs a comprehensive suite of tests on the results of a form
@@ -24,19 +27,27 @@ import static org.junit.Assert.assertNotNull;
  */
 public class CompactSerializingVisitorTest {
     private String text;
+    private FormInstance formInstance;
 
     @Before
     public void setUp() throws IOException {
         FormParseInit formParser = new FormParseInit();
         formParser.setFormToParse(r("sms_form.xml").toString());
         FormEntryController formEntryController = formParser.getFormEntryController();
-        FormInstance formInstance = formEntryController.getModel().getForm().getInstance();
+        formInstance = formEntryController.getModel().getForm().getInstance();
 
         CompactSerializingVisitor serializer = new CompactSerializingVisitor();
 
         ByteArrayPayload payload = (ByteArrayPayload) serializer.createSerializedPayload(formInstance);
 
         text = payload.toString().replace("\\", "").replace("\\\\", "\\");
+    }
+
+    @Test
+    public void ensurePrefixIsPresent() {
+        TreeElement root = formInstance.getRoot();
+        String prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
+        assertTrue(text.contains(prefix));
     }
 
     @Test

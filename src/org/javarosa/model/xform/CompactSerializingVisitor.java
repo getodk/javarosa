@@ -126,7 +126,7 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
         }
 
         // serialize each node (and its children) to get its answers
-        resultText = serializeTreeToString(root);
+        resultText = resultText.concat(serializeTreeToString(root));
     }
 
     private String serializeTreeToString(TreeElement root) {
