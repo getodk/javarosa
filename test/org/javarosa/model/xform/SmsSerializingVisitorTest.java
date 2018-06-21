@@ -36,7 +36,7 @@ public class SmsSerializingVisitorTest {
 
         ByteArrayPayload payload = (ByteArrayPayload) serializer.createSerializedPayload(formInstance);
 
-        sms = new String(payload.getPayloadBytes(), "UTF-8").replace("\\", "").replace("\\\\", "\\");
+        sms = payload.toString().replace("\\", "").replace("\\\\", "\\");
     }
 
     @Test
