@@ -60,22 +60,15 @@ public class SmsSerializingVisitorTest {
 
     }
 
-    /***
-     * Checks to see than an answer doesn't have a tag is present.
-     * Placeholder is an answer bounded to the <maiden_name> tag
-     */
+    /** Ensures that the answer for maiden_name, which doesn’t have the “tag” attribute, is not present */
     @Test
-    public void testAnswerWithoutATag() {
+    public void ensureAnswerInNonTaggedElementNotPresent() {
         assertFalse(sms.contains("Placeholder"));
     }
 
-    /***
-     * Checks to see a tag that doesn't have an answer exists within
-     * the SMS.
-     * the CTY tag is attached to the country question.
-     */
+    /** Ensures that “CTY”, which does have the “tag” attribute, but has no answer, is not present */
     @Test
-    public void testTagWithNoAnswer() {
+    public void ensureTagWithNoAnswerNotPresent() {
         assertFalse(sms.contains("CTY"));
     }
 }
