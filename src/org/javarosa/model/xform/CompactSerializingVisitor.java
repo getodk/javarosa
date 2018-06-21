@@ -182,7 +182,6 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
                         .replace(delimiter, "\\" + delimiter));
                     stringBuilder.append(delimiter);
                 }
-                stringBuilder.append(delimiter);
             } else {
                 throw new RuntimeException("Can't handle serialized output for "
                     + instanceNode.getValue().toString() + ", "
