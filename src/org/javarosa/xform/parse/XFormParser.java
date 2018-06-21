@@ -119,6 +119,7 @@ public class XFormParser implements IXFormParserFunctions {
     private static final Logger logger = LoggerFactory.getLogger(XFormParser.class);
 
     public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
+    public static final String NAMESPACE_ODK = "http://www.opendatakit.org/xforms";
 
     //Constants to clean up code and prevent user error
     private static final String FORM_ATTR = "form";

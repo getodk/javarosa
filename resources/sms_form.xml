@@ -1,9 +1,13 @@
-<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+<h:html xmlns="http://www.w3.org/2002/xforms"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:odk="http://www.opendatakit.org/xforms"
+    xmlns:jr="http://openrosa.org/javarosa">
   <h:head>
     <h:title>SMS Tester Form</h:title>
     <model>
       <instance>
-        <data id="build_SMS-Tester-Form_1524097605" xmlns="http://openrosa.org/smsdata" prefix="FORM232">
+        <data id="build_SMS-Tester-Form_1524097605" prefix="FORM232">
           <meta>
             <instanceID/>
           </meta>

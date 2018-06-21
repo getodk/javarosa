@@ -26,7 +26,7 @@ public class SmsSerializingVisitorTest {
     private String sms;
 
     @Before
-    public void setup() throws IOException {
+    public void setUp() throws IOException {
         FormParseInit formParser = new FormParseInit();
         formParser.setFormToParse(r("sms_form.xml").toString());
         FormEntryController formEntryController = formParser.getFormEntryController();
@@ -57,16 +57,19 @@ public class SmsSerializingVisitorTest {
         }
         assertEquals("Only these tags were found: " + tagsFound,
             tags.split("\\|").length, tagsFound.size());
-
     }
 
-    /** Ensures that the answer for maiden_name, which doesn’t have the “tag” attribute, is not present */
+    /**
+     * Ensures that the answer for maiden_name, which doesn’t have the “tag” attribute, is not present
+     */
     @Test
     public void ensureAnswerInNonTaggedElementNotPresent() {
         assertFalse(sms.contains("Placeholder"));
     }
 
-    /** Ensures that “CTY”, which does have the “tag” attribute, but has no answer, is not present */
+    /**
+     * Ensures that “CTY”, which does have the “tag” attribute, but has no answer, is not present
+     */
     @Test
     public void ensureTagWithNoAnswerNotPresent() {
         assertFalse(sms.contains("CTY"));

@@ -30,6 +30,8 @@ import org.kxml2.kdom.Node;
 
 import java.io.IOException;
 
+import static org.javarosa.xform.parse.XFormParser.NAMESPACE_ODK;
+
 /**
  * A modified version of Clayton's XFormSerializingVisitor that constructs
  * SMS's.
@@ -130,12 +132,12 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
         TreeElement root = tree.getRoot();
 
         xmlns = root.getAttributeValue("", "xmlns");
-        delimiter = root.getAttributeValue("", "delimiter");
+        delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimiter");
         if (delimiter == null) {
             // for the spelling-impaired...
-            delimiter = root.getAttributeValue("", "delimeter");
+            delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimeter");
         }
-        prefix = root.getAttributeValue("", "prefix");
+        prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
 
         xmlns = (xmlns != null) ? xmlns : " ";
         delimiter = (delimiter != null) ? delimiter : " ";
