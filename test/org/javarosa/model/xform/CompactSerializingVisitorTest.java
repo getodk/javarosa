@@ -20,10 +20,10 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * Performs a comprehensive suite of tests on the results of a form
- * being serialized to the SMS format.
+ * being serialized to the compact format.
  */
-public class SmsSerializingVisitorTest {
-    private String sms;
+public class CompactSerializingVisitorTest {
+    private String text;
 
     @Before
     public void setUp() throws IOException {
@@ -32,16 +32,16 @@ public class SmsSerializingVisitorTest {
         FormEntryController formEntryController = formParser.getFormEntryController();
         FormInstance formInstance = formEntryController.getModel().getForm().getInstance();
 
-        SMSSerializingVisitor serializer = new SMSSerializingVisitor();
+        CompactSerializingVisitor serializer = new CompactSerializingVisitor();
 
         ByteArrayPayload payload = (ByteArrayPayload) serializer.createSerializedPayload(formInstance);
 
-        sms = payload.toString().replace("\\", "").replace("\\\\", "\\");
+        text = payload.toString().replace("\\", "").replace("\\\\", "\\");
     }
 
     @Test
     public void SmsNotNull() {
-        assertNotNull(sms);
+        assertNotNull(text);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class SmsSerializingVisitorTest {
         Set<String> tagsFound = new HashSet<>();
         String tags = "FN|LN|DOB|CN|PIC";
         Pattern p = Pattern.compile("(" + tags + ")\\s*(\\S+)");
-        Matcher m = p.matcher(sms);
+        Matcher m = p.matcher(text);
         while (m.find()) {
             if (m.groupCount() == 2) {
                 tagsFound.add(m.group(1));
@@ -64,7 +64,7 @@ public class SmsSerializingVisitorTest {
      */
     @Test
     public void ensureAnswerInNonTaggedElementNotPresent() {
-        assertFalse(sms.contains("Placeholder"));
+        assertFalse(text.contains("Placeholder"));
     }
 
     /**
@@ -72,6 +72,6 @@ public class SmsSerializingVisitorTest {
      */
     @Test
     public void ensureTagWithNoAnswerNotPresent() {
-        assertFalse(sms.contains("CTY"));
+        assertFalse(text.contains("CTY"));
     }
 }
