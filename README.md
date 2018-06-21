@@ -1,4 +1,5 @@
 # ODK JavaRosa
+
 ![Platform](https://img.shields.io/badge/platform-Java-blue.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build status](https://circleci.com/gh/opendatakit/javarosa.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/opendatakit/javarosa)
@@ -38,11 +39,13 @@ To build the project, go to the `View` menu, then `Tool Windows > Gradle`. `buil
 To package a jar, use the `jar` Gradle task.
 
 ## Contributing code
+
 Any and all contributions to the project are welcome. ODK JavaRosa is used across the world primarily by organizations with a social purpose so you can have real impact!
 
 If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
 ## Downloading builds
+
 Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/opendatakit/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS.
 
 ## Publishing the jar to OSSRH and Maven Central
@@ -51,7 +54,7 @@ Project maintainers have the private keys to upload signed jars to Sonatype's OS
 
 While Gradle is the default build tool for all ODK tools (including this one), Maven is used for for publishing the jar because OSSRH's Gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
 
-Deviations from OSSRH's documentation are that maintainers use `gpg2` (and not `gpg`), the latest versions of the Maven plugins in `pom.xml`, and a `secrets.xml` file that include the GPG home directory, key name, and pass phrase. All that is needed in the GPG home directory is `private-keys-v1.d` and `pubring.gpg`.
+Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and greater (not `gpg`), the latest versions of the Maven plugins in `pom.xml`, and a `secrets.xml` file that include the GPG home directory, key name, and pass phrase. All that is needed in the GPG home directory is `private-keys-v1.d` and `pubring.gpg`.
 ```
 <!-- secrets.xml -->
 <settings>
@@ -78,6 +81,8 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` (and not `
     </profiles>
 </settings>
 ```
+
+Official releases are typically done by @yanokwa who uses Oracle Java v1.8.x running on macOS Sierra. 
 
 To generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 
