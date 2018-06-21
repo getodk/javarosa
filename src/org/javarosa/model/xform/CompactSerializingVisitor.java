@@ -179,8 +179,7 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
                 for (int k = 0; k < element.getChildCount(); k++) {
                     stringBuilder.append(element.getChild(k).toString().
                         replace("\\", "\\\\")
-                        .replace(delimiter, "\\" + delimiter)
-                        .replace(tag, "\\" + tag));
+                        .replace(delimiter, "\\" + delimiter));
                     stringBuilder.append(delimiter);
                 }
                 stringBuilder.append(delimiter);
