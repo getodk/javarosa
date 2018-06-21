@@ -120,9 +120,10 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
         String prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
 
         delimiter = (delimiter != null) ? delimiter : " ";
-        prefix = (prefix != null) ? prefix : " ";
 
-        resultText = prefix.concat(delimiter);
+        if (prefix != null) {
+            resultText = prefix.concat(delimiter);
+        }
 
         // serialize each node (and its children) to get its answers
         resultText = serializeTreeToString(root);
@@ -137,7 +138,7 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
     private void serializeTree(TreeElement root, StringBuilder sb) {
         for (int j = 0; j < root.getNumChildren(); j++) {
             TreeElement treeElement = root.getChildAt(j);
-            if (treeElement.isLeaf() && treeElement.getAttribute("", "tag") != null) {
+            if (treeElement.isLeaf() && treeElement.getAttribute(NAMESPACE_ODK, "tag") != null) {
                 String result = serializeNode(treeElement);
                 if (result != null) {
                     sb.append(result);
@@ -169,7 +170,7 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
                 Element element = new Element();
                 element.addChild(Node.TEXT, serializedAnswer);
 
-                String tag = instanceNode.getAttributeValue("", "tag");
+                String tag = instanceNode.getAttributeValue(NAMESPACE_ODK, "tag");
 
                 stringBuilder.append(tag);
 
