@@ -1,4 +1,5 @@
 package org.javarosa.model.xform;
+
 /*
  * Copyright (C) 2009 JavaRosa
  *
@@ -14,7 +15,11 @@ package org.javarosa.model.xform;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IDataReference;
@@ -28,29 +33,47 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
-import java.io.IOException;
-
-import static org.javarosa.xform.parse.XFormParser.NAMESPACE_ODK;
-
 /**
  * A modified version of Clayton's XFormSerializingVisitor that constructs
  * SMS's.
  *
  * @author Munaf Sheikh, Cell-Life
+ *
+ *@deprecated This version of the visitor is kept for backward compatibility. If you are utilizing
+ * the latest odk xforms spec then use {@link #CompactSerializingVisitor()} instead.
  */
+@Deprecated
 public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
-    private String theSmsStr; // sms string to be returned
-    private String delimiter;
+    private String theSmsStr = null; // sms string to be returned
+    private String nodeSet = null; // which nodeset the sms contents are in
+    private String xmlns = null;
+    private String delimiter = null;
+    private String prefix = null;
+    private String method = null;
+    private TreeReference rootRef;
 
-    /**
-     * The serializer to be used in constructing XML for AnswerData elements
-     */
-    private IAnswerDataSerializer serializer;
+    /** The serializer to be used in constructing XML for AnswerData elements */
+    IAnswerDataSerializer serializer;
+
+    /** The schema to be used to serialize answer data */
+    FormDef schema; // not used
+
+    private List<IDataPointer> dataPointers;
+
+    private void init() {
+        theSmsStr = null;
+        schema = null;
+        dataPointers = new ArrayList<IDataPointer>(0);
+        theSmsStr = "";
+    }
 
     public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
+        init();
+        this.schema = formDef;
         return serializeInstance(model);
     }
+
 
     /*
      * (non-Javadoc)
@@ -65,7 +88,8 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
      * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeInstance(org.javarosa.core.model.instance.FormInstance, org.javarosa.core.model.IDataReference)
      */
     public byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException {
-
+        init();
+        rootRef = FormInstance.unpackReference(ref);
         if (this.serializer == null) {
             this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
         }
@@ -88,13 +112,14 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
     public IDataPayload createSerializedPayload(FormInstance model, IDataReference ref)
         throws IOException {
-
+        init();
+        rootRef = FormInstance.unpackReference(ref);
         if (this.serializer == null) {
             this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
         }
         model.accept(this);
         if (theSmsStr != null) {
-            byte[] form = theSmsStr.getBytes("UTF-8");
+            byte[] form = theSmsStr.getBytes("UTF-16");
             return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_SMS);
         } else {
             return null;
@@ -109,52 +134,44 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
      * .DataModelTree)
      */
     public void visit(FormInstance tree) {
+        nodeSet = new String();
 
-        TreeElement root = tree.getRoot();
+        //TreeElement root = tree.getRoot();
+        TreeElement root = tree.resolveReference(rootRef);
 
-        delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimiter");
-        if (delimiter == null) {
+        xmlns = root.getAttributeValue("", "xmlns");
+        delimiter = root.getAttributeValue("", "delimiter");
+        if ( delimiter == null ) {
             // for the spelling-impaired...
-            delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimeter");
+            delimiter = root.getAttributeValue("", "delimeter");
         }
-        String prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
+        prefix = root.getAttributeValue("", "prefix");
 
-        delimiter = (delimiter != null) ? delimiter : " ";
+        xmlns = (xmlns != null)? xmlns : " ";
+        delimiter = (delimiter != null ) ? delimiter : " ";
         prefix = (prefix != null) ? prefix : " ";
 
-        theSmsStr = prefix.concat(delimiter);
+        //Don't bother adding any delimiters, yet. Delimiters are
+        //added before tags/data
+        theSmsStr = prefix;
 
-        // serialize each node (and its children) to get its answers
-        theSmsStr = serializeTreeToString(root);
-    }
-
-    private String serializeTreeToString(TreeElement root) {
-        StringBuilder sb = new StringBuilder();
-        serializeTree(root, sb);
-        return sb.toString().trim();
-    }
-
-    private void serializeTree(TreeElement root, StringBuilder sb) {
+        // serialize each node to get it's answers
         for (int j = 0; j < root.getNumChildren(); j++) {
-            TreeElement treeElement = root.getChildAt(j);
-            if (treeElement.isLeaf() && treeElement.getAttribute("", "tag") != null) {
-                String result = serializeNode(treeElement);
-                if (result != null) {
-                    sb.append(result);
-                }
-            } else {
-                serializeTree(treeElement, sb);
+            TreeElement tee = root.getChildAt(j);
+            String e = serializeNode(tee);
+            if(e != null) {
+                theSmsStr += e;
             }
         }
+        theSmsStr = theSmsStr.trim();
     }
 
     public String serializeNode(TreeElement instanceNode) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder b = new StringBuilder();
         // don't serialize template nodes or non-relevant nodes
         if (!instanceNode.isRelevant()
-            || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE) {
+            || instanceNode.getMult() == TreeReference.INDEX_TEMPLATE)
             return null;
-        }
 
         if (instanceNode.getValue() != null) {
             Object serializedAnswer = serializer.serializeAnswerData(
@@ -166,30 +183,36 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
                     + instanceNode.getValue().toString() + ", "
                     + serializedAnswer);
             } else if (serializedAnswer instanceof String) {
-                Element element = new Element();
-                element.addChild(Node.TEXT, serializedAnswer);
+                Element e = new Element();
+                e.addChild(Node.TEXT, (String) serializedAnswer);
 
                 String tag = instanceNode.getAttributeValue("", "tag");
-
-                stringBuilder.append(tag);
-
-                stringBuilder.append(delimiter);
-
-                for (int k = 0; k < element.getChildCount(); k++) {
-                    stringBuilder.append(element.getChild(k).toString().
-                        replace("\\", "\\\\")
-                        .replace(delimiter, "\\" + delimiter)
-                        .replace(tag, "\\" + tag));
-                    stringBuilder.append(delimiter);
+                if ( tag != null ) {
+                    b.append(tag);
                 }
-                stringBuilder.append(delimiter);
+                b.append(delimiter);
+
+                for (int k = 0; k < e.getChildCount(); k++) {
+                    b.append(e.getChild(k).toString());
+                    b.append(delimiter);
+                }
+
             } else {
                 throw new RuntimeException("Can't handle serialized output for "
                     + instanceNode.getValue().toString() + ", "
                     + serializedAnswer);
             }
+
+            if (serializer.containsExternalData(instanceNode.getValue())
+                .booleanValue()) {
+                IDataPointer[] pointer = serializer
+                    .retrieveExternalDataPointer(instanceNode.getValue());
+                for (int i = 0; i < pointer.length; ++i) {
+                    dataPointers.add(pointer[i]);
+                }
+            }
         }
-        return stringBuilder.toString();
+        return b.toString();
     }
 
     /*
