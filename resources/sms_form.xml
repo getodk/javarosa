@@ -7,21 +7,21 @@
     <h:title>SMS Tester Form</h:title>
     <model>
       <instance>
-        <data id="build_SMS-Tester-Form_1524097605" prefix="FORM232">
+        <data id="build_SMS-Tester-Form_1524097605" odk:prefix="FORM232">
           <meta>
             <instanceID/>
           </meta>
-          <first_name tag="FN">
+          <first_name odk:tag="FN">
             John
           </first_name>
-          <last_name tag="LN">
+          <last_name odk:tag="LN">
             Doe
           </last_name>
           <address>
             39 Reed Street
           </address>
-          <country tag="CTY"/>
-          <dob tag="DOB">
+          <country odk:tag="CTY"/>
+          <dob odk:tag="DOB">
             2015-08-05
           </dob>
           <gender>
@@ -31,14 +31,14 @@
            Placeholder
           </maiden_name>
           <children>
-            <child_full_name tag="CN">Mary Doe</child_full_name>
+            <child_full_name odk:tag="CN">Mary Doe</child_full_name>
             <child_country>Jamaica</child_country>
-            <child_full_name tag="CN">Sara Doe</child_full_name>
+            <child_full_name odk:tag="CN">Sara Doe</child_full_name>
             <child_country>Jamaica</child_country>
-            <child_full_name tag="CN">Jim Doe</child_full_name>
+            <child_full_name odk:tag="CN">Jim Doe</child_full_name>
             <child_country>America</child_country>
           </children>
-          <picture tag="PIC">test_image.jpg</picture>
+          <picture odk:tag="PIC">test_image.jpg</picture>
         </data>
       </instance>
       <itext>
