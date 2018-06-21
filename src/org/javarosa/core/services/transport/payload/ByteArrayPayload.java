@@ -19,15 +19,18 @@
  */
 package org.javarosa.core.services.transport.payload;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
+import java.io.UnsupportedEncodingException;
 
 /**
  * A ByteArrayPayload is a simple payload consisting of a
@@ -35,14 +38,15 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  * @author Clayton Sims
  * @date Dec 18, 2008
- *
  */
 public class ByteArrayPayload implements IDataPayload {
-    byte[] payload;
+    private static final Logger logger = LoggerFactory.getLogger(ByteArrayPayload.class);
 
-    String id;
+    private byte[] payload;
 
-    int type;
+    private String id;
+
+    private int type;
 
     /**
      * Note: Only useful for serialization.
@@ -51,10 +55,9 @@ public class ByteArrayPayload implements IDataPayload {
     }
 
     /**
-     *
      * @param payload The byte array for this payload.
-     * @param id An optional id identifying the payload
-     * @param type The type of data for this byte array
+     * @param id      An optional id identifying the payload
+     * @param type    The type of data for this byte array
      */
     public ByteArrayPayload(byte[] payload, String id, int type) {
         this.payload = payload;
@@ -63,7 +66,6 @@ public class ByteArrayPayload implements IDataPayload {
     }
 
     /**
-     *
      * @param payload The byte array for this payload.
      */
     public ByteArrayPayload(byte[] payload) {
@@ -72,68 +74,69 @@ public class ByteArrayPayload implements IDataPayload {
         this.type = IDataPayload.PAYLOAD_TYPE_XML;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.transport.IDataPayload#getPayloadStream()
-     */
+    @Override
     public InputStream getPayloadStream() {
-
         return new ByteArrayInputStream(payload);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-     */
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+        throws IOException, DeserializationException {
         int length = in.readInt();
-        if(length > 0) {
+        if (length > 0) {
             this.payload = new byte[length];
             in.read(this.payload);
         }
         id = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         out.writeInt(payload.length);
-        if(payload.length > 0) {
+        if (payload.length > 0) {
             out.write(payload);
         }
         ExtUtil.writeString(out, ExtUtil.emptyIfNull(id));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.services.transport.IDataPayload#accept(org.javarosa.core.services.transport.IDataPayloadVisitor)
-     */
+    @Override
     public <T> T accept(IDataPayloadVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.services.transport.IDataPayload#getPayloadId()
-     */
+    public byte[] getPayloadBytes() {
+        return payload;
+    }
+
+    @Override
     public String getPayloadId() {
         return id;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.services.transport.IDataPayload#getPayloadType()
-     */
+    @Override
     public int getPayloadType() {
         return type;
     }
 
+    @Override
     public long getLength() {
         return payload.length;
     }
 
+    @Override
     public int getTransportId() {
         //TODO: Most messages can include this data
         return -1;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new String(payload, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("The encoding being utilized isn't supported.", e);
+        }
+
+        return "";
     }
 }
