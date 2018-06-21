@@ -113,10 +113,7 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
         TreeElement root = tree.getRoot();
 
         delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimiter");
-        if (delimiter == null) {
-            // for the spelling-impaired...
-            delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimeter");
-        }
+
         String prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
 
         delimiter = (delimiter != null) ? delimiter : " ";
