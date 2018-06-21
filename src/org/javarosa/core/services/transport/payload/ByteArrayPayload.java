@@ -19,16 +19,18 @@
  */
 package org.javarosa.core.services.transport.payload;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A ByteArrayPayload is a simple payload consisting of a
@@ -38,6 +40,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Dec 18, 2008
  */
 public class ByteArrayPayload implements IDataPayload {
+    private static final Logger logger = LoggerFactory.getLogger(ByteArrayPayload.class);
+
     private byte[] payload;
 
     private String id;
@@ -130,7 +134,7 @@ public class ByteArrayPayload implements IDataPayload {
         try {
             return new String(payload, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("The encoding being utilized isn't supported.", e);
         }
 
         return null;
