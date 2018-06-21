@@ -24,6 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -35,7 +36,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  * @author Clayton Sims
  * @date Dec 18, 2008
- *
  */
 public class ByteArrayPayload implements IDataPayload {
     private byte[] payload;
@@ -51,10 +51,9 @@ public class ByteArrayPayload implements IDataPayload {
     }
 
     /**
-     *
      * @param payload The byte array for this payload.
-     * @param id An optional id identifying the payload
-     * @param type The type of data for this byte array
+     * @param id      An optional id identifying the payload
+     * @param type    The type of data for this byte array
      */
     public ByteArrayPayload(byte[] payload, String id, int type) {
         this.payload = payload;
@@ -63,7 +62,6 @@ public class ByteArrayPayload implements IDataPayload {
     }
 
     /**
-     *
      * @param payload The byte array for this payload.
      */
     public ByteArrayPayload(byte[] payload) {
@@ -79,9 +77,9 @@ public class ByteArrayPayload implements IDataPayload {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+        throws IOException, DeserializationException {
         int length = in.readInt();
-        if(length > 0) {
+        if (length > 0) {
             this.payload = new byte[length];
             in.read(this.payload);
         }
@@ -91,7 +89,7 @@ public class ByteArrayPayload implements IDataPayload {
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         out.writeInt(payload.length);
-        if(payload.length > 0) {
+        if (payload.length > 0) {
             out.write(payload);
         }
         ExtUtil.writeString(out, ExtUtil.emptyIfNull(id));
@@ -125,5 +123,16 @@ public class ByteArrayPayload implements IDataPayload {
     public int getTransportId() {
         //TODO: Most messages can include this data
         return -1;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new String(payload, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
