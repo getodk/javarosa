@@ -40,31 +40,15 @@ import static org.javarosa.xform.parse.XFormParser.NAMESPACE_ODK;
  */
 public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
-    private String theSmsStr = null; // sms string to be returned
-    private String nodeSet = null; // which nodeset the sms contents are in
-    private String xmlns = null;
-    private String delimiter = null;
-    private String prefix = null;
+    private String theSmsStr; // sms string to be returned
+    private String delimiter;
 
     /**
      * The serializer to be used in constructing XML for AnswerData elements
      */
-    IAnswerDataSerializer serializer;
-
-    /**
-     * The schema to be used to serialize answer data
-     */
-    FormDef schema; // not used
-
-    private void init() {
-        theSmsStr = null;
-        schema = null;
-        theSmsStr = "";
-    }
+    private IAnswerDataSerializer serializer;
 
     public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
-        init();
-        this.schema = formDef;
         return serializeInstance(model);
     }
 
@@ -81,7 +65,6 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
      * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeInstance(org.javarosa.core.model.instance.FormInstance, org.javarosa.core.model.IDataReference)
      */
     public byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException {
-        init();
 
         if (this.serializer == null) {
             this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
@@ -105,7 +88,6 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
     public IDataPayload createSerializedPayload(FormInstance model, IDataReference ref)
         throws IOException {
-        init();
 
         if (this.serializer == null) {
             this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
@@ -127,19 +109,16 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
      * .DataModelTree)
      */
     public void visit(FormInstance tree) {
-        nodeSet = new String();
 
         TreeElement root = tree.getRoot();
 
-        xmlns = root.getAttributeValue("", "xmlns");
         delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimiter");
         if (delimiter == null) {
             // for the spelling-impaired...
             delimiter = root.getAttributeValue(NAMESPACE_ODK, "delimeter");
         }
-        prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
+        String prefix = root.getAttributeValue(NAMESPACE_ODK, "prefix");
 
-        xmlns = (xmlns != null) ? xmlns : " ";
         delimiter = (delimiter != null) ? delimiter : " ";
         prefix = (prefix != null) ? prefix : " ";
 
