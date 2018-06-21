@@ -7,7 +7,7 @@
     <h:title>SMS Tester Form</h:title>
     <model>
       <instance>
-        <data id="build_SMS-Tester-Form_1524097605" odk:prefix="FORM232">
+        <data id="build_SMS-Tester-Form_1524097605" odk:delimiter=";" odk:prefix="FORM232">
           <meta>
             <instanceID/>
           </meta>

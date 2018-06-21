@@ -9,10 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.XFormParser.NAMESPACE_ODK;
@@ -56,18 +52,8 @@ public class CompactSerializingVisitorTest {
     }
 
     @Test
-    public void ensureAllTagsArePresentAndHaveValues() {
-        Set<String> tagsFound = new HashSet<>();
-        String tags = "FN|LN|DOB|CN|PIC";
-        Pattern p = Pattern.compile("(" + tags + ")\\s*(\\S+)");
-        Matcher m = p.matcher(text);
-        while (m.find()) {
-            if (m.groupCount() == 2) {
-                tagsFound.add(m.group(1));
-            }
-        }
-        assertEquals("Only these tags were found: " + tagsFound,
-            tags.split("\\|").length, tagsFound.size());
+    public void ensureCorrectSerialization() {
+        assertEquals("Serialized form", "FORM232;FN;John;LN;Doe;DOB;2015-08-05;CN;Mary Doe;CN;Sara Doe;CN;Jim Doe;PIC;test_image.jpg;", text);
     }
 
     /**
