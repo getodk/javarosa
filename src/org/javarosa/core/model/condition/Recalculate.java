@@ -17,7 +17,7 @@
 package org.javarosa.core.model.condition;
 
 import java.util.Date;
-import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataType;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
@@ -36,6 +36,17 @@ import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+
+import static org.javarosa.core.model.DataType.BOOLEAN;
+import static org.javarosa.core.model.DataType.CHOICE;
+import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
+import static org.javarosa.core.model.DataType.DATE;
+import static org.javarosa.core.model.DataType.GEOPOINT;
+import static org.javarosa.core.model.DataType.GEOSHAPE;
+import static org.javarosa.core.model.DataType.GEOTRACE;
+import static org.javarosa.core.model.DataType.INTEGER;
+import static org.javarosa.core.model.DataType.LONG;
+import static org.javarosa.core.model.DataType.TIME;
 
 public class Recalculate extends Triggerable {
 
@@ -86,13 +97,15 @@ public class Recalculate extends Triggerable {
      * convert the data object returned by the xpath expression into an IAnswerData suitable for
      * storage in the FormInstance
      */
-    public static IAnswerData wrapData(Object val, int dataType) {
+    public static IAnswerData wrapData(Object val, int intDataType) {
         if ((val instanceof String && ((String) val).length() == 0) ||
                 (val instanceof Double && ((Double) val).isNaN())) {
             return null;
         }
 
-        if (Constants.DATATYPE_BOOLEAN == dataType || val instanceof Boolean) {
+        final DataType dataType = DataType.from(intDataType);
+
+        if (BOOLEAN == dataType || val instanceof Boolean) {
             //ctsims: We should really be using the boolean datatype for real, it's
             //necessary for backend calculations and XSD compliance
 
@@ -115,30 +128,30 @@ public class Recalculate extends Triggerable {
             double d = (Double) val;
             long l = (long) d;
             boolean isIntegral = Math.abs(d - l) < 1.0e-9;
-            if (Constants.DATATYPE_INTEGER == dataType ||
+            if (INTEGER == dataType ||
                     (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
                 return new IntegerData((int) d);
-            } else if (Constants.DATATYPE_LONG == dataType || isIntegral) {
+            } else if (LONG == dataType || isIntegral) {
                 return new LongData((long) d);
             } else {
                 return new DecimalData(d);
             }
-        } else if (dataType == Constants.DATATYPE_GEOPOINT) {
+        } else if (dataType == GEOPOINT) {
             return new GeoPointData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == Constants.DATATYPE_GEOSHAPE) {
+        } else if (dataType == GEOSHAPE) {
             return new GeoShapeData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == Constants.DATATYPE_GEOTRACE) {
+        } else if (dataType == GEOTRACE) {
             return new GeoTraceData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == Constants.DATATYPE_CHOICE) {
+        } else if (dataType == CHOICE) {
             return new SelectOneData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == Constants.DATATYPE_MULTIPLE_ITEMS) {
+        } else if (dataType == MULTIPLE_ITEMS) {
             return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
         } else if (val instanceof String) {
             return new StringData((String) val);
         } else if (val instanceof Date) {
-            if (dataType == Constants.DATATYPE_TIME)
+            if (dataType == TIME)
                 return new TimeData((Date) val);
-            if (dataType == Constants.DATATYPE_DATE)
+            if (dataType == DATE)
                 return new DateData((Date) val);
             return new DateTimeData((Date) val);
         } else {

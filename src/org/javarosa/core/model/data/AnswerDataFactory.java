@@ -4,6 +4,7 @@
 package org.javarosa.core.model.data;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataType;
 
 /**
  * This is not a factory, actually, since there's no drop-in component model, but
@@ -24,10 +25,6 @@ public class AnswerDataFactory {
      * which to cast incoming values.
      *
      * All enormous spaghetti ifs should be replaced with a call to this
-     *
-     * @param controlType
-     * @param dataType
-     * @return
      */
     public static IAnswerData template(int controlType, int datatype) {
         //First take care of the easy two, selections, since their
@@ -46,40 +43,40 @@ public class AnswerDataFactory {
     }
 
     public static IAnswerData templateByDataType(int datatype) {
-        switch(datatype) {
-            case Constants.DATATYPE_CHOICE:
+        switch(DataType.from(datatype)) {
+            case CHOICE:
                 return new SelectOneData();
-            case Constants.DATATYPE_MULTIPLE_ITEMS:
+            case MULTIPLE_ITEMS:
                 return new MultipleItemsData();
-            case Constants.DATATYPE_BOOLEAN:
+            case BOOLEAN:
                 return new BooleanData();
-            case Constants.DATATYPE_DATE:
+            case DATE:
                 return new DateData();
-            case Constants.DATATYPE_DATE_TIME:
+            case DATE_TIME:
                 return new DateTimeData();
-            case Constants.DATATYPE_DECIMAL:
+            case DECIMAL:
                 return new DecimalData();
-            case Constants.DATATYPE_GEOPOINT:
+            case GEOPOINT:
                 return new GeoPointData();
-            case Constants.DATATYPE_GEOSHAPE:
+            case GEOSHAPE:
                 return new GeoShapeData();
-            case Constants.DATATYPE_GEOTRACE:
+            case GEOTRACE:
                 return new GeoTraceData();
-            case Constants.DATATYPE_INTEGER:
+            case INTEGER:
                 return new IntegerData();
-            case Constants.DATATYPE_LONG:
+            case LONG:
                 return new LongData();
-            case Constants.DATATYPE_TEXT:
+            case TEXT:
                 return new StringData();
-            case Constants.DATATYPE_TIME:
+            case TIME:
                 return new TimeData();
 
             //All of these are things that might require other manipulations in the future, but
             //for low can all just live as untyped
-            case Constants.DATATYPE_BARCODE:
-            case Constants.DATATYPE_BINARY:
-            case Constants.DATATYPE_UNSUPPORTED:
-            case Constants.DATATYPE_NULL:
+            case BARCODE:
+            case BINARY:
+            case UNSUPPORTED:
+            case NULL:
                 return new UncastData();
 
             //If this is new and we don't know what's going on, just leave it untyped

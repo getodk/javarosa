@@ -16,29 +16,17 @@
 
 package org.javarosa.core.model.instance.utils;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataType;
+import org.javarosa.core.model.DataTypeClasses;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoPointData;
-import org.javarosa.core.model.data.GeoShapeData;
-import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -56,6 +44,13 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableWrapper;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * An alternate serialization format for FormInstances (saved form instances) that drastically reduces the
@@ -472,24 +467,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
      * @param dataType
      * @return
      */
-    public static Class classForDataType (int dataType) {
-        switch (dataType) {
-        case Constants.DATATYPE_NULL: return StringData.class;
-        case Constants.DATATYPE_TEXT: return StringData.class;
-        case Constants.DATATYPE_INTEGER: return IntegerData.class;
-        case Constants.DATATYPE_LONG: return LongData.class;
-        case Constants.DATATYPE_DECIMAL: return DecimalData.class;
-        case Constants.DATATYPE_BOOLEAN: return BooleanData.class;
-        case Constants.DATATYPE_DATE: return DateData.class;
-        case Constants.DATATYPE_TIME: return TimeData.class;
-        case Constants.DATATYPE_DATE_TIME: return DateTimeData.class;
-        case Constants.DATATYPE_CHOICE: return SelectOneData.class;
-        case Constants.DATATYPE_MULTIPLE_ITEMS: return MultipleItemsData.class;
-        case Constants.DATATYPE_GEOPOINT: return GeoPointData.class;
-        case Constants.DATATYPE_GEOSHAPE: return GeoShapeData.class;
-        case Constants.DATATYPE_GEOTRACE: return GeoTraceData.class;
-        default: return null;
-        }
+    public static Class classForDataType(int dataType) {
+        return DataTypeClasses.classForType(DataType.from(dataType));
     }
-
 }

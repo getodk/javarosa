@@ -46,41 +46,26 @@ public class Constants {
     /** Over The Air or HTTP Connection */
     public static final int CONNECTION_OTA = 4;
 
-    public static final int DATATYPE_UNSUPPORTED = -1;
-    /** For nodes that have no data, or data type otherwise unknown */
-    public static final int DATATYPE_NULL = 0;
-    /** Text question type. */
-    public static final int DATATYPE_TEXT = 1;
-    /** Numeric question type. These are numbers without decimal points. */
-    public static final int DATATYPE_INTEGER = 2;
-    /** Decimal question type. These are numbers with decimals. */
-    public static final int DATATYPE_DECIMAL = 3;
-    /** Date question type. This has only date component without time. */
-    public static final int DATATYPE_DATE = 4;
-    /** Time question type. This has only time element without date. */
-    public static final int DATATYPE_TIME = 5;
-    /** Date and Time question type. This has both the date and time components */
-    public static final int DATATYPE_DATE_TIME = 6;
-    /** This is a question with a list of options where not more than one option can be selected at a time. */
-    public static final int DATATYPE_CHOICE = 7;
-    /** This is a question with a list of items used for selecting multiple answers or ordering them. */
+    public static final int DATATYPE_UNSUPPORTED    = -1;
+    public static final int DATATYPE_NULL           = 0;
+    public static final int DATATYPE_TEXT           = 1;
+    public static final int DATATYPE_INTEGER        = 2;
+    public static final int DATATYPE_DECIMAL        = 3;
+    public static final int DATATYPE_DATE           = 4;
+    public static final int DATATYPE_TIME           = 5;
+    public static final int DATATYPE_DATE_TIME      = 6;
+    public static final int DATATYPE_CHOICE         = 7;
+    /** A list of items used for selecting multiple answers or ordering them */
     public static final int DATATYPE_MULTIPLE_ITEMS = 8;
-    /** The same as above but exists only for backwards compatibility. */
-    public static final int DATATYPE_CHOICE_LIST = 8;
-    /** Question with true and false answers. */
-    public static final int DATATYPE_BOOLEAN = 9;
-    /** Question with location answer. */
-    public static final int DATATYPE_GEOPOINT = 10;
-    /** Question with barcode string answer. */
-    public static final int DATATYPE_BARCODE = 11;
-    /** Question with external binary answer. */
-    public static final int DATATYPE_BINARY = 12;
-    /** Question with external binary answer. */
-    public static final int DATATYPE_LONG = 13;
-    /** Question with GeoShape answer. */
-    public static final int DATATYPE_GEOSHAPE = 14;
-    /** Question with GeoTrace answer. */
-    public static final int DATATYPE_GEOTRACE = 15;
+    /** The same as {@link Constants#DATATYPE_MULTIPLE_ITEMS} (for backwards compatibility) */
+    public static final int DATATYPE_CHOICE_LIST    = 8;
+    public static final int DATATYPE_BOOLEAN        = 9;
+    public static final int DATATYPE_GEOPOINT       = 10;
+    public static final int DATATYPE_BARCODE        = 11;
+    public static final int DATATYPE_BINARY         = 12;
+    public static final int DATATYPE_LONG           = 13;
+    public static final int DATATYPE_GEOSHAPE       = 14;
+    public static final int DATATYPE_GEOTRACE       = 15;
 
     public static final int CONTROL_UNTYPED = -1;
     public static final int CONTROL_INPUT = 1;
