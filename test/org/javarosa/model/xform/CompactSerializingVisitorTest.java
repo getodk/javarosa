@@ -27,8 +27,7 @@ public class CompactSerializingVisitorTest {
 
     @Before
     public void setUp() throws IOException {
-        FormParseInit formParser = new FormParseInit();
-        formParser.setFormToParse(r("sms_form.xml").toString());
+        FormParseInit formParser = new FormParseInit(r("sms_form.xml"));
         FormEntryController formEntryController = formParser.getFormEntryController();
         formInstance = formEntryController.getModel().getForm().getInstance();
 
