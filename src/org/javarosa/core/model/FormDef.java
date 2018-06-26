@@ -382,12 +382,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                          boolean midSurvey) {
         IAnswerData oldValue = node.getValue();
         IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
-        if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer()
-                && objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
-                answerDataSerializer.serializeAnswerData(data))) {
+
+        boolean valueChanged = !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
+                answerDataSerializer.serializeAnswerData(data));
+
+        if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer() && !valueChanged) {
             return;
         }
         setAnswer(data, node);
+
+        QuestionDef currentQuestion = findQuestionByRef(ref, this);
+        if (valueChanged && currentQuestion != null) {
+            currentQuestion.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, this,
+                    ref.getParentRef(), null);
+        }
+
         Collection<QuickTriggerable> qts = triggerTriggerables(ref, midSurvey);
         dagImpl.publishSummary("New value", ref, qts);
         // TODO: pre-populate fix-count repeats here?
