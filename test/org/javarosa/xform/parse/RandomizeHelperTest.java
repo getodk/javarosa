@@ -34,11 +34,15 @@ public class RandomizeHelperTest {
     @Test
     public void cleans_the_nodeset_definition() {
         // We will try different combinations of whitespace and seed presence around the path
-        assertEquals("/some/path", cleanNodesetDefinition("randomize(/some/path)"));
-        assertEquals("/some/path", cleanNodesetDefinition("randomize( /some/path )"));
-        assertEquals("/some/path", cleanNodesetDefinition("randomize(/some/path,33)"));
-        assertEquals("/some/path", cleanNodesetDefinition("randomize(/some/path, 33)"));
-        assertEquals("/some/path", cleanNodesetDefinition("randomize( /some/path , 33)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize( /some/path )"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path,33)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path, 33)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize( /some/path , 33)"));
+        assertEquals("/some/path[someFilter]",                  cleanNodesetDefinition("randomize(/some/path[someFilter])"));
+        assertEquals("/some/path[someFilter]",                  cleanNodesetDefinition("randomize(/some/path[someFilter], 33)"));
+        assertEquals("/some/path[someFilter(with, commas)]",    cleanNodesetDefinition("randomize(/some/path[someFilter(with, commas)])"));
+        assertEquals("/some/path[someFilter(with, commas)]",    cleanNodesetDefinition("randomize(/some/path[someFilter(with, commas)], 33)"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -58,6 +62,10 @@ public class RandomizeHelperTest {
         assertEquals(new Long(33), parseSeed("randomize(/some/path,33)"));
         assertEquals(new Long(33), parseSeed("randomize(/some/path, 33)"));
         assertEquals(new Long(33), parseSeed("randomize(/some/path, 33 )"));
+        assertNull(parseSeed("randomize(/some/path[someFilter])"));
+        assertEquals(new Long(33), parseSeed("randomize(/some/path[someFilter], 33)"));
+        assertNull(parseSeed("randomize(/some/path[someFilter(with, commas)])"));
+        assertEquals(new Long(33), parseSeed("randomize(/some/path[someFilter(with, commas)], 33)"));
     }
 
     @Test(expected = IllegalArgumentException.class)
