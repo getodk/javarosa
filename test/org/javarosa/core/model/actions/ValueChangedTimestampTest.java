@@ -5,6 +5,8 @@ import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
 import org.joda.time.DateTimeUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -38,11 +40,7 @@ public class ValueChangedTimestampTest {
         // Given
         final FormDef formDef =
                 parse(r("nested-setvalue-action.xml")).formDef;
-
-        TreeReference triggerRef = new TreeReference();
-        triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
-        triggerRef.add("data", 0);
-        triggerRef.add("cost", 0);
+        FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
 
         TreeReference targetRef = new TreeReference();
         targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
@@ -53,7 +51,8 @@ public class ValueChangedTimestampTest {
         assertNull(targetValue);
 
         // When
-        formDef.setValue(new DecimalData(22.0), triggerRef, true);
+        formEntryController.stepToNextEvent();
+        formEntryController.answerQuestion(new DecimalData(22.0), true);
 
         // Then
         targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
@@ -67,31 +66,32 @@ public class ValueChangedTimestampTest {
         // Given
         final FormDef formDef =
                 parse(r("nested-setvalue-action-with-repeats.xml")).formDef;
+        FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
 
-        TreeReference[] triggerRefs = new TreeReference[3];
         TreeReference[] targetRefs = new TreeReference[3];
 
         for (int i = 0; i < 3; i++) {
-            TreeReference triggerRef = new TreeReference();
-            triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
-            triggerRef.add("data", 0);
-            triggerRef.add("repeat", i);
-            triggerRef.add("cost", 0);
-
             TreeReference targetRef = new TreeReference();
             targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
             targetRef.add("data", 0);
             targetRef.add("repeat", i);
             targetRef.add("cost_timestamp", 0);
 
-            triggerRefs[i] = triggerRef;
             targetRefs[i] = targetRef;
+
+            IAnswerData targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
+            assertNull(targetValue);
         }
 
         // When
         for (int i = 0; i < 3; i++) {
+            int eventType = -1;
+            while (eventType != FormEntryController.EVENT_QUESTION) {
+                eventType = formEntryController.stepToNextEvent();
+            }
+
             DateTimeUtils.setCurrentMillisFixed(DATE_NOW + i * DAY_OFFSET);
-            formDef.setValue(new DecimalData(i+1), triggerRefs[i], true);
+            formEntryController.answerQuestion(new DecimalData(i + 1), true);
         }
 
         // Then
@@ -107,28 +107,27 @@ public class ValueChangedTimestampTest {
         // Given
         final FormDef formDef =
                 parse(r("nested-setvalue-action.xml")).formDef;
-
-        TreeReference triggerRef = new TreeReference();
-        triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
-        triggerRef.add("data", 0);
-        triggerRef.add("cost", 0);
+        FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
 
         TreeReference targetRef = new TreeReference();
         targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
         targetRef.add("data", 0);
         targetRef.add("cost_timestamp", 0);
 
-        DecimalData decimalValue = new DecimalData(22.0);
-        formDef.getMainInstance().resolveReference(targetRef).setValue(new DateTimeData(new Date(DATE_NOW)));
-        formDef.getMainInstance().resolveReference(triggerRef).setValue(decimalValue);
+        formEntryController.stepToNextEvent();
+        formEntryController.answerQuestion(new DecimalData(22.0), true);
+
+        IAnswerData targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
+        IAnswerData expectedValue = new DateTimeData(new Date(DATE_NOW));
+        assertEquals(expectedValue.getValue(), targetValue.getValue());
 
         // When
         DateTimeUtils.setCurrentMillisFixed(DATE_NOW + DAY_OFFSET); // shift the current time so we can test whether the setvalue action was re-fired
-        formDef.setValue(decimalValue, triggerRef, true);
+        formEntryController.answerQuestion(new DecimalData(22.0), true);
 
         // Then
-        IAnswerData targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
-        IAnswerData expectedValue = new DateTimeData(new Date(DATE_NOW));
+        targetValue = formDef.getMainInstance().resolveReference(targetRef).getValue();
+        expectedValue = new DateTimeData(new Date(DATE_NOW));
 
         assertEquals(expectedValue.getValue(), targetValue.getValue());
     }

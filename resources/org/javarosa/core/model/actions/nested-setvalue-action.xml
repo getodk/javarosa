@@ -6,7 +6,6 @@
                 <data id="data-id">
                     <cost/>
                     <cost_timestamp/>
-                    <cost_calculation/>
                 </data>
             </instance>
             <bind nodeset="/data/cost" type="decimal" />
