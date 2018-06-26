@@ -16,12 +16,16 @@
 package org.javarosa.xform.parse;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class contains all the code needed to implement the xform randomize()
  * function.
  */
 public final class RandomizeHelper {
+    private static final Pattern CHOICE_FILTER_PATTERN = Pattern.compile("randomize\\((.+?),?([^,)\\]]+?)?\\)");
+
     /**
      * Looks for a seed in an xform randomize() expression. If it is present and
      * it can be parsed into a {@link Long}, it returns it. If it is not present,
@@ -84,6 +88,13 @@ public final class RandomizeHelper {
     private static String[] getArgs(String nodesetStr) {
         if (!nodesetStr.startsWith("randomize(") || !nodesetStr.endsWith(")"))
             throw new IllegalArgumentException("Nodeset definition must use randomize(path, seed?) function");
-        return nodesetStr.substring(10, nodesetStr.length() - 1).split(",");
+        if (!nodesetStr.contains("["))
+            return nodesetStr.substring(10, nodesetStr.length() - 1).split(",");
+        Matcher matcher = CHOICE_FILTER_PATTERN.matcher(nodesetStr);
+        if (!matcher.matches())
+            throw new IllegalArgumentException("Can't parse the Nodeset definition");
+        String nodeset = matcher.group(1);
+        String seed = matcher.group(2);
+        return seed != null ? new String[]{nodeset, seed} : new String[]{nodeset};
     }
 }
