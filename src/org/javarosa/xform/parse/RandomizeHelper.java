@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
  * function.
  */
 public final class RandomizeHelper {
+    private static final Pattern CHOICE_FILTER_PATTERN = Pattern.compile("randomize\\((.+?),?([^,)\\]]+?)?\\)");
+
     /**
      * Looks for a seed in an xform randomize() expression. If it is present and
      * it can be parsed into a {@link Long}, it returns it. If it is not present,
@@ -88,7 +90,7 @@ public final class RandomizeHelper {
             throw new IllegalArgumentException("Nodeset definition must use randomize(path, seed?) function");
         if (!nodesetStr.contains("["))
             return nodesetStr.substring(10, nodesetStr.length() - 1).split(",");
-        Matcher matcher = Pattern.compile("randomize\\((.+?),?([^,)\\]]+?)?\\)").matcher(nodesetStr);
+        Matcher matcher = CHOICE_FILTER_PATTERN.matcher(nodesetStr);
         if (!matcher.matches())
             throw new IllegalArgumentException("Can't parse the Nodeset definition");
         String nodeset = matcher.group(1);
