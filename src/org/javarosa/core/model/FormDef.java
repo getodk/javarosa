@@ -1571,7 +1571,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     @Override
     public ActionController getActionController() {
-        return this.actionController;
+        return actionController;
     }
 
     /**

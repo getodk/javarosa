@@ -165,7 +165,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
     @Override
     public ActionController getActionController() {
-        return this.actionController;
+        return actionController;
     }
 
     public String getHelpTextID () {

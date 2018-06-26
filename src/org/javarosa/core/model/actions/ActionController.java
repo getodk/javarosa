@@ -29,14 +29,14 @@ public class ActionController implements Externalizable {
     private HashMap<String, List<Action>> eventListeners;
 
     public ActionController() {
-        this.eventListeners = new HashMap<String, List<Action>>();
+        this.eventListeners = new HashMap<>();
     }
 
     public List<Action> getListenersForEvent(String event) {
         if (this.eventListeners.containsKey(event)) {
             return eventListeners.get(event);
         }
-        return new ArrayList<Action>();
+        return new ArrayList<>();
     }
 
     public void registerEventListener(String event, Action action) {
@@ -44,7 +44,7 @@ public class ActionController implements Externalizable {
         if (eventListeners.containsKey(event)) {
             actions = eventListeners.get(event);
         } else {
-            actions = new ArrayList<Action>();
+            actions = new ArrayList<>();
             eventListeners.put(event, actions);
         }
         actions.add(action);
