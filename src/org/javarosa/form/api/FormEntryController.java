@@ -95,7 +95,8 @@ public class FormEntryController {
             return ANSWER_CONSTRAINT_VIOLATED;
         } else if (!complexQuestion) {
             commitAnswer(element, index, data, midSurvey);
-            q.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, model.getForm());
+            q.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, model.getForm(),
+                    element.getRef().getParentRef(), null);
             return ANSWER_OK;
         } else if (complexQuestion && hasConstraints) {
             //TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
@@ -107,7 +108,8 @@ public class FormEntryController {
                 logger.error("Error", ire);
                 throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
             }
-            q.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, model.getForm());
+            q.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, model.getForm(),
+                    element.getRef().getParentRef(), null);
             return ANSWER_OK;
         }
     }
