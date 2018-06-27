@@ -61,6 +61,8 @@ import static java.lang.Double.NaN;
  *
  */
 public class XPathFuncExpr extends XPathExpression {
+    /** Part of an error message, exposed so it can be located in tests */
+    public static final String REQUIRES_THREE_POINTS_MESSAGE = "requires at least three points";
     public XPathQName id;            //name of the function
     public XPathExpression[] args;    //argument list
 
@@ -415,7 +417,7 @@ public class XPathFuncExpr extends XPathExpression {
             assertArgsCount(name, args, 1);
             List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
             if (latLongs.size() < 3) {
-                throw new XPathUnhandledException(String.format("function '%s' requires at least three points.", name));
+                throw new XPathUnhandledException(String.format("function '%s' %s.", name, REQUIRES_THREE_POINTS_MESSAGE));
             }
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
         } else if (name.equals("distance")) {
