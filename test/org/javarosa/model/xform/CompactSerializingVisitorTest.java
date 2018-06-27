@@ -70,4 +70,17 @@ public class CompactSerializingVisitorTest {
     public void ensureTagWithNoAnswerNotPresent() {
         assertFalse(text.contains("CTY"));
     }
+
+    @Test
+    public void ensureThatFormWithNoSmsTagsIsEmpty() throws IOException {
+        FormParseInit formParser = new FormParseInit(r("simple-form.xml"));
+        FormEntryController formEntryController = formParser.getFormEntryController();
+        formInstance = formEntryController.getModel().getForm().getInstance();
+
+        CompactSerializingVisitor serializer = new CompactSerializingVisitor();
+
+        ByteArrayPayload payload = (ByteArrayPayload) serializer.createSerializedPayload(formInstance);
+
+        assertEquals(payload.toString(), "");
+    }
 }
