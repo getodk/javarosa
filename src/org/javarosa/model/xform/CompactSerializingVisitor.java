@@ -48,6 +48,10 @@ public class CompactSerializingVisitor implements IInstanceSerializingVisitor {
      */
     private IAnswerDataSerializer serializer;
 
+    public CompactSerializingVisitor() {
+        resultText = "";
+    }
+
     public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
         return serializeInstance(model);
     }
