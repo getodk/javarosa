@@ -36,20 +36,31 @@ import static org.junit.Assert.assertEquals;
 public class GeoShapeAreaTest {
     private static final Logger logger = LoggerFactory.getLogger(GeoShapeAreaTest.class);
 
-  @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
-    // Read the form definition
-    final FormDef formDef = parse(r("area.xml")).formDef;
+    @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
+        // Read the form definition
+        final FormDef formDef = parse(r("area.xml")).formDef;
 
-    // Trigger all calculations
-    formDef.initialize(true, new InstanceInitializationFactory());
+        // Trigger all calculations
+        formDef.initialize(true, new InstanceInitializationFactory());
 
-    // Check the results. The data and expected results come from GeoUtilsTest.
-    TreeElement root = formDef.getMainInstance().getRoot();
+        // Check the results. The data and expected results come from GeoUtilsTest.
+        TreeElement root = formDef.getMainInstance().getRoot();
 
-    IAnswerData area = root.getChildAt(1).getValue();
-    assertEquals(151_452, (Double) area.getValue(), 0.5);
+        IAnswerData area = root.getChildAt(1).getValue();
+        assertEquals(151_452, (Double) area.getValue(), 0.5);
 
-    IAnswerData distance = root.getChildAt(2).getValue();
-    assertEquals(1_801, (Double) distance.getValue(), 0.5);
-  }
+        IAnswerData distance = root.getChildAt(2).getValue();
+        assertEquals(1_801, (Double) distance.getValue(), 0.5);
+    }
+
+    @Test
+    public void testAreaWithLessThanThreePoints() throws Exception {
+        FormDef formDef = parse(r("area_with_less_than_three_points.xml")).formDef;
+        try {
+            formDef.initialize(true, new InstanceInitializationFactory());
+        } catch (Exception e) {
+            assertEquals("Error evaluating field 'arearesult': The problem was located in calculate expression for /area/arearesult\n" +
+                "XPath evaluation: cannot handle function 'enclosed-area' requires at least three points.", e.getMessage());
+        }
+    }
 }
