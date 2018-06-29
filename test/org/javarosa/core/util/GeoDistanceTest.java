@@ -20,6 +20,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.xpath.XPathUnhandledException;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -27,11 +28,15 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.javarosa.core.model.instance.TreeReference.DEFAULT_MULTIPLICITY;
 import static org.javarosa.core.util.GeoUtils.EARTH_EQUATORIAL_CIRCUMFERENCE_METERS;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.javarosa.xpath.expr.XPathFuncExpr.REQUIRES_TWO_POINTS_MESSAGE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 @RunWith(Enclosed.class)
 public class GeoDistanceTest {
@@ -73,9 +78,12 @@ public class GeoDistanceTest {
             try {
                 formDef.initialize(true, new InstanceInitializationFactory());
             } catch (Exception e) {
-                assertEquals("Error evaluating field 'trace-result': The problem was located in calculate expression for /distance/trace-result\n" +
-                    "XPath evaluation: cannot handle function 'distance' requires at least two points.", e.getMessage());
+                if (e.getCause() instanceof XPathUnhandledException) {
+                    assertThat(e.getCause().getMessage(), containsString(REQUIRES_TWO_POINTS_MESSAGE));
+                    return;
+                }
             }
+            fail("The expected exception with error about two points being required was not thrown");
         }
     }
 }
