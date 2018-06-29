@@ -20,26 +20,19 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.xpath.XPathUnhandledException;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.javarosa.xpath.expr.XPathFuncExpr.REQUIRES_THREE_POINTS_MESSAGE;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Author: Meletis Margaritis
  * Date: 8/4/14
  * Time: 3:40 PM
  */
-public class GeoShapeAreaTest {
-    private static final Logger logger = LoggerFactory.getLogger(GeoShapeAreaTest.class);
+public class GeoShapeAreaTest extends GeoTest {
 
     @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
         // Read the form definition
@@ -60,15 +53,6 @@ public class GeoShapeAreaTest {
 
     @Test
     public void testAreaWithLessThanThreePoints() throws Exception {
-        FormDef formDef = parse(r("area_with_less_than_three_points.xml")).formDef;
-        try {
-            formDef.initialize(true, new InstanceInitializationFactory());
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof XPathUnhandledException) {
-                assertThat(e.getCause().getMessage(), containsString(REQUIRES_THREE_POINTS_MESSAGE));
-                return;
-            }
-        }
-        fail("The expected exception with error about three points being required was not thrown");
+        expectUnhandledExceptionWithMessage("area_with_less_than_three_points.xml", REQUIRES_THREE_POINTS_MESSAGE);
     }
 }
