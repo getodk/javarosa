@@ -353,6 +353,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return ref;
     }
 
+    public TreeElement getFirstDescendantWithName(String name) {
+        return mainInstance.getRoot().getFirstDescendantWithName(name);
+    }
+
     public void setLocalizer(Localizer l) {
         if (this.localizer != null) {
             this.localizer.unregisterLocalizable(this);
