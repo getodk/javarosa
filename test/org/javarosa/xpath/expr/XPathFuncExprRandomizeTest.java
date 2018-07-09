@@ -19,9 +19,9 @@ import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.delete;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
-import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
-import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
+import static org.javarosa.TestHelper.getAnswerValue;
+import static org.javarosa.TestHelper.getSelectChoices;
+import static org.javarosa.TestHelper.initializeNewInstance;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,19 +31,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +62,7 @@ public class XPathFuncExprRandomizeTest {
         List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/fruit1");
         List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/fruit2");
 
-        assertFalse(nodesEqualInOrder(choices1, choices2));
+        assertFalse(selectChoicesEqualInOrder(choices1, choices2));
     }
 
     @Test
@@ -78,7 +73,7 @@ public class XPathFuncExprRandomizeTest {
         initializeNewInstance(formDef);
         List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/fruit1");
 
-        assertFalse(nodesEqualInOrder(choices1, choices2));
+        assertFalse(selectChoicesEqualInOrder(choices1, choices2));
     }
 
     @Test
@@ -87,7 +82,7 @@ public class XPathFuncExprRandomizeTest {
         List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/seededFruit1");
         List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/seededFruit2");
 
-        assertTrue(nodesEqualInOrder(choices1, choices2));
+        assertTrue(selectChoicesEqualInOrder(choices1, choices2));
     }
 
     @Test
@@ -98,7 +93,7 @@ public class XPathFuncExprRandomizeTest {
         initializeNewInstance(formDef);
         List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/seededFruit2");
 
-        assertTrue(nodesEqualInOrder(choices1, choices2));
+        assertTrue(selectChoicesEqualInOrder(choices1, choices2));
     }
 
     @Test
@@ -111,7 +106,7 @@ public class XPathFuncExprRandomizeTest {
         initializeNewInstance(formDefAfterSerialization);
         List<SelectChoice> choices2 = getSelectChoices(formDefAfterSerialization, "/randomize/seededFruit2");
 
-        assertTrue(nodesEqualInOrder(choices1, choices2));
+        assertTrue(selectChoicesEqualInOrder(choices1, choices2));
     }
 
     @Test
@@ -149,30 +144,7 @@ public class XPathFuncExprRandomizeTest {
         return deserializedFormDef;
     }
 
-    private static void initializeNewInstance(FormDef formDef) {
-        formDef.initialize(true, new InstanceInitializationFactory());
-    }
-
-    private List<SelectChoice> getSelectChoices(FormDef formDef, String ref) {
-        FormIndex formIndex = getFormIndex(formDef, absoluteRef(ref));
-        FormEntryPrompt formEntryPrompt = new FormEntryPrompt(formDef, formIndex);
-        return formEntryPrompt.getSelectChoices();
-    }
-
-    private Object getAnswerValue(FormDef formDef, String ref) {
-        FormIndex formIndex = getFormIndex(formDef, absoluteRef(ref));
-        FormEntryPrompt formEntryPrompt = new FormEntryPrompt(formDef, formIndex);
-        return formEntryPrompt.getAnswerValue().getValue();
-    }
-
-    private FormIndex getFormIndex(FormDef formDef, TreeReference ref) {
-        for (int localIndex = 0, lastIndex = formDef.getChildren().size(); localIndex < lastIndex; localIndex++)
-            if (formDef.getChild(localIndex).getBind().getReference().equals(ref))
-                return new FormIndex(localIndex, 0, ref);
-        throw new IllegalArgumentException("Reference " + ref + " not found");
-    }
-
-    private static boolean nodesEqualInOrder(List<SelectChoice> left, List<SelectChoice> right) {
+    private static boolean selectChoicesEqualInOrder(List<SelectChoice> left, List<SelectChoice> right) {
         if (left.size() != right.size())
             return false;
 
@@ -181,16 +153,5 @@ public class XPathFuncExprRandomizeTest {
                 return false;
 
         return true;
-    }
-
-    private static TreeReference absoluteRef(String path) {
-        TreeReference tr = new TreeReference();
-        tr.setRefLevel(REF_ABSOLUTE);
-        tr.setContext(CONTEXT_ABSOLUTE);
-        tr.setInstanceName(null);
-        Arrays.stream(path.split("/"))
-            .filter(s -> !s.isEmpty())
-            .forEach(s -> tr.add(s, INDEX_UNBOUND));
-        return tr;
     }
 }
