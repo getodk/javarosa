@@ -23,6 +23,8 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.FormParseInit;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 public class ConstraintTextTest {
 
     @Test
@@ -32,20 +34,10 @@ public class ConstraintTextTest {
         FormDef formDef = fpi.getFormDef();
         formDef.getLocalizer().setLocale("English");
 
-        formEntryModel.setQuestionIndex(formEntryModel.incrementIndex(formEntryModel.getFormIndex()));
-        FormEntryPrompt formEntryPrompt = new FormEntryPrompt(formDef, formEntryModel.getFormIndex());
-        assertEquals("Your message", formEntryPrompt.getConstraintText());
-
-        formEntryModel.setQuestionIndex(formEntryModel.incrementIndex(formEntryModel.getFormIndex()));
-        formEntryPrompt = new FormEntryPrompt(formDef, formEntryModel.getFormIndex());
-        assertEquals("Message", formEntryPrompt.getConstraintText());
-
-        formEntryModel.setQuestionIndex(formEntryModel.incrementIndex(formEntryModel.getFormIndex()));
-        formEntryPrompt = new FormEntryPrompt(formDef, formEntryModel.getFormIndex());
-        assertEquals("Your message", formEntryPrompt.getConstraintText());
-
-        formEntryModel.setQuestionIndex(formEntryModel.incrementIndex(formEntryModel.getFormIndex()));
-        formEntryPrompt = new FormEntryPrompt(formDef, formEntryModel.getFormIndex());
-        assertEquals("Message", formEntryPrompt.getConstraintText());
+        for (String expectedText : Arrays.asList("Your message", "Message", "Your message", "Message")) {
+            formEntryModel.setQuestionIndex(formEntryModel.incrementIndex(formEntryModel.getFormIndex()));
+            FormEntryPrompt formEntryPrompt = new FormEntryPrompt(formDef, formEntryModel.getFormIndex());
+            assertEquals(expectedText, formEntryPrompt.getConstraintText());
+        }
     }
 }
