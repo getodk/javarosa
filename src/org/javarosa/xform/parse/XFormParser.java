@@ -39,8 +39,8 @@ import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExt
 import static org.javarosa.core.services.ProgramFlow.die;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
-import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.RANK;
+import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
 import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
 import static org.javarosa.xform.parse.RandomizeHelper.parseSeed;
@@ -231,7 +231,8 @@ public class XFormParser implements IXFormParserFunctions {
                 }
             });
             put(RANK, new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
+                @Override
+                public void handle(XFormParser p, Element e, Object parent) {
                     p.parseControl((IFormElement) parent, e, CONTROL_RANK);
                 }
             });
@@ -977,8 +978,8 @@ public class XFormParser implements IXFormParserFunctions {
 
         boolean isItem =
             controlType == CONTROL_SELECT_MULTI
-            || controlType == CONTROL_RANK
-            || controlType == CONTROL_SELECT_ONE;
+                || controlType == CONTROL_RANK
+                || controlType == CONTROL_SELECT_ONE;
 
         question.setControlType(controlType);
         question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
