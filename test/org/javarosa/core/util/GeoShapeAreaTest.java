@@ -21,11 +21,10 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.javarosa.xpath.expr.XPathFuncExpr.REQUIRES_THREE_POINTS_MESSAGE;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -33,23 +32,27 @@ import static org.junit.Assert.assertEquals;
  * Date: 8/4/14
  * Time: 3:40 PM
  */
-public class GeoShapeAreaTest {
-    private static final Logger logger = LoggerFactory.getLogger(GeoShapeAreaTest.class);
+public class GeoShapeAreaTest extends GeoTest {
 
-  @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
-    // Read the form definition
-    final FormDef formDef = parse(r("area.xml")).formDef;
+    @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
+        // Read the form definition
+        final FormDef formDef = parse(r("area.xml")).formDef;
 
-    // Trigger all calculations
-    formDef.initialize(true, new InstanceInitializationFactory());
+        // Trigger all calculations
+        formDef.initialize(true, new InstanceInitializationFactory());
 
-    // Check the results. The data and expected results come from GeoUtilsTest.
-    TreeElement root = formDef.getMainInstance().getRoot();
+        // Check the results. The data and expected results come from GeoUtilsTest.
+        TreeElement root = formDef.getMainInstance().getRoot();
 
-    IAnswerData area = root.getChildAt(1).getValue();
-    assertEquals(151_452, (Double) area.getValue(), 0.5);
+        IAnswerData area = root.getChildAt(1).getValue();
+        assertEquals(151_452, (Double) area.getValue(), 0.5);
 
-    IAnswerData distance = root.getChildAt(2).getValue();
-    assertEquals(1_801, (Double) distance.getValue(), 0.5);
-  }
+        IAnswerData distance = root.getChildAt(2).getValue();
+        assertEquals(1_801, (Double) distance.getValue(), 0.5);
+    }
+
+    @Test
+    public void testAreaWithLessThanThreePoints() throws Exception {
+        expectUnhandledExceptionWithMessage("area_with_less_than_three_points.xml", REQUIRES_THREE_POINTS_MESSAGE);
+    }
 }
