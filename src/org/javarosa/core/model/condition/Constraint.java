@@ -84,9 +84,6 @@ public class Constraint implements Externalizable {
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         constraint = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
         constraintMsg = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
-        if (constraintMsg != null) {
-            constraintMsg = constraintMsg.trim();
-        }
         attemptConstraintCompile();
     }
 
