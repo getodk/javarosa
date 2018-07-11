@@ -37,10 +37,48 @@ class Scenario {
         return new Scenario(formDef, formEntryController);
     }
 
-    Scenario answer(String xpath, String value) {
-        FormIndex index = getIndexOf(xpath);
-        formEntryController.answerQuestion(index, new StringData(value), true);
-        return this;
+    void answer(String xpath, String value) {
+        createMissingRepeats(xpath);
+        TreeElement resolve = resolve(xpath);
+        formDef.setValue(new StringData(value), resolve.getRef(), true);
+    }
+
+    @SuppressWarnings("unchecked")
+    <T extends IAnswerData> T answerOf(String xpath) {
+        TreeElement root = (TreeElement) formDef.getMainInstance().getRoot().getParent();
+        String relativeXPath = xpath.startsWith("/") ? xpath.substring(1) : xpath;
+        TreeElement resolve = resolve(root, relativeXPath);
+        return resolve != null ? (T) resolve.getValue() : null;
+    }
+
+    List<SelectChoice> choicesOf(String xpath) {
+        QuestionDef control = formEntryController.getModel().getQuestionPrompt(getIndexOf(xpath)).getQuestion();
+        formDef.populateDynamicChoices(control.getDynamicChoices(), (TreeReference) control.getBind().getReference());
+        return control.getChoices() == null
+            ? control.getDynamicChoices().getChoices()
+            : control.getChoices();
+    }
+
+    private void createMissingRepeats(String xpath) {
+        List<String> parts = Arrays.asList(xpath.substring(1).split("/"));
+        String currentXPath = "";
+        do {
+            String firstPart = parts.get(0);
+            String name = firstPart.contains("[") ? firstPart.substring(0, firstPart.indexOf("[")) : firstPart;
+            currentXPath = currentXPath.equals("") ? "/" + name : currentXPath + "/" + firstPart;
+
+            boolean isRepeat = isRepeatXPath(currentXPath);
+            boolean isMissingNode = resolve(currentXPath) == null;
+            if (isRepeat && isMissingNode) {
+                formEntryController.newRepeat(getIndexOf(currentXPath + "[-1]"));
+            }
+            parts = parts.subList(1, parts.size());
+        } while (!parts.isEmpty());
+    }
+
+    private static boolean isRepeatXPath(String xPath) {
+        // We'll only look at the last part
+        return xPath.substring(xPath.lastIndexOf("/")).contains("[");
     }
 
     private TreeReference absoluteRef(String xpath) {
@@ -69,35 +107,29 @@ class Scenario {
                 return index;
             index = model.incrementIndex(index);
         } while (index.isInForm());
-        throw new IllegalArgumentException("Reference " + ref + " not found");
+        return null;
     }
 
-    @SuppressWarnings("unchecked")
-    <T extends IAnswerData> T answerOf(String xpath) {
+
+    private TreeElement resolve(String xPath) {
         TreeElement root = (TreeElement) formDef.getMainInstance().getRoot().getParent();
-        TreeElement resolve = resolve(root, xpath.startsWith("/") ? xpath.substring(1) : xpath);
-        return (T) resolve.getValue();
+        String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
+        return resolve(root, relativeXPath);
     }
 
-    static TreeElement resolve(TreeElement current, String xpath) {
-        List<String> parts = Arrays.asList(xpath.split("/"));
+    private TreeElement resolve(TreeElement currentElement, String restOfXPath) {
+        List<String> parts = Arrays.asList(restOfXPath.split("/"));
         String firstPart = parts.get(0);
         String name = firstPart.contains("[") ? firstPart.substring(0, firstPart.indexOf("[")) : firstPart;
         int multiplicity = firstPart.contains("[") ? Integer.parseInt(firstPart.substring(firstPart.indexOf("[") + 1, firstPart.indexOf("]"))) : 0;
-        TreeElement nextElement = current.getChild(name, multiplicity);
-        return parts.size() > 1 ? resolve(nextElement, shift(xpath)) : nextElement;
+        TreeElement nextElement = currentElement.getChild(name, multiplicity);
+        if (nextElement == null)
+            return null;
+        return parts.size() > 1 ? resolve(nextElement, shift(restOfXPath)) : nextElement;
     }
 
     private static String shift(String xpath) {
         List<String> parts2 = Arrays.asList(xpath.split("/"));
         return String.join("/", parts2.subList(1, parts2.size()));
-    }
-
-    List<SelectChoice> choicesOf(String xpath) {
-        QuestionDef control = formEntryController.getModel().getQuestionPrompt(getIndexOf(xpath)).getQuestion();
-        formDef.populateDynamicChoices(control.getDynamicChoices(), (TreeReference) control.getBind().getReference());
-        return control.getChoices() == null
-            ? control.getDynamicChoices().getChoices()
-            : control.getChoices();
     }
 }
