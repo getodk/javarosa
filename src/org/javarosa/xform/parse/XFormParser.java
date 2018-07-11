@@ -127,8 +127,8 @@ public class XFormParser implements IXFormParserFunctions {
     private static final String APPEARANCE_ATTR = "appearance";
     private static final String LABEL_ELEMENT = "label";
     private static final String VALUE = "value";
-    private static final String ITEXT_CLOSE = "')";
-    private static final String ITEXT_OPEN = "jr:itext('";
+    public static final String ITEXT_CLOSE = "')";
+    public static final String ITEXT_OPEN = "jr:itext('";
     private static final String DYNAMIC_ITEXT_CLOSE = ")";
     private static final String DYNAMIC_ITEXT_OPEN = "jr:itext(";
     private static final String BIND_ATTR = "bind";
