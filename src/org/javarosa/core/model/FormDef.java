@@ -122,7 +122,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             tref = TreeReference.selfRef(); //only happens for <group>s with no binding
         }
 
-        tref = tref.parent(parentRef);
+        tref = tref.anchor(parentRef);
         if (tref == null) {
             throw new XFormParseException("Binding path [" + tref + "] not allowed with parent binding of [" + parentRef + "]");
         }
