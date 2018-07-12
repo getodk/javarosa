@@ -15,10 +15,10 @@
  */
 package org.javarosa.xpath.expr;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.javarosa.xpath.expr.SelectChoiceMatchers.choice;
 import static org.junit.Assert.assertThat;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,16 +34,28 @@ public class XPathPathExprCurrentItemsetNodesetTest {
     public void current_in_itemset_nodeset_should_refer_to_node() {
         // The choices for /data/selected_person are taken from the repeat group at /data/people
         // First We insert two items
-        scenario.answer("/data/people[0]/person", "Bob");
-        scenario.answer("/data/people[1]/person", "Janet");
+        scenario.answer("/data/repeat_group[0]/people[0]/person", "Bob");
+        scenario.answer("/data/repeat_group[0]/people[1]/person", "Janet");
+        scenario.answer("/data/repeat_group[1]/people[0]/person", "Phil");
+        scenario.answer("/data/repeat_group[1]/people[1]/person", "Rose");
+        scenario.answer("/data/repeat_group[1]/people[2]/person", "Ada");
 
         // Then we check that the choices are what we expect
         // The value of each item is the position that item holds inside the repeat group
         assertThat(
-            scenario.choicesOf("/data/selected_person"),
-            Matchers.containsInAnyOrder(
+            scenario.choicesOf("/data/repeat_group[0]/selected_person"),
+            containsInAnyOrder(
                 choice("1", "Bob"),
                 choice("2", "Janet")
+            )
+        );
+
+        assertThat(
+            scenario.choicesOf("/data/repeat_group[1]/selected_person"),
+            containsInAnyOrder(
+                choice("1", "Phil"),
+                choice("2", "Rose"),
+                choice("3", "Ada")
             )
         );
     }
