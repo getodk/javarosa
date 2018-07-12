@@ -31,7 +31,7 @@ class SelectChoiceMatchers {
 
             @Override
             public void describeTo(Description description) {
-                description.appendText("choice with value \"" + expectedValue + "\"");
+                description.appendText("choice " + expectedDisplayText + "(\"" + expectedValue + "\")");
             }
 
             @Override
