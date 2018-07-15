@@ -14,16 +14,12 @@
  * the License.
  */
 
-/**
- *
- */
 package org.javarosa.core.model.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -46,17 +42,11 @@ public class BooleanData implements IAnswerData {
         this.data = data;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#clone()
-     */
     @Override
     public IAnswerData clone() {
         return new BooleanData(data);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-     */
     @Override
     public String getDisplayText() {
         if(data) {
@@ -66,35 +56,23 @@ public class BooleanData implements IAnswerData {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue() {
-        return new Boolean(data);
+        return data;
     }
 
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
-     */
     @Override
     public void setValue(Object o) {
-        data = ((Boolean)o).booleanValue();
+        data = (Boolean) o;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-     */
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         data = in.readBoolean();
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         out.writeBoolean(data);
@@ -116,5 +94,12 @@ public class BooleanData implements IAnswerData {
         }
 
         throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Boolean");
+    }
+
+    @Override
+    public String toString() {
+        return "BooleanData{" +
+            "data=" + data +
+            '}';
     }
 }

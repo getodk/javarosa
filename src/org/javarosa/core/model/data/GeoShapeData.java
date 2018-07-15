@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
@@ -46,18 +45,18 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
      *
      */
     public static class GeoShape {
-        public ArrayList<double[]> points;
+        public final ArrayList<double[]> points;
 
         public GeoShape() {
-            points = new ArrayList<double[]>();
+            points = new ArrayList<>();
         }
 
         public GeoShape(ArrayList<double[]> points) {
             this.points = points;
         }
-    };
+    }
 
-    public final ArrayList<GeoPointData> points = new ArrayList<GeoPointData>();
+    public final ArrayList<GeoPointData> points = new ArrayList<>();
 
 
     /**
@@ -89,11 +88,6 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
         return new GeoShapeData(this);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-     */
     @Override
     public String getDisplayText() {
         StringBuilder b = new StringBuilder();
@@ -109,19 +103,13 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
     }
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue() {
-        ArrayList<double[]> pts = new ArrayList<double[]>();
+        ArrayList<double[]> pts = new ArrayList<>();
         for ( GeoPointData p : points ) {
             pts.add((double[])p.getValue());
         }
-        GeoShape gs = new GeoShape(pts);
-        return gs;
+        return new GeoShape(pts);
     }
 
     @Override
@@ -135,7 +123,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
             o = v.getValue();
         }
         GeoShape gs = (GeoShape) o;
-        ArrayList<GeoPointData> temp = new ArrayList<GeoPointData>();
+        ArrayList<GeoPointData> temp = new ArrayList<>();
         for ( double[] da : gs.points ) {
             temp.add(new GeoPointData(da));
         }
@@ -145,8 +133,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
 
 
     @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException,
-            DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         points.clear();
         int len = (int) ExtUtil.readNumeric(in);
         for ( int i = 0 ; i < len ; ++i ) {
@@ -160,8 +147,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeNumeric(out, points.size());
-        for ( int i = 0 ; i < points.size() ; ++i ) {
-            GeoPointData t = points.get(i);
+        for (GeoPointData t : points) {
             t.writeExternal(out);
         }
     }
@@ -191,10 +177,7 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
     @Override
     public Boolean toBoolean() {
         // return whether or not any Geopoints have been set
-        if ( points.size() == 0 ) {
-            return false;
-        }
-        return true;
+        return !points.isEmpty();
     }
 
     @Override
@@ -215,5 +198,4 @@ public class GeoShapeData implements IAnswerData, IExprDataType {
     public String toString() {
         return getDisplayText();
     }
-
 }

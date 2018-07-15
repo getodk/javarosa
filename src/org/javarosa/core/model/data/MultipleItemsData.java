@@ -37,7 +37,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class MultipleItemsData implements IAnswerData {
-   List<Selection> vs; //List of Selection
+    private List<Selection> vs; //List of Selection
 
     /**
      * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -53,52 +53,40 @@ public class MultipleItemsData implements IAnswerData {
 
     @Override
     public IAnswerData clone () {
-       List<Selection> v = new ArrayList<Selection>(vs.size());
-        for (int i = 0; i < vs.size(); i++) {
-            v.add(vs.get(i).clone());
+       List<Selection> v = new ArrayList<>(vs.size());
+        for (Selection v1 : vs) {
+            v.add(v1.clone());
         }
         return new MultipleItemsData(v);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
-     */
     @Override
     public void setValue (Object o) {
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
 
-        ArrayList<Selection> selections = new ArrayList<Selection>(((List<Object>) o).size());
+        ArrayList<Selection> selections = new ArrayList<>(((List<Object>) o).size());
         for ( Object obj : (List<Object>) o) {
             selections.add((Selection) obj);
         }
         vs = selections;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue () {
-        return new ArrayList<Selection>(vs);
+        return new ArrayList<>(vs);
     }
 
     /**
      * @return THE XMLVALUE!!
-     */
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
      */
     @Override
     public String getDisplayText () {
         StringBuilder b = new StringBuilder();
 
         for (int i = 0; i < vs.size(); i++) {
-            Selection s = (Selection)vs.get(i);
+            Selection s = vs.get(i);
             b.append(s.getValue());
             if (i < vs.size() - 1)
                 b.append(", ");
@@ -106,18 +94,13 @@ public class MultipleItemsData implements IAnswerData {
 
         return b.toString();
     }
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-     */
+
     @SuppressWarnings("unchecked")
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         vs = (List<Selection>)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.write(out, new ExtWrapList(vs));
@@ -141,7 +124,7 @@ public class MultipleItemsData implements IAnswerData {
     public MultipleItemsData cast(UncastData data) throws IllegalArgumentException {
 
        List<String> choices = DateUtils.split(data.value, " ", true);
-       List<Selection> v = new ArrayList<Selection>(choices.size());
+       List<Selection> v = new ArrayList<>(choices.size());
 
         for(String s : choices) {
             v.add(new Selection(s));

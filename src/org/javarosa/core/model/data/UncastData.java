@@ -1,13 +1,9 @@
-/**
- *
- */
 package org.javarosa.core.model.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -39,27 +35,22 @@ public class UncastData implements IAnswerData {
         this.value = value;
     }
 
+    @Override
     public IAnswerData clone() {
         return new UncastData(value);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-     */
+    @Override
     public String getDisplayText() {
         return value;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
+    @Override
     public Object getValue() {
         return value;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
-     */
+    @Override
     public void setValue(Object o) {
         value = (String)o;
     }
@@ -72,25 +63,23 @@ public class UncastData implements IAnswerData {
         return value;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
-     */
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         value = ExtUtil.readString(in);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, value);
     }
 
+    @Override
     public UncastData uncast() {
         return this;
     }
 
+    @Override
     public UncastData cast(UncastData data) {
         return new UncastData(data.value);
     }

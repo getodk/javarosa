@@ -89,8 +89,8 @@ public class MultiPointerAnswerData implements IAnswerData {
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         out.writeInt(data.length);
-        for(int i = 0; i < data.length ; ++i ) {
-            ExtUtil.write(out, new ExtWrapTagged(data[i]));
+        for (IDataPointer aData : data) {
+            ExtUtil.write(out, new ExtWrapTagged(aData));
         }
     }
 

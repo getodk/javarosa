@@ -21,11 +21,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
-
 
 /**
  * A response to a question requesting an GeoTrace Value.
@@ -46,18 +44,18 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
      *
      */
     public static class GeoTrace {
-        public ArrayList<double[]> points;
+        public final ArrayList<double[]> points;
 
         public GeoTrace() {
-            points = new ArrayList<double[]>();
+            points = new ArrayList<>();
         }
 
         public GeoTrace(ArrayList<double[]> points) {
             this.points = points;
         }
-    };
+    }
 
-    public final ArrayList<GeoPointData> points = new ArrayList<GeoPointData>();
+    public final ArrayList<GeoPointData> points = new ArrayList<>();
 
 
     /**
@@ -110,19 +108,13 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     }
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue() {
-        ArrayList<double[]> pts = new ArrayList<double[]>();
+        ArrayList<double[]> pts = new ArrayList<>();
         for ( GeoPointData p : points ) {
             pts.add((double[])p.getValue());
         }
-        GeoTrace gs = new GeoTrace(pts);
-        return gs;
+        return new GeoTrace(pts);
     }
 
 
@@ -137,7 +129,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
             o = v.getValue();
         }
         GeoTrace gs = (GeoTrace) o;
-        ArrayList<GeoPointData> temp = new ArrayList<GeoPointData>();
+        ArrayList<GeoPointData> temp = new ArrayList<>();
         for ( double[] da : gs.points ) {
             temp.add(new GeoPointData(da));
         }
@@ -147,8 +139,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
 
 
     @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException,
-            DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         points.clear();
         int len = (int) ExtUtil.readNumeric(in);
         for ( int i = 0 ; i < len ; ++i ) {
@@ -162,8 +153,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeNumeric(out, points.size());
-        for ( int i = 0 ; i < points.size() ; ++i ) {
-            GeoPointData t = points.get(i);
+        for (GeoPointData t : points) {
             t.writeExternal(out);
         }
     }
@@ -193,10 +183,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     @Override
     public Boolean toBoolean() {
         // return whether or not any Geopoints have been set
-        if ( points.size() == 0 ) {
-            return false;
-        }
-        return true;
+        return !points.isEmpty();
     }
 
     @Override
@@ -217,5 +204,4 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
     public String toString() {
         return getDisplayText();
     }
-
 }

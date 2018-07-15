@@ -20,7 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -31,7 +30,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class LongData implements IAnswerData {
-    long n;
+    private long n;
 
     /**
      * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -53,20 +52,14 @@ public class LongData implements IAnswerData {
         return new LongData(n);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-     */
     @Override
     public String getDisplayText() {
         return String.valueOf(n);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue() {
-        return new Long(n);
+        return n;
     }
 
     @Override
@@ -74,20 +67,14 @@ public class LongData implements IAnswerData {
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
-        n = ((Long)o).longValue();
+        n = (Long) o;
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-     */
     @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         n = ExtUtil.readNumeric(in);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeNumeric(out, n);
@@ -105,5 +92,12 @@ public class LongData implements IAnswerData {
         } catch(NumberFormatException nfe) {
             throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Long");
         }
+    }
+
+    @Override
+    public String toString() {
+        return "LongData{" +
+            "n=" + n +
+            '}';
     }
 }
