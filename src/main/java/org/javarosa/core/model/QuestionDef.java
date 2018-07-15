@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * filling out a form.
  *
  * QuestionDef requires that any IDataReferences that are used
- * are contained in the FormDefRMS's PrototypeFactoryDeprecated in order
+ * are registered with PrototypeManager in order
  * to be properly deserialized. If they aren't, an exception
  * will be thrown at the time of deserialization.
  *

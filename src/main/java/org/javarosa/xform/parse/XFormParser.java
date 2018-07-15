@@ -90,7 +90,6 @@ import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.StopWatch;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.InterningKXmlParser;
 import org.javarosa.xform.util.XFormAnswerDataParser;
@@ -149,7 +148,6 @@ public class XFormParser implements IXFormParserFunctions {
     private static HashMap<String, IElementHandler> topLevelHandlers;
     private static HashMap<String, IElementHandler> groupLevelHandlers;
     private static final Map<String, Integer> typeMappings = TypeMappings.getMap();
-    private static PrototypeFactoryDeprecated modelPrototypes;
     private static List<SubmissionParser> submissionParsers;
 
     private Reader _reader;
@@ -205,7 +203,6 @@ public class XFormParser implements IXFormParserFunctions {
 
     private static void staticInit() {
         initProcessingRules();
-        modelPrototypes = new PrototypeFactoryDeprecated();
         submissionParsers = new ArrayList<>(1);
 
         referencedInstanceIds = new HashSet<>();
@@ -2020,14 +2017,8 @@ public class XFormParser implements IXFormParserFunctions {
             if (typeMappings.get(modelType) == null) {
                 throw new XFormParseException("ModelType " + modelType + " is not recognized.", node);
             }
-            element = (TreeElement) modelPrototypes.getNewInstance(typeMappings.get(modelType).toString());
-            if (element == null) {
-                element = new TreeElement(name, multiplicity);
-                logger.info("No model type prototype available for {}", modelType);
-            } else {
-                element.setName(name);
-                element.setMult(multiplicity);
-            }
+            element = new TreeElement(name, multiplicity);
+            logger.info("No model type prototype available for {}", modelType);
         }
         if (node.getNamespace() != null) {
             if (!node.getNamespace().equals(docnamespace)) {
