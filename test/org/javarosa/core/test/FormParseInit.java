@@ -1,8 +1,10 @@
 package org.javarosa.core.test;
 
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 import java.nio.file.Path;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -16,28 +18,19 @@ import org.javarosa.xform.util.XFormUtils;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/* TODO
- * Priority: Top priority is getting the localizations tested so that test coverage isn't lost
- *             Have a method to provide answers to test constraints
- */
-
 
 /**
  * This class sets up everything you need to perform tests on the models and form elements found in JR (such
  * as QuestionDef, FormDef, Selections, etc).  It exposes hooks to the FormEntryController,FormEntryModel and
  * FormDef (all the toys you need to test IFormElements, provide answers to questions and test constraints, etc)
- *
- * REMEMBER to set the
+ * <p>
+ * TODO Make some better lazy-people methods for testing constraints.
+ * TODO Get the localizations tested so that test coverage isn't lost.
+ * TODO Have a method to provide answers to test constraints.
  */
-
-
-//TODO
-//Make some better lazy-people methods for testing constraints.
-
-
 public class FormParseInit {
     private static final Logger logger = LoggerFactory.getLogger(FormParseInit.class);
     private final String FORM_NAME;
@@ -45,18 +38,17 @@ public class FormParseInit {
     private FormEntryController fec;
     private FormEntryModel femodel;
 
-
-    public FormParseInit(){
+    public FormParseInit() {
         FORM_NAME = r("ImageSelectTester.xhtml").toString();
         this.init();
     }
 
-    public FormParseInit(Path form){
+    public FormParseInit(Path form) {
         FORM_NAME = form.toString();
         this.init();
     }
 
-    private void init(){
+    private void init() {
         String xf_name = FORM_NAME;
         FileInputStream is;
         try {
@@ -72,53 +64,52 @@ public class FormParseInit {
         femodel = new FormEntryModel(xform);
         fec = new FormEntryController(femodel);
 
-        if( xform == null ) {
+        if (xform == null) {
             logger.error("ERROR: XForm has failed validation!!");
         }
     }
 
-
     /**
      * @return the first questionDef found in the form.
      */
-    public QuestionDef getFirstQuestionDef(){
+    public QuestionDef getFirstQuestionDef() {
         //go to the beginning of the form
         fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-        do{
+        do {
             FormEntryCaption fep = femodel.getCaptionPrompt();
-            if(fep.getFormElement() instanceof QuestionDef){
-                return (QuestionDef)fep.getFormElement();
+            if (fep.getFormElement() instanceof QuestionDef) {
+                return (QuestionDef) fep.getFormElement();
             }
-        }while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
+        } while (fec.stepToNextEvent() != EVENT_END_OF_FORM);
 
         return null;
     }
 
     /**
      * Gets the current question based off of
+     *
      * @return the question after getFirstQuestionDef()
      */
-    public QuestionDef getCurrentQuestion(){
+    public QuestionDef getCurrentQuestion() {
         FormEntryCaption fep = femodel.getCaptionPrompt();
-        if(fep.getFormElement() instanceof QuestionDef){
-            return (QuestionDef)fep.getFormElement();
+        if (fep.getFormElement() instanceof QuestionDef) {
+            return (QuestionDef) fep.getFormElement();
         }
         return null;
     }
 
     /**
-     *
      * @return the next question in the form (QuestionDef), or null if the end of the form has been reached.
      */
-    public QuestionDef getNextQuestion(){
+    public QuestionDef getNextQuestion() {
         //jump to next event and check for end of form
-        if(fec.stepToNextEvent() == FormEntryController.EVENT_END_OF_FORM) return null;
+        if (fec.stepToNextEvent() == EVENT_END_OF_FORM) return null;
 
         FormEntryCaption fep = this.getFormEntryModel().getCaptionPrompt();
 
-        do{
-            if(fep.getFormElement() instanceof QuestionDef) return (QuestionDef)fep.getFormElement();
-        }while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
+        do {
+            if (fep.getFormElement() instanceof QuestionDef) return (QuestionDef) fep.getFormElement();
+        } while (fec.stepToNextEvent() != EVENT_END_OF_FORM);
 
         return null;
     }
@@ -126,55 +117,54 @@ public class FormParseInit {
     /**
      * @return the FormDef for this form
      */
-
-    public FormDef getFormDef(){
+    public FormDef getFormDef() {
         return xform;
     }
 
-    public FormEntryModel getFormEntryModel(){
+    public FormEntryModel getFormEntryModel() {
         return fec.getModel();
     }
 
-    public FormEntryController getFormEntryController(){
+    public FormEntryController getFormEntryController() {
         return fec;
     }
 
     /*
      * Makes an 'extremely basic' print out of the xform model.
      */
-    public String printStuff(){
-        String stuff = "";
+    public String printStuff() {
+        StringBuilder stuff = new StringBuilder();
         //go to the beginning of the form
         fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-        do{
+        do {
             FormEntryCaption fep = femodel.getCaptionPrompt();
             boolean choiceFlag = false;
 
-            if(fep.getFormElement() instanceof QuestionDef){
-                stuff+="\t[Type:QuestionDef, ";
-                List<SelectChoice> s = ((QuestionDef)fep.getFormElement()).getChoices();
-                stuff+="ContainsChoices: "+ ((s != null && s.size() > 0) ? "true " : "false" ) +", ";
-                if(s != null && s.size() > 0) choiceFlag = true;
-            }else if(fep.getFormElement() instanceof FormDef){
-                stuff+="\t[Type:FormDef, ";
-            }else if(fep.getFormElement() instanceof GroupDef){
-                stuff+="\t[Type:GroupDef, ";
-            }else{
-                stuff+="\t[Type:Unknown]\n";
+            if (fep.getFormElement() instanceof QuestionDef) {
+                stuff.append("\t[Type:QuestionDef, ");
+                List<SelectChoice> s = ((QuestionDef) fep.getFormElement()).getChoices();
+                stuff.append("ContainsChoices: ").append((s != null && s.size() > 0) ? "true " : "false").append(", ");
+                if (s != null && s.size() > 0) choiceFlag = true;
+            } else if (fep.getFormElement() instanceof FormDef) {
+                stuff.append("\t[Type:FormDef, ");
+            } else if (fep.getFormElement() instanceof GroupDef) {
+                stuff.append("\t[Type:GroupDef, ");
+            } else {
+                stuff.append("\t[Type:Unknown]\n");
                 continue;
             }
 
-            stuff+="ID:"+fep.getFormElement().getID()+", TextID:"+fep.getFormElement().getTextID()+",InnerText:"+fep.getFormElement().getLabelInnerText();
-            if(choiceFlag){
-
-                stuff+="] \n\t\t---Choices:"+((QuestionDef)fep.getFormElement()).getChoices().toString()+"\n";
-            }else{
-                stuff+="]\n";
+            stuff.append("ID:").append(fep.getFormElement().getID()).append(", TextID:").
+                append(fep.getFormElement().getTextID()).append(",InnerText:").
+                append(fep.getFormElement().getLabelInnerText());
+            if (choiceFlag) {
+                stuff.append("] \n\t\t---Choices:").
+                    append(((QuestionDef) fep.getFormElement()).getChoices().toString()).append("\n");
+            } else {
+                stuff.append("]\n");
             }
-        }while(fec.stepToNextEvent()!=fec.EVENT_END_OF_FORM);
+        } while (fec.stepToNextEvent() != EVENT_END_OF_FORM);
 
-        return stuff;
+        return stuff.toString();
     }
-
-
 }
