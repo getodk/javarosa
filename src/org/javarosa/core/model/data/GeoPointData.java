@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
@@ -48,7 +47,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     // value to be reported if we never captured a datapoint
     public static final double NO_ACCURACY_VALUE = 9999999.0;
 
-    private double[] gp = new double[4];
+    private final double[] gp = new double[4];
     private int len = REQUIRED_ARRAY_SIZE;
 
 
@@ -74,9 +73,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
 
     private void fillArray(double[] gp) {
         len = gp.length;
-        for (int i = 0; i < len; i++) {
-            this.gp[i] = gp[i];
-        }
+        System.arraycopy(gp, 0, this.gp, 0, len);
         // make sure that any old data is removed...
         for (int i = len ; i < gp.length ; ++i ) {
             this.gp[i] = MISSING_VALUE;
@@ -90,11 +87,6 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-     */
     @Override
     public String getDisplayText() {
         if ( !toBoolean() ) {
@@ -113,11 +105,6 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue() {
         // clone()'ing to prevent some potential bad direct accesses
@@ -136,8 +123,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
 
 
     @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException,
-            DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         len = (int) ExtUtil.readNumeric(in);
         for (int i = 0; i < len; i++) {
             gp[i] = ExtUtil.readDecimal(in);

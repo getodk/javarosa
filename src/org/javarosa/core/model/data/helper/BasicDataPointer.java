@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.javarosa.core.data.IDataPointer;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -49,43 +48,31 @@ public class BasicDataPointer implements IDataPointer {
         this.data = data;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IDataPointer#deleteData()
-     */
+    @Override
     public boolean deleteData() {
 
         this.data = null;
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IDataPointer#getData()
-     */
+    @Override
     public byte[] getData() {
         return data;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IDataPointer#getDisplayText()
-     */
+    @Override
     public String getDisplayText() {
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IDataPointer#getDataStream()
-     */
+    @Override
     public InputStream getDataStream() {
-        ByteArrayInputStream bis = new ByteArrayInputStream(data);
-        return bis;
+        return new ByteArrayInputStream(data);
     }
 
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         int size = in.readInt();
         if(size != -1) {
             data = new byte[size];
@@ -94,6 +81,7 @@ public class BasicDataPointer implements IDataPointer {
         name = ExtUtil.readString(in);
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         if(data == null || data.length < 0) {
             out.writeInt(-1);
@@ -104,10 +92,9 @@ public class BasicDataPointer implements IDataPointer {
         ExtUtil.writeString(out, name);
     }
 
+    @Override
     public long getLength() {
         // TODO Auto-generated method stub
         return data.length;
     }
-
-
 }

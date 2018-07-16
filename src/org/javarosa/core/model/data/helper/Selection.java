@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -80,6 +79,7 @@ public class Selection implements Externalizable {
         this.index = index;
     }
 
+    @Override
     public Selection clone () {
         Selection s = new Selection();
         s.choice = choice;
@@ -123,17 +123,13 @@ public class Selection implements Externalizable {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-     */
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    @Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         xmlValue = ExtUtil.readString(in);
         index = ExtUtil.readInt(in);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, getValue());
         ExtUtil.writeNumeric(out, index);

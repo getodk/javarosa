@@ -20,7 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -49,43 +48,30 @@ public class StringData implements IAnswerData {
         return new StringData(s);
     }
 
-    //string should not be null or empty; the entire StringData reference should be null in this case
     @Override
     public void setValue (Object o) {
+        //string should not be null or empty; the entire StringData reference should be null in this case
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
         s = (String)o;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getValue()
-     */
     @Override
     public Object getValue () {
         return s;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-     */
     @Override
     public String getDisplayText () {
         return s;
     }
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-     */
+
     @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         s = ExtUtil.readString(in);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, s);
@@ -99,5 +85,12 @@ public class StringData implements IAnswerData {
     @Override
     public StringData cast(UncastData data) throws IllegalArgumentException {
         return new StringData(data.value);
+    }
+
+    @Override
+    public String toString() {
+        return "StringData{" +
+            "s='" + s + '\'' +
+            '}';
     }
 }
