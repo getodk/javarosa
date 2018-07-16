@@ -50,12 +50,12 @@ class TypeMappings {
 
         //xforms
         put("listItem",     DATATYPE_CHOICE);
-        put("listItems", DATATYPE_MULTIPLE_ITEMS);
+        put("listItems",    DATATYPE_MULTIPLE_ITEMS);
 
         //non-standard
         put(SELECTONE,      DATATYPE_CHOICE);
-        put(SELECT, DATATYPE_MULTIPLE_ITEMS);
-        put(RANK, DATATYPE_MULTIPLE_ITEMS);
+        put(SELECT,         DATATYPE_MULTIPLE_ITEMS);
+        put(RANK,           DATATYPE_MULTIPLE_ITEMS);
         put("geopoint",     DATATYPE_GEOPOINT);
         put("geoshape",     DATATYPE_GEOSHAPE);
         put("geotrace",     DATATYPE_GEOTRACE);
