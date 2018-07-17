@@ -59,7 +59,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.javarosa.core.model.Action;
+import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -70,6 +70,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
+import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
@@ -133,6 +134,7 @@ public class XFormParser implements IXFormParserFunctions {
     private static final String DYNAMIC_ITEXT_OPEN = "jr:itext(";
     private static final String BIND_ATTR = "bind";
     private static final String REF_ATTR = "ref";
+    private static final String EVENT_ATTR = "event";
 
     private static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
@@ -165,8 +167,7 @@ public class XFormParser implements IXFormParserFunctions {
     private List<Element> instanceNodes;
     private List<String> instanceNodeIdStrs;
     private List<String> itextKnownForms;
-    private List<String> namedActions;
-    private HashMap<String, IElementHandler> structuredActions;
+    private static HashMap<String, IElementHandler> actionHandlers;
 
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
     private final List<ErrorCallback> errorCallbacks = new ArrayList<>();
@@ -297,6 +298,13 @@ public class XFormParser implements IXFormParserFunctions {
             });
         }};
         topLevelHandlers.putAll(groupLevelHandlers);
+
+        setUpActionHandlers();
+    }
+
+    private static void setUpActionHandlers() {
+        actionHandlers = new HashMap<>();
+        registerActionHandler(SetValueAction.ELEMENT_NAME, SetValueAction.getHandler());
     }
 
     private void initState() {
@@ -317,22 +325,6 @@ public class XFormParser implements IXFormParserFunctions {
         itextKnownForms.add("short");
         itextKnownForms.add("image");
         itextKnownForms.add("audio");
-
-        namedActions = new ArrayList<>(6);
-        namedActions.add("rebuild");
-        namedActions.add("recalculate");
-        namedActions.add("revalidate");
-        namedActions.add("refresh");
-        namedActions.add("setfocus");
-        namedActions.add("reset");
-
-
-        structuredActions = new HashMap<>();
-        structuredActions.put("setvalue", new IElementHandler() {
-            public void handle(XFormParser p, Element e, Object parent) {
-                p.parseSetValueAction((FormDef) parent, e);
-            }
-        });
     }
 
     CacheTable<String> stringCache;
@@ -620,7 +612,7 @@ public class XFormParser implements IXFormParserFunctions {
                 parseBind(child);
             } else if ("submission".equals(childName)) {
                 delayedParseElements.add(child);
-            } else if (namedActions.contains(childName) || (childName != null && structuredActions.containsKey(childName))) {
+            } else if (childName != null && actionHandlers.containsKey(childName)) {
                 delayedParseElements.add(child);
             } else { //invalid model content
                 if (type == Node.ELEMENT) {
@@ -646,29 +638,38 @@ public class XFormParser implements IXFormParserFunctions {
             if (name.equals("submission")) {
                 parseSubmission(child);
             } else {
-                //For now, anything that isn't a submission is an action
-                if (namedActions.contains(name)) {
-                    parseNamedAction(child);
-                } else {
-                    structuredActions.get(name).handle(this, child, _f);
-                }
+                // For now, anything that isn't a submission is an action
+                actionHandlers.get(name).handle(this, child, _f);
             }
         }
     }
 
-    private void parseNamedAction(Element action) {
-        //TODO: Anything useful
+    /**
+     * Generic parse method that all actions get passed through. Checks that the action element's
+     * event attribute and location in the xform are both valid, and then invokes the more specific
+     * handler that is provided.
+     */
+    private void parseAction(Element e, Object parent, IElementHandler specificHandler) {
+        // Check that the event registered to trigger this action is a valid event that we support
+        String event = e.getAttributeValue(null, EVENT_ATTR);
+        if (!Action.isValidEvent(event)) {
+            throw new XFormParseException("An action was registered for an unsupported event: " + event);
+        }
+        // Check that the action was included in a valid place within the XForm
+        if (!(parent instanceof IFormElement)) {
+            // parent must either be a FormDef or QuestionDef, both of which are IFormElements
+            throw new XFormParseException("An action element occurred in an invalid location. " +
+                    "Must be either a child of a control element, or a child of the <model>");
+        }
+        specificHandler.handle(this, e, parent);
     }
 
-    private void parseSetValueAction(FormDef form, Element e) {
+    public void parseSetValueAction(ActionController source, Element e) {
         String ref = e.getAttributeValue(null, REF_ATTR);
         String bind = e.getAttributeValue(null, BIND_ATTR);
 
-        String event = e.getAttributeValue(null, "event");
-
-        IDataReference dataRef = null;
+        IDataReference dataRef;
         boolean refFromBind = false;
-
 
         //TODO: There is a _lot_ of duplication of this code, fix that!
         if (bind != null) {
@@ -694,7 +695,7 @@ public class XFormParser implements IXFormParserFunctions {
         Action action;
         TreeReference treeref = FormInstance.unpackReference(dataRef);
 
-        actionTargets.add(treeref);
+        registerActionTarget(treeref);
         if (valueRef == null) {
             if (e.getChildCount() == 0 || !e.isText(0)) {
                 throw new XFormParseException("No 'value' attribute and no inner value set in <setvalue> associated with: " + treeref, e);
@@ -709,8 +710,9 @@ public class XFormParser implements IXFormParserFunctions {
                 throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueRef + "'", e);
             }
         }
-        form.registerEventListener(event, action);
 
+        String event = e.getAttributeValue(null, "event");
+        source.registerEventListener(event, action);
     }
 
     private void parseSubmission(Element submission) {
@@ -996,6 +998,8 @@ public class XFormParser implements IXFormParserFunctions {
                 parseItem(question, child);
             } else if (isItem && "itemset".equals(childName)) {
                 parseItemset(question, child, parent);
+            } else if (actionHandlers.containsKey(childName)) {
+                actionHandlers.get(childName).handle(this, child, question);
             }
         }
         if (isItem) {
@@ -2090,6 +2094,32 @@ public class XFormParser implements IXFormParserFunctions {
         //   if (loc != null) {
         //       f.localeChanged(loc.getLocale(), loc);
         //     }
+    }
+
+    /**
+     * Let the parser know how to handle a given action -- All actions are first parsed by the
+     * generic parseAction() method, which is passed another handler to invoke after the generic
+     * handler is done
+     *
+     * @param specificHandler the handler for the specific action indicated by name, which
+     *                        is passed to and invoked by the generic parseAction() handler
+     */
+    public static void registerActionHandler(String name, final IElementHandler specificHandler) {
+        actionHandlers.put(
+                name,
+                new IElementHandler() {
+                    public void handle(XFormParser p, Element e, Object parent) {
+                        p.parseAction(e, parent, specificHandler);
+                    }
+                }
+        );
+    }
+
+    /**
+     * Notify parser about a node that will later be relevant to an action.
+     */
+    public void registerActionTarget(TreeReference target) {
+        actionTargets.add(target);
     }
 
     public static String getXMLText(Node n, boolean trim) {

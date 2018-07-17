@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.osm.OSMTag;
@@ -70,6 +71,8 @@ public class QuestionDef implements IFormElement, Localizable {
 
     List<FormElementStateListener> observers;
 
+    private ActionController actionController;
+
     public QuestionDef () {
         this(Constants.NULL_ID, Constants.DATATYPE_TEXT);
     }
@@ -78,6 +81,7 @@ public class QuestionDef implements IFormElement, Localizable {
         setID(id);
         setControlType(controlType);
         observers = new ArrayList<>(0);
+        actionController = new ActionController();
     }
 
     @Override
@@ -159,6 +163,11 @@ public class QuestionDef implements IFormElement, Localizable {
         return additionalAttributes;
     }
 
+    @Override
+    public ActionController getActionController() {
+        return actionController;
+    }
+
     public String getHelpTextID () {
         return helpTextID;
     }
@@ -185,12 +194,6 @@ public class QuestionDef implements IFormElement, Localizable {
 
         if(choices.contains(choice)){
             choices.remove(choice);
-        }
-    }
-
-    public void removeAllSelectChoices(){
-        if(choices != null){
-            choices.clear();
         }
     }
 
@@ -292,6 +295,7 @@ public class QuestionDef implements IFormElement, Localizable {
                 choices.get(i).setIndex(i);
             }
             setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
+            actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
 
             osmTags = (List<OSMTag>) ExtUtil.nullIfEmpty((List<OSMTag>)ExtUtil.read(dis, new ExtWrapList(OSMTag.class), pf));
         } catch ( OutOfMemoryError e ) {
@@ -316,6 +320,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
         ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
         ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
+        ExtUtil.write(dos, new ExtWrapNullable(actionController));
 
         ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(osmTags)));
     }

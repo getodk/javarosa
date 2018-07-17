@@ -18,6 +18,8 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.IDag.EventNotifierAccessor;
+import org.javarosa.core.model.actions.Action;
+import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -70,6 +72,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +82,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Daniel Kayiwa, Drew Roos
  */
-public class FormDef implements IFormElement, Localizable, Persistable, IMetaData {
+public class FormDef implements IFormElement, Localizable, Persistable, IMetaData,
+    ActionController.ActionResultProcessor {
     private static final Logger logger = LoggerFactory.getLogger(FormDef.class);
 
     public static final String STORAGE_KEY = "FORMDEF";
@@ -162,7 +166,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private HashMap<String, DataInstance> formInstances;
     private FormInstance mainInstance = null;
 
-    private HashMap<String, List<Action>> eventListeners;
+    private ActionController actionController;
 
     private EventNotifier eventNotifier;
 
@@ -202,8 +206,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         outputFragments = new ArrayList<IConditionExpr>();
         submissionProfiles = new HashMap<String, SubmissionProfile>();
         formInstances = new HashMap<String, DataInstance>();
-        eventListeners = new HashMap<String, List<Action>>();
         extensions = new ArrayList<XFormExtension>();
+        actionController = new ActionController();
 
         this.eventNotifier = eventNotifier;
     }
@@ -378,12 +382,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                          boolean midSurvey) {
         IAnswerData oldValue = node.getValue();
         IAnswerDataSerializer answerDataSerializer = new XFormAnswerDataSerializer();
-        if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer()
-                && objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
-                answerDataSerializer.serializeAnswerData(data))) {
+
+        boolean valueChanged = !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
+                answerDataSerializer.serializeAnswerData(data));
+
+        if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer() && !valueChanged) {
             return;
         }
         setAnswer(data, node);
+
+        QuestionDef currentQuestion = findQuestionByRef(ref, this);
+        if (valueChanged && currentQuestion != null) {
+            currentQuestion.getActionController().triggerActionsFromEvent(Action.EVENT_QUESTION_VALUE_CHANGED, this,
+                    ref.getParentRef(), null);
+        }
+
         Collection<QuickTriggerable> qts = triggerTriggerables(ref, midSurvey);
         dagImpl.publishSummary("New value", ref, qts);
         // TODO: pre-populate fix-count repeats here?
@@ -488,26 +501,31 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public void createNewRepeat(FormIndex index) throws InvalidReferenceException {
-        TreeReference destRef = getChildInstanceRef(index);
-        TreeElement template = mainInstance.getTemplate(destRef);
+        TreeReference repeatContextRef = getChildInstanceRef(index);
+        TreeElement template = mainInstance.getTemplate(repeatContextRef);
 
-        mainInstance.copyNode(template, destRef);
+        mainInstance.copyNode(template, repeatContextRef);
 
-        TreeElement newNode = mainInstance.resolveReference(destRef);
+        TreeElement newNode = mainInstance.resolveReference(repeatContextRef);
         preloadInstance(newNode);
 
         // 2013-05-14 - ctsims - Events should get fired _before_ calculate stuff
-        // is fired, moved
-        // this above triggering triggerables
-        // Grab any actions listening to this event
-        List<Action> listeners = getEventListeners(Action.EVENT_JR_INSERT);
-        for (Action a : listeners) {
-            a.processAction(this, destRef);
-        }
+        // is fired, moved this above triggering triggerables
+        actionController.triggerActionsFromEvent(Action.EVENT_JR_INSERT, this, repeatContextRef, this);
 
-        TreeReference parentRef = destRef.getParentRef();
+        // trigger conditions that depend on the creation of this new node
+        triggerTriggerables(repeatContextRef, true);
+
+        TreeReference parentRef = repeatContextRef.getParentRef();
         TreeElement parentElement = mainInstance.resolveReference(parentRef);
-        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), destRef, parentElement, newNode);
+        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, parentElement, newNode);
+    }
+
+    @Override
+    public void processResultOfAction(TreeReference refSetByAction, String event) {
+        if (Action.EVENT_JR_INSERT.equals(event)) {
+            // CommCare has an implementation if needed
+        }
     }
 
     public boolean isRepeatRelevant(TreeReference repeatRef) {
@@ -1106,7 +1124,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public boolean postProcessInstance() {
-        dispatchFormEvent(Action.EVENT_XFORMS_REVALIDATE);
+        actionController.triggerActionsFromEvent(Action.EVENT_XFORMS_REVALIDATE, this);
         return postProcessInstance(mainInstance.getRoot());
     }
 
@@ -1194,12 +1212,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, new ExtWrapTagged()), pf);
 
-        eventListeners = (HashMap<String, List<Action>>) ExtUtil.read(dis, new ExtWrapMap(
-                String.class, new ExtWrapListPoly()), pf);
-
         extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
         resetEvaluationContext();
+        actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
     }
 
     /**
@@ -1226,7 +1242,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // using a slightly different event for "First Load" which doesn't
         // get fired again, but always fire this one?
         if (newInstance) {
-            dispatchFormEvent(Action.EVENT_XFORMS_READY);
+            actionController.triggerActionsFromEvent(Action.EVENT_XFORMS_READY, this);
         }
 
         Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef(), false);
@@ -1260,8 +1276,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // for support of multi-instance forms
 
         ExtUtil.write(dos, new ExtWrapMap(formInstances, new ExtWrapTagged()));
-        ExtUtil.write(dos, new ExtWrapMap(eventListeners, new ExtWrapListPoly()));
         ExtUtil.write(dos, new ExtWrapListPoly(extensions));
+        ExtUtil.write(dos, new ExtWrapNullable(actionController));
     }
 
     public void collapseIndex(FormIndex index, List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
@@ -1553,6 +1569,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 "This method call is not relevant for FormDefs getAppearanceAttr ()");
     }
 
+    @Override
+    public ActionController getActionController() {
+        return actionController;
+    }
+
     /**
      * Appearance isn't a valid attribute for form, but this method must be
      * included as a result of conforming to the IFormElement interface.
@@ -1613,31 +1634,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public List<TreeElement> getAdditionalAttributes() {
         // Not supported.
         return Collections.emptyList();
-    }
-
-    public List<Action> getEventListeners(String event) {
-        if (this.eventListeners.containsKey(event)) {
-            return eventListeners.get(event);
-        }
-        return new ArrayList<Action>();
-    }
-
-    public void registerEventListener(String event, Action action) {
-        List<Action> actions;
-
-        if (this.eventListeners.containsKey(event)) {
-            actions = eventListeners.get(event);
-        } else {
-            actions = new ArrayList<Action>(1);
-        }
-        actions.add(action);
-        this.eventListeners.put(event, actions);
-    }
-
-    public void dispatchFormEvent(String event) {
-        for (Action action : getEventListeners(event)) {
-            action.processAction(this, null);
-        }
     }
 
     public <X extends XFormExtension> X getExtension(Class<X> extension) {
