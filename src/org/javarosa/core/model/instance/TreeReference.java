@@ -248,7 +248,7 @@ public class TreeReference implements Externalizable, Serializable {
 
             if (refLevel > 0) {
                 if (!baseReference.isAbsolute() && baseReference.size() == 0) {
-                    baseReference.refLevel += refLevel;
+                    newRef.refLevel += refLevel;
                 } else {
                     return null;
                 }
