@@ -242,7 +242,7 @@ public class TreeReference implements Externalizable, Serializable {
      **/
     public TreeReference parent(TreeReference baseReference) {
         if (isAbsolute()) {
-            return this;
+            return this.clone();
         } else {
             TreeReference newRef = baseReference.clone();
 
