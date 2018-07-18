@@ -1,4 +1,4 @@
-<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/">
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms/">
     <h:head>
         <h:title>Rank Form</h:title>
         <model>
@@ -43,7 +43,7 @@
         </model>
     </h:head>
     <h:body>
-        <orx:rank ref="/data/rankWidget">
+        <odk:rank ref="/data/rankWidget">
             <label ref="jr:itext('/data/rankWidget:label')"/>
             <item>
                 <label ref="jr:itext('/data/rankWidget:option0')"/>
@@ -73,6 +73,6 @@
                 <label ref="jr:itext('/data/rankWidget:option6')"/>
                 <value>G</value>
             </item>
-        </orx:rank>
+        </odk:rank>
     </h:body>
 </h:html>
