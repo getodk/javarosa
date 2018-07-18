@@ -63,7 +63,8 @@ class FormInstanceParser {
         FormInstance instanceModel = new FormInstance(root);
         instanceModel.setName(isMainInstance ? formDef.getTitle() : name);
 
-        final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList("id", "version", "uiVersion", "name"));
+        final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList("id", "version", "uiVersion", "name",
+                "prefix", "delimiter"));
 
         String schema = e.getNamespace();
         if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
