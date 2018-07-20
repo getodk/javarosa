@@ -1,0 +1,51 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Untitled Form</h:title>
+        <model>
+            <instance>
+                <data id="relative-current-ref-repeat">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                    <people>
+                        <count/>
+                        <person/>
+                    </people>
+
+                    <selected_person/>
+                </data>
+            </instance>
+            <itext>
+                <translation lang="English">
+                    <text id="/data/people:label">
+                        <value>People</value>
+                    </text>
+                    <text id="/data/people/person:label">
+                        <value>Person</value>
+                    </text>
+                </translation>
+            </itext>
+            <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+            <bind nodeset="/data/people/count" type="int" calculate="position(..)"/>
+            <bind nodeset="/data/people/person" type="string"/>
+            <bind nodeset="/data/selected_person" type="select1"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group>
+            <label ref="jr:itext('/data/people:label')"/>
+            <repeat nodeset="/data/people">
+                <input ref="/data/people/person">
+                    <label ref="jr:itext('/data/people/person:label')"/>
+                </input>
+            </repeat>
+
+            <select1 ref="/data/selected_person">
+                <itemset nodeset="current()/../people">
+                    <value ref="count"/>
+                    <label ref="person"/>
+                </itemset>
+            </select1>
+        </group>
+    </h:body>
+</h:html>

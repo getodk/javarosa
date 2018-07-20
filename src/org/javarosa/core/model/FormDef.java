@@ -126,7 +126,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             tref = TreeReference.selfRef(); //only happens for <group>s with no binding
         }
 
-        tref = tref.parent(parentRef);
+        tref = tref.anchor(parentRef);
         if (tref == null) {
             throw new XFormParseException("Binding path [" + tref + "] not allowed with parent binding of [" + parentRef + "]");
         }
@@ -355,6 +355,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         return ref;
+    }
+
+    public TreeElement getFirstDescendantWithName(String name) {
+        return mainInstance.getRoot().getFirstDescendantWithName(name);
     }
 
     public void setLocalizer(Localizer l) {

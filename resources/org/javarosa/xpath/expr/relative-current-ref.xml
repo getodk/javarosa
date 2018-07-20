@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>relative-current-ref</h:title>
+        <model>
+            <itext>
+                <translation default="true()" lang="default">
+                    <text id="static_instance-variety-3">
+                        <value>Collins</value>
+                    </text>
+                    <text id="static_instance-fruit-0">
+                        <value>Apple</value>
+                    </text>
+                    <text id="static_instance-variety-2">
+                        <value>Blueray</value>
+                    </text>
+                    <text id="static_instance-fruit-1">
+                        <value>Blueberry</value>
+                    </text>
+                    <text id="static_instance-fruit-2">
+                        <value>Cherimoya</value>
+                    </text>
+                    <text id="static_instance-variety-5">
+                        <value>Booth</value>
+                    </text>
+                    <text id="static_instance-variety-4">
+                        <value>Behl</value>
+                    </text>
+                    <text id="static_instance-variety-0">
+                        <value>Granny Smith</value>
+                    </text>
+                    <text id="static_instance-variety-1">
+                        <value>Gala</value>
+                    </text>
+                    <text id="static_instance-variety-6">
+                        <value>Duke</value>
+                    </text>
+                </translation>
+            </itext>
+            <instance>
+                <data id="relative-current-ref">
+                    <my_group>
+                        <name/>
+                        <name_relative/>
+                        <name_note/>
+                    </my_group>
+                    <fruit/>
+                    <variety/>
+                    <my_repeat jr:template="">
+                        <repeat_name/>
+                        <repeat_name_relative/>
+                        <repeat_name_note/>
+                        <repeat_fruit/>
+                        <repeat_variety/>
+                    </my_repeat>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <instance id="variety">
+                <root>
+                    <item>
+                        <itextId>static_instance-variety-0</itextId>
+                        <fruit>apple</fruit>
+                        <name>granny_smith</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-variety-1</itextId>
+                        <fruit>apple</fruit>
+                        <name>gala</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-variety-2</itextId>
+                        <fruit>blueberry</fruit>
+                        <name>blueray</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-variety-3</itextId>
+                        <fruit>blueberry</fruit>
+                        <name>collins</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-variety-6</itextId>
+                        <fruit>blueberry</fruit>
+                        <name>duke</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-variety-4</itextId>
+                        <fruit>cherimoya</fruit>
+                        <name>behl</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-variety-5</itextId>
+                        <fruit>cherimoya</fruit>
+                        <name>booth</name>
+                    </item>
+                </root>
+            </instance>
+            <instance id="fruit">
+                <root>
+                    <item>
+                        <itextId>static_instance-fruit-0</itextId>
+                        <name>apple</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-fruit-1</itextId>
+                        <name>blueberry</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-fruit-2</itextId>
+                        <name>cherimoya</name>
+                    </item>
+                </root>
+            </instance>
+            <bind nodeset="/data/my_group/name" type="string"/>
+            <bind calculate="current()/../name" nodeset="/data/my_group/name_relative" type="string"/>
+            <bind nodeset="/data/my_group/name_note" readonly="true()" type="string"/>
+            <bind nodeset="/data/fruit" type="select1"/>
+            <bind nodeset="/data/variety" type="select1"/>
+            <bind nodeset="/data/my_repeat/repeat_name" type="string"/>
+            <bind calculate="current()/../repeat_name" nodeset="/data/my_repeat/repeat_name_relative" type="string"/>
+            <bind nodeset="/data/my_repeat/repeat_name_note" readonly="true()" type="string"/>
+            <bind nodeset="/data/my_repeat/repeat_fruit" type="select1"/>
+            <bind nodeset="/data/my_repeat/repeat_variety" type="select1"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/data/my_group">
+            <label>My group</label>
+            <input ref="/data/my_group/name">
+                <label>Name</label>
+            </input>
+            <input ref="/data/my_group/name_note">
+                <label>Your name is
+                    <output value=" /data/my_group/name_relative "/></label>
+            </input>
+        </group>
+        <select1 ref="/data/fruit">
+            <label>Fruit</label>
+            <item>
+                <label>Apple</label>
+                <value>apple</value>
+            </item>
+            <item>
+                <label>Blueberry</label>
+                <value>blueberry</value>
+            </item>
+            <item>
+                <label>Cherimoya</label>
+                <value>cherimoya</value>
+            </item>
+        </select1>
+        <select1 ref="/data/variety">
+            <label>Variety</label>
+            <itemset nodeset="instance('variety')/root/item[fruit = current()/../fruit]">
+                <value ref="name"/>
+                <label ref="jr:itext(itextId)"/>
+            </itemset>
+        </select1>
+        <group ref="/data/my_repeat">
+            <label>My repeat</label>
+            <repeat nodeset="/data/my_repeat">
+                <input ref="/data/my_repeat/repeat_name">
+                    <label>Name</label>
+                </input>
+                <input ref="/data/my_repeat/repeat_name_note">
+                    <label>Your name is
+                        <output value=" /data/my_repeat/repeat_name_relative "/></label>
+                </input>
+                <select1 ref="/data/my_repeat/repeat_fruit">
+                    <label>Fruit</label>
+                    <item>
+                        <label>Apple</label>
+                        <value>apple</value>
+                    </item>
+                    <item>
+                        <label>Blueberry</label>
+                        <value>blueberry</value>
+                    </item>
+                    <item>
+                        <label>Cherimoya</label>
+                        <value>cherimoya</value>
+                    </item>
+                </select1>
+                <select1 ref="/data/my_repeat/repeat_variety">
+                    <label>Variety</label>
+                    <itemset nodeset="instance('variety')/root/item[fruit = current()/../repeat_fruit]">
+                        <value ref="name"/>
+                        <label ref="jr:itext(itextId)"/>
+                    </itemset>
+                </select1>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>

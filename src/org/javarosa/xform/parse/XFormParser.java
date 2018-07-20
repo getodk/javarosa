@@ -1324,7 +1324,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
         itemset.nodesetExpr = new XPathConditional(path);
-        itemset.contextRef = getFormElementRef(qparent);
+        itemset.contextRef = getFormElementRef(q);
         // this is not valid yet...
         itemset.nodesetRef = null;
         // itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), itemset.contextRef));
