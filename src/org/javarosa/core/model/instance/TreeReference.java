@@ -226,65 +226,79 @@ public class TreeReference implements Externalizable, Serializable {
         }
     }
 
-    //return a new reference that is this reference anchored to a passed-in parent reference
-    //if this reference is absolute, return self
-    //if this ref has 'parent' steps (..), it can only be anchored if the parent ref is a relative ref consisting only of other 'parent' steps
-    //return null in these invalid situations
-    public TreeReference parent (TreeReference parentRef) {
+
+
+    /**
+     * Builds and returns a new reference that is this reference anchored to a passed-in base reference.
+     *
+     * Unlike in {link #anchor(TreeReference)}, the base reference can be relative. This allows anchoring of nodes
+     * with inherited context such as in {@link org.javarosa.core.model.instance.TreeElement#BuildRef} which
+     * {@link #anchor(TreeReference) anchor} can't do. However, if this ref has 'parent' steps (..), it can only be
+     * anchored if the base ref is a relative ref consisting only of other 'parent' steps. For example,
+     * '../../a'.parent('..') is valid and yields '../../../a'.
+     *
+     * @return a new TreeReference that represents this reference anchored to the parent or null if this ref has parent
+     * steps and the parent ref is not a relative reference consisting only of other 'parent' steps.
+     **/
+    public TreeReference parent(TreeReference baseReference) {
         if (isAbsolute()) {
-            return this;
+            return this.clone();
         } else {
-            TreeReference newRef = parentRef.clone();
+            TreeReference newRef = baseReference.clone();
 
             if (refLevel > 0) {
-                if (!parentRef.isAbsolute() && parentRef.size() == 0) {
-                    parentRef.refLevel += refLevel;
+                if (!baseReference.isAbsolute() && baseReference.size() == 0) {
+                    newRef.refLevel += refLevel;
                 } else {
                     return null;
                 }
             }
 
-            for(TreeReferenceLevel l : data) {
-                newRef.add(l.shallowCopy());
+            for (TreeReferenceLevel level : data) {
+                newRef.add(level.shallowCopy());
             }
 
             return newRef;
         }
     }
 
-
-    //very similar to parent(), but assumes contextRef refers to a singular, existing node in the model
-    //this means we can do '/a/b/c + ../../d/e/f = /a/d/e/f', which we couldn't do in parent()
-    //return null if context ref is not absolute, or we parent up past the root node
-    //NOTE: this function still works even when contextRef contains INDEX_UNBOUND multiplicites... conditions depend on this behavior,
-    //  even though it's slightly icky
-    public TreeReference anchor (TreeReference contextRef) throws XPathException {
-        //TODO: Technically we should possibly be modifying context stuff here
-        //instead of in the xpath stuff;
-
+    /**
+     * Builds and returns a new reference that is this reference anchored to a passed-in base reference.
+     *
+     * Unlike in {link #parent(TreeReference)}, the base reference must be absolute and refer to a singular, existing
+     * node in the model. For example, this allows '../../d/e/f'.anchor('/a/b/c') -> '/a/d/e/f' which can't be done by
+     * {link #parent(TreeReference)}.
+     *
+     * NOTE: this function still works even when baseReference contains INDEX_UNBOUND multiplicities. Conditions depend
+     * on this behavior, even though it's slightly icky
+     *
+     * TODO: Technically we should possibly be modifying context stuff here instead of in the xpath stuff
+     *
+     * @return a new TreeReference that represents this reference anchored to the context.
+     * @throws XPathException if the context reference is not absolute or if there is an attempt to parent past the
+     * root node (too many '../' levels).
+     */
+    public TreeReference anchor (TreeReference baseReference) throws XPathException {
         if (isAbsolute()) {
             return this.clone();
-        } else if (!contextRef.isAbsolute()) {
-            throw new XPathException("Could not resolve " + this.toString(true));
-        } else {
-            TreeReference newRef = contextRef.clone();
-            int contextSize = contextRef.size();
-            if (refLevel > contextSize) {
-                //tried to do '/..'
-                throw new XPathException("Could not resolve " + this.toString(true));
-            } else {
-                for (int i = 0; i < refLevel; i++) {
-                    newRef.removeLastLevel();
-                }
-                for (int i = 0; i < size(); i++) {
-                    newRef.add(data.get(i).shallowCopy());
-                }
-                return newRef;
-            }
+        } else if (!baseReference.isAbsolute()) {
+            throw new XPathException(baseReference.toString(true) + " is not an absolute reference");
+        } else if (refLevel > baseReference.size()) {
+            throw new XPathException("Attempt to parent past the root node " + this.toString(true));
         }
-    }
 
-    //TODO: merge anchor() and parent()
+        TreeReference newRef = baseReference.clone();
+
+        for (int i = 0; i < refLevel; i++) {
+            newRef.removeLastLevel();
+        }
+
+        for (TreeReferenceLevel level : data) {
+            newRef.add(level.shallowCopy());
+        }
+
+        return newRef;
+    }
 
     public TreeReference contextualize (TreeReference contextRef) {
         //TODO: Technically we should possibly be modifying context stuff here
