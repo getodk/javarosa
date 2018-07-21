@@ -231,7 +231,7 @@ public class TreeReference implements Externalizable, Serializable {
     /**
      * Builds and returns a new reference that is this reference anchored to a passed-in base reference.
      *
-     * Unlike in {link #anchor(TreeReference)}, the base reference can be relative. This allows anchoring of nodes
+     * Unlike in {@link #anchor(TreeReference)}, the base reference can be relative. This allows anchoring of nodes
      * with inherited context such as in {@link org.javarosa.core.model.instance.TreeElement#BuildRef} which
      * {@link #anchor(TreeReference) anchor} can't do. However, if this ref has 'parent' steps (..), it can only be
      * anchored if the base ref is a relative ref consisting only of other 'parent' steps. For example,
@@ -265,12 +265,12 @@ public class TreeReference implements Externalizable, Serializable {
     /**
      * Builds and returns a new reference that is this reference anchored to a passed-in base reference.
      *
-     * Unlike in {link #parent(TreeReference)}, the base reference must be absolute and refer to a singular, existing
+     * Unlike in {@link #parent(TreeReference)}, the base reference must be absolute and refer to a singular, existing
      * node in the model. For example, this allows '../../d/e/f'.anchor('/a/b/c') -> '/a/d/e/f' which can't be done by
-     * {link #parent(TreeReference)}.
+     * {@link #parent(TreeReference)}.
      *
      * NOTE: this function still works even when baseReference contains INDEX_UNBOUND multiplicities. Conditions depend
-     * on this behavior, even though it's slightly icky
+     * on this behavior, even though it's slightly icky.
      *
      * TODO: Technically we should possibly be modifying context stuff here instead of in the xpath stuff
      *

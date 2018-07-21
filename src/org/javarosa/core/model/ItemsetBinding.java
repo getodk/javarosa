@@ -114,11 +114,15 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public void initReferences(QuestionDef q) {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
-        nodesetRef = getPathAbsTreeRef(new XPathReference(getCastExpr(nodesetExpr).getReference()), contextRef);
 
-        if (labelExpr != null) labelRef = getCondAbsTreeRef(labelExpr, nodesetRef);
-        if (copyExpr  != null) copyRef  = getCondAbsTreeRef(copyExpr,  nodesetRef);
-        if (valueExpr != null) valueRef = getCondAbsTreeRef(valueExpr, nodesetRef);
+        // Convert the expression to a relative reference and then anchor it to the context.
+        nodesetRef = getAbsoluteRef(nodesetExpr, contextRef);
+
+        // For the label, copy and value, get absolute references. To do that, start with the expressions, convert
+        // them to relative references and then anchor those to the nodesetRef we previously anchored.
+        if (labelExpr != null) labelRef = getAbsoluteRef(labelExpr, nodesetRef);
+        if (copyExpr  != null) copyRef  = getAbsoluteRef(copyExpr,  nodesetRef);
+        if (valueExpr != null) valueRef = getAbsoluteRef(valueExpr, nodesetRef);
 
         if (q != null) {
             // When loading from XML, the first time through, during verification, q will be null.
@@ -131,20 +135,10 @@ public class ItemsetBinding implements Externalizable, Localizable {
         }
     }
 
-    /** Returns a TreeReference from an absolute reference from an IConditionExpr and a parent TreeReference */
-    private static TreeReference getCondAbsTreeRef(IConditionExpr condExpr, TreeReference parentTreeRef) {
-        XPathPathExpr xPathPathExpr = getCastExpr(condExpr);
-        return getPathAbsTreeRef(new XPathReference(xPathPathExpr), parentTreeRef);
-    }
-
-    /** Returns a TreeReference from an absolute reference from an XPathReference and a parent TreeReference */
-    private static TreeReference getPathAbsTreeRef(XPathReference xPathReference, TreeReference parentTreeRef) {
-        IDataReference dataReference = getAbsRef(xPathReference, parentTreeRef);
+    private static TreeReference getAbsoluteRef(IConditionExpr condExpr, TreeReference baseRef) {
+        XPathPathExpr xPathPathExpr = (XPathPathExpr) ((XPathConditional) condExpr).getExpr();
+        IDataReference dataReference = getAbsRef(new XPathReference(xPathPathExpr), baseRef);
         return (TreeReference) dataReference.getReference();
-    }
-
-    private static XPathPathExpr getCastExpr(IConditionExpr expr) {
-        return (XPathPathExpr) ((XPathConditional) expr).getExpr();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
