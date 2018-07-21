@@ -1,5 +1,6 @@
 package org.javarosa.core.model;
 
+import static org.javarosa.core.model.FormDef.getAbsRef;
 import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
 
 import java.io.DataInputStream;
@@ -8,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
@@ -114,30 +114,37 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public void initReferences(QuestionDef q) {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
-        nodesetRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(
-                ((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference()), contextRef));
-        if ( labelExpr != null ) {
-            labelRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) labelExpr).getExpr())),
-                    nodesetRef));
-        }
-        if ( copyExpr != null ) {
-            copyRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) copyExpr).getExpr())),
-                    nodesetRef));
-        }
-        if ( valueExpr != null ) {
-            valueRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) valueExpr).getExpr())),
-                    nodesetRef));
-        }
+        nodesetRef = getPathAbsTreeRef(new XPathReference(getCastExpr(nodesetExpr).getReference()), contextRef);
 
-        if ( q != null ) {
+        if (labelExpr != null) labelRef = getCondAbsTreeRef(labelExpr, nodesetRef);
+        if (copyExpr  != null) copyRef  = getCondAbsTreeRef(copyExpr,  nodesetRef);
+        if (valueExpr != null) valueRef = getCondAbsTreeRef(valueExpr, nodesetRef);
+
+        if (q != null) {
             // When loading from XML, the first time through, during verification, q will be null.
             // The second time through, q will be non-null.
             // Otherwise, when loading from binary, this will be called only once with a non-null q.
-            destRef = FormInstance.unpackReference(q.getBind()).clone();
+            destRef = ((TreeReference) q.getBind().getReference()).clone();
             if (copyMode) {
                 destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
             }
         }
+    }
+
+    /** Returns a TreeReference from an absolute reference from an IConditionExpr and a parent TreeReference */
+    private static TreeReference getCondAbsTreeRef(IConditionExpr condExpr, TreeReference parentTreeRef) {
+        XPathPathExpr xPathPathExpr = getCastExpr(condExpr);
+        return getPathAbsTreeRef(new XPathReference(xPathPathExpr), parentTreeRef);
+    }
+
+    /** Returns a TreeReference from an absolute reference from an XPathReference and a parent TreeReference */
+    private static TreeReference getPathAbsTreeRef(XPathReference xPathReference, TreeReference parentTreeRef) {
+        IDataReference dataReference = getAbsRef(xPathReference, parentTreeRef);
+        return (TreeReference) dataReference.getReference();
+    }
+
+    private static XPathPathExpr getCastExpr(IConditionExpr expr) {
+        return (XPathPathExpr) ((XPathConditional) expr).getExpr();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
