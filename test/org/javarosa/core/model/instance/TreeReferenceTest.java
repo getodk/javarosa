@@ -32,6 +32,13 @@ public class TreeReferenceTest {
         assertThat(tr.anchor(trBase), Matchers.is(tr));
     }
 
+    @Test(expected = XPathException.class)
+    public void anchoring_to_a_too_shallow_base_throws() {
+        TreeReference tr = buildRef("../../../bar");
+        TreeReference trBase = buildRef("/foo/bar");
+        tr.anchor(trBase);
+    }
+
     private TreeReference buildRef(String xpath) {
         String[] parts = xpath.split("/");
         XPathStep[] steps = Stream.of(parts)
