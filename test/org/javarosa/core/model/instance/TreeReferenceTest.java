@@ -39,6 +39,13 @@ public class TreeReferenceTest {
         tr.anchor(trBase);
     }
 
+    @Test
+    public void otherwise_it_returns_an_absolute_ref() {
+        TreeReference tr = buildRef("../baz");
+        TreeReference trBase = buildRef("/foo/bar");
+        assertThat(tr.anchor(trBase), Matchers.is(buildRef("/foo/baz")));
+    }
+
     private TreeReference buildRef(String xpath) {
         String[] parts = xpath.split("/");
         XPathStep[] steps = Stream.of(parts)
