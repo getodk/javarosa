@@ -1,5 +1,6 @@
 package org.javarosa.core.model.instance;
 
+import static org.hamcrest.Matchers.*;
 import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
 import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_ROOT;
 import static org.javarosa.xpath.expr.XPathStep.ABBR_PARENT;
@@ -16,20 +17,13 @@ import org.javarosa.xpath.expr.XPathQName;
 import org.javarosa.xpath.expr.XPathStep;
 import org.junit.Test;
 
-public class TreeReferenceTest {
+public class TreeReferenceAnchorTest {
 
     @Test(expected = XPathException.class)
     public void anchoring_to_a_relative_ref_throws() {
         TreeReference tr = buildRef("some/relative/path");
         TreeReference trBase = buildRef("some/other/relative/path");
         tr.anchor(trBase);
-    }
-
-    @Test
-    public void anchoring_an_absolute_ref_has_no_effect_on_it() {
-        TreeReference tr = buildRef("/some/absolute/ref");
-        TreeReference trBase = buildRef("/some/other/absolute/ref");
-        assertThat(tr.anchor(trBase), Matchers.is(tr));
     }
 
     @Test(expected = XPathException.class)
@@ -43,7 +37,14 @@ public class TreeReferenceTest {
     public void otherwise_it_returns_an_absolute_ref() {
         TreeReference tr = buildRef("../baz");
         TreeReference trBase = buildRef("/foo/bar");
-        assertThat(tr.anchor(trBase), Matchers.is(buildRef("/foo/baz")));
+        assertThat(tr.anchor(trBase), is(buildRef("/foo/baz")));
+    }
+
+    @Test
+    public void anchoring_an_absolute_ref_has_no_effect_on_it() {
+        TreeReference tr = buildRef("/some/absolute/ref");
+        TreeReference trBase = buildRef("/some/other/absolute/ref");
+        assertThat(tr.anchor(trBase), is(tr));
     }
 
     private TreeReference buildRef(String xpath) {
