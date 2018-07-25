@@ -31,11 +31,10 @@ import static org.javarosa.core.model.instance.TreeReference.DEFAULT_MULTIPLICIT
 import static org.javarosa.core.util.GeoUtils.EARTH_EQUATORIAL_CIRCUMFERENCE_METERS;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.javarosa.xpath.expr.XPathFuncExpr.REQUIRES_TWO_POINTS_MESSAGE;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Enclosed.class)
-public class GeoDistanceTest extends GeoTest {
+public class GeoDistanceTest {
 
     @RunWith(Parameterized.class)
     public static class ParameterizedPart {
@@ -70,8 +69,20 @@ public class GeoDistanceTest extends GeoTest {
     public static class NotParameterizedPart {
         @Test
         public void testDistanceWithLessThanTwoPoints() throws Exception {
-            expectUnhandledExceptionWithMessage("distance_with_less_than_two_points.xml", REQUIRES_TWO_POINTS_MESSAGE);
+            // Read the form definition
+            final FormDef formDef = parse(r("distance_with_less_than_two_points.xml")).formDef;
+
+            // Trigger all calculations
+            formDef.initialize(true, new InstanceInitializationFactory());
+
+            // Check the results. The data and expected results come from GeoUtilsTest.
+            TreeElement root = formDef.getMainInstance().getRoot();
+
+            IAnswerData area = root.getChildAt(2).getValue();
+            assertEquals(0, area.getValue());
+
+            area = root.getChildAt(3).getValue();
+            assertEquals(0, area.getValue());
         }
     }
-
 }

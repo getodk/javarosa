@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.javarosa.xpath.expr.XPathFuncExpr.REQUIRES_THREE_POINTS_MESSAGE;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertEquals;
  * Date: 8/4/14
  * Time: 3:40 PM
  */
-public class GeoShapeAreaTest extends GeoTest {
+public class GeoShapeAreaTest {
 
     @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
         // Read the form definition
@@ -53,6 +52,22 @@ public class GeoShapeAreaTest extends GeoTest {
 
     @Test
     public void testAreaWithLessThanThreePoints() throws Exception {
-        expectUnhandledExceptionWithMessage("area_with_less_than_three_points.xml", REQUIRES_THREE_POINTS_MESSAGE);
+        // Read the form definition
+        final FormDef formDef = parse(r("area_with_less_than_three_points.xml")).formDef;
+
+        // Trigger all calculations
+        formDef.initialize(true, new InstanceInitializationFactory());
+
+        // Check the results. The data and expected results come from GeoUtilsTest.
+        TreeElement root = formDef.getMainInstance().getRoot();
+
+        IAnswerData area = root.getChildAt(3).getValue();
+        assertEquals(0, area.getValue());
+
+        area = root.getChildAt(4).getValue();
+        assertEquals(0, area.getValue());
+
+        area = root.getChildAt(5).getValue();
+        assertEquals(0, area.getValue());
     }
 }
