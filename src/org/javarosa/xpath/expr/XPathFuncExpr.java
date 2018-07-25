@@ -418,16 +418,10 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("enclosed-area") || name.equals("area")) {
             assertArgsCount(name, args, 1);
             List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
-            if (latLongs.size() < 3) {
-                throw new XPathUnhandledException(String.format("function '%s' %s.", name, REQUIRES_THREE_POINTS_MESSAGE));
-            }
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
         } else if (name.equals("distance")) {
             assertArgsCount(name, args, 1);
             List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
-            if (latLongs.size() < 2) {
-                throw new XPathUnhandledException(String.format("function '%s' %s.", name, REQUIRES_TWO_POINTS_MESSAGE));
-            }
             return GeoUtils.calculateDistance(latLongs);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from((String) argVals[1]).digest(
