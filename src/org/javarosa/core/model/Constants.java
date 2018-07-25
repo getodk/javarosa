@@ -46,26 +46,26 @@ public class Constants {
     /** Over The Air or HTTP Connection */
     public static final int CONNECTION_OTA = 4;
 
-    public static final int DATATYPE_UNSUPPORTED    = -1;
-    public static final int DATATYPE_NULL           = 0;
-    public static final int DATATYPE_TEXT           = 1;
-    public static final int DATATYPE_INTEGER        = 2;
-    public static final int DATATYPE_DECIMAL        = 3;
-    public static final int DATATYPE_DATE           = 4;
-    public static final int DATATYPE_TIME           = 5;
-    public static final int DATATYPE_DATE_TIME      = 6;
-    public static final int DATATYPE_CHOICE         = 7;
+    public static final int DATATYPE_UNSUPPORTED    = DataType.UNSUPPORTED.value;
+    public static final int DATATYPE_NULL           = DataType.NULL.value;
+    public static final int DATATYPE_TEXT           = DataType.TEXT.value;
+    public static final int DATATYPE_INTEGER        = DataType.INTEGER.value;
+    public static final int DATATYPE_DECIMAL        = DataType.DECIMAL.value;
+    public static final int DATATYPE_DATE           = DataType.DATE.value;
+    public static final int DATATYPE_TIME           = DataType.TIME.value;
+    public static final int DATATYPE_DATE_TIME      = DataType.DATE_TIME.value;
+    public static final int DATATYPE_CHOICE         = DataType.CHOICE.value;
     /** A list of items used for selecting multiple answers or ordering them */
-    public static final int DATATYPE_MULTIPLE_ITEMS = 8;
+    public static final int DATATYPE_MULTIPLE_ITEMS = DataType.MULTIPLE_ITEMS.value;
     /** The same as {@link Constants#DATATYPE_MULTIPLE_ITEMS} (for backwards compatibility) */
-    public static final int DATATYPE_CHOICE_LIST    = 8;
-    public static final int DATATYPE_BOOLEAN        = 9;
-    public static final int DATATYPE_GEOPOINT       = 10;
-    public static final int DATATYPE_BARCODE        = 11;
-    public static final int DATATYPE_BINARY         = 12;
-    public static final int DATATYPE_LONG           = 13;
-    public static final int DATATYPE_GEOSHAPE       = 14;
-    public static final int DATATYPE_GEOTRACE       = 15;
+    public static final int DATATYPE_CHOICE_LIST    = DataType.MULTIPLE_ITEMS.value;
+    public static final int DATATYPE_BOOLEAN        = DataType.BOOLEAN.value;
+    public static final int DATATYPE_GEOPOINT       = DataType.GEOPOINT.value;
+    public static final int DATATYPE_BARCODE        = DataType.BARCODE.value;
+    public static final int DATATYPE_BINARY         = DataType.BINARY.value;
+    public static final int DATATYPE_LONG           = DataType.LONG.value;
+    public static final int DATATYPE_GEOSHAPE       = DataType.GEOSHAPE.value;
+    public static final int DATATYPE_GEOTRACE       = DataType.GEOTRACE.value;
 
     public static final int CONTROL_UNTYPED         = ControlType.UNTYPED.value;
     public static final int CONTROL_INPUT           = ControlType.INPUT.value;
