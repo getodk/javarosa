@@ -62,9 +62,6 @@ import static java.lang.Double.NaN;
  *
  */
 public class XPathFuncExpr extends XPathExpression {
-    /** Part of an error message, exposed so it can be located in tests */
-    public static final String REQUIRES_TWO_POINTS_MESSAGE = "requires at least two points";
-    public static final String REQUIRES_THREE_POINTS_MESSAGE = "requires at least three points";
     public XPathQName id;            //name of the function
     public XPathExpression[] args;    //argument list
 
