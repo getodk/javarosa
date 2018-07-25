@@ -5,7 +5,7 @@
   <!-- Be sure to update version in build.gradle to match -->
   <!-- snapshot release = x.x.x-SNAPSHOT -->
   <!-- production release = x.x.x -->
-  <version>2.11.1</version>
+  <version>2.11.2</version>
   <packaging>jar</packaging>
   <name>opendatakit-javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
