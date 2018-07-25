@@ -69,13 +69,20 @@ public class GeoDistanceTest {
     public static class NotParameterizedPart {
         @Test
         public void testDistanceWithLessThanTwoPoints() throws Exception {
-            FormDef formDef = parse(r("distance_with_less_than_two_points.xml")).formDef;
-            try {
-                formDef.initialize(true, new InstanceInitializationFactory());
-            } catch (Exception e) {
-                assertEquals("Error evaluating field 'trace-result': The problem was located in calculate expression for /distance/trace-result\n" +
-                    "XPath evaluation: cannot handle function 'distance' requires at least two points.", e.getMessage());
-            }
+            // Read the form definition
+            final FormDef formDef = parse(r("distance_with_less_than_two_points.xml")).formDef;
+
+            // Trigger all calculations
+            formDef.initialize(true, new InstanceInitializationFactory());
+
+            // Check the results. The data and expected results come from GeoUtilsTest.
+            TreeElement root = formDef.getMainInstance().getRoot();
+
+            IAnswerData area = root.getChildAt(2).getValue();
+            assertEquals(0, area.getValue());
+
+            area = root.getChildAt(3).getValue();
+            assertEquals(0, area.getValue());
         }
     }
 }

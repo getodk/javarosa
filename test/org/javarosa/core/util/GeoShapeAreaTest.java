@@ -21,8 +21,6 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -34,7 +32,6 @@ import static org.junit.Assert.assertEquals;
  * Time: 3:40 PM
  */
 public class GeoShapeAreaTest {
-    private static final Logger logger = LoggerFactory.getLogger(GeoShapeAreaTest.class);
 
     @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
         // Read the form definition
@@ -55,12 +52,22 @@ public class GeoShapeAreaTest {
 
     @Test
     public void testAreaWithLessThanThreePoints() throws Exception {
-        FormDef formDef = parse(r("area_with_less_than_three_points.xml")).formDef;
-        try {
-            formDef.initialize(true, new InstanceInitializationFactory());
-        } catch (Exception e) {
-            assertEquals("Error evaluating field 'arearesult': The problem was located in calculate expression for /area/arearesult\n" +
-                "XPath evaluation: cannot handle function 'enclosed-area' requires at least three points.", e.getMessage());
-        }
+        // Read the form definition
+        final FormDef formDef = parse(r("area_with_less_than_three_points.xml")).formDef;
+
+        // Trigger all calculations
+        formDef.initialize(true, new InstanceInitializationFactory());
+
+        // Check the results. The data and expected results come from GeoUtilsTest.
+        TreeElement root = formDef.getMainInstance().getRoot();
+
+        IAnswerData area = root.getChildAt(3).getValue();
+        assertEquals(0, area.getValue());
+
+        area = root.getChildAt(4).getValue();
+        assertEquals(0, area.getValue());
+
+        area = root.getChildAt(5).getValue();
+        assertEquals(0, area.getValue());
     }
 }
