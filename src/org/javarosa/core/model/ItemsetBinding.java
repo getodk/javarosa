@@ -1,5 +1,6 @@
 package org.javarosa.core.model;
 
+import static org.javarosa.core.model.FormDef.getAbsRef;
 import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
 
 import java.io.DataInputStream;
@@ -8,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
@@ -114,30 +114,31 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public void initReferences(QuestionDef q) {
         // To construct the xxxRef, we need the full model, which wasn't available before now.
         // Compute the xxxRefs now.
-        nodesetRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(
-                ((XPathPathExpr) ((XPathConditional) nodesetExpr).getExpr()).getReference()), contextRef));
-        if ( labelExpr != null ) {
-            labelRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) labelExpr).getExpr())),
-                    nodesetRef));
-        }
-        if ( copyExpr != null ) {
-            copyRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) copyExpr).getExpr())),
-                    nodesetRef));
-        }
-        if ( valueExpr != null ) {
-            valueRef = FormInstance.unpackReference(FormDef.getAbsRef(new XPathReference(((XPathPathExpr) ((XPathConditional) valueExpr).getExpr())),
-                    nodesetRef));
-        }
 
-        if ( q != null ) {
+        // Convert the expression to a relative reference and then anchor it to the context.
+        nodesetRef = getAbsoluteRef(nodesetExpr, contextRef);
+
+        // For the label, copy and value, get absolute references. To do that, start with the expressions, convert
+        // them to relative references and then anchor those to the nodesetRef we previously anchored.
+        if (labelExpr != null) labelRef = getAbsoluteRef(labelExpr, nodesetRef);
+        if (copyExpr  != null) copyRef  = getAbsoluteRef(copyExpr,  nodesetRef);
+        if (valueExpr != null) valueRef = getAbsoluteRef(valueExpr, nodesetRef);
+
+        if (q != null) {
             // When loading from XML, the first time through, during verification, q will be null.
             // The second time through, q will be non-null.
             // Otherwise, when loading from binary, this will be called only once with a non-null q.
-            destRef = FormInstance.unpackReference(q.getBind()).clone();
+            destRef = ((TreeReference) q.getBind().getReference()).clone();
             if (copyMode) {
                 destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
             }
         }
+    }
+
+    private static TreeReference getAbsoluteRef(IConditionExpr condExpr, TreeReference baseRef) {
+        XPathPathExpr xPathPathExpr = (XPathPathExpr) ((XPathConditional) condExpr).getExpr();
+        IDataReference dataReference = getAbsRef(new XPathReference(xPathPathExpr), baseRef);
+        return (TreeReference) dataReference.getReference();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
