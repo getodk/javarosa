@@ -67,24 +67,24 @@ public class Constants {
     public static final int DATATYPE_GEOSHAPE       = 14;
     public static final int DATATYPE_GEOTRACE       = 15;
 
-    public static final int CONTROL_UNTYPED = -1;
-    public static final int CONTROL_INPUT = 1;
-    public static final int CONTROL_SELECT_ONE = 2;
-    public static final int CONTROL_SELECT_MULTI = 3;
-    public static final int CONTROL_TEXTAREA = 4;
-    public static final int CONTROL_SECRET = 5;
-    public static final int CONTROL_RANGE = 6;
-    public static final int CONTROL_UPLOAD = 7;
-    public static final int CONTROL_SUBMIT = 8;
-    public static final int CONTROL_TRIGGER = 9;
-    public static final int CONTROL_IMAGE_CHOOSE = 10;
-    public static final int CONTROL_LABEL = 11;
-    public static final int CONTROL_AUDIO_CAPTURE = 12;
-    public static final int CONTROL_VIDEO_CAPTURE = 13;
-    public static final int CONTROL_OSM_CAPTURE = 14;
+    public static final int CONTROL_UNTYPED         = ControlType.UNTYPED.value;
+    public static final int CONTROL_INPUT           = ControlType.INPUT.value;
+    public static final int CONTROL_SELECT_ONE      = ControlType.SELECT_ONE.value;
+    public static final int CONTROL_SELECT_MULTI    = ControlType.SELECT_MULTI.value;
+    public static final int CONTROL_TEXTAREA        = ControlType.TEXTAREA.value;
+    public static final int CONTROL_SECRET          = ControlType.SECRET.value;
+    public static final int CONTROL_RANGE           = ControlType.RANGE.value;
+    public static final int CONTROL_UPLOAD          = ControlType.UPLOAD.value;
+    public static final int CONTROL_SUBMIT          = ControlType.SUBMIT.value;
+    public static final int CONTROL_TRIGGER         = ControlType.TRIGGER.value;
+    public static final int CONTROL_IMAGE_CHOOSE    = ControlType.IMAGE_CHOOSE.value;
+    public static final int CONTROL_LABEL           = ControlType.LABEL.value;
+    public static final int CONTROL_AUDIO_CAPTURE   = ControlType.AUDIO_CAPTURE.value;
+    public static final int CONTROL_VIDEO_CAPTURE   = ControlType.VIDEO_CAPTURE.value;
+    public static final int CONTROL_OSM_CAPTURE     = ControlType.OSM_CAPTURE.value;
     /** generic upload */
-    public static final int CONTROL_FILE_CAPTURE = 15;
-    public static final int CONTROL_RANK = 16;
+    public static final int CONTROL_FILE_CAPTURE    = ControlType.FILE_CAPTURE.value;
+    public static final int CONTROL_RANK            = ControlType.RANK.value;
 
     /* constants for xform tags */
     public static final String XFTAG_UPLOAD = "upload";
