@@ -1,9 +1,11 @@
 package org.javarosa.xpath.expr;
 
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +82,97 @@ class Scenario {
     }
 
     /**
+     * Jumps to the first question with the given name.
+     * <p>
+     * This method is part of a set of methods that address form navigation in a dynamic way,
+     * imitating real user interaction with the form:
+     * <ul>
+     * <li>{@link #jumpToFirst(String)}
+     * <li>{@link #answer(String)}
+     * <li>{@link #next()}
+     * <li>{@link #next(String)}
+     * <li>{@link #atTheEndOfForm()}
+     * </ul>
+     */
+    public Scenario jumpToFirst(String name) {
+        formEntryController.jumpToFirstQuestionWithName(name);
+        return this;
+    }
+
+    /**
+     * Answers the current question.
+     * <p>
+     * This method is part of a set of methods that address form navigation in a dynamic way,
+     * imitating real user interaction with the form:
+     * <ul>
+     * <li>{@link #jumpToFirst(String)}
+     * <li>{@link #answer(String)}
+     * <li>{@link #next()}
+     * <li>{@link #next(String)}
+     * <li>{@link #atTheEndOfForm()}
+     * </ul>
+     */
+    public Scenario answer(String value) {
+        formEntryController.answerQuestion(formEntryController.getModel().getFormIndex(), new StringData(value), true);
+        return this;
+    }
+
+    /**
+     * Jumps to next event
+     * <p>
+     * This method is part of a set of methods that address form navigation in a dynamic way,
+     * imitating real user interaction with the form:
+     * <ul>
+     * <li>{@link #jumpToFirst(String)}
+     * <li>{@link #answer(String, String)}
+     * <li>{@link #next()}
+     * <li>{@link #next(String)}
+     * <li>{@link #atTheEndOfForm()}
+     * </ul>
+     */
+    public void next() {
+        formEntryController.stepToNextEvent();
+    }
+
+    /**
+     * Jumps to next event with the given name
+     * <p>
+     * This method is part of a set of methods that address form navigation in a dynamic way,
+     * imitating real user interaction with the form:
+     * <ul>
+     * <li>{@link #jumpToFirst(String)}
+     * <li>{@link #answer(String, String)}
+     * <li>{@link #next()}
+     * <li>{@link #next(String)}
+     * <li>{@link #atTheEndOfForm()}
+     * </ul>
+     */
+    public Scenario next(String name) {
+        next();
+        TreeReference reference = formEntryController.getModel().getFormIndex().getReference();
+        String xpath = reference.toString(true, true);
+        formEntryController.jumpToIndex(getIndexOf(xpath + "/" + name));
+        return this;
+    }
+
+    /**
+     * Returns true when the index is at the end of the form, false otherwise
+     * <p>
+     * This method is part of a set of methods that address form navigation in a dynamic way,
+     * imitating real user interaction with the form:
+     * <ul>
+     * <li>{@link #jumpToFirst(String)}
+     * <li>{@link #answer(String, String)}
+     * <li>{@link #next()}
+     * <li>{@link #next(String)}
+     * <li>{@link #atTheEndOfForm()}
+     * </ul>
+     */
+    public boolean atTheEndOfForm() {
+        return formEntryController.getModel().getFormIndex().isEndOfFormIndex();
+    }
+
+    /**
      * Returns the value of the element located at the given xPath in the main instance.
      * <p>
      * This method supports an enhanced version of xpath with the following perks and
@@ -115,6 +208,30 @@ class Scenario {
 
         // Return the value if the element exists, otherwise return null
         return element != null ? (T) element.getValue() : null;
+    }
+
+    public List<TreeElement> repeatInstancesOf(String xPath) {
+        // Get the real root element
+        TreeElement root = (TreeElement) formDef.getMainInstance().getRoot().getParent();
+        // Since we start searching from "/", we make the input xPath relative to that
+        String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
+
+        String parentXPath = pop(relativeXPath);
+        String repeatName = tailPart(xPath);
+
+        // We call the recursive resolve algorithm and get the element
+        TreeElement parent = resolve(root, parentXPath);
+
+        if (parent == null)
+            throw new RuntimeException("The parent element at " + parentXPath + " doesn't exist");
+
+        List<TreeElement> children = new ArrayList<>();
+        for (int i = 0; i < parent.getNumChildren(); i++) {
+            TreeElement child = parent.getChildAt(i);
+            if (child.getMultiplicity() != INDEX_TEMPLATE && child.getName().equals(repeatName))
+                children.add(child);
+        }
+        return children;
     }
 
     /**
@@ -219,7 +336,10 @@ class Scenario {
      * Returns null if the reference is not found.
      */
     private FormIndex getIndexOf(String xPath) {
-        TreeReference ref = absoluteRef(xPath);
+        return getIndexOf(absoluteRef(xPath));
+    }
+
+    private FormIndex getIndexOf(TreeReference ref) {
         formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
         FormEntryModel model = formEntryController.getModel();
         FormIndex index = model.getFormIndex();
@@ -278,5 +398,15 @@ class Scenario {
     private static String shift(String xPath) {
         List<String> parts = Arrays.asList(xPath.split("/"));
         return String.join("/", parts.subList(1, parts.size()));
+    }
+
+    private static String pop(String xPath) {
+        List<String> parts = Arrays.asList(xPath.split("/"));
+        return String.join("/", parts.subList(0, parts.size() - 1));
+    }
+
+    private static String tailPart(String xPath) {
+        List<String> parts = Arrays.asList(xPath.split("/"));
+        return parts.get(parts.size() - 1);
     }
 }
