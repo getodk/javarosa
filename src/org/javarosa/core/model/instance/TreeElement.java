@@ -235,15 +235,17 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
 
     private TreeElement getFirstDescendantWithName(TreeElement node, String name) {
         if (node.getMultiplicity() != TreeReference.INDEX_TEMPLATE &&
-                TreeElementNameComparator.elementMatchesName(node, name)) {
+            TreeElementNameComparator.elementMatchesName(node, name)) {
             return node;
         }
 
         for (TreeElement child : node.children) {
-            TreeElement result = getFirstDescendantWithName(child, name);
+            if (child.getMultiplicity() != TreeReference.INDEX_TEMPLATE) {
+                TreeElement result = getFirstDescendantWithName(child, name);
 
-            if (result != null) {
-                return result;
+                if (result != null) {
+                    return result;
+                }
             }
         }
 
