@@ -3,12 +3,22 @@ package org.javarosa.xpath.expr;
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
+import static org.javarosa.core.model.instance.utils.TreeElementNameComparator.elementMatchesName;
+import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
+import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
@@ -22,8 +32,11 @@ import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class Scenario {
+    private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     private final FormDef formDef;
     private final FormEntryController formEntryController;
 
@@ -95,7 +108,7 @@ class Scenario {
      * </ul>
      */
     public Scenario jumpToFirst(String name) {
-        formEntryController.jumpToFirstQuestionWithName(name);
+        jumpToFirstQuestionWithName(name);
         return this;
     }
 
@@ -151,7 +164,7 @@ class Scenario {
         next();
         TreeReference reference = formEntryController.getModel().getFormIndex().getReference();
         String xpath = reference.toString(true, true);
-        formEntryController.jumpToIndex(getIndexOf(xpath + "/" + name));
+        jump(getIndexOf(xpath + "/" + name));
         return this;
     }
 
@@ -198,21 +211,17 @@ class Scenario {
      */
     @SuppressWarnings("unchecked")
     public <T extends IAnswerData> T answerOf(String xPath) {
-        // Get the real root element
-        TreeElement root = (TreeElement) formDef.getMainInstance().getRoot().getParent();
         // Since we start searching from "/", we make the input xPath relative to that
         String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
 
         // We call the recursive resolve algorithm and get the element
-        TreeElement element = resolve(root, relativeXPath);
+        TreeElement element = resolve(getRootElement(), relativeXPath);
 
         // Return the value if the element exists, otherwise return null
         return element != null ? (T) element.getValue() : null;
     }
 
     public List<TreeElement> repeatInstancesOf(String xPath) {
-        // Get the real root element
-        TreeElement root = (TreeElement) formDef.getMainInstance().getRoot().getParent();
         // Since we start searching from "/", we make the input xPath relative to that
         String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
 
@@ -220,7 +229,7 @@ class Scenario {
         String repeatName = tailPart(xPath);
 
         // We call the recursive resolve algorithm and get the element
-        TreeElement parent = resolve(root, parentXPath);
+        TreeElement parent = resolve(getRootElement(), parentXPath);
 
         if (parent == null)
             throw new RuntimeException("The parent element at " + parentXPath + " doesn't exist");
@@ -284,7 +293,7 @@ class Scenario {
                 // Jumping to the repeat instance for [0] always works because formEntryController.descendIntoNewRepeat() deals with it:
                 // - if the [0] doesn't exists, it creates it
                 // - if the [0] exists, looks for the next sequential repeat and creates it
-                formEntryController.jumpToIndex(getIndexOf((currentXPath + "/" + nextName) + "[0]"));
+                jump(getIndexOf((currentXPath + "/" + nextName) + "[0]"));
                 formEntryController.descendIntoNewRepeat();
             }
             // Shift the first part of the list, reset the current xPath and loop
@@ -340,7 +349,7 @@ class Scenario {
     }
 
     private FormIndex getIndexOf(TreeReference ref) {
-        formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+        jump(FormIndex.createBeginningOfFormIndex());
         FormEntryModel model = formEntryController.getModel();
         FormIndex index = model.getFormIndex();
         do {
@@ -365,11 +374,15 @@ class Scenario {
      */
     private TreeElement resolve(String xPath) {
         // Get the real root element
-        TreeElement root = (TreeElement) formDef.getMainInstance().getRoot().getParent();
+        TreeElement root = getRootElement();
         // Since we start searching from "/", we make the input xPath relative to that
         String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
 
         return resolve(root, relativeXPath);
+    }
+
+    private TreeElement getRootElement() {
+        return (TreeElement) formDef.getMainInstance().getRoot().getParent();
     }
 
     /**
@@ -408,5 +421,70 @@ class Scenario {
     private static String tailPart(String xPath) {
         List<String> parts = Arrays.asList(xPath.split("/"));
         return parts.get(parts.size() - 1);
+    }
+
+    private Optional<TreeElement> getFirstDescendantWithName(TreeElement node, String name) {
+        if (isNotRoot(node) && isNotTemplate(node) && elementMatchesName(node, name))
+            return Optional.of(node);
+
+        List<TreeElement> nonTemplateChildren = childrenOf(node).stream()
+            .filter(this::isNotTemplate)
+            .collect(Collectors.toList());
+
+        for (TreeElement child : nonTemplateChildren) {
+            Optional<TreeElement> result = getFirstDescendantWithName(child, name);
+            if (result.isPresent())
+                return result;
+        }
+
+        return Optional.empty();
+    }
+
+    private List<TreeElement> childrenOf(TreeElement node) {
+        List<TreeElement> children = new ArrayList<>();
+        for (int i = 0, max = node.getNumChildren(); i < max; i++) {
+            children.add(node.getChildAt(i));
+        }
+        return children;
+    }
+
+    private boolean isNotRoot(TreeElement node) {
+        return node.getName() != null;
+    }
+
+    private boolean isNotTemplate(TreeElement node) {
+        return node.getMultiplicity() != TreeReference.INDEX_TEMPLATE;
+    }
+
+    private void jumpToFirstQuestionWithName(String name) {
+        TreeReference ref = getFirstDescendantWithName(getRootElement(), name)
+            .map(TreeElement::getRef)
+            .orElseThrow(() -> new IllegalArgumentException("No question with name " + name + " found"));
+        jump(getIndexOf(ref));
+    }
+
+    private void jump(FormIndex indexOf) {
+        int result = formEntryController.jumpToIndex(indexOf);
+        log.debug("Jumped to " + decodeJumpResult(result));
+    }
+
+    private String decodeJumpResult(int code) {
+        switch (code) {
+            case EVENT_BEGINNING_OF_FORM:
+                return "Beginning of Form";
+            case EVENT_END_OF_FORM:
+                return "End of Form";
+            case EVENT_PROMPT_NEW_REPEAT:
+                return "Prompt new Repeat";
+            case EVENT_QUESTION:
+                return "Question";
+            case EVENT_GROUP:
+                return "Group";
+            case EVENT_REPEAT:
+                return "Repeat";
+            case EVENT_REPEAT_JUNCTURE:
+                return "Repeat Juncture";
+        }
+        return "Unknown";
     }
 }

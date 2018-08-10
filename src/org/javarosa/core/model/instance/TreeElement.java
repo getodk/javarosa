@@ -36,7 +36,6 @@ import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.instance.utils.TreeElementChildrenList;
-import org.javarosa.core.model.instance.utils.TreeElementNameComparator;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -226,30 +225,6 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     @Override
     public List<TreeElement> getChildrenWithName(String name) {
         return children.get(name);
-    }
-
-    /** Returns the first element across descendants that has the specified name. Useful for testing. **/
-    public TreeElement getFirstDescendantWithName(String name) {
-        return getFirstDescendantWithName(this, name);
-    }
-
-    private TreeElement getFirstDescendantWithName(TreeElement node, String name) {
-        if (node.getMultiplicity() != TreeReference.INDEX_TEMPLATE &&
-            TreeElementNameComparator.elementMatchesName(node, name)) {
-            return node;
-        }
-
-        for (TreeElement child : node.children) {
-            if (child.getMultiplicity() != TreeReference.INDEX_TEMPLATE) {
-                TreeElement result = getFirstDescendantWithName(child, name);
-
-                if (result != null) {
-                    return result;
-                }
-            }
-        }
-
-        return null;
     }
 
     private int getNumChildrenWithName(String name) {
