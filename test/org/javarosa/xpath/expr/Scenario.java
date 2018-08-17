@@ -35,6 +35,27 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class helps writing JavaRosa tests. It provides two separate APIs:
+ * <ul>
+ * <li>A static, declarative API that lets the test author to define the state
+ * of a form in a given time.</li>
+ * <li>A dynamic, imperative API that lets the test author fill the form as the
+ * user would do, by controlling the flow while filling questions. These methods
+ * return the {@link Scenario} to be able to chain compatible methods.</li>
+ * </ul>
+ * <p>
+ * All the methods that accept a {@link String} xpath argument, support an enhanced
+ * version of xpath with the following perks and limitations:
+ * <ul>
+ * <li>Only supports absolute xpaths</li>
+ * <li>Supports adding the index (zero-indexed) of a repeat instance by suffixing it between
+ * brackets. Example that would select the fourth instance of the <code>/foo/bar</code>
+ * repeat: <code>/foo/bar[3]</code></li>
+ * </ul>
+ * <p>
+ */
+// TODO Extract both APIs to two separate contexts so that they can't be mixed, probably best if it's a Scenario steps runner that would have the common .given(setup).when(action).then(assertion)
 class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     private final FormDef formDef;
@@ -61,19 +82,6 @@ class Scenario {
     /**
      * Sets the value of the element located at the given xPath in the main instance.
      * <p>
-     * This method supports an enhanced version of xpath with the following perks and
-     * limitations:
-     * <ul>
-     * <li>Only supports absolute xpaths</li>
-     * <li>Supports adding the index (zero-indexed) of a repeat instance by suffixing it between
-     * brackets. Example that would select the fourth instance of the <code>/foo/bar</code>
-     * repeat: <code>/foo/bar[3]</code></li>
-     * </ul>
-     * <p>
-     * This method ensures that all the repeat instances required by the given xPath
-     * exist. For example: /data/people[1]/name will make sure the second repeat for
-     * /data/people exists.
-     * <p>
      * This method ensures that any required downstream change after the given value
      * is set is triggered.
      */
@@ -96,16 +104,6 @@ class Scenario {
 
     /**
      * Jumps to the first question with the given name.
-     * <p>
-     * This method is part of a set of methods that address form navigation in a dynamic way,
-     * imitating real user interaction with the form:
-     * <ul>
-     * <li>{@link #jumpToFirst(String)}
-     * <li>{@link #answer(String)}
-     * <li>{@link #next()}
-     * <li>{@link #next(String)}
-     * <li>{@link #atTheEndOfForm()}
-     * </ul>
      */
     public Scenario jumpToFirst(String name) {
         jumpToFirstQuestionWithName(name);
@@ -114,16 +112,6 @@ class Scenario {
 
     /**
      * Answers the current question.
-     * <p>
-     * This method is part of a set of methods that address form navigation in a dynamic way,
-     * imitating real user interaction with the form:
-     * <ul>
-     * <li>{@link #jumpToFirst(String)}
-     * <li>{@link #answer(String)}
-     * <li>{@link #next()}
-     * <li>{@link #next(String)}
-     * <li>{@link #atTheEndOfForm()}
-     * </ul>
      */
     public Scenario answer(String value) {
         formEntryController.answerQuestion(formEntryController.getModel().getFormIndex(), new StringData(value), true);
@@ -132,15 +120,6 @@ class Scenario {
 
     /**
      * Jumps to next event
-     * <p>
-     * This method is part of a set of methods that address form navigation in a dynamic way,
-     * imitating real user interaction with the form:
-     * <ul>
-     * <li>{@link #jumpToFirst(String)}
-     * <li>{@link #answer(String, String)}
-     * <li>{@link #next()}
-     * <li>{@link #next(String)}
-     * <li>{@link #atTheEndOfForm()}
      * </ul>
      */
     public void next() {
@@ -149,16 +128,6 @@ class Scenario {
 
     /**
      * Jumps to next event with the given name
-     * <p>
-     * This method is part of a set of methods that address form navigation in a dynamic way,
-     * imitating real user interaction with the form:
-     * <ul>
-     * <li>{@link #jumpToFirst(String)}
-     * <li>{@link #answer(String, String)}
-     * <li>{@link #next()}
-     * <li>{@link #next(String)}
-     * <li>{@link #atTheEndOfForm()}
-     * </ul>
      */
     public Scenario next(String name) {
         next();
@@ -170,16 +139,6 @@ class Scenario {
 
     /**
      * Returns true when the index is at the end of the form, false otherwise
-     * <p>
-     * This method is part of a set of methods that address form navigation in a dynamic way,
-     * imitating real user interaction with the form:
-     * <ul>
-     * <li>{@link #jumpToFirst(String)}
-     * <li>{@link #answer(String, String)}
-     * <li>{@link #next()}
-     * <li>{@link #next(String)}
-     * <li>{@link #atTheEndOfForm()}
-     * </ul>
      */
     public boolean atTheEndOfForm() {
         return formEntryController.getModel().getFormIndex().isEndOfFormIndex();
@@ -187,16 +146,6 @@ class Scenario {
 
     /**
      * Returns the value of the element located at the given xPath in the main instance.
-     * <p>
-     * This method supports an enhanced version of xpath with the following perks and
-     * limitations:
-     * <ul>
-     * <li>Only supports absolute xpaths</li>
-     * <li>Supports adding the index (zero-indexed) of a repeat instance by suffixing it between
-     * brackets. Example that would select the fourth instance of the <code>/foo/bar</code>
-     * repeat: <code>/foo/bar[3]</code></li>
-     * </ul>
-     * <p>
      * Answers live in the main instance of a form. We will traverse the main
      * instance's tree of elements recursively using the xPath as a guide of
      * steps.
@@ -245,16 +194,6 @@ class Scenario {
 
     /**
      * Returns the list of choices of the &lt;select&gt; or &lt;select1&gt; form controls.
-     * <p>
-     * This method supports an enhanced version of xpath with the following perks and
-     * limitations:
-     * <ul>
-     * <li>Only supports absolute xpaths</li>
-     * <li>Supports adding the index (zero-indexed) of a repeat instance by suffixing it between
-     * brackets. Example that would select the fourth instance of the <code>/foo/bar</code>
-     * repeat: <code>/foo/bar[3]</code></li>
-     * </ul>
-     * <p>
      * This method ensures that any dynamic choce lists are populated to reflect the status
      * of the form (already answered questions, etc.).
      */
