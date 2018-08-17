@@ -474,6 +474,10 @@ public class TreeReference implements Externalizable, Serializable {
     }
 
     public String toString (boolean includePredicates) {
+        return toString(includePredicates, false);
+    }
+
+    public String toString (boolean includePredicates, boolean zeroIndexMult) {
         StringBuilder sb = new StringBuilder();
         if(instanceName != null) {
             sb.append("instance("+instanceName+")");
@@ -499,13 +503,14 @@ public class TreeReference implements Externalizable, Serializable {
 
             if (includePredicates) {
                 switch (mult) {
-                case INDEX_UNBOUND: break;
-                case INDEX_TEMPLATE: sb.append("[@template]"); break;
-                case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
-                default:
-                    if ((i > 0 || mult != 0) && mult !=-4)
-                        sb.append("[" + (mult + 1) + "]");
-                    break;
+                    case INDEX_UNBOUND: break;
+                    case INDEX_TEMPLATE: sb.append("[@template]"); break;
+                    case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
+                    default:
+                        if ((i > 0 || mult != 0) && mult !=-4) {
+                            sb.append("[").append(mult + (zeroIndexMult ? 0 : 1)).append("]");
+                        }
+                        break;
                 }
             }
 
