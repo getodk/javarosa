@@ -441,7 +441,7 @@ class Scenario {
     }
 
     private List<TreeElement> childrenOf(TreeElement node) {
-        List<TreeElement> children = new ArrayList<>();
+        List<TreeElement> children = new ArrayList<>(node.getNumChildren());
         for (int i = 0, max = node.getNumChildren(); i < max; i++) {
             children.add(node.getChildAt(i));
         }
