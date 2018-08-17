@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>relative-current-ref</h:title>
+        <model>
+            <instance>
+                <data id="relative-current-ref-form-field-bind">
+                    <count>3</count>
+                    <my_group>
+                        <name/>
+                    </my_group>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <bind nodeset="/data/count" type="int"/>
+            <bind nodeset="/data/my_group/name" type="string"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/data/my_group">
+            <label>Some label</label>
+            <repeat nodeset="/data/my_group" jr:count="current()/../count">
+                <input ref="name">
+                    <label>Name</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>

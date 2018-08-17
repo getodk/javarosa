@@ -21,7 +21,6 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,28 +213,6 @@ public class FormEntryController {
     public int jumpToIndex(FormIndex index) {
         model.setQuestionIndex(index);
         return model.getEvent(index);
-    }
-
-    /**
-     * Jump to the first node with the given name. Useful for testing.
-     */
-    public int jumpToFirstQuestionWithName(String name) {
-        return jumpToReference(getModel().getForm().getFirstDescendantWithName(name).getRef());
-    }
-
-    private int jumpToReference(TreeReference reference) {
-        jumpToIndex(FormIndex.createBeginningOfFormIndex());
-        FormIndex index = model.getFormIndex();
-
-        do {
-            if (index.getReference() != null && index.getReference().equals(reference)) {
-                return jumpToIndex(index);
-            }
-
-            index = model.incrementIndex(index);
-        } while (index.isInForm());
-
-        return jumpToIndex(index);
     }
 
     public FormIndex descendIntoRepeat (int n) {

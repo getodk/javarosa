@@ -15,86 +15,49 @@
  */
 package org.javarosa.xpath.expr;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.ItemsetBinding;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.xpath.expr.AnswerDataMatchers.answer;
+import static org.javarosa.xpath.expr.SelectChoiceMatchers.choice;
+import static org.junit.Assert.assertThat;
+
+import java.util.List;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.test.FormParseInit;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-
 public class XPathPathExprCurrentTest {
-    private FormDef formDef;
-    private FormEntryController formEntryController;
+    private Scenario scenario;
 
     @Before
     public void setUp() {
-        FormParseInit fpi = new FormParseInit(r("relative-current-ref.xml"));
-        formDef = fpi.getFormDef();
-        formDef.initialize(true, new InstanceInitializationFactory());
-        FormEntryModel formEntryModel = new FormEntryModel(formDef);
-        formEntryController = new FormEntryController(formEntryModel);
+        scenario = Scenario.init("relative-current-ref.xml");
     }
 
-    /**
-     * current() in a calculate should refer to the node it is in (in this case, /data/my_group/name_relative).
-     * This means that to refer to a sibling node, the path should be current()/../<name of sibling node>. This is
-     * verified by changing the value of the node that the calculate is supposed to refer to
-     * (/data/my_group/name) and seeing that the dependent calculate is updated accordingly.
-     */
     @Test
     public void current_in_calculate_should_refer_to_node() {
-        formEntryController.jumpToFirstQuestionWithName("name");
-        StringData nameValue = new StringData("Bob");
-        formEntryController.answerQuestion(nameValue, true);
+        scenario.answer("/data/my_group/name", "Bob");
 
-        StringData relativeName = (StringData) formDef.getFirstDescendantWithName("name").getValue();
-        assertEquals(nameValue.getValue(), relativeName.getValue());
+        // The binding of /data/my_group/name_relative is:
+        //   <bind calculate="current()/../name" nodeset="/data/my_group/name_relative" type="string"/>
+        // That will copy the value of our previous answer to /data/my_group/name
+        assertThat(
+            scenario.answerOf("/data/my_group/name_relative"),
+            is(answer(scenario.answerOf("/data/my_group/name")))
+        );
     }
 
-    /**
-     * current() in a choice filter should refer to the select node the choice filter is called from, NOT the expression
-     * it is in. See https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/current -- this is the difference
-     * between current() and .
-     *
-     * The behavior of current() in a choice filter is verified by selecting a value for a first, static select and then
-     * using that value to filter a second, dynamic select.
-     */
     @Test
     public void current_in_choice_filter_should_refer_to_node() {
-        formEntryController.jumpToFirstQuestionWithName("fruit");
-        Selection fruitSelection = new Selection(1);
-        fruitSelection.attachChoice(formEntryController.getModel().getQuestionPrompt().getQuestion());
-        formEntryController.answerQuestion(new SelectOneData(fruitSelection), true);
-
-        SelectOneData fruitSelectionValue = (SelectOneData) formDef.getFirstDescendantWithName("fruit").getValue();
-        assertEquals("blueberry", fruitSelectionValue.getDisplayText());
-
-        // === Variety question ===
-        formEntryController.stepToNextEvent();
-        // Collect calls getAnswerValue to populate dynamic choices
-        FormEntryPrompt varietyPrompt = formEntryController.getModel().getQuestionPrompt();
-        varietyPrompt.getAnswerValue();
-        ItemsetBinding dynamicChoices = varietyPrompt.getQuestion().getDynamicChoices();
-
-        // There are three blueberry varieties defined by the form
-        assertEquals(dynamicChoices.getChoices().size(), 3);
-
-        SelectChoice varietyChoice = dynamicChoices.getChoices().get(1);
-        SelectOneData varietySelection = new SelectOneData(new Selection(varietyChoice));
-        assertEquals("Collins", varietyPrompt.getSelectChoiceText(varietyChoice));
-        formEntryController.answerQuestion(varietySelection, true);
-
-        SelectOneData variety = (SelectOneData) formDef.getFirstDescendantWithName("variety").getValue();
-        assertEquals("collins", variety.getDisplayText());
+        scenario.answer("/data/fruit", "blueberry");
+        List<SelectChoice> choices = scenario.choicesOf("/data/variety");
+        // The itemset for /data/variety is instance('variety')/root/item[fruit = current()/../fruit]
+        // and the "variety" instance has three items for blueberry: blueray, collins, and duke
+        assertThat(choices, containsInAnyOrder(
+            choice("blueray"),
+            choice("collins"),
+            choice("duke")
+        ));
     }
+
 }
