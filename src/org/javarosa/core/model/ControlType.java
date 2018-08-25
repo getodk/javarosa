@@ -24,4 +24,18 @@ public enum ControlType {
     ControlType(int value) {
         this.value = value;
     }
+
+    /**
+     * Returns a {@link ControlType} from its int value
+     *
+     * @param intControlType the int value of the requested ControlType
+     * @return the related {@link ControlType} instance
+     */
+    public static ControlType from(int intControlType) {
+        for (ControlType dt : values()) {
+            if (dt.value == intControlType)
+                return dt;
+        }
+        throw new IllegalArgumentException("No ControlType with value " + intControlType);
+    }
 }
