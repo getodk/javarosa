@@ -46,45 +46,45 @@ public class Constants {
     /** Over The Air or HTTP Connection */
     public static final int CONNECTION_OTA = 4;
 
-    public static final int DATATYPE_UNSUPPORTED    = DataType.UNSUPPORTED.value;
-    public static final int DATATYPE_NULL           = DataType.NULL.value;
-    public static final int DATATYPE_TEXT           = DataType.TEXT.value;
-    public static final int DATATYPE_INTEGER        = DataType.INTEGER.value;
-    public static final int DATATYPE_DECIMAL        = DataType.DECIMAL.value;
-    public static final int DATATYPE_DATE           = DataType.DATE.value;
-    public static final int DATATYPE_TIME           = DataType.TIME.value;
-    public static final int DATATYPE_DATE_TIME      = DataType.DATE_TIME.value;
-    public static final int DATATYPE_CHOICE         = DataType.CHOICE.value;
+    public static final int DATATYPE_UNSUPPORTED    = -1;
+    public static final int DATATYPE_NULL           = 0;
+    public static final int DATATYPE_TEXT           = 1;
+    public static final int DATATYPE_INTEGER        = 2;
+    public static final int DATATYPE_DECIMAL        = 3;
+    public static final int DATATYPE_DATE           = 4;
+    public static final int DATATYPE_TIME           = 5;
+    public static final int DATATYPE_DATE_TIME      = 6;
+    public static final int DATATYPE_CHOICE         = 7;
     /** A list of items used for selecting multiple answers or ordering them */
-    public static final int DATATYPE_MULTIPLE_ITEMS = DataType.MULTIPLE_ITEMS.value;
+    public static final int DATATYPE_MULTIPLE_ITEMS = 8;
     /** The same as {@link Constants#DATATYPE_MULTIPLE_ITEMS} (for backwards compatibility) */
-    public static final int DATATYPE_CHOICE_LIST    = DataType.MULTIPLE_ITEMS.value;
-    public static final int DATATYPE_BOOLEAN        = DataType.BOOLEAN.value;
-    public static final int DATATYPE_GEOPOINT       = DataType.GEOPOINT.value;
-    public static final int DATATYPE_BARCODE        = DataType.BARCODE.value;
-    public static final int DATATYPE_BINARY         = DataType.BINARY.value;
-    public static final int DATATYPE_LONG           = DataType.LONG.value;
-    public static final int DATATYPE_GEOSHAPE       = DataType.GEOSHAPE.value;
-    public static final int DATATYPE_GEOTRACE       = DataType.GEOTRACE.value;
+    public static final int DATATYPE_CHOICE_LIST    = 8;
+    public static final int DATATYPE_BOOLEAN        = 9;
+    public static final int DATATYPE_GEOPOINT       = 10;
+    public static final int DATATYPE_BARCODE        = 11;
+    public static final int DATATYPE_BINARY         = 12;
+    public static final int DATATYPE_LONG           = 13;
+    public static final int DATATYPE_GEOSHAPE       = 14;
+    public static final int DATATYPE_GEOTRACE       = 15;
 
-    public static final int CONTROL_UNTYPED         = ControlType.UNTYPED.value;
-    public static final int CONTROL_INPUT           = ControlType.INPUT.value;
-    public static final int CONTROL_SELECT_ONE      = ControlType.SELECT_ONE.value;
-    public static final int CONTROL_SELECT_MULTI    = ControlType.SELECT_MULTI.value;
-    public static final int CONTROL_TEXTAREA        = ControlType.TEXTAREA.value;
-    public static final int CONTROL_SECRET          = ControlType.SECRET.value;
-    public static final int CONTROL_RANGE           = ControlType.RANGE.value;
-    public static final int CONTROL_UPLOAD          = ControlType.UPLOAD.value;
-    public static final int CONTROL_SUBMIT          = ControlType.SUBMIT.value;
-    public static final int CONTROL_TRIGGER         = ControlType.TRIGGER.value;
-    public static final int CONTROL_IMAGE_CHOOSE    = ControlType.IMAGE_CHOOSE.value;
-    public static final int CONTROL_LABEL           = ControlType.LABEL.value;
-    public static final int CONTROL_AUDIO_CAPTURE   = ControlType.AUDIO_CAPTURE.value;
-    public static final int CONTROL_VIDEO_CAPTURE   = ControlType.VIDEO_CAPTURE.value;
-    public static final int CONTROL_OSM_CAPTURE     = ControlType.OSM_CAPTURE.value;
+    public static final int CONTROL_UNTYPED         = -1;
+    public static final int CONTROL_INPUT           = 1;
+    public static final int CONTROL_SELECT_ONE      = 2;
+    public static final int CONTROL_SELECT_MULTI    = 3;
+    public static final int CONTROL_TEXTAREA        = 4;
+    public static final int CONTROL_SECRET          = 5;
+    public static final int CONTROL_RANGE           = 6;
+    public static final int CONTROL_UPLOAD          = 7;
+    public static final int CONTROL_SUBMIT          = 8;
+    public static final int CONTROL_TRIGGER         = 9;
+    public static final int CONTROL_IMAGE_CHOOSE    = 10;
+    public static final int CONTROL_LABEL           = 11;
+    public static final int CONTROL_AUDIO_CAPTURE   = 12;
+    public static final int CONTROL_VIDEO_CAPTURE   = 13;
+    public static final int CONTROL_OSM_CAPTURE     = 14;
     /** generic upload */
-    public static final int CONTROL_FILE_CAPTURE    = ControlType.FILE_CAPTURE.value;
-    public static final int CONTROL_RANK            = ControlType.RANK.value;
+    public static final int CONTROL_FILE_CAPTURE    = 15;
+    public static final int CONTROL_RANK            = 16;
 
     /* constants for xform tags */
     public static final String XFTAG_UPLOAD = "upload";
