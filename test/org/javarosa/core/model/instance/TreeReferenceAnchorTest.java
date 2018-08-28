@@ -9,6 +9,14 @@ import org.junit.Test;
 
 public class TreeReferenceAnchorTest {
 
+    @Test
+    public void a_relative_ref_can_be_anchored_to_an_absolute_ref() {
+        // 'baz'.anchor('/foo/bar') -> '/foo/bar/baz'
+        TreeReference tr = buildRef("baz");
+        TreeReference base = buildRef("/foo/bar");
+        assertThat(tr.anchor(base), is(buildRef("/foo/bar/baz")));
+    }
+
     @Test(expected = XPathException.class)
     public void anchoring_to_a_relative_ref_throws() {
         TreeReference tr = buildRef("some/relative/path");

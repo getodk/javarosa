@@ -33,9 +33,8 @@ public class TreeReferenceParentTest {
             {"Parenting to an empty ref doesn't change them", "../foo", "", "../foo"},
             {"foo.parent(bar) gives bar/foo", "foo", "bar", "bar/foo"},
             {"foo.parent(../bar) gives ../bar/foo", "foo", "../bar", "../bar/foo"},
-            // TODO review this. Shouldn't this resolve to "bar/foo"?
             {"../foo.parent(bar/baz) gives null", "../foo", "bar/baz", null},
-
+            {"../../a.parent(..) gives ../../../a", "../../a", "..", "../../../a"}
         });
     }
 
