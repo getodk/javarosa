@@ -127,6 +127,20 @@ public class XPathPathExpr extends XPathExpression {
                             }
                             break;
                         case "current":
+                            /*
+                             * Notes about the current() function:
+                             *
+                             * - current() in a calculate should refer to the node it is in.
+                             *   This means that to refer to a sibling node, the path should be current()/../<name of sibling node>.
+                             *
+                             * - current() in a choice filter should refer to the select node the choice filter is called from,
+                             *   NOT the expression it is in.
+                             *   See https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/current
+                             *   (this is the difference between current() and .)
+                             *
+                             * These cases have been tested and documented with specific examples
+                             * in the XPathPathExprCurrentTest test class
+                             */
                             parentsAllowed = true;
                             ref.setContext(TreeReference.CONTEXT_ORIGINAL);
                             break;
