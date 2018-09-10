@@ -40,6 +40,8 @@ import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The XFormAnswerDataParser is responsible for taking XForms elements and
@@ -50,6 +52,8 @@ import org.javarosa.core.model.utils.DateUtils;
 
 public class XFormAnswerDataParser {
     //FIXME: the QuestionDef parameter is a hack until we find a better way to represent AnswerDatas for select questions
+
+    private static final Logger logger = LoggerFactory.getLogger(XFormAnswerDataParser.class.getSimpleName());
 
     public static IAnswerData getAnswerData(String text, int dataType) {
         return getAnswerData(text, dataType, null);
@@ -128,6 +132,7 @@ public class XFormAnswerDataParser {
                 try {
                     return new GeoPointData().cast(new UncastData(trimmedText));
                 } catch (Exception e) {
+                    logGeoCreateError(GeoPointData.class, trimmedText);
                     return null;
                 }
 
@@ -138,6 +143,7 @@ public class XFormAnswerDataParser {
                 try {
                     return new GeoShapeData().cast(new UncastData(trimmedText));
                 } catch (Exception e) {
+                    logGeoCreateError(GeoShapeData.class, trimmedText);
                     return null;
                 }
 
@@ -148,12 +154,17 @@ public class XFormAnswerDataParser {
                 try {
                     return new GeoTraceData().cast(new UncastData(trimmedText));
                 } catch (Exception e) {
+                    logGeoCreateError(GeoTraceData.class, trimmedText);
                     return null;
                 }
 
             default:
                 return new UncastData(trimmedText);
         }
+    }
+
+    private static void logGeoCreateError(Class geoType, String trimmedText) {
+        logger.warn("Could not create {} from \"{}\"", geoType.getSimpleName(), trimmedText);
     }
 
     private static List<Selection> getSelections(String text, QuestionDef q) {
