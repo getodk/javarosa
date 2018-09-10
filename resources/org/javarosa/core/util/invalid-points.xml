@@ -3,31 +3,21 @@
         xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa"
         xmlns:orx="http://openrosa.org/xforms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <h:head>
-        <h:title>Distance of a geoshape, geotrace, or set of geopoints</h:title>
+        <h:title>Invalid points</h:title>
         <model>
             <instance>
-                <distance id="distance" version="2018042401">
-                    <!-- 0 is used internally for “no data”, so we’ll use 1e-15, a slightly larger number that still
-                         works for our calculations around the equator -->
-                    <geoshape>1e-15 1; 1e-15 91</geoshape>
-                    <geotrace>1e-15 1; 1e-15 91</geotrace>
+                <distance id="invalid-points" version="2018090901">
                     <points>
-                        <point>1e-15 1</point>
-                        <point>1e-15 91</point>
+                        <point>one</point>
+                        <point>2</point>
                     </points>
-                    <shape-result/>
-                    <trace-result/>
                     <point-result/>
                     <meta>
                         <instanceID/>
                     </meta>
                 </distance>
             </instance>
-            <bind nodeset="/distance/geoshape" type="geoshape"/>
-            <bind nodeset="/distance/geotrace" type="geotrace"/>
             <bind nodeset="/distance/points/point" type="geopoint"/>
-            <bind calculate="distance( /distance/geoshape     )" nodeset="/distance/shape-result" type="string"/>
-            <bind calculate="distance( /distance/geotrace     )" nodeset="/distance/trace-result" type="string"/>
             <bind calculate="distance( /distance/points/point )" nodeset="/distance/point-result" type="string"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/distance/meta/instanceID" readonly="true()" type="string"/>
         </model>

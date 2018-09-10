@@ -5,10 +5,8 @@
         <model>
             <instance>
                 <area id="area" version="2018042401">
-                    <geoshape0/>
                     <geoshape1>38.253094215699576 21.756382658677467</geoshape1>
                     <geoshape2>38.253094215699576 21.756382658677467;38.25021274773806 21.756382658677467</geoshape2>
-                    <arearesult0/>
                     <arearesult1/>
                     <arearesult2/>
                     <meta>
@@ -16,10 +14,8 @@
                     </meta>
                 </area>
             </instance>
-            <bind nodeset="/area/geoshape0" type="geoshape"/>
             <bind nodeset="/area/geoshape1" type="geoshape"/>
             <bind nodeset="/area/geoshape2" type="geoshape"/>
-            <bind calculate="enclosed-area( /area/geoshape0 )" nodeset="/area/arearesult0" type="string"/>
             <bind calculate="enclosed-area( /area/geoshape1 )" nodeset="/area/arearesult1" type="string"/>
             <bind calculate="enclosed-area( /area/geoshape2 )" nodeset="/area/arearesult2" type="string"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/area/meta/instanceID" readonly="true()" type="string"/>
