@@ -132,7 +132,7 @@ public class XFormAnswerDataParser {
                 try {
                     return new GeoPointData().cast(new UncastData(trimmedText));
                 } catch (Exception e) {
-                    logGeoCreateError(GeoPointData.class, trimmedText);
+                    logGeoCreateError(GeoPointData.class, trimmedText, e);
                     return null;
                 }
 
@@ -143,7 +143,7 @@ public class XFormAnswerDataParser {
                 try {
                     return new GeoShapeData().cast(new UncastData(trimmedText));
                 } catch (Exception e) {
-                    logGeoCreateError(GeoShapeData.class, trimmedText);
+                    logGeoCreateError(GeoShapeData.class, trimmedText, e);
                     return null;
                 }
 
@@ -154,7 +154,7 @@ public class XFormAnswerDataParser {
                 try {
                     return new GeoTraceData().cast(new UncastData(trimmedText));
                 } catch (Exception e) {
-                    logGeoCreateError(GeoTraceData.class, trimmedText);
+                    logGeoCreateError(GeoTraceData.class, trimmedText, e);
                     return null;
                 }
 
@@ -163,8 +163,8 @@ public class XFormAnswerDataParser {
         }
     }
 
-    private static void logGeoCreateError(Class geoType, String trimmedText) {
-        logger.warn("Could not create {} from \"{}\"", geoType.getSimpleName(), trimmedText);
+    private static void logGeoCreateError(Class geoType, String trimmedText, Exception exception) {
+        logger.warn("Could not create {} from \"{}\": {}", geoType.getSimpleName(), trimmedText, exception.toString());
     }
 
     private static List<Selection> getSelections(String text, QuestionDef q) {
