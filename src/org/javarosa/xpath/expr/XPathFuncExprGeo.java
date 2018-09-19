@@ -7,12 +7,16 @@ import org.javarosa.core.util.GeoUtils;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** XPath function expression geographic logic */
 class XPathFuncExprGeo {
+    private static final Logger logger = LoggerFactory.getLogger(XPathFuncExprGeo.class.getSimpleName());
+
     List<GeoUtils.LatLong> getGpsCoordinatesFromNodeset(String name, Object argVal) {
         if (!(argVal instanceof XPathNodeset)) {
             throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
@@ -30,7 +34,7 @@ class XPathFuncExprGeo {
                     latLongs.add(new GeoUtils.LatLong(point.getPart(0), point.getPart(1)));
                 }
             } catch (Exception e) {
-                throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + argList[0]);
+                throwMismatch(name);
             }
         } else if (repeatSize >= 2) {
             // treat the input as a series of GeoPointData
@@ -40,10 +44,16 @@ class XPathFuncExprGeo {
                     GeoPointData geoPointData = new GeoPointData().cast(new UncastData(XPathFuncExpr.toString(arg)));
                     latLongs.add(new GeoUtils.LatLong(geoPointData.getPart(0), geoPointData.getPart(1)));
                 } catch (Exception e) {
-                    throw new XPathTypeMismatchException("The function \'" + name + "\' received a value that does not represent GPS coordinates: " + arg);
+                    throwMismatch(name);
                 }
             }
         }
         return latLongs;
+    }
+
+    private void throwMismatch(String name) {
+        String msg = "The function '" + name + "' received a value that does not represent GPS coordinates";
+        logger.warn(msg);
+        throw new XPathTypeMismatchException(msg);
     }
 }

@@ -61,13 +61,10 @@ public class GeoShapeAreaTest {
         // Check the results. The data and expected results come from GeoUtilsTest.
         TreeElement root = formDef.getMainInstance().getRoot();
 
-        IAnswerData area = root.getChildAt(3).getValue();
+        IAnswerData area = root.getChildAt(2).getValue();
         assertEquals(0, area.getValue());
 
-        area = root.getChildAt(4).getValue();
-        assertEquals(0, area.getValue());
-
-        area = root.getChildAt(5).getValue();
+        area = root.getChildAt(3).getValue();
         assertEquals(0, area.getValue());
     }
 }

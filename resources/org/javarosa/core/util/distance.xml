@@ -7,11 +7,13 @@
         <model>
             <instance>
                 <distance id="distance" version="2018042401">
-                    <geoshape>0 0; 0 91</geoshape>
-                    <geotrace>0 0; 0 91</geotrace>
+                    <!-- 0 is used internally for “no data”, so we’ll use 1e-15, a slightly larger number that still
+                         works for our calculations around the equator -->
+                    <geoshape>1e-15 1; 1e-15 91</geoshape>
+                    <geotrace>1e-15 1; 1e-15 91</geotrace>
                     <points>
-                        <point>0 0</point>
-                        <point>0 91</point>
+                        <point>1e-15 1</point>
+                        <point>1e-15 91</point>
                     </points>
                     <shape-result/>
                     <trace-result/>
