@@ -1185,7 +1185,7 @@ public class XFormParser implements IXFormParserFunctions {
             if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
                 String textRef = ref.substring(ITEXT_OPEN.length(), ref.lastIndexOf(ITEXT_CLOSE));
 
-                verifyTextMappings(textRef, "<hint>", false);
+                verifyTextMappings(textRef, "<hint>", true);
                 q.setHelpTextID(textRef);
             } else {
                 throw new RuntimeException("malformed ref [" + ref + "] for <hint>");
