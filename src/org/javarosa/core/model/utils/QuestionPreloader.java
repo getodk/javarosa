@@ -109,8 +109,10 @@ public class QuestionPreloader {
             public String preloadHandled() {
                 return "uid";
             }
+
+            // Generates an RFC 4122 UUID with a "uuid:" prefix
             public IAnswerData handlePreload(String preloadParams) {
-                return new StringData(PropertyUtils.genGUID(25));
+                return new StringData("uuid:" + PropertyUtils.genUUID());
             }
 
             public boolean handlePostProcess(TreeElement node, String params) {
