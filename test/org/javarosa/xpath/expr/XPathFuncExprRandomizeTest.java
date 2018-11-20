@@ -64,8 +64,8 @@ public class XPathFuncExprRandomizeTest {
     @Test
     public void fields_without_seed_in_the_same_form_get_a_different_order_of_choices() {
         initializeNewInstance(formDef);
-        List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/fruit1");
-        List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/fruit2");
+        List<SelectChoice> choices1 = getSelectChoices(formDef, "/data/no-seed-fruit1");
+        List<SelectChoice> choices2 = getSelectChoices(formDef, "/data/no-seed-fruit2");
 
         assertFalse(nodesEqualInOrder(choices1, choices2));
     }
@@ -73,10 +73,10 @@ public class XPathFuncExprRandomizeTest {
     @Test
     public void the_same_field_without_seed_in_different_instances_gets_a_different_order_of_choices() {
         initializeNewInstance(formDef);
-        List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/fruit1");
+        List<SelectChoice> choices1 = getSelectChoices(formDef, "/data/no-seed-fruit1");
 
         initializeNewInstance(formDef);
-        List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/fruit1");
+        List<SelectChoice> choices2 = getSelectChoices(formDef, "/data/no-seed-fruit1");
 
         assertFalse(nodesEqualInOrder(choices1, choices2));
     }
@@ -84,8 +84,8 @@ public class XPathFuncExprRandomizeTest {
     @Test
     public void seeded_fields_in_the_same_form_get_the_same_order_of_choices() {
         initializeNewInstance(formDef);
-        List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/seededFruit1");
-        List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/seededFruit2");
+        List<SelectChoice> choices1 = getSelectChoices(formDef, "/data/static-seed-fruit1");
+        List<SelectChoice> choices2 = getSelectChoices(formDef, "/data/static-seed-fruit2");
 
         assertTrue(nodesEqualInOrder(choices1, choices2));
     }
@@ -93,10 +93,10 @@ public class XPathFuncExprRandomizeTest {
     @Test
     public void the_same_seeded_field_in_different_instances_gets_the_same_order_of_choices() {
         initializeNewInstance(formDef);
-        List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/seededFruit2");
+        List<SelectChoice> choices1 = getSelectChoices(formDef, "/data/static-seed-fruit2");
 
         initializeNewInstance(formDef);
-        List<SelectChoice> choices2 = getSelectChoices(formDef, "/randomize/seededFruit2");
+        List<SelectChoice> choices2 = getSelectChoices(formDef, "/data/static-seed-fruit2");
 
         assertTrue(nodesEqualInOrder(choices1, choices2));
     }
@@ -104,12 +104,12 @@ public class XPathFuncExprRandomizeTest {
     @Test
     public void the_same_seeded_field_in_different_instances_from_deserialized_forms_gets_the_same_order_of_choices() throws IOException, DeserializationException {
         initializeNewInstance(formDef);
-        List<SelectChoice> choices1 = getSelectChoices(formDef, "/randomize/seededFruit2");
+        List<SelectChoice> choices1 = getSelectChoices(formDef, "/data/static-seed-fruit2");
 
         FormDef formDefAfterSerialization = serializeAndDeserializeForm(formDef);
 
         initializeNewInstance(formDefAfterSerialization);
-        List<SelectChoice> choices2 = getSelectChoices(formDefAfterSerialization, "/randomize/seededFruit2");
+        List<SelectChoice> choices2 = getSelectChoices(formDefAfterSerialization, "/data/static-seed-fruit2");
 
         assertTrue(nodesEqualInOrder(choices1, choices2));
     }
@@ -117,15 +117,45 @@ public class XPathFuncExprRandomizeTest {
     @Test
     public void randomize_function_can_be_used_outside_itemset_nodeset_definitions() {
         initializeNewInstance(formDef);
-        // The ref /randomize/randomValue is the max from a randomized nodeset of numbers from 1 to 6
-        assertEquals(6, getAnswerValue(formDef, "/randomize/randomValue"));
+        // The ref /data/randomValue is the max from a randomized nodeset of numbers from 1 to 6
+        assertEquals(6, getAnswerValue(formDef, "/data/no-seed-random-value"));
     }
 
     @Test
     public void seeded_randomize_function_can_be_used_outside_itemset_nodeset_definitions() {
         initializeNewInstance(formDef);
-        // The ref /randomize/seededRandomValue is the max from a randomized nodeset of numbers from 1 to 6
-        assertEquals(6, getAnswerValue(formDef, "/randomize/seededRandomValue"));
+        // The ref /data/seededRandomValue is the max from a randomized nodeset of numbers from 1 to 6
+        assertEquals(6, getAnswerValue(formDef, "/data/static-seed-random-value"));
+    }
+
+    @Test
+    public void randomize_function_can_take_a_seed_from_a_nodeset() {
+        initializeNewInstance(formDef);
+        // The ref /data/seededRandomValue is the max from a randomized nodeset of numbers from 1 to 6
+        assertEquals(6, getAnswerValue(formDef, "/data/nodeset-seed-random-value"));
+    }
+
+    @Test
+    public void fields_can_take_their_randomize_seeds_from_a_nodeset() throws IOException, DeserializationException {
+        initializeNewInstance(formDef);
+        List<SelectChoice> choices1a = getSelectChoices(formDef, "/data/nodeset-seed-fruit1");
+        List<SelectChoice> choices2a = getSelectChoices(formDef, "/data/nodeset-seed-fruit2");
+
+        initializeNewInstance(formDef);
+        List<SelectChoice> choices1b = getSelectChoices(formDef, "/data/nodeset-seed-fruit1");
+        List<SelectChoice> choices2b = getSelectChoices(formDef, "/data/nodeset-seed-fruit2");
+
+        FormDef formDefAfterSerialization = serializeAndDeserializeForm(formDef);
+
+        initializeNewInstance(formDef);
+        List<SelectChoice> choices1c = getSelectChoices(formDefAfterSerialization, "/data/nodeset-seed-fruit1");
+        List<SelectChoice> choices2c = getSelectChoices(formDefAfterSerialization, "/data/nodeset-seed-fruit2");
+
+        assertTrue(nodesEqualInOrder(choices1a, choices2a));
+        assertTrue(nodesEqualInOrder(choices1a, choices1b));
+        assertTrue(nodesEqualInOrder(choices1a, choices1c));
+        assertTrue(nodesEqualInOrder(choices2a, choices2b));
+        assertTrue(nodesEqualInOrder(choices2a, choices2c));
     }
 
     private FormDef serializeAndDeserializeForm(FormDef formDef) throws IOException, DeserializationException {
