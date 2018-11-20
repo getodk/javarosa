@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotSame;
 import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.parseSeed;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
 import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -35,14 +35,35 @@ public class RandomizeHelperTest {
     public void cleans_the_nodeset_definition() {
         // We will try different combinations of whitespace and seed presence around the path
         assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition(" randomize(/some/path)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path) "));
+        assertEquals("/some/path",                              cleanNodesetDefinition(" randomize(/some/path) "));
         assertEquals("/some/path",                              cleanNodesetDefinition("randomize( /some/path )"));
         assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path,33)"));
         assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path, 33)"));
         assertEquals("/some/path",                              cleanNodesetDefinition("randomize( /some/path , 33)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path, /some/other/path)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize(/some/path , /some/other/path)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize( /some/path, /some/other/path)"));
+        assertEquals("/some/path",                              cleanNodesetDefinition("randomize( /some/path , /some/other/path)"));
         assertEquals("/some/path[someFilter]",                  cleanNodesetDefinition("randomize(/some/path[someFilter])"));
         assertEquals("/some/path[someFilter]",                  cleanNodesetDefinition("randomize(/some/path[someFilter], 33)"));
         assertEquals("/some/path[someFilter(with, commas)]",    cleanNodesetDefinition("randomize(/some/path[someFilter(with, commas)])"));
         assertEquals("/some/path[someFilter(with, commas)]",    cleanNodesetDefinition("randomize(/some/path[someFilter(with, commas)], 33)"));
+    }
+
+    @Test
+    public void cleans_the_seed_definition() {
+        // We will try different combinations of whitespace and seed presence around the path
+        assertNull(cleanSeedDefinition("randomize(/some/path)"));
+        assertEquals("33",               cleanSeedDefinition("randomize(/some/path,33)"));
+        assertEquals("33",               cleanSeedDefinition("randomize(/some/path,33 )"));
+        assertEquals("33",               cleanSeedDefinition("randomize(/some/path, 33)"));
+        assertEquals("33",               cleanSeedDefinition("randomize(/some/path, 33 )"));
+        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path,/some/other/path)"));
+        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path,/some/other/path) "));
+        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path, /some/other/path)"));
+        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path, /some/other/path) "));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -53,34 +74,6 @@ public class RandomizeHelperTest {
     @Test(expected = IllegalArgumentException.class)
     public void throws_when_cleaning_a_nodeset_that_does_not_use_randomize_variant_2() {
         cleanNodesetDefinition("this doesn't end with ) *some filler here*");
-    }
-
-    @Test
-    public void parses_the_seed() {
-        assertNull(parseSeed("randomize(/some/path)"));
-        // We will try different combinations of whitespace
-        assertEquals(new Long(33), parseSeed("randomize(/some/path,33)"));
-        assertEquals(new Long(33), parseSeed("randomize(/some/path, 33)"));
-        assertEquals(new Long(33), parseSeed("randomize(/some/path, 33 )"));
-        assertNull(parseSeed("randomize(/some/path[someFilter])"));
-        assertEquals(new Long(33), parseSeed("randomize(/some/path[someFilter], 33)"));
-        assertNull(parseSeed("randomize(/some/path[someFilter(with, commas)])"));
-        assertEquals(new Long(33), parseSeed("randomize(/some/path[someFilter(with, commas)], 33)"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throws_when_parsing_the_seed_from_a_nodeset_that_does_not_use_randomize_variant_1() {
-        parseSeed("this doesn't start with randomize( )");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throws_when_parsing_the_seed_from_a_nodeset_that_does_not_use_randomize_variant_2() {
-        parseSeed("this doesn't end with ) *some filler here*");
-    }
-
-    @Test(expected = NumberFormatException.class)
-    public void throws_when_parsing_a_seed_that_is_not_long() {
-        parseSeed("randomize(/some/path, xyz)");
     }
 
     @Test

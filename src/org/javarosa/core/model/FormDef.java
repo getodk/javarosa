@@ -1060,7 +1060,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         itemset.clearChoices();
-        itemset.setChoices(choices, this.getLocalizer());
+        itemset.setChoices(choices, getMainInstance(), exprEvalContext, this.getLocalizer());
     }
 
     public QuestionPreloader getPreloader() {

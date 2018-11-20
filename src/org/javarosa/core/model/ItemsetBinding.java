@@ -2,13 +2,16 @@ package org.javarosa.core.model;
 
 import static org.javarosa.core.model.FormDef.getAbsRef;
 import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
@@ -21,6 +24,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,18 +59,27 @@ public class ItemsetBinding implements Externalizable, Localizable {
     private List<SelectChoice> choices; //dynamic choices -- not serialized, obviously
 
     public boolean randomize = false;
-    public Long randomSeed = null;
+    public XPathNumericLiteral randomSeedNumericExpr = null;
+    public XPathPathExpr randomSeedPathExpr = null;
 
     public List<SelectChoice> getChoices () {
         return choices;
     }
 
-    public void setChoices (List<SelectChoice> choices, Localizer localizer) {
+    private Long resolveRandomSeed(DataInstance model, EvaluationContext ec) {
+        if (randomSeedNumericExpr != null)
+            return ((Double) randomSeedNumericExpr.eval(model, ec)).longValue();
+        if (randomSeedPathExpr != null)
+            return toNumeric(randomSeedPathExpr.eval(model, ec)).longValue();
+        return null;
+    }
+
+    public void setChoices (List<SelectChoice> choices, DataInstance model, EvaluationContext ec, Localizer localizer) {
         if (this.choices != null) {
             logger.warn("previous choices not cleared out");
             clearChoices();
         }
-        this.choices = randomize ? shuffle(choices, randomSeed) : choices;
+        this.choices = randomize ? shuffle(choices, resolveRandomSeed(model, ec)) : choices;
 
         if (randomize) {
             // Match indices to new positions
@@ -150,7 +163,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         labelIsItext = ExtUtil.readBool(in);
         copyMode = ExtUtil.readBool(in);
         randomize = ExtUtil.readBool(in);
-        randomSeed = (Long)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()));
+        randomSeedNumericExpr = (XPathNumericLiteral) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
+        randomSeedPathExpr = (XPathPathExpr) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -162,7 +176,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         ExtUtil.writeBool(out, labelIsItext);
         ExtUtil.writeBool(out, copyMode);
         ExtUtil.writeBool(out, randomize);
-        ExtUtil.write(out, new ExtWrapNullable(randomSeed == null ? null : new ExtWrapTagged(randomSeed)));
+        ExtUtil.write(out, new ExtWrapNullable(randomSeedNumericExpr == null ? null : new ExtWrapTagged(randomSeedNumericExpr)));
+        ExtUtil.write(out, new ExtWrapNullable(randomSeedPathExpr == null ? null : new ExtWrapTagged(randomSeedPathExpr)));
     }
 
 }
