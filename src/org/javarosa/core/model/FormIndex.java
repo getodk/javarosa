@@ -20,15 +20,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
 /**
  * {@code FormIndex} is an immutable index which is structured to provide quick access to a specific node in a
- * {@link FormDef} (tree of {@link IFormElement} representing a blank form) or a {@link FormInstance}
- * (tree of {@link TreeElement} representing a form instance that can be filled). It also includes a
- * {@link TreeReference} representing the XPath path of that node.
+ * {@link FormDef} (tree of {@link IFormElement} representing a blank form) or a 
+ * {@link org.javarosa.core.model.instance.FormInstance FormInstance} (tree of 
+ * {@link org.javarosa.core.model.instance.TreeElement TreeElement} representing a form instance that can be filled). 
+ * It also includes a {@link TreeReference} representing the XPath path of that node.
  *
  * The XML node referred to by a FormIndex can correspond to either a question or a group. The index is constructed as a
  * linked list of levels.
@@ -78,7 +77,8 @@ import org.javarosa.core.model.instance.TreeReference;
  * always has a @{code localIndex} of 0.
  *
  * To go from a {@code FormIndex} to a form element in a blank form, {@link FormDef#getChild(FormIndex)} can be used.
- * To go from a {@code FormIndex} to a node in a filled form, {@link FormInstance#resolveReference(TreeReference)} can
+ * To go from a {@code FormIndex} to a node in a filled form, 
+ * {@link org.javarosa.core.model.instance.FormInstance#resolveReference(TreeReference) FormInstance#resolveReference(TreeReference)} can
  * be used along with {@link #getReference()}.
  *
  * No circularity is allowed. That is, no {@code FormIndex}'s ancestor can be itself.
