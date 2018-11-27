@@ -164,7 +164,7 @@ public class XPathFuncExpr extends XPathExpression {
             assertArgsCount(name, args, 1);
             Double val = toNumeric(argVals[0]);
             if (val.isNaN()) {
-                return Double(0);
+                return new Double(0);
             } else {
                 return val;
             }
