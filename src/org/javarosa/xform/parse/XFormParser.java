@@ -39,11 +39,11 @@ import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExt
 import static org.javarosa.core.services.ProgramFlow.die;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
-import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.RANK;
+import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
 import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.parseSeed;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
 import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 import java.io.ByteArrayInputStream;
@@ -59,7 +59,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -70,6 +69,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
+import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -98,6 +98,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
@@ -1318,7 +1319,11 @@ public class XFormParser implements IXFormParserFunctions {
 
         if (nodesetStr.startsWith("randomize(")) {
             itemset.randomize = true;
-            itemset.randomSeed = parseSeed(nodesetStr);
+            String seedStr = cleanSeedDefinition(nodesetStr);
+            if (seedStr != null && seedStr.matches("\\d*\\.?\\d+"))
+                itemset.randomSeedNumericExpr = new XPathNumericLiteral(Double.parseDouble(seedStr));
+            else if (seedStr != null)
+                itemset.randomSeedPathExpr = XPathReference.getPathExpr(seedStr);
             nodesetStr = cleanNodesetDefinition(nodesetStr);
         }
 

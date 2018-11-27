@@ -27,25 +27,6 @@ public final class RandomizeHelper {
     private static final Pattern CHOICE_FILTER_PATTERN = Pattern.compile("randomize\\((.+?),?([^,)\\]]+?)?\\)");
 
     /**
-     * Looks for a seed in an xform randomize() expression. If it is present and
-     * it can be parsed into a {@link Long}, it returns it. If it is not present,
-     * returns null.
-     * <p>
-     * Can throw an {@link IllegalArgumentException} if the expression doesn't conform
-     * to an xform randomize() call.
-     * Can throw a {@link NumberFormatException} if it can't parse the seed into a {@link Long}
-     *
-     * @param nodesetStr an xform randomize() expression
-     * @return a {@link Long} seed or null if it is not found inside the expression
-     */
-    static Long parseSeed(String nodesetStr) {
-        String[] args = getArgs(nodesetStr);
-        return args.length == 2
-            ? Long.parseLong(args[1].trim())
-            : null;
-    }
-
-    /**
      * Cleans an xform randomize() expression to leave only its first argument, which
      * should be an xpath expression.
      * <p>
@@ -57,6 +38,22 @@ public final class RandomizeHelper {
      */
     static String cleanNodesetDefinition(String nodesetStr) {
         return getArgs(nodesetStr)[0].trim();
+    }
+
+    /**
+     * Cleans an xform randomize() expression to leave only its second argument, if it exists, which
+     * should be a number or an xpath expression, or null if there's no second argument present
+     * <p>
+     * Can throw an {@link IllegalArgumentException} if the expression doesn't conform
+     * to an xform randomize() call.
+     *
+     * @param nodesetStr an xform randomize() expression
+     * @return a {@link String} with the second argument of the xform randomize() expression, or
+     *         null, if there's no second argument present
+     */
+    static String cleanSeedDefinition(String nodesetStr) {
+        String[] args = getArgs(nodesetStr);
+        return args.length > 1 ? args[1].trim() : null;
     }
 
     /**
@@ -86,6 +83,7 @@ public final class RandomizeHelper {
     }
 
     private static String[] getArgs(String nodesetStr) {
+        nodesetStr = nodesetStr.trim();
         if (!nodesetStr.startsWith("randomize(") || !nodesetStr.endsWith(")"))
             throw new IllegalArgumentException("Nodeset definition must use randomize(path, seed?) function");
         if (!nodesetStr.contains("["))
