@@ -160,6 +160,14 @@ public class XPathFuncExpr extends XPathExpression {
                 argVals[1] = args[1].eval(model, evalContext);
                 return argVals[1];
             }
+        } else if (name.equals("number-or-zero")) {
+            assertArgsCount(name, args, 1);
+            Double val = toNumeric(argVals[0]);
+            if (val.isNaN()) {
+                return Double(0);
+            } else {
+                return val;
+            }
         } else if (name.equals("indexed-repeat")) {
             if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
                 return indexedRepeat(model, evalContext, args, argVals);
