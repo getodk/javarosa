@@ -62,7 +62,7 @@ jar {
     // Be sure to update version in pom.xml to match
     // snapshot release = x.x.x-SNAPSHOT
     // production release = x.x.x
-    version = '2.12.1-SNAPSHOT'
+    version = '2.12.1'
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
