@@ -70,15 +70,27 @@ public class FormEntryController {
         return answerQuestion(model.getFormIndex(), data, midSurvey);
     }
 
-
-    /**
-     * Attempts to save the answer at the specified FormIndex into the
-     * datamodel.
-     *
-     * @param index
-     * @param data
-     * @return OK if save was successful, error if a constraint was violated.
-     */
+   /**
+    * Attempts to save the answer at the given {@link FormIndex} into the instance
+    * and returns one of three possible {@code int} attempt result codes:
+    * <ul>
+    * <li>{@link #ANSWER_OK}
+    * <li>{@link #ANSWER_REQUIRED_BUT_EMPTY}
+    * <li>{@link #ANSWER_CONSTRAINT_VIOLATED}
+    * </ul>
+    * <p>
+    * Side effects: When it returns {@link #ANSWER_OK}, it mutates
+    * the {@link TreeElement} corresponding to the given {@link FormIndex} by
+    * setting its value to the given {@link IAnswerData} or by copying an
+    * itemset answer if the question is complex.
+    *
+    * @param index The index of the question/prompt that is being currently evaluated
+    * @param data  The data to attempt to answer the question with.
+    * @return the attempt's {@code int} result code
+    * @throws RuntimeException when the question is complex and it has constraints.
+    *                          See inline comments.
+    * @see QuestionDef#isComplex()
+    */
     public int answerQuestion(FormIndex index, IAnswerData data, boolean midSurvey) {
         QuestionDef q = model.getQuestionPrompt(index).getQuestion();
         if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {

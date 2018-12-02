@@ -52,19 +52,18 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStringLiteral;
 
 /**
- * An element of a FormInstance.
+ * <p>An element of a FormInstance.</p>
  *
- * TreeElements represent an XML node in the instance. It may either have a value (e.g., <name>Drew</name>),
- * a number of TreeElement children (e.g., <meta><device /><timestamp /><user_id /></meta>), or neither (e.g.,
- * <empty_node />)
+ * <p>TreeElements represent an XML node in the instance. It may either have a value (e.g., <name>Drew</name>),
+ * a number of TreeElement children (e.g., <meta><device /><timestamp /><user_id /></meta>), or neither (e.g.,<empty_node />)</p>
  *
- * TreeElements can also represent attributes. Attributes are unique from normal elements in that they are
- * not "children" of their parent, and are always leaf nodes: IE cannot have children.
+ * <p>TreeElements can also represent attributes. Attributes are unique from normal elements in that they are
+ * not "children" of their parent, and are always leaf nodes: IE cannot have children.</p>
  *
- * TODO: Split out the bind-able session data from this class and leave only the mandatory values to speed up
- * new DOM-like models
- *  * @author Clayton Sims
- *
+ * <p>TODO: Split out the bind-able session data from this class and leave only the mandatory values to speed up
+ * new DOM-like models</p>
+ 
+ * @author Clayton Sims
  */
 
  public class TreeElement implements Externalizable, AbstractTreeElement<TreeElement> {
@@ -144,11 +143,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     /**
-     * Retrieves the TreeElement representing the attribute for
-     * the provided namespace and name, or null if none exists.
+     * <p>Retrieves the TreeElement representing the attribute for
+     * the provided namespace and name, or null if none exists.</p>
      *
-     * If 'null' is provided for the namespace, it will match the first
-     * attribute with the matching name.
+     * <p>If 'null' is provided for the namespace, it will match the first
+     * attribute with the matching name.</p>
      *
      * @param attributes - list of attributes to search
      * @param namespace
@@ -423,11 +422,11 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     /**
-     * Retrieves the TreeElement representing an arbitrary bind attribute
-     * for this element at the provided namespace and name, or null if none exists.
+     * <p>Retrieves the TreeElement representing an arbitrary bind attribute
+     * for this element at the provided namespace and name, or null if none exists.</p>
      *
-     * If 'null' is provided for the namespace, it will match the first
-     * attribute with the matching name.
+     * <p>If 'null' is provided for the namespace, it will match the first
+     * attribute with the matching name.</p>
      *
      * @return TreeElement
      */
@@ -435,11 +434,19 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         return getAttribute(bindAttributes, namespace, name);
     }
 
-    /**
-     * get value of the bind attribute with namespace:name' in the list
-     *
-     * @return String
-     */
+   /**
+    * Returns the value of the given bind attribute from the given namespace.
+    * <p>
+    * Example:
+    * <ul>
+    * <li>Given a binding {@code <bind assertion="blah"/>}, calling {@code getBindAttributeValue(null, "assertion")} will return {@code "blah"}
+    * <li>Given a binding {@code <bind odk:assertion="blah"/>}, calling {@code getBindAttributeValue("odk", "assertion")} will return {@code "blah"}
+    * </ul>
+    * </p>
+    *
+    * @param namespace the namespace of the attribute. It can be null
+    * @param name      the name of the attribute
+    */
     public String getBindAttributeValue(String namespace, String name) {
         TreeElement element = getBindAttribute(namespace,name);
         return element == null ? null: getAttributeValue(element);
@@ -576,13 +583,13 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     /*
      * TODO:
      *
-     * this new serialization scheme is kind of lame. ideally, we shouldn't have
+     * This new serialization scheme is kind of lame. ideally, we shouldn't have
      * to sub-class TreeElement at all; we should have an API that can
      * seamlessly represent complex data model objects (like weight history or
      * immunizations) as if they were explicity XML subtrees underneath the
-     * parent TreeElement
+     * parent TreeElement.
      *
-     * failing that, we should wrap this scheme in an ExternalizableWrapper
+     * Failing that, we should wrap this scheme in an ExternalizableWrapper.
      */
 
     @Override
