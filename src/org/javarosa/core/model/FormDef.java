@@ -973,15 +973,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     /**
-     * Identifies the itemset in the backend model, and creates a set of
-     * SelectChoice objects at the current question reference based on the data
+     * Identifies the <code>itemset</code> in the backend model, and creates a set of
+     * <code>SelectChoice</code> objects at the current question reference based on the data
      * in the model.
      * <p/>
-     * Will modify the itemset binding to contain the relevant choices
+     * Modifies the <code>itemset</code> object passed by clearing any choices currently on it, and populating with
+     * choices based on the question reference <code>curQRef</code> that was passed.
      *
-     * @param itemset The binding for an itemset, where the choices will be populated
-     * @param curQRef A reference to the current question's element, which will be
-     *                used to determine the values to be chosen from.
+     * @param itemset the binding for an itemset, where the choices will be populated
+     * @param curQRef a reference to the current question's element, which will be
+     *                used to determine the values to be chosen from
      */
     public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
         getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
@@ -1117,7 +1118,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /**
      * Iterates over the form's data bindings, and evaluates all post-processing calls.
      *
-     * @return true if the instance was modified in any way. false otherwise.
+     * @return true if the instance was modified in any way, otherwise false
      */
     private boolean postProcessInstance(TreeElement node) {
         // we might have issues with ordering, for example, a handler that writes
@@ -1163,7 +1164,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * Requires that the instance has been set to a prototype of the instance
      * that should be used for deserialization.
      *
-     * @param dis - the stream to read from.
+     * @param dis - the stream to read from
      * @throws IOException
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -1237,7 +1238,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /**
      * Writes the form definition object to the supplied stream.
      *
-     * @param dos - the stream to write to.
+     * @param dos - the stream to write to
      * @throws IOException
      */
     @Override
@@ -1525,6 +1526,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
     }
 
+    /**
+    * Traverses recursively the given {@link IFormElement} node tree and returns
+    * the first {@link QuestionDef} that matches the binding defined in the
+    * given {@link TreeReference}.
+    *
+    * @param ref reference to a form binding
+    * @param fe  the recursive {@link IFormElement}. The starting call would
+    *            typically receive a {@link FormDef}
+    * @return the question definition, {@code null} if no {@link QuestionDef}
+    *         matches the given binding
+    */
     public static QuestionDef findQuestionByRef(TreeReference ref, IFormElement fe) {
         if (fe instanceof FormDef) {
             ref = ref.genericize();

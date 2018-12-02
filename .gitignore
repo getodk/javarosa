@@ -17,3 +17,6 @@ secrets.xml
 # logging
 logback.xml
 logback-test.xml
+
+# macOS
+.DS_Store
