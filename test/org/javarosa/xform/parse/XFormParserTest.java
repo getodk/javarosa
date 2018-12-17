@@ -123,9 +123,9 @@ public class XFormParserTest {
         assertEquals(1, treeReferences.size());
         DataInstance townInstance = formDef.getNonMainInstance("towns");
         AbstractTreeElement tiRoot = townInstance.getRoot();
-        assertEquals("towndata", tiRoot.getName());
-        assertEquals(1, tiRoot.getNumChildren());
-        AbstractTreeElement dataSetChild = tiRoot.getChild("data_set", 0);
+        AbstractTreeElement townData = tiRoot.getChild("towndata", 0);
+        assertEquals(1, townData.getNumChildren());
+        AbstractTreeElement dataSetChild = townData.getChild("data_set", 0);
         assertEquals("us_east", dataSetChild.getValue().getDisplayText());
     }
 

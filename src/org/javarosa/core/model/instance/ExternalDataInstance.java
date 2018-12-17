@@ -42,7 +42,9 @@ public class ExternalDataInstance extends DataInstance {
         KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(absolutePath));
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
         TreeElement root = treeElementParser.parse();
-        return new ExternalDataInstance(path, instanceId, root);
+        TreeElement rootParent = new TreeElement("root parent");
+        rootParent.addChild(root);
+        return new ExternalDataInstance(path, instanceId, rootParent);
     }
 
     private static String getPathPrefix() {
