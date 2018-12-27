@@ -344,6 +344,16 @@ public class XPathFuncExpr extends XPathExpression {
             }
         } else if (name.equals("substr") && (args.length == 2 || args.length == 3)) {
             return substring(argVals[0], argVals[1], args.length == 3 ? argVals[2] : null);
+        } else if (name.equals("substring-before") && args.length == 2) {
+            String str = toString(argVals[0]);
+            String substr = toString(argVals[1]);
+            int pos = str.indexOf(substr);
+            return (pos >= 0 ? str.substring(0, pos) : ""); // empty string if not found
+        } else if (name.equals("substring-after") && args.length == 2) {
+            String str = toString(argVals[0]);
+            String substr = toString(argVals[1]);
+            int pos = str.indexOf(substr);
+            return (pos >= 0 ? str.substring(pos + substr.length()) : ""); // empty string if not found
         } else if (name.equals("contains") && args.length == 2) {
             return toString(argVals[0]).contains(toString(argVals[1]));
         } else if (name.equals("starts-with") && args.length == 2) {
