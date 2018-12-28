@@ -52,24 +52,26 @@ public class ExternalDataInstance extends DataInstance {
         KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(path));
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
         TreeElement root = treeElementParser.parse();
-        TreeElement rootParent = new TreeElement("root parent");
+        TreeElement rootParent = new TreeElement();
         rootParent.addChild(root);
         return new ExternalDataInstance(path, instanceId, rootParent);
     }
 
     @Override
     public AbstractTreeElement getBase() {
-        return root; // ToDo what should this be?
-    }
-
-    @Override
-    public AbstractTreeElement getRoot() {
         return root;
     }
 
     @Override
+    public AbstractTreeElement getRoot() {
+        if (root.getNumChildren() == 0)
+            throw new RuntimeException("root node has no children");
+
+        return root.getChildAt(0);
+    }
+
+    @Override
     public void initialize(InstanceInitializationFactory initializer, String instanceId) {
-        throw new RuntimeException("Not implemented");
     }
 
     @Override
