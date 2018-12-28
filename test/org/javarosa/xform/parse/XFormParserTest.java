@@ -114,6 +114,12 @@ public class XFormParserTest {
         assertEquals("Form with secondary instance", formDef.getTitle());
     }
 
+    @Test public void parsesSecondaryInstanceForm2() throws IOException {
+        Path formName = r("internal_select_10.xml");
+        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
+        assertEquals("internal select 10", formDef.getTitle());
+    }
+
     private String allButLastSubpath(Path formName) {
         return formName.subpath(0, formName.getNameCount() - 1).toString();
     }
@@ -133,6 +139,12 @@ public class XFormParserTest {
         assertEquals(1, townData.getNumChildren());
         AbstractTreeElement dataSetChild = townData.getChild("data_set", 0);
         assertEquals("us_east", dataSetChild.getValue().getDisplayText());
+    }
+
+    @Test public void parsesExternalSecondaryInstanceForm2() throws IOException {
+        Path formName = r("external_select_10.xml");
+        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
+        assertEquals("external select 10", formDef.getTitle());
     }
 
     @Test public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
