@@ -57,6 +57,7 @@ import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.javarosa.xform.parse.FormParserHelper.parseWithPrefix;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -108,13 +109,18 @@ public class XFormParserTest {
         assertEquals("Sample Form - Preloading", formDef.getTitle());
     }
 
-    @Test public void parsesSecondaryInstanceForm() throws IOException, XPathSyntaxException {
+    @Test public void parsesSecondaryInstanceForm() throws IOException {
         FormDef formDef = parse(SECONDARY_INSTANCE_XML).formDef;
         assertEquals("Form with secondary instance", formDef.getTitle());
     }
 
+    private String allButLastSubpath(Path formName) {
+        return formName.subpath(0, formName.getNameCount() - 1).toString();
+    }
+
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        FormDef formDef = parse(EXTERNAL_SECONDARY_INSTANCE_XML).formDef;
+        Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
+        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
         assertEquals("Form with external secondary instance", formDef.getTitle());
         TreeReference treeReference = ((XPathPathExpr)
                 parseXPath("instance('towns')/data_set")).getReference();
@@ -135,7 +141,7 @@ public class XFormParserTest {
     }
 
     @Test public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
-        timeParsing(new LargeEsiFileGenerator(), r("towns-large.xml"), EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
+        timeParsing(new LargeEsiFileGenerator(), r("towns-large.xml", false), EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
     }
 
     /**
@@ -155,7 +161,7 @@ public class XFormParserTest {
             int numChildren = (int) Math.pow(10, powerOfTen);
             lfg.createLargeInstanceSource(largeDataFilename, numChildren);
             long startMs = System.currentTimeMillis();
-            parse(parseFilename);
+            parseWithPrefix(parseFilename, allButLastSubpath(largeDataFilename));
             double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
             results.add(nf.format(numChildren) + "\t" + nf.format(elapsed));
             if (elapsed > 5.0) { // Make this larger if needed
@@ -178,7 +184,7 @@ public class XFormParserTest {
 
     private void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
         initSerialization();
-        FormDef formDef = parse(formName).formDef;
+        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
         Path p = Files.createTempFile("serialized-form", null);
 
         final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));

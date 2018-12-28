@@ -177,6 +177,8 @@ public class XFormParser implements IXFormParserFunctions {
 
     private static IAnswerResolver answerResolver;
 
+    private String externalInstancePathPrefix = "";
+
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
@@ -355,7 +357,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()));
+            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()), externalInstancePathPrefix);
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -438,7 +440,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(Map<String, String> namespacePrefixesByUri) {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri, String externalInstancePathPrefix) {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
 
@@ -462,7 +464,7 @@ public class XFormParser implements IXFormParserFunctions {
 
                 if (ediPath != null) {
                     try { /* todo implement better error handling */
-                        _f.addNonMainInstance(ExternalDataInstance.buildFromPath(ediPath, instanceId));
+                        _f.addNonMainInstance(ExternalDataInstance.build(externalInstancePathPrefix + ediPath, instanceId));
                     } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
                         e.printStackTrace();
                     }
@@ -2255,6 +2257,11 @@ public class XFormParser implements IXFormParserFunctions {
         logger.error("XForm Parse Error: {}", message);
         for (ErrorCallback callback : errorCallbacks)
             callback.accept(message);
+    }
+
+    /** Sets where to locate external instance data: A path to be placed in front of what follows `jr://file/` in the src attribute of the instance element */
+    public void setExternalInstancePathPrefix(String externalInstancePathPrefix) {
+        this.externalInstancePathPrefix = externalInstancePathPrefix;
     }
 
     interface WarningCallback {

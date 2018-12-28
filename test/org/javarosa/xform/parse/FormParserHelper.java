@@ -1,8 +1,9 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.xform.util.XFormUtils;
 
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -14,21 +15,17 @@ public final class FormParserHelper {
     }
 
     public static ParseResult parse(Path formName) throws IOException {
-        XFormParser parser = new XFormParser(new FileReader(formName.toString()));
+        return parseWithPrefix(formName, "");
+    }
+
+    public static ParseResult parseWithPrefix(Path formName, String externalInstancePathPrefix) throws IOException {
         final List<String> errorMessages = new ArrayList<>();
-        parser.onWarning(new XFormParser.WarningCallback() {
-            @Override
-            public void accept(String message, String xmlLocation) {
-                errorMessages.add(message);
-            }
-        });
-        parser.onError(new XFormParser.ErrorCallback() {
-            @Override
-            public void accept(String message) {
-                errorMessages.add(message);
-            }
-        });
-        return new ParseResult(parser.parse(), errorMessages);
+        FormDef formDef = XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()), externalInstancePathPrefix,
+            parser -> {
+                parser.onWarning((message, xmlLocation) -> errorMessages.add(message));
+                parser.onError(errorMessages::add);
+            });
+        return new ParseResult(formDef, errorMessages);
     }
 
     public static class ParseResult {

@@ -36,24 +36,25 @@ public class ExternalDataInstance extends DataInstance {
         this.root = root;
     }
 
-    public static ExternalDataInstance buildFromPath(String path, String instanceId)
-            throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        String absolutePath = getPathPrefix() + path;
-        KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(absolutePath));
+    /**
+     * Builds an ExternaldataInstance
+     *
+     * @param path       the path to the XML file
+     * @param instanceId the ID of the new instance
+     * @return a new ExternalDataInstance
+     * @throws IOException                       if FileInputStream can’t find the file, or ElementParser can’t read the stream
+     * @throws UnfullfilledRequirementsException thrown by {@link TreeElementParser#parse()}
+     * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
+     * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
+     */
+    public static ExternalDataInstance build(String path, String instanceId)
+        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+        KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(path));
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
         TreeElement root = treeElementParser.parse();
         TreeElement rootParent = new TreeElement("root parent");
         rootParent.addChild(root);
         return new ExternalDataInstance(path, instanceId, rootParent);
-    }
-
-    private static String getPathPrefix() {
-        return System.getProperty("user.dir") + "/resources";
-        /* ToDo find out how to get the actual location. Hélène says:
-        Other "stuff outside the form" uses `<odk-form-folder>/<form-name>-media/` as the root dir but
-        in this case all external secondary instances will go in the same folder. It would be good for
-        that folder to reside in the odk root folder. We can come back to it.
-        */
     }
 
     @Override

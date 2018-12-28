@@ -6,16 +6,34 @@ import java.nio.file.Paths;
 
 public class ResourcePathHelper {
 
-    /** Makes a Path for a resource file */
+    /**
+     * Makes a Path for a resource file either in a directory corresponding to the test class’s package, or
+     * in the resources directory.
+     *
+     * @param filename the file name for which to create a path
+     * @return a Path for the resource file
+     */
     public static Path r(String filename) {
+        return r(filename, true);
+    }
+
+    /**
+     * Makes a Path for a resource file either in a directory corresponding to the test class’s package, or
+     * in the resources directory.
+     *
+     * @param filename the file name for which to create a path
+     * @param fallBack whether to “fall back” to the resources directory if the file is not in the
+     *                 class’s corresponding directory
+     * @return a Path for the resource file
+     */
+    public static Path r(String filename, boolean fallBack) {
         final String resourceFileParentPath = inferResourceFileParentPath();
         final Path resourceFilePath = Paths.get("resources", resourceFileParentPath, filename);
 
-        if (resourceFilePath.toFile().exists()) {
+        if (! fallBack || resourceFilePath.toFile().exists()) {
             return resourceFilePath;
-        } else { // try to find the file in the resources root directory
-            return Paths.get("resources", filename);
         }
+        return Paths.get("resources", filename);
     }
 
     /**

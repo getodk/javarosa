@@ -29,6 +29,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
@@ -66,10 +67,34 @@ public class XFormUtils {
         return _factory.getXFormParser(isr).parse();
     }
 
-    /*
-     * This method throws XFormParseException when the form has errors.
+    /**
+     * Parses the form contained in the provided InputStream, and returns a FormDef.
+     *
+     * @param is the InputStream containing the form
+     * @return a FormDef for the parsed form
+     * @throws XFormParseException if the form can’t be parsed
      */
     public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
+        return getFormFromInputStream(is, "");
+    }
+
+    /**
+     * Parses a form with an external secondary instance, and returns a FormDef.
+     *
+     * @param is                         the InputStream containing the form
+     * @param externalInstancePathPrefix where to locate external instance data: A path to be placed
+     *                                   in front of what follows `jr://file/` in the src attribute
+     *                                   of the instance element
+     * @return a FormDef for the parsed form
+     * @throws XFormParseException if the form can’t be parsed
+     */
+    public static FormDef getFormFromInputStream(InputStream is, String externalInstancePathPrefix) throws XFormParseException {
+        return getFormFromInputStream(is, externalInstancePathPrefix, null);
+    }
+
+    /** For JavaRosa internal testing use: Parses a form, allowing the parser to be customized, using a callback. */
+    public static FormDef getFormFromInputStream(InputStream is, String externalInstancePathPrefix,
+                                                 ParserCustomizer parserCustomizer) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -78,7 +103,12 @@ public class XFormUtils {
                 throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
             }
 
-            return _factory.getXFormParser(isr).parse();
+            XFormParser xFormParser = _factory.getXFormParser(isr);
+            xFormParser.setExternalInstancePathPrefix(externalInstancePathPrefix);
+            if (parserCustomizer != null) {
+                parserCustomizer.customize(xFormParser);
+            }
+            return xFormParser.parse();
         } catch(IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
