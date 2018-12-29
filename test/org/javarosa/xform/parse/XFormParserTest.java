@@ -57,7 +57,6 @@ import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.javarosa.xform.parse.FormParserHelper.parseWithPrefix;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -116,17 +115,12 @@ public class XFormParserTest {
 
     @Test public void parsesSecondaryInstanceForm2() throws IOException {
         Path formName = r("internal_select_10.xml");
-        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
+        FormDef formDef = parse(formName).formDef;
         assertEquals("internal select 10", formDef.getTitle());
     }
 
-    private String allButLastSubpath(Path formName) {
-        return formName.subpath(0, formName.getNameCount() - 1).toString();
-    }
-
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
-        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
+        FormDef formDef = parse(EXTERNAL_SECONDARY_INSTANCE_XML).formDef;
         assertEquals("Form with external secondary instance", formDef.getTitle());
         TreeReference treeReference = ((XPathPathExpr)
                 parseXPath("instance('towns')/data_set")).getReference();
@@ -143,16 +137,16 @@ public class XFormParserTest {
 
     @Test public void parsesExternalSecondaryInstanceForm2() throws IOException {
         Path formName = r("external_select_10.xml");
-        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
+        FormDef formDef = parse(formName).formDef;
         assertEquals("external select 10", formDef.getTitle());
     }
 
-    @Test public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
+    @Test public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException {
         timeParsing(new LargeIsiFileGenerator(SECONDARY_INSTANCE_XML), SECONDARY_INSTANCE_LARGE_XML,
                 SECONDARY_INSTANCE_LARGE_XML);
     }
 
-    @Test public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException, XPathSyntaxException {
+    @Test public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException {
         timeParsing(new LargeEsiFileGenerator(), r("towns-large.xml", false), EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
     }
 
@@ -173,7 +167,7 @@ public class XFormParserTest {
             int numChildren = (int) Math.pow(10, powerOfTen);
             lfg.createLargeInstanceSource(largeDataFilename, numChildren);
             long startMs = System.currentTimeMillis();
-            parseWithPrefix(parseFilename, allButLastSubpath(largeDataFilename));
+            FormParserHelper.parse(parseFilename, largeDataFilename.getParent());
             double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
             results.add(nf.format(numChildren) + "\t" + nf.format(elapsed));
             if (elapsed > 5.0) { // Make this larger if needed
@@ -196,7 +190,7 @@ public class XFormParserTest {
 
     private void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
         initSerialization();
-        FormDef formDef = parseWithPrefix(formName, allButLastSubpath(formName)).formDef;
+        FormDef formDef = parse(formName).formDef;
         Path p = Files.createTempFile("serialized-form", null);
 
         final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));
@@ -268,8 +262,8 @@ public class XFormParserTest {
         assertEquals(ORX_2_NAMESPACE_URI, audit2.getNamespace());
 
         assertNotNull(audit3);
-        assertEquals(null, audit3.getNamespacePrefix());
-        assertEquals(null, audit3.getNamespace());
+        assertNull(audit3.getNamespacePrefix());
+        assertNull(audit3.getNamespace());
 
         audit.setAnswer(new StringData(AUDIT_ANSWER));
         audit2.setAnswer(new StringData(AUDIT_2_ANSWER));
@@ -302,8 +296,8 @@ public class XFormParserTest {
         assertEquals(AUDIT_2_ANSWER, audit2.getValue().getValue());
 
         assertNotNull(audit3);
-        assertEquals(null, audit3.getNamespacePrefix());
-        assertEquals(null, audit3.getNamespace());
+        assertNull(audit3.getNamespacePrefix());
+        assertNull(audit3.getNamespace());
         assertEquals(AUDIT_3_ANSWER, audit3.getValue().getValue());
     }
 
@@ -433,7 +427,7 @@ public class XFormParserTest {
     }
 
     /** Generates large versions of a secondary instance */
-    public interface LargeInstanceFileGenerator {
+    interface LargeInstanceFileGenerator {
         /** Creates a large instance file with the given name, and the given number of children */
         void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException;
     }
@@ -454,7 +448,7 @@ public class XFormParserTest {
 
     /** Generates large versions of a file with an internal secondary instance, using a template */
     class LargeIsiFileGenerator implements LargeInstanceFileGenerator {
-        private Path templateFilename;
+        private final Path templateFilename;
 
         LargeIsiFileGenerator(Path templateFilename) {
             this.templateFilename = templateFilename;

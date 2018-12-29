@@ -14,17 +14,14 @@ public final class FormParserHelper {
     private FormParserHelper() {
     }
 
-    public static ParseResult parse(Path formName) throws IOException {
-        return parseWithPrefix(formName, "");
+    public static ParseResult parse(Path formPath) throws IOException {
+        return parse(formPath, formPath.getParent());
     }
 
-    public static ParseResult parseWithPrefix(Path formName, String externalInstancePathPrefix) throws IOException {
+    public static ParseResult parse(Path formName, Path externalInstancePathPrefix) throws IOException {
         final List<String> errorMessages = new ArrayList<>();
-        FormDef formDef = XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()), externalInstancePathPrefix,
-            parser -> {
-                parser.onWarning((message, xmlLocation) -> errorMessages.add(message));
-                parser.onError(errorMessages::add);
-            });
+        FormDef formDef = XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()),
+            externalInstancePathPrefix.toString(), errorMessages);
         return new ParseResult(formDef, errorMessages);
     }
 

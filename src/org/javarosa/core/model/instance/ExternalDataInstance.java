@@ -39,7 +39,7 @@ public class ExternalDataInstance extends DataInstance {
     /**
      * Builds an ExternaldataInstance
      *
-     * @param path       the path to the XML file
+     * @param path       the absolute path to the XML file
      * @param instanceId the ID of the new instance
      * @return a new ExternalDataInstance
      * @throws IOException                       if FileInputStream can’t find the file, or ElementParser can’t read the stream

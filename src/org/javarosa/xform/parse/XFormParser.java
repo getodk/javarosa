@@ -2240,17 +2240,17 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public void onWarning(WarningCallback callback) {
-        this.warningCallbacks.add(callback);
+        warningCallbacks.add(callback);
     }
 
     public void onError(ErrorCallback callback) {
-        this.errorCallbacks.add(callback);
+        errorCallbacks.add(callback);
     }
 
     private void triggerWarning(String message, String xmlLocation) {
         logger.warn("XForm Parse Warning: {}{}", message, xmlLocation == null ? "" : xmlLocation);
         for (WarningCallback callback : warningCallbacks)
-            callback.accept(message, xmlLocation);
+            callback.accept(message);
     }
 
     private void triggerError(String message) {
@@ -2259,16 +2259,23 @@ public class XFormParser implements IXFormParserFunctions {
             callback.accept(message);
     }
 
-    /** Sets where to locate external instance data: A path to be placed in front of what follows `jr://file/` in the src attribute of the instance element */
+    /**
+     * Sets where to find external instance data files. For example,
+     * given an externalInstancePathPrefix of <br/>
+     * “{@code path/a/b/}”,<br/>
+     * JavaRosa will read the external instance data defined as<br/>
+     * {@code <instance id="a" src="jr://file/data.xml">}<br/>
+     * from the file “{@code path/a/b/data.xml}”.
+     */
     public void setExternalInstancePathPrefix(String externalInstancePathPrefix) {
         this.externalInstancePathPrefix = externalInstancePathPrefix;
     }
 
-    interface WarningCallback {
-        void accept(String message, String xmlLocation);
+    public interface WarningCallback {
+        void accept(String message);
     }
 
-    interface ErrorCallback {
+    public interface ErrorCallback {
         void accept(String message);
     }
 }

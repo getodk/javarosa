@@ -92,9 +92,9 @@ public class XFormUtils {
         return getFormFromInputStream(is, externalInstancePathPrefix, null);
     }
 
-    /** For JavaRosa internal testing use: Parses a form, allowing the parser to be customized, using a callback. */
+    /** For JavaRosa internal testing use: Parses a form, collecting error messages, which are examined by automated tests. */
     public static FormDef getFormFromInputStream(InputStream is, String externalInstancePathPrefix,
-                                                 ParserCustomizer parserCustomizer) throws XFormParseException {
+                                                 List<String> errorMessages) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -105,8 +105,9 @@ public class XFormUtils {
 
             XFormParser xFormParser = _factory.getXFormParser(isr);
             xFormParser.setExternalInstancePathPrefix(externalInstancePathPrefix);
-            if (parserCustomizer != null) {
-                parserCustomizer.customize(xFormParser);
+            if (errorMessages != null) {
+                xFormParser.onWarning(errorMessages::add);
+                xFormParser.onError(errorMessages::add);
             }
             return xFormParser.parse();
         } catch(IOException e) {

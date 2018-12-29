@@ -8,7 +8,8 @@ public class ResourcePathHelper {
 
     /**
      * Makes a Path for a resource file either in a directory corresponding to the test class’s package, or
-     * in the resources directory.
+     * in the resources directory. Automated tests generate some files dynamically, so the Paths created here
+     * aren’t always for existing files.
      *
      * @param filename the file name for which to create a path
      * @return a Path for the resource file
@@ -19,7 +20,8 @@ public class ResourcePathHelper {
 
     /**
      * Makes a Path for a resource file either in a directory corresponding to the test class’s package, or
-     * in the resources directory.
+     * in the resources directory. Automated tests generate some files dynamically, so the Paths created here
+     * aren’t always for existing files.
      *
      * @param filename the file name for which to create a path
      * @param fallBack whether to “fall back” to the resources directory if the file is not in the
