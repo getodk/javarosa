@@ -53,6 +53,7 @@ public class ExternalDataInstance extends DataInstance {
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
         TreeElement root = treeElementParser.parse();
         TreeElement rootParent = new TreeElement();
+        rootParent.setInstanceName(instanceId);
         rootParent.addChild(root);
         return new ExternalDataInstance(path, instanceId, rootParent);
     }
