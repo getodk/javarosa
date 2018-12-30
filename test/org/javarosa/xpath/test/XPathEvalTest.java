@@ -250,6 +250,16 @@ public class XPathEvalTest extends TestCase {
         testEval("substr('hello',1,4)", "ell");
         testEval("substr('hello',-2)", "lo");
         testEval("substr('hello',0,-1)", "hell");
+        testEval("substring-before('hello','l')", "he");
+        testEval("substring-before('hello','q')", "");
+        testEval("substring-before('hello','')", "");
+        testEval("substring-before('','')", "");
+        testEval("substring-before('','q')", "");
+        testEval("substring-after('hello','l')", "lo");
+        testEval("substring-after('hello','q')", "");
+        testEval("substring-after('hello','')", "hello");
+        testEval("substring-after('','')", "");
+        testEval("substring-after('','q')", "");
         testEval("contains('a', 'a')",      true);
         testEval("contains('a', 'b')",      false);
         testEval("contains('abc', 'b')",    true);
