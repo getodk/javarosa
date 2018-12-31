@@ -29,11 +29,11 @@ public class ExternalDataInstance extends DataInstance {
     public ExternalDataInstance() {
     }
 
-    public ExternalDataInstance(String path, String instanceId, TreeElement root) {
+    private ExternalDataInstance(TreeElement root, String instanceId, String path) {
         super(instanceId);
         this.path = path;
         setName(instanceId);
-        this.root = root;
+        setRoot(root);
     }
 
     /**
@@ -52,10 +52,7 @@ public class ExternalDataInstance extends DataInstance {
         KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(path));
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
         TreeElement root = treeElementParser.parse();
-        TreeElement rootParent = new TreeElement();
-        rootParent.setInstanceName(instanceId);
-        rootParent.addChild(root);
-        return new ExternalDataInstance(path, instanceId, rootParent);
+        return new ExternalDataInstance(root, instanceId, path);
     }
 
     @Override
@@ -71,6 +68,12 @@ public class ExternalDataInstance extends DataInstance {
         return root.getChildAt(0);
     }
 
+    private void setRoot(TreeElement topLevel) {
+        root = new TreeElement();
+        root.setInstanceName(getName());
+        root.addChild(topLevel);
+    }
+
     @Override
     public void initialize(InstanceInitializationFactory initializer, String instanceId) {
     }
@@ -80,12 +83,14 @@ public class ExternalDataInstance extends DataInstance {
             throws IOException, DeserializationException {
         super.readExternal(in, pf);
         path = ExtUtil.readString(in);
+        setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         super.writeExternal(out);
         ExtUtil.write(out, path);
+        ExtUtil.write(out, getRoot());
     }
 
     /**
