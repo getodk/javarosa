@@ -89,12 +89,6 @@ public class XFormUtils {
      * @throws XFormParseException if the form can’t be parsed
      */
     public static FormDef getFormFromInputStream(InputStream is, String externalInstancePathPrefix) throws XFormParseException {
-        return getFormFromInputStream(is, externalInstancePathPrefix, null);
-    }
-
-    /** For JavaRosa internal testing use: Parses a form, collecting error messages, which are examined by automated tests. */
-    public static FormDef getFormFromInputStream(InputStream is, String externalInstancePathPrefix,
-                                                 List<String> errorMessages) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -105,10 +99,6 @@ public class XFormUtils {
 
             XFormParser xFormParser = _factory.getXFormParser(isr);
             xFormParser.setExternalInstancePathPrefix(externalInstancePathPrefix);
-            if (errorMessages != null) {
-                xFormParser.onWarning(errorMessages::add);
-                xFormParser.onError(errorMessages::add);
-            }
             return xFormParser.parse();
         } catch(IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());

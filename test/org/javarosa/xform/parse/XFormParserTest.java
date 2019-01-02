@@ -1,8 +1,8 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.CoreModelModule;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
@@ -24,7 +24,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.xform.parse.FormParserHelper.ParseResult;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
@@ -90,13 +89,13 @@ public class XFormParserTest {
 
     @Test
     public void parsesSimpleForm() throws IOException {
-        FormDef formDef = parse(r("simple-form.xml")).formDef;
+        FormDef formDef = parse(r("simple-form.xml"));
         assertEquals(formDef.getTitle(), "Simple Form");
     }
 
     @Test
     public void parsesForm2() throws IOException {
-        FormDef formDef = parse(r("form2.xml")).formDef;
+        FormDef formDef = parse(r("form2.xml"));
         assertEquals("My Survey", formDef.getTitle());
         assertEquals(3, formDef.getChildren().size());
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
@@ -104,23 +103,23 @@ public class XFormParserTest {
 
     @Test
     public void parsesPreloadForm() throws IOException {
-        FormDef formDef = parse(r("Sample-Preloading.xml")).formDef;
+        FormDef formDef = parse(r("Sample-Preloading.xml"));
         assertEquals("Sample Form - Preloading", formDef.getTitle());
     }
 
     @Test public void parsesSecondaryInstanceForm() throws IOException {
-        FormDef formDef = parse(SECONDARY_INSTANCE_XML).formDef;
+        FormDef formDef = parse(SECONDARY_INSTANCE_XML);
         assertEquals("Form with secondary instance", formDef.getTitle());
     }
 
     @Test public void parsesSecondaryInstanceForm2() throws IOException {
         Path formName = r("internal_select_10.xml");
-        FormDef formDef = parse(formName).formDef;
+        FormDef formDef = parse(formName);
         assertEquals("internal select 10", formDef.getTitle());
     }
 
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        FormDef formDef = parse(EXTERNAL_SECONDARY_INSTANCE_XML).formDef;
+        FormDef formDef = parse(EXTERNAL_SECONDARY_INSTANCE_XML);
         assertEquals("Form with external secondary instance", formDef.getTitle());
         TreeReference treeReference = ((XPathPathExpr)
                 parseXPath("instance('towns')/data_set")).getReference();
@@ -137,7 +136,7 @@ public class XFormParserTest {
 
     @Test public void parsesExternalSecondaryInstanceForm2() throws IOException {
         Path formName = r("external_select_10.xml");
-        FormDef formDef = parse(formName).formDef;
+        FormDef formDef = parse(formName);
         assertEquals("external select 10", formDef.getTitle());
     }
 
@@ -190,7 +189,7 @@ public class XFormParserTest {
 
     private void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
         initSerialization();
-        FormDef formDef = parse(formName).formDef;
+        FormDef formDef = parse(formName);
         Path p = Files.createTempFile("serialized-form", null);
 
         final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));
@@ -212,16 +211,16 @@ public class XFormParserTest {
 
     @Test
     public void parsesRankForm() throws IOException {
-        ParseResult parseResult = parse(r("rank-form.xml"));
-        assertEquals(parseResult.formDef.getTitle(), "Rank Form");
-        assertEquals(1, parseResult.formDef.getChildren().size());
-        assertEquals(CONTROL_RANK, ((QuestionDef) parseResult.formDef.getChild(0)).getControlType());
-        assertNoParseErrors(parseResult);
+        FormDef formDef = parse(r("rank-form.xml"));
+        assertEquals(formDef.getTitle(), "Rank Form");
+        assertEquals(1, formDef.getChildren().size());
+        assertEquals(CONTROL_RANK, ((QuestionDef) formDef.getChild(0)).getControlType());
+        assertNoParseErrors(formDef);
     }
 
     @Test
     public void parsesRangeForm() throws IOException {
-        FormDef formDef = parse(r("range-form.xml")).formDef;
+        FormDef formDef = parse(r("range-form.xml"));
         RangeQuestion question = (RangeQuestion) formDef.getChild(0);
         assertEquals(CONTROL_RANGE, question.getControlType());
         assertEquals(-2.0d, question.getRangeStart().doubleValue(), 0);
@@ -236,19 +235,18 @@ public class XFormParserTest {
 
     @Test
     public void parsesMetaNamespaceForm() throws IOException {
-        ParseResult parseResult = parse(r("meta-namespace-form.xml"));
-        assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
-        assertNoParseErrors(parseResult);
+        FormDef formDef = parse(r("meta-namespace-form.xml"));
+        assertEquals(formDef.getTitle(), "Namespace for Metadata");
+        assertNoParseErrors(formDef);
     }
 
     @Test
     public void serializeAndRestoreMetaNamespaceFormInstance() throws IOException {
         // Given
-        ParseResult parseResult = parse(r("meta-namespace-form.xml"));
-        assertEquals(parseResult.formDef.getTitle(), "Namespace for Metadata");
-        assertNoParseErrors(parseResult);
+        FormDef formDef = parse(r("meta-namespace-form.xml"));
+        assertEquals(formDef.getTitle(), "Namespace for Metadata");
+        assertNoParseErrors(formDef);
 
-        FormDef formDef = parseResult.formDef;
         TreeElement audit = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_NODE);
         TreeElement audit2 = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_2_NODE);
         TreeElement audit3 = findDepthFirst(formDef.getInstance().getRoot(), AUDIT_3_NODE);
@@ -303,31 +301,31 @@ public class XFormParserTest {
 
     @Test public void parseFormWithTemplateRepeat() throws IOException {
         // Given & When
-        ParseResult parseResult = parse(r("template-repeat.xml"));
+        FormDef formDef = parse(r("template-repeat.xml"));
 
         // Then
-        assertEquals(parseResult.formDef.getTitle(), "Repeat with template");
-        assertNoParseErrors(parseResult);
+        assertEquals(formDef.getTitle(), "Repeat with template");
+        assertNoParseErrors(formDef);
     }
 
     @Test public void parseIMCIbyDTreeForm() throws IOException {
         // Given & When
-        ParseResult parseResult = parse(r("eIMCI-by-D-Tree.xml"));
+        FormDef formDef = parse(r("eIMCI-by-D-Tree.xml"));
 
         // Then
-        assertEquals(parseResult.formDef.getTitle(), "eIMCI by D-Tree");
-        assertNoParseErrors(parseResult);
+        assertEquals(formDef.getTitle(), "eIMCI by D-Tree");
+        assertNoParseErrors(formDef);
     }
 
     @Test public void parseFormWithSubmissionElement() throws IOException {
         // Given & When
-        ParseResult parseResult = parse(r("submission-element.xml"));
+        FormDef formDef = parse(r("submission-element.xml"));
 
         // Then
-        assertEquals(parseResult.formDef.getTitle(), "Single Submission Element");
-        assertNoParseErrors(parseResult);
+        assertEquals(formDef.getTitle(), "Single Submission Element");
+        assertNoParseErrors(formDef);
 
-        SubmissionProfile submissionProfile = parseResult.formDef.getSubmissionProfile();
+        SubmissionProfile submissionProfile = formDef.getSubmissionProfile();
         assertEquals("http://some.destination.com", submissionProfile.getAction());
         assertEquals("form-data-post", submissionProfile.getMethod());
         assertNull(submissionProfile.getMediaType());
@@ -347,13 +345,16 @@ public class XFormParserTest {
     @Test
     public void parseFormWithTwoModels() throws IOException {
         // Given & When
-        ParseResult parseResult = parse(r("two-models.xml"));
+        FormDef formDef = parse(r("two-models.xml"));
 
         // Then
-        FormDef formDef = parseResult.formDef;
         assertEquals(formDef.getTitle(), "Two Models");
-        assertEquals("Number of error messages", 1, parseResult.errorMessages.size());
-        assertEquals("Multiple models not supported. Ignoring subsequent models.", parseResult.errorMessages.get(0));
+        List<String> parseWarnings = formDef.getParseWarnings();
+        assertEquals("Number of error messages", 1, parseWarnings.size());
+        assertEquals("XForm Parse Warning: Multiple models not supported. Ignoring subsequent models.\n" +
+            "    Problem found at nodeset: /html/head/model\n" +
+            "    With element <model><instance><data id=\"second-model\">...\n" +
+            "", parseWarnings.get(0));
         String firstModelInstanceId =
                 (String) formDef
                         .getMainInstance()
@@ -367,15 +368,14 @@ public class XFormParserTest {
     @Test
     public void parseFormWithSetValueAction() throws IOException {
         // Given & When
-        ParseResult parseResult = parse(r("form-with-setvalue-action.xml"));
-        FormDef formDef = parseResult.formDef;
+        FormDef formDef = parse(r("form-with-setvalue-action.xml"));
 
         // dispatch 'xforms-ready' action (Action.EVENT_XFORMS_READY)
         formDef.initialize(true, new InstanceInitializationFactory());
 
         // Then
         assertEquals(formDef.getTitle(), "SetValue action");
-        assertNoParseErrors(parseResult);
+        assertNoParseErrors(formDef);
         assertEquals(1, formDef.getActionController().getListenersForEvent(Action.EVENT_XFORMS_READY).size());
 
         TreeElement textNode =
@@ -386,11 +386,11 @@ public class XFormParserTest {
 
     @Test public void parseGroupWithNodesetAttrForm() throws IOException {
         // Given & When
-        ParseResult parseResult = parse(r("group-with-nodeset-attr.xml"));
+        FormDef formDef = parse(r("group-with-nodeset-attr.xml"));
 
         // Then
-        assertEquals(parseResult.formDef.getTitle(), "group with nodeset attribute");
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+        assertEquals(formDef.getTitle(), "group with nodeset attribute");
+        assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
 
         final TreeReference expectedTreeReference = new TreeReference();
         expectedTreeReference.setRefLevel(-1); // absolute reference
@@ -399,7 +399,7 @@ public class XFormParserTest {
         expectedTreeReference.add("G2", -1); // the inner group
         final IDataReference expectedXPathReference = new XPathReference(expectedTreeReference);
 
-        IFormElement groupElement = parseResult.formDef.getChild(0).getChild(0);
+        IFormElement groupElement = formDef.getChild(0).getChild(0);
 
         assertThat(groupElement, instanceOf(GroupDef.class));
         assertThat(((GroupDef) groupElement).getRepeat(), is(false));
@@ -422,8 +422,8 @@ public class XFormParserTest {
         return null;
     }
 
-    private void assertNoParseErrors(ParseResult parseResult) {
-        assertEquals("Number of error messages", 0, parseResult.errorMessages.size());
+    private void assertNoParseErrors(FormDef formDef) {
+        assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
     }
 
     /** Generates large versions of a secondary instance */

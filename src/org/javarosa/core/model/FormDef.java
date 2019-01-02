@@ -171,6 +171,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private EventNotifier eventNotifier;
 
+    private List<String> parseWarnings = new ArrayList<>();
+    private List<String> parseErrors = new ArrayList<>();
+
     public FormDef() {
         this(defaultMode, defaultEventNotifier);
     }
@@ -1666,5 +1669,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public final void printTriggerables(String path) {
         dagImpl.printTriggerables(path);
+    }
+
+    public List<String> getParseWarnings() {
+        return parseWarnings;
+    }
+
+    public List<String> getParseErrors() {
+        return parseErrors;
+    }
+
+    public void addParseWarning(String warning) {
+        parseWarnings.add(warning);
+    }
+
+    public void addParseError(String error) {
+        parseErrors.add(error);
     }
 }

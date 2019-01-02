@@ -2248,15 +2248,19 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     private void triggerWarning(String message, String xmlLocation) {
-        logger.warn("XForm Parse Warning: {}{}", message, xmlLocation == null ? "" : xmlLocation);
+        String warning = "XForm Parse Warning: " + message + (xmlLocation == null ? "" : xmlLocation);
+        logger.warn(warning);
+        _f.addParseWarning(warning);
         for (WarningCallback callback : warningCallbacks)
-            callback.accept(message);
+            callback.accept(warning);
     }
 
     private void triggerError(String message) {
-        logger.error("XForm Parse Error: {}", message);
+        String error = "XForm Parse Error: " + message;
+        logger.error(error);
+        _f.addParseError(error);
         for (ErrorCallback callback : errorCallbacks)
-            callback.accept(message);
+            callback.accept(error);
     }
 
     /**

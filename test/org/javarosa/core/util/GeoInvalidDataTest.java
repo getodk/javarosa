@@ -14,7 +14,7 @@ public class GeoInvalidDataTest {
     @Test
      public void testDistanceWithLessThanTwoPoints() throws Exception {
          // Read the form definition
-         final FormDef formDef = parse(r("distance_with_less_than_two_points.xml")).formDef;
+         final FormDef formDef = parse(r("distance_with_less_than_two_points.xml"));
 
          // Trigger all calculations
          formDef.initialize(true, new InstanceInitializationFactory());

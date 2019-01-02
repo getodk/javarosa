@@ -41,7 +41,7 @@ public class GeoDistanceTest {
      * <a href="https://opendatakit.github.io/xforms-spec/#fn:distance">as specified</a>.
      */
     @Test public void parsingAndDistanceIsCorrectForThreeGeoTypes() throws Exception {
-        FormDef formDef = parse(r("distance.xml")).formDef;
+        FormDef formDef = parse(r("distance.xml"));
         formDef.initialize(true, new InstanceInitializationFactory());
         TreeElement root = formDef.getMainInstance().getRoot();
         IAnswerData distance = root.getChild(geoType + "-result", DEFAULT_MULTIPLICITY).getValue();

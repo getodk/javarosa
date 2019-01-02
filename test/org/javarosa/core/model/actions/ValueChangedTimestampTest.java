@@ -48,7 +48,7 @@ public class ValueChangedTimestampTest {
     @Test
     public void when_triggerNodeIsUpdated_targetNodeCalculation_isEvaluated() throws IOException {
         // Given
-        final FormDef formDef = parse(r("nested-setvalue-action.xml")).formDef;
+        final FormDef formDef = parse(r("nested-setvalue-action.xml"));
         FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
         TreeReference targetRef = createTargetRef(null);
 
@@ -65,7 +65,7 @@ public class ValueChangedTimestampTest {
     @Test
     public void when_triggerNodeIsUpdatedWithinRepeat_targetNodeCalculation_isEvaluated() throws IOException {
         // Given
-        final FormDef formDef = parse(r("nested-setvalue-action-with-repeats.xml")).formDef;
+        final FormDef formDef = parse(r("nested-setvalue-action-with-repeats.xml"));
         FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
 
         TreeReference[] targetRefs = new TreeReference[3];
@@ -95,7 +95,7 @@ public class ValueChangedTimestampTest {
     @Test
     public void when_triggerNodeIsUpdatedWithTheSameValue_targetNodeCalculation_isNotEvaluated() throws IOException {
         // Given
-        final FormDef formDef = parse(r("nested-setvalue-action.xml")).formDef;
+        final FormDef formDef = parse(r("nested-setvalue-action.xml"));
         FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
         TreeReference targetRef = createTargetRef(null);
 
@@ -118,7 +118,7 @@ public class ValueChangedTimestampTest {
         PrototypeManager.registerPrototypes(CoreModelModule.classNames);
         new XFormsModule().registerModule();
 
-        FormDef formDef = parse(r("nested-setvalue-action.xml")).formDef;
+        FormDef formDef = parse(r("nested-setvalue-action.xml"));
         Path p = Files.createTempFile("serialized-form", null);
 
         final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));

@@ -35,7 +35,7 @@ public class GeoShapeAreaTest {
 
     @Test public void testGeoShapeSupportForEnclosedArea() throws Exception {
         // Read the form definition
-        final FormDef formDef = parse(r("area.xml")).formDef;
+        final FormDef formDef = parse(r("area.xml"));
 
         // Trigger all calculations
         formDef.initialize(true, new InstanceInitializationFactory());
@@ -53,7 +53,7 @@ public class GeoShapeAreaTest {
     @Test
     public void testAreaWithLessThanThreePoints() throws Exception {
         // Read the form definition
-        final FormDef formDef = parse(r("area_with_less_than_three_points.xml")).formDef;
+        final FormDef formDef = parse(r("area_with_less_than_three_points.xml"));
 
         // Trigger all calculations
         formDef.initialize(true, new InstanceInitializationFactory());
