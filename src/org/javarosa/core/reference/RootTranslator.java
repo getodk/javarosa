@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.javarosa.core.reference;
 
@@ -19,10 +19,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * which don't describe any real raw accessor like "jr://media/",
  * which could access a file reference (jr://file/) on one platform,
  * but a resource reference (jr://resource/) on another.
- * 
- * Root Translators can be externalized and used as a dynamically 
+ *
+ * Root Translators can be externalized and used as a dynamically
  * configured object.
- * 
+ *
  * @author ctsims
  *
  */

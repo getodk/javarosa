@@ -45,12 +45,18 @@ public class ReferenceManager {
         sessionTranslators = new ArrayList<RootTranslator>(0);
     }
 
+    public void reset() {
+        translators.clear();
+        factories.clear();
+        sessionTranslators.clear();
+    }
+
     /**
      * @return Singleton accessor to the global
      * ReferenceManager.
      */
     public static ReferenceManager instance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new ReferenceManager();
         }
         return instance;
@@ -77,7 +83,7 @@ public class ReferenceManager {
      * @param translator
      */
     public void addRootTranslator(RootTranslator translator) {
-        if(!translators.contains(translator)) {
+        if (!translators.contains(translator)) {
             translators.add(translator);
         }
     }
@@ -88,7 +94,7 @@ public class ReferenceManager {
      * a reference.
      */
     public void addReferenceFactory(ReferenceFactory factory) {
-        if(!factories.contains(factory)) {
+        if (!factories.contains(factory)) {
             factories.add(factory);
         }
     }
@@ -106,7 +112,7 @@ public class ReferenceManager {
      * not be derived by the current environment
      */
     public Reference DeriveReference(String uri) throws InvalidReferenceException {
-        return DeriveReference(uri, (String)null);
+        return DeriveReference(uri, (String) null);
     }
 
     /**
@@ -135,18 +141,18 @@ public class ReferenceManager {
      * is not valid in the current environment.
      */
     public Reference DeriveReference(String uri, String context) throws InvalidReferenceException {
-        if(uri == null) {
-            throw new InvalidReferenceException("Null references aren't valid",uri);
+        if (uri == null) {
+            throw new InvalidReferenceException("Null references aren't valid", uri);
         }
 
         //Relative URI's need to determine their context first.
-        if(isRelative(uri)) {
+        if (isRelative(uri)) {
             //Clean up the relative reference to lack any leading separators.
-            if(uri.startsWith("./")) {
+            if (uri.startsWith("./")) {
                 uri = uri.substring(2);
             }
 
-            if(context == null ) {
+            if (context == null) {
                 throw new RuntimeException("Attempted to retrieve local reference with no context");
             } else {
                 return derivingRoot(context).derive(uri, context);
@@ -178,22 +184,22 @@ public class ReferenceManager {
     private ReferenceFactory derivingRoot(String uri) throws InvalidReferenceException {
 
         //First, try any/all roots which are put in the temporary session stack
-        for(RootTranslator root : sessionTranslators) {
-            if(root.derives(uri)) {
+        for (RootTranslator root : sessionTranslators) {
+            if (root.derives(uri)) {
                 return root;
             }
         }
 
         //Now, try any/all roots referenced at runtime.
-        for(RootTranslator root : translators) {
-            if(root.derives(uri)) {
+        for (RootTranslator root : translators) {
+            if (root.derives(uri)) {
                 return root;
             }
         }
 
         //Now try all of the raw connectors available
-        for(ReferenceFactory root : factories) {
-            if(root.derives(uri)) {
+        for (ReferenceFactory root : factories) {
+            if (root.derives(uri)) {
                 return root;
             }
         }
@@ -202,55 +208,57 @@ public class ReferenceManager {
     }
 
     private String getPrettyPrintException(String uri) {
-        if(uri == null || uri.length() == 0) { return "Attempt to derive a blank reference";}
+        if (uri == null || uri.length() == 0) {
+            return "Attempt to derive a blank reference";
+        }
         try {
             String uriRoot = uri;
             String jrRefMessagePortion = "reference type";
-            if(uri.indexOf("jr://") != -1) {
+            if (uri.indexOf("jr://") != -1) {
                 uriRoot = uri.substring("jr://".length());
-                jrRefMessagePortion ="javarosa jr:// reference root";
+                jrRefMessagePortion = "javarosa jr:// reference root";
             }
             //For http:// style uri's
             int endOfRoot = uriRoot.indexOf("://") + "://".length();
-            if(endOfRoot == "://".length() - 1)  {
+            if (endOfRoot == "://".length() - 1) {
                 endOfRoot = uriRoot.indexOf("/");
             }
-            if(endOfRoot != -1 ){
+            if (endOfRoot != -1) {
                 uriRoot = uriRoot.substring(0, endOfRoot);
             }
             String message = "The reference \"" + uri + "\" was invalid and couldn't be understood. The " + jrRefMessagePortion + " \"" + uriRoot +
-                    "\" is not available on this system and may have been mis-typed. Some available roots: ";
-            for(RootTranslator root : sessionTranslators) {
+                "\" is not available on this system and may have been mis-typed. Some available roots: ";
+            for (RootTranslator root : sessionTranslators) {
                 message += "\n" + root.prefix;
             }
 
             //Now, try any/all roots referenced at runtime.
-            for(RootTranslator root : translators) {
+            for (RootTranslator root : translators) {
                 message += "\n" + root.prefix;
             }
 
             //Now try all of the raw connectors available
-            for(ReferenceFactory root : factories) {
+            for (ReferenceFactory root : factories) {
 
                 //TODO: Skeeeeeeeeeeeeetch
                 try {
 
-                    if(root instanceof PrefixedRootFactory) {
-                        for(String rootName : ((PrefixedRootFactory)root).roots) {
+                    if (root instanceof PrefixedRootFactory) {
+                        for (String rootName : ((PrefixedRootFactory) root).roots) {
                             message += "\n" + rootName;
                         }
                     } else {
                         message += "\n" + root.derive("").getURI();
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
 
                 }
             }
             return message;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return "Couldn't process the reference " + uri + " . It may have been entered incorrectly. " +
-                    "Note that this doesn't mean that this doesn't mean the file or location referenced " +
-                    "couldn't be found, the reference itself was not understood.";
+                "Note that this doesn't mean that this doesn't mean the file or location referenced " +
+                "couldn't be found, the reference itself was not understood.";
         }
     }
 
@@ -259,7 +267,7 @@ public class ReferenceManager {
      * @return Whether the provided URI describe a relative reference.
      */
     public static boolean isRelative(String URI) {
-        if(URI.startsWith("./")) {
+        if (URI.startsWith("./")) {
             return true;
         }
         return false;
