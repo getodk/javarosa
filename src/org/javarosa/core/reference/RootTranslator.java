@@ -70,7 +70,7 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
      * @see org.commcare.reference.Root#derives(java.lang.String)
      */
     public boolean derives(String URI) {
-        if(URI.startsWith(prefix)) {
+        if(URI.startsWith(prefix) && !URI.startsWith(translatedPrefix)) {
             return true;
         } else{
             return false;
