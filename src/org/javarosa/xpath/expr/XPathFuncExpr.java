@@ -356,6 +356,26 @@ public class XPathFuncExpr extends XPathExpression {
             int pos = str.indexOf(substr);
             // XPath reference states that we should return the empty string when we don't find the substring
             return pos >= 0 ? str.substring(pos + substr.length()) : "";
+        } else if (name.equals("translate") && args.length == 3) {
+            String str = toString(argVals[0]);
+            String fromChars = toString(argVals[1]);
+            String toChars = toString(argVals[2]);
+            StringBuilder result = new StringBuilder();
+            // iterate thru each char in the original string
+            for (int i = 0; i < str.length(); i++) {
+                char from = str.charAt(i);
+                // determine if there is a mapping for this char
+                int fromPos = fromChars.indexOf(from);
+                if (fromPos == -1) {
+                    // no mapping for this char, so just add it to result unchanged
+                    result.append(from);
+                } else if (fromPos < toChars.length()) {
+                    // replace with the corresponding char it is mapped to
+                    result.append(toChars.charAt(fromPos));
+                }
+                // else the char is mapped to nothing, so per XPath definition we 'delete' it from the string by simply not appending it
+            }
+            return result.toString();
         } else if (name.equals("contains") && args.length == 2) {
             return toString(argVals[0]).contains(toString(argVals[1]));
         } else if (name.equals("starts-with") && args.length == 2) {
