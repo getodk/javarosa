@@ -260,6 +260,15 @@ public class XPathEvalTest extends TestCase {
         testEval("substring-after('hello','')", "hello");
         testEval("substring-after('','')", "");
         testEval("substring-after('','q')", "");
+        testEval("translate('hello','l','L')", "heLLo");
+        testEval("translate('hello','q','Q')", "hello");
+        testEval("translate('hello','','L')", "hello");
+        testEval("translate('hello','l','')", "heo");
+        testEval("translate('','l','L')", "");
+        testEval("translate('hello','lo','LO')", "heLLO");
+        testEval("translate('hello world','hello','')", "wrd");
+        testEval("translate('hello wor,ld',' ,',', ')", "hello,wor ld");
+        testEval("translate('2019/01/02','/','-')", "2019-01-02");
         testEval("contains('a', 'a')",      true);
         testEval("contains('a', 'b')",      false);
         testEval("contains('abc', 'b')",    true);
