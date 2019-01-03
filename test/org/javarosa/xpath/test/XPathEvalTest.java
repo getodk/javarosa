@@ -266,7 +266,7 @@ public class XPathEvalTest extends TestCase {
         testEval("translate('hello','l','')", "heo");
         testEval("translate('','l','L')", "");
         testEval("translate('hello','lo','LO')", "heLLO");
-        testEval("translate('hello world','hello','')", "wrd");
+        testEval("translate('hello world','hello','')", " wrd");
         testEval("translate('hello wor,ld',' ,',', ')", "hello,wor ld");
         testEval("translate('2019/01/02','/','-')", "2019-01-02");
         testEval("contains('a', 'a')",      true);
