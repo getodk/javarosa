@@ -360,6 +360,7 @@ public class XPathFuncExpr extends XPathExpression {
             String str = toString(argVals[0]);
             String fromChars = toString(argVals[1]);
             String toChars = toString(argVals[2]);
+            int toNumChars = toChars.length();
             StringBuilder result = new StringBuilder();
             // iterate thru each char in the original string
             for (int i = 0; i < str.length(); i++) {
@@ -369,7 +370,7 @@ public class XPathFuncExpr extends XPathExpression {
                 if (fromPos == -1) {
                     // no mapping for this char, so just add it to result unchanged
                     result.append(from);
-                } else if (fromPos < toChars.length()) {
+                } else if (fromPos < toNumChars) {
                     // replace with the corresponding char it is mapped to
                     result.append(toChars.charAt(fromPos));
                 }
