@@ -11,14 +11,7 @@ public final class FormParserHelper {
     private FormParserHelper() {
     }
 
-    public static FormDef parse(Path formPath) throws IOException {
-        return parse(formPath, formPath.getParent());
-    }
-
-    public static FormDef parse(Path formName, Path externalInstancePathPrefix) throws IOException {
-        return XFormUtils.getFormFromInputStream(
-            new FileInputStream(formName.toString()),
-            externalInstancePathPrefix.toString()
-        );
+    public static FormDef parse(Path formName) throws IOException {
+        return XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()));
     }
 }

@@ -1,5 +1,6 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -8,18 +9,19 @@ import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.io.KXmlParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 // This is still a work in progress.
 
 public class ExternalDataInstance extends DataInstance {
+    private static final Logger logger = LoggerFactory.getLogger(ExternalDataInstance.class.getSimpleName());
     private String path;
     private TreeElement root;
 
@@ -37,7 +39,7 @@ public class ExternalDataInstance extends DataInstance {
     }
 
     /**
-     * Builds an ExternaldataInstance
+     * Builds an ExternalDataInstance
      *
      * @param path       the absolute path to the XML file
      * @param instanceId the ID of the new instance
@@ -97,19 +99,17 @@ public class ExternalDataInstance extends DataInstance {
      * Returns the path of the URI at srcLocation if the scheme is <code>jr</code> and the host is
      * <code>file</code>, otherwise returns <code>null</code>.
      * @param srcLocation the value of the <code>src</code> attribute of the <code>instance</code> element
-     * @throws URISyntaxException if srcLocation can’t be parsed as a URI
      */
     public static String getPathIfExternalDataInstance(String srcLocation) {
-        if (srcLocation != null && !srcLocation.isEmpty()) {
-            try {
-                URI uri = new URI(srcLocation);
-                if ("jr".equals(uri.getScheme()) && "file".equals(uri.getHost())) {
-                    return uri.getPath();
-                }
-            } catch (URISyntaxException e) {
-                e.printStackTrace(); // ToDo: decide what errors to report and how to report them
-            }
+        if (srcLocation == null || srcLocation.isEmpty() || !srcLocation.toLowerCase().startsWith("jr://file/"))
+            return null; // The src attribute of this instance element does not point to an external instance
+
+        try {
+            String uri = ReferenceManager.instance().DeriveReference(srcLocation).getLocalURI();
+            return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
+        } catch (org.javarosa.core.reference.InvalidReferenceException e) {
+            logger.error("Unable to derive reference " + srcLocation, e);
+            return null;
         }
-        return null;
     }
 }

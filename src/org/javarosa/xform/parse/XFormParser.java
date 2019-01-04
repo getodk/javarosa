@@ -177,8 +177,6 @@ public class XFormParser implements IXFormParserFunctions {
 
     private static IAnswerResolver answerResolver;
 
-    private String externalInstancePathPrefix = "";
-
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
@@ -357,7 +355,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()), externalInstancePathPrefix);
+            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()));
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -440,7 +438,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(Map<String, String> namespacePrefixesByUri, String externalInstancePathPrefix) {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri) {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
 
@@ -464,7 +462,7 @@ public class XFormParser implements IXFormParserFunctions {
 
                 if (ediPath != null) {
                     try { /* todo implement better error handling */
-                        _f.addNonMainInstance(ExternalDataInstance.build(externalInstancePathPrefix + ediPath, instanceId));
+                        _f.addNonMainInstance(ExternalDataInstance.build(ediPath, instanceId));
                     } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
                         e.printStackTrace();
                     }
@@ -2261,18 +2259,6 @@ public class XFormParser implements IXFormParserFunctions {
         _f.addParseError(error);
         for (ErrorCallback callback : errorCallbacks)
             callback.accept(error);
-    }
-
-    /**
-     * Sets where to find external instance data files. For example,
-     * given an externalInstancePathPrefix of <br/>
-     * “{@code path/a/b/}”,<br/>
-     * JavaRosa will read the external instance data defined as<br/>
-     * {@code <instance id="a" src="jr://file/data.xml">}<br/>
-     * from the file “{@code path/a/b/data.xml}”.
-     */
-    public void setExternalInstancePathPrefix(String externalInstancePathPrefix) {
-        this.externalInstancePathPrefix = externalInstancePathPrefix;
     }
 
     public interface WarningCallback {

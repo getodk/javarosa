@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class ReferenceManagerTest {
 
-    private static PrefixedRootFactory buildReferenceFactory(String scheme, final String path) {
+    public static PrefixedRootFactory buildReferenceFactory(String scheme, final String path) {
         return new PrefixedRootFactory(new String[]{scheme + "/"}) {
             @Override
             protected Reference factory(String terminal, String URI) {

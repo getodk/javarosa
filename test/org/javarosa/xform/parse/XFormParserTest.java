@@ -17,6 +17,7 @@ import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
@@ -53,6 +54,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.reference.ReferenceManagerTest.buildReferenceFactory;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -119,7 +121,9 @@ public class XFormParserTest {
     }
 
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        FormDef formDef = parse(EXTERNAL_SECONDARY_INSTANCE_XML);
+        Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
+        mapFileToResourcePath(formName);
+        FormDef formDef = parse(formName);
         assertEquals("Form with external secondary instance", formDef.getTitle());
         TreeReference treeReference = ((XPathPathExpr)
                 parseXPath("instance('towns')/data_set")).getReference();
@@ -136,6 +140,7 @@ public class XFormParserTest {
 
     @Test public void parsesExternalSecondaryInstanceForm2() throws IOException {
         Path formName = r("external_select_10.xml");
+        mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
         assertEquals("external select 10", formDef.getTitle());
     }
@@ -159,6 +164,7 @@ public class XFormParserTest {
      * @throws IOException if there are problems reading or writing files
      */
     private void timeParsing(LargeInstanceFileGenerator lfg, Path largeDataFilename, Path parseFilename) throws IOException {
+        mapFileToResourcePath(largeDataFilename);
         NumberFormat nf = NumberFormat.getNumberInstance();
         List<String> results = new ArrayList<>(); // Collect and display at end
         results.add("Children\tSeconds");
@@ -166,7 +172,7 @@ public class XFormParserTest {
             int numChildren = (int) Math.pow(10, powerOfTen);
             lfg.createLargeInstanceSource(largeDataFilename, numChildren);
             long startMs = System.currentTimeMillis();
-            FormParserHelper.parse(parseFilename, largeDataFilename.getParent());
+            FormParserHelper.parse(parseFilename);
             double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
             results.add(nf.format(numChildren) + "\t" + nf.format(elapsed));
             if (elapsed > 5.0) { // Make this larger if needed
@@ -184,7 +190,9 @@ public class XFormParserTest {
     }
 
     @Test public void externalSecondaryInstanceFormSavesAndRestores() throws IOException, DeserializationException {
-        serAndDeserializeForm(EXTERNAL_SECONDARY_INSTANCE_XML);
+        Path formPath = EXTERNAL_SECONDARY_INSTANCE_XML;
+        mapFileToResourcePath(formPath);
+        serAndDeserializeForm(formPath);
     }
 
     private void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
@@ -424,6 +432,12 @@ public class XFormParserTest {
 
     private void assertNoParseErrors(FormDef formDef) {
         assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
+    }
+
+    private void mapFileToResourcePath(Path formPath) {
+        ReferenceManager rm = ReferenceManager.instance();
+        rm.reset();
+        rm.addReferenceFactory(buildReferenceFactory("file", formPath.getParent().toString()));
     }
 
     /** Generates large versions of a secondary instance */
