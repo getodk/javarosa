@@ -3,6 +3,8 @@
  */
 package org.javarosa.core.reference;
 
+import java.util.Arrays;
+
 /**
  * PrefixedRootFactory provides a clean way to implement
  * the vast majority of behavior for a reference factory.
@@ -76,24 +78,25 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
      */
     protected abstract Reference factory(String terminal, String URI);
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.reference.ReferenceFactory#derive(java.lang.String, java.lang.String)
-     */
     public Reference derive(String URI, String context) throws InvalidReferenceException {
         String referenceURI = context.substring(0,context.lastIndexOf('/') + 1) + URI;
         return ReferenceManager.instance().DeriveReference(referenceURI);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.reference.ReferenceFactory#derives(java.lang.String)
-     */
     public boolean derives(String URI) {
         for(String root : roots) {
-            if(URI.indexOf(root) != -1) {
+            if (URI.contains(root)) {
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "PrefixedRootFactory{" +
+            "roots=" + Arrays.toString(roots) +
+            '}';
     }
 
 }

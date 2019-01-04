@@ -3,6 +3,9 @@
  */
 package org.javarosa.core.reference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 
 
@@ -32,6 +35,7 @@ import java.util.ArrayList;
  *
  */
 public class ReferenceManager {
+    private static final Logger logger = LoggerFactory.getLogger(ReferenceManager.class.getSimpleName());
 
     private static ReferenceManager instance;
 
@@ -40,15 +44,23 @@ public class ReferenceManager {
     private ArrayList<RootTranslator> sessionTranslators;
 
     private ReferenceManager() {
-        translators = new ArrayList<RootTranslator>(0);
-        factories = new ArrayList<ReferenceFactory>(0);
-        sessionTranslators = new ArrayList<RootTranslator>(0);
+        logger.debug("created");
+        translators = new ArrayList<>(0);
+        factories = new ArrayList<>(0);
+        sessionTranslators = new ArrayList<>(0);
     }
 
     public void reset() {
-        translators.clear();
-        factories.clear();
-        sessionTranslators.clear();
+        int t = translators.size();
+        int f = factories.size();
+        int st = sessionTranslators.size();
+
+        if (t + f + st > 0) {
+            translators.clear();
+            factories.clear();
+            sessionTranslators.clear();
+            logger.debug("reset translators ({}), session translators ({}), and factories ({})", t, st, f);
+        }
     }
 
     /**
@@ -85,7 +97,8 @@ public class ReferenceManager {
     public void addRootTranslator(RootTranslator translator) {
         if (!translators.contains(translator)) {
             translators.add(translator);
-        }
+            logger.debug("added root translator {}", translator);
+        } else logger.debug("skipped adding already-present root translator {}", translator);
     }
 
     /**
@@ -96,11 +109,14 @@ public class ReferenceManager {
     public void addReferenceFactory(ReferenceFactory factory) {
         if (!factories.contains(factory)) {
             factories.add(factory);
-        }
+            logger.debug("added reference factory {}", factory);
+        } else logger.debug("skipped adding already-present reference factory {}", factory);
     }
 
     public boolean removeReferenceFactory(ReferenceFactory factory) {
-        return factories.remove(factory);
+        boolean removed = factories.remove(factory);
+        logger.debug("factory {} was " + (removed ? "removed" : "not removed because it was not present"), factory);
+        return removed;
     }
 
     /**
@@ -155,10 +171,14 @@ public class ReferenceManager {
             if (context == null) {
                 throw new RuntimeException("Attempted to retrieve local reference with no context");
             } else {
-                return derivingRoot(context).derive(uri, context);
+                Reference reference = derivingRoot(context).derive(uri, context);
+                logger.debug("{} was derived from {}", reference.getLocalURI(), uri);
+                return reference;
             }
         } else {
-            return derivingRoot(uri).derive(uri);
+            Reference reference = derivingRoot(uri).derive(uri);
+            logger.debug("{} was derived from {}", reference.getLocalURI(), uri);
+            return reference;
         }
     }
 
@@ -170,6 +190,7 @@ public class ReferenceManager {
      */
     public void addSessionRootTranslator(RootTranslator translator) {
         sessionTranslators.add(translator);
+        logger.debug("added session root translator {}", translator);
     }
 
     /**
@@ -179,6 +200,7 @@ public class ReferenceManager {
      */
     public void clearSession() {
         sessionTranslators.clear();
+        logger.debug("cleared all session translators");
     }
 
     private ReferenceFactory derivingRoot(String uri) throws InvalidReferenceException {

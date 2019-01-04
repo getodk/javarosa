@@ -75,4 +75,11 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
         ExtUtil.writeString(out, translatedPrefix);
     }
 
+    @Override
+    public String toString() {
+        return "RootTranslator{" +
+            "prefix='" + prefix + '\'' +
+            ", translatedPrefix='" + translatedPrefix + '\'' +
+            '}';
+    }
 }
