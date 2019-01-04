@@ -1,5 +1,6 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -41,20 +42,25 @@ public class ExternalDataInstance extends DataInstance {
     /**
      * Builds an ExternalDataInstance
      *
-     * @param path       the absolute path to the XML file
+     * @param instanceSrc       the value of the instance’s src attribute, e.g., jr://file/…
      * @param instanceId the ID of the new instance
      * @return a new ExternalDataInstance
      * @throws IOException                       if FileInputStream can’t find the file, or ElementParser can’t read the stream
+     * @throws InvalidReferenceException         if the ReferenceManager in getPath(String srcLocation) can’t derive a reference
      * @throws UnfullfilledRequirementsException thrown by {@link TreeElementParser#parse()}
      * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
      * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
      */
-    public static ExternalDataInstance build(String path, String instanceId)
-        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(path));
+    public static ExternalDataInstance build(String instanceSrc, String instanceId)
+        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException, InvalidReferenceException {
+        TreeElement root = parseExternalInstance(instanceSrc, instanceId);
+        return new ExternalDataInstance(root, instanceId, instanceSrc);
+    }
+
+    private static TreeElement parseExternalInstance(String instanceSrc, String instanceId) throws IOException, InvalidReferenceException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
+        KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(getPath(instanceSrc)));
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
-        TreeElement root = treeElementParser.parse();
-        return new ExternalDataInstance(root, instanceId, path);
+        return treeElementParser.parse();
     }
 
     @Override
@@ -85,31 +91,25 @@ public class ExternalDataInstance extends DataInstance {
             throws IOException, DeserializationException {
         super.readExternal(in, pf);
         path = ExtUtil.readString(in);
-        setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
+        try {
+            setRoot(parseExternalInstance(path, getInstanceId()));
+        } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException | UnfullfilledRequirementsException e) {
+            throw new DeserializationException("Unable to parse external instance: " + e);
+        }
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         super.writeExternal(out);
         ExtUtil.write(out, path);
-        ExtUtil.write(out, getRoot());
     }
 
     /**
-     * Returns the path of the URI at srcLocation if the scheme is <code>jr</code> and the host is
-     * <code>file</code>, otherwise returns <code>null</code>.
+     * Returns the path of the URI at srcLocation.
      * @param srcLocation the value of the <code>src</code> attribute of the <code>instance</code> element
      */
-    public static String getPathIfExternalDataInstance(String srcLocation) {
-        if (srcLocation == null || srcLocation.isEmpty() || !srcLocation.toLowerCase().startsWith("jr://file/"))
-            return null; // The src attribute of this instance element does not point to an external instance
-
-        try {
-            String uri = ReferenceManager.instance().DeriveReference(srcLocation).getLocalURI();
-            return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
-        } catch (org.javarosa.core.reference.InvalidReferenceException e) {
-            logger.error("Unable to derive reference " + srcLocation, e);
-            return null;
-        }
+    private static String getPath(String srcLocation) throws InvalidReferenceException {
+        String uri = ReferenceManager.instance().DeriveReference(srcLocation).getLocalURI();
+        return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
     }
 }

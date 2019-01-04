@@ -35,7 +35,6 @@ import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
 import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
 import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
 import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
-import static org.javarosa.core.model.instance.ExternalDataInstance.getPathIfExternalDataInstance;
 import static org.javarosa.core.services.ProgramFlow.die;
 import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
@@ -83,6 +82,7 @@ import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.model.osm.OSMTagItem;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
@@ -118,7 +118,7 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author Drew Roos
  */
 public class XFormParser implements IXFormParserFunctions {
-    private static final Logger logger = LoggerFactory.getLogger(XFormParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(XFormParser.class.getSimpleName());
 
     public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
     public static final String NAMESPACE_ODK = "http://www.opendatakit.org/xforms";
@@ -458,14 +458,19 @@ public class XFormParser implements IXFormParserFunctions {
             for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
                 final Element instance = instanceNodes.get(instanceIndex);
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
-                final String ediPath = getPathIfExternalDataInstance(instance.getAttributeValue(null, "src"));
+                final String instanceSrc = instance.getAttributeValue(null, "src");
 
-                if (ediPath != null) {
-                    try { /* todo implement better error handling */
-                        _f.addNonMainInstance(ExternalDataInstance.build(ediPath, instanceId));
-                    } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
-                        e.printStackTrace();
+                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file/")) {
+                    final ExternalDataInstance externalDataInstance;
+                    try {
+                        externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
+                    } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
+                            XmlPullParserException | InvalidReferenceException e) {
+                        String msg = "Unable to parse external secondary instance";
+                        logger.error(msg, e);
+                        throw new XFormParseException(msg + ": " + e.toString(), instance);
                     }
+                    _f.addNonMainInstance(externalDataInstance);
                 } else {
                     FormInstance fi = instanceParser.parseInstance(instance, false,
                         instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
