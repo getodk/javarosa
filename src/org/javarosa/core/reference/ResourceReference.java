@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.javarosa.core.reference;
 
 import java.io.IOException;
@@ -32,10 +29,7 @@ public class ResourceReference implements Reference {
         this.URI = URI;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.reference.Reference#doesBinaryExist()
-     */
+    @Override
     public boolean doesBinaryExist() throws IOException {
         //Figure out if there's a file by trying to open
         //a stream to it and determining if it's null.
@@ -48,35 +42,21 @@ public class ResourceReference implements Reference {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.reference.Reference#getStream()
-     */
+    @Override
     public InputStream getStream() throws IOException {
-        InputStream is = System.class.getResourceAsStream(URI);
-        return is;
+        return System.class.getResourceAsStream(URI);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.reference.Reference#getURI()
-     */
+    @Override
     public String getURI() {
         return "jr://" + "resource" + this.URI;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.reference.Reference#isReadOnly()
-     */
+    @Override
     public boolean isReadOnly() {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     public boolean equals(Object o) {
         if(o instanceof ResourceReference) {
             return URI.equals(((ResourceReference)o).URI);
@@ -85,26 +65,22 @@ public class ResourceReference implements Reference {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.reference.Reference#getOutputStream()
-     */
+    @Override
     public OutputStream getOutputStream() throws IOException {
         throw new IOException("Resource references are read-only URI's");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.javarosa.core.reference.Reference#remove()
-     */
+    @Override
     public void remove() throws IOException {
         throw new IOException("Resource references are read-only URI's");
     }
 
+    @Override
     public String getLocalURI() {
         return URI;
     }
 
+    @Override
     public Reference[] probeAlternativeReferences() {
         //We can't poll the JAR for resources, unfortunately. It's possible
         //we could try to figure out something about the file and poll alternatives

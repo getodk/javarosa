@@ -109,7 +109,7 @@ public class ExternalDataInstance extends DataInstance {
      * @param srcLocation the value of the <code>src</code> attribute of the <code>instance</code> element
      */
     private static String getPath(String srcLocation) throws InvalidReferenceException {
-        String uri = ReferenceManager.instance().DeriveReference(srcLocation).getLocalURI();
+        String uri = ReferenceManager.instance().deriveReference(srcLocation).getLocalURI();
         return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
     }
 }

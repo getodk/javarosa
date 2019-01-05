@@ -1,53 +1,41 @@
-/**
- *
- */
 package org.javarosa.core.reference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * <p>The reference manager is a singleton class which
- * is responsible for deriving reference URI's into
+ * <p>The reference manager is a singleton class which is responsible for deriving reference URI's into
  * references at runtime.</p>
  *
- * <p>Raw reference factories
- * (which are capable of actually creating fully
- * qualified reference objects) are added with the
- * addFactory() method. The most common method
- * of doing so is to implement the PrefixedRootFactory
- * as either a full class, or an anonymous inner class,
- * providing the roots available in the current environment
- * and the code for constructing a reference from them.</p>
+ * <p>Raw reference factories (which are capable of actually creating fully
+ * qualified reference objects) are added with the addFactory() method. The most common method
+ * of doing so is to implement the PrefixedRootFactory as either a full class, or an anonymous inner class,
+ * providing the roots available in the current environment and the code for constructing a reference from them.</p>
  *
- * <p>RootTranslators (which rely on other factories) are
- * used to describe that a particular reference style (generally
- * a high level reference like "jr://media/" or "jr://images/"
- * should be translated to another available reference in this
- * environment like "jr://file/". Root Translators do not
- * directly derive references, but rather translate them to what
+ * <p>RootTranslators (which rely on other factories) are used to describe that a particular reference style (generally
+ * a high level reference like "jr://media/" or "jr://images/") should be translated to another available reference in this
+ * environment like "jr://file/". Root Translators do not directly derive references, but rather translate them to what
  * the reference should look like in the current circumstances.</p>
  *
  * @author ctsims
- *
  */
 public class ReferenceManager {
     private static final Logger logger = LoggerFactory.getLogger(ReferenceManager.class.getSimpleName());
-
     private static ReferenceManager instance;
 
-    private ArrayList<RootTranslator> translators;
-    private ArrayList<ReferenceFactory> factories;
-    private ArrayList<RootTranslator> sessionTranslators;
+    private List<RootTranslator> translators;
+    private List<ReferenceFactory> factories;
+    private List<RootTranslator> sessionTranslators;
 
     private ReferenceManager() {
         logger.debug("created");
-        translators = new ArrayList<>(0);
-        factories = new ArrayList<>(0);
-        sessionTranslators = new ArrayList<>(0);
+        translators         = new ArrayList<>();
+        factories           = new ArrayList<>();
+        sessionTranslators  = new ArrayList<>();
     }
 
     public void reset() {
@@ -75,8 +63,8 @@ public class ReferenceManager {
     }
 
     /**
-     * @deprecated use instance() instead
      * @see ReferenceManager#instance
+     * @deprecated use instance() instead
      */
     @Deprecated
     public static ReferenceManager __() {
@@ -92,7 +80,6 @@ public class ReferenceManager {
 
     /**
      * Adds a new Translator to the current environment.
-     * @param translator
      */
     public void addRootTranslator(RootTranslator translator) {
         if (!translators.contains(translator)) {
@@ -103,8 +90,9 @@ public class ReferenceManager {
 
     /**
      * Adds a factory for deriving reference URI's into references
+     *
      * @param factory A raw ReferenceFactory capable of creating
-     * a reference.
+     *                a reference.
      */
     public void addReferenceFactory(ReferenceFactory factory) {
         if (!factories.contains(factory)) {
@@ -125,38 +113,38 @@ public class ReferenceManager {
      * @param uri The URI representing a global reference.
      * @return A reference which is identified by the provided URI.
      * @throws InvalidReferenceException If the current reference could
-     * not be derived by the current environment
+     *                                   not be derived by the current environment
      */
-    public Reference DeriveReference(String uri) throws InvalidReferenceException {
-        return DeriveReference(uri, (String) null);
+    public Reference deriveReference(String uri) throws InvalidReferenceException {
+        return deriveReference(uri, (String) null);
     }
 
     /**
      * Derives a reference from a URI in the current environment.
      *
-     * @param uri The URI representing a reference.
+     * @param uri     The URI representing a reference.
      * @param context A reference which provides context for any
-     * relative reference accessors.
+     *                relative reference accessors.
      * @return A reference which is identified by the provided URI.
      * @throws InvalidReferenceException If the current reference could
-     * not be derived by the current environment
+     *                                   not be derived by the current environment
      */
-    public Reference DeriveReference(String uri, Reference context) throws InvalidReferenceException {
-        return DeriveReference(uri, context.getURI());
+    public Reference deriveReference(String uri, Reference context) throws InvalidReferenceException {
+        return deriveReference(uri, context.getURI());
     }
 
     /**
      * Derives a reference from a URI in the current environment.
      *
-     * @param uri The URI representing a reference.
+     * @param uri     The URI representing a reference.
      * @param context A reference URI which provides context for any
-     * relative reference accessors.
+     *                relative reference accessors.
      * @return A reference which is identified by the provided URI.
      * @throws InvalidReferenceException If the current reference could
-     * not be derived by the current environment, or if the context URI
-     * is not valid in the current environment.
+     *                                   not be derived by the current environment, or if the context URI
+     *                                   is not valid in the current environment.
      */
-    public Reference DeriveReference(String uri, String context) throws InvalidReferenceException {
+    public Reference deriveReference(String uri, String context) throws InvalidReferenceException {
         if (uri == null) {
             throw new InvalidReferenceException("Null references aren't valid", uri);
         }
@@ -203,28 +191,15 @@ public class ReferenceManager {
         logger.debug("cleared all session translators");
     }
 
+    /**
+     * Returns the first deriving factory in the three ReferenceFactory collections.
+     */
     private ReferenceFactory derivingRoot(String uri) throws InvalidReferenceException {
-
-        //First, try any/all roots which are put in the temporary session stack
-        for (RootTranslator root : sessionTranslators) {
-            if (root.derives(uri)) {
-                return root;
-            }
-        }
-
-        //Now, try any/all roots referenced at runtime.
-        for (RootTranslator root : translators) {
-            if (root.derives(uri)) {
-                return root;
-            }
-        }
-
-        //Now try all of the raw connectors available
-        for (ReferenceFactory root : factories) {
-            if (root.derives(uri)) {
-                return root;
-            }
-        }
+        // See https://github.com/opendatakit/javarosa/pull/394#discussion_r245902058 for why `? extends` is needed
+        for (List<? extends ReferenceFactory> rfs : Arrays.asList(sessionTranslators, translators, factories))
+            for (ReferenceFactory rf : rfs)
+                if (rf.derives(uri))
+                    return rf;
 
         throw new InvalidReferenceException(getPrettyPrintException(uri), uri);
     }
@@ -236,7 +211,7 @@ public class ReferenceManager {
         try {
             String uriRoot = uri;
             String jrRefMessagePortion = "reference type";
-            if (uri.indexOf("jr://") != -1) {
+            if (uri.contains("jr://")) {
                 uriRoot = uri.substring("jr://".length());
                 jrRefMessagePortion = "javarosa jr:// reference root";
             }
@@ -285,13 +260,27 @@ public class ReferenceManager {
     }
 
     /**
-     * @param URI
-     * @return Whether the provided URI describe a relative reference.
+     * @return Whether the provided URI describes a relative reference.
      */
     public static boolean isRelative(String URI) {
-        if (URI.startsWith("./")) {
-            return true;
-        }
-        return false;
+        return URI.startsWith("./");
+    }
+
+    /** @deprecated use deriveReference instead */
+    @Deprecated
+    public Reference DeriveReference(String uri) throws InvalidReferenceException {
+        return deriveReference(uri);
+    }
+
+    /** @deprecated use deriveReference instead */
+    @Deprecated
+    public Reference DeriveReference(String uri, Reference context) throws InvalidReferenceException {
+        return deriveReference(uri, context);
+    }
+
+    /** @deprecated use deriveReference instead */
+    @Deprecated
+    public Reference DeriveReference(String uri, String context) throws InvalidReferenceException {
+        return deriveReference(uri, context);
     }
 }

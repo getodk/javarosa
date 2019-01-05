@@ -28,7 +28,7 @@ public class ReferenceManagerTest {
     public void derives_uris_according_to_a_reference_factory() throws InvalidReferenceException {
         refManager.addReferenceFactory(buildReferenceFactory("file", "/some/path"));
         assertThat(
-            refManager.DeriveReference("jr://file/some-file.jpg").getLocalURI(),
+            refManager.deriveReference("jr://file/some-file.jpg").getLocalURI(),
             is("/some/path/some-file.jpg")
         );
     }
@@ -39,7 +39,7 @@ public class ReferenceManagerTest {
         refManager.addRootTranslator(new RootTranslator("jr://image/", "jr://file/forms/some-form-media/"));
         // This configuration will translate jr://image/... to jr://file/forms/some-form-media/... and then to /some/path/forms/some-form-media/...
         assertThat(
-            refManager.DeriveReference("jr://image/some-file.jpg").getLocalURI(),
+            refManager.deriveReference("jr://image/some-file.jpg").getLocalURI(),
             is("/some/path/forms/some-form-media/some-file.jpg")
         );
     }
@@ -50,7 +50,7 @@ public class ReferenceManagerTest {
         refManager.addRootTranslator(new RootTranslator("jr://image/", "jr://file/forms/some-form-media/"));
         refManager.addSessionRootTranslator(new RootTranslator("jr://images/", "jr://image/"));
         assertThat(
-            refManager.DeriveReference("jr://images/some-file.jpg").getLocalURI(),
+            refManager.deriveReference("jr://images/some-file.jpg").getLocalURI(),
             is("/some/path/forms/some-form-media/some-file.jpg")
         );
     }
@@ -61,7 +61,7 @@ public class ReferenceManagerTest {
         refManager.addRootTranslator(new RootTranslator("jr://image/", "jr://file/forms/some-form-media/"));
         refManager.addSessionRootTranslator(new RootTranslator("jr://images/", "jr://image/"));
         refManager.clearSession();
-        refManager.DeriveReference("jr://images/some-file.jpg").getLocalURI();
+        refManager.deriveReference("jr://images/some-file.jpg").getLocalURI();
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ReferenceManagerTest {
         refManager.addReferenceFactory(buildReferenceFactory("file", "/some/path"));
         refManager.addSessionRootTranslator(new RootTranslator("jr://file/", "jr://file/forms/some-form-media/"));
         assertThat(
-            refManager.DeriveReference("jr://file/some-file.xml").getLocalURI(),
+            refManager.deriveReference("jr://file/some-file.xml").getLocalURI(),
             is("/some/path/forms/some-form-media/some-file.xml")
         );
     }

@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.javarosa.core.reference;
 
 import java.io.DataInputStream;
@@ -42,9 +39,6 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
      * Creates a translator which will create references of the
      * type described by translatedPrefix whenever references of
      * the type prefix are being derived.
-     *
-     * @param prefix
-     * @param translatedPrefix
      */
     public RootTranslator(String prefix, String translatedPrefix) {
         //TODO: Manage semantics of "ends with /" etc here?
@@ -52,24 +46,29 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
         this.translatedPrefix = translatedPrefix;
     }
 
+    @Override
     public Reference derive(String URI) throws InvalidReferenceException {
-        return ReferenceManager.instance().DeriveReference(translatedPrefix + URI.substring(prefix.length()));
+        return ReferenceManager.instance().deriveReference(translatedPrefix + URI.substring(prefix.length()));
     }
 
+    @Override
     public Reference derive(String URI, String context) throws InvalidReferenceException {
-        return ReferenceManager.instance().DeriveReference(URI, translatedPrefix + context.substring(prefix.length()));
+        return ReferenceManager.instance().deriveReference(URI, translatedPrefix + context.substring(prefix.length()));
     }
 
+    @Override
     public boolean derives(String URI) {
         return URI.startsWith(prefix) && !URI.startsWith(translatedPrefix);
     }
 
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
             throws IOException, DeserializationException {
         prefix = ExtUtil.readString(in);
         translatedPrefix = ExtUtil.readString(in);
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, prefix);
         ExtUtil.writeString(out, translatedPrefix);
