@@ -41,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.core.reference.ReferenceManagerTest.buildReferenceFactory;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -105,7 +107,11 @@ public class XFormParserTest {
 
     @Test
     public void parsesPreloadForm() throws IOException {
-        FormDef formDef = parse(r("Sample-Preloading.xml"));
+        // The form on this test uses a jr://file-csv resource.
+        // We need to prime the ReferenceManager to deal with those
+        Path form = r("Sample-Preloading.xml");
+        setUpSimpleReferenceManager("file-csv", form.getParent());
+        FormDef formDef = parse(form);
         assertEquals("Sample Form - Preloading", formDef.getTitle());
     }
 
@@ -140,6 +146,13 @@ public class XFormParserTest {
 
     @Test public void parsesExternalSecondaryInstanceForm2() throws IOException {
         Path formName = r("external_select_10.xml");
+        mapFileToResourcePath(formName);
+        FormDef formDef = parse(formName);
+        assertEquals("external select 10", formDef.getTitle());
+    }
+
+    @Test public void parsesExternalSecondaryInstanceCsvForm() throws IOException {
+        Path formName = r("external-select-csv.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
         assertEquals("external select 10", formDef.getTitle());
@@ -437,7 +450,8 @@ public class XFormParserTest {
     private void mapFileToResourcePath(Path formPath) {
         ReferenceManager rm = ReferenceManager.instance();
         rm.reset();
-        rm.addReferenceFactory(buildReferenceFactory("file", formPath.getParent().toString()));
+        for (String t : Arrays.asList("file", "file-csv"))
+            rm.addReferenceFactory(buildReferenceFactory(t, formPath.getParent().toString()));
     }
 
     /** Generates large versions of a secondary instance */
