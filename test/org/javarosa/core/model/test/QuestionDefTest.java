@@ -169,7 +169,7 @@ public class QuestionDefTest {
         ReferenceManager.instance().addReferenceFactory(new ResourceReferenceFactory());
         ReferenceManager.instance().addRootTranslator(new RootTranslator("jr://audio/", "jr://resource/"));
         try {
-            Reference r = ReferenceManager.instance().DeriveReference(audioURI);
+            Reference r = ReferenceManager.instance().deriveReference(audioURI);
             ref = r.getURI();
             if (!ref.equals("jr://resource/hah.mp3")) {
                 fail("Root translation failed.");
@@ -185,7 +185,7 @@ public class QuestionDefTest {
         fep = fpi.getFormEntryModel().getQuestionPrompt();
         String imURI = fep.getImageText();
         try {
-            Reference r = ReferenceManager.instance().DeriveReference(imURI);
+            Reference r = ReferenceManager.instance().deriveReference(imURI);
             ref = r.getURI();
             if (!ref.equals("jr://resource/four.gif")) {
                 fail("Root translation failed.");

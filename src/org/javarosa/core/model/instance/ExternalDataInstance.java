@@ -1,5 +1,7 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -8,18 +10,19 @@ import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.io.KXmlParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 // This is still a work in progress.
 
 public class ExternalDataInstance extends DataInstance {
+    private static final Logger logger = LoggerFactory.getLogger(ExternalDataInstance.class.getSimpleName());
     private String path;
     private TreeElement root;
 
@@ -29,44 +32,58 @@ public class ExternalDataInstance extends DataInstance {
     public ExternalDataInstance() {
     }
 
-    public ExternalDataInstance(String path, String instanceId, TreeElement root) {
+    private ExternalDataInstance(TreeElement root, String instanceId, String path) {
         super(instanceId);
         this.path = path;
         setName(instanceId);
-        this.root = root;
+        setRoot(root);
     }
 
-    public static ExternalDataInstance buildFromPath(String path, String instanceId)
-            throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        String absolutePath = getPathPrefix() + path;
-        KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(absolutePath));
+    /**
+     * Builds an ExternalDataInstance
+     *
+     * @param instanceSrc       the value of the instance’s src attribute, e.g., jr://file/…
+     * @param instanceId the ID of the new instance
+     * @return a new ExternalDataInstance
+     * @throws IOException                       if FileInputStream can’t find the file, or ElementParser can’t read the stream
+     * @throws InvalidReferenceException         if the ReferenceManager in getPath(String srcLocation) can’t derive a reference
+     * @throws UnfullfilledRequirementsException thrown by {@link TreeElementParser#parse()}
+     * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
+     * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
+     */
+    public static ExternalDataInstance build(String instanceSrc, String instanceId)
+        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException, InvalidReferenceException {
+        TreeElement root = parseExternalInstance(instanceSrc, instanceId);
+        return new ExternalDataInstance(root, instanceId, instanceSrc);
+    }
+
+    private static TreeElement parseExternalInstance(String instanceSrc, String instanceId) throws IOException, InvalidReferenceException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
+        KXmlParser xmlParser = ElementParser.instantiateParser(new FileInputStream(getPath(instanceSrc)));
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
-        TreeElement root = treeElementParser.parse();
-        return new ExternalDataInstance(path, instanceId, root);
-    }
-
-    private static String getPathPrefix() {
-        return System.getProperty("user.dir") + "/resources";
-        /* ToDo find out how to get the actual location. Hélène says:
-        Other "stuff outside the form" uses `<odk-form-folder>/<form-name>-media/` as the root dir but
-        in this case all external secondary instances will go in the same folder. It would be good for
-        that folder to reside in the odk root folder. We can come back to it.
-        */
+        return treeElementParser.parse();
     }
 
     @Override
     public AbstractTreeElement getBase() {
-        return root; // ToDo what should this be?
-    }
-
-    @Override
-    public AbstractTreeElement getRoot() {
         return root;
     }
 
     @Override
+    public AbstractTreeElement getRoot() {
+        if (root.getNumChildren() == 0)
+            throw new RuntimeException("root node has no children");
+
+        return root.getChildAt(0);
+    }
+
+    private void setRoot(TreeElement topLevel) {
+        root = new TreeElement();
+        root.setInstanceName(getName());
+        root.addChild(topLevel);
+    }
+
+    @Override
     public void initialize(InstanceInitializationFactory initializer, String instanceId) {
-        throw new RuntimeException("Not implemented");
     }
 
     @Override
@@ -74,6 +91,11 @@ public class ExternalDataInstance extends DataInstance {
             throws IOException, DeserializationException {
         super.readExternal(in, pf);
         path = ExtUtil.readString(in);
+        try {
+            setRoot(parseExternalInstance(path, getInstanceId()));
+        } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException | UnfullfilledRequirementsException e) {
+            throw new DeserializationException("Unable to parse external instance: " + e);
+        }
     }
 
     @Override
@@ -83,22 +105,11 @@ public class ExternalDataInstance extends DataInstance {
     }
 
     /**
-     * Returns the path of the URI at srcLocation if the scheme is <code>jr</code> and the host is
-     * <code>file</code>, otherwise returns <code>null</code>.
+     * Returns the path of the URI at srcLocation.
      * @param srcLocation the value of the <code>src</code> attribute of the <code>instance</code> element
-     * @throws URISyntaxException if srcLocation can’t be parsed as a URI
      */
-    public static String getPathIfExternalDataInstance(String srcLocation) {
-        if (srcLocation != null && !srcLocation.isEmpty()) {
-            try {
-                URI uri = new URI(srcLocation);
-                if ("jr".equals(uri.getScheme()) && "file".equals(uri.getHost())) {
-                    return uri.getPath();
-                }
-            } catch (URISyntaxException e) {
-                e.printStackTrace(); // ToDo: decide what errors to report and how to report them
-            }
-        }
-        return null;
+    private static String getPath(String srcLocation) throws InvalidReferenceException {
+        String uri = ReferenceManager.instance().deriveReference(srcLocation).getLocalURI();
+        return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
     }
 }

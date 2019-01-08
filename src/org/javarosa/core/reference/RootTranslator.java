@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.javarosa.core.reference;
 
 import java.io.DataInputStream;
@@ -19,10 +16,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * which don't describe any real raw accessor like "jr://media/",
  * which could access a file reference (jr://file/) on one platform,
  * but a resource reference (jr://resource/) on another.
- * 
- * Root Translators can be externalized and used as a dynamically 
+ *
+ * Root Translators can be externalized and used as a dynamically
  * configured object.
- * 
+ *
  * @author ctsims
  *
  */
@@ -42,9 +39,6 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
      * Creates a translator which will create references of the
      * type described by translatedPrefix whenever references of
      * the type prefix are being derived.
-     *
-     * @param prefix
-     * @param translatedPrefix
      */
     public RootTranslator(String prefix, String translatedPrefix) {
         //TODO: Manage semantics of "ends with /" etc here?
@@ -52,40 +46,39 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
         this.translatedPrefix = translatedPrefix;
     }
 
-    /* (non-Javadoc)
-     * @see org.commcare.reference.Root#derive(java.lang.String)
-     */
+    @Override
     public Reference derive(String URI) throws InvalidReferenceException {
-        return ReferenceManager.instance().DeriveReference(translatedPrefix + URI.substring(prefix.length()));
+        return ReferenceManager.instance().deriveReference(translatedPrefix + URI.substring(prefix.length()));
     }
 
-    /* (non-Javadoc)
-     * @see org.commcare.reference.Root#derive(java.lang.String, java.lang.String)
-     */
+    @Override
     public Reference derive(String URI, String context) throws InvalidReferenceException {
-        return ReferenceManager.instance().DeriveReference(URI, translatedPrefix + context.substring(prefix.length()));
+        return ReferenceManager.instance().deriveReference(URI, translatedPrefix + context.substring(prefix.length()));
     }
 
-    /* (non-Javadoc)
-     * @see org.commcare.reference.Root#derives(java.lang.String)
-     */
+    @Override
     public boolean derives(String URI) {
-        if(URI.startsWith(prefix)) {
-            return true;
-        } else{
-            return false;
-        }
+        return URI.startsWith(prefix) && !URI.startsWith(translatedPrefix);
     }
 
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
             throws IOException, DeserializationException {
         prefix = ExtUtil.readString(in);
         translatedPrefix = ExtUtil.readString(in);
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, prefix);
         ExtUtil.writeString(out, translatedPrefix);
     }
 
+    @Override
+    public String toString() {
+        return "RootTranslator{" +
+            "prefix='" + prefix + '\'' +
+            ", translatedPrefix='" + translatedPrefix + '\'' +
+            '}';
+    }
 }

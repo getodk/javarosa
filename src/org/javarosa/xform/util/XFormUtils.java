@@ -29,6 +29,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
@@ -66,8 +67,12 @@ public class XFormUtils {
         return _factory.getXFormParser(isr).parse();
     }
 
-    /*
-     * This method throws XFormParseException when the form has errors.
+    /**
+     * Parses a form with an external secondary instance, and returns a FormDef.
+     *
+     * @param is                         the InputStream containing the form
+     * @return a FormDef for the parsed form
+     * @throws XFormParseException if the form can’t be parsed
      */
     public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
         InputStreamReader isr = null;
@@ -78,7 +83,8 @@ public class XFormUtils {
                 throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
             }
 
-            return _factory.getXFormParser(isr).parse();
+            XFormParser xFormParser = _factory.getXFormParser(isr);
+            return xFormParser.parse();
         } catch(IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {

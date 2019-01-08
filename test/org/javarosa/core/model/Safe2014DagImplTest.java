@@ -38,7 +38,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnFollowingRepeatGroupSiblings() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-children-position-calculation.xml")).formDef;
+                parse(r("repeat-group-with-children-position-calculation.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -90,7 +90,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-children-calculations-dependent-on-the-parent.xml")).formDef;
+                parse(r("repeat-group-with-children-calculations-dependent-on-the-parent.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -151,7 +151,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml")).formDef;
+                parse(r("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -210,7 +210,7 @@ public class Safe2014DagImplTest {
     public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("calculation-dependent-on-the-repeat-groups-number.xml")).formDef;
+                parse(r("calculation-dependent-on-the-repeat-groups-number.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -294,7 +294,7 @@ public class Safe2014DagImplTest {
     public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("calculation-indirectly-dependent-on-the-repeat-groups-number.xml")).formDef;
+                parse(r("calculation-indirectly-dependent-on-the-repeat-groups-number.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -347,7 +347,7 @@ public class Safe2014DagImplTest {
     public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("delete-repeat-group-with-calculations-timing-test.xml")).formDef;
+                parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
 
         assertIDagImplUnderTest(formDef);
 
