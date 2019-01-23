@@ -379,6 +379,30 @@ public class FormEntryCaption implements FormElementStateListener {
         }
     }
 
+    /**
+     * Returns true if the group has a displayable label,
+     * i.e. it's a "presentation group".
+     */
+    public boolean isPresentationGroup() {
+        if (!(element instanceof GroupDef)) {
+            return false;
+        }
+
+        return getShortText() != null;
+    }
+
+    /**
+     * Returns true if the group has an XML `ref` attribute,
+     * i.e. it's a "logical group".
+     */
+    public boolean isLogicalGroup() {
+        if (!(element instanceof GroupDef)) {
+            return false;
+        }
+
+        return ((GroupDef) element).isLogicalGroup;
+    }
+
     public FormIndex getIndex() {
         return index;
     }

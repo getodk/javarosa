@@ -1450,6 +1450,8 @@ public class XFormParser implements IXFormParserFunctions {
         String bind = e.getAttributeValue(null, BIND_ATTR);
         group.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
 
+        group.isLogicalGroup = ref != null;
+
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
             if (binding == null) {

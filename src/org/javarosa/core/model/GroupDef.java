@@ -70,6 +70,8 @@ public class GroupDef implements IFormElement, Localizable {
     List<FormElementStateListener> observers;
 
     public boolean noAddRemove = false;
+    /** True if the group has a `ref`, i.e. it's a "logical group". */
+    public boolean isLogicalGroup = false;
     public IDataReference count = null;
 
     public GroupDef () {
@@ -209,6 +211,7 @@ public class GroupDef implements IFormElement, Localizable {
             setChildren((List<IFormElement>)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
             noAddRemove = ExtUtil.readBool(dis);
+            isLogicalGroup = ExtUtil.readBool(dis);
             count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 
             chooseCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
@@ -238,6 +241,7 @@ public class GroupDef implements IFormElement, Localizable {
         ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 
         ExtUtil.writeBool(dos, noAddRemove);
+        ExtUtil.writeBool(dos, isLogicalGroup);
         ExtUtil.write(dos, new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
 
         ExtUtil.writeString(dos, ExtUtil.emptyIfNull(chooseCaption));
