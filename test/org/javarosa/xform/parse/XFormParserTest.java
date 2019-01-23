@@ -414,6 +414,24 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
+    @Test public void parseGroupWithRefAttrForm() throws IOException, XPathSyntaxException {
+        // Given & When
+        FormDef formDef = parse(r("group-with-ref-attr.xml"));
+
+        // Then
+        assertEquals(formDef.getTitle(), "group with ref attribute");
+        assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
+
+        IFormElement firstGroup = formDef.getChild(0);
+        assertThat(((GroupDef) firstGroup).isLogicalGroup, is(true));
+
+        IFormElement secondGroup = firstGroup.getChild(0);
+        assertThat(((GroupDef) secondGroup).isLogicalGroup, is(false));
+
+        IFormElement thirdGroup = firstGroup.getChild(1);
+        assertThat(((GroupDef) thirdGroup).isLogicalGroup, is(true));
+    }
+
     private TreeElement findDepthFirst(TreeElement parent, String name) {
         int len = parent.getNumChildren();
         for (int i = 0; i < len; ++i) {
