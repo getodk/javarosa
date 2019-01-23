@@ -1,0 +1,29 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>group with ref attribute</h:title>
+        <model>
+            <instance>
+                <data id="group-with-ref-attr">
+                    <G1>
+                        <G2>
+                            <Q1/>
+                        </G2>
+                        <G3>
+                            <Q2/>
+                        </G3>
+                    </G1>
+                </data>
+            </instance>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/data/G1">
+            <group>
+                <input ref="/data/G1/G2/Q1"/>
+            </group>
+            <group ref="/data/G1/G3">
+                <input ref="/data/G1/G3/Q2"/>
+            </group>
+        </group>
+    </h:body>
+</h:html>

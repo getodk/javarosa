@@ -414,6 +414,41 @@ public class XFormParserTest {
         assertThat(groupElement.getBind(), is(expectedXPathReference));
     }
 
+    @Test public void parseGroupWithRefAttrForm() throws IOException, XPathSyntaxException {
+        // Given & When
+        FormDef formDef = parse(r("group-with-ref-attr.xml"));
+
+        // Then
+        assertEquals(formDef.getTitle(), "group with ref attribute");
+        assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
+
+        final TreeReference g2TreeRef = new TreeReference();
+        g2TreeRef.setRefLevel(-1); // absolute reference
+        g2TreeRef.add("data", -1); // the instance root
+        g2TreeRef.add("G1", -1); // the outer group
+        g2TreeRef.add("G2", -1); // the inner group
+
+        // G2 does NOT have a `ref`.
+        // Collect implicitly assumes the TreeReference will be created like this.
+        IDataReference g2AbsRef = FormDef.getAbsRef(null, g2TreeRef.getParentRef());
+
+        IFormElement g2Element = formDef.getChild(0).getChild(0);
+        assertThat(g2Element.getBind(), is(g2AbsRef));
+
+        final TreeReference g3TreeRef = new TreeReference();
+        g3TreeRef.setRefLevel(-1); // absolute reference
+        g3TreeRef.add("data", -1); // the instance root
+        g3TreeRef.add("G1", -1); // the outer group
+        g3TreeRef.add("G3", -1); // the inner group
+
+        // G3 has a `ref`.
+        // Collect implicitly assumes the TreeReference will be created like this.
+        IDataReference g3AbsRef = FormDef.getAbsRef(new XPathReference(g3TreeRef), g3TreeRef.getParentRef());
+
+        IFormElement g3Element = formDef.getChild(0).getChild(1);
+        assertThat(g3Element.getBind(), is(g3AbsRef));
+    }
+
     private TreeElement findDepthFirst(TreeElement parent, String name) {
         int len = parent.getNumChildren();
         for (int i = 0; i < len; ++i) {
