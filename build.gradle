@@ -54,7 +54,7 @@ jacocoTestReport {
 
 // Required to use fileExtensions property in checkstyle file
 checkstyle {
-    toolVersion = '7.6.1' 
+    toolVersion = '7.6.1'
 }
 
 jar {
@@ -62,7 +62,7 @@ jar {
     // Be sure to update version in pom.xml to match
     // snapshot release = x.x.x-SNAPSHOT
     // production release = x.x.x
-    version = '2.13.0'
+    version = '2.14.0-SNAPSHOT'
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
