@@ -46,27 +46,6 @@ public class XFormUtils {
 
     private static IXFormParserFactory _factory = new XFormParserFactory();
 
-    public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
-        IXFormParserFactory oldFactory = _factory;
-        _factory = factory;
-        return oldFactory;
-    }
-
-    public static FormDef getFormFromResource (String resource) {
-        InputStream is = System.class.getResourceAsStream(resource);
-        if (is == null) {
-            logger.error("Can't find form resource {}. Is it in the JAR?", resource);
-            return null;
-        }
-
-        return getFormFromInputStream(is);
-    }
-
-
-    public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException{
-        return _factory.getXFormParser(isr).parse();
-    }
-
     /**
      * Parses a form with an external secondary instance, and returns a FormDef.
      *
