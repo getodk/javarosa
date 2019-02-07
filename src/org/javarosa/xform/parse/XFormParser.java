@@ -348,7 +348,7 @@ public class XFormParser implements IXFormParserFunctions {
         _instDoc = instance;
     }
 
-    public FormDef parse() throws IOException {
+    public FormDef parse(String lastSavedSrc) throws IOException {
         if (_f == null) {
             logger.info("Parsing form...");
 
@@ -356,7 +356,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()));
+            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -439,7 +439,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(Map<String, String> namespacePrefixesByUri) {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
 
@@ -461,10 +461,23 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = instance.getAttributeValue(null, "src");
 
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file")) { // file or file-csv
+                final String externalSrc;
+                if (instanceSrc == null) {
+                    // It's internal, not external.
+                    externalSrc = null;
+                } else if (instanceSrc.toLowerCase().startsWith("jr://file")) { // file or file-csv
+                    externalSrc = instanceSrc;
+                } else if (instanceSrc.toLowerCase().startsWith("jr://instance/last-saved")) {
+                    externalSrc = lastSavedSrc;
+                } else {
+                    logger.warn("Invalid instanceSrc: " + instanceSrc);
+                    externalSrc = null;
+                }
+
+                if (externalSrc != null) {
                     final ExternalDataInstance externalDataInstance;
                     try {
-                        externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
+                        externalDataInstance = ExternalDataInstance.build(externalSrc, instanceId);
                     } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
                             XmlPullParserException | InvalidReferenceException e) {
                         String msg = "Unable to parse external secondary instance";

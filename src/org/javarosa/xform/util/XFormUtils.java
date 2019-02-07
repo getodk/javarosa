@@ -74,7 +74,7 @@ public class XFormUtils {
      * @return a FormDef for the parsed form
      * @throws XFormParseException if the form can’t be parsed
      */
-    public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
+    public static FormDef getFormFromInputStream(InputStream is, String lastSavedSrc) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -84,7 +84,7 @@ public class XFormUtils {
             }
 
             XFormParser xFormParser = _factory.getXFormParser(isr);
-            return xFormParser.parse();
+            return xFormParser.parse(lastSavedSrc);
         } catch(IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
