@@ -348,6 +348,16 @@ public class XFormParser implements IXFormParserFunctions {
         _instDoc = instance;
     }
 
+    public FormDef parse() throws IOException {
+        return parse(null);
+    }
+
+    /**
+     * @see #parse()
+     *
+     * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
+     *                     no data will be loaded and the instance will be blank.
+     */
     public FormDef parse(String lastSavedSrc) throws IOException {
         if (_f == null) {
             logger.info("Parsing form...");

@@ -74,6 +74,16 @@ public class XFormUtils {
      * @return a FormDef for the parsed form
      * @throws XFormParseException if the form can’t be parsed
      */
+    public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
+        return getFormFromInputStream(is, null);
+    }
+
+    /**
+     * @see #getFormFromInputStream(InputStream)
+     *
+     * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
+     *                     no data will be loaded and the instance will be blank.
+     */
     public static FormDef getFormFromInputStream(InputStream is, String lastSavedSrc) throws XFormParseException {
         InputStreamReader isr = null;
         try {
