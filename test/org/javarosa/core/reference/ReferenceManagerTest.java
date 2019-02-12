@@ -1,21 +1,13 @@
 package org.javarosa.core.reference;
 
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class ReferenceManagerTest {
-
-    public static PrefixedRootFactory buildReferenceFactory(String scheme, final String path) {
-        return new PrefixedRootFactory(new String[]{scheme + "/"}) {
-            @Override
-            protected Reference factory(String terminal, String URI) {
-                return new ResourceReference(path + "/" + terminal);
-            }
-        };
-    }
 
     private ReferenceManager refManager = ReferenceManager.instance();
 
