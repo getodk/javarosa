@@ -126,6 +126,12 @@ public class XFormParserTest {
         assertEquals("internal select 10", formDef.getTitle());
     }
 
+    @Test public void parsesLastSavedInstanceWithNullSrc() throws IOException {
+        Path formName = r("last-saved-blank.xml");
+        FormDef formDef = parse(formName, null);
+        assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
+    }
+
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
         Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
         mapFileToResourcePath(formName);
