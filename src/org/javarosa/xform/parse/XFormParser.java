@@ -469,25 +469,12 @@ public class XFormParser implements IXFormParserFunctions {
             for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
                 final Element instance = instanceNodes.get(instanceIndex);
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
-                final String instanceSrc = instance.getAttributeValue(null, "src");
+                final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                final String externalSrc;
-                if (instanceSrc == null) {
-                    // It's internal, not external.
-                    externalSrc = null;
-                } else if (instanceSrc.toLowerCase().startsWith("jr://file")) { // file or file-csv
-                    externalSrc = instanceSrc;
-                } else if (instanceSrc.toLowerCase().startsWith("jr://instance/last-saved")) {
-                    externalSrc = lastSavedSrc;
-                } else {
-                    logger.warn("Invalid instanceSrc: " + instanceSrc);
-                    externalSrc = null;
-                }
-
-                if (externalSrc != null) {
+                if (instanceSrc != null) {
                     final ExternalDataInstance externalDataInstance;
                     try {
-                        externalDataInstance = ExternalDataInstance.build(externalSrc, instanceId);
+                        externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
                     } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
                             XmlPullParserException | InvalidReferenceException e) {
                         String msg = "Unable to parse external secondary instance";
@@ -534,6 +521,22 @@ public class XFormParser implements IXFormParserFunctions {
         _f.getMainInstance().getRoot().clearCaches();
 
         logger.info(codeTimer.logLine("Creating FormDef from parsed XML"));
+    }
+
+    private String parseInstanceSrc(Element instance, String lastSavedSrc) {
+        String rawSrc = instance.getAttributeValue(null, "src");
+
+        if (rawSrc == null) {
+            // It's internal, so src is null.
+            return null;
+        } else if (rawSrc.toLowerCase().startsWith("jr://file")) { // file or file-csv
+            return rawSrc;
+        } else if (rawSrc.toLowerCase().startsWith("jr://instance/last-saved")) {
+            return lastSavedSrc;
+        } else {
+            logger.warn("Invalid instance `src`: " + rawSrc);
+            return null;
+        }
     }
 
     private final Set<String> validElementNames = unmodifiableSet(new HashSet<>(asList(
