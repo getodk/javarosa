@@ -249,7 +249,7 @@ public class DateUtils {
             int value = Math.abs(offset) / 1000 / 60;
 
             String hrs = intPad(value / 60, 2);
-            String mins = value % 60 != 0 ? ":" + intPad(value % 60, 2) :"";
+            String mins = ":" + intPad(value % 60, 2);
 
             time += offsetSign + hrs + mins;
         }
