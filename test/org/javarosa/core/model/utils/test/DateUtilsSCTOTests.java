@@ -43,7 +43,7 @@ public class DateUtilsSCTOTests {
         Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
         String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
 
-        assertEquals("2014-10-04T23:03:05.244+0200", str);
+        assertEquals("2014-10-04T23:03:05.244+02:00", str);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class DateUtilsSCTOTests {
         Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
         String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
 
-        assertEquals("2014-10-05T00:03:05.244+0300", str);
+        assertEquals("2014-10-05T00:03:05.244+03:00", str);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class DateUtilsSCTOTests {
 
         String formatted = DateUtils.formatTime(date, DateUtils.FORMAT_ISO8601);
 
-        assertEquals("11:03:05.011+0200", formatted);
+        assertEquals("11:03:05.011+02:00", formatted);
     }
 
     @Test
