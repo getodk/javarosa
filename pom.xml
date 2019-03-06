@@ -115,8 +115,10 @@
             <goals>
               <goal>jar</goal>
             </goals>
-            <!-- Turn off doclint in JDK 8 because it errors instead of warns -->
             <configuration>
+              <!-- Fix for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+              <source>8</source>
+              <!-- Turn off doclint in JDK 8 because it errors instead of warns -->
               <additionalparam>-Xdoclint:none</additionalparam>
             </configuration>
           </execution>
