@@ -525,13 +525,14 @@ public class XFormParser implements IXFormParserFunctions {
 
     private String parseInstanceSrc(Element instance, String lastSavedSrc) {
         String rawSrc = instance.getAttributeValue(null, "src");
+        String rawSrcLower = rawSrc == null ? null : rawSrc.toLowerCase();
 
         if (rawSrc == null) {
             // It's internal, so src is null.
             return null;
-        } else if (rawSrc.toLowerCase().startsWith("jr://file")) { // file or file-csv
+        } else if (rawSrcLower.startsWith("jr://file/") || rawSrcLower.startsWith("jr://file-csv/")) {
             return rawSrc;
-        } else if (rawSrc.toLowerCase().startsWith("jr://instance/last-saved")) {
+        } else if (rawSrcLower.startsWith("jr://instance/last-saved")) {
             return lastSavedSrc;
         } else {
             logger.warn("Invalid instance `src`: " + rawSrc);
