@@ -532,7 +532,7 @@ public class XFormParser implements IXFormParserFunctions {
             return null;
         } else if (rawSrcLower.startsWith("jr://file/") || rawSrcLower.startsWith("jr://file-csv/")) {
             return rawSrc;
-        } else if (rawSrcLower.startsWith("jr://instance/last-saved")) {
+        } else if (rawSrcLower.equals("jr://instance/last-saved")) {
             return lastSavedSrc;
         } else {
             logger.warn("Invalid instance `src`: " + rawSrc);
