@@ -18,6 +18,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
@@ -130,6 +131,28 @@ public class XFormParserTest {
         Path formName = r("last-saved-blank.xml");
         FormDef formDef = parse(formName, null);
         assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
+
+        DataInstance lastSaved = formDef.getNonMainInstance("last-saved");
+        AbstractTreeElement root = lastSaved.getRoot();
+        assertEquals(0, root.getNumChildren());
+    }
+
+    @Test public void parsesLastSavedInstanceWithFilledForm() throws IOException {
+        Path formName = r("last-saved-blank.xml");
+        Path lastSavedSubmissionDirectory = r("last-saved-filled.xml").toAbsolutePath().getParent();
+        ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", lastSavedSubmissionDirectory);
+        FormDef formDef = parse(formName, "jr://file/last-saved-filled.xml");
+        assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
+
+        DataInstance lastSaved = formDef.getNonMainInstance("last-saved");
+        AbstractTreeElement root = lastSaved.getRoot();
+        AbstractTreeElement item = root
+            .getChild("head", 0)
+            .getChild("model", 0)
+            .getChild("instance", 0)
+            .getChild("data", 0)
+            .getChild("item", 0);
+        assertEquals("Foo", item.getValue().getDisplayText());
     }
 
     @Test public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {

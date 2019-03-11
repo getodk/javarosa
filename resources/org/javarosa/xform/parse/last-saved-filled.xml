@@ -1,0 +1,22 @@
+<h:html
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/2002/xforms">
+
+    <h:head>
+        <h:title>Form with last-saved instance (filled)</h:title>
+        <model>
+            <instance>
+                <data>
+                    <item>Foo</item>
+                </data>
+            </instance>
+            <instance id="last-saved" src="jr://instance/last-saved"/>
+            <bind nodeset="/data/item" type="string"/>
+            <setvalue event="xforms-ready" ref="/data/item" value="instance('last-saved')/data/item"/>
+        </model>
+    </h:head>
+
+    <h:body>
+    </h:body>
+
+</h:html>
