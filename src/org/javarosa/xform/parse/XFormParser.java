@@ -349,6 +349,16 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public FormDef parse() throws IOException {
+        return parse(null);
+    }
+
+    /**
+     * @see #parse()
+     *
+     * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
+     *                     no data will be loaded and the instance will be blank.
+     */
+    public FormDef parse(String lastSavedSrc) throws IOException {
         if (_f == null) {
             logger.info("Parsing form...");
 
@@ -356,7 +366,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()));
+            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -439,7 +449,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(Map<String, String> namespacePrefixesByUri) {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
 
@@ -459,9 +469,9 @@ public class XFormParser implements IXFormParserFunctions {
             for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
                 final Element instance = instanceNodes.get(instanceIndex);
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
-                final String instanceSrc = instance.getAttributeValue(null, "src");
+                final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file")) { // file or file-csv
+                if (instanceSrc != null) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
@@ -511,6 +521,23 @@ public class XFormParser implements IXFormParserFunctions {
         _f.getMainInstance().getRoot().clearCaches();
 
         logger.info(codeTimer.logLine("Creating FormDef from parsed XML"));
+    }
+
+    private String parseInstanceSrc(Element instance, String lastSavedSrc) {
+        String rawSrc = instance.getAttributeValue(null, "src");
+        String rawSrcLower = rawSrc == null ? null : rawSrc.toLowerCase();
+
+        if (rawSrc == null) {
+            // It's internal, so src is null.
+            return null;
+        } else if (rawSrcLower.startsWith("jr://file/") || rawSrcLower.startsWith("jr://file-csv/")) {
+            return rawSrc;
+        } else if (rawSrcLower.equals("jr://instance/last-saved")) {
+            return lastSavedSrc;
+        } else {
+            logger.warn("Invalid instance `src`: " + rawSrc);
+            return null;
+        }
     }
 
     private final Set<String> validElementNames = unmodifiableSet(new HashSet<>(asList(

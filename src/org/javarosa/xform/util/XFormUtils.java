@@ -75,6 +75,16 @@ public class XFormUtils {
      * @throws XFormParseException if the form can’t be parsed
      */
     public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException {
+        return getFormFromInputStream(is, null);
+    }
+
+    /**
+     * @see #getFormFromInputStream(InputStream)
+     *
+     * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
+     *                     no data will be loaded and the instance will be blank.
+     */
+    public static FormDef getFormFromInputStream(InputStream is, String lastSavedSrc) throws XFormParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -84,7 +94,7 @@ public class XFormUtils {
             }
 
             XFormParser xFormParser = _factory.getXFormParser(isr);
-            return xFormParser.parse();
+            return xFormParser.parse(lastSavedSrc);
         } catch(IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
