@@ -27,6 +27,7 @@ public class CoreModelModule implements IModule {
             "org.javarosa.core.model.SubmissionProfile",
             "org.javarosa.core.model.FormDef",
             "org.javarosa.core.model.QuestionDef",
+            "org.javarosa.core.model.RangeQuestion",
             "org.javarosa.core.model.GroupDef",
             "org.javarosa.core.model.instance.FormInstance",
             "org.javarosa.core.model.instance.ExternalDataInstance",

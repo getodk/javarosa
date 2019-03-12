@@ -78,7 +78,7 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 
             //find wrapper indicated by code
             ExternalizableWrapper type = null;
-      for (Object key : WRAPPER_CODES.keySet()) {
+            for (Object key : WRAPPER_CODES.keySet()) {
                 Class t = (Class)key;
                 if (WRAPPER_CODES.get(t) == wrapperCode) {
                     try {

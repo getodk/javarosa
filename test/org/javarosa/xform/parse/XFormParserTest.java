@@ -231,6 +231,14 @@ public class XFormParserTest {
         serAndDeserializeForm(r("Simpler_Cascading_Select_Form.xml"));
     }
 
+    /**
+     * ensure serializing and deserializing a range form is done without errors
+     * see https://github.com/opendatakit/javarosa/issues/245 why this is needed
+     */
+    @Test public void rangeFormSavesAndRestores() throws IOException, DeserializationException {
+        serAndDeserializeForm(r("range-form.xml"));
+    }
+
     @Test public void externalSecondaryInstanceFormSavesAndRestores() throws IOException, DeserializationException {
         Path formPath = EXTERNAL_SECONDARY_INSTANCE_XML;
         mapFileToResourcePath(formPath);
