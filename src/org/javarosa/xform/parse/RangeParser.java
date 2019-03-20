@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** Features for parsing the range element */
-class RangeParser {
+public class RangeParser {
     static void populateQuestionWithRangeAttributes(RangeQuestion question, Element e) {
         final Set<String> rangeAttributeNames = Collections.unmodifiableSet(
                 new HashSet<>(Arrays.asList("start", "end", "step")));
@@ -43,7 +43,7 @@ class RangeParser {
         }
     }
 
-    private static BigDecimal getDecimalValue(String s) {
+    public static BigDecimal getDecimalValue(String s) {
         try {
             return new BigDecimal(s);
         } catch (NumberFormatException nfe) {
