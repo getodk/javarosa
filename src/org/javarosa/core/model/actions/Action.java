@@ -20,11 +20,23 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public abstract class Action implements Externalizable {
     // Events that can trigger an action
+
+    /**
+     * Dispatched the first time a form instance is loaded.
+     */
+    public static final String EVENT_ODK_INSTANCE_FIRST_LOAD = "odk-instance-first-load";
+
+    /**
+     * @deprecated because as W3C XForms defines it, it should be dispatched any time the XForms engine is ready. In
+     * JavaRosa, it was dispatched only on first load of a form instance. Use
+     * {@link #EVENT_ODK_INSTANCE_FIRST_LOAD} instead.
+     */
+    @Deprecated
     public static final String EVENT_XFORMS_READY = "xforms-ready";
     public static final String EVENT_XFORMS_REVALIDATE = "xforms-revalidate";
     public static final String EVENT_JR_INSERT = "jr-insert";
     public static final String EVENT_QUESTION_VALUE_CHANGED = "xforms-value-changed";
-    private static final String[] allEvents = new String[]{EVENT_JR_INSERT,
+    private static final String[] allEvents = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_JR_INSERT,
                         EVENT_QUESTION_VALUE_CHANGED, EVENT_XFORMS_READY, EVENT_XFORMS_REVALIDATE};
 
     private String name;
