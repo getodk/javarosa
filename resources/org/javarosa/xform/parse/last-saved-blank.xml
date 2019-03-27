@@ -12,7 +12,7 @@
             </instance>
             <instance id="last-saved" src="jr://instance/last-saved"/>
             <bind nodeset="/data/item" type="string"/>
-            <setvalue event="xforms-ready" ref="/data/item" value="instance('last-saved')/data/item"/>
+            <setvalue event="odk-instance-first-load" ref="/data/item" value="instance('last-saved')/data/item"/>
         </model>
     </h:head>
 

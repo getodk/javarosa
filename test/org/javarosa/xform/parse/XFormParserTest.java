@@ -428,13 +428,13 @@ public class XFormParserTest {
         // Given & When
         FormDef formDef = parse(r("form-with-setvalue-action.xml"));
 
-        // dispatch 'xforms-ready' action (Action.EVENT_XFORMS_READY)
+        // dispatch 'odk-instance-first-load' event (Action.EVENT_ODK_INSTANCE_FIRST_LOAD)
         formDef.initialize(true, new InstanceInitializationFactory());
 
         // Then
         assertEquals(formDef.getTitle(), "SetValue action");
         assertNoParseErrors(formDef);
-        assertEquals(1, formDef.getActionController().getListenersForEvent(Action.EVENT_XFORMS_READY).size());
+        assertEquals(1, formDef.getActionController().getListenersForEvent(Action.EVENT_ODK_INSTANCE_FIRST_LOAD).size());
 
         TreeElement textNode =
                 formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);

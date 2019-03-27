@@ -9,7 +9,7 @@
                 </data>
             </instance>
             <bind id="text-data-binding" nodeset="/data/text" type="string"/>
-            <setvalue bind="text-data-binding" event="xforms-ready" >Test Value</setvalue>
+            <setvalue bind="text-data-binding" event="odk-instance-first-load" >Test Value</setvalue>
         </model>
     </h:head>
     <h:body />
