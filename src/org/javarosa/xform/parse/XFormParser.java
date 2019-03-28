@@ -471,7 +471,7 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                if (instanceSrc != null) {
+                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file/")) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
