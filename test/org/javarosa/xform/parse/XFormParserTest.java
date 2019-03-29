@@ -29,6 +29,7 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kxml2.kdom.Element;
 
@@ -180,6 +181,7 @@ public class XFormParserTest {
         assertEquals("external select 10", formDef.getTitle());
     }
 
+    @Ignore("See https://github.com/opendatakit/javarosa/pull/416")
     @Test public void parsesExternalSecondaryInstanceCsvForm() throws IOException {
         Path formName = r("external-select-csv.xml");
         mapFileToResourcePath(formName);
