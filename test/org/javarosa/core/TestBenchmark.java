@@ -1,26 +1,22 @@
 package org.javarosa.core;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.xform.parse.IXFormParserFactory;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.FormParserHelper;
 import org.javarosa.xform.parse.XFormParser;
-import org.javarosa.xform.parse.XFormParserFactory;
+import org.javarosa.xml.util.InvalidStructureException;
+import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -36,8 +32,10 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlpull.v1.XmlPullParserException;
 
 
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.fail;
 
@@ -52,17 +50,17 @@ public class TestBenchmark {
             .include(this.getClass().getName() + ".*")
             // Set the following options as needed
             .mode(Mode.AverageTime)
-            .timeUnit(TimeUnit.MICROSECONDS)
-            .warmupTime(TimeValue.seconds(1))
-            .warmupIterations(2)
+            .timeUnit(TimeUnit.SECONDS)
+            .warmupTime(TimeValue.seconds(5))
+            .warmupIterations(0)
             .measurementTime(TimeValue.seconds(1))
-            .measurementIterations(2)
-            .threads(2)
-            .measurementIterations(5)
+            .threads(1)
+            .measurementIterations(10)
             .forks(1)
             .shouldFailOnError(true)
             .shouldDoGC(true)
             //.jvmArgs("-XX:+UnlockDiagnosticVMOptions", "-XX:+PrintInlining")
+            .jvmArgs("-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-XX:MaxRAMFraction=10")
             //.addProfiler(WinPerfAsmProfiler.class)
             .build();
 
@@ -70,72 +68,131 @@ public class TestBenchmark {
         //run.
     }
 
+
     // The JMH samples are the best documentation for how to use it
     // http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org/openjdk/jmh/samples/
     @State(Scope.Thread)
     public static class BenchmarkState {
-        List<Integer> list;
+        private TreeElement dataRootNode;
+        private TreeElement savedRoot;
+        private FormDef formDef;
 
         @Setup(Level.Trial)
         public void
         initialize() {
 
-            Random rand = new Random();
+            FormParseInit formParseInit = new FormParseInit(r("nigeria_wards_external_combined.xml"));
 
-            list = new ArrayList<>();
-            for (int i = 0; i < 1000; i++)
-                list.add(rand.nextInt());
+            FormEntryController formEntryController = formParseInit.getFormEntryController();
+
+            byte[] formInstanceAsBytes = null;
+            try {
+                formInstanceAsBytes = Files.readAllBytes(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "populate-nodes-attributes-instance.xml"));
+            } catch (IOException e) {
+                fail("There was a problem with reading the test data.\n" + e.getMessage());
+            }
+            savedRoot = XFormParser.restoreDataModel(formInstanceAsBytes, null).getRoot();
+            formDef = formEntryController.getModel().getForm();
+            dataRootNode = formDef.getInstance().getRoot().deepCopy(true);
         }
     }
 
-    @Benchmark
-    public void
-    benchmark1(BenchmarkState state, Blackhole bh) {
+    @State(Scope.Thread)
+    public static class ParseWithExternalInstanceState {
+        Path resourcePath = PathConst.getTestResourcePath().toPath();
 
-        List<Integer> list = state.list;
+        Path xFormFilePath = r("nigeria_wards_external.xml");
+        FormDef formDef;
+        @Setup(Level.Trial)
+        public void
+        initialize() {
+            Path resourcePath = PathConst.getTestResourcePath().toPath();
+            ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
 
-        for (int i = 0; i < 1000; i++)
-            bh.consume(list.get(i));
+
+        }
     }
 
+
+    @State(Scope.Thread)
+    public static class ParseWithInternalInstanceState {
+        Path resourcePath = PathConst.getTestResourcePath().toPath();
+
+        Path xFormFilePath = r("nigeria_wards_external_combined.xml");
+        FormDef formDef;
+        @Setup(Level.Trial)
+        public void
+        initialize() {
+            Path resourcePath = PathConst.getTestResourcePath().toPath();
+            ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
+
+
+        }
+    }
+
+    @State(Scope.Thread)
+    public static class ExternalDataInstanceState {
+        ExternalDataInstance externalDataInstance = null;
+
+        @Setup(Level.Trial)
+        public void
+        initialize() {
+            Path resourcePath = PathConst.getTestResourcePath().toPath();
+            ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
+
+
+        }
+    }
+
+
     @Benchmark
     public void
-    benchmark2(BenchmarkState state, Blackhole bh) {
-        bh.consume(Benchmarks.benchMark2());
+    benchmarkPopulateRootNode(BenchmarkState state, Blackhole bh) {
+        state.dataRootNode.populate(state.savedRoot, state.formDef);
 
   }
 
     @Benchmark
     public void
-    benchmark3(BenchmarkState state, Blackhole bh) {
-         Benchmarks.benchMark2();
-
-//        String fileName = "populate-nodes-attributes-instance.xml";
-//        Path filePath = r(fileName);
-//        InputStreamReader isr = null;
-//
-//        InputStream is =  Benchmarks.getFileInputStream(filePath.toAbsolutePath().toString());
-//        try {
-//            try {
-//                isr = new InputStreamReader(is, "UTF-8");
-//            } catch (UnsupportedEncodingException uee) {
-//                throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
-//            }
-//
-//            XFormParser xFormParser = Benchmarks.getXFormParserFactory().getXFormParser(isr);
-//            bh.consume(xFormParser.parse("");
-//        } catch(IOException e) {
-//
-//            e.printStackTrace();
-//            throw new XFormParseException("IO Exception during parse! " + e.getMessage());
-//        } finally {
-//            try {
-//                if (isr != null) {
-//                    isr.close();
-//                }
-//            } catch (IOException e) {
-//                logger.error("IO Exception while closing stream.", e);
-//            }
-//        }
+    benchmarkParseXFormWithExternalInstances(ParseWithExternalInstanceState state, Blackhole bh) {
+        try {
+            bh.consume(FormParserHelper.parse(state.xFormFilePath));
+        } catch (IOException e) {
+            fail("There was a problem with reading the test data.\n" + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
+
+    @Benchmark
+    public void
+    benchmarkParseXFormWithInternalInstances(ParseWithInternalInstanceState state, Blackhole bh) {
+        try {
+            bh.consume(FormParserHelper.parse(state.xFormFilePath));
+        } catch (IOException e) {
+            fail("There was a problem with reading the test data.\n" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Benchmark
+    public void
+    benchmarkParseExternalInstances(ExternalDataInstanceState state, Blackhole bh) {
+        try {
+            bh.consume(ExternalDataInstance.build("jr://file/wards.xml", "wards"));
+        } catch (IOException e) {
+            fail("There was a problem with reading the test data.\n" + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (InvalidReferenceException e) {
+            e.printStackTrace();
+        } catch (UnfullfilledRequirementsException e) {
+            e.printStackTrace();
+        } catch (InvalidStructureException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
