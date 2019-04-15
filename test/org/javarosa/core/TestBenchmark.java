@@ -11,6 +11,7 @@ import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.FormParserHelper;
@@ -99,33 +100,28 @@ public class TestBenchmark {
 
     @State(Scope.Thread)
     public static class ParseWithExternalInstanceState {
-        Path resourcePath = PathConst.getTestResourcePath().toPath();
-
         Path xFormFilePath = r("nigeria_wards_external.xml");
+        Path resourcePath = xFormFilePath.getParent();
         FormDef formDef;
         @Setup(Level.Trial)
         public void
         initialize() {
             Path resourcePath = PathConst.getTestResourcePath().toPath();
-            ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
-
-
+            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", resourcePath);
         }
     }
 
 
     @State(Scope.Thread)
     public static class ParseWithInternalInstanceState {
-        Path resourcePath = PathConst.getTestResourcePath().toPath();
-
         Path xFormFilePath = r("nigeria_wards_external_combined.xml");
+        Path resourcePath = xFormFilePath.getParent();
         FormDef formDef;
         @Setup(Level.Trial)
         public void
         initialize() {
             Path resourcePath = PathConst.getTestResourcePath().toPath();
-            ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
-
+            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", resourcePath);
 
         }
     }
@@ -138,8 +134,7 @@ public class TestBenchmark {
         public void
         initialize() {
             Path resourcePath = PathConst.getTestResourcePath().toPath();
-            ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
-
+            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", resourcePath);
 
         }
     }
