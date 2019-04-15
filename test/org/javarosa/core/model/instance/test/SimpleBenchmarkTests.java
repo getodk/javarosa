@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class BenchmarkTreeElementTests {
+public class SimpleBenchmarkTests {
 
 //    @Test
 //    public void testPopulate_withNodesAttributes() {

@@ -75,6 +75,4 @@ public class TreeElementTests {
         assertEquals("xyz3", customAttr2.getAttributeValue());
     }
 
-
-
 }

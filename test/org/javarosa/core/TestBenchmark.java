@@ -52,15 +52,15 @@ public class TestBenchmark {
             .mode(Mode.AverageTime)
             .timeUnit(TimeUnit.SECONDS)
             .warmupTime(TimeValue.seconds(5))
-            .warmupIterations(0)
+            .warmupIterations(5)
             .measurementTime(TimeValue.seconds(1))
             .threads(1)
-            .measurementIterations(10)
+            .measurementIterations(5)
             .forks(1)
             .shouldFailOnError(true)
             .shouldDoGC(true)
             //.jvmArgs("-XX:+UnlockDiagnosticVMOptions", "-XX:+PrintInlining")
-            .jvmArgs("-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-XX:MaxRAMFraction=10")
+            //.jvmArgs("-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-XX:MaxRAMFraction=10")
             //.addProfiler(WinPerfAsmProfiler.class)
             .build();
 
