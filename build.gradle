@@ -57,6 +57,7 @@ jacocoTestReport {
 // Required to use fileExtensions property in checkstyle file
 checkstyle {
     toolVersion = '7.6.1'
+    sourceSets = []
 }
 
 jar {
