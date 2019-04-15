@@ -142,51 +142,33 @@ public class TestBenchmark {
 
     @Benchmark
     public void
-    benchmarkPopulateRootNode(BenchmarkState state, Blackhole bh) {
+    benchmarkPopulateRootNode(BenchmarkState state, Blackhole bh) throws IOException {
         state.dataRootNode.populate(state.savedRoot, state.formDef);
 
   }
 
     @Benchmark
     public void
-    benchmarkParseXFormWithExternalInstances(ParseWithExternalInstanceState state, Blackhole bh) {
-        try {
-            bh.consume(FormParserHelper.parse(state.xFormFilePath));
-        } catch (IOException e) {
-            fail("There was a problem with reading the test data.\n" + e.getMessage());
-            throw new RuntimeException(e);
-        }
+    benchmarkParseXFormWithExternalInstances(ParseWithExternalInstanceState state, Blackhole bh) throws IOException {
+        bh.consume(FormParserHelper.parse(state.xFormFilePath));
+
     }
 
     @Benchmark
     public void
-    benchmarkParseXFormWithInternalInstances(ParseWithInternalInstanceState state, Blackhole bh) {
-        try {
-            bh.consume(FormParserHelper.parse(state.xFormFilePath));
-        } catch (IOException e) {
-            fail("There was a problem with reading the test data.\n" + e.getMessage());
-            throw new RuntimeException(e);
-        }
+    benchmarkParseXFormWithInternalInstances(ParseWithInternalInstanceState state, Blackhole bh) throws IOException {
+        bh.consume(FormParserHelper.parse(state.xFormFilePath));
     }
 
 
     @Benchmark
     public void
-    benchmarkParseExternalInstances(ExternalDataInstanceState state, Blackhole bh) {
-        try {
-            bh.consume(ExternalDataInstance.build("jr://file/wards.xml", "wards"));
-        } catch (IOException e) {
-            fail("There was a problem with reading the test data.\n" + e.getMessage());
-            throw new RuntimeException(e);
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (InvalidReferenceException e) {
-            e.printStackTrace();
-        } catch (UnfullfilledRequirementsException e) {
-            e.printStackTrace();
-        } catch (InvalidStructureException e) {
-            e.printStackTrace();
-        }
+    benchmarkParseExternalInstances(ExternalDataInstanceState state, Blackhole bh)
+        throws IOException, XmlPullParserException, InvalidReferenceException,
+        UnfullfilledRequirementsException, InvalidStructureException{
+
+        bh.consume(ExternalDataInstance.build("jr://file/wards.xml", "wards"));
+
     }
 
 
