@@ -1,7 +1,7 @@
 package org.javarosa.core.model.instance.test;
 
 
-import org.javarosa.core.PathConst;
+import org.javarosa.core.util.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;

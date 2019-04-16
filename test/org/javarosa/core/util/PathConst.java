@@ -1,4 +1,4 @@
-package org.javarosa.core;
+package org.javarosa.core.util;
 
 import java.io.File;
 
