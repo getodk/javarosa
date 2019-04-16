@@ -14,6 +14,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
+import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class PopulateTreeNodeBenchmark {
@@ -32,6 +34,7 @@ public class PopulateTreeNodeBenchmark {
     public void
     launchBenchmark() throws Exception {
         RunResult run = new Runner(BenchmarkUtils.getJVMOptions(this.getClass().getName())).run().iterator().next();
+        assertNotNull(run);
     }
 
     @Benchmark
