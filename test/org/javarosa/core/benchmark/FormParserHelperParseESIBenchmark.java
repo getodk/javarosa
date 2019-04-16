@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
+import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertNotNull;
 
 public class FormParserHelperParseESIBenchmark {
     private static final Logger logger = LoggerFactory.getLogger(FormParserHelperParseESIBenchmark.class);
@@ -28,6 +30,7 @@ public class FormParserHelperParseESIBenchmark {
     public void
     launchBenchmark() throws Exception {
         RunResult run = new Runner(BenchmarkUtils.getJVMOptions(this.getClass().getName())).run().iterator().next();
+        assertNotNull(run);
     }
     @State(Scope.Thread)
     public static class FormParserHelperParseExternalSecondaryInstanceState {

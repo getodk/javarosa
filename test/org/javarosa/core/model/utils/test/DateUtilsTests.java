@@ -239,7 +239,7 @@ public class DateUtilsTests {
     //   when bound to a date, which is not the case
     // - We're effectively binding all times to the EPOCH date
     //   (1970-01-01, UTC), which has no DST
-    public void testParseTime_with_DST() {
+    public void testParseTime_with_DST() {// testFormatting
         Locale.setDefault(Locale.US);
 
         // this is a timezone that operates DST every day of the year!
