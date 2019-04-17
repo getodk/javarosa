@@ -14,16 +14,13 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
-public class FormParserHelperParseESIBenchmark {
-    private static final Logger logger = LoggerFactory.getLogger(FormParserHelperParseESIBenchmark.class);
+public class FormDefValidateBenchmark {
 
     @Test
     public void
@@ -35,24 +32,23 @@ public class FormParserHelperParseESIBenchmark {
 
         }
     }
+
     @State(Scope.Thread)
-    public static class FormParserHelperParseExternalSecondaryInstanceState {
-        Path xFormFilePath = r("nigeria_wards_external.xml");
-        Path resourcePath = xFormFilePath.getParent();
-        FormDef formDef;
+    public static class FormDefValidateState {
+        FormDef formDef = null;
         @Setup(Level.Trial)
         public void
-        initialize() {
-            Path resourcePath = PathConst.getTestResourcePath().toPath();
-            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", resourcePath);
+        initialize() throws IOException {
+            Path resourcePath = r("nigeria_wards_external_combined.xml");
+            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", PathConst.getTestResourcePath().toPath());
+            formDef = FormParserHelper.parse(resourcePath);
         }
     }
 
     @Benchmark
     public void
-    benchmark_FormParserHelper_parse_external_secondary_instance(FormParserHelperParseExternalSecondaryInstanceState state, Blackhole bh) throws IOException {
-        bh.consume(FormParserHelper.parse(state.xFormFilePath));
+    benchmark_FormDefValidate_validate(FormDefValidateState state, Blackhole bh) {
+        bh.consume(state.formDef.validate(true));
     }
-
 
 }

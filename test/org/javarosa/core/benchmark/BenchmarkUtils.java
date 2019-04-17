@@ -1,9 +1,16 @@
 package org.javarosa.core.benchmark;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.LongData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.PathConst;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParser;
@@ -13,6 +20,8 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -94,6 +103,60 @@ public class BenchmarkUtils {
             .build();
 
         return opt;
+    }
+
+
+    public static IAnswerData getStubAnswer(QuestionDef questionDef) {
+        switch (questionDef.getControlType()){
+            case Constants.CONTROL_INPUT:
+                return new LongData(2);
+//            case Constants.CONTROL_SELECT_ONE:
+//                Selection selection = new Selection(1);
+//                selection.attachChoice(questionDef);
+//                return new SelectOneData(selection);
+            default:
+                return  new IAnswerData() {
+                    @Override
+                    public void setValue(Object o) {}
+
+                    @Override
+                    public Object getValue() {
+                        return "Auto Generated Answer";
+                    }
+
+                    @Override
+                    public String getDisplayText() {
+                        return getValue().toString();
+                    }
+
+                    @Override
+                    public IAnswerData clone() {
+                        return this;
+                    }
+
+                    @Override
+                    public UncastData uncast() {
+                        return null;
+                    }
+
+                    @Override
+                    public IAnswerData cast(UncastData data) throws IllegalArgumentException {
+                        return null;
+                    }
+
+                    @Override
+                    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+
+                    }
+
+                    @Override
+                    public void writeExternal(DataOutputStream out) throws IOException {
+                        out.writeBytes(getValue().toString());
+                    }
+                };
+
+
+        }
     }
 
 }
