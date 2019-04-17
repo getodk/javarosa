@@ -16,6 +16,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +28,13 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.fail;
 
 public class PopulateTreeNodeBenchmark {
-    private static final Logger logger = LoggerFactory.getLogger(FormParserHelperParseESIBenchmark.class);
 
     @Test
     public void
-    launchBenchmark() throws Exception {
+    launchBenchmark() throws RunnerException {
+        /**
+         * JMH tests throw this Exception when run with gradle build
+         */
         try{
             RunResult run = new Runner(BenchmarkUtils.getJVMOptions(this.getClass().getName())).run().iterator().next();
 

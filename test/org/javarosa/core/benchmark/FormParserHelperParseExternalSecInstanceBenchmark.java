@@ -14,16 +14,13 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
-public class FormParserHelperParseISIBenchmark {
-    private static final Logger logger = LoggerFactory.getLogger(FormParserHelperParseISIBenchmark.class);
+public class FormParserHelperParseExternalSecInstanceBenchmark {
 
     @Test
     public void
@@ -35,13 +32,10 @@ public class FormParserHelperParseISIBenchmark {
 
         }
     }
-
-
     @State(Scope.Thread)
-    public static class FormParserHelperParseInternalSecondaryInstanceState {
-        Path xFormFilePath = r("nigeria_wards_external_combined.xml");
+    public static class FormParserHelperParseExternalSecondaryInstanceState {
+        Path xFormFilePath = r("nigeria_wards_external.xml");
         Path resourcePath = xFormFilePath.getParent();
-        FormDef formDef;
         @Setup(Level.Trial)
         public void
         initialize() {
@@ -52,8 +46,9 @@ public class FormParserHelperParseISIBenchmark {
 
     @Benchmark
     public void
-    benchmark_FormParserHelper_parse_internal_secondary_instance(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
+    benchmark_FormParserHelper_parse_external_secondary_instance(FormParserHelperParseExternalSecondaryInstanceState state, Blackhole bh) throws IOException {
         bh.consume(FormParserHelper.parse(state.xFormFilePath));
     }
+
 
 }

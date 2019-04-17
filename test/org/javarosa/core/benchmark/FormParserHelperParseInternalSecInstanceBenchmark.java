@@ -1,11 +1,9 @@
 package org.javarosa.core.benchmark;
 
-import org.javarosa.core.model.instance.ExternalDataInstance;
-import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.util.PathConst;
-import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
+import org.javarosa.xform.parse.FormParserHelper;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -16,12 +14,13 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class ExternalDataInstanceBuildBenchmark {
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+
+public class FormParserHelperParseInternalSecInstanceBenchmark {
 
     @Test
     public void
@@ -34,10 +33,12 @@ public class ExternalDataInstanceBuildBenchmark {
         }
     }
 
-    @State(Scope.Thread)
-    public static class ExternalDataInstanceState {
-        ExternalDataInstance externalDataInstance = null;
 
+    @State(Scope.Thread)
+    public static class FormParserHelperParseInternalSecondaryInstanceState {
+        Path xFormFilePath = r("nigeria_wards_external_combined.xml");
+        Path resourcePath = xFormFilePath.getParent();
+        FormDef formDef;
         @Setup(Level.Trial)
         public void
         initialize() {
@@ -48,10 +49,8 @@ public class ExternalDataInstanceBuildBenchmark {
 
     @Benchmark
     public void
-    benchmark_ExternalDataInstance_build(ExternalDataInstanceState state, Blackhole bh)
-        throws IOException, XmlPullParserException, InvalidReferenceException,
-        UnfullfilledRequirementsException, InvalidStructureException {
-        bh.consume(ExternalDataInstance.build("jr://file/wards.xml", "wards"));
+    benchmark_FormParserHelper_parse_internal_secondary_instance(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
+        bh.consume(FormParserHelper.parse(state.xFormFilePath));
     }
 
 }
