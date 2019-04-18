@@ -95,8 +95,8 @@ public class BenchmarkUtils {
             .warmupTime(TimeValue.seconds(5))
             .warmupIterations(1)
             .measurementTime(TimeValue.seconds(1))
-            .threads(2)
-            .measurementIterations(1)
+            .threads(1)
+            .measurementIterations(5)
             .forks(1)
             .shouldFailOnError(true)
             .shouldDoGC(true)
@@ -113,13 +113,13 @@ public class BenchmarkUtils {
         IAnswerData answer;
         switch (question.getLabelInnerText()){
             case "State":
-                answer = new SelectOneData(new Selection(question.getChoices().get(0)));
+                answer = new SelectOneData(new Selection(question.getChoices().get(0)));//Abia
                 break;
             case "LGA":
-                answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));
+                answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));//Aba North
                 break;
             case "Ward":
-                answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));
+                answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));//Ariaria
                 break;
             case "Comments":
                 answer = new StringData("No Comment");
