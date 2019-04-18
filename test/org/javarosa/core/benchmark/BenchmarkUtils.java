@@ -5,7 +5,10 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.LongData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.UncastData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.PathConst;
@@ -90,10 +93,10 @@ public class BenchmarkUtils {
             .mode(Mode.AverageTime)
             .timeUnit(TimeUnit.SECONDS)
             .warmupTime(TimeValue.seconds(5))
-            .warmupIterations(5)
+            .warmupIterations(1)
             .measurementTime(TimeValue.seconds(1))
-            .threads(1)
-            .measurementIterations(5)
+            .threads(2)
+            .measurementIterations(1)
             .forks(1)
             .shouldFailOnError(true)
             .shouldDoGC(true)
@@ -106,57 +109,29 @@ public class BenchmarkUtils {
     }
 
 
-    public static IAnswerData getStubAnswer(QuestionDef questionDef) {
-        switch (questionDef.getControlType()){
-            case Constants.CONTROL_INPUT:
-                return new LongData(2);
-//            case Constants.CONTROL_SELECT_ONE:
-//                Selection selection = new Selection(1);
-//                selection.attachChoice(questionDef);
-//                return new SelectOneData(selection);
+    public static IAnswerData getStubAnswer(QuestionDef question) {
+        IAnswerData answer;
+        switch (question.getLabelInnerText()){
+            case "State":
+                answer = new SelectOneData(new Selection(question.getChoices().get(0)));
+                break;
+            case "LGA":
+                answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));
+                break;
+            case "Ward":
+                answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));
+                break;
+            case "Comments":
+                answer = new StringData("No Comment");
+                break;
+            case "What population do you want to search for?":
+                answer = new LongData(699967);
+                break;
             default:
-                return  new IAnswerData() {
-                    @Override
-                    public void setValue(Object o) {}
-
-                    @Override
-                    public Object getValue() {
-                        return "Auto Generated Answer";
-                    }
-
-                    @Override
-                    public String getDisplayText() {
-                        return getValue().toString();
-                    }
-
-                    @Override
-                    public IAnswerData clone() {
-                        return this;
-                    }
-
-                    @Override
-                    public UncastData uncast() {
-                        return null;
-                    }
-
-                    @Override
-                    public IAnswerData cast(UncastData data) throws IllegalArgumentException {
-                        return null;
-                    }
-
-                    @Override
-                    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-
-                    }
-
-                    @Override
-                    public void writeExternal(DataOutputStream out) throws IOException {
-                        out.writeBytes(getValue().toString());
-                    }
-                };
-
+                answer = new LongData(0);
 
         }
+        return answer;
     }
 
 }

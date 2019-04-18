@@ -4,12 +4,16 @@ package org.javarosa.core.model.instance.test;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.util.PathConst;
@@ -34,6 +38,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
@@ -131,69 +136,44 @@ public class SimpleBenchmarkTests {
         while(formEntryModel.getFormIndex().isInForm()){
             FormIndex questionIndex = formEntryController.getModel().getFormIndex();
             FormEntryPrompt formEntryPrompt = formEntryModel.getQuestionPrompt(questionIndex);
-            IAnswerData answer = getStubAnswer(formEntryPrompt.getQuestion());
+
+            //Resolve DynamicChoices
+            QuestionDef question = formEntryModel.getQuestionPrompt(questionIndex).getQuestion();
+            ItemsetBinding itemsetBinding = question.getDynamicChoices();
+
+            if(itemsetBinding != null){
+                formDef.populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+            }
+
+            IAnswerData answer = null;
             answersMap.put(questionIndex, answer);
             formEntryController.answerQuestion(questionIndex, answer, true);
+
+            switch (question.getLabelInnerText()){
+                case "State":
+                    answer = new SelectOneData(new Selection(question.getChoices().get(0)));
+                    break;
+                case "LGA":
+                    answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));
+                    break;
+                case "Ward":
+                    answer = new SelectOneData(new Selection(question.getDynamicChoices().getChoices().get(0)));
+                    break;
+                case "Comments":
+                    answer = new StringData("No Comment");
+                    break;
+                case "What population do you want to search for?":
+                    answer = new LongData(699967);
+                    break;
+                default:
+                    answer = new LongData(0);
+
+            }
             formEntryController.saveAnswer(questionIndex, answer, true);
             formEntryController.stepToNextEvent();
         }
-
         assertNotNull(answersMap);
 
-    }
-
-
-    private IAnswerData getStubAnswer(QuestionDef questionDef) {
-        switch (questionDef.getControlType()){
-            case Constants.CONTROL_INPUT:
-                return new LongData(2);
-//            case Constants.CONTROL_SELECT_ONE:
-//                Selection selection = new Selection(1);
-//                selection.attachChoice(questionDef);
-//                return new SelectOneData(selection);
-                default:
-                    return  new IAnswerData() {
-                        @Override
-                        public void setValue(Object o) {}
-
-                        @Override
-                        public Object getValue() {
-                            return "Auto Generated Answer";
-                        }
-
-                        @Override
-                        public String getDisplayText() {
-                            return getValue().toString();
-                        }
-
-                        @Override
-                        public IAnswerData clone() {
-                            return this;
-                        }
-
-                        @Override
-                        public UncastData uncast() {
-                            return null;
-                        }
-
-                        @Override
-                        public IAnswerData cast(UncastData data) throws IllegalArgumentException {
-                            return null;
-                        }
-
-                        @Override
-                        public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-
-                        }
-
-                        @Override
-                        public void writeExternal(DataOutputStream out) throws IOException {
-                            out.writeBytes(getValue().toString());
-                        }
-                    };
-
-
-        }
     }
 
 

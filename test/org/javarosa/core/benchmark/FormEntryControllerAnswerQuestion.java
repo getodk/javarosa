@@ -2,9 +2,14 @@ package org.javarosa.core.benchmark;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.util.PathConst;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -22,7 +27,9 @@ import org.openjdk.jmh.runner.Runner;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
@@ -52,33 +59,56 @@ public class FormEntryControllerAnswerQuestion {
             formEntryModel = new FormEntryModel(formDef);
             HashMap<FormIndex, IAnswerData> answersMap = new HashMap<>();
             formEntryController = new FormEntryController(formEntryModel);
+
             formEntryController.stepToNextEvent();
-
-
+            while(formEntryModel.getFormIndex().isInForm()) {
+                FormIndex questionIndex = formEntryController.getModel().getFormIndex();
+                QuestionDef question = formEntryModel.getQuestionPrompt(questionIndex).getQuestion();
+                //Resolve DynamicChoices
+                ItemsetBinding itemsetBinding = question.getDynamicChoices();
+                if(itemsetBinding != null){
+                    formDef.populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+                }
+                formEntryController.stepToNextEvent();
+            }
+            formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
         }
-
     }
 
     @Benchmark
     public void
-    benchmark_FormDefValidate_answerAndSaveAll(FormControllerAnswerQuestionState state, Blackhole bh) {
+    benchmark_FormEntryController_answerAndSaveAll(FormControllerAnswerQuestionState state, Blackhole bh) {
+        state.formEntryController.stepToNextEvent();
         while(state.formEntryModel.getFormIndex().isInForm()){
             FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();
             FormEntryPrompt formEntryPrompt = state.formEntryModel.getQuestionPrompt(questionIndex);
+            QuestionDef question = formEntryPrompt.getQuestion();
+            ItemsetBinding itemsetBinding = question.getDynamicChoices();
+            if(itemsetBinding != null){
+                state.formEntryController.getModel().getForm()
+                    .populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+            }
             IAnswerData answer = BenchmarkUtils.getStubAnswer(formEntryPrompt.getQuestion());
             state.formEntryController.answerQuestion(questionIndex, answer, true);
             state.formEntryController.saveAnswer(questionIndex, answer, true);
             state.formEntryController.stepToNextEvent();
         }
+        state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
-
 
     @Benchmark
     public void
-    benchmark_FormDefValidate_answerAll(FormControllerAnswerQuestionState state, Blackhole bh) {
+    benchmark_FormEntryController_answerAll(FormControllerAnswerQuestionState state, Blackhole bh) {
+        state.formEntryController.stepToNextEvent();
         while(state.formEntryModel.getFormIndex().isInForm()){
             FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();
             FormEntryPrompt formEntryPrompt = state.formEntryModel.getQuestionPrompt(questionIndex);
+            QuestionDef question = formEntryPrompt.getQuestion();
+            ItemsetBinding itemsetBinding = question.getDynamicChoices();
+            if(itemsetBinding != null){
+                state.formEntryController.getModel().getForm()
+                    .populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+            }
             IAnswerData answer = BenchmarkUtils.getStubAnswer(formEntryPrompt.getQuestion());
             state.formEntryController.answerQuestion(questionIndex, answer, true);
             state.formEntryController.stepToNextEvent();
@@ -86,10 +116,37 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
+    @Benchmark
+    public void
+    benchmark_FormEntryController_answerAllThenSaveAll(FormControllerAnswerQuestionState state, Blackhole bh) {
+        ArrayList failures = new ArrayList();
+        HashMap<FormIndex, IAnswerData> answers = new HashMap<>();
+        state.formEntryController.stepToNextEvent();
+        while(state.formEntryModel.getFormIndex().isInForm()){
+            FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();
+            FormEntryPrompt formEntryPrompt = state.formEntryModel.getQuestionPrompt(questionIndex);
+            QuestionDef question = formEntryPrompt.getQuestion();
+            ItemsetBinding itemsetBinding = question.getDynamicChoices();
+            if(itemsetBinding != null){
+                state.formEntryController.getModel().getForm()
+                    .populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+            }
+            IAnswerData answer = BenchmarkUtils.getStubAnswer(formEntryPrompt.getQuestion());
+            int saveStatus = state.formEntryController.answerQuestion(questionIndex, answer, true);
+            if(saveStatus != FormEntryController.ANSWER_OK){ failures.add(failures); }
+            answers.put(questionIndex, answer);
+            state.formEntryController.stepToNextEvent();
+        }
+        for(FormIndex questionIndex: answers.keySet()){
+            state.formEntryController.saveAnswer(questionIndex, answers.get(questionIndex),false);
+        }
+        state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+    }
+
 
     @Benchmark
     public void
-    benchmark_FormDefValidate_answerOne(FormControllerAnswerQuestionState state, Blackhole bh) throws RuntimeException {
+    benchmark_FormEntryController_answerOne(FormControllerAnswerQuestionState state, Blackhole bh) throws RuntimeException {
         state.formEntryController.stepToNextEvent();
         if(state.formEntryModel.getFormIndex().isInForm()){
             FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();
@@ -98,7 +155,7 @@ public class FormEntryControllerAnswerQuestion {
             state.formEntryController.answerQuestion(questionIndex, answer, true);
             state.formEntryController.stepToNextEvent();
         }else{
-            throw new RuntimeException("Form COntroller not in a Question Index");
+            throw new RuntimeException("Form controller not in a question index");
         }
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
