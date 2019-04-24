@@ -3,6 +3,7 @@ package org.javarosa.core.model.instance.test;
 
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
@@ -16,6 +17,9 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
+import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -26,6 +30,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xform.parse.FormParserHelper;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
@@ -34,6 +39,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -176,5 +182,31 @@ public class SimpleBenchmarkTests {
 
     }
 
+
+    @Test
+    public void FormDefWriteAndReadFromToCache() throws  IOException{
+
+        // I am not sure if these commented sniipets have anything to do with the error
+//        PropertyManager mgr = new PropertyManager();
+//        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+//        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+//        new XFormsModule().registerModule();
+
+//        // needed to override rms property manager
+//        org.javarosa.core.services.PropertyManager
+//            .setPropertyManager(mgr);
+
+        Path resourcePath = r("nigeria_wards_external.xml");
+        //Setup reference manager
+        ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", PathConst.getTestResourcePath().toPath());
+        //Parse File to FormDef
+        FormDef formDef = FormParserHelper.parse(resourcePath);
+        //Save to cache
+        FormDefCache.writeCache(formDef, resourcePath.toAbsolutePath().toString());
+        //Read from cache
+        FormDef cachedFormDef = FormDefCache.readCache(resourcePath.toFile());
+        //Run assertions
+        assertNotNull(cachedFormDef);
+    }
 
 }

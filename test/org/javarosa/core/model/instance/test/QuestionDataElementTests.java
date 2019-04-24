@@ -37,7 +37,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class QuestionDataElementTests extends TestCase{
+public class  QuestionDataElementTests extends TestCase{
     private static final Logger logger = LoggerFactory.getLogger(QuestionDataElementTests.class);
     private final String stringElementName = "String Data Element";
 
