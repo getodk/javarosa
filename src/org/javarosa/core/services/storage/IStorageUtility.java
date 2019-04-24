@@ -1,8 +1,8 @@
 package org.javarosa.core.services.storage;
 
-import java.util.List;
-
 import org.javarosa.core.util.externalizable.Externalizable;
+
+import java.util.List;
 
 /**
  * IStorageUtility

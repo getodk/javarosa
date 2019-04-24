@@ -1,10 +1,11 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.model.FormDef;
+import org.javarosa.xform.util.XFormUtils;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.xform.util.XFormUtils;
 
 public final class FormParserHelper {
 

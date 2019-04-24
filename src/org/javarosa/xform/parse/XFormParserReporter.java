@@ -3,9 +3,10 @@
  */
 package org.javarosa.xform.parse;
 
-import java.io.PrintStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.PrintStream;
 
 /**
  * <b>Warning:</b> This class is unused and should remain that way. It will be removed in a future release.

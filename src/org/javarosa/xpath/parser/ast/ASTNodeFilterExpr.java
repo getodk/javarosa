@@ -16,12 +16,12 @@
 
 package org.javarosa.xpath.parser.ast;
 
-import java.util.Enumeration;
-import java.util.Vector;
-
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFilterExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class ASTNodeFilterExpr extends ASTNode {
     public ASTNodeAbstractExpr expr;

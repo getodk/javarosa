@@ -1,14 +1,9 @@
 package org.javarosa.core.benchmark;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.test.FormDefCache;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.test.FormParseInit;
-import org.javarosa.core.util.PathConst;
-import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -23,13 +18,9 @@ import org.openjdk.jmh.runner.RunnerException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 public class FormDefCacheBenchMark {
 

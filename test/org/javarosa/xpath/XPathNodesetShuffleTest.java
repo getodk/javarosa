@@ -16,18 +16,19 @@
 
 package org.javarosa.xpath;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.javarosa.xpath.XPathNodeset.shuffle;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import org.javarosa.core.model.instance.TreeReference;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.javarosa.core.model.instance.TreeReference;
-import org.junit.Test;
+
+import static junit.framework.TestCase.assertFalse;
+import static org.javarosa.xpath.XPathNodeset.shuffle;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class XPathNodesetShuffleTest {
     @Test

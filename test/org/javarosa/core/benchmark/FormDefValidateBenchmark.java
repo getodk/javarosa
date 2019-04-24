@@ -25,7 +25,6 @@ import org.openjdk.jmh.runner.Runner;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 

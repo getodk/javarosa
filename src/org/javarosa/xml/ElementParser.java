@@ -1,10 +1,10 @@
 package org.javarosa.xml;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.io.KXmlParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;

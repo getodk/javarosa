@@ -1,14 +1,5 @@
 package org.javarosa.core.model;
 
-import static org.javarosa.core.model.FormDef.getAbsRef;
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.DataInstance;
@@ -28,6 +19,15 @@ import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+import static org.javarosa.core.model.FormDef.getAbsRef;
+import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 public class ItemsetBinding implements Externalizable, Localizable {
     private static final Logger logger = LoggerFactory.getLogger(ItemsetBinding.class);

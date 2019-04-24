@@ -19,9 +19,6 @@
  */
 package org.javarosa.core.model.utils;
 
-import java.util.Date;
-import java.util.List;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -30,6 +27,9 @@ import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Clayton Sims

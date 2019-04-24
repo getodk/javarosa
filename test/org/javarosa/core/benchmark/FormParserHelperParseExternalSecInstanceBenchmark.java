@@ -1,6 +1,5 @@
 package org.javarosa.core.benchmark;
 
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.util.PathConst;
 import org.javarosa.xform.parse.FormParserHelper;

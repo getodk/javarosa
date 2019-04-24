@@ -15,12 +15,12 @@
  */
 package org.javarosa.xpath.expr;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.xpath.expr.AnswerDataMatchers.stringAnswer;
 import static org.junit.Assert.assertThat;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class XPathPathExprCurrentFieldRefTest {
     private Scenario scenario;

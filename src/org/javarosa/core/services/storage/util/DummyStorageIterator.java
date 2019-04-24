@@ -3,12 +3,12 @@
  */
 package org.javarosa.core.services.storage.util;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.DataUtil;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * @author ctsims

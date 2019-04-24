@@ -16,9 +16,9 @@
 
 package org.javarosa.xpath.parser;
 
-import java.util.Vector;
-
 import org.javarosa.xpath.expr.XPathQName;
+
+import java.util.Vector;
 
 public class Lexer {
 

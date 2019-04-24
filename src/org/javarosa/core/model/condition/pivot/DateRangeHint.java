@@ -3,10 +3,10 @@
  */
 package org.javarosa.core.model.condition.pivot;
 
-import java.util.Date;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.xpath.expr.XPathFuncExpr;
+
+import java.util.Date;
 
 /**
  * @author ctsims

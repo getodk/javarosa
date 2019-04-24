@@ -3,9 +3,9 @@
  */
 package org.javarosa.core.log;
 
-import java.io.IOException;
-
 import org.javarosa.core.util.SortedIntSet;
+
+import java.io.IOException;
 
 /**
  * @author ctsims

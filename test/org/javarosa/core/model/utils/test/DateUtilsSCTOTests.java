@@ -6,18 +6,19 @@
 
 package org.javarosa.core.model.utils.test;
 
-import static org.junit.Assert.assertEquals;
+import org.javarosa.core.model.utils.DateUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import org.javarosa.core.model.utils.DateUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class DateUtilsSCTOTests {
 
