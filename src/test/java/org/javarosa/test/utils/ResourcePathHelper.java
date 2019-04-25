@@ -1,8 +1,16 @@
 package org.javarosa.test.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ResourcePathHelper {
 
@@ -30,29 +38,32 @@ public class ResourcePathHelper {
      */
     public static Path r(String filename, boolean fallBack) {
         final String resourceFileParentPath = inferResourceFileParentPath();
-        final Path resourceFilePath = Paths.get("src/test/resources", resourceFileParentPath, filename);
+        String prefix = !filename.startsWith("/") ? "src/test/resources" : "";
 
-        if (! fallBack || resourceFilePath.toFile().exists()) {
+        final Path resourceFilePath = Paths.get(prefix, resourceFileParentPath, filename);
+
+        if (!fallBack || resourceFilePath.toFile().exists()) {
             return resourceFilePath;
         }
-        return Paths.get("src/test/resources", filename);
+        return Paths.get(prefix, filename);
     }
 
     /**
      * If the class that called {@link ResourcePathHelper#r(String)} is {@link org.javarosa.core.model.Safe2014DagImpl}
      * then this method will return "org/javarosa/core/model"
+     *
      * @return Caller test class package as a path
      */
     private static String inferResourceFileParentPath() {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         int callerStackIndex = 2; // 0 is getStackTrace, 1 is this method, 2 is immediate caller
         while (callerStackIndex < stackTrace.length &&
-                stackTrace[callerStackIndex].getClassName().equals(ResourcePathHelper.class.getName())) {
+            stackTrace[callerStackIndex].getClassName().equals(ResourcePathHelper.class.getName())) {
             ++callerStackIndex;
         }
         final String callerClassName = stackTrace[callerStackIndex].getClassName();
         return callerClassName
-                .substring(0, callerClassName.lastIndexOf(".")) // strip the class name
-                .replace(".", File.separator);  // change all '.' to '/' ('\' on Windows)
+            .substring(0, callerClassName.lastIndexOf(".")) // strip the class name
+            .replace(".", File.separator);  // change all '.' to '/' ('\' on Windows)
     }
 }
