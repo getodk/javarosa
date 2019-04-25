@@ -82,5 +82,5 @@ jmh {
     warmupBatchSize = 1
     warmupForks = 0
     warmupIterations = 1
-    includeTests = false
+    includeTests = true
 }
