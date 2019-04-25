@@ -1,9 +1,9 @@
 package org.javarosa.core.benchmark;
 
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.util.PathConst;
 import org.javarosa.xform.parse.FormParserHelper;
+import org.javarosa.xform.util.XFormUtils;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -15,10 +15,11 @@ import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
-
-import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 public class FormParserHelperParseInternalSecInstanceBenchmark {
 
@@ -36,21 +37,28 @@ public class FormParserHelperParseInternalSecInstanceBenchmark {
 
     @State(Scope.Thread)
     public static class FormParserHelperParseInternalSecondaryInstanceState {
-        Path xFormFilePath = r("nigeria_wards_external_combined.xml");
-        Path resourcePath = xFormFilePath.getParent();
-        FormDef formDef;
+        Path xFormFilePath = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance().toPath();
+        InputStream xFormFileInputStream;
         @Setup(Level.Trial)
         public void
-        initialize() {
+        initialize() throws FileNotFoundException {
             Path resourcePath = PathConst.getTestResourcePath().toPath();
             ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", resourcePath);
+            xFormFileInputStream = new FileInputStream(xFormFilePath.toString());
         }
     }
 
     @Benchmark
     public void
-    benchmark_FormParserHelper_parse_internal_secondary_instance(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
+    benchmark_FormParserHelper_parse_internal_secondary_instance_file(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
         bh.consume(FormParserHelper.parse(state.xFormFilePath));
+    }
+
+
+    @Benchmark
+    public void
+    benchmark_FormParserHelper_parse_internal_secondary_instance_inputstream(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
+        bh.consume(XFormUtils.getFormFromInputStream(state.xFormFileInputStream));
     }
 
 }

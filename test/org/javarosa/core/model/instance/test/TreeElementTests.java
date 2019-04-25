@@ -1,10 +1,10 @@
 package org.javarosa.core.model.instance.test;
 
 
-import org.javarosa.core.util.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
+import org.javarosa.core.util.PathConst;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;

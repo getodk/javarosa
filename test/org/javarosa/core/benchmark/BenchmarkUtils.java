@@ -17,8 +17,10 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
@@ -56,11 +58,11 @@ public class BenchmarkUtils {
             // Set the following options as needed
             .mode(Mode.AverageTime)
             .timeUnit(TimeUnit.SECONDS)
-            .warmupTime(TimeValue.seconds(5))
-            .warmupIterations(5)
-            .measurementTime(TimeValue.seconds(1))
+            .warmupTime(TimeValue.seconds(2))
+            .warmupIterations(20)
+            .measurementTime(TimeValue.seconds(2))
             .threads(1)
-            .measurementIterations(5)
+            .measurementIterations(10)
             .forks(1)
             .shouldFailOnError(true)
             .shouldDoGC(true)
@@ -73,7 +75,7 @@ public class BenchmarkUtils {
     }
 
 
-    public static IAnswerData getStubAnswer(QuestionDef question) {
+    public static IAnswerData answerNigeriaWardsQuestion(QuestionDef question) {
         IAnswerData answer;
         switch (question.getLabelInnerText()){
             case "State":
@@ -92,9 +94,19 @@ public class BenchmarkUtils {
                 answer = new LongData(699967);
                 break;
             default:
-                answer = new StringData("");
+                answer = new StringData("Question not understood...");
         }
         return answer;
+    }
+
+    public static File getNigeriaWardsXMLWithInternal2ndryInstance(){
+        Path filePath = r("nigeria_wards_internal_2ndry_instance.xml");
+        return filePath.toFile();
+    }
+
+    public static File getNigeriaWardsXMLWithExternal2ndryInstance(){
+        Path filePath = r("nigeria_wards_external_2ndry_instance.xml");
+        return filePath.toFile();
     }
 
 }

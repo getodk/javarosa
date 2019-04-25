@@ -25,9 +25,6 @@ import org.openjdk.jmh.runner.Runner;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-
-import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 public class FormDefValidateBenchmark {
 
@@ -48,7 +45,8 @@ public class FormDefValidateBenchmark {
         @Setup(Level.Trial)
         public void
         initialize() throws IOException {
-            Path resourcePath = r("nigeria_wards_external.xml");
+            Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance().toPath();
+
             ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", PathConst.getTestResourcePath().toPath());
             formDef = FormParserHelper.parse(resourcePath);
             FormEntryModel formEntryModel = new FormEntryModel(formDef);
@@ -63,7 +61,7 @@ public class FormDefValidateBenchmark {
                 if(itemsetBinding != null){
                     formDef.populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
                 }
-                IAnswerData answer = BenchmarkUtils.getStubAnswer(formEntryPrompt.getQuestion());
+                IAnswerData answer = BenchmarkUtils.answerNigeriaWardsQuestion(formEntryPrompt.getQuestion());
                 formEntryController.answerQuestion(questionIndex, answer, true);
                 formEntryController.stepToNextEvent();
             }

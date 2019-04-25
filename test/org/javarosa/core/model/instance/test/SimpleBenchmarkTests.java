@@ -1,45 +1,40 @@
 package org.javarosa.core.model.instance.test;
 
 
-
-import org.javarosa.core.model.Constants;
+import org.javarosa.core.benchmark.BenchmarkUtils;
+import org.javarosa.core.model.CoreModelModule;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.util.PathConst;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.ExternalDataInstance;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.reference.ReferenceManagerTestUtils;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.JavaRosaCoreModule;
+import org.javarosa.core.util.PathConst;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xform.parse.FormParserHelper;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.junit.Test;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.ThreadLocalRandom;
-
 
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
@@ -174,6 +169,36 @@ public class SimpleBenchmarkTests {
         }
         assertNotNull(answersMap);
 
+    }
+
+    @Test
+    public void FormDefWriteAndReadFromToCache() throws  IOException{
+
+
+        initSerialization();
+
+        Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance().toPath();
+        //Setup reference manager
+        ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", PathConst.getTestResourcePath().toPath());
+        //Parse File to FormDef
+        FormDef formDef = FormParserHelper.parse(resourcePath);
+        //Save to cache
+        FormDefCache.writeCache(formDef, resourcePath.toAbsolutePath().toString());
+        //Read from cache
+        FormDef cachedFormDef = FormDefCache.readCache(resourcePath.toFile());
+        //Run assertions
+        assertNotNull(cachedFormDef);
+        assertEquals(formDef.getName(), cachedFormDef.getName());
+        assertEquals(formDef.getTitle(), cachedFormDef.getTitle());
+        assertEquals(formDef.getMainInstance().getName(), cachedFormDef.getMainInstance().getName());
+        assertEquals(Arrays.asList(formDef.getNonMainInstances()).size(),
+            Arrays.asList(cachedFormDef.getNonMainInstances()).size());
+    }
+
+    private void initSerialization() {
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+        new XFormsModule().registerModule();
     }
 
 

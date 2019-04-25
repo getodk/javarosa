@@ -1,14 +1,15 @@
 package org.javarosa.core.model.instance;
 
-import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
-import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import static org.junit.Assert.assertThat;
 
 /**
  * This test ensures that {@link TreeReference#anchor(TreeReference)} gives the same

@@ -17,15 +17,10 @@ import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.NoBenchmarksException;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.fail;
 
 public class PopulateTreeNodeBenchmark {
 
@@ -60,15 +55,12 @@ public class PopulateTreeNodeBenchmark {
 
         @Setup(Level.Trial)
         public void
-        initialize() {
-            FormParseInit formParseInit = new FormParseInit(r("nigeria_wards_external_combined.xml"));
+        initialize() throws IOException {
+            FormParseInit formParseInit = new FormParseInit(BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance().toPath());
             FormEntryController formEntryController = formParseInit.getFormEntryController();
-            byte[] formInstanceAsBytes = null;
-            try {
-                formInstanceAsBytes = Files.readAllBytes(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "populate-nodes-attributes-instance.xml"));
-            } catch (IOException e) {
-                fail("There was a problem with reading the test data.\n" + e.getMessage());
-            }
+            byte[] formInstanceAsBytes;
+            formInstanceAsBytes = Files.readAllBytes(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(), "populate-nodes-attributes-instance.xml"));
+
             savedRoot = XFormParser.restoreDataModel(formInstanceAsBytes, null).getRoot();
             formDef = formEntryController.getModel().getForm();
             dataRootNode = formDef.getInstance().getRoot().deepCopy(true);

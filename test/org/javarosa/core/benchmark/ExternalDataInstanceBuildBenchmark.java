@@ -36,7 +36,6 @@ public class ExternalDataInstanceBuildBenchmark {
 
     @State(Scope.Thread)
     public static class ExternalDataInstanceState {
-        ExternalDataInstance externalDataInstance = null;
 
         @Setup(Level.Trial)
         public void
@@ -48,10 +47,22 @@ public class ExternalDataInstanceBuildBenchmark {
 
     @Benchmark
     public void
-    benchmark_ExternalDataInstance_build(ExternalDataInstanceState state, Blackhole bh)
+    benchmark_ExternalDataInstance_build_wards(ExternalDataInstanceState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
-        bh.consume(ExternalDataInstance.build("jr://file/wards.xml", "wards"));
+        ExternalDataInstance wardsExternalInstance =
+            ExternalDataInstance.build("jr://file/wards.xml", "wards");
+        bh.consume(wardsExternalInstance);
+    }
+
+    @Benchmark
+    public void
+    benchmark_ExternalDataInstance_build_lgas(ExternalDataInstanceState state, Blackhole bh)
+        throws IOException, XmlPullParserException, InvalidReferenceException,
+        UnfullfilledRequirementsException, InvalidStructureException {
+        ExternalDataInstance lgaIExternalInstance =
+            ExternalDataInstance.build("jr://file/lgas.xml", "lgas");
+        bh.consume(lgaIExternalInstance);
     }
 
 }
