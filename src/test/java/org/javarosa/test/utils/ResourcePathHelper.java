@@ -30,12 +30,12 @@ public class ResourcePathHelper {
      */
     public static Path r(String filename, boolean fallBack) {
         final String resourceFileParentPath = inferResourceFileParentPath();
-        final Path resourceFilePath = Paths.get("resources", resourceFileParentPath, filename);
+        final Path resourceFilePath = Paths.get("src/test/resources", resourceFileParentPath, filename);
 
         if (! fallBack || resourceFilePath.toFile().exists()) {
             return resourceFilePath;
         }
-        return Paths.get("resources", filename);
+        return Paths.get("src/test/resources", filename);
     }
 
     /**
