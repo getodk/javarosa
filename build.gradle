@@ -10,10 +10,10 @@ repositories {
 }
 
 sourceSets {
-    main.java.srcDirs=['src/main/java']
-    main.resources.srcDirs=['src/main/resources']
-    test.java.srcDirs=['src/test/java']
-    test.resources.srcDirs=['src/test/resources']
+    main.java.srcDirs = ['src/main/java']
+    main.resources.srcDirs = ['src/main/resources']
+    test.java.srcDirs = ['src/test/java']
+    test.resources.srcDirs = ['src/test/resources']
 }
 
 compileJava {
