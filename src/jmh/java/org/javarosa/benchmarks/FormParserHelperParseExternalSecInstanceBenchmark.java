@@ -1,6 +1,6 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.benchmarks.BenchmarkUtils.*;
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 

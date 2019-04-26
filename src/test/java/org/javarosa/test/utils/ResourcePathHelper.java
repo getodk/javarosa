@@ -1,16 +1,8 @@
 package org.javarosa.test.utils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ResourcePathHelper {
 
