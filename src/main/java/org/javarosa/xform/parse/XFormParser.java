@@ -71,6 +71,8 @@ import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
+import org.javarosa.core.model.actions.setlocation.SetLocationActionHandler;
+import org.javarosa.core.model.actions.setlocation.StubSetLocationActionHandler;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -306,6 +308,10 @@ public class XFormParser implements IXFormParserFunctions {
     private static void setUpActionHandlers() {
         actionHandlers = new HashMap<>();
         registerActionHandler(SetValueAction.ELEMENT_NAME, SetValueAction.getHandler());
+
+        // Register a stub odk:setlocation action handler. Clients that want to actually collect location need to
+        // register their own subclass handler which will replace this one.
+        registerActionHandler(SetLocationActionHandler.ELEMENT_NAME, new StubSetLocationActionHandler());
     }
 
     private void initState() {
@@ -696,6 +702,7 @@ public class XFormParser implements IXFormParserFunctions {
             throw new XFormParseException("An action element occurred in an invalid location. " +
                     "Must be either a child of a control element, or a child of the <model>");
         }
+
         specificHandler.handle(this, e, parent);
     }
 
