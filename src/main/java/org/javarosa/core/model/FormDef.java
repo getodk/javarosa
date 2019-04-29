@@ -62,6 +62,8 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -71,11 +73,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -169,6 +170,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private FormInstance mainInstance = null;
 
     private ActionController actionController;
+    /**
+     * The names of the action types that this form includes. This allows clients to do things like let users know if
+     * location is captured in the background. Actions can nest so to dynamically figure out which ones the form
+     * includes we'd have to query the actionController on every node.
+     */
+    private Set<String> actions;
 
     private EventNotifier eventNotifier;
 
@@ -213,6 +220,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         formInstances = new HashMap<>();
         extensions = new ArrayList<>();
         actionController = new ActionController();
+        actions = new HashSet<>();
 
         this.eventNotifier = eventNotifier;
     }
@@ -1204,6 +1212,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         resetEvaluationContext();
         actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
+        actions = new HashSet<>((List<String>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
     }
 
     /**
@@ -1263,10 +1272,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));
 
         // for support of multi-instance forms
-
         ExtUtil.write(dos, new ExtWrapMap(formInstances, new ExtWrapTagged()));
+
         ExtUtil.write(dos, new ExtWrapListPoly(extensions));
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
+        ExtUtil.write(dos, new ExtWrapListPoly(new ArrayList<>(actions)));
     }
 
     public void collapseIndex(FormIndex index, List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
@@ -1663,6 +1673,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         dagImpl = null;
         // We may need ths one, actually
         exprEvalContext = null;
+    }
+
+    /**
+     * Records that the form definition includes an action of the given name. Clients may need to configure resources
+     * accordingly or communicate something to the user (e.g. in the case of setlocation).
+     */
+    public void registerAction(String actionName) {
+        actions.add(actionName);
+    }
+
+    /**
+     * Returns true if this form definition includes one or more action of the given name.
+     */
+    public boolean hasAction(String name) {
+        return actions.contains(name);
     }
 
     /**

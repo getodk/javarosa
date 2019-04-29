@@ -50,13 +50,17 @@ public abstract class SetLocationAction extends Action {
         // empty body for serialization
     }
 
-    SetLocationAction(TreeReference targetReference) {
+    public SetLocationAction(TreeReference targetReference) {
         super(SetLocationActionHandler.ELEMENT_NAME);
         setTargetReference(targetReference);
     }
 
     public TreeReference getTargetReference() {
         return targetReference;
+    }
+
+    public TreeReference getContextualizedTargetReference() {
+        return contextualizedTargetReference;
     }
 
     public void setTargetReference(TreeReference targetReference) {
