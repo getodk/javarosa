@@ -3,7 +3,6 @@ package org.javarosa.core.benchmark;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.util.PathConst;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.javarosa.xform.util.XFormUtils;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -55,10 +54,10 @@ public class FormParserHelperParseInternalSecInstanceBenchmark {
     }
 
 
-    @Benchmark
-    public void
-    benchmark_FormParserHelper_parse_internal_secondary_instance_inputstream(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
-        bh.consume(XFormUtils.getFormFromInputStream(state.xFormFileInputStream));
-    }
+//    @Benchmark
+//    public void
+//    benchmark_FormParserHelper_parse_internal_secondary_instance_inputstream(FormParserHelperParseInternalSecondaryInstanceState state, Blackhole bh) throws IOException {
+//        bh.consume(XFormUtils.getFormFromInputStream(state.xFormFileInputStream));
+//    }
 
 }

@@ -12,6 +12,7 @@ import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.InvalidReferenceException;
@@ -25,19 +26,23 @@ import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xform.parse.FormParserHelper;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.junit.Test;
+import org.kxml2.kdom.Document;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -46,7 +51,7 @@ public class SimpleBenchmarkTests {
 
     @Test
     public void testParseXFormWithoutExternalInstance() {
-        Path xFormFilePath = r("nigeria_wards_external_combined.xml");
+        Path xFormFilePath = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance().toPath();
         FormDef formDef;
         try {
         formDef  = FormParserHelper.parse(xFormFilePath);
@@ -55,7 +60,7 @@ public class SimpleBenchmarkTests {
           throw new RuntimeException(e);
       }
 
-        assertEquals( "Nigeria Wards External", formDef.getName());
+        assertEquals( "Nigeria Wards", formDef.getName());
         assertEquals(3, Collections.list(formDef.getNonMainInstances()).size());
         assertNotNull(formDef.getNonMainInstance("lgas"));
         assertNotNull(formDef.getNonMainInstance("wards"));
@@ -70,7 +75,7 @@ public class SimpleBenchmarkTests {
         Path resourcePath = PathConst.getTestResourcePath().toPath();
         ReferenceManager.instance().addReferenceFactory((buildReferenceFactory("file", resourcePath.toString())));
 
-        Path xFormFilePath = r("nigeria_wards_external.xml");
+        Path xFormFilePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance().toPath();
         FormDef formDef;
         try {
             formDef  = FormParserHelper.parse(xFormFilePath);
@@ -78,9 +83,11 @@ public class SimpleBenchmarkTests {
             fail("There was a problem with reading the test data.\n" + e.getMessage());
             throw new RuntimeException(e);
         }
+        ArrayList<DataInstance> secondaryInstances = Collections.list(formDef.getNonMainInstances());
 
-        assertEquals( "Nigeria Wards External", formDef.getName());
-        assertEquals(3, Collections.list(formDef.getNonMainInstances()).size());
+        assertEquals( "Nigeria Wards", formDef.getName());
+        assertEquals(3, secondaryInstances.size());
+
         // assertEquals("Nigeria Wards External",formDef.getMainInstance().getName());
         assertNotNull(formDef.getNonMainInstance("lgas"));
         assertNotNull(formDef.getNonMainInstance("wards"));
@@ -120,9 +127,9 @@ public class SimpleBenchmarkTests {
     @Test
     public void testFormEntryControllerValidate() throws IOException {
 
-        Path resourcePath = r("nigeria_wards_external.xml");
+        Path xFormFilePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance().toPath();
         ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", PathConst.getTestResourcePath().toPath());
-        FormDef formDef = FormParserHelper.parse(resourcePath);
+        FormDef formDef = FormParserHelper.parse(xFormFilePath);
         FormEntryModel formEntryModel = new FormEntryModel(formDef);
         FormEntryController formEntryController = new FormEntryController(formEntryModel);
         HashMap<FormIndex, IAnswerData> answersMap = new HashMap<>();
@@ -169,6 +176,14 @@ public class SimpleBenchmarkTests {
         }
         assertNotNull(answersMap);
 
+    }
+
+    @Test
+    public void ParseXMLDocument() throws  IOException {
+        Path xFormFilePath = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance().toPath();
+        Reader reader = new FileReader(xFormFilePath.toFile());
+        Document document = XFormParser.getXMLDocument(reader);
+        assertNotNull(document);
     }
 
     @Test

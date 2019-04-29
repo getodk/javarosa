@@ -109,4 +109,14 @@ public class BenchmarkUtils {
         return filePath.toFile();
     }
 
+    public static File getNigeriaWardsWardsXMLInstance(){
+        Path filePath = r("wards.xml");
+        return filePath.toFile();
+    }
+
+    public static File getNigeriaWardsWardsLGAsInstance(){
+        Path filePath = r("lgas.xml");
+        return filePath.toFile();
+    }
+
 }

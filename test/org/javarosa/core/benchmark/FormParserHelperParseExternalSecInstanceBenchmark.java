@@ -1,9 +1,10 @@
 package org.javarosa.core.benchmark;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.javarosa.xform.util.XFormUtils;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -20,6 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class FormParserHelperParseExternalSecInstanceBenchmark {
 
@@ -49,15 +53,17 @@ public class FormParserHelperParseExternalSecInstanceBenchmark {
     public void
     benchmark_FormParserHelper_parse_external_secondary_instance_filer(FormParserHelperParseExternalSecondaryInstanceState state, Blackhole bh) throws IOException {
         FormDef parsedXFormToFormDef = FormParserHelper.parse(state.xFormFilePath);
+
         bh.consume(parsedXFormToFormDef);
+
     }
 
-    @Benchmark
-    public void
-    benchmark_FormParserHelper_parse_external_secondary_instance_inputstream(FormParserHelperParseExternalSecondaryInstanceState state, Blackhole bh) throws IOException {
-        FormDef parsedXFormToFormDef = XFormUtils.getFormFromInputStream(state.xFormFileInputStream);
-        bh.consume(parsedXFormToFormDef);
-    }
+//    @Benchmark
+//    public void
+//    benchmark_FormParserHelper_parse_external_secondary_instance_inputstream(FormParserHelperParseExternalSecondaryInstanceState state, Blackhole bh) throws IOException {
+//        FormDef parsedXFormToFormDef = XFormUtils.getFormFromInputStream(state.xFormFileInputStream);
+//        bh.consume(parsedXFormToFormDef);
+//    }
 
 
 }
