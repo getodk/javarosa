@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
@@ -132,4 +133,27 @@ public class SelectChoice implements Externalizable, Localizable {
         this.textID = textID;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        SelectChoice otherChoice = (SelectChoice) other;
+
+        return Objects.equals(labelInnerText, otherChoice.labelInnerText)
+            && Objects.equals(textID, otherChoice.textID)
+            && isLocalizable == otherChoice.isLocalizable
+            && Objects.equals(value, otherChoice.value)
+            && index == otherChoice.index
+            && Objects.equals(copyNode, otherChoice.copyNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(labelInnerText, textID, isLocalizable, value, index, copyNode);
+    }
 }
