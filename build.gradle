@@ -78,10 +78,10 @@ jmh {
     fork = 1
     timeout = '10s'
     warmup = '2s'
-    warmupIterations = 0
+    warmupIterations = 5
     warmupBatchSize = 1
     warmupForks = 1
-    iterations = 1
+    iterations = 10
     timeOnIteration = '2s'
     timeUnit = 's'
     benchmarkMode = ['avgt','ss']
