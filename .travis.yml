@@ -6,4 +6,5 @@ jdk:
 
 script:
     - mv src/jmh/resources/logback-test.xml.example src/jmh/resources/logback-test.xml
+    - ./gradlew clean
     - ./gradlew jmh
