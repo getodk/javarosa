@@ -41,7 +41,7 @@ public class BenchmarkTemplate {
         }
     }
 
-    // @Benchmark
+    //@Benchmark
     public void benchmark_method_template(StateClassTemplate state, Blackhole bh) throws IOException {
         // Always use Blackhole.consume with the output of the benchmarked action
         bh.consume(readAllBytes(state.formFile));

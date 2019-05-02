@@ -6,18 +6,21 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static org.javarosa.benchmarks.BenchmarkUtils.*;
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+import static org.javarosa.benchmarks.BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance;
 
 public class FormDefValidateBenchmark {
     public static void main(String[] args) {
@@ -52,7 +55,7 @@ public class FormDefValidateBenchmark {
         }
     }
 
-     @Benchmark
+    //@Benchmark
     public void benchmark_FormDefValidate_validate(FormDefValidateState state, Blackhole bh) {
         bh.consume(state.formDef.validate(true));
     }

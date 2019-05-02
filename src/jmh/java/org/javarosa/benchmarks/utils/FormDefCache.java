@@ -1,13 +1,20 @@
 package org.javarosa.benchmarks.utils;
 
-import org.javarosa.benchmarks.BenchmarkUtils;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,7 +28,7 @@ public class FormDefCache {
     private FormDefCache() {
         // Private constructor
     }
-    private static String CACHE_PATH = BenchmarkUtils.prepareAssets("lgas.xml").getParent() + "/.cache";
+    private static String CACHE_PATH =    "/.cache";
     /**
      * Serializes a FormDef and saves it in the cache. To avoid problems from two callers
      * trying to cache the same file at the same time, we serialize into a temporary file,
@@ -35,6 +42,7 @@ public class FormDefCache {
         File cachedFormDefFile = FormDefCache.getCacheFile(new File(formPath));
         File cacheDir = new File(CACHE_PATH);
         createIfNotExists(cacheDir);
+        System.out.println("=========" + CACHE_PATH);
         final File tempCacheFile = File.createTempFile("cache", null,
             cacheDir);
         logger.info(String.format("Started saving %s to the cache via temp file %s",
@@ -76,8 +84,10 @@ public class FormDefCache {
     }
 
     private static void createIfNotExists(File directory) throws IOException {
-        if(directory.exists() == false){
-            directory.mkdirs();
+        directory.mkdir();
+        if(Files.notExists(directory.toPath())){
+            System.out.println("2=========2" + CACHE_PATH);
+            directory.mkdir();
         }
     }
 

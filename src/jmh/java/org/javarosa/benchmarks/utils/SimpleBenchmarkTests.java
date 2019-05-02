@@ -2,7 +2,11 @@ package org.javarosa.benchmarks.utils;
 
 
 import org.javarosa.benchmarks.BenchmarkUtils;
-import org.javarosa.core.model.*;
+import org.javarosa.core.model.CoreModelModule;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.ItemsetBinding;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -24,6 +28,9 @@ import org.javarosa.xform.parse.FormParserHelper;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.kxml2.kdom.Document;
 import org.xmlpull.v1.XmlPullParserException;
@@ -39,7 +46,6 @@ import java.util.HashMap;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
-import static org.junit.Assert.*;
 
 public class SimpleBenchmarkTests {
 

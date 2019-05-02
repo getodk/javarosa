@@ -15,7 +15,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
@@ -69,7 +73,7 @@ public class BenchmarkUtils {
     }
 
     /**
-     * This method will run all methods annotated with  @Benchmark declared in the provided class.
+     * This method will run all methods annotated with   // //@Benchmark declared in the provided class.
      * <p>
      * This method uses reflection to provide all the required params.
      */
@@ -164,7 +168,7 @@ public class BenchmarkUtils {
     }
 
     public static Path getSubmissionFile(){
-        Path assetsPath = prepareAssets( "populate-nodes-attributes-instance.xml", "nigeria_wards_external_combined.xml");
+        Path assetsPath = prepareAssets( "populate-nodes-attributes-instance.xml", "nigeria_wards_internal_2ndry_instance_minified.xml");
         Path submissionFile = assetsPath.resolve("populate-nodes-attributes-instance.xml");
         return submissionFile;
     }
