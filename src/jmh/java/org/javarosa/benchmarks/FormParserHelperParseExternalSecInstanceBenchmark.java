@@ -3,6 +3,7 @@ package org.javarosa.benchmarks;
 import org.javarosa.xform.parse.FormParserHelper;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParserFactory;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -38,7 +39,7 @@ public class FormParserHelperParseExternalSecInstanceBenchmark {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public void
     benchmark_FormParserHelper_parse_external_secondary_instance(FormParserHelperParseExternalSecondaryInstanceState state, Blackhole bh) throws IOException {
         bh.consume(FormParserHelper.parse(state.xFormFilePath));

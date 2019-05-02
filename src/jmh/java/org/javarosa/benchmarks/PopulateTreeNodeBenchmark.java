@@ -5,6 +5,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -20,7 +21,7 @@ public class PopulateTreeNodeBenchmark {
         BenchmarkUtils.dryRun(PopulateTreeNodeBenchmark.class);
     }
 
-   //@Benchmark
+   @Benchmark
     public void benchmark_TreeElement_populate(TreeElementPopulateState state) {
         state.dataRootNode.populate(state.savedRoot, state.formDef);
     }

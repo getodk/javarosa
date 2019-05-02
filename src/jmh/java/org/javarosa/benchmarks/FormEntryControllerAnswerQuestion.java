@@ -10,6 +10,7 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.FormParserHelper;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -52,7 +53,7 @@ public class FormEntryControllerAnswerQuestion {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public void benchmark_FormEntryController_answerAndSaveAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
@@ -65,7 +66,7 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
-    //@Benchmark
+    @Benchmark
     public void benchmark_FormEntryController_answerAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
@@ -75,7 +76,7 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
-      // //@Benchmark
+      @Benchmark
     public void benchmark_FormEntryController_answerAllThenSaveAll(FormControllerAnswerQuestionState state) {
         HashMap<FormIndex, IAnswerData> answers = new HashMap<>();
         state.formEntryController.stepToNextEvent();
@@ -100,7 +101,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
 
-      // //@Benchmark
+      @Benchmark
     public void benchmark_FormEntryController_answerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
         state.formEntryController.stepToNextEvent();
         if (state.formEntryModel.getFormIndex().isInForm()) {

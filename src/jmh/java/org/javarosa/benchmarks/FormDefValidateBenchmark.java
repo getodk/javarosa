@@ -10,6 +10,7 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.FormParserHelper;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -55,7 +56,7 @@ public class FormDefValidateBenchmark {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public void benchmark_FormDefValidate_validate(FormDefValidateState state, Blackhole bh) {
         bh.consume(state.formDef.validate(true));
     }

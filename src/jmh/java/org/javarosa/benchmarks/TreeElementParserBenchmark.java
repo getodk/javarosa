@@ -4,6 +4,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.XmlXFormInstance;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -32,7 +33,7 @@ public class TreeElementParserBenchmark {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public void benchmark_TreeElementParser_parse_internal_secondary_instance(XmlExternalInstanceState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement documentRootTreeElement = XmlXFormInstance.parse("nigeriawards", state.xFormFilePath);
         bh.consume(documentRootTreeElement);

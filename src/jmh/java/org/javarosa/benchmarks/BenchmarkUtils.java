@@ -73,7 +73,7 @@ public class BenchmarkUtils {
     }
 
     /**
-     * This method will run all methods annotated with   // //@Benchmark declared in the provided class.
+     * This method will run all methods annotated with   @Benchmark declared in the provided class.
      * <p>
      * This method uses reflection to provide all the required params.
      */
