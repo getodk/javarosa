@@ -1,0 +1,9 @@
+language: java
+install: true
+
+jdk:
+    - oraclejdk8
+
+script:
+    - mv src/jmh/resources/logback-test.xml.example src/jmh/resources/logback-test.xml
+    - ./gradlew jmh
