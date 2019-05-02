@@ -1,13 +1,14 @@
 package org.javarosa.xform.parse;
 
-import static org.javarosa.xform.parse.FisherYatesTest.list;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.javarosa.xform.parse.FisherYatesTest.list;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class FisherYatesExamplesTest {

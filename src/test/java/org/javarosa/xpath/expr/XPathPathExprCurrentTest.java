@@ -15,16 +15,17 @@
  */
 package org.javarosa.xpath.expr;
 
+import org.javarosa.core.model.SelectChoice;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.List;
+
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.xpath.expr.AnswerDataMatchers.answer;
 import static org.javarosa.xpath.expr.SelectChoiceMatchers.choice;
 import static org.junit.Assert.assertThat;
-
-import java.util.List;
-import org.javarosa.core.model.SelectChoice;
-import org.junit.Before;
-import org.junit.Test;
 
 public class XPathPathExprCurrentTest {
     private Scenario scenario;

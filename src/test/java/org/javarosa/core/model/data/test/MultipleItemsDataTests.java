@@ -16,11 +16,10 @@
 
 package org.javarosa.core.model.data.test;
 
-import java.util.ArrayList;
-import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -28,6 +27,9 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MultipleItemsDataTests extends TestCase {
     private static final Logger logger = LoggerFactory.getLogger(MultipleItemsDataTests.class);

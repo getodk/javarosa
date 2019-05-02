@@ -1,19 +1,19 @@
 package org.javarosa.core.model.instance.test;
 
-
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
+import java.nio.file.Files;
+
+import java.io.IOException;
 
 public class TreeElementTests {
 

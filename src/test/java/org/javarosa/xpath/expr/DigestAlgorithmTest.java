@@ -15,17 +15,18 @@
  */
 package org.javarosa.xpath.expr;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+
 import static org.javarosa.xpath.expr.DigestAlgorithm.MD5;
 import static org.javarosa.xpath.expr.DigestAlgorithm.SHA1;
 import static org.javarosa.xpath.expr.DigestAlgorithm.SHA256;
 import static org.javarosa.xpath.expr.DigestAlgorithm.SHA384;
 import static org.javarosa.xpath.expr.DigestAlgorithm.SHA512;
 import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class DigestAlgorithmTest {

@@ -20,8 +20,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.Date;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -31,6 +29,8 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * Note that this is just a start and doesn't cover direct comparisons

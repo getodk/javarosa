@@ -1,13 +1,14 @@
 package org.javarosa.xform.parse;
 
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static java.util.Collections.emptyList;
 import static org.javarosa.xform.parse.FisherYates.shuffle;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.List;
-import org.junit.Test;
 
 public class FisherYatesTest {
     private static final List<Integer> INPUT = list(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);

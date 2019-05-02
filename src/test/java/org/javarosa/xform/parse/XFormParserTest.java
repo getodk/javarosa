@@ -1,13 +1,14 @@
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.CoreModelModule;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SubmissionProfile;
+import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -16,7 +17,6 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.services.PrototypeManager;
@@ -32,6 +32,8 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kxml2.kdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -45,9 +47,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;

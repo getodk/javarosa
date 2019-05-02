@@ -1,20 +1,5 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.stream.Stream;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.LongData;
@@ -23,6 +8,19 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
+import java.util.HashMap;
+import java.util.stream.Stream;
+
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 public class BenchmarkUtils {
     public static Path prepareAssets(String... filenames) {
@@ -71,7 +69,7 @@ public class BenchmarkUtils {
     }
 
     /**
-     * This method will run all methods annotated with @Benchmark declared in the provided class.
+     * This method will run all methods annotated with  @Benchmark declared in the provided class.
      * <p>
      * This method uses reflection to provide all the required params.
      */
@@ -113,7 +111,9 @@ public class BenchmarkUtils {
             .filter(paramTypeMethod -> paramTypeMethod.isAnnotationPresent(annotationClass));
     }
 
-    public static IAnswerData getStubAnswer(QuestionDef question) {
+
+
+    public static IAnswerData answerNigeriaWardsQuestion(QuestionDef question) {
         switch (question.getLabelInnerText()) {
             case "State":
                 return new StringData("7b0ded95031647702b8bed17dce7698a"); // Abia
@@ -129,4 +129,45 @@ public class BenchmarkUtils {
                 return new StringData("");
         }
     }
+
+
+    public static Path getNigeriaWardsXMLWithInternal2ndryInstance(){
+        Path assetsPath = prepareAssets("nigeria_wards_internal_2ndry_instance.xml");
+        Path filePath = assetsPath.resolve("nigeria_wards_internal_2ndry_instance.xml");
+        return filePath;
+    }
+
+    public static Path getMinifiedNigeriaWardsXMLWithInternal2ndryInstance(){
+        Path assetsPath = prepareAssets("nigeria_wards_internal_2ndry_instance_minified.xml");
+        Path filePath = assetsPath.resolve("nigeria_wards_internal_2ndry_instance_minified.xml");
+        return filePath;
+    }
+
+    public static Path getNigeriaWardsXMLWithExternal2ndryInstance(){
+        Path assetsPath = prepareAssets("nigeria_wards_external_2ndry_instance.xml", "lgas.xml", "wards.xml");
+        setUpSimpleReferenceManager("file", assetsPath);
+        Path filePath = assetsPath.resolve("nigeria_wards_external_2ndry_instance.xml");
+        return filePath;
+    }
+
+    public static Path getWardsExternalInstance(){
+        Path assetsPath = prepareAssets( "wards.xml");
+        setUpSimpleReferenceManager("file", assetsPath);
+        Path filePath = assetsPath.resolve("wards.xml");
+        return filePath;
+    }
+
+    public static Path getLGAsExternalInstance(){
+        Path assetsPath = prepareAssets( "lgas.xml");
+        Path filePath = assetsPath.resolve("lgas.xml");
+        return filePath;
+    }
+
+    public static Path getSubmissionFile(){
+        Path assetsPath = prepareAssets( "populate-nodes-attributes-instance.xml", "nigeria_wards_external_combined.xml");
+        Path submissionFile = assetsPath.resolve("populate-nodes-attributes-instance.xml");
+        return submissionFile;
+    }
+
+
 }

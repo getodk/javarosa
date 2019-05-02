@@ -15,24 +15,6 @@
  */
 package org.javarosa.xpath.expr;
 
-import static java.nio.file.Files.createTempFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
-import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -47,6 +29,25 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
+import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class XPathFuncExprRandomizeTest {
 

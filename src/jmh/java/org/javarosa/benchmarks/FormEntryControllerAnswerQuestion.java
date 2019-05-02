@@ -1,12 +1,5 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.BenchmarkUtils.getStubAnswer;
-import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashMap;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
@@ -18,11 +11,13 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+
+import static org.javarosa.benchmarks.BenchmarkUtils.*;
 
 public class FormEntryControllerAnswerQuestion {
     public static void main(String[] args) {
@@ -36,9 +31,7 @@ public class FormEntryControllerAnswerQuestion {
 
         @Setup(Level.Trial)
         public void initialize() throws IOException {
-            Path assetsDir = prepareAssets("nigeria_wards_external.xml", "lgas.xml", "wards.xml");
-            Path formFile = assetsDir.resolve("nigeria_wards_external.xml");
-            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", assetsDir);
+            Path formFile = getNigeriaWardsXMLWithExternal2ndryInstance();
             FormDef formDef = FormParserHelper.parse(formFile);
             formEntryModel = new FormEntryModel(formDef);
             formEntryController = new FormEntryController(formEntryModel);
@@ -58,7 +51,7 @@ public class FormEntryControllerAnswerQuestion {
         }
     }
 
-    @Benchmark
+     @Benchmark
     public void benchmark_FormEntryController_answerAndSaveAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
@@ -71,7 +64,7 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
-    @Benchmark
+     @Benchmark
     public void benchmark_FormEntryController_answerAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
@@ -81,7 +74,7 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
-    @Benchmark
+     @Benchmark
     public void benchmark_FormEntryController_answerAllThenSaveAll(FormControllerAnswerQuestionState state) {
         HashMap<FormIndex, IAnswerData> answers = new HashMap<>();
         state.formEntryController.stepToNextEvent();
@@ -94,7 +87,7 @@ public class FormEntryControllerAnswerQuestion {
                 state.formEntryController.getModel().getForm()
                     .populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
             }
-            IAnswerData answer = getStubAnswer(formEntryPrompt.getQuestion());
+            IAnswerData answer = answerNigeriaWardsQuestion(formEntryPrompt.getQuestion());
             int saveStatus = state.formEntryController.answerQuestion(questionIndex, answer, true);
             answers.put(questionIndex, answer);
             state.formEntryController.stepToNextEvent();
@@ -106,13 +99,13 @@ public class FormEntryControllerAnswerQuestion {
     }
 
 
-    @Benchmark
+     @Benchmark
     public void benchmark_FormEntryController_answerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
         state.formEntryController.stepToNextEvent();
         if (state.formEntryModel.getFormIndex().isInForm()) {
             FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();
             FormEntryPrompt formEntryPrompt = state.formEntryModel.getQuestionPrompt(questionIndex);
-            IAnswerData answer = getStubAnswer(formEntryPrompt.getQuestion());
+            IAnswerData answer = answerNigeriaWardsQuestion(formEntryPrompt.getQuestion());
             state.formEntryController.answerQuestion(questionIndex, answer, true);
             state.formEntryController.stepToNextEvent();
         } else {
@@ -148,7 +141,7 @@ public class FormEntryControllerAnswerQuestion {
                     itemsetBinding,
                     (TreeReference) question.getBind().getReference()
                 );
-            answer = getStubAnswer(formEntryPrompt.getQuestion());
+            answer = answerNigeriaWardsQuestion(formEntryPrompt.getQuestion());
             state.formEntryController.answerQuestion(questionIndex, answer, true);
             return this;
         }
