@@ -38,13 +38,13 @@ public class FormDefCacheExternal2ndryInstanceBenchMark {
         }
     }
 
-    @Benchmark
+    // @Benchmark
     public void
     benchmark_FormDefCache_1_writeToCache(FormDefCacheState state, Blackhole bh) throws IOException {
         FormDefCache.writeCache(state.formDef, state.resourcePath.toString());
     }
 
-    @Benchmark
+    // @Benchmark
     public void
     benchmark_FormDefCache_2_readFromCache(FormDefCacheState state, Blackhole bh) throws IOException {
         FormDef cachedFormDef = FormDefCache.readCache(state.resourcePath.toFile());
