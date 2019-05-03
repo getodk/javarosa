@@ -26,7 +26,6 @@ public class ResourcePathHelper {
         }
     }
 
-
     /**
      * Makes a Path for a resource file either in a directory corresponding to the test class’s package, or
      * in the resources directory. Automated tests generate some files dynamically, so the Paths created here
@@ -36,25 +35,6 @@ public class ResourcePathHelper {
      * @return a Path for the resource file
      */
     public static Path r(String filename) {
-        if (resourcePathsCache == null)
-            throw new RuntimeException("Too fast! The resources cache hasn't been built yet! Don't use r() within static members!");
-        return resourcePathsCache.stream()
-            .filter(p -> p.endsWith(filename))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("File " + filename + " not found among files in resources"));
-    }
-
-    /**
-     * Makes a Path for a resource file either in a directory corresponding to the test class’s package, or
-     * in the resources directory. Automated tests generate some files dynamically, so the Paths created here
-     * aren’t always for existing files.
-     *
-     * @param filename the file name for which to create a path
-     * @param fallBack whether to “fall back” to the resources directory if the file is not in the
-     *                 class’s corresponding directory
-     * @return a Path for the resource file
-     */
-    public static Path r(String filename, boolean fallBack) {
         if (resourcePathsCache == null)
             throw new RuntimeException("Too fast! The resources cache hasn't been built yet! Don't use r() within static members!");
         return resourcePathsCache.stream()
