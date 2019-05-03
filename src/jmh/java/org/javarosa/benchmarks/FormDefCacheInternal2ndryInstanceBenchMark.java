@@ -7,6 +7,7 @@ import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xform.parse.FormParserHelper;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -35,13 +36,13 @@ public class FormDefCacheInternal2ndryInstanceBenchMark {
         }
     }
 
-    // @Benchmark
+    @Benchmark
     public void
     benchmark_FormDefCache_1_writeToCache(FormDefCacheState state, Blackhole bh) throws IOException {
         FormDefCache.writeCache(state.formDef, state.resourcePath.toString());
     }
 
-    // @Benchmark
+    @Benchmark
     public void
     benchmark_FormDefCache_2_readFromCache(FormDefCacheState state, Blackhole bh) throws IOException {
         FormDef cachedFormDef = FormDefCache.readCache(state.resourcePath.toFile());

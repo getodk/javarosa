@@ -28,7 +28,7 @@ public class FormDefCache {
     private FormDefCache() {
         // Private constructor
     }
-    private static String CACHE_PATH =    "/.cache";
+
     /**
      * Serializes a FormDef and saves it in the cache. To avoid problems from two callers
      * trying to cache the same file at the same time, we serialize into a temporary file,
@@ -40,11 +40,8 @@ public class FormDefCache {
     public static void writeCache(FormDef formDef, String formPath) throws IOException {
         final long formSaveStart = System.currentTimeMillis();
         File cachedFormDefFile = FormDefCache.getCacheFile(new File(formPath));
-        File cacheDir = new File(CACHE_PATH);
-        createIfNotExists(cacheDir);
-        System.out.println("=========" + CACHE_PATH);
         final File tempCacheFile = File.createTempFile("cache", null,
-            cacheDir);
+            null);
         logger.info(String.format("Started saving %s to the cache via temp file %s",
             formDef.getTitle(), tempCacheFile.getName()));
 
@@ -83,13 +80,6 @@ public class FormDefCache {
         }
     }
 
-    private static void createIfNotExists(File directory) throws IOException {
-        directory.mkdir();
-        if(Files.notExists(directory.toPath())){
-            System.out.println("2=========2" + CACHE_PATH);
-            directory.mkdir();
-        }
-    }
 
     /**
      * If a form is present in the cache, deserializes and returns it as as FormDef.
@@ -123,7 +113,7 @@ public class FormDefCache {
      * @return a File object
      */
     private static File getCacheFile(File formXml) {
-        return new File(CACHE_PATH + File.separator +
+        return new File( File.separator +
             getMd5Hash(formXml) + ".formdef");
     }
 
