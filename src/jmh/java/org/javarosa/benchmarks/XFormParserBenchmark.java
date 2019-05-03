@@ -52,7 +52,6 @@ public class XFormParserGetXMLDocExternalInstanceBenchmark {
        Reader internalInstanceXFormReader = new FileReader(state.xFormWithOnlyInternalSecondaryInstances.toFile());
        Document xFormXMLDocument = XFormParser.getXMLDocument(internalInstanceXFormReader);
        bh.consume(xFormXMLDocument);
-
     }
 
       @Benchmark
