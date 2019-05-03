@@ -41,7 +41,7 @@ public class FormDefParserBenchmark {
         public void initialize() {
             xFormExternalInstanceFilePath = getNigeriaWardsXMLWithExternal2ndryInstance();
             xFormInternalInstanceFilePath = getNigeriaWardsXMLWithInternal2ndryInstance();
-            xFormMinifiedInternalInstanceFilePath = getNigeriaWardsXMLWithInternal2ndryInstance();
+            xFormMinifiedInternalInstanceFilePath = getMinifiedNigeriaWardsXMLWithInternal2ndryInstance();
         }
     }
 
