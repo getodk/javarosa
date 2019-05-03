@@ -37,20 +37,20 @@ public class TreeElementParserBenchmark {
     }
 
     @Benchmark
-    public void benchmark_TreeElementParser_parse_xform_with_external_instance(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+    public void benchmarkParseExternalInstanceXFormOnly(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement documentRootTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormExternalSecondayInstances);
         bh.consume(documentRootTreeElement);
     }
 
     @Benchmark
-    public void benchmark_TreeElementParser_parse_xform_with_internal_instance(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+    public void benchmarkParseInternalInstanceXformOnly(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement documentRootTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormInternalSecondaryInstances);
         bh.consume(documentRootTreeElement);
     }
 
 
     @Benchmark
-    public void benchmark_TreeElementParser_parse_all(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+    public void benchmarkParseExternalInstanceXFormWithInstanceFiles(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement xFormTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormExternalSecondayInstances);
         TreeElement lgaInstanceTreeElement = XmlXFormInstance.parse("lgas", state.lgasInstance);
         TreeElement wardInstanceTreeElement = XmlXFormInstance.parse("wards", state.wardsInstance);

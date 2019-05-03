@@ -29,12 +29,11 @@ public class ExternalDataInstanceBuildBenchmark {
         @Setup(Level.Trial)
         public void initialize() {
             Path assetsDir = prepareAssets("wards.xml", "lgas.xml");
-            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", assetsDir);
         }
     }
 
-      @Benchmark
-    public void benchmark_ExternalDataInstance_build_wards(ExternalDataInstanceState state, Blackhole bh)
+    @Benchmark
+    public void benchmarkBuildWards(ExternalDataInstanceState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         ExternalDataInstance wardsExternalInstance =
@@ -44,7 +43,7 @@ public class ExternalDataInstanceBuildBenchmark {
 
     @Benchmark
     public void
-    benchmark_ExternalDataInstance_build_lgas(ExternalDataInstanceState state, Blackhole bh)
+    benchmarkBuildLGAs(ExternalDataInstanceState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         ExternalDataInstance lgaIExternalInstance =

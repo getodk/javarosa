@@ -4,6 +4,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.ValidateOutcome;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.form.api.FormEntryController;
@@ -57,8 +58,9 @@ public class FormDefValidateBenchmark {
     }
 
     @Benchmark
-    public void benchmark_FormDefValidate_validate(FormDefValidateState state, Blackhole bh) {
-        bh.consume(state.formDef.validate(true));
+    public void benchmarkFormDefValidate(FormDefValidateState state, Blackhole bh) {
+        ValidateOutcome validateOutcome = state.formDef.validate(true);
+        bh.consume(validateOutcome);
     }
 
 }

@@ -22,7 +22,7 @@ public class PopulateTreeNodeBenchmark {
     }
 
    @Benchmark
-    public void benchmark_TreeElement_populate(TreeElementPopulateState state) {
+    public void benchmarkPopulate(TreeElementPopulateState state) {
         state.dataRootNode.populate(state.savedRoot, state.formDef);
     }
 

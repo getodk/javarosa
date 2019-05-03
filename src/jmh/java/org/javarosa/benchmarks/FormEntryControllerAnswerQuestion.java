@@ -54,7 +54,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
     @Benchmark
-    public void benchmark_FormEntryController_answerAndSaveAll(FormControllerAnswerQuestionState state) {
+    public void benchmarkAnswerAndSaveAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
             AnswerCurrentQuestionAction action = new AnswerCurrentQuestionAction(state).invoke();
@@ -67,7 +67,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
     @Benchmark
-    public void benchmark_FormEntryController_answerAll(FormControllerAnswerQuestionState state) {
+    public void benchmarkAnswerAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
             new AnswerCurrentQuestionAction(state).invoke();
@@ -77,7 +77,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
       @Benchmark
-    public void benchmark_FormEntryController_answerAllThenSaveAll(FormControllerAnswerQuestionState state) {
+    public void benchmarkAnswerAllThenSaveAll(FormControllerAnswerQuestionState state) {
         HashMap<FormIndex, IAnswerData> answers = new HashMap<>();
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
@@ -102,7 +102,7 @@ public class FormEntryControllerAnswerQuestion {
 
 
       @Benchmark
-    public void benchmark_FormEntryController_answerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
+    public void benchmarkAnswerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
         state.formEntryController.stepToNextEvent();
         if (state.formEntryModel.getFormIndex().isInForm()) {
             FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();
