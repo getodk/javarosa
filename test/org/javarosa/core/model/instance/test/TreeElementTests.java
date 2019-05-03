@@ -1,7 +1,6 @@
 package org.javarosa.core.model.instance.test;
 
 
-import org.javarosa.core.PathConst;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
@@ -11,7 +10,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
@@ -30,8 +28,7 @@ public class TreeElementTests {
         byte[] formInstanceAsBytes = null;
         try {
             formInstanceAsBytes =
-                    Files.readAllBytes(Paths.get(PathConst.getTestResourcePath().getAbsolutePath(),
-                            "populate-nodes-attributes-instance.xml"));
+                    Files.readAllBytes(r("populate-nodes-attributes-instance.xml"));
         } catch (IOException e) {
             fail("There was a problem with reading the test data.\n" + e.getMessage());
         }
