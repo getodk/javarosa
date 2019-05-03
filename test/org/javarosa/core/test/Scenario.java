@@ -44,7 +44,6 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -52,6 +51,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * <div style="border: 1px 1px 1px 1px; background-color: #556B2F; color: white; padding: 20px">
+ * <b>Warning</b> This class is probably incomplete. If your testing requirements
+ * aren't met by this class, please, ask around and let's try to make this tool
+ * awesome together.
+ * <ul>
+ * <li><a href="https://opendatakit.slack.com">OpenDataKit Slack</a></li>
+ * <li><a href="https://github.com/opendatakit/javarosa/issues">GitHub issues</a></li>
+ * <li><a href="https://forum.opendatakit.org/c/development">Development forum</a></li>
+ * </ul>
+ * <hr/>
+ * </div>
+ * <p>
  * This class helps writing JavaRosa tests. It provides two separate APIs:
  * <ul>
  * <li>A static, declarative API that lets the test author to define the state
