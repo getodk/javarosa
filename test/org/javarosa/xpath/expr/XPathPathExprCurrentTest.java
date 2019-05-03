@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.test.Scenario;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,4 +1,20 @@
-package org.javarosa.xpath.expr;
+/*
+ * Copyright 2019 Nafundi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.javarosa.core.test;
 
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
@@ -56,7 +72,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  */
 // TODO Extract both APIs to two separate contexts so that they can't be mixed, probably best if it's a Scenario steps runner that would have the common .given(setup).when(action).then(assertion)
-class Scenario {
+public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     private final FormDef formDef;
     private final FormEntryController formEntryController;
