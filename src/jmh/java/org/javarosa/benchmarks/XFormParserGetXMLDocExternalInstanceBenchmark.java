@@ -21,9 +21,9 @@ import java.nio.file.Path;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 
-public class XFormParserGetXMLDocBenchmark {
+public class XFormParserGetXMLDocExternalInstanceBenchmark {
     public static void main(String[] args) {
-        dryRun(XFormParserGetXMLDocBenchmark.class);
+        dryRun(XFormParserGetXMLDocExternalInstanceBenchmark.class);
     }
 
     @State(Scope.Thread)
