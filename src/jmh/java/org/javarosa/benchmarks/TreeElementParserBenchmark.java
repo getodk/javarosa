@@ -57,6 +57,18 @@ public class TreeElementParserBenchmark {
     }
 
     @Benchmark
+    public void benchmarkParseExternalInstanceLGAs(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+        TreeElement treeElement = XmlXFormInstance.parse("lgas", state.lgasInstance);
+        bh.consume(treeElement);
+    }
+
+    @Benchmark
+    public void benchmarkParseExternalInstanceWards(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+        TreeElement treeElement = XmlXFormInstance.parse("wards", state.wardsInstance);
+        bh.consume(treeElement);
+    }
+
+    @Benchmark
     public void benchmarkParseExternalInstanceXFormWithInstanceFiles(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement xFormTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormExternalSecondayInstances);
         TreeElement lgaInstanceTreeElement = XmlXFormInstance.parse("lgas", state.lgasInstance);
