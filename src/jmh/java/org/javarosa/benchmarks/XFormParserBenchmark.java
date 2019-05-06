@@ -81,10 +81,7 @@ public class XFormParserBenchmark {
         bh.consume(externalXFormInstanceDocument);
         bh.consume(lgaExternalInstanceDocument);
         bh.consume(wardExternalInstanceDocument);
-<<<<<<< HEAD
 
-=======
->>>>>>> 0139a4ef7e62961e839cf43b64b1639766f5f135
     }
  
 
