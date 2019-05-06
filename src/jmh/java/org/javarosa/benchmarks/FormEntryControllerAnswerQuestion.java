@@ -100,8 +100,7 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
-
-      @Benchmark
+    @Benchmark
     public void benchmarkAnswerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
         state.formEntryController.stepToNextEvent();
         if (state.formEntryModel.getFormIndex().isInForm()) {

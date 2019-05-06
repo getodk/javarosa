@@ -30,19 +30,18 @@ public class XFormParserBenchmark {
     public static class XFormParserState {
         Path xFormInternalSecondaryInstancesMinified;
         Path xFormInternalSecondaryInstances;
-        Path xFormExternalSecondayInstances;
+        Path xFormExternalSecondaryInstances;
         Path lgaSecondaryInstance;
         Path wardExternalSecondaryInstance;
+
         @Setup(Level.Trial)
         public void
         initialize() throws FileNotFoundException {
             xFormInternalSecondaryInstancesMinified = BenchmarkUtils.getMinifiedNigeriaWardsXMLWithInternal2ndryInstance();
             xFormInternalSecondaryInstances = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance();
-            xFormExternalSecondayInstances = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
+            xFormExternalSecondaryInstances = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             lgaSecondaryInstance = BenchmarkUtils.getLGAsExternalInstance();
             wardExternalSecondaryInstance = BenchmarkUtils.getWardsExternalInstance();
-
-
         }
     }
 
@@ -72,7 +71,7 @@ public class XFormParserBenchmark {
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
 
-        Reader externalInstanceXFormReader = new FileReader(state.xFormExternalSecondayInstances.toFile());
+        Reader externalInstanceXFormReader = new FileReader(state.xFormExternalSecondaryInstances.toFile());
         Reader lgaSecondaryInstanceReader = new FileReader(state.lgaSecondaryInstance.toFile());
         Reader wardsSecondaryInstanceReader = new FileReader(state.wardExternalSecondaryInstance.toFile());
         Document externalXFormInstanceDocument = XFormParser.getXMLDocument(externalInstanceXFormReader);
@@ -82,7 +81,10 @@ public class XFormParserBenchmark {
         bh.consume(externalXFormInstanceDocument);
         bh.consume(lgaExternalInstanceDocument);
         bh.consume(wardExternalInstanceDocument);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0139a4ef7e62961e839cf43b64b1639766f5f135
     }
  
 

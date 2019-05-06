@@ -53,7 +53,6 @@ public class FormDefParserBenchmark {
         bh.consume(formDef);
     }
 
-
     @Benchmark
     public void
     benchmarkParseInternalSecondaryInstance(FormDefParserState state, Blackhole bh) throws IOException {
@@ -61,12 +60,10 @@ public class FormDefParserBenchmark {
         bh.consume(formDef);
     }
 
-
     @Benchmark
     public void
     benchmarkParseMinifiedInternalSecondaryInstance(FormDefParserState state, Blackhole bh) throws IOException {
         FormDef formDef = FormParserHelper.parse(state.xFormMinifiedInternalInstanceFilePath);
         bh.consume(formDef);
     }
-
 }

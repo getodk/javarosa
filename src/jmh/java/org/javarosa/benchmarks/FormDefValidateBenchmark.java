@@ -62,5 +62,4 @@ public class FormDefValidateBenchmark {
         ValidateOutcome validateOutcome = state.formDef.validate(true);
         bh.consume(validateOutcome);
     }
-
 }

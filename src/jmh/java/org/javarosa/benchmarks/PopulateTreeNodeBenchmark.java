@@ -21,7 +21,7 @@ public class PopulateTreeNodeBenchmark {
         BenchmarkUtils.dryRun(PopulateTreeNodeBenchmark.class);
     }
 
-   @Benchmark
+    @Benchmark
     public void benchmarkPopulate(TreeElementPopulateState state) {
         state.dataRootNode.populate(state.savedRoot, state.formDef);
     }
