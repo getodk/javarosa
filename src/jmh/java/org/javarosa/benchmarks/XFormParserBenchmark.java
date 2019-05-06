@@ -28,6 +28,7 @@ public class XFormParserBenchmark {
 
     @State(Scope.Thread)
     public static class XFormParserState {
+        Path xFormInternalSecondaryInstancesMinified;
         Path xFormInternalSecondaryInstances;
         Path xFormExternalSecondayInstances;
         Path lgaSecondaryInstance;
@@ -35,6 +36,7 @@ public class XFormParserBenchmark {
         @Setup(Level.Trial)
         public void
         initialize() throws FileNotFoundException {
+            xFormInternalSecondaryInstancesMinified = BenchmarkUtils.getMinifiedNigeriaWardsXMLWithInternal2ndryInstance();
             xFormInternalSecondaryInstances = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance();
             xFormExternalSecondayInstances = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             lgaSecondaryInstance = BenchmarkUtils.getLGAsExternalInstance();
@@ -49,14 +51,14 @@ public class XFormParserBenchmark {
     benchmarkParseExternalInstanceXFormOnly(XFormParserState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
-        Reader internalInstanceXFormReader = new FileReader(state.xFormExternalSecondayInstances.toFile());
-        Document xFormXMLDocument = XFormParser.getXMLDocument(internalInstanceXFormReader);
-        bh.consume(xFormXMLDocument);
+        Reader reader = new FileReader(state.xFormInternalSecondaryInstancesMinified.toFile());
+        Document kxmlDocument = XFormParser.getXMLDocument(reader);
+        bh.consume(kxmlDocument);
     }
 
     @Benchmark
     public void
-    benchmarkParseInternalInstanceXformOnly(XFormParserState state, Blackhole bh)
+    benchmarkParseInternalInstanceXForm(XFormParserState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         Reader internalInstanceXFormReader = new FileReader(state.xFormInternalSecondaryInstances.toFile());
@@ -81,7 +83,7 @@ public class XFormParserBenchmark {
         bh.consume(lgaExternalInstanceDocument);
         bh.consume(wardExternalInstanceDocument);
 
-
     }
+ 
 
 }
