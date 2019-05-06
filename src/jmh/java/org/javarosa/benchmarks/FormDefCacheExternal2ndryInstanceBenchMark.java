@@ -18,13 +18,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class FormDefCacheExternal2ndryInstanceBenchMark {
-
     // The JMH samples are the best documentation for how to use it
     // http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org/openjdk/jmh/samples/
     @State(Scope.Thread)
     public static class FormDefCacheState {
         Path resourcePath;
         FormDef formDef;
+
         @Setup(Level.Trial)
         public void
         initialize() throws IOException {
@@ -48,6 +48,4 @@ public class FormDefCacheExternal2ndryInstanceBenchMark {
         FormDef cachedFormDef = FormDefCache.readCache(state.resourcePath.toFile());
         bh.consume(cachedFormDef);
     }
-
-
 }

@@ -2,7 +2,6 @@ package org.javarosa.benchmarks;
 
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -50,5 +49,4 @@ public class ExternalDataInstanceBuildBenchmark {
             ExternalDataInstance.build("jr://file/lgas.xml", "lgas");
         bh.consume(lgaIExternalInstance);
     }
-
 }

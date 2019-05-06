@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class FormDefCacheInternal2ndryInstanceBenchMark {
-
     // The JMH samples are the best documentation for how to use it
     // http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org/openjdk/jmh/samples/
     @State(Scope.Thread)

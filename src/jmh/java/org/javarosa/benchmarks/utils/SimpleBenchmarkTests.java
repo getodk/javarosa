@@ -126,7 +126,6 @@ public class SimpleBenchmarkTests {
 
     @Test
     public void testFormEntryControllerValidate() throws IOException {
-
         Path xFormFilePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
         ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", prepareAssets());
         FormDef formDef = FormParserHelper.parse(xFormFilePath);
@@ -188,8 +187,6 @@ public class SimpleBenchmarkTests {
 
     @Test
     public void FormDefWriteAndReadFromToCache() throws  IOException{
-
-
         initSerialization();
 
         Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance();
@@ -215,6 +212,4 @@ public class SimpleBenchmarkTests {
         PrototypeManager.registerPrototypes(CoreModelModule.classNames);
         new XFormsModule().registerModule();
     }
-
-
 }

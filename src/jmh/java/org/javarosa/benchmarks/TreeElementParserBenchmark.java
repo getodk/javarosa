@@ -48,7 +48,6 @@ public class TreeElementParserBenchmark {
         bh.consume(documentRootTreeElement);
     }
 
-
     @Benchmark
     public void benchmarkParseExternalInstanceXFormWithInstanceFiles(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement xFormTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormExternalSecondayInstances);
