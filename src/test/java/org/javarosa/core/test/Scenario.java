@@ -221,7 +221,7 @@ public class Scenario {
 
     /**
      * Returns the list of choices of the &lt;select&gt; or &lt;select1&gt; form controls.
-     * This method ensures that any dynamic choce lists are populated to reflect the status
+     * This method ensures that any dynamic choice lists are populated to reflect the status
      * of the form (already answered questions, etc.).
      */
     public List<SelectChoice> choicesOf(String xPath) {

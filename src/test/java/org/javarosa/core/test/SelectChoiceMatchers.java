@@ -1,12 +1,12 @@
-package org.javarosa.xpath.expr;
+package org.javarosa.core.test;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.javarosa.core.model.SelectChoice;
 
-class SelectChoiceMatchers {
-    static Matcher<SelectChoice> choice(String expectedValue) {
+public class SelectChoiceMatchers {
+    public static Matcher<SelectChoice> choice(String expectedValue) {
         return new TypeSafeMatcher<SelectChoice>() {
 
             @Override
@@ -26,7 +26,7 @@ class SelectChoiceMatchers {
         };
     }
 
-    static Matcher<SelectChoice> choice(String expectedValue, String expectedDisplayText) {
+    public static Matcher<SelectChoice> choice(String expectedValue, String expectedDisplayText) {
         return new TypeSafeMatcher<SelectChoice>() {
 
             @Override
