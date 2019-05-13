@@ -21,8 +21,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 
 public class ItemsetBindingTest {
@@ -95,6 +98,7 @@ public class ItemsetBindingTest {
 
         scenario.answer("/data/level1", "");
         assertThat(scenario.choicesOf("/data/level2"), empty());
+        assertThat(scenario.answerOf("/data/level2"), is(stringAnswer("")));
         assertThat(scenario.choicesOf("/data/level3"), empty());
     }
 }

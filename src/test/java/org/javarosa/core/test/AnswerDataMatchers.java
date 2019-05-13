@@ -1,4 +1,4 @@
-package org.javarosa.xpath.expr;
+package org.javarosa.core.test;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

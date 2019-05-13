@@ -17,7 +17,7 @@ package org.javarosa.xpath.expr;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.xpath.expr.AnswerDataMatchers.answer;
+import static org.javarosa.core.test.AnswerDataMatchers.answer;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 import static org.junit.Assert.assertThat;
 
