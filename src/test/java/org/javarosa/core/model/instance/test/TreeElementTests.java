@@ -1,35 +1,29 @@
 package org.javarosa.core.model.instance.test;
 
+
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
-import java.nio.file.Files;
-
-import java.io.IOException;
 
 public class TreeElementTests {
 
     @Test
-    public void testPopulate_withNodesAttributes() {
+    public void testPopulate_withNodesAttributes() throws IOException {
         // Given
         FormParseInit formParseInit = new FormParseInit(r("populate-nodes-attributes.xml"));
 
         FormEntryController formEntryController = formParseInit.getFormEntryController();
 
-        byte[] formInstanceAsBytes = null;
-        try {
-            formInstanceAsBytes = Files.readAllBytes(r("populate-nodes-attributes-instance.xml"));
-        } catch (IOException e) {
-            fail("There was a problem with reading the test data.\n" + e.getMessage());
-        }
+        byte[] formInstanceAsBytes = Files.readAllBytes(r("populate-nodes-attributes-instance.xml"));
         TreeElement savedRoot = XFormParser.restoreDataModel(formInstanceAsBytes, null).getRoot();
         FormDef formDef = formEntryController.getModel().getForm();
         TreeElement dataRootNode = formDef.getInstance().getRoot().deepCopy(true);

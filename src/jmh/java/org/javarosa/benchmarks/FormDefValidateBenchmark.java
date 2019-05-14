@@ -1,5 +1,9 @@
 package org.javarosa.benchmarks;
 
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+
+import java.io.IOException;
+import java.nio.file.Path;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
@@ -18,12 +22,6 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
-import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance;
-
 public class FormDefValidateBenchmark {
     public static void main(String[] args) {
         dryRun(FormDefValidateBenchmark.class);
@@ -35,7 +33,7 @@ public class FormDefValidateBenchmark {
 
         @Setup(Level.Trial)
         public void initialize() throws IOException {
-            Path resourcePath = getNigeriaWardsXMLWithExternal2ndryInstance();
+            Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             formDef = FormParserHelper.parse(resourcePath);
             FormEntryModel formEntryModel = new FormEntryModel(formDef);
             FormEntryController formEntryController = new FormEntryController(formEntryModel);

@@ -27,6 +27,8 @@ import static org.javarosa.xpath.expr.AnswerDataMatchers.answer;
 import static org.javarosa.xpath.expr.SelectChoiceMatchers.choice;
 import static org.junit.Assert.assertThat;
 
+import org.javarosa.core.test.Scenario;
+
 public class XPathPathExprCurrentTest {
     private Scenario scenario;
 

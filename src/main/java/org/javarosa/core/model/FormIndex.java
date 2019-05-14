@@ -19,6 +19,7 @@ package org.javarosa.core.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.javarosa.core.model.instance.TreeReference;
 
@@ -113,7 +114,8 @@ public class FormIndex implements Serializable {
     private FormIndex nextLevel;
 
     /**
-     * The XPath reference this index refers to.
+     * The XPath reference this index refers to. Warning: these are mutable and could conceivably get out of sync with
+     * the index.
      */
     private TreeReference reference;
 
@@ -292,6 +294,7 @@ public class FormIndex implements Serializable {
         return beginningOfForm;
     }
 
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof FormIndex))
             return false;
@@ -319,6 +322,13 @@ public class FormIndex implements Serializable {
 //            index = index.getNextLevel();
 //        }
 //
+    }
+
+    @Override
+    public int hashCode() {
+        // The reference field is not included. This matches the equals(Object) implementation. TreeReferences are
+        // mutable and are provided as a way to convert between FormIndex and other types.
+        return Objects.hash(beginningOfForm, endOfForm, localIndex, instanceIndex, nextLevel);
     }
 
     public int compareTo(Object o) {

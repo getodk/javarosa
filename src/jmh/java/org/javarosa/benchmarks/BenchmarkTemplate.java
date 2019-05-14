@@ -1,18 +1,18 @@
 package org.javarosa.benchmarks;
 
+import static java.nio.file.Files.readAllBytes;
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.io.IOException;
-import java.nio.file.Path;
-
-import static java.nio.file.Files.readAllBytes;
-import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
-import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 
 public class BenchmarkTemplate {
     public static void main(String[] args) {
@@ -41,7 +41,7 @@ public class BenchmarkTemplate {
         }
     }
 
-    //@Benchmark
+    @Benchmark
     public void benchmark_method_template(StateClassTemplate state, Blackhole bh) throws IOException {
         // Always use Blackhole.consume with the output of the benchmarked action
         bh.consume(readAllBytes(state.formFile));

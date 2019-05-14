@@ -1,7 +1,0 @@
-<?xml version='1.0' ?>
-<data id="populate-nodes-attributes" xmlns:cns="custom_name_space">
-    <free_text_1 custom_attr_1="xyz1">Abc</free_text_1>
-    <regular_group cns:custom_attr_1="xyz2">
-        <free_text_2 custom_attr_2="xyz3">Abc2</free_text_2>
-    </regular_group>
-</data>

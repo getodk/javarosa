@@ -23,6 +23,8 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.xpath.expr.AnswerDataMatchers.stringAnswer;
 import static org.junit.Assert.assertThat;
 
+import org.javarosa.core.test.Scenario;
+
 public class XPathPathExprCurrentGroupCountRefTest {
     private Scenario scenario;
 
