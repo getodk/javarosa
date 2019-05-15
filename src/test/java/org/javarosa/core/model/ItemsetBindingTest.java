@@ -51,9 +51,9 @@ public class ItemsetBindingTest {
         scenario.answer("/data/level1", "b");
 
         assertThat(scenario.choicesOf("/data/level2"), containsInAnyOrder(
-            choice("b1"),
-            choice("b2"),
-            choice("b3")));
+            choice("ba"),
+            choice("bb"),
+            choice("bc")));
     }
 
     @Test
@@ -63,10 +63,10 @@ public class ItemsetBindingTest {
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
         scenario.answer("/data/level1", "b");
-        scenario.answer("/data/level2", "b1");
+        scenario.answer("/data/level2", "ba");
         assertThat(scenario.choicesOf("/data/level3"), containsInAnyOrder(
-            choice("b1a"),
-            choice("b1b")));
+            choice("baa"),
+            choice("bab")));
     }
 
     @Test
@@ -76,10 +76,10 @@ public class ItemsetBindingTest {
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
         scenario.answer("/data/level1", "a");
-        scenario.answer("/data/level2", "a1");
+        scenario.answer("/data/level2", "aa");
         assertThat(scenario.choicesOf("/data/level3"), containsInAnyOrder(
-            choice("a1a"),
-            choice("a1b")));
+            choice("aaa"),
+            choice("aab")));
         scenario.answer("/data/level2", "");
         assertThat(scenario.choicesOf("/data/level3"), empty());
     }
@@ -91,14 +91,57 @@ public class ItemsetBindingTest {
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
         scenario.answer("/data/level1", "a");
-        scenario.answer("/data/level2", "a1");
+        scenario.answer("/data/level2", "aa");
         assertThat(scenario.choicesOf("/data/level3"), containsInAnyOrder(
-            choice("a1a"),
-            choice("a1b")));
+            choice("aaa"),
+            choice("aab")));
 
         scenario.answer("/data/level1", "");
         assertThat(scenario.choicesOf("/data/level2"), empty());
+        // this next assertion is only true because the one before called populateDynamic choices
+        // TODO: make clearing out answers that are no longer available choices part of the form re-evaluation
         assertThat(scenario.answerOf("/data/level2"), is(stringAnswer("")));
         assertThat(scenario.choicesOf("/data/level3"), empty());
+    }
+
+    @Test
+    public void changingValueAtLevel2_ShouldClearLevel3_IfChoiceNoLongerAvailable() {
+        scenario.newInstance();
+
+        scenario.answer("/data/level1_contains", "a");
+        scenario.answer("/data/level2_contains", "aa");
+        assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
+            choice("aaa"),
+            choice("aab"),
+            choice("baa")));
+        scenario.answer("/data/level3_contains", "aaa");
+        scenario.answer("/data/level2_contains", "ab");
+        assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
+            choice("aab"),
+            choice("bab")));
+        // this next assertion is only true because the one before called populateDynamicChoices
+        // TODO: make clearing out answers that are no longer available choices part of the form re-evaluation
+        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("")));
+    }
+
+    @Test
+    public void changingValueAtLevel2_ShouldNotClearLevel3_IfChoiceStillAvailable() {
+        scenario.newInstance();
+
+        scenario.answer("/data/level1_contains", "a");
+        scenario.answer("/data/level2_contains", "aa");
+        assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
+            choice("aaa"),
+            choice("aab"),
+            choice("baa")));
+        scenario.answer("/data/level3_contains", "aab");
+        scenario.answer("/data/level2_contains", "ab");
+        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("aab")));
+
+        // Since populateDynamicChoices can change answers, verify it doesn't in this case
+        assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
+            choice("aab"),
+            choice("bab")));
+        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("aab")));
     }
 }
