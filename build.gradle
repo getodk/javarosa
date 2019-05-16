@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
+    id "me.champeau.gradle.jmh" version "0.4.8"
 }
 
 repositories {
@@ -9,19 +10,10 @@ repositories {
 }
 
 sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
-    }
-    test {
-        java {
-            srcDirs = ['test']
-        }
-        resources {
-            srcDirs = ['resources']
-        }
-    }
+    main.java.srcDirs = ['src/main/java']
+    main.resources.srcDirs = ['src/main/resources']
+    test.java.srcDirs = ['src/test/java']
+    test.resources.srcDirs = ['src/test/resources']
 }
 
 compileJava {
@@ -81,3 +73,14 @@ javadoc {
     failOnError = false
 }
 
+jmh {
+    iterations = 1
+    fork = 0
+    timeOnIteration = '1s'
+    timeout = '1s'
+    warmup = '1s'
+    warmupBatchSize = 1
+    warmupForks = 0
+    warmupIterations = 1
+    includeTests = true
+}

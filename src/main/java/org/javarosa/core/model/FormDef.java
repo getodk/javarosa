@@ -1024,7 +1024,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                     item));
             String value = null;
             TreeElement copyNode = null;
-
             if (itemset.copyMode) {
                 copyNode = this.getMainInstance().resolveReference(itemset.copyRef.contextualize(item));
             }
