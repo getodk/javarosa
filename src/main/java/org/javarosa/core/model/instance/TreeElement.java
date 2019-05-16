@@ -62,7 +62,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
  *
  * <p>TODO: Split out the bind-able session data from this class and leave only the mandatory values to speed up
  * new DOM-like models</p>
- 
+
  * @author Clayton Sims
  */
 
@@ -226,6 +226,10 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         return children.get(name);
     }
 
+    @Override
+    public List<TreeElement> getChildrenWithName(String name, String filterField, String filterValue, boolean useCache) {
+        return children.get(name, filterField, filterValue, useCache);
+    }
     private int getNumChildrenWithName(String name) {
         return children.getCount(name);
     }

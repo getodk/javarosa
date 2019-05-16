@@ -27,7 +27,10 @@ import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
+import org.javarosa.xpath.XPathNodeset;
+import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathPathExpr;
 
 /**
  * A collection of objects that affect the evaluation of an expression, like
@@ -254,11 +257,39 @@ public class EvaluationContext {
         final int mult = sourceRef.getMultiplicity(depth);
         final List<TreeReference> treeReferences = new ArrayList<>(1);
 
-        final AbstractTreeElement node = sourceInstance.resolveReference(workingRef);
+        final AbstractTreeElement<TreeElement> node = (AbstractTreeElement<TreeElement>) sourceInstance.resolveReference(workingRef);
 
+        boolean runPredicates = true;
+        boolean toggleOptimizedFiltering = true;
+        boolean toggleFilteredValuesCache = true;
         if (node.getNumChildren() > 0) {
             if (mult == TreeReference.INDEX_UNBOUND) {
-                final List<TreeElement> childrenWithName = node.getChildrenWithName(name);
+                List<TreeElement> childrenWithName = null;
+                if (toggleOptimizedFiltering && predicates != null && predicates.size() == 1 && predicates.get(0) instanceof XPathEqExpr) {
+                    XPathEqExpr eqExpr = (XPathEqExpr) predicates.get(0);
+                    XPathPathExpr valueExpr = null;
+                    String filterFieldName = null;
+                    String fieldNameInA = extractEqExprFieldName(eqExpr.a);
+                    String fieldNameInB = extractEqExprFieldName(eqExpr.b);
+                    if (fieldNameInA != null) {
+                        filterFieldName = fieldNameInA;
+                        valueExpr = (XPathPathExpr) eqExpr.b;
+                    } else if (fieldNameInB != null) {
+                        filterFieldName = fieldNameInB;
+                        valueExpr = (XPathPathExpr) eqExpr.a;
+                    }
+                    if (filterFieldName != null && valueExpr != null) {
+                        EvaluationContext ec = new EvaluationContext(this, valueExpr.getReference());
+                        XPathNodeset eval = valueExpr.eval(sourceInstance, ec);
+                        String value = (String) eval.getValAt(0);
+                        if (value != null) {
+                            childrenWithName = node.getChildrenWithName(name, filterFieldName, value, toggleFilteredValuesCache);
+                            runPredicates = false;
+                        }
+                    }
+                }
+                if (childrenWithName == null)
+                    childrenWithName = node.getChildrenWithName(name);
                 final int count = childrenWithName.size();
                 for (int i = 0; i < count; i++) {
                     TreeElement child = childrenWithName.get(i);
@@ -291,11 +322,11 @@ public class EvaluationContext {
             }
         }
 
-        if (predicates != null && predicateEvaluationProgress != null) {
+        if (predicates != null && runPredicates && predicateEvaluationProgress != null) {
             predicateEvaluationProgress[1] += treeReferences.size();
         }
 
-        if (predicates != null) {
+        if (predicates != null && runPredicates) {
             boolean firstTime = true;
             List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
@@ -329,6 +360,14 @@ public class EvaluationContext {
         }
     }
 
+    private String extractEqExprFieldName(XPathExpression eqExprPart) {
+        if (eqExprPart instanceof XPathPathExpr) {
+            XPathPathExpr xppe = (XPathPathExpr) eqExprPart;
+            if (!xppe.getReference().isAbsolute() && xppe.steps.length == 1)
+                return xppe.steps[0].name.name;
+        }
+        return null;
+    }
     private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
         EvaluationContext ec = new EvaluationContext(this, treeRef);
         // broken:
