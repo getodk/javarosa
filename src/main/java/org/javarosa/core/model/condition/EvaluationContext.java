@@ -330,6 +330,49 @@ public class EvaluationContext {
 
         //ETHERTON: Is this where we should test for predicates?
         final int mult = sourceRef.getMultiplicity(depth);
+        final List<TreeReference> treeReferences = getRefs(includeTemplates, node, name, mult);
+
+        filterRefs(sourceInstance, predicates, treeReferences);
+
+        for (TreeReference treeRef : treeReferences) {
+            expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
+        }
+    }
+
+    private void filterRefs(DataInstance sourceInstance, List<XPathExpression> predicates, List<TreeReference> treeReferences) {
+        if (!predicates.isEmpty() && predicateEvaluationProgress != null) {
+            predicateEvaluationProgress[1] += treeReferences.size();
+        }
+
+        boolean firstTime = true;
+        List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
+        for (XPathExpression xpe : predicates) {
+            for (int i = 0; i < treeReferences.size(); ++i) {
+                //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+                TreeReference treeRef = treeReferences.get(i);
+
+                //test the predicate on the treeElement
+                EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
+                Object o = xpe.eval(sourceInstance, evalContext);
+                if (o instanceof Boolean) {
+                    boolean testOutcome = (Boolean) o;
+                    if (testOutcome) {
+                        passed.add(treeRef);
+                    }
+                }
+            }
+            firstTime = false;
+            treeReferences.clear();
+            treeReferences.addAll(passed);
+            passed.clear();
+
+            if (predicateEvaluationProgress != null) {
+                predicateEvaluationProgress[0]++;
+            }
+        }
+    }
+
+    private List<TreeReference> getRefs(boolean includeTemplates, AbstractTreeElement<TreeElement> node, String name, int mult) {
         final List<TreeReference> treeReferences = new ArrayList<>(1);
 
         if (node.getNumChildren() > 0) {
@@ -366,41 +409,7 @@ public class EvaluationContext {
                 treeReferences.add(attribute.getRef());
             }
         }
-
-        if (!predicates.isEmpty() && predicateEvaluationProgress != null) {
-            predicateEvaluationProgress[1] += treeReferences.size();
-        }
-
-        boolean firstTime = true;
-        List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
-        for (XPathExpression xpe : predicates) {
-            for (int i = 0; i < treeReferences.size(); ++i) {
-                //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                TreeReference treeRef = treeReferences.get(i);
-
-                //test the predicate on the treeElement
-                EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
-                Object o = xpe.eval(sourceInstance, evalContext);
-                if (o instanceof Boolean) {
-                    boolean testOutcome = (Boolean) o;
-                    if (testOutcome) {
-                        passed.add(treeRef);
-                    }
-                }
-            }
-            firstTime = false;
-            treeReferences.clear();
-            treeReferences.addAll(passed);
-            passed.clear();
-
-            if (predicateEvaluationProgress != null) {
-                predicateEvaluationProgress[0]++;
-            }
-        }
-
-        for (TreeReference treeRef : treeReferences) {
-            expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
-        }
+        return treeReferences;
     }
 
     private String extractEqExprFieldName(XPathExpression eqExprPart) {
