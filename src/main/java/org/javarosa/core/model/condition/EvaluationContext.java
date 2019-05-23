@@ -332,35 +332,9 @@ public class EvaluationContext {
         final int mult = sourceRef.getMultiplicity(depth);
         final List<TreeReference> treeReferences = new ArrayList<>(1);
 
-        boolean runPredicates = true;
         if (node.getNumChildren() > 0) {
             if (mult == TreeReference.INDEX_UNBOUND) {
-                List<TreeElement> childrenWithName = null;
-                if (predicates != null && predicates.size() == 1 && predicates.get(0) instanceof XPathEqExpr) {
-                    XPathEqExpr eqExpr = (XPathEqExpr) predicates.get(0);
-                    XPathPathExpr valueExpr = null;
-                    String filterFieldName = null;
-                    String fieldNameInA = extractEqExprFieldName(eqExpr.a);
-                    String fieldNameInB = extractEqExprFieldName(eqExpr.b);
-                    if (fieldNameInA != null) {
-                        filterFieldName = fieldNameInA;
-                        valueExpr = (XPathPathExpr) eqExpr.b;
-                    } else if (fieldNameInB != null) {
-                        filterFieldName = fieldNameInB;
-                        valueExpr = (XPathPathExpr) eqExpr.a;
-                    }
-                    if (filterFieldName != null && valueExpr != null) {
-                        EvaluationContext ec = new EvaluationContext(this, valueExpr.getReference());
-                        XPathNodeset eval = valueExpr.eval(sourceInstance, ec);
-                        String value = (String) eval.getValAt(0);
-                        if (value != null) {
-                            childrenWithName = node.getChildrenWithName(name, filterFieldName, value);
-                            runPredicates = false;
-                        }
-                    }
-                }
-                if (childrenWithName == null)
-                    childrenWithName = node.getChildrenWithName(name);
+                List<TreeElement> childrenWithName = node.getChildrenWithName(name);
                 final int count = childrenWithName.size();
                 for (int i = 0; i < count; i++) {
                     TreeElement child = childrenWithName.get(i);
@@ -393,11 +367,11 @@ public class EvaluationContext {
             }
         }
 
-        if (predicates != null && runPredicates && predicateEvaluationProgress != null) {
+        if (predicates != null && predicateEvaluationProgress != null) {
             predicateEvaluationProgress[1] += treeReferences.size();
         }
 
-        if (predicates != null && runPredicates) {
+        if (predicates != null) {
             boolean firstTime = true;
             List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
