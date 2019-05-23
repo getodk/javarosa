@@ -373,10 +373,9 @@ public class EvaluationContext {
     }
 
     private List<TreeReference> getRefs(boolean includeTemplates, AbstractTreeElement<TreeElement> node, String name, int mult) {
-        final List<TreeReference> treeReferences = new ArrayList<>(1);
-
         if (node.getNumChildren() > 0) {
             if (mult == TreeReference.INDEX_UNBOUND) {
+                final List<TreeReference> treeReferences = new ArrayList<>(1);
                 List<TreeElement> childrenWithName = node.getChildrenWithName(name);
                 final int count = childrenWithName.size();
                 for (int i = 0; i < count; i++) {
@@ -392,13 +391,14 @@ public class EvaluationContext {
                         treeReferences.add(template.getRef());
                     }
                 }
+                return treeReferences;
             } else if (mult != TreeReference.INDEX_ATTRIBUTE) {
                 //TODO: Make this test mult >= 0?
                 //If the multiplicity is a simple integer, just get
                 //the appropriate child
                 AbstractTreeElement child = node.getChild(name, mult);
                 if (child != null) {
-                    treeReferences.add(child.getRef());
+                    return Arrays.asList(child.getRef());
                 }
             }
         }
@@ -406,10 +406,10 @@ public class EvaluationContext {
         if (mult == TreeReference.INDEX_ATTRIBUTE) {
             AbstractTreeElement attribute = node.getAttribute(null, name);
             if (attribute != null) {
-                treeReferences.add(attribute.getRef());
+                return Arrays.asList(attribute.getRef());
             }
         }
-        return treeReferences;
+        return new ArrayList<>();
     }
 
     private String extractEqExprFieldName(XPathExpression eqExprPart) {
