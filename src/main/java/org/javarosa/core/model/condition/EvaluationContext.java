@@ -379,14 +379,11 @@ public class EvaluationContext {
 
     private List<TreeReference> getRefs(boolean includeTemplates, AbstractTreeElement<TreeElement> node, String name, int mult) {
         if (node.getNumChildren() > 0 && mult == TreeReference.INDEX_UNBOUND) {
+            int i = 0;
             final List<TreeReference> treeReferences = new ArrayList<>(1);
-            List<TreeElement> childrenWithName = node.getChildrenWithName(name);
-            final int count = childrenWithName.size();
-            for (int i = 0; i < count; i++) {
-                TreeElement child = childrenWithName.get(i);
-                if (child.getMultiplicity() != i) {
+            for (TreeElement child : node.getChildrenWithName(name)) {
+                if (child.getMultiplicity() != i++)
                     throw new IllegalStateException("Unexpected multiplicity mismatch");
-                }
                 treeReferences.add(child.getRef());
             }
             if (includeTemplates) {
