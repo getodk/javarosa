@@ -367,36 +367,34 @@ public class EvaluationContext {
             }
         }
 
-        if (predicates != null && predicateEvaluationProgress != null) {
+        if (!predicates.isEmpty() && predicateEvaluationProgress != null) {
             predicateEvaluationProgress[1] += treeReferences.size();
         }
 
-        if (predicates != null) {
-            boolean firstTime = true;
-            List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
-            for (XPathExpression xpe : predicates) {
-                for (int i = 0; i < treeReferences.size(); ++i) {
-                    //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                    TreeReference treeRef = treeReferences.get(i);
+        boolean firstTime = true;
+        List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
+        for (XPathExpression xpe : predicates) {
+            for (int i = 0; i < treeReferences.size(); ++i) {
+                //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+                TreeReference treeRef = treeReferences.get(i);
 
-                    //test the predicate on the treeElement
-                    EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
-                    Object o = xpe.eval(sourceInstance, evalContext);
-                    if (o instanceof Boolean) {
-                        boolean testOutcome = (Boolean) o;
-                        if (testOutcome) {
-                            passed.add(treeRef);
-                        }
+                //test the predicate on the treeElement
+                EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
+                Object o = xpe.eval(sourceInstance, evalContext);
+                if (o instanceof Boolean) {
+                    boolean testOutcome = (Boolean) o;
+                    if (testOutcome) {
+                        passed.add(treeRef);
                     }
                 }
-                firstTime = false;
-                treeReferences.clear();
-                treeReferences.addAll(passed);
-                passed.clear();
+            }
+            firstTime = false;
+            treeReferences.clear();
+            treeReferences.addAll(passed);
+            passed.clear();
 
-                if (predicateEvaluationProgress != null) {
-                    predicateEvaluationProgress[0]++;
-                }
+            if (predicateEvaluationProgress != null) {
+                predicateEvaluationProgress[0]++;
             }
         }
 
