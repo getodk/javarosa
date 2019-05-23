@@ -324,6 +324,11 @@ public class EvaluationContext {
         return child != null ? child.getRef() : null;
     }
 
+    private TreeReference getAttributeByName(String name, AbstractTreeElement<TreeElement> node) {
+        TreeElement attribute = node.getAttribute(null, name);
+        return attribute != null ? attribute.getRef() : null;
+    }
+
     private void originalAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, List<XPathExpression> predicates, int depth) {
         // Get the next set of matching references
         final String name = sourceRef.getName(depth);
@@ -385,10 +390,9 @@ public class EvaluationContext {
                 treeReferences.add(child.getRef());
             }
             if (includeTemplates) {
-                AbstractTreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-                if (template != null) {
-                    treeReferences.add(template.getRef());
-                }
+                TreeReference templateRef = getChildRefByNameAndMult(name, TreeReference.INDEX_TEMPLATE, node);
+                if (templateRef != null)
+                    treeReferences.add(templateRef);
             }
             return treeReferences;
         }
@@ -396,17 +400,15 @@ public class EvaluationContext {
             //TODO: Make this test mult >= 0?
             //If the multiplicity is a simple integer, just get
             //the appropriate child
-            AbstractTreeElement child = node.getChild(name, mult);
-            if (child != null) {
-                return Arrays.asList(child.getRef());
-            }
+            TreeReference childRef = getChildRefByNameAndMult(name, mult, node);
+            if (childRef != null)
+                return Arrays.asList(childRef);
         }
 
         if (mult == TreeReference.INDEX_ATTRIBUTE) {
-            AbstractTreeElement attribute = node.getAttribute(null, name);
-            if (attribute != null) {
-                return Arrays.asList(attribute.getRef());
-            }
+            TreeReference attributeRef = getAttributeByName(name, node);
+            if (attributeRef != null)
+                return Arrays.asList(attributeRef);
         }
         return new ArrayList<>();
     }
