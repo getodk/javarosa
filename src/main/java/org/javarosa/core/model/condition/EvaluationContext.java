@@ -232,6 +232,95 @@ public class EvaluationContext {
     private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance sourceInstance,
                                             TreeReference workingRef, List<TreeReference> refs,
                                             boolean includeTemplates) {
+        int depth = workingRef.size();
+
+        if (depth == sourceRef.size()) {
+            //TODO: Do we need to clone these references?
+            refs.add(workingRef);
+            return;
+        }
+
+        AbstractTreeElement<TreeElement> node = (AbstractTreeElement<TreeElement>) sourceInstance.resolveReference(workingRef);
+
+        List<XPathExpression> sourcePredicates = sourceRef.getPredicate(depth);
+        List<XPathExpression> copyPredicates = sourcePredicates != null ? new ArrayList<>(sourcePredicates) : new ArrayList<>();
+
+        if (canUseOptimizedAlgorithm(sourceRef, workingRef, node, copyPredicates))
+            optimizedEqExprPredicateAlgorithm(sourceRef, sourceInstance, workingRef, refs, includeTemplates, node, (XPathEqExpr) copyPredicates.get(0), depth);
+        else
+            originalAlgorithm(sourceRef, sourceInstance, workingRef, refs, includeTemplates);
+    }
+
+    private boolean canUseOptimizedAlgorithm(TreeReference sourceRef, TreeReference workingRef, AbstractTreeElement<TreeElement> node, List<XPathExpression> predicates) {
+        return node.getNumChildren() > 0 &&  // The node has children
+            sourceRef.getMultiplicity(workingRef.size()) == TreeReference.INDEX_UNBOUND && // The form asks for an unbounded amount of nodes
+            predicates.size() == 1 && // The form defines exactly one predicate
+            predicates.get(0) instanceof XPathEqExpr; // And the predicate is composed by an equals expression
+    }
+
+    private void optimizedEqExprPredicateAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, XPathEqExpr predicate, int depth) {
+        String filterFieldName = resolveFilterFieldName(predicate);
+        String filterValue = resolveFilterValue(predicate, sourceInstance);
+
+        if (filterFieldName == null || filterValue == null) {
+            // Something has gone wrong while trying to extract filter params and the
+            // optimized algorithm can't continue. Revert to the original algorithm
+            originalAlgorithm(sourceRef, sourceInstance, workingRef, refs, includeTemplates);
+            return;
+        }
+
+        String nodeName = sourceRef.getName(depth);
+        List<TreeReference> treeReferences = new ArrayList<>();
+        for (TreeElement child : node.getChildrenWithName(nodeName, filterFieldName, filterValue))
+            treeReferences.add(child.getRef());
+
+        if (includeTemplates) {
+            TreeReference templateRef = getChildRefByNameAndMult(nodeName, TreeReference.INDEX_TEMPLATE, node);
+            if (templateRef != null)
+                treeReferences.add(templateRef);
+        }
+
+        for (TreeReference treeRef : treeReferences)
+            expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
+    }
+
+    private String resolveFilterFieldName(XPathEqExpr predicate) {
+        String fieldNameInA = extractEqExprFieldName(predicate.a);
+        if (fieldNameInA != null)
+            return fieldNameInA;
+
+        String fieldNameInB = extractEqExprFieldName(predicate.b);
+        if (fieldNameInB != null)
+            return fieldNameInB;
+
+        return null;
+    }
+
+    private XPathPathExpr resolveXPathPathExpr(XPathEqExpr predicate) {
+        if (extractEqExprFieldName(predicate.a) != null)
+            return (XPathPathExpr) predicate.b;
+
+        if (extractEqExprFieldName(predicate.b) != null)
+            return (XPathPathExpr) predicate.a;
+
+        return null;
+    }
+
+    private String resolveFilterValue(XPathEqExpr predicate, DataInstance sourceInstance) {
+        XPathPathExpr valueExpr = resolveXPathPathExpr(predicate);
+        if (valueExpr == null)
+            return null;
+
+        XPathNodeset eval = valueExpr.eval(sourceInstance, this);
+        return (String) eval.getValAt(0);
+    }
+
+    private TreeReference getChildRefByNameAndMult(String name, int mult, AbstractTreeElement<TreeElement> node) {
+        TreeElement child = node.getChild(name, mult);
+        return child != null ? child.getRef() : null;
+    }
+
+    private void originalAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates) {
         final int depth = workingRef.size();
 
         //check to see if we've matched fully
