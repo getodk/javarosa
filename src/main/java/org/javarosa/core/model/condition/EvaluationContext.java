@@ -373,33 +373,32 @@ public class EvaluationContext {
     }
 
     private List<TreeReference> getRefs(boolean includeTemplates, AbstractTreeElement<TreeElement> node, String name, int mult) {
-        if (node.getNumChildren() > 0) {
-            if (mult == TreeReference.INDEX_UNBOUND) {
-                final List<TreeReference> treeReferences = new ArrayList<>(1);
-                List<TreeElement> childrenWithName = node.getChildrenWithName(name);
-                final int count = childrenWithName.size();
-                for (int i = 0; i < count; i++) {
-                    TreeElement child = childrenWithName.get(i);
-                    if (child.getMultiplicity() != i) {
-                        throw new IllegalStateException("Unexpected multiplicity mismatch");
-                    }
-                    treeReferences.add(child.getRef());
+        if (node.getNumChildren() > 0 && mult == TreeReference.INDEX_UNBOUND) {
+            final List<TreeReference> treeReferences = new ArrayList<>(1);
+            List<TreeElement> childrenWithName = node.getChildrenWithName(name);
+            final int count = childrenWithName.size();
+            for (int i = 0; i < count; i++) {
+                TreeElement child = childrenWithName.get(i);
+                if (child.getMultiplicity() != i) {
+                    throw new IllegalStateException("Unexpected multiplicity mismatch");
                 }
-                if (includeTemplates) {
-                    AbstractTreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-                    if (template != null) {
-                        treeReferences.add(template.getRef());
-                    }
+                treeReferences.add(child.getRef());
+            }
+            if (includeTemplates) {
+                AbstractTreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
+                if (template != null) {
+                    treeReferences.add(template.getRef());
                 }
-                return treeReferences;
-            } else if (mult != TreeReference.INDEX_ATTRIBUTE) {
-                //TODO: Make this test mult >= 0?
-                //If the multiplicity is a simple integer, just get
-                //the appropriate child
-                AbstractTreeElement child = node.getChild(name, mult);
-                if (child != null) {
-                    return Arrays.asList(child.getRef());
-                }
+            }
+            return treeReferences;
+        }
+        if (node.getNumChildren() > 0 && mult != TreeReference.INDEX_ATTRIBUTE) {
+            //TODO: Make this test mult >= 0?
+            //If the multiplicity is a simple integer, just get
+            //the appropriate child
+            AbstractTreeElement child = node.getChild(name, mult);
+            if (child != null) {
+                return Arrays.asList(child.getRef());
             }
         }
 
