@@ -17,6 +17,7 @@
 package org.javarosa.core.model.condition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -249,9 +250,9 @@ public class EvaluationContext {
         List<XPathExpression> copyPredicates = sourcePredicates != null ? new ArrayList<>(sourcePredicates) : new ArrayList<>();
 
         if (canUseOptimizedAlgorithm(sourceRef, workingRef, node, copyPredicates))
-            optimizedEqExprPredicateAlgorithm(sourceRef, sourceInstance, workingRef, refs, includeTemplates, node, (XPathEqExpr) copyPredicates.get(0), depth);
+            optimizedEqExprPredicateAlgorithm(sourceRef, sourceInstance, refs, includeTemplates, node, (XPathEqExpr) copyPredicates.get(0), depth);
         else
-            originalAlgorithm(sourceRef, sourceInstance, workingRef, refs, includeTemplates);
+            originalAlgorithm(sourceRef, sourceInstance, refs, includeTemplates, node, copyPredicates, depth);
     }
 
     private boolean canUseOptimizedAlgorithm(TreeReference sourceRef, TreeReference workingRef, AbstractTreeElement<TreeElement> node, List<XPathExpression> predicates) {
@@ -261,14 +262,14 @@ public class EvaluationContext {
             predicates.get(0) instanceof XPathEqExpr; // And the predicate is composed by an equals expression
     }
 
-    private void optimizedEqExprPredicateAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, XPathEqExpr predicate, int depth) {
+    private void optimizedEqExprPredicateAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, XPathEqExpr predicate, int depth) {
         String filterFieldName = resolveFilterFieldName(predicate);
         String filterValue = resolveFilterValue(predicate, sourceInstance);
 
         if (filterFieldName == null || filterValue == null) {
             // Something has gone wrong while trying to extract filter params and the
             // optimized algorithm can't continue. Revert to the original algorithm
-            originalAlgorithm(sourceRef, sourceInstance, workingRef, refs, includeTemplates);
+            originalAlgorithm(sourceRef, sourceInstance, refs, includeTemplates, node, Arrays.asList(predicate), depth);
             return;
         }
 
@@ -323,33 +324,13 @@ public class EvaluationContext {
         return child != null ? child.getRef() : null;
     }
 
-    private void originalAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, TreeReference workingRef, List<TreeReference> refs, boolean includeTemplates) {
-        final int depth = workingRef.size();
-
-        //check to see if we've matched fully
-        if (depth == sourceRef.size()) {
-            //TODO: Do we need to clone these references?
-            refs.add(workingRef);
-            return;
-        }
-
+    private void originalAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, List<XPathExpression> predicates, int depth) {
         // Get the next set of matching references
         final String name = sourceRef.getName(depth);
-        List<XPathExpression> predicates = sourceRef.getPredicate(depth);
 
-        // Copy predicates for batch fetch
-        if (predicates != null) {
-            List<XPathExpression> predCopy = new ArrayList<XPathExpression>(predicates.size());
-            for (XPathExpression xpe : predicates) {
-                predCopy.add(xpe);
-            }
-            predicates = predCopy;
-        }
         //ETHERTON: Is this where we should test for predicates?
         final int mult = sourceRef.getMultiplicity(depth);
         final List<TreeReference> treeReferences = new ArrayList<>(1);
-
-        final AbstractTreeElement<TreeElement> node = (AbstractTreeElement<TreeElement>) sourceInstance.resolveReference(workingRef);
 
         boolean runPredicates = true;
         if (node.getNumChildren() > 0) {
