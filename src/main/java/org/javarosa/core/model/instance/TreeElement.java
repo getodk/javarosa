@@ -227,8 +227,8 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     @Override
-    public List<TreeElement> getChildrenWithName(String name, String filterField, String filterValue, boolean useCache) {
-        return children.get(name, filterField, filterValue, useCache);
+    public List<TreeElement> getChildrenWithName(String name, String filterField, String filterValue) {
+        return children.get(name, filterField, filterValue);
     }
     private int getNumChildrenWithName(String name) {
         return children.getCount(name);

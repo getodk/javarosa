@@ -26,7 +26,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
      */
     public abstract List<T> getChildrenWithName(String name);
 
-    public abstract List<T> getChildrenWithName(String name, String filterField, String filterValue, boolean useCache);
+    public abstract List<T> getChildrenWithName(String name, String filterField, String filterValue);
     public abstract boolean hasChildren();
 
     public abstract int getNumChildren();

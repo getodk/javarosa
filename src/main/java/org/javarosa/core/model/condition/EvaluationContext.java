@@ -261,7 +261,6 @@ public class EvaluationContext {
 
         boolean runPredicates = true;
         boolean toggleOptimizedFiltering = true;
-        boolean toggleFilteredValuesCache = true;
         if (node.getNumChildren() > 0) {
             if (mult == TreeReference.INDEX_UNBOUND) {
                 List<TreeElement> childrenWithName = null;
@@ -283,7 +282,7 @@ public class EvaluationContext {
                         XPathNodeset eval = valueExpr.eval(sourceInstance, ec);
                         String value = (String) eval.getValAt(0);
                         if (value != null) {
-                            childrenWithName = node.getChildrenWithName(name, filterFieldName, value, toggleFilteredValuesCache);
+                            childrenWithName = node.getChildrenWithName(name, filterFieldName, value);
                             runPredicates = false;
                         }
                     }

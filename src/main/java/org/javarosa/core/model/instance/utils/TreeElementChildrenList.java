@@ -120,34 +120,21 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
 
     private final Map<FilterKey, List<TreeElement>> filteredRawValuesCache = new ConcurrentHashMap<>();
 
-    public List<TreeElement> get(String name, String filterFieldName, String filterValue, boolean useCache) {
-        if (!useCache) {
-            List<TreeElement> filteredRawValues = new ArrayList<>();
-            int multiplicitySeq = 0;
-            for (TreeElement rawValue : this)
-                if (rawValue.getName().equals(name) && rawValue.getChildrenWithName(filterFieldName).get(0).getValue().getDisplayText().equals(filterValue)) {
-                    // Set the mult so that populateDynamicChoices doesn't complain
-                    TreeElement rawValueCopy = rawValue.shallowCopy();
-                    rawValueCopy.setMult(multiplicitySeq++);
-                    filteredRawValues.add(rawValueCopy);
-                }
-            return filteredRawValues;
-        } else {
-            FilterKey key = new FilterKey(name, filterFieldName, filterValue);
-            if (filteredRawValuesCache.containsKey(key))
-                return filteredRawValuesCache.get(key);
-            List<TreeElement> filteredRawValues = new ArrayList<>();
-            int multiplicitySeq = 0;
-            for (TreeElement rawValue : this)
-                if (rawValue.getName().equals(name) && rawValue.getChildrenWithName(filterFieldName).get(0).getValue().getDisplayText().equals(filterValue)) {
-                    // Set the mult so that populateDynamicChoices doesn't complain
-                    TreeElement rawValueCopy = rawValue.shallowCopy();
-                    rawValueCopy.setMult(multiplicitySeq++);
-                    filteredRawValues.add(rawValueCopy);
-                }
-            filteredRawValuesCache.put(key, filteredRawValues);
-            return filteredRawValues;
-        }
+    public List<TreeElement> get(String name, String filterFieldName, String filterValue) {
+        FilterKey key = new FilterKey(name, filterFieldName, filterValue);
+        if (filteredRawValuesCache.containsKey(key))
+            return filteredRawValuesCache.get(key);
+        List<TreeElement> filteredRawValues = new ArrayList<>();
+        int multiplicitySeq = 0;
+        for (TreeElement rawValue : this)
+            if (rawValue.getName().equals(name) && rawValue.getChildrenWithName(filterFieldName).get(0).getValue().getDisplayText().equals(filterValue)) {
+                // Set the mult so that populateDynamicChoices doesn't complain
+                TreeElement rawValueCopy = rawValue.shallowCopy();
+                rawValueCopy.setMult(multiplicitySeq++);
+                filteredRawValues.add(rawValueCopy);
+            }
+        filteredRawValuesCache.put(key, filteredRawValues);
+        return filteredRawValues;
     }
 
     /**
