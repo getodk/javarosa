@@ -260,11 +260,10 @@ public class EvaluationContext {
         final AbstractTreeElement<TreeElement> node = (AbstractTreeElement<TreeElement>) sourceInstance.resolveReference(workingRef);
 
         boolean runPredicates = true;
-        boolean toggleOptimizedFiltering = true;
         if (node.getNumChildren() > 0) {
             if (mult == TreeReference.INDEX_UNBOUND) {
                 List<TreeElement> childrenWithName = null;
-                if (toggleOptimizedFiltering && predicates != null && predicates.size() == 1 && predicates.get(0) instanceof XPathEqExpr) {
+                if (predicates != null && predicates.size() == 1 && predicates.get(0) instanceof XPathEqExpr) {
                     XPathEqExpr eqExpr = (XPathEqExpr) predicates.get(0);
                     XPathPathExpr valueExpr = null;
                     String filterFieldName = null;
