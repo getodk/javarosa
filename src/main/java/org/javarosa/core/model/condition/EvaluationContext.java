@@ -330,12 +330,7 @@ public class EvaluationContext {
     }
 
     private void originalAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, List<XPathExpression> predicates, int depth) {
-        // Get the next set of matching references
-        final String name = sourceRef.getName(depth);
-
-        //ETHERTON: Is this where we should test for predicates?
-        final int mult = sourceRef.getMultiplicity(depth);
-        final List<TreeReference> treeReferences = getRefs(includeTemplates, node, name, mult);
+        List<TreeReference> treeReferences = getRefs(includeTemplates, node, sourceRef.getName(depth), sourceRef.getMultiplicity(depth));
 
         filterRefs(sourceInstance, predicates, treeReferences);
 
