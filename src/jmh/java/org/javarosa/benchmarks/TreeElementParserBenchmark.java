@@ -1,9 +1,11 @@
 package org.javarosa.benchmarks;
 
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.XmlXFormInstance;
+import org.javarosa.xml.ElementParser;
+import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
+import org.kxml2.io.KXmlParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -12,7 +14,9 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 
@@ -40,41 +44,48 @@ public class TreeElementParserBenchmark {
 
     @Benchmark
     public void benchmarkParseMinifiedInternalInstanceXForm(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        TreeElement documentRootTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormMinifiedInternalSecondaryInstances);
+        TreeElement documentRootTreeElement = parse("nigeria-wards", state.xFormMinifiedInternalSecondaryInstances);
         bh.consume(documentRootTreeElement);
     }
 
     @Benchmark
     public void benchmarkParseExternalInstanceXFormOnly(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        TreeElement documentRootTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormExternalSecondayInstances);
+        TreeElement documentRootTreeElement = parse("nigeria-wards", state.xFormExternalSecondayInstances);
         bh.consume(documentRootTreeElement);
     }
 
     @Benchmark
     public void benchmarkParseInternalInstanceXForm(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        TreeElement treeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormInternalSecondaryInstances);
+        TreeElement treeElement = parse("nigeria-wards", state.xFormInternalSecondaryInstances);
         bh.consume(treeElement);
     }
 
     @Benchmark
     public void benchmarkParseExternalInstanceLGAs(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        TreeElement treeElement = XmlXFormInstance.parse("lgas", state.lgasInstance);
+        TreeElement treeElement = parse("lgas", state.lgasInstance);
         bh.consume(treeElement);
     }
 
     @Benchmark
     public void benchmarkParseExternalInstanceWards(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        TreeElement treeElement = XmlXFormInstance.parse("wards", state.wardsInstance);
+        TreeElement treeElement = parse("wards", state.wardsInstance);
         bh.consume(treeElement);
     }
 
     @Benchmark
     public void benchmarkParseExternalInstanceXFormWithInstanceFiles(TreeElementParserState state, Blackhole bh) throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
-        TreeElement xFormTreeElement = XmlXFormInstance.parse("nigeria-wards", state.xFormExternalSecondayInstances);
-        TreeElement lgaInstanceTreeElement = XmlXFormInstance.parse("lgas", state.lgasInstance);
-        TreeElement wardInstanceTreeElement = XmlXFormInstance.parse("wards", state.wardsInstance);
+        TreeElement xFormTreeElement = parse("nigeria-wards", state.xFormExternalSecondayInstances);
+        TreeElement lgaInstanceTreeElement = parse("lgas", state.lgasInstance);
+        TreeElement wardInstanceTreeElement = parse("wards", state.wardsInstance);
         bh.consume(xFormTreeElement);
         bh.consume(lgaInstanceTreeElement);
         bh.consume(wardInstanceTreeElement);
+    }
+
+    private static TreeElement parse(String instanceId, String path) throws IOException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
+        InputStream inputStream = new FileInputStream(path);
+        KXmlParser xmlParser = ElementParser.instantiateParser(inputStream);
+        TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
+        return treeElementParser.parse();
     }
 }
