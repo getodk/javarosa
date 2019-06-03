@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+import static org.javarosa.benchmarks.BenchmarkUtils.getMinifiedNigeriaWardsXMLWithInternal2ndryInstance;
 import static org.javarosa.benchmarks.BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance;
 import static org.javarosa.benchmarks.BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance;
-import static org.javarosa.benchmarks.BenchmarkUtils.getMinifiedNigeriaWardsXMLWithInternal2ndryInstance;
 
 public class FormDefParserBenchmark {
     public static void main(String[] args) {

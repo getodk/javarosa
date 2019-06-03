@@ -1,9 +1,10 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.model.data.UncastData;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import org.javarosa.core.model.data.UncastData;
 
 public class CsvExternalInstance {
     public static TreeElement parse(String instanceId, String path) throws IOException {

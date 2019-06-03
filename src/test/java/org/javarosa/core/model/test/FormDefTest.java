@@ -19,7 +19,6 @@ package org.javarosa.core.model.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.QuestionDef;

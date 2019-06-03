@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model.condition;
 
-import java.util.Date;
 import org.javarosa.core.model.DataType;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
@@ -37,15 +36,17 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
+import java.util.Date;
+
 import static org.javarosa.core.model.DataType.BOOLEAN;
 import static org.javarosa.core.model.DataType.CHOICE;
-import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
 import static org.javarosa.core.model.DataType.DATE;
 import static org.javarosa.core.model.DataType.GEOPOINT;
 import static org.javarosa.core.model.DataType.GEOSHAPE;
 import static org.javarosa.core.model.DataType.GEOTRACE;
 import static org.javarosa.core.model.DataType.INTEGER;
 import static org.javarosa.core.model.DataType.LONG;
+import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
 import static org.javarosa.core.model.DataType.TIME;
 
 public class Recalculate extends Triggerable {

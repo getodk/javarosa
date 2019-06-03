@@ -16,12 +16,12 @@
 
 package org.javarosa.xpath.parser.ast;
 
-import java.util.Vector;
-
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathQName;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+
+import java.util.Vector;
 
 public class ASTNodeFunctionCall extends ASTNode {
     public XPathQName name;

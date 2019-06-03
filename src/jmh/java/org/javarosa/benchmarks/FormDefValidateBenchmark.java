@@ -1,9 +1,5 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-
-import java.io.IOException;
-import java.nio.file.Path;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
@@ -21,6 +17,11 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 
 public class FormDefValidateBenchmark {
     public static void main(String[] args) {

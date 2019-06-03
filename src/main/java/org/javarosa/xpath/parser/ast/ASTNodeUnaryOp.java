@@ -16,13 +16,13 @@
 
 package org.javarosa.xpath.parser.ast;
 
-import java.util.Vector;
-
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathNumNegExpr;
 import org.javarosa.xpath.expr.XPathUnaryOpExpr;
 import org.javarosa.xpath.parser.Token;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+
+import java.util.Vector;
 
 public class ASTNodeUnaryOp extends ASTNode {
     public ASTNode expr;

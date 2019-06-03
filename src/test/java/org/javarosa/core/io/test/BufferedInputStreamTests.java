@@ -19,7 +19,6 @@ package org.javarosa.core.io.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.io.BufferedInputStream;
 import org.javarosa.core.util.ArrayUtilities;
 import org.slf4j.Logger;

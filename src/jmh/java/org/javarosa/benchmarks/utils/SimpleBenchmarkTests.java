@@ -28,9 +28,6 @@ import org.javarosa.xform.parse.FormParserHelper;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.kxml2.kdom.Document;
 import org.xmlpull.v1.XmlPullParserException;
@@ -46,6 +43,9 @@ import java.util.HashMap;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SimpleBenchmarkTests {
 

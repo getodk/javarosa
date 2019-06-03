@@ -7,11 +7,10 @@
       -->
 
 
-<h:html xmlns="http://www.w3.org/2002/xforms"
-        xmlns:h="http://www.w3.org/1999/xhtml"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:jr="http://openrosa.org/javarosa"><!-- ODK Aggregate upload time: 2016-04-26T00:03:26.288+0000 on https://opendatakit.appspot.com -->
+ <h:html xmlns="http://www.w3.org/2002/xforms"
+         xmlns:h="http://www.w3.org/1999/xhtml"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:jr="http://openrosa.org/javarosa"><!-- ODK Aggregate upload time: 2016-04-26T00:03:26.288+0000 on https://opendatakit.appspot.com -->
   <h:head>
     <h:title>eIMCI by D-Tree</h:title>
 

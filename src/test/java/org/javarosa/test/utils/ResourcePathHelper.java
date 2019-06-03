@@ -1,15 +1,15 @@
 package org.javarosa.test.utils;
 
-import static java.nio.file.Files.isRegularFile;
-import static java.nio.file.Files.walk;
-import static java.util.stream.Collectors.toSet;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+
+import static java.nio.file.Files.isRegularFile;
+import static java.nio.file.Files.walk;
+import static java.util.stream.Collectors.toSet;
 
 public class ResourcePathHelper {
     private static Set<Path> resourcePathsCache = buildCache();

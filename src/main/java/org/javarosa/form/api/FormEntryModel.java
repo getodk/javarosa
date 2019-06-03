@@ -16,10 +16,6 @@
 
 package org.javarosa.form.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -32,6 +28,10 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The data model used during form entry. Represents the current state of the

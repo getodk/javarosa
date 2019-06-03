@@ -15,10 +15,11 @@
  */
 package org.javarosa.xpath.expr;
 
+import org.javarosa.xpath.XPathUnsupportedException;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.javarosa.xpath.XPathUnsupportedException;
 
 /**
  * Implements the digest algorithms for XPathFuncExpr digest() function

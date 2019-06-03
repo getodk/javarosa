@@ -19,7 +19,6 @@ package org.javarosa.core.model.data.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.utils.DateUtils;
 import org.slf4j.Logger;

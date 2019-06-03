@@ -15,6 +15,7 @@
  */
 package org.javarosa.xpath.expr;
 
+import org.javarosa.core.test.Scenario;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,8 +23,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.xpath.expr.AnswerDataMatchers.stringAnswer;
 import static org.junit.Assert.assertThat;
-
-import org.javarosa.core.test.Scenario;
 
 public class XPathPathExprCurrentGroupCountRefTest {
     private Scenario scenario;

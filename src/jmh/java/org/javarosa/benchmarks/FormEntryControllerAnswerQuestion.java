@@ -1,10 +1,5 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashMap;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
@@ -20,6 +15,12 @@ import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 
 public class FormEntryControllerAnswerQuestion {
     public static void main(String[] args) {

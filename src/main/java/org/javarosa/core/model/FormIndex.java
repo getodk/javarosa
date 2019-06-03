@@ -16,12 +16,12 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.instance.TreeReference;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import org.javarosa.core.model.instance.TreeReference;
 
 /**
  * {@code FormIndex} is an immutable index which is structured to provide quick access to a specific node in a
