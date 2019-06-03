@@ -1,10 +1,10 @@
 package org.javarosa.core.services.storage;
 
-import org.javarosa.core.util.InvalidIndexException;
-import org.javarosa.core.util.externalizable.Externalizable;
-
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.javarosa.core.util.InvalidIndexException;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /* TEMPORARY / EXPERIMENTAL */
 

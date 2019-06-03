@@ -16,10 +16,10 @@
 
 package org.javarosa.core.services.transport.payload;
 
-import org.javarosa.core.util.externalizable.Externalizable;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * IDataPayload is an interface that specifies a piece of data

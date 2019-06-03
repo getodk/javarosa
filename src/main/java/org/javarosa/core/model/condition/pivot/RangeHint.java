@@ -3,14 +3,14 @@
  */
 package org.javarosa.core.model.condition.pivot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.xpath.expr.XPathFuncExpr;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author ctsims

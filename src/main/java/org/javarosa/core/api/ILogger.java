@@ -19,11 +19,10 @@
  */
 package org.javarosa.core.api;
 
-import org.javarosa.core.log.IFullLogSerializer;
-import org.javarosa.core.log.StreamLogSerializer;
-
 import java.io.IOException;
 import java.util.Date;
+import org.javarosa.core.log.IFullLogSerializer;
+import org.javarosa.core.log.StreamLogSerializer;
 
 /**
  * <b>Warning:</b> This class is unused and should remain that way. It will be removed in a future release.

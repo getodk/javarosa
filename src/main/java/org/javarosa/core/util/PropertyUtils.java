@@ -16,13 +16,13 @@
 
 package org.javarosa.core.util;
 
-import org.javarosa.core.services.PropertyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import org.javarosa.core.services.PropertyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertyUtils {
     private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);

@@ -16,6 +16,11 @@
 
 package org.javarosa.xpath.expr;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
+
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.CmpPivot;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
@@ -26,11 +31,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathNodeset;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
 
 public class XPathCmpExpr extends XPathBinaryOpExpr {
     public static final int LT = 0;

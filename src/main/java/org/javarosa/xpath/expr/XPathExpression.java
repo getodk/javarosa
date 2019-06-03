@@ -16,16 +16,15 @@
 
 package org.javarosa.xpath.expr;
 
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
-import org.javarosa.core.model.instance.DataInstance;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
+import org.javarosa.core.model.instance.DataInstance;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 public abstract class XPathExpression implements Externalizable, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(XPathExpression.class);

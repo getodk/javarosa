@@ -16,14 +16,14 @@
 
 package org.javarosa.core.model.data;
 
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A response to a question requesting a Date Value

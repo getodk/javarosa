@@ -18,14 +18,15 @@ package org.javarosa.model.xform;
      */
 
 
+
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeReference;
 import org.kxml2.io.KXmlSerializer;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
     /**
      * A quick rewrite of the basics for writing higher level xml documents straight to

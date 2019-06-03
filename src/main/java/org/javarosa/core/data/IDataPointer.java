@@ -16,10 +16,10 @@
 
 package org.javarosa.core.data;
 
-import org.javarosa.core.util.externalizable.Externalizable;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * A data pointer representing a pointer to a (usually) larger object in memory.

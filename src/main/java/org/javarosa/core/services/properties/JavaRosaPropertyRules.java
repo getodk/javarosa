@@ -16,13 +16,13 @@
 
 package org.javarosa.core.services.properties;
 
-import org.javarosa.core.services.PropertyManager;
-import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.services.locale.Localizer;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+
+import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.locale.Localizer;
 
 /**
  * A set of rules governing the allowable properties for JavaRosa's

@@ -16,14 +16,14 @@
 
 package org.javarosa.core.util.externalizable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.javarosa.xpath.expr.DigestAlgorithm.MD5;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import static org.javarosa.xpath.expr.DigestAlgorithm.MD5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PrototypeFactory {
     private static final Logger logger = LoggerFactory.getLogger(PrototypeFactory.class);

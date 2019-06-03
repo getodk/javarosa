@@ -16,6 +16,8 @@
 
 package org.javarosa.model.xform;
 
+import java.io.IOException;
+
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.IConditionExpr;
@@ -32,8 +34,6 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathPathExpr;
-
-import java.io.IOException;
 
 public class XFormsModule implements IModule {
 

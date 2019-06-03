@@ -16,12 +16,12 @@
 
 package org.javarosa.core.services.storage;
 
+import static org.javarosa.core.services.ProgramFlow.die;
+
 import org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 import java.util.HashMap;
-
-import static org.javarosa.core.services.ProgramFlow.die;
 
 /**
  * Manages StorageProviders for JavaRosa, which maintain persistent

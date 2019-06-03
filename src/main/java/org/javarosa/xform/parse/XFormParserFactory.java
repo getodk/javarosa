@@ -1,9 +1,9 @@
 package org.javarosa.xform.parse;
 
+import java.io.Reader;
+
 import org.javarosa.core.util.CacheTable;
 import org.kxml2.kdom.Document;
-
-import java.io.Reader;
 
 /**
  * Class factory for creating an XFormParser.

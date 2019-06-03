@@ -16,6 +16,9 @@
 
 package org.javarosa.xpath.parser;
 
+import java.util.Enumeration;
+import java.util.Vector;
+
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathQName;
 import org.javarosa.xpath.parser.ast.ASTNode;
@@ -27,9 +30,6 @@ import org.javarosa.xpath.parser.ast.ASTNodeLocPath;
 import org.javarosa.xpath.parser.ast.ASTNodePathStep;
 import org.javarosa.xpath.parser.ast.ASTNodePredicate;
 import org.javarosa.xpath.parser.ast.ASTNodeUnaryOp;
-
-import java.util.Enumeration;
-import java.util.Vector;
 
 /* if you try to edit this code, you will likely break it */
 

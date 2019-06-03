@@ -16,6 +16,11 @@
 
 package org.javarosa.core.model.util.restorable;
 
+import static org.javarosa.core.model.DataType.from;
+
+import java.util.Date;
+import java.util.List;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
@@ -36,11 +41,6 @@ import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.javarosa.core.model.DataType.from;
 
 public class RestoreUtils {
     public static final String RECORD_ID_TAG = "rec-id";

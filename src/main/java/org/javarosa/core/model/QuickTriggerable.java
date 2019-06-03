@@ -1,8 +1,8 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.model.condition.Triggerable;
-
 import java.util.Comparator;
+
+import org.javarosa.core.model.condition.Triggerable;
 
 /**
  * Triggerable implementations have a deep equals() comparison operator. Once

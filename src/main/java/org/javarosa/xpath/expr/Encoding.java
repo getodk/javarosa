@@ -15,9 +15,8 @@
  */
 package org.javarosa.xpath.expr;
 
-import org.javarosa.xpath.XPathUnsupportedException;
-
 import java.io.UnsupportedEncodingException;
+import org.javarosa.xpath.XPathUnsupportedException;
 
 /**
  * Implements the hash encoding methods for XPathFuncExpr digest() function

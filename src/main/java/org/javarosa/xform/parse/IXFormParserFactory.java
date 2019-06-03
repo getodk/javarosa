@@ -1,8 +1,8 @@
 package org.javarosa.xform.parse;
 
-import org.kxml2.kdom.Document;
-
 import java.io.Reader;
+
+import org.kxml2.kdom.Document;
 
 /**
  * Interface for class factory for creating an XFormParser.

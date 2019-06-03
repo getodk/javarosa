@@ -16,6 +16,10 @@ package org.javarosa.model.xform;
  * the License.
  */
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
@@ -33,10 +37,6 @@ import org.javarosa.xform.util.XFormSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A visitor-esque class which walks a FormInstance and constructs an XML document
