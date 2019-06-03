@@ -35,6 +35,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -189,15 +190,17 @@ public class SimpleBenchmarkTests {
     public void FormDefWriteAndReadFromToCache() throws  IOException{
         initSerialization();
 
+        String cachePath = Files.createTempDirectory(".cache").toString();
+
         Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithInternal2ndryInstance();
         //Setup reference manager
         ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", prepareAssets());
         //Parse File to FormDef
         FormDef formDef = FormParserHelper.parse(resourcePath);
         //Save to cache
-        FormDefCache.writeCache(formDef, resourcePath.toAbsolutePath().toString());
+        FormDefCache.writeCache(formDef, resourcePath.toAbsolutePath().toString(), cachePath);
         //Read from cache
-        FormDef cachedFormDef = FormDefCache.readCache(resourcePath.toFile());
+        FormDef cachedFormDef = FormDefCache.readCache(resourcePath.toFile(), cachePath);
         //Run assertions
         assertNotNull(cachedFormDef);
         assertEquals(formDef.getName(), cachedFormDef.getName());

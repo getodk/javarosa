@@ -45,6 +45,10 @@ public class BenchmarkUtils {
         }
     }
 
+    public static Path prepareCache() throws IOException {
+        return Files.createTempDirectory(".javarosa_benchmarks_cache");
+    }
+
     private static Path getPathInJar(String realPath) {
         Path sourcePath;
         try {

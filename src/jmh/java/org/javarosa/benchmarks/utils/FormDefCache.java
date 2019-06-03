@@ -14,6 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -36,11 +38,12 @@ public class FormDefCache {
      * @param formDef  - The FormDef to be cached
      * @param formPath - The form XML file
      */
-    public static void writeCache(FormDef formDef, String formPath) throws IOException {
+    public static void writeCache(FormDef formDef, String formPath, String cachePath) throws IOException {
+
         final long formSaveStart = System.currentTimeMillis();
-        File cachedFormDefFile = FormDefCache.getCacheFile(new File(formPath));
+        File cachedFormDefFile = FormDefCache.getCacheFile(new File(formPath), cachePath);
         final File tempCacheFile = File.createTempFile("cache", null,
-            null);
+            new File(cachePath));
         logger.info(String.format("Started saving %s to the cache via temp file %s",
             formDef.getTitle(), tempCacheFile.getName()));
 
@@ -85,8 +88,8 @@ public class FormDefCache {
      * @param formXml a File containing the XML version of the form
      * @return a FormDef, or null if the form is not present in the cache
      */
-    public static FormDef readCache(File formXml) {
-        final File cachedForm = getCacheFile(formXml);
+    public static FormDef readCache(File formXml, String cachePath) {
+        final File cachedForm = getCacheFile(formXml, cachePath);
         if (cachedForm.exists()) {
             logger.info("Attempting to load %s from cached file: %s.",
                 formXml.getName(), cachedForm.getName());
@@ -111,8 +114,8 @@ public class FormDefCache {
      * @param formXml the File containing the XML form
      * @return a File object
      */
-    private static File getCacheFile(File formXml) {
-        return new File( File.separator +
+    private static File getCacheFile(File formXml, String cachePath) {
+        return new File( cachePath + File.separator +
             getMd5Hash(formXml) + ".formdef");
     }
 
