@@ -15,12 +15,6 @@
  */
 package org.javarosa.xform.parse;
 
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
 import static java.util.stream.Collectors.toList;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotSame;
@@ -30,6 +24,11 @@ import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+import org.junit.Test;
 
 public class RandomizeHelperTest {
     @Test

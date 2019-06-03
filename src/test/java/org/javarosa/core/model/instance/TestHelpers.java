@@ -1,10 +1,10 @@
 package org.javarosa.core.model.instance;
 
+import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
+
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStep;
-
-import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
 
 public class TestHelpers {
     static TreeReference buildRef(String xpath) {

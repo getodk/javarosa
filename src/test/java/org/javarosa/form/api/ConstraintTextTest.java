@@ -16,16 +16,14 @@
 
 package org.javarosa.form.api;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertEquals;
+;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.FormParseInit;
 import org.junit.Test;
 
 import java.util.Arrays;
-
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.assertEquals;
-
-;
 
 public class ConstraintTextTest {
 

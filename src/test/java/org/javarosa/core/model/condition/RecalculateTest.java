@@ -1,5 +1,8 @@
 package org.javarosa.core.model.condition;
 
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertEquals;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
@@ -7,9 +10,6 @@ import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.assertEquals;
 
 public class RecalculateTest {
     private FormDef formDef;

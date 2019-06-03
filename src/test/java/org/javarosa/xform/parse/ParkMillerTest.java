@@ -1,8 +1,8 @@
 package org.javarosa.xform.parse;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class ParkMillerTest {
     @Test

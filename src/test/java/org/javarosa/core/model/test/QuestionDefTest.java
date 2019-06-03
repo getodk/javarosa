@@ -16,6 +16,8 @@
 
 package org.javarosa.core.model.test;
 
+import java.util.ArrayList;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.IDataReference;
@@ -35,8 +37,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 import static junit.framework.TestCase.fail;
 

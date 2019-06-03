@@ -1,5 +1,10 @@
 package org.javarosa.core.test;
 
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+
+import java.nio.file.Path;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -9,16 +14,13 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.xform.util.XFormUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.util.List;
 
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class sets up everything you need to perform tests on the models and form elements found in JR (such

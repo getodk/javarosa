@@ -16,16 +16,15 @@
 package org.javarosa.xpath.expr;
 
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-
 import static org.javarosa.xpath.expr.Encoding.BASE64;
 import static org.javarosa.xpath.expr.Encoding.HEX;
 import static org.junit.Assert.assertEquals;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class EncodingTest {

@@ -1,11 +1,11 @@
 package org.javarosa.core.model.instance;
 
-import org.javarosa.xpath.XPathException;
-import org.junit.Test;
-
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.model.instance.TestHelpers.buildRef;
 import static org.junit.Assert.assertThat;
+
+import org.javarosa.xpath.XPathException;
+import org.junit.Test;
 
 public class TreeReferenceAnchorTest {
 

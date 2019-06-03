@@ -1,5 +1,13 @@
 package org.javarosa.xpath.expr;
 
+import static java.lang.Double.NEGATIVE_INFINITY;
+import static java.lang.Double.POSITIVE_INFINITY;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.function.Consumer;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -7,15 +15,6 @@ import org.joda.time.LocalDateTime;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.function.Consumer;
-
-import static java.lang.Double.NEGATIVE_INFINITY;
-import static java.lang.Double.POSITIVE_INFINITY;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
-import static org.junit.Assert.assertEquals;
 
 public class ToDateTest {
     private static final DateTime EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
