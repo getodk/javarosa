@@ -16,8 +16,9 @@
 
 package org.javarosa.core.model.condition;
 
+import static java.util.Collections.singletonList;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -106,15 +107,15 @@ public class EvaluationContext {
     }
 
     public EvaluationContext(DataInstance instance) {
-        this(instance, new HashMap<String, DataInstance>());
+        this(instance, new HashMap<>());
     }
 
     public EvaluationContext(DataInstance instance, HashMap<String, DataInstance> formInstances) {
         this.formInstances = formInstances;
         this.instance = instance;
         this.contextNode = TreeReference.rootRef();
-        functionHandlers = new HashMap<String, IFunctionHandler>();
-        variables = new HashMap<String, Object>();
+        functionHandlers = new HashMap<>();
+        variables = new HashMap<>();
     }
 
     public DataInstance getInstance(String id) {
@@ -234,6 +235,7 @@ public class EvaluationContext {
      * @param workingRef     explicit path that refers to the current node
      * @param refs           accumulator List to collect matching paths.
      */
+    @SuppressWarnings("unchecked")
     private void expandReferenceAccumulator(TreeReference sourceRef, DataInstance sourceInstance,
                                             TreeReference workingRef, List<TreeReference> refs,
                                             boolean includeTemplates) {
@@ -270,7 +272,7 @@ public class EvaluationContext {
         if (filterFieldName == null || filterValue == null) {
             // Something has gone wrong while trying to extract filter params and the
             // optimized algorithm can't continue. Revert to the original algorithm
-            originalAlgorithm(sourceRef, sourceInstance, refs, includeTemplates, node, Arrays.asList(predicate), depth);
+            originalAlgorithm(sourceRef, sourceInstance, refs, includeTemplates, node, singletonList(predicate), depth);
             return;
         }
 
@@ -291,14 +293,10 @@ public class EvaluationContext {
 
     private String resolveFilterFieldName(XPathEqExpr predicate) {
         String fieldNameInA = extractEqExprFieldName(predicate.a);
-        if (fieldNameInA != null)
-            return fieldNameInA;
+        return fieldNameInA != null
+            ? fieldNameInA
+            : extractEqExprFieldName(predicate.b);
 
-        String fieldNameInB = extractEqExprFieldName(predicate.b);
-        if (fieldNameInB != null)
-            return fieldNameInB;
-
-        return null;
     }
 
     private XPathPathExpr resolveXPathPathExpr(XPathEqExpr predicate) {
@@ -341,9 +339,8 @@ public class EvaluationContext {
     }
 
     private List<TreeReference> filterRefs(DataInstance sourceInstance, List<XPathExpression> predicates, List<TreeReference> treeReferences) {
-        if (!predicates.isEmpty() && predicateEvaluationProgress != null) {
+        if (!predicates.isEmpty() && predicateEvaluationProgress != null)
             predicateEvaluationProgress[1] += treeReferences.size();
-        }
 
         if (predicates.isEmpty())
             return treeReferences;
@@ -386,13 +383,13 @@ public class EvaluationContext {
             //the appropriate child
             TreeReference childRef = getChildRefByNameAndMult(name, mult, node);
             if (childRef != null)
-                return Arrays.asList(childRef);
+                return singletonList(childRef);
         }
 
         if (mult == TreeReference.INDEX_ATTRIBUTE) {
             TreeReference attributeRef = getAttributeByName(name, node);
             if (attributeRef != null)
-                return Arrays.asList(attributeRef);
+                return singletonList(attributeRef);
         }
         return new ArrayList<>();
     }
@@ -420,11 +417,5 @@ public class EvaluationContext {
 
     public int getContextPosition() {
         return currentContextPosition;
-    }
-
-    public void setPredicateProcessSet(int[] loadingDetails) {
-        if (loadingDetails != null && loadingDetails.length == 2) {
-            predicateEvaluationProgress = loadingDetails;
-        }
     }
 }
