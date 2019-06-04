@@ -406,28 +406,6 @@ public class EvaluationContext {
         return null;
     }
 
-    private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
-        EvaluationContext ec = new EvaluationContext(this, treeRef);
-        // broken:
-        ec.currentContextPosition = currentContextPosition;
-        //If there was no original context position, we'll want to set the next original
-        //context to be this rescoping (which would be the backup original one).
-        if (original != null) {
-            ec.setOriginalContext(getOriginalContext());
-        } else {
-            //Check to see if we have a context, if not, the treeRef is the original declared
-            //nodeset.
-            if (TreeReference.rootRef().equals(getContextRef())) {
-                ec.setOriginalContext(treeRef);
-            } else {
-                //If we do have a legit context, use it!
-                ec.setOriginalContext(getContextRef());
-            }
-
-        }
-        return ec;
-    }
-
     public DataInstance getMainInstance() {
         return instance;
     }
