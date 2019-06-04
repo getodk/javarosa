@@ -125,14 +125,9 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
         if (filteredRawValuesCache.containsKey(key))
             return filteredRawValuesCache.get(key);
         List<TreeElement> filteredRawValues = new ArrayList<>();
-        int multiplicitySeq = 0;
         for (TreeElement rawValue : this)
-            if (rawValue.getName().equals(name) && rawValue.getChildrenWithName(filterFieldName).get(0).getValue().getDisplayText().equals(filterValue)) {
-                // Set the mult so that populateDynamicChoices doesn't complain
-                TreeElement rawValueCopy = rawValue.shallowCopy();
-                rawValueCopy.setMult(multiplicitySeq++);
-                filteredRawValues.add(rawValueCopy);
-            }
+            if (rawValue.getName().equals(name) && rawValue.getChildrenWithName(filterFieldName).get(0).getValue().getDisplayText().equals(filterValue))
+                filteredRawValues.add(rawValue);
         filteredRawValuesCache.put(key, filteredRawValues);
         return filteredRawValues;
     }
