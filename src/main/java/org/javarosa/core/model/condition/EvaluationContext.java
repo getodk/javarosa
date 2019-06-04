@@ -63,7 +63,6 @@ public class EvaluationContext {
     private int currentContextPosition = -1;
 
     private DataInstance instance;
-    private int[] predicateEvaluationProgress;
 
     /**
      * Copy Constructor
@@ -339,9 +338,6 @@ public class EvaluationContext {
     }
 
     private List<TreeReference> filterRefs(DataInstance sourceInstance, List<XPathExpression> predicates, List<TreeReference> treeReferences) {
-        if (!predicates.isEmpty() && predicateEvaluationProgress != null)
-            predicateEvaluationProgress[1] += treeReferences.size();
-
         if (predicates.isEmpty())
             return treeReferences;
 
@@ -352,8 +348,6 @@ public class EvaluationContext {
             while (passes && predicateIterator.hasNext()) {
                 // TODO This sentence will throw if the predicate produces a value that's not casteable to Boolean. Throw a controlled exception with a useful message instead.
                 passes = (Boolean) predicateIterator.next().eval(sourceInstance, this);
-                if (predicateEvaluationProgress != null)
-                    predicateEvaluationProgress[0]++;
             }
             if (passes)
                 filteredRefs.add(ref);
