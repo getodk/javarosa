@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -332,44 +333,35 @@ public class EvaluationContext {
     private void originalAlgorithm(TreeReference sourceRef, DataInstance sourceInstance, List<TreeReference> refs, boolean includeTemplates, AbstractTreeElement<TreeElement> node, List<XPathExpression> predicates, int depth) {
         List<TreeReference> treeReferences = getRefs(includeTemplates, node, sourceRef.getName(depth), sourceRef.getMultiplicity(depth));
 
-        filterRefs(sourceInstance, predicates, treeReferences);
+        List<TreeReference> filteredRefs = filterRefs(sourceInstance, predicates, treeReferences);
 
-        for (TreeReference treeRef : treeReferences) {
+        for (TreeReference treeRef : filteredRefs) {
             expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
         }
     }
 
-    private void filterRefs(DataInstance sourceInstance, List<XPathExpression> predicates, List<TreeReference> treeReferences) {
+    private List<TreeReference> filterRefs(DataInstance sourceInstance, List<XPathExpression> predicates, List<TreeReference> treeReferences) {
         if (!predicates.isEmpty() && predicateEvaluationProgress != null) {
             predicateEvaluationProgress[1] += treeReferences.size();
         }
 
-        boolean firstTime = true;
-        List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
-        for (XPathExpression xpe : predicates) {
-            for (int i = 0; i < treeReferences.size(); ++i) {
-                //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                TreeReference treeRef = treeReferences.get(i);
+        if (predicates.isEmpty())
+            return treeReferences;
 
-                //test the predicate on the treeElement
-                EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
-                Object o = xpe.eval(sourceInstance, evalContext);
-                if (o instanceof Boolean) {
-                    boolean testOutcome = (Boolean) o;
-                    if (testOutcome) {
-                        passed.add(treeRef);
-                    }
-                }
+        List<TreeReference> filteredRefs = new ArrayList<>();
+        for (TreeReference ref : treeReferences) {
+            boolean passes = true;
+            Iterator<XPathExpression> predicateIterator = predicates.iterator();
+            while (passes && predicateIterator.hasNext()) {
+                // TODO This sentence will throw if the predicate produces a value that's not casteable to Boolean. Throw a controlled exception with a useful message instead.
+                passes = (Boolean) predicateIterator.next().eval(sourceInstance, this);
+                if (predicateEvaluationProgress != null)
+                    predicateEvaluationProgress[0]++;
             }
-            firstTime = false;
-            treeReferences.clear();
-            treeReferences.addAll(passed);
-            passed.clear();
-
-            if (predicateEvaluationProgress != null) {
-                predicateEvaluationProgress[0]++;
-            }
+            if (passes)
+                filteredRefs.add(ref);
         }
+        return filteredRefs;
     }
 
     private List<TreeReference> getRefs(boolean includeTemplates, AbstractTreeElement<TreeElement> node, String name, int mult) {
