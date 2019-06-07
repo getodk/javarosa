@@ -77,7 +77,7 @@ public class KXmlElementParser extends ElementParser<Element> {
                     if (shouldSkipSubTree(name, elementsToSkip)) {
                         Element elementToSkip = initCurrentElement();
                         element.addChild(Node.ELEMENT,elementToSkip);
-                        skipSubTree(parser);
+                        skipSubTree();
                     } else {
                         final Integer multiplicity = multiplicitiesByName.get(name);
                         int newMultiplicity = (multiplicity != null) ? multiplicity + 1 : 0;
@@ -139,32 +139,6 @@ public class KXmlElementParser extends ElementParser<Element> {
             element.setAttribute(parser.getAttributeNamespace(i), parser.getAttributeName(i), parser.getAttributeValue(i));
         }
         return element;
-    }
-
-
-    // Method not in embeded KXML library on android,
-    // copied from  KXmlParser
-
-    /**
-     * Skip sub tree that is currently porser positioned on.
-     * <br>NOTE: parser must be on START_TAG and when funtion returns
-     * parser will be positioned on corresponding END_TAG.
-     */
-
-    //	Implementation copied from Alek's mail...
-
-    public void skipSubTree(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, null, null);
-        int level = 1;
-        while (level > 0) {
-            int eventType = parser.next();
-            if (eventType == parser.END_TAG) {
-                --level;
-            }
-            else if (eventType == XmlPullParser.START_TAG) {
-                ++level;
-            }
-        }
     }
 
 }

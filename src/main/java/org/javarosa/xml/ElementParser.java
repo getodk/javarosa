@@ -9,6 +9,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
@@ -50,35 +51,6 @@ public abstract class ElementParser<T> {
      * Prepares a parser that will be used by the element parser, configuring relevant
      * parameters and setting it to the appropriate point in the document.
      *
-     * @param stream A stream which is reading the XML content
-     *               of the document.
-     * @throws IOException If the stream cannot be read for any reason
-     *                     other than invalid XML Structures.
-     */
-    public static KXmlParser instantiateParser(InputStream stream) throws IOException {
-        KXmlParser parser = new KXmlParser();
-        try {
-            parser.setInput(stream, "UTF-8");
-            parser.setFeature(KXmlParser.FEATURE_PROCESS_NAMESPACES, true);
-
-            //Point to the first available tag.
-            parser.next();
-
-            return parser;
-        } catch (XmlPullParserException e) {
-            // TODO Auto-generated catch block
-            logger.error("Element Parser", e);
-            throw new IOException(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    /**
-     * Prepares a parser that will be used by the element parser, configuring relevant
-     * parameters and setting it to the appropriate point in the document.
-     *
      * @param reader A reader reading the XML content
      *               of the document.
      * @throws IOException If the stream cannot be read for any reason
@@ -104,6 +76,19 @@ public abstract class ElementParser<T> {
         }
     }
 
+    /**
+     * Prepares a parser that will be used by the element parser, configuring relevant
+     * parameters and setting it to the appropriate point in the document.
+     *
+     * @param stream A input stream which is reading the XML content
+     *               of the document.
+     * @throws IOException If the stream cannot be read for any reason
+     *                     other than invalid XML Structures.
+     */
+    public static KXmlParser instantiateParser(InputStream stream) throws IOException {
+        Reader reader = new InputStreamReader(stream, "UTF-8");
+        return instantiateParser(reader);
+    }
 
     /**
      * Parses the XML document at the current level, returning the datatype
@@ -127,4 +112,32 @@ public abstract class ElementParser<T> {
         }
         return ret;
     }
+
+
+    // Copied from most recent KxmlParser in
+    // https://github.com/stefanhaustein/kxml2/blob/87f02cdcd8e826e7741cfd5ae854c4b985c62218/src/main/java/org/kxml2/io/KXmlParser.java#L1434
+    // Not currently in an android phone's embedded kxml library
+
+    /**
+     * Skip sub tree that is currently porser positioned on.
+     * <br>NOTE: parser must be on START_TAG and when funtion returns
+     * parser will be positioned on corresponding END_TAG.
+     */
+
+    //	Implementation copied from Alek's mail...
+
+    public void skipSubTree() throws XmlPullParserException, IOException {
+        parser.require(KXmlParser.START_TAG, null, null);
+        int level = 1;
+        while (level > 0) {
+            int eventType = parser.next();
+            if (eventType == KXmlParser.END_TAG) {
+                --level;
+            }
+            else if (eventType == KXmlParser.START_TAG) {
+                ++level;
+            }
+        }
+    }
+
 }

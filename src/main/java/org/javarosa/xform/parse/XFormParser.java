@@ -75,6 +75,7 @@ import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InternalDataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
@@ -95,6 +96,7 @@ import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xml.ElementSkipper;
+import org.javarosa.xml.InternalDataInstanceParser;
 import org.javarosa.xml.KXmlElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
@@ -352,7 +354,11 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public FormDef parse() throws IOException {
-        return parse(null);
+        return parse(null, null);
+    }
+
+    public FormDef parse(String lastSavedSrc) throws IOException {
+        return parse(null, lastSavedSrc);
     }
 
     /**
@@ -361,15 +367,15 @@ public class XFormParser implements IXFormParserFunctions {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public FormDef parse(String lastSavedSrc) throws IOException {
+    public FormDef parse(String xFormFile, String lastSavedSrc) throws IOException {
         if (_f == null) {
             logger.info("Parsing form...");
 
             if (_xmldoc == null) {
-                _xmldoc = getXMLDocument(_reader, stringCache);
+                _xmldoc = getXMLDocument(_reader, stringCache, true);
             }
 
-            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
+            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()),xFormFile, lastSavedSrc);
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -477,7 +483,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
+    private void parseDoc(Map<String, String> namespacePrefixesByUri,String  xFormPath, String lastSavedSrc) {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
 
@@ -513,11 +519,26 @@ public class XFormParser implements IXFormParserFunctions {
                     }
                     _f.addNonMainInstance(externalDataInstance);
                 } else {
-                    FormInstance fi = instanceParser.parseInstance(instance, false,
-                        instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
-                    loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
-                    loadInstanceData(instance, fi.getRoot(), _f);
-                    _f.addNonMainInstance(fi);
+                    if(xFormPath == null){
+                        FormInstance fi = instanceParser.parseInstance(instance, false,
+                            instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
+                        loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
+                        loadInstanceData(instance, fi.getRoot(), _f);
+                        _f.addNonMainInstance(fi);
+                    }else{
+                        //Internal secondary instances were not parsed with xform - skipped
+                        final InternalDataInstance internalDataInstance;
+                        try{
+                            internalDataInstance = InternalDataInstanceParser.build( xFormPath, instanceId);
+                        } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
+                            XmlPullParserException | InvalidReferenceException e) {
+                            String msg = "Unable to parse internal secondary instance";
+                            logger.error(msg, e);
+                            throw new XFormParseException(msg + ": " + e.toString(), null);
+                        }
+                        _f.addNonMainInstance(internalDataInstance);
+                    }
+
                 }
             }
         }
