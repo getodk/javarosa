@@ -159,6 +159,7 @@ public class BenchmarkUtils {
 
     public static Path getLGAsExternalInstance(){
         Path assetsPath = prepareAssets( "lgas.xml");
+        setUpSimpleReferenceManager("file", assetsPath);
         Path filePath = assetsPath.resolve("lgas.xml");
         return filePath;
     }
