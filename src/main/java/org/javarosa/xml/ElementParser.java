@@ -124,7 +124,7 @@ public abstract class ElementParser<T> {
      * parser will be positioned on corresponding END_TAG.
      */
 
-    //	Implementation copied from Alek's mail...
+    // Implementation copied from Alek's mail...
 
     public void skipSubTree() throws XmlPullParserException, IOException {
         parser.require(KXmlParser.START_TAG, null, null);
