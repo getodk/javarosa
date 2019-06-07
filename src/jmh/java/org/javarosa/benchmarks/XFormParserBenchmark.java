@@ -1,7 +1,6 @@
 package org.javarosa.benchmarks;
 
 import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.kdom.Document;
@@ -27,7 +26,7 @@ public class XFormParserBenchmark {
     }
 
     @State(Scope.Thread)
-    public static class XFormParserState {
+    public static class XFormParserBenchmarkState {
         Path xFormInternalSecondaryInstancesMinified;
         Path xFormInternalSecondaryInstances;
         Path xFormExternalSecondaryInstances;
@@ -47,57 +46,57 @@ public class XFormParserBenchmark {
 
     @Benchmark
     public void
-    benchmarkParseExternalInstanceXFormOnly(XFormParserState state, Blackhole bh)
+    benchmarkParseExternalInstanceXFormOnly(XFormParserBenchmarkState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         Reader reader = new FileReader(state.xFormInternalSecondaryInstancesMinified.toFile());
-        Document kxmlDocument = XFormParser.getXMLDocument(reader);
+        Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
     }
 
     @Benchmark
     public void
-    benchmarkParseInternalInstanceXForm(XFormParserState state, Blackhole bh)
+    benchmarkParseInternalInstanceXForm(XFormParserBenchmarkState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         Reader reader = new FileReader(state.xFormInternalSecondaryInstances.toFile());
-        Document kxmlDocument = XFormParser.getXMLDocument(reader);
+        Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
     }
 
 
     @Benchmark
     public void
-    benchmarkParseExternalInstanceLGA(XFormParserState state, Blackhole bh)
+    benchmarkParseExternalInstanceLGA(XFormParserBenchmarkState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         Reader reader = new FileReader(state.lgaSecondaryInstance.toFile());
-        Document kxmlDocument = XFormParser.getXMLDocument(reader);
+        Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
     }
 
     @Benchmark
     public void
-    benchmarkParseExternalInstanceWards(XFormParserState state, Blackhole bh)
+    benchmarkParseExternalInstanceWards(XFormParserBenchmarkState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         Reader reader = new FileReader(state.wardExternalSecondaryInstance.toFile());
-        Document kxmlDocument = XFormParser.getXMLDocument(reader);
+        Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
     }
 
     @Benchmark
     public void
-    benchmarkParseExternalInstanceXFormWithInstanceFiles(XFormParserState state, Blackhole bh)
+    benchmarkParseExternalInstanceXFormWithInstanceFiles(XFormParserBenchmarkState state, Blackhole bh)
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
 
         Reader externalInstanceXFormReader = new FileReader(state.xFormExternalSecondaryInstances.toFile());
         Reader lgaSecondaryInstanceReader = new FileReader(state.lgaSecondaryInstance.toFile());
         Reader wardsSecondaryInstanceReader = new FileReader(state.wardExternalSecondaryInstance.toFile());
-        Document externalXFormInstanceDocument = XFormParser.getXMLDocument(externalInstanceXFormReader);
-        Document lgaExternalInstanceDocument = XFormParser.getXMLDocument(lgaSecondaryInstanceReader);
-        Document wardExternalInstanceDocument = XFormParser.getXMLDocument(wardsSecondaryInstanceReader);
+        Document externalXFormInstanceDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(externalInstanceXFormReader);
+        Document lgaExternalInstanceDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(lgaSecondaryInstanceReader);
+        Document wardExternalInstanceDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(wardsSecondaryInstanceReader);
 
         bh.consume(externalXFormInstanceDocument);
         bh.consume(lgaExternalInstanceDocument);

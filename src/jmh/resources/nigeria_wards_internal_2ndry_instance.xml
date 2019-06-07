@@ -74886,7 +74886,7 @@
       <label>What population do you want to search for?</label>
     </input>
     <input ref="/nigeria_wards_internal/pop_filter_label">
-      <label> Ward with population of <output value=" /nigeria_wards_internal/target_pop "/>: <output value=" /nigeria_wards_internal/pop_filter "/> </label>
+      <label> Ward with population of </label>
     </input>
   </h:body>
 </h:html>
