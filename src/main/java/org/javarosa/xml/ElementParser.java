@@ -9,6 +9,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 /**
  * <p>Element Parser is the core parsing element for XML files. Implementations
@@ -73,6 +74,36 @@ public abstract class ElementParser<T> {
             throw new IOException(e.getMessage());
         }
     }
+
+    /**
+     * Prepares a parser that will be used by the element parser, configuring relevant
+     * parameters and setting it to the appropriate point in the document.
+     *
+     * @param reader A reader reading the XML content
+     *               of the document.
+     * @throws IOException If the stream cannot be read for any reason
+     *                     other than invalid XML Structures.
+     */
+    public static KXmlParser instantiateParser(Reader reader) throws IOException {
+        KXmlParser parser = new KXmlParser();
+        try {
+            parser.setInput(reader);
+            parser.setFeature(KXmlParser.FEATURE_PROCESS_NAMESPACES, true);
+
+            //Point to the first available tag.
+            parser.next();
+
+            return parser;
+        } catch (XmlPullParserException e) {
+            // TODO Auto-generated catch block
+            logger.error("Element Parser", e);
+            throw new IOException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
+        }
+    }
+
 
     /**
      * Parses the XML document at the current level, returning the datatype

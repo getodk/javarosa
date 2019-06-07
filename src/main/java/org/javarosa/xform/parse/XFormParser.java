@@ -94,6 +94,7 @@ import org.javarosa.xform.util.InterningKXmlParser;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.xml.KXmlElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
@@ -409,20 +410,22 @@ public class XFormParser implements IXFormParserFunctions {
     public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
         throws IOException {
         final StopWatch ctParse = StopWatch.start();
-        Document doc = new Document();
+        Document doc;
 
         try {
             KXmlParser parser;
 
             if (stringCache != null) {
+                doc = new Document();
                 parser = new InterningKXmlParser(stringCache);
+                parser.setInput(reader);
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
+                doc.parse(parser);
             } else {
-                parser = new KXmlParser();
+                parser = KXmlElementParser.instantiateParser(reader);
+                KXmlElementParser kxmlElementParser = new KXmlElementParser(parser);
+                doc = kxmlElementParser.parseDoc();
             }
-
-            parser.setInput(reader);
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-            doc.parse(parser);
         } catch (XmlPullParserException e) {
             String errorMsg = "XML Syntax Error at Line: " + e.getLineNumber() + ", Column: " + e.getColumnNumber() + "!";
             logger.error(errorMsg, e);
@@ -478,7 +481,7 @@ public class XFormParser implements IXFormParserFunctions {
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
                     } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
-                            XmlPullParserException | InvalidReferenceException e) {
+                        XmlPullParserException | InvalidReferenceException e) {
                         String msg = "Unable to parse external secondary instance";
                         logger.error(msg, e);
                         throw new XFormParseException(msg + ": " + e.toString(), instance);
@@ -694,7 +697,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (!(parent instanceof IFormElement)) {
             // parent must either be a FormDef or QuestionDef, both of which are IFormElements
             throw new XFormParseException("An action element occurred in an invalid location. " +
-                    "Must be either a child of a control element, or a child of the <model>");
+                "Must be either a child of a control element, or a child of the <model>");
         }
         specificHandler.handle(this, e, parent);
     }
@@ -1014,8 +1017,8 @@ public class XFormParser implements IXFormParserFunctions {
 
         boolean isItem =
             controlType == CONTROL_SELECT_MULTI
-            || controlType == CONTROL_RANK
-            || controlType == CONTROL_SELECT_ONE;
+                || controlType == CONTROL_RANK
+                || controlType == CONTROL_SELECT_ONE;
 
         question.setControlType(controlType);
         question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
@@ -2145,12 +2148,12 @@ public class XFormParser implements IXFormParserFunctions {
      */
     public static void registerActionHandler(String name, final IElementHandler specificHandler) {
         actionHandlers.put(
-                name,
-                new IElementHandler() {
-                    public void handle(XFormParser p, Element e, Object parent) {
-                        p.parseAction(e, parent, specificHandler);
-                    }
+            name,
+            new IElementHandler() {
+                public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseAction(e, parent, specificHandler);
                 }
+            }
         );
     }
 
