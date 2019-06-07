@@ -74,7 +74,6 @@ javadoc {
 }
 
 jmh {
-    include = "(TreeElementParserBenchmark)"
     exclude = "(BenchmarkTemplate)"
     threads = 1
     fork = 1
