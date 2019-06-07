@@ -9,6 +9,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.ValidateOutcome;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
@@ -34,9 +35,7 @@ public class FormDefValidateBenchmark {
 
         @Setup(Level.Trial)
         public void initialize() throws IOException {
-            Path assetsDir = prepareAssets("nigeria_wards_external.xml", "lgas.xml", "wards.xml");
-            Path resourcePath = assetsDir.resolve("nigeria_wards_external.xml");
-            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", assetsDir);
+            Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             formDef = FormParserHelper.parse(resourcePath);
             FormEntryModel formEntryModel = new FormEntryModel(formDef);
             FormEntryController formEntryController = new FormEntryController(formEntryModel);
@@ -59,8 +58,8 @@ public class FormDefValidateBenchmark {
     }
 
     @Benchmark
-    public void benchmark_FormDefValidate_validate(FormDefValidateState state, Blackhole bh) {
-        bh.consume(state.formDef.validate(true));
+    public void benchmarkFormDefValidate(FormDefValidateState state, Blackhole bh) {
+        ValidateOutcome validateOutcome = state.formDef.validate(true);
+        bh.consume(validateOutcome);
     }
-
 }
