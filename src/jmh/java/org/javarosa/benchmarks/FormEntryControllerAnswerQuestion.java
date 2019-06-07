@@ -2,7 +2,6 @@ package org.javarosa.benchmarks;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 import static org.javarosa.benchmarks.BenchmarkUtils.getStubAnswer;
-import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,7 +12,6 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
