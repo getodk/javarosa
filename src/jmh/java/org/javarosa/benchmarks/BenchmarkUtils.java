@@ -26,6 +26,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
 public class BenchmarkUtils {
+    private static Path CACHE_PATH;
     public static Path prepareAssets(String... filenames) {
         try {
             Path assetsDir = Files.createTempDirectory("javarosa_benchmarks_");
@@ -162,6 +163,13 @@ public class BenchmarkUtils {
         setUpSimpleReferenceManager("file", assetsPath);
         Path filePath = assetsPath.resolve("lgas.xml");
         return filePath;
+    }
+
+    public static Path getCachePath() throws IOException {
+        if(CACHE_PATH == null){
+            CACHE_PATH = Files.createTempDirectory("javarosa_benchmarks_cache");
+        }
+        return CACHE_PATH;
     }
 
 }
