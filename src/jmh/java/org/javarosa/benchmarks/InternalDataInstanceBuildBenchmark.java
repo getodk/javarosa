@@ -14,10 +14,8 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 
 public class InternalDataInstanceBuildBenchmark {
     public static void main(String[] args) {
