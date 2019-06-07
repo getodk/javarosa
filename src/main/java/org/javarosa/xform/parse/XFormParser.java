@@ -94,6 +94,7 @@ import org.javarosa.xform.util.InterningKXmlParser;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.xml.ElementSkipper;
 import org.javarosa.xml.KXmlElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
@@ -127,6 +128,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     //Constants to clean up code and prevent user error
     private static final String FORM_ATTR = "form";
+    private static final String INSTANCE_ELEMENT = "instance";
     private static final String APPEARANCE_ATTR = "appearance";
     private static final String LABEL_ELEMENT = "label";
     private static final String VALUE = "value";
@@ -393,7 +395,16 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public static Document getXMLDocument(Reader reader) throws IOException {
-        return getXMLDocument(reader, null);
+        return getXMLDocument(reader,null, false);
+    }
+
+    public static Document getXMLDocument(Reader reader, boolean skipSecondaryInstance) throws IOException {
+        return getXMLDocument(reader,null, skipSecondaryInstance);
+    }
+
+    public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
+        throws IOException {
+        return getXMLDocument(reader, stringCache, false);
     }
 
     /**
@@ -407,7 +418,7 @@ public class XFormParser implements IXFormParserFunctions {
      * @deprecated The InterningKXmlParser is not used.
      */
     @Deprecated
-    public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
+    public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache, boolean skipInternalInstance)
         throws IOException {
         final StopWatch ctParse = StopWatch.start();
         Document doc;
@@ -422,10 +433,24 @@ public class XFormParser implements IXFormParserFunctions {
                 parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
                 doc.parse(parser);
             } else {
-                parser = KXmlElementParser.instantiateParser(reader);
-                KXmlElementParser kxmlElementParser = new KXmlElementParser(parser);
-                doc = kxmlElementParser.parseDoc();
+
+                if (skipInternalInstance) {
+                    ElementSkipper elementSkipper = new ElementSkipper(INSTANCE_ELEMENT,1);
+                    parser = KXmlElementParser.instantiateParser(reader);
+                    KXmlElementParser kxmlElementParser = new KXmlElementParser(parser, elementSkipper);
+                    doc = kxmlElementParser.parseDoc();
+                } else {
+                    parser = new KXmlParser();
+                    doc = new Document();
+                    //Parses the whole xform
+                    parser.setInput(reader);
+                    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
+                    doc.parse(parser);
+
+                }
+
             }
+
         } catch (XmlPullParserException e) {
             String errorMsg = "XML Syntax Error at Line: " + e.getLineNumber() + ", Column: " + e.getColumnNumber() + "!";
             logger.error(errorMsg, e);
