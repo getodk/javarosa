@@ -371,9 +371,8 @@ public class XFormParser implements IXFormParserFunctions {
         if (_f == null) {
             logger.info("Parsing form...");
 
-            if (_xmldoc == null) {
-                _xmldoc = getXMLDocument(_reader, stringCache, true);
-            }
+            boolean skipSecondaryInstance = xFormFile != null;
+            _xmldoc = getXMLDocument(_reader, stringCache, skipSecondaryInstance);
 
             parseDoc(buildNamespacesMap(_xmldoc.getRootElement()),xFormFile, lastSavedSrc);
 
