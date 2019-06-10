@@ -85,7 +85,7 @@ public class TreeElementParser extends ElementParser<TreeElement> {
         //instance node is assumed not to be the first node
         int foundInstanceIndex = -1;
         while (parser.getDepth() >= depth) {
-            while (findInstanceNode()){
+            if(isInstanceNode()){
                 //instance names are in the default namespace
                 String instanceId = parser.getAttributeValue( null, ID_ATTR);
                 if (this.instanceId.equals(instanceId)) {
@@ -119,7 +119,7 @@ public class TreeElementParser extends ElementParser<TreeElement> {
         final int depth = parser.getDepth();
         if (depth > 0) {
             while (parser.getDepth() >= depth) {
-                while(findInstanceNode()){
+                if(isInstanceNode()){
                     TreeElement treeElement = new TreeElementParser(parser, 0, "").parse();
                     if(treeElement.getAttributeValue(null, ID_ATTR) !=null){
                         String instanceId = treeElement.getAttributeValue(null,ID_ATTR);
@@ -136,15 +136,10 @@ public class TreeElementParser extends ElementParser<TreeElement> {
         }
     }
 
-    public boolean findInstanceNode() throws XmlPullParserException, IOException {
+
+    public boolean isInstanceNode() throws IOException, XmlPullParserException {
         int ret = nextNonWhitespace();
-        if (ret == Node.ELEMENT && parser.getName().equals(INSTANCE_ELEMENT)) {
-            return true;
-        } else if (ret != KXmlParser.END_TAG) {
-            return false;
-        } else {
-            return findInstanceNode();
-        }
+        return ret == Node.ELEMENT && parser.getName().equals(INSTANCE_ELEMENT);
     }
 
 }
