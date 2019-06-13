@@ -16,7 +16,7 @@
 package org.javarosa.xpath.expr;
 
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.xpath.expr.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.junit.Assert.assertThat;
 
 import org.javarosa.core.test.Scenario;

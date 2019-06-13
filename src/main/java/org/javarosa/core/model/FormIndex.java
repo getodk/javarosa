@@ -79,7 +79,7 @@ import org.javarosa.core.model.instance.TreeReference;
  *
  * To go from a {@code FormIndex} to a form element in a blank form, {@link FormDef#getChild(FormIndex)} can be used.
  * To go from a {@code FormIndex} to a node in a filled form, 
- * {@link org.javarosa.core.model.instance.FormInstance#resolveReference(TreeReference) FormInstance#resolveReference(TreeReference)} can
+ * {@link org.javarosa.core.model.instance.FormInstance#resolveReference(TreeReference)} can
  * be used along with {@link #getReference()}.
  *
  * No circularity is allowed. That is, no {@code FormIndex}'s ancestor can be itself.
