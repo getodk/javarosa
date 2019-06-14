@@ -1,6 +1,7 @@
 package org.javarosa.benchmarks;
 
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -25,6 +26,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
 public class BenchmarkUtils {
+    private static Path CACHE_PATH;
     public static Path prepareAssets(String... filenames) {
         try {
             Path assetsDir = Files.createTempDirectory("javarosa_benchmarks_");
@@ -129,4 +131,45 @@ public class BenchmarkUtils {
                 return new StringData("");
         }
     }
+
+    public static Path getNigeriaWardsXMLWithInternal2ndryInstance(){
+        Path assetsPath = prepareAssets("nigeria_wards_internal_2ndry_instance.xml");
+        Path filePath = assetsPath.resolve("nigeria_wards_internal_2ndry_instance.xml");
+        return filePath;
+    }
+
+    public static Path getMinifiedNigeriaWardsXMLWithInternal2ndryInstance(){
+        Path assetsPath = prepareAssets("nigeria_wards_internal_2ndry_instance_minified.xml");
+        Path filePath = assetsPath.resolve("nigeria_wards_internal_2ndry_instance_minified.xml");
+        return filePath;
+    }
+
+    public static Path getNigeriaWardsXMLWithExternal2ndryInstance(){
+        Path assetsPath = prepareAssets("nigeria_wards_external_2ndry_instance.xml", "lgas.xml", "wards.xml");
+        setUpSimpleReferenceManager("file", assetsPath);
+        Path filePath = assetsPath.resolve("nigeria_wards_external_2ndry_instance.xml");
+        return filePath;
+    }
+
+    public static Path getWardsExternalInstance(){
+        Path assetsPath = prepareAssets( "wards.xml");
+        setUpSimpleReferenceManager("file", assetsPath);
+        Path filePath = assetsPath.resolve("wards.xml");
+        return filePath;
+    }
+
+    public static Path getLGAsExternalInstance(){
+        Path assetsPath = prepareAssets( "lgas.xml");
+        setUpSimpleReferenceManager("file", assetsPath);
+        Path filePath = assetsPath.resolve("lgas.xml");
+        return filePath;
+    }
+
+    public static Path getCachePath() throws IOException {
+        if(CACHE_PATH == null){
+            CACHE_PATH = Files.createTempDirectory("javarosa_benchmarks_cache");
+        }
+        return CACHE_PATH;
+    }
+
 }

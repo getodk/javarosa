@@ -74,13 +74,19 @@ javadoc {
 }
 
 jmh {
-    iterations = 1
-    fork = 0
-    timeOnIteration = '1s'
-    timeout = '1s'
-    warmup = '1s'
+    exclude = "(BenchmarkTemplate)"
+    threads = 1
+    fork = 1
+    timeout = '10s'
+    warmup = '2s'
+    warmupIterations = 10
     warmupBatchSize = 1
-    warmupForks = 0
-    warmupIterations = 1
+    warmupForks = 1
+    iterations = 20
+    timeOnIteration = '2s'
+    timeUnit = 's'
+    benchmarkMode = ['avgt','ss']
     includeTests = true
+    resultFormat = 'CSV'
+    forceGC = true
 }
