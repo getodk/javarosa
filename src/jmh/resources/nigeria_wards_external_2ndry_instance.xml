@@ -469,6 +469,6 @@
       <label>What population do you want to search for?</label>
     </input>
     <input ref="/nigeria_wards_external/pop_filter_label">
-      <label> Ward with population of <output value=" /nigeria_wards_external/target_pop "/>: <output value=" /nigeria_wards_external/pop_filter "/> </label></input>
+      <label> Ward with population of </label></input>
   </h:body>
 </h:html>

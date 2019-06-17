@@ -1,4 +1,4 @@
-package org.javarosa.xpath.expr;
+package org.javarosa.core.test;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -6,7 +6,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 
-class AnswerDataMatchers {
+public class AnswerDataMatchers {
     public static Matcher<StringData> stringAnswer(String expectedAnswer) {
         return new TypeSafeMatcher<StringData>() {
             @Override

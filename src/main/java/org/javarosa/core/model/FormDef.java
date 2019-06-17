@@ -30,6 +30,7 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
@@ -995,32 +996,33 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
                 new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
-        DataInstance fi = null;
-        if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
-        // with the default
-        // instance
-        {
-            fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
-            if (fi == null) {
-                throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName()
-                        + " not found");
+        DataInstance formInstance;
+        if (itemset.nodesetRef.getInstanceName() != null) { // a secondary instance is specified
+            formInstance = getNonMainInstance(itemset.nodesetRef.getInstanceName());
+            if (formInstance == null) {
+                throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName() + " not found");
             }
         } else {
-            fi = getMainInstance();
+            formInstance = getMainInstance();
         }
 
         if (matches == null) {
-            throw new XPathException("Could not find references depended on by"
-                    + itemset.nodesetRef.getInstanceName());
+            throw new XPathException("Could not find references depended on by" + itemset.nodesetRef.getInstanceName());
         }
 
+        // Get the answer to the current question so that it can be compared with the new choice list. If the answer
+        // to the question is no longer in the choice list, it will be cleared.
+        String currentQuestionAnswer = null;
+        IAnswerData rawValue = getMainInstance().resolveReference(curQRef).getValue();
+        if (rawValue != null) {
+            currentQuestionAnswer = rawValue.getDisplayText();
+        }
+
+        boolean currentAnswerIsInNewChoices = false;
         for (int i = 0; i < matches.size(); i++) {
             TreeReference item = matches.get(i);
 
-            // String label =
-            // itemset.labelExpr.evalReadable(this.getMainInstance(), new
-            // EvaluationContext(exprEvalContext, item));
-            String label = itemset.labelExpr.evalReadable(fi, new EvaluationContext(exprEvalContext,
+            String label = itemset.labelExpr.evalReadable(formInstance, new EvaluationContext(exprEvalContext,
                     item));
             String value = null;
             TreeElement copyNode = null;
@@ -1028,15 +1030,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 copyNode = this.getMainInstance().resolveReference(itemset.copyRef.contextualize(item));
             }
             if (itemset.valueRef != null) {
-                // value = itemset.valueExpr.evalReadable(this.getMainInstance(),
-                // new EvaluationContext(exprEvalContext, item));
                 value = itemset.valueExpr
-                        .evalReadable(fi, new EvaluationContext(exprEvalContext, item));
+                        .evalReadable(formInstance, new EvaluationContext(exprEvalContext, item));
             }
-            // SelectChoice choice = new
-            // SelectChoice(labelID,labelInnerText,value,isLocalizable);
-            SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i,
-                    itemset.labelIsItext);
+
+            // Provide a default value if none is specified
+            value = value != null ? value : "dynamic:" + i;
+
+            if (value.equals(currentQuestionAnswer)) {
+                currentAnswerIsInNewChoices = true;
+            }
+
+            SelectChoice choice = new SelectChoice(label, value, itemset.labelIsItext);
             choice.setIndex(i);
             if (itemset.copyMode)
                 choice.copyNode = copyNode;
@@ -1045,21 +1050,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         if (choices.size() == 0) {
-            // throw new
-            // RuntimeException("dynamic select question has no choices! [" +
-            // itemset.nodesetRef + "]");
-            // When you exit a survey mid way through and want to save it, it seems
-            // that Collect wants to
-            // go through all the questions. Well of course not all the questions
-            // are going to have answers
-            // to chose from if the user hasn't filled them out. So I'm just going
-            // to make a note of this
-            // and not throw an exception.
             logger.info("Dynamic select question has no choices! [{}]. If this occurs while " +
                 "filling out a form (and not while saving an incomplete form), the filter " +
                 "condition may have eliminated all the choices. Is that what you intended?"
                 , itemset.nodesetRef);
 
+        }
+
+        // Clear the answer if it is no longer in the choice list.
+        if (!currentAnswerIsInNewChoices) {
+            getMainInstance().resolveReference(curQRef).setAnswer(new StringData(""));
         }
 
         itemset.clearChoices();
