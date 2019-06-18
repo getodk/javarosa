@@ -109,31 +109,6 @@ public class XFormUtils {
         }
     }
 
-    /**
-     *
-     * @param xFormPath The path to the XForm that is to be parsed
-     * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
-     *                     no data will be loaded and the instance will be blank.
-     */
-    public static FormDef getFormFromFile(String xFormPath, String lastSavedSrc) throws XFormParseException {
-        InputStreamReader isr = null;
-        try {
-            isr = new FileReader(xFormPath);
-            XFormParser xFormParser = _factory.getXFormParser(isr);
-            return xFormParser.parse(xFormPath, lastSavedSrc);
-        } catch(IOException e) {
-            throw new XFormParseException("IO Exception during parse! " + e.getMessage());
-        } finally {
-            try {
-                if (isr != null) {
-                    isr.close();
-                }
-            } catch (IOException e) {
-                logger.error("IO Exception while closing stream.", e);
-            }
-        }
-    }
-
     public static FormDef getFormFromSerializedResource(String resource) {
         FormDef returnForm = null;
         InputStream is = System.class.getResourceAsStream(resource);

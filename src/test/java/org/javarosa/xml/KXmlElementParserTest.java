@@ -64,7 +64,7 @@ public class KXmlElementParserTest {
 
     @Test
     public void testParseXFormSkipInternalInstances() throws IOException, XmlPullParserException {
-        ElementSkipper elementToSkip = new ElementSkipper("instance", 1);
+        NodeGatherer elementToSkip = new NodeGatherer("instance", 1);
         Path xFormFilePath = r("simple-form.xml");
         Document document;
         KXmlElementParser kxmlElementParser ;

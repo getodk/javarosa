@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class KXmlElementParser extends ElementParser<Element> {
 
-    private ElementSkipper[] elementsToSkip;
+    private NodeGatherer[] nodesToGather;
     private Element elementCreator;
 
     public KXmlElementParser(KXmlParser parser) {
@@ -35,9 +35,9 @@ public class KXmlElementParser extends ElementParser<Element> {
         elementCreator = new Element();
     }
 
-    public KXmlElementParser(KXmlParser parser, ElementSkipper ...elementsToSkip) {
+    public KXmlElementParser(KXmlParser parser, NodeGatherer...nodesToGather) {
         this(parser);
-        this.elementsToSkip = elementsToSkip;
+        this.nodesToGather = nodesToGather;
     }
 
     /**
@@ -66,7 +66,6 @@ public class KXmlElementParser extends ElementParser<Element> {
      */
     public Element parse()
         throws IOException, XmlPullParserException {
-
         final int depth = parser.getDepth();
         Element element = initCurrentElement();
         final Map<String, Integer> multiplicitiesByName = new HashMap();
@@ -74,10 +73,12 @@ public class KXmlElementParser extends ElementParser<Element> {
             switch (nextNonWhitespace()) {
                 case XmlPullParser.START_TAG:
                     String name = parser.getName();
-                    if (shouldSkipSubTree(name, elementsToSkip)) {
+                    NodeGatherer nodeGatherer = shouldGatherNode(name, nodesToGather);
+                    if (nodeGatherer != null) {
                         Element elementToSkip = initCurrentElement();
                         element.addChild(Node.ELEMENT,elementToSkip);
-                        skipSubTree();
+                        String nodeString = writeToString();
+                        nodeGatherer.add(nodeString);
                     } else {
                         final Integer multiplicity = multiplicitiesByName.get(name);
                         int newMultiplicity = (multiplicity != null) ? multiplicity + 1 : 0;
@@ -103,25 +104,24 @@ public class KXmlElementParser extends ElementParser<Element> {
 
     /**
      * Check to see if parser should
-     * skip the parsing child nodes
+     * gather the child node instead of parsing
      * of the provided element name
      *
-     * @param elementName The Element name that it's children shouldn't
-     *                    be parsed
-     * @param elementsToSkip Representation of predefined elements
-     *                       intended to be skip
-     * @return if this Element should be skipped
+     * @param elementName The name of the current Element being parsed.
+     * @param nodesToGather Representation of predefined nodes
+     *                       intended to be gathered
+     * @return if the provided node should be gathered
      */
-    private boolean shouldSkipSubTree(String elementName, ElementSkipper ...elementsToSkip){
-        if(elementsToSkip != null){
-            for(int e = 0; e < elementsToSkip.length; e++){
-                ElementSkipper elementSkipper = elementsToSkip[e];
-                if(elementSkipper.skip(elementName)){
-                    return true;
+    private NodeGatherer shouldGatherNode(String elementName, NodeGatherer ...nodesToGather){
+        if(nodesToGather != null){
+            for(int e = 0; e < nodesToGather.length; e++){
+                NodeGatherer NodeGatherer = nodesToGather[e];
+                if(NodeGatherer.skip(elementName)){
+                    return NodeGatherer;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     /**

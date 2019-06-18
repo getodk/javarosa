@@ -140,4 +140,46 @@ public abstract class ElementParser<T> {
         }
     }
 
+    /**
+     * Gathers the current Node as a string
+     * @return
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
+    public String writeToString() throws XmlPullParserException, IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        parser.require(KXmlParser.START_TAG, null, null);
+        writeElement(stringBuilder);
+
+        int level = 1;
+        while (level > 0) {
+            int eventType = parser.next();
+            if (eventType == KXmlParser.END_TAG) {
+                stringBuilder.append("</"+ parser.getName() + ">");
+                --level;
+            }
+            else if (eventType == KXmlParser.START_TAG) {
+                writeElement(stringBuilder);
+                ++level;
+            }else{
+                stringBuilder.append(parser.getText());
+            }
+
+        }
+        return stringBuilder.toString();
+    }
+
+    private void writeElement(StringBuilder stringBuilder){
+        stringBuilder.append("<"+ parser.getName());
+        for (int i = parser.getNamespaceCount (parser.getDepth () - 1);
+             i < parser.getNamespaceCount (parser.getDepth ()); i++) {
+            stringBuilder.append(" " + parser.getNamespacePrefix (i) + "=\"" + parser.getNamespaceUri (i) +"\"" );
+        }
+
+        for (int i = 0; i < parser.getAttributeCount(); ++i) {
+            stringBuilder.append(" " + (parser.getAttributeNamespace(i) == null ? (parser.getAttributeNamespace(i) + ":") : "") + parser.getAttributeName(i) + "=\"" + parser.getAttributeValue(i) +"\"" );
+        }
+        stringBuilder.append(">");
+    }
+
 }
