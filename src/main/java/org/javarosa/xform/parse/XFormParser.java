@@ -50,8 +50,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,6 +105,7 @@ import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
+import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
@@ -141,6 +145,8 @@ public class XFormParser implements IXFormParserFunctions {
 
     private static final int CONTAINER_GROUP = 1;
     private static final int CONTAINER_REPEAT = 2;
+    private static final Pattern COLLECT_FUNC_EXPR = Pattern
+        .compile("(instance)\\s*\\(\\s*'([^\\s]{1,64})'\\s*");
 
     private static HashMap<String, IElementHandler> topLevelHandlers;
     private static HashMap<String, IElementHandler> groupLevelHandlers;
@@ -168,6 +174,7 @@ public class XFormParser implements IXFormParserFunctions {
     private List<Element> instanceNodes;
     private List<String> instanceNodeIdStrs;
     private List<String> itextKnownForms;
+    private List<String> externalInstanceBuildList;
     private static HashMap<String, IElementHandler> actionHandlers;
 
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
@@ -312,6 +319,7 @@ public class XFormParser implements IXFormParserFunctions {
         modelFound = false;
         bindingsByID = new HashMap<>();
         bindings = new ArrayList<>();
+        externalInstanceBuildList = new ArrayList<>();
         actionTargets = new ArrayList<>();
         repeats = new ArrayList<>();
         itemsets = new ArrayList<>();
@@ -471,9 +479,8 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                // Disable jr://file-csv/ support by explicitly only supporting jr://file/
-                // until https://github.com/opendatakit/javarosa/issues/417 is addressed
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file/")) {
+                // only build when ESI Id is not referenced in pulldata
+                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file") && externalInstanceBuildList.contains(instanceId)) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
@@ -493,6 +500,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
             }
         }
+
         //now parse the main instance
         if (mainInstanceNode != null) {
             FormInstance fi = instanceParser.parseInstance(mainInstanceNode, true,
@@ -636,6 +644,9 @@ public class XFormParser implements IXFormParserFunctions {
             int type = e.getType(i);
             Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
             String childName = (child != null ? child.getName() : null);
+
+            if (child != null)
+                addToESIBuildList(child);
 
             if ("itext".equals(childName)) {
                 parseIText(child);
@@ -975,6 +986,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         String ref = e.getAttributeValue(null, REF_ATTR);
         String bind = e.getAttributeValue(null, BIND_ATTR);
+        addToESIBuildList(e);
 
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
@@ -1841,6 +1853,32 @@ public class XFormParser implements IXFormParserFunctions {
         "saveIncomplete"
     ));
 
+    private String toXMLTag(Element element) {
+        String converted = "";
+        KXmlSerializer kXmlSerializer = new KXmlSerializer();
+        StringWriter stringWriter = new StringWriter();
+        kXmlSerializer.setOutput(stringWriter);
+        try {
+            element.write(kXmlSerializer);
+            kXmlSerializer.flush();
+            kXmlSerializer.endDocument();
+            stringWriter.close();
+            converted = stringWriter.toString();
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+
+        return converted;
+    }
+
+    private void addToESIBuildList(Element element) {
+        String elementTagString = toXMLTag(element);
+        Matcher matcher = COLLECT_FUNC_EXPR.matcher(elementTagString);
+        String functionFirstParam = matcher.find() ? matcher.group(2) : null;
+        if (functionFirstParam != null && !externalInstanceBuildList.contains(functionFirstParam))
+            externalInstanceBuildList.add(functionFirstParam);
+    }
+
     private void parseBind(Element element) {
         final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element);
 
@@ -1855,7 +1893,6 @@ public class XFormParser implements IXFormParserFunctions {
 
     private void addBinding(DataBinding binding) {
         bindings.add(binding);
-
         if (binding.getId() != null) {
             if (bindingsByID.put(binding.getId(), binding) != null) {
                 throw new XFormParseException("XForm Parse: <bind>s with duplicate ID: '" + binding.getId() + "'");

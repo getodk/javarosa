@@ -17,6 +17,7 @@ import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -30,6 +31,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
@@ -128,6 +130,19 @@ public class XFormParserTest {
         setUpSimpleReferenceManager("file-csv", form.getParent());
         FormDef formDef = parse(form);
         assertEquals("Sample Form - Preloading", formDef.getTitle());
+    }
+
+    @Test
+    public void parsesExternalSecondaryInstanceAsFormInstance() throws IOException {
+        Path form = r("Sample-Preloading.xml");
+        setUpSimpleReferenceManager("file-csv", form.getParent());
+        FormDef formDef = parse(form);
+        Enumeration<DataInstance> elements = formDef.getNonMainInstances();
+
+        while (elements.hasMoreElements()) {
+            DataInstance instance = elements.nextElement();
+            assertTrue(instance instanceof FormInstance);
+        }
     }
 
     @Test
