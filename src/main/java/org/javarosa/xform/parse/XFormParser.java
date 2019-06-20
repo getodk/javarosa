@@ -53,8 +53,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,6 +92,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.InterningKXmlParser;
+import org.javarosa.xform.util.SecondaryInstanceAnalyzer;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
@@ -145,8 +144,6 @@ public class XFormParser implements IXFormParserFunctions {
 
     private static final int CONTAINER_GROUP = 1;
     private static final int CONTAINER_REPEAT = 2;
-    private static final Pattern COLLECT_FUNC_EXPR = Pattern
-        .compile("(instance)\\s*\\(\\s*'([^\\s]{1,64})'\\s*");
 
     private static HashMap<String, IElementHandler> topLevelHandlers;
     private static HashMap<String, IElementHandler> groupLevelHandlers;
@@ -174,11 +171,11 @@ public class XFormParser implements IXFormParserFunctions {
     private List<Element> instanceNodes;
     private List<String> instanceNodeIdStrs;
     private List<String> itextKnownForms;
-    private List<String> externalInstanceBuildList;
     private static HashMap<String, IElementHandler> actionHandlers;
 
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
     private final List<ErrorCallback> errorCallbacks = new ArrayList<>();
+    private final SecondaryInstanceAnalyzer secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
 
     //incremented to provide unique question ID for each question
     private int serialQuestionID = 1;
@@ -319,7 +316,6 @@ public class XFormParser implements IXFormParserFunctions {
         modelFound = false;
         bindingsByID = new HashMap<>();
         bindings = new ArrayList<>();
-        externalInstanceBuildList = new ArrayList<>();
         actionTargets = new ArrayList<>();
         repeats = new ArrayList<>();
         itemsets = new ArrayList<>();
@@ -480,7 +476,7 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
                 // only build when ESI Id is not referenced in pulldata
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file") && externalInstanceBuildList.contains(instanceId)) {
+                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file") && secondaryInstanceAnalyzer.shouldSecondaryInstanceBeParsed(instanceId)) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
@@ -646,7 +642,7 @@ public class XFormParser implements IXFormParserFunctions {
             String childName = (child != null ? child.getName() : null);
 
             if (child != null)
-                addToESIBuildList(child);
+                secondaryInstanceAnalyzer.analyzeElement(child);
 
             if ("itext".equals(childName)) {
                 parseIText(child);
@@ -986,7 +982,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         String ref = e.getAttributeValue(null, REF_ATTR);
         String bind = e.getAttributeValue(null, BIND_ATTR);
-        addToESIBuildList(e);
+        secondaryInstanceAnalyzer.analyzeElement(e);
 
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
@@ -1869,14 +1865,6 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         return converted;
-    }
-
-    private void addToESIBuildList(Element element) {
-        String elementTagString = toXMLTag(element);
-        Matcher matcher = COLLECT_FUNC_EXPR.matcher(elementTagString);
-        String functionFirstParam = matcher.find() ? matcher.group(2) : null;
-        if (functionFirstParam != null && !externalInstanceBuildList.contains(functionFirstParam))
-            externalInstanceBuildList.add(functionFirstParam);
     }
 
     private void parseBind(Element element) {
