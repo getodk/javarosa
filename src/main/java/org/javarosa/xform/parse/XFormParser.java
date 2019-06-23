@@ -175,7 +175,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
     private final List<ErrorCallback> errorCallbacks = new ArrayList<>();
-    private final SecondaryInstanceAnalyzer secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
+    private SecondaryInstanceAnalyzer secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
 
     //incremented to provide unique question ID for each question
     private int serialQuestionID = 1;
@@ -324,6 +324,7 @@ public class XFormParser implements IXFormParserFunctions {
         mainInstanceNode = null;
         instanceNodes = new ArrayList<>();
         instanceNodeIdStrs = new ArrayList<>();
+        secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
 
         itextKnownForms = new ArrayList<>(4);
         itextKnownForms.add("long");
