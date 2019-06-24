@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import static org.javarosa.xform.util.XFormSerializer.elementToString;
 
+
 public class SecondaryInstanceAnalyzer {
     // a list of SIs that need to be built in memory
     private final List<String> inMemorySecondaryInstances;

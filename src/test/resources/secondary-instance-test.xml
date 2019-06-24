@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<root>
+    <instance id="esi-id-1" src="jr://file-csv/no-file-1.csv" />
+    <instance id="esi-id-2" src="jr://file-csv/no-file-2.csv" />
+    <instance id="esi-id-3" src="jr://file-csv/no-file-3.csv" />
+
+    <element attr="instance('esi-id-1')" />
+    <element attr="instance('esi-id-2')" />
+    <element attr="instance('esi-id-2')" />
+
+    <element attr="pulldata('esi-id-1')" />
+    <element attr="pulldata('esi-id-3')" />
+</root>
