@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -104,7 +103,6 @@ import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
-import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
@@ -1849,24 +1847,6 @@ public class XFormParser implements IXFormParserFunctions {
         "requiredMsg",
         "saveIncomplete"
     ));
-
-    private String toXMLTag(Element element) {
-        String converted = "";
-        KXmlSerializer kXmlSerializer = new KXmlSerializer();
-        StringWriter stringWriter = new StringWriter();
-        kXmlSerializer.setOutput(stringWriter);
-        try {
-            element.write(kXmlSerializer);
-            kXmlSerializer.flush();
-            kXmlSerializer.endDocument();
-            stringWriter.close();
-            converted = stringWriter.toString();
-        } catch (IOException e) {
-            System.out.println(e.toString());
-        }
-
-        return converted;
-    }
 
     private void parseBind(Element element) {
         final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element);
