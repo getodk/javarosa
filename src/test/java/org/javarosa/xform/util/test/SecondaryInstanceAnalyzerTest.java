@@ -19,22 +19,25 @@ import static org.junit.Assert.assertEquals;
 public class SecondaryInstanceAnalyzerTest {
     private static final Logger logger = LoggerFactory.getLogger(SecondaryInstanceAnalyzer.class);
 
+    private void parseElement(Element element, SecondaryInstanceAnalyzer secondaryInstanceAnalyzer) {
+        for (int i = 0; i < element.getChildCount(); i++) {
+            if (element.getType(i) == Element.ELEMENT) {
+                secondaryInstanceAnalyzer.analyzeElement(element);
+                parseElement(element.getElement(i), secondaryInstanceAnalyzer);
+            }
+        }
+    }
+
     @Test
     public void getIDFromAttributes() throws IOException {
         String filePath = r("secondary-instance-test.xml").toString();
         Document doc = XFormParser.getXMLDocument(new FileReader(filePath));
         Element root = doc.getRootElement();
         SecondaryInstanceAnalyzer secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
-        int count = root.getChildCount();
-
-
-        for (int i = 0; i < count; i++) {
-            Element element = root.getElement(i);
-            secondaryInstanceAnalyzer.analyzeElement(element);
-        }
+        parseElement(root, secondaryInstanceAnalyzer);
 
         assertEquals(secondaryInstanceAnalyzer.getInMemorySecondaryInstances().toArray().length, 2);
-        assertFalse(secondaryInstanceAnalyzer.shouldSecondaryInstanceBeParsed("esi-id-3"));
-        assertTrue(secondaryInstanceAnalyzer.shouldSecondaryInstanceBeParsed("esi-id-1"));
+        assertFalse(secondaryInstanceAnalyzer.shouldSecondaryInstanceBeParsed("country"));
+        assertTrue(secondaryInstanceAnalyzer.shouldSecondaryInstanceBeParsed("lgas"));
     }
 }
