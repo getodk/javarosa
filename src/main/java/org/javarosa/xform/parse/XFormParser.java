@@ -91,6 +91,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.InterningKXmlParser;
+import org.javarosa.xform.util.SecondaryInstanceAnalyzer;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
@@ -172,6 +173,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
     private final List<ErrorCallback> errorCallbacks = new ArrayList<>();
+    private SecondaryInstanceAnalyzer secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
 
     //incremented to provide unique question ID for each question
     private int serialQuestionID = 1;
@@ -320,6 +322,7 @@ public class XFormParser implements IXFormParserFunctions {
         mainInstanceNode = null;
         instanceNodes = new ArrayList<>();
         instanceNodeIdStrs = new ArrayList<>();
+        secondaryInstanceAnalyzer = new SecondaryInstanceAnalyzer();
 
         itextKnownForms = new ArrayList<>(4);
         itextKnownForms.add("long");
@@ -471,9 +474,8 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                // Disable jr://file-csv/ support by explicitly only supporting jr://file/
-                // until https://github.com/opendatakit/javarosa/issues/417 is addressed
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file/")) {
+                // only build when ESI Id is not referenced in pulldata
+                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file") && secondaryInstanceAnalyzer.shouldSecondaryInstanceBeParsed(instanceId)) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
@@ -493,6 +495,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
             }
         }
+
         //now parse the main instance
         if (mainInstanceNode != null) {
             FormInstance fi = instanceParser.parseInstance(mainInstanceNode, true,
@@ -636,6 +639,9 @@ public class XFormParser implements IXFormParserFunctions {
             int type = e.getType(i);
             Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
             String childName = (child != null ? child.getName() : null);
+
+            if (child != null)
+                secondaryInstanceAnalyzer.analyzeElement(child);
 
             if ("itext".equals(childName)) {
                 parseIText(child);
@@ -975,6 +981,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         String ref = e.getAttributeValue(null, REF_ATTR);
         String bind = e.getAttributeValue(null, BIND_ATTR);
+        secondaryInstanceAnalyzer.analyzeElement(e);
 
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
@@ -1855,7 +1862,6 @@ public class XFormParser implements IXFormParserFunctions {
 
     private void addBinding(DataBinding binding) {
         bindings.add(binding);
-
         if (binding.getId() != null) {
             if (bindingsByID.put(binding.getId(), binding) != null) {
                 throw new XFormParseException("XForm Parse: <bind>s with duplicate ID: '" + binding.getId() + "'");
