@@ -480,25 +480,27 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                // Only read in an external instance if its ID is used in the primary instance as an argument to an
+                // Only read in an secondary instance if its ID is used in the primary instance as an argument to an
                 // instance() call
-                if (instanceSrc != null && referencedInstanceIds.contains(instanceId)) {
-                    final ExternalDataInstance externalDataInstance;
-                    try {
-                        externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
-                    } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
+                if (referencedInstanceIds.contains(instanceId)) {
+                    if (instanceSrc != null) {
+                        final ExternalDataInstance externalDataInstance;
+                        try {
+                            externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
+                        } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
                             XmlPullParserException | InvalidReferenceException e) {
-                        String msg = "Unable to parse external secondary instance";
-                        logger.error(msg, e);
-                        throw new XFormParseException(msg + ": " + e.toString(), instance);
+                            String msg = "Unable to parse external secondary instance";
+                            logger.error(msg, e);
+                            throw new XFormParseException(msg + ": " + e.toString(), instance);
+                        }
+                        _f.addNonMainInstance(externalDataInstance);
+                    } else {
+                        FormInstance fi = instanceParser.parseInstance(instance, false,
+                            instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
+                        loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
+                        loadInstanceData(instance, fi.getRoot(), _f);
+                        _f.addNonMainInstance(fi);
                     }
-                    _f.addNonMainInstance(externalDataInstance);
-                } else {
-                    FormInstance fi = instanceParser.parseInstance(instance, false,
-                        instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
-                    loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
-                    loadInstanceData(instance, fi.getRoot(), _f);
-                    _f.addNonMainInstance(fi);
                 }
             }
         }

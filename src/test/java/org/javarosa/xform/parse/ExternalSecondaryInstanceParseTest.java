@@ -21,8 +21,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.mapFileToResourcePath;
@@ -97,7 +97,7 @@ public class ExternalSecondaryInstanceParseTest {
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
 
-        assertThat(formDef.getNonMainInstance("second").getRoot().hasChildren(), is(false));
+        assertThat(formDef.getNonMainInstance("second"), nullValue());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class ExternalSecondaryInstanceParseTest {
         formPath = r("unused-secondary-instance.xml");
         fpi = new FormParseInit(formPath);
         formDef = fpi.getFormDef();
-        assertThat(formDef.getNonMainInstance("second").getRoot().hasChildren(), is(false));
+        assertThat(formDef.getNonMainInstance("second"), nullValue());
     }
 
     @Test
