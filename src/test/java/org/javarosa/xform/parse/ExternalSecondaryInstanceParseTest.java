@@ -45,11 +45,17 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void formWithExternalSecondaryXMLInstance_ShouldParseWithoutError() throws IOException {
-        Path formName = r("external_select_10.xml");
+    public void formWithExternalSecondaryXMLInstance_ShouldParseWithoutError() throws IOException, XPathSyntaxException {
+        Path formName = r("external-select-xml.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
-        assertEquals("external select 10", formDef.getTitle());
+        assertEquals("XML External Secondary Instance", formDef.getTitle());
+
+        // Confirm that items are made available to the XPath parser
+        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-xml')/root/item")).getReference();
+        EvaluationContext evaluationContext = formDef.getEvaluationContext();
+        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
+        assertThat(treeReferences.size(), is(12));
     }
 
     @Test
@@ -85,12 +91,12 @@ public class ExternalSecondaryInstanceParseTest {
         Path formName = r("external-select-csv.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
-        assertEquals("External Secondary Instance CSV", formDef.getTitle());
-
+        assertEquals("CSV External Secondary Instance", formDef.getTitle());
+        
         TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-csv')/root/item")).getReference();
         EvaluationContext evaluationContext = formDef.getEvaluationContext();
         List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
-        assertThat(treeReferences.size(), is(6));
+        assertThat(treeReferences.size(), is(12));
     }
 
     // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
