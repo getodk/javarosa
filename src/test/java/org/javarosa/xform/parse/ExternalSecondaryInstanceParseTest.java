@@ -125,6 +125,18 @@ public class ExternalSecondaryInstanceParseTest {
         assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
     }
 
+    // See https://github.com/opendatakit/javarosa/issues/451
+    @Test
+    public void dummyNodesInExternalInstanceDeclaration_ShouldBeIgnored() throws IOException, XPathSyntaxException {
+        Path formPath = r("external-select-xml-dummy-nodes.xml");
+        mapFileToResourcePath(formPath);
+        FormDef formDef = parse(formPath);
+
+        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-xml')/root/item")).getReference();
+        List<TreeReference> dataSet = formDef.getEvaluationContext().expandReference(treeReference);
+        assertThat(dataSet.size(), is(12));
+    }
+
     @Test
     public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException {
         Path tempDir = Files.createTempDirectory("javarosa-test-");

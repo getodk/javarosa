@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml" >
+    <h:head>
+        <h:title>XML External Secondary Instance With Dummy Nodes</h:title>
+        <model>
+            <instance>
+                <data id="external-select-xml">
+                    <first/>
+                    <second/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+
+            <instance id="external-xml" src="jr://file/external-data.xml">
+                <root>
+                    <item>
+                        <name>_</name>
+                        <label>_</label>
+                    </item>
+                </root>
+            </instance>
+
+            <bind nodeset="/data/first" type="select1"/>
+            <bind nodeset="/data/second" type="select1"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/data/first">
+            <label>First</label>
+            <itemset nodeset="instance('external-xml')/root/item[first='']">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select1>
+
+        <select1 ref="/data/second">
+            <label>Second</label>
+            <itemset nodeset="instance('external-xml')/root/item[first=/data/first]">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select1>
+    </h:body>
+</h:html>

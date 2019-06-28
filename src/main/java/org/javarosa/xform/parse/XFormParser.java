@@ -823,13 +823,18 @@ public class XFormParser implements IXFormParserFunctions {
     private void saveInstanceNode(Element instance) {
         Element instanceNode = null;
         String instanceId = instance.getAttributeValue("", "id");
+        String instanceSrc = instance.getAttributeValue("", "src");
 
-        for (int i = 0; i < instance.getChildCount(); i++) {
-            if (instance.getType(i) == Node.ELEMENT) {
-                if (instanceNode != null) {
-                    throw new XFormParseException("XForm Parse: <instance> has more than one child element", instance);
-                } else {
-                    instanceNode = instance.getElement(i);
+        // Only consider child nodes if the instance declaration does not include a source.
+        // TODO: revisit this to allow for a mix of static and dynamic data but beware of https://github.com/opendatakit/javarosa/issues/451
+        if (instanceSrc == null) {
+            for (int i = 0; i < instance.getChildCount(); i++) {
+                if (instance.getType(i) == Node.ELEMENT) {
+                    if (instanceNode != null) {
+                        throw new XFormParseException("XForm Parse: <instance> has more than one child element", instance);
+                    } else {
+                        instanceNode = instance.getElement(i);
+                    }
                 }
             }
         }
