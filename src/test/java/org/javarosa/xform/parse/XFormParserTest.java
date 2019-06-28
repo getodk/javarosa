@@ -1,37 +1,5 @@
 package org.javarosa.xform.parse;
 
-import static java.nio.file.Files.copy;
-import static java.nio.file.Files.readAllBytes;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.javarosa.core.model.Constants.CONTROL_RANGE;
-import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
-import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
-import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.javarosa.xpath.XPathParseTool.parseXPath;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UncheckedIOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
@@ -40,7 +8,6 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.Action;
-import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
@@ -48,24 +15,41 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
-import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.readAllBytes;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
     private static final Logger logger = LoggerFactory.getLogger(XFormParserTest.class);
@@ -73,8 +57,6 @@ public class XFormParserTest {
     private static Path FORM_INSTANCE_XML_FILE_NAME;
     private static Path SECONDARY_INSTANCE_XML;
     private static Path SECONDARY_INSTANCE_LARGE_XML;
-    private static Path EXTERNAL_SECONDARY_INSTANCE_XML;
-    private static Path EXTERNAL_SECONDARY_INSTANCE_LARGE_XML;
 
     private static final String AUDIT_NODE = "audit";
     private static final String AUDIT_ANSWER = "audit111.csv";
@@ -94,8 +76,6 @@ public class XFormParserTest {
             FORM_INSTANCE_XML_FILE_NAME = Files.createTempFile("instance.xml", null);
             SECONDARY_INSTANCE_XML = r("secondary-instance.xml");
             SECONDARY_INSTANCE_LARGE_XML = Files.createTempFile("secondary-instance-large.xml", null);
-            EXTERNAL_SECONDARY_INSTANCE_XML = r("external-secondary-instance.xml");
-            EXTERNAL_SECONDARY_INSTANCE_LARGE_XML = r("external-secondary-instance-large.xml");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -121,16 +101,6 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parsesPreloadForm() throws IOException {
-        // The form on this test uses a jr://file-csv resource.
-        // We need to prime the ReferenceManager to deal with those
-        Path form = r("Sample-Preloading.xml");
-        setUpSimpleReferenceManager("file-csv", form.getParent());
-        FormDef formDef = parse(form);
-        assertEquals("Sample Form - Preloading", formDef.getTitle());
-    }
-
-    @Test
     public void parsesSecondaryInstanceForm() throws IOException {
         FormDef formDef = parse(SECONDARY_INSTANCE_XML);
         assertEquals("Form with secondary instance", formDef.getTitle());
@@ -141,6 +111,12 @@ public class XFormParserTest {
         Path formName = r("internal_select_10.xml");
         FormDef formDef = parse(formName);
         assertEquals("internal select 10", formDef.getTitle());
+    }
+
+    @Test
+    public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException {
+        FormParserHelper.timeParsing(new LargeIsiFileGenerator(SECONDARY_INSTANCE_XML), SECONDARY_INSTANCE_LARGE_XML,
+            SECONDARY_INSTANCE_LARGE_XML, logger);
     }
 
     @Test
@@ -174,88 +150,8 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
-        mapFileToResourcePath(formName);
-        FormDef formDef = parse(formName);
-        assertEquals("Form with external secondary instance", formDef.getTitle());
-        TreeReference treeReference = ((XPathPathExpr)
-            parseXPath("instance('towns')/data_set")).getReference();
-        EvaluationContext evaluationContext = formDef.getEvaluationContext();
-        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
-        assertEquals(1, treeReferences.size());
-        DataInstance townInstance = formDef.getNonMainInstance("towns");
-        AbstractTreeElement tiRoot = townInstance.getRoot();
-        AbstractTreeElement townData = tiRoot.getChild("towndata", 0);
-        assertEquals(1, townData.getNumChildren());
-        AbstractTreeElement dataSetChild = townData.getChild("data_set", 0);
-        assertEquals("us_east", dataSetChild.getValue().getDisplayText());
-    }
-
-    @Test
-    public void parsesExternalSecondaryInstanceForm2() throws IOException {
-        Path formName = r("external_select_10.xml");
-        mapFileToResourcePath(formName);
-        FormDef formDef = parse(formName);
-        assertEquals("external select 10", formDef.getTitle());
-    }
-
-    @Ignore("See https://github.com/opendatakit/javarosa/pull/416")
-    @Test
-    public void parsesExternalSecondaryInstanceCsvForm() throws IOException {
-        Path formName = r("external-select-csv.xml");
-        mapFileToResourcePath(formName);
-        FormDef formDef = parse(formName);
-        assertEquals("external select 10", formDef.getTitle());
-    }
-
-    @Test
-    public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException {
-        timeParsing(new LargeIsiFileGenerator(SECONDARY_INSTANCE_XML), SECONDARY_INSTANCE_LARGE_XML,
-            SECONDARY_INSTANCE_LARGE_XML);
-    }
-
-    @Test
-    public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException {
-        Path tempDir = Files.createTempDirectory("javarosa-test-");
-        Path tempFile = tempDir.resolve("towns-large.xml");
-        timeParsing(new LargeEsiFileGenerator(), tempFile, EXTERNAL_SECONDARY_INSTANCE_LARGE_XML);
-    }
-
-    /**
-     * In a loop, parses forms with increasingly larger external secondary instance files. Writes timing results
-     * to the console.
-     *
-     * @param lfg               a file generator
-     * @param largeDataFilename the name to be given to the generated file
-     * @param parseFilename     the name of the file to parse
-     * @throws IOException if there are problems reading or writing files
-     */
-    private void timeParsing(LargeInstanceFileGenerator lfg, Path largeDataFilename, Path parseFilename) throws IOException {
-        mapFileToResourcePath(largeDataFilename);
-        NumberFormat nf = NumberFormat.getNumberInstance();
-        List<String> results = new ArrayList<>(); // Collect and display at end
-        results.add("Children\tSeconds");
-        for (double powerOfTen = 3; powerOfTen <= 4.0; powerOfTen += 0.1) {  // Raise this upper limit to really measure
-            int numChildren = (int) Math.pow(10, powerOfTen);
-            lfg.createLargeInstanceSource(largeDataFilename, numChildren);
-            long startMs = System.currentTimeMillis();
-            FormParserHelper.parse(parseFilename);
-            double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
-            results.add(nf.format(numChildren) + "\t" + nf.format(elapsed));
-            if (elapsed > 5.0) { // Make this larger if needed
-                break;
-            }
-        }
-        for (String line : results) {
-            logger.info(line);
-        }
-        Files.delete(largeDataFilename);
-    }
-
-    @Test
     public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException {
-        serAndDeserializeForm(r("Simpler_Cascading_Select_Form.xml"));
+        FormParserHelper.serAndDeserializeForm(r("Simpler_Cascading_Select_Form.xml"));
     }
 
     /**
@@ -264,36 +160,7 @@ public class XFormParserTest {
      */
     @Test
     public void rangeFormSavesAndRestores() throws IOException, DeserializationException {
-        serAndDeserializeForm(r("range-form.xml"));
-    }
-
-    @Test
-    public void externalSecondaryInstanceFormSavesAndRestores() throws IOException, DeserializationException {
-        Path formPath = EXTERNAL_SECONDARY_INSTANCE_XML;
-        mapFileToResourcePath(formPath);
-        serAndDeserializeForm(formPath);
-    }
-
-    private void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
-        initSerialization();
-        FormDef formDef = parse(formName);
-        Path p = Files.createTempFile("serialized-form", null);
-
-        final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));
-        formDef.writeExternal(dos);
-        dos.close();
-
-        final DataInputStream dis = new DataInputStream(Files.newInputStream(p));
-        formDef.readExternal(dis, defaultPrototypes());
-        dis.close();
-
-        Files.delete(p);
-    }
-
-    private void initSerialization() {
-        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
-        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
-        new XFormsModule().registerModule();
+        FormParserHelper.serAndDeserializeForm(r("range-form.xml"));
     }
 
     @Test
@@ -553,43 +420,10 @@ public class XFormParserTest {
         assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
     }
 
-    private void mapFileToResourcePath(Path formPath) {
-        ReferenceManager rm = ReferenceManager.instance();
-        rm.reset();
-        for (String t : Arrays.asList("file", "file-csv"))
-            rm.addReferenceFactory(buildReferenceFactory(t, formPath.getParent().toString()));
-    }
-
     /**
-     * Generates large versions of a secondary instance
-     */
-    interface LargeInstanceFileGenerator {
-        /**
-         * Creates a large instance file with the given name, and the given number of children
-         */
-        void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException;
-    }
-
-    /**
-     * Generates large versions of an external secondary instance, from scratch
-     */
-    class LargeEsiFileGenerator implements LargeInstanceFileGenerator {
-        @Override
-        public void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException {
-            PrintWriter pw = new PrintWriter(outputFilename.toString());
-            pw.println("<towndata>");
-            for (int i = 0; i < numChildren; ++i) {
-                pw.println("<data_set>us_east</data_set>");
-            }
-            pw.println("</towndata>");
-            pw.close();
-        }
-    }
-
-    /**
-     * Generates large versions of a file with an internal secondary instance, using a template
-     */
-    class LargeIsiFileGenerator implements LargeInstanceFileGenerator {
+    * Generates large versions of a file with an internal secondary instance, using a template
+    */
+    class LargeIsiFileGenerator implements FormParserHelper.LargeInstanceFileGenerator {
         private final Path templateFilename;
 
         LargeIsiFileGenerator(Path templateFilename) {
