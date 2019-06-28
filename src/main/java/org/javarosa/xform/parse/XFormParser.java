@@ -471,9 +471,7 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                // Disable jr://file-csv/ support by explicitly only supporting jr://file/
-                // until https://github.com/opendatakit/javarosa/issues/417 is addressed
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file/")) {
+                if (instanceSrc != null) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
