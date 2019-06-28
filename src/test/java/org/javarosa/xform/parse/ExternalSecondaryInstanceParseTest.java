@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.mapFileToResourcePath;
@@ -44,33 +45,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void externalSecondaryInstanceFormSavesAndRestores() throws IOException, DeserializationException {
-        Path formPath = EXTERNAL_SECONDARY_INSTANCE_XML;
-        mapFileToResourcePath(formPath);
-        serAndDeserializeForm(formPath);
-    }
-
-    @Test
-    public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
-        Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
-        mapFileToResourcePath(formName);
-        FormDef formDef = parse(formName);
-        assertEquals("Form with external secondary instance", formDef.getTitle());
-        TreeReference treeReference = ((XPathPathExpr)
-            parseXPath("instance('towns')/data_set")).getReference();
-        EvaluationContext evaluationContext = formDef.getEvaluationContext();
-        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
-        assertEquals(1, treeReferences.size());
-        DataInstance townInstance = formDef.getNonMainInstance("towns");
-        AbstractTreeElement tiRoot = townInstance.getRoot();
-        AbstractTreeElement townData = tiRoot.getChild("towndata", 0);
-        assertEquals(1, townData.getNumChildren());
-        AbstractTreeElement dataSetChild = townData.getChild("data_set", 0);
-        assertEquals("us_east", dataSetChild.getValue().getDisplayText());
-    }
-
-    @Test
-    public void parsesExternalSecondaryInstanceForm2() throws IOException {
+    public void formWithExternalSecondaryXMLInstance_ShouldParseWithoutError() throws IOException {
         Path formName = r("external_select_10.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
@@ -78,13 +53,43 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void parsesExternalSecondaryInstanceCsvForm() throws IOException {
+    public void formWithExternalSecondaryXMLInstance_ShouldSerializeAndDeserializeWithoutError() throws IOException, DeserializationException {
+        Path formPath = EXTERNAL_SECONDARY_INSTANCE_XML;
+        mapFileToResourcePath(formPath);
+        serAndDeserializeForm(formPath);
+    }
+
+
+    @Test
+    public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
+        Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
+        mapFileToResourcePath(formName);
+        FormDef formDef = parse(formName);
+        assertEquals("Form with external secondary instance", formDef.getTitle());
+
+        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('towns')/root/towndata/data_set")).getReference();
+        EvaluationContext evaluationContext = formDef.getEvaluationContext();
+        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
+        assertEquals(2, treeReferences.size());
+
+        DataInstance townInstance = formDef.getNonMainInstance("towns");
+        AbstractTreeElement tiRoot = townInstance.getRoot();
+        AbstractTreeElement townData = tiRoot.getChild("towndata", 1);
+        assertEquals(1, townData.getNumChildren());
+        AbstractTreeElement dataSetChild = townData.getChild("data_set", 0);
+        assertEquals("us_west", dataSetChild.getValue().getDisplayText());
+    }
+
+    @Test
+    public void formWithExternalSecondaryCSVInstance_ShouldParseWithoutError() throws IOException {
         Path formName = r("external-select-csv.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
         assertEquals("external select 10", formDef.getTitle());
     }
 
+    // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
+    // secondary instance is declared but not referenced in an instance() call, it is ignored by JavaRosa.
     @Test
     public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced() {
         Path formPath = r("unused-secondary-instance.xml");
