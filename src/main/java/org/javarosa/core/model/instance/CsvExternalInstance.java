@@ -1,9 +1,10 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.model.data.UncastData;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import org.javarosa.core.model.data.UncastData;
 
 public class CsvExternalInstance {
     public static TreeElement parse(String instanceId, String path) throws IOException {
@@ -20,7 +21,8 @@ public class CsvExternalInstance {
                 String[] data = csvLine.split(",");
                 for (int i = 0; i < fieldNames.length; ++i) {
                     TreeElement field = new TreeElement(fieldNames[i], 0);
-                    field.setValue(new UncastData(data[i]));
+                    field.setValue(new UncastData(i < data.length ? data[i] : ""));
+
                     item.addChild(field);
                 }
 

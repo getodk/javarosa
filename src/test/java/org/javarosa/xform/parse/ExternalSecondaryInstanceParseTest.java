@@ -81,11 +81,11 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void formWithExternalSecondaryCSVInstance_ShouldParseWithoutError() throws IOException {
+    public void formWithExternalSecondaryCSVInstance_ShouldParseWithoutError() throws IOException, XPathSyntaxException {
         Path formName = r("external-select-csv.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
-        assertEquals("external select 10", formDef.getTitle());
+        assertEquals("External Secondary Instance CSV", formDef.getTitle());
     }
 
     // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
@@ -97,7 +97,7 @@ public class ExternalSecondaryInstanceParseTest {
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
 
-        assertThat(formDef.getNonMainInstance("second"), nullValue());
+        assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
     }
 
     @Test
@@ -106,12 +106,12 @@ public class ExternalSecondaryInstanceParseTest {
         setUpSimpleReferenceManager("file-csv", formPath.getParent());
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
-        assertThat(formDef.getNonMainInstance("second").getRoot().hasChildren(), is(true));
+        assertThat(formDef.getNonMainInstance("external-csv").getRoot().hasChildren(), is(true));
 
         formPath = r("unused-secondary-instance.xml");
         fpi = new FormParseInit(formPath);
         formDef = fpi.getFormDef();
-        assertThat(formDef.getNonMainInstance("second"), nullValue());
+        assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
     }
 
     @Test
