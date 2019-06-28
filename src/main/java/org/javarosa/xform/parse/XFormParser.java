@@ -170,6 +170,9 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> itextKnownForms;
     private static HashMap<String, IElementHandler> actionHandlers;
 
+    /** The string IDs of all instances that are referenced in a instance() function call in the primary instance **/
+    private static Set<String> referencedInstanceIds;
+
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
     private final List<ErrorCallback> errorCallbacks = new ArrayList<>();
 
@@ -198,6 +201,8 @@ public class XFormParser implements IXFormParserFunctions {
         initProcessingRules();
         modelPrototypes = new PrototypeFactoryDeprecated();
         submissionParsers = new ArrayList<>(1);
+
+        referencedInstanceIds = new HashSet<>();
     }
 
     private static void initProcessingRules() {
@@ -471,7 +476,9 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                if (instanceSrc != null) {
+                // Only read in an external instance if its ID is used in the primary instance as an argument to an
+                // instance() call
+                if (instanceSrc != null && referencedInstanceIds.contains(instanceId)) {
                     final ExternalDataInstance externalDataInstance;
                     try {
                         externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
@@ -574,6 +581,13 @@ public class XFormParser implements IXFormParserFunctions {
                 }
             }
         }
+    }
+
+    /**
+     * Records that the given instance ID was used as the argument to an instance() function call.
+     */
+    public static void recordInstanceFunctionCall(String instanceId) {
+        referencedInstanceIds.add(instanceId);
     }
 
     private void parseTitle(Element e) {

@@ -18,7 +18,7 @@ public class ExternalSecondaryInstanceTest {
         setUpSimpleReferenceManager("file-csv", formPath.getParent());
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
-
+        
         assertThat(formDef.getNonMainInstance("fruits").getRoot().hasChildren(), is(false));
     }
 }
