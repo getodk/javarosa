@@ -11,7 +11,7 @@
                     </meta>
                 </data>
             </instance>
-            <instance id="fruits" src="jr://file-csv/fruits.csv"/>
+            <instance id="second" src="jr://file-csv/external-select.csv"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>

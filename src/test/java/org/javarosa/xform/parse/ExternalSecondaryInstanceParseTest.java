@@ -92,7 +92,21 @@ public class ExternalSecondaryInstanceParseTest {
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
 
-        assertThat(formDef.getNonMainInstance("fruits").getRoot().hasChildren(), is(false));
+        assertThat(formDef.getNonMainInstance("second").getRoot().hasChildren(), is(false));
+    }
+
+    @Test
+    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced_AfterParsingFormWithReference() {
+        Path formPath = r("external-select-csv.xml");
+        setUpSimpleReferenceManager("file-csv", formPath.getParent());
+        FormParseInit fpi = new FormParseInit(formPath);
+        FormDef formDef = fpi.getFormDef();
+        assertThat(formDef.getNonMainInstance("second").getRoot().hasChildren(), is(true));
+
+        formPath = r("unused-secondary-instance.xml");
+        fpi = new FormParseInit(formPath);
+        formDef = fpi.getFormDef();
+        assertThat(formDef.getNonMainInstance("second").getRoot().hasChildren(), is(false));
     }
 
     @Test
