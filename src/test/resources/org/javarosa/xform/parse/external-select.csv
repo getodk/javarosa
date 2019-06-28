@@ -1,5 +1,5 @@
-itextId,name,first
-static_instance-second-0,aa,a
-static_instance-second-0,ab,a
-static_instance-second-0,ba,b
-static_instance-second-0,bb,b
+label,name,first
+AA,aa,a
+AB,ab,a
+BA,ba,b
+BB,bb,b

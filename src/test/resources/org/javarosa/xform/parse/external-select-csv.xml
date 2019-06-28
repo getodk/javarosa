@@ -1,30 +1,9 @@
 <?xml version="1.0"?>
-<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml" >
     <h:head>
         <h:title>external select 10</h:title>
         <model>
-            <itext>
-                <translation default="true()" lang="default">
-                    <text id="static_instance-first-0">
-                        <value>a</value>
-                    </text>
-                    <text id="static_instance-first-1">
-                        <value>b</value>
-                    </text>
-                    <text id="static_instance-second-0">
-                        <value>aa</value>
-                    </text>
-                    <text id="static_instance-second-1">
-                        <value>ab</value>
-                    </text>
-                    <text id="static_instance-second-3">
-                        <value>ba</value>
-                    </text>
-                    <text id="static_instance-second-4">
-                        <value>bb</value>
-                    </text>
-                </translation>
-            </itext>
             <instance>
                 <external_select_10 id="external_select_10">
                     <first/>
@@ -46,8 +25,9 @@
                     </item>
                 </root>
             </instance>
-            <instance id="second" src="jr://file-csv/external-select.csv">
-            </instance>
+
+            <instance id="second" src="jr://file-csv/external-select.csv" />
+
             <bind nodeset="/external_select_10/first" type="select1"/>
             <bind nodeset="/external_select_10/second" type="select1"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/external_select_10/meta/instanceID" readonly="true()" type="string"/>
@@ -57,19 +37,20 @@
         <select1 ref="/external_select_10/first">
             <label>First</label>
             <item>
-                <label>a</label>
+                <label>A</label>
                 <value>a</value>
             </item>
             <item>
-                <label>b</label>
+                <label>B</label>
                 <value>b</value>
             </item>
         </select1>
+
         <select1 ref="/external_select_10/second">
             <label>Second</label>
             <itemset nodeset="instance('second')/root/item[first= /external_select_10/first ]">
                 <value ref="name"/>
-                <label ref="jr:itext(itextId)"/>
+                <label ref="label"/>
             </itemset>
         </select1>
     </h:body>

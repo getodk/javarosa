@@ -10,7 +10,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +77,6 @@ public class ExternalSecondaryInstanceParseTest {
         assertEquals("external select 10", formDef.getTitle());
     }
 
-    @Ignore("See https://github.com/opendatakit/javarosa/pull/416")
     @Test
     public void parsesExternalSecondaryInstanceCsvForm() throws IOException {
         Path formName = r("external-select-csv.xml");
