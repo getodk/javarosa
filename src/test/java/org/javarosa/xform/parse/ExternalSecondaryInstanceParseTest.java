@@ -115,16 +115,6 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void parsesPreloadForm() throws IOException {
-        // The form on this test uses a jr://file-csv resource.
-        // We need to prime the ReferenceManager to deal with those
-        Path form = r("Sample-Preloading.xml");
-        setUpSimpleReferenceManager("file-csv", form.getParent());
-        FormDef formDef = parse(form);
-        assertEquals("Sample Form - Preloading", formDef.getTitle());
-    }
-
-    @Test
     public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException {
         Path tempDir = Files.createTempDirectory("javarosa-test-");
         Path tempFile = tempDir.resolve("towns-large.xml");
