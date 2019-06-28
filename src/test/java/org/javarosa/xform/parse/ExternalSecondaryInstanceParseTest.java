@@ -81,11 +81,16 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void formWithExternalSecondaryCSVInstance_ShouldParseWithoutError() throws IOException, XPathSyntaxException {
+    public void itemsFromExternalSecondaryCSVInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
         Path formName = r("external-select-csv.xml");
         mapFileToResourcePath(formName);
         FormDef formDef = parse(formName);
         assertEquals("External Secondary Instance CSV", formDef.getTitle());
+
+        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-csv')/root/item")).getReference();
+        EvaluationContext evaluationContext = formDef.getEvaluationContext();
+        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
+        assertThat(treeReferences.size(), is(6));
     }
 
     // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
