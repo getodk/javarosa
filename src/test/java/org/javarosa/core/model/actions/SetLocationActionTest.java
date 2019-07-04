@@ -17,9 +17,9 @@
 package org.javarosa.core.model.actions;
 
 import org.hamcrest.Matcher;
+import org.javarosa.core.model.actions.setlocation.SetLocationAction;
 import org.javarosa.core.model.actions.setlocation.StubSetLocationAction;
 import org.javarosa.core.model.data.StringData;
-
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.XFormParseException;
@@ -78,7 +78,7 @@ public class SetLocationActionTest {
             originalAction.writeExternal(dos);
         }
 
-        StubSetLocationAction deserializedAction = new StubSetLocationAction(null);
+        SetLocationAction deserializedAction = new StubSetLocationAction(null);
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(ser))) {
             deserializedAction.readExternal(dis, defaultPrototypes());
         }

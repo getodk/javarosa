@@ -93,12 +93,11 @@ public abstract class SetLocationAction extends Action {
         if (node != null) {
             int dataType = node.getDataType();
             IAnswerData val = Recalculate.wrapData(location, dataType);
-            if (val == null) {
-                formDef.setValue(null, contextualizedTargetReference, true);
-            } else {
-                IAnswerData answer = AnswerDataFactory.templateByDataType(dataType).cast(val.uncast());
-                formDef.setValue(answer, contextualizedTargetReference, true);
-            }
+
+            IAnswerData answer = val != null
+                ? AnswerDataFactory.templateByDataType(dataType).cast(val.uncast())
+                : null;
+            formDef.setValue(answer, contextualizedTargetReference, true);
         }
     }
 

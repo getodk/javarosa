@@ -36,7 +36,6 @@ public abstract class SetLocationActionHandler implements IElementHandler {
             throw new XFormParseException("setlocation action must be in http://www.opendatakit.org/xforms namespace");
         }
 
-        TreeReference target;
         String ref = e.getAttributeValue(null, "ref");
 
         if (ref == null) {
@@ -44,7 +43,7 @@ public abstract class SetLocationActionHandler implements IElementHandler {
         }
 
         IDataReference dataRef = FormDef.getAbsRef(new XPathReference(ref), TreeReference.rootRef());
-        target = FormInstance.unpackReference(dataRef);
+        TreeReference target = FormInstance.unpackReference(dataRef);
         p.registerActionTarget(target);
 
         SetLocationAction action = getSetLocationAction();
