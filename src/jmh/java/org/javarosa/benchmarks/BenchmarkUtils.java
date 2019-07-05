@@ -146,21 +146,21 @@ public class BenchmarkUtils {
 
     public static Path getNigeriaWardsXMLWithExternal2ndryInstance(){
         Path assetsPath = prepareAssets("nigeria_wards_external_2ndry_instance.xml", "lgas.xml", "wards.xml");
-        setUpSimpleReferenceManager("file", assetsPath);
+        setUpSimpleReferenceManager(assetsPath, "file");
         Path filePath = assetsPath.resolve("nigeria_wards_external_2ndry_instance.xml");
         return filePath;
     }
 
     public static Path getWardsExternalInstance(){
         Path assetsPath = prepareAssets( "wards.xml");
-        setUpSimpleReferenceManager("file", assetsPath);
+        setUpSimpleReferenceManager(assetsPath, "file");
         Path filePath = assetsPath.resolve("wards.xml");
         return filePath;
     }
 
     public static Path getLGAsExternalInstance(){
         Path assetsPath = prepareAssets( "lgas.xml");
-        setUpSimpleReferenceManager("file", assetsPath);
+        setUpSimpleReferenceManager(assetsPath, "file");
         Path filePath = assetsPath.resolve("lgas.xml");
         return filePath;
     }

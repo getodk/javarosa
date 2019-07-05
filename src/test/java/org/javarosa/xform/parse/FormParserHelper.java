@@ -2,7 +2,6 @@ package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -18,10 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.javarosa.core.reference.ReferenceManagerTestUtils.buildReferenceFactory;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 
 public final class FormParserHelper {
@@ -48,7 +46,7 @@ public final class FormParserHelper {
      * @throws IOException if there are problems reading or writing files
      */
     static void timeParsing(LargeInstanceFileGenerator lfg, Path largeDataFilename, Path parseFilename, Logger logger) throws IOException {
-        mapFileToResourcePath(largeDataFilename);
+        setUpSimpleReferenceManager(largeDataFilename.getParent(), "file");
         NumberFormat nf = NumberFormat.getNumberInstance();
         List<String> results = new ArrayList<>(); // Collect and display at end
         results.add("Children\tSeconds");
@@ -67,13 +65,6 @@ public final class FormParserHelper {
             logger.info(line);
         }
         Files.delete(largeDataFilename);
-    }
-
-    static void mapFileToResourcePath(Path formPath) {
-        ReferenceManager rm = ReferenceManager.instance();
-        rm.reset();
-        for (String t : Arrays.asList("file", "file-csv"))
-            rm.addReferenceFactory(buildReferenceFactory(t, formPath.getParent().toString()));
     }
 
     static void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {

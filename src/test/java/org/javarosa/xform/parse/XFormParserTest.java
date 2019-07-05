@@ -134,7 +134,7 @@ public class XFormParserTest {
     public void parsesLastSavedInstanceWithFilledForm() throws IOException {
         Path formName = r("last-saved-blank.xml");
         Path lastSavedSubmissionDirectory = r("last-saved-filled.xml").toAbsolutePath().getParent();
-        ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", lastSavedSubmissionDirectory);
+        ReferenceManagerTestUtils.setUpSimpleReferenceManager(lastSavedSubmissionDirectory, "file");
         FormDef formDef = parse(formName, "jr://file/last-saved-filled.xml");
         assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
 

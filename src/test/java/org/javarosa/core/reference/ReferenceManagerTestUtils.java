@@ -22,19 +22,17 @@ public class ReferenceManagerTestUtils {
      * <p>
      * Please, be aware that this method resets the singleton ReferenceManager, which could
      * have unintended consequences for other classes using it during the same JVM session.
-     * <p>
-     * Use of this method is intended when only one scheme is to be derived. If your test
-     * form uses more than one scheme, you will have to follow a more conventional setup of
-     * having a reference factory for jr://file to a base path and some session translators
-     * that derive any other scheme (e.g. jr://audio) to a jr://file path.
      */
-    public static ReferenceManager setUpSimpleReferenceManager(String scheme, Path path) {
+    public static ReferenceManager setUpSimpleReferenceManager(Path path, String... schemes) {
         ReferenceManager refManager = ReferenceManager.instance();
         refManager.reset();
-        refManager.addReferenceFactory(buildReferenceFactory(
-            scheme,
-            path.toAbsolutePath().toString()
-        ));
+
+        for (String scheme : schemes) {
+            refManager.addReferenceFactory(buildReferenceFactory(
+                scheme,
+                path.toAbsolutePath().toString()
+            ));
+        }
         return refManager;
     }
 }

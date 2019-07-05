@@ -25,7 +25,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.mapFileToResourcePath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.javarosa.xform.parse.FormParserHelper.serAndDeserializeForm;
 import static org.javarosa.xform.parse.FormParserHelper.timeParsing;
@@ -47,7 +46,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void formWithExternalSecondaryXMLInstance_ShouldParseWithoutError() throws IOException, XPathSyntaxException {
         Path formName = r("external-select-xml.xml");
-        mapFileToResourcePath(formName);
+        setUpSimpleReferenceManager(formName.getParent(), "file");
         FormDef formDef = parse(formName);
         assertEquals("XML External Secondary Instance", formDef.getTitle());
 
@@ -61,7 +60,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void formWithExternalSecondaryXMLInstance_ShouldSerializeAndDeserializeWithoutError() throws IOException, DeserializationException {
         Path formPath = EXTERNAL_SECONDARY_INSTANCE_XML;
-        mapFileToResourcePath(formPath);
+        setUpSimpleReferenceManager(formPath.getParent(), "file");
         serAndDeserializeForm(formPath);
     }
 
@@ -69,7 +68,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
         Path formName = EXTERNAL_SECONDARY_INSTANCE_XML;
-        mapFileToResourcePath(formName);
+        setUpSimpleReferenceManager(formName.getParent(), "file");
         FormDef formDef = parse(formName);
         assertEquals("Form with external secondary instance", formDef.getTitle());
 
@@ -89,7 +88,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void itemsFromExternalSecondaryCSVInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
         Path formName = r("external-select-csv.xml");
-        mapFileToResourcePath(formName);
+        setUpSimpleReferenceManager(formName.getParent(), "file-csv");
         FormDef formDef = parse(formName);
         assertEquals("CSV External Secondary Instance", formDef.getTitle());
         
@@ -104,7 +103,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced() {
         Path formPath = r("unused-secondary-instance.xml");
-        setUpSimpleReferenceManager("file-csv", formPath.getParent());
+        setUpSimpleReferenceManager(formPath.getParent(), "file-csv");
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
 
@@ -114,7 +113,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced_AfterParsingFormWithReference() {
         Path formPath = r("external-select-csv.xml");
-        setUpSimpleReferenceManager("file-csv", formPath.getParent());
+        setUpSimpleReferenceManager(formPath.getParent(), "file-csv");
         FormParseInit fpi = new FormParseInit(formPath);
         FormDef formDef = fpi.getFormDef();
         assertThat(formDef.getNonMainInstance("external-csv").getRoot().hasChildren(), is(true));
@@ -129,7 +128,7 @@ public class ExternalSecondaryInstanceParseTest {
     @Test
     public void dummyNodesInExternalInstanceDeclaration_ShouldBeIgnored() throws IOException, XPathSyntaxException {
         Path formPath = r("external-select-xml-dummy-nodes.xml");
-        mapFileToResourcePath(formPath);
+        setUpSimpleReferenceManager(formPath.getParent(), "file");
         FormDef formDef = parse(formPath);
 
         TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-xml')/root/item")).getReference();
