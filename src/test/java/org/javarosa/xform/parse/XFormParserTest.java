@@ -28,11 +28,8 @@ import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -111,12 +108,6 @@ public class XFormParserTest {
         Path formName = r("internal_select_10.xml");
         FormDef formDef = parse(formName);
         assertEquals("internal select 10", formDef.getTitle());
-    }
-
-    @Test
-    public void timesParsingLargeInternalSecondaryInstanceFiles() throws IOException {
-        FormParserHelper.timeParsing(new LargeIsiFileGenerator(SECONDARY_INSTANCE_XML), SECONDARY_INSTANCE_LARGE_XML,
-            SECONDARY_INSTANCE_LARGE_XML, logger);
     }
 
     @Test
@@ -418,34 +409,5 @@ public class XFormParserTest {
 
     private void assertNoParseErrors(FormDef formDef) {
         assertEquals("Number of error messages", 0, formDef.getParseErrors().size());
-    }
-
-    /**
-    * Generates large versions of a file with an internal secondary instance, using a template
-    */
-    class LargeIsiFileGenerator implements FormParserHelper.LargeInstanceFileGenerator {
-        private final Path templateFilename;
-
-        LargeIsiFileGenerator(Path templateFilename) {
-            this.templateFilename = templateFilename;
-        }
-
-        @Override
-        public void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException {
-            BufferedReader br = Files.newBufferedReader(templateFilename, Charset.defaultCharset());
-            PrintWriter pw = new PrintWriter(outputFilename.toString());
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.trim().startsWith("<data_set>")) {
-                    // The one instance of this in the template is replaced with multiple lines
-                    for (int i = 0; i < numChildren; ++i) {
-                        pw.println("<data_set>us_east</data_set>");
-                    }
-                } else {
-                    pw.println(line);
-                }
-            }
-            pw.close();
-        }
     }
 }

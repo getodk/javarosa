@@ -8,14 +8,11 @@ import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -26,21 +23,11 @@ import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleR
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.javarosa.xform.parse.FormParserHelper.serAndDeserializeForm;
-import static org.javarosa.xform.parse.FormParserHelper.timeParsing;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 
 public class ExternalSecondaryInstanceParseTest {
     private static final Logger logger = LoggerFactory.getLogger(ExternalSecondaryInstanceParseTest.class);
-
-    private static Path EXTERNAL_SECONDARY_INSTANCE_XML;
-    private static Path EXTERNAL_SECONDARY_INSTANCE_LARGE_XML;
-
-    @BeforeClass
-    public static void setUp() {
-        EXTERNAL_SECONDARY_INSTANCE_XML = r("external-secondary-instance.xml");
-        EXTERNAL_SECONDARY_INSTANCE_LARGE_XML = r("external-secondary-instance-large.xml");
-    }
 
     @Test
     public void itemsFromExternalSecondaryXMLInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
@@ -117,28 +104,5 @@ public class ExternalSecondaryInstanceParseTest {
         TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-xml')/root/item")).getReference();
         List<TreeReference> dataSet = formDef.getEvaluationContext().expandReference(treeReference);
         assertThat(dataSet.size(), is(12));
-    }
-
-    @Test
-    public void timesParsingLargeExternalSecondaryInstanceFiles() throws IOException {
-        Path tempDir = Files.createTempDirectory("javarosa-test-");
-        Path tempFile = tempDir.resolve("towns-large.xml");
-        timeParsing(new LargeEsiFileGenerator(), tempFile, EXTERNAL_SECONDARY_INSTANCE_LARGE_XML, logger);
-    }
-
-    /**
-     * Generates large versions of an external secondary instance, from scratch
-     */
-    class LargeEsiFileGenerator implements FormParserHelper.LargeInstanceFileGenerator {
-        @Override
-        public void createLargeInstanceSource(Path outputFilename, int numChildren) throws IOException {
-            PrintWriter pw = new PrintWriter(outputFilename.toString());
-            pw.println("<towndata>");
-            for (int i = 0; i < numChildren; ++i) {
-                pw.println("<data_set>us_east</data_set>");
-            }
-            pw.println("</towndata>");
-            pw.close();
-        }
     }
 }
