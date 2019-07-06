@@ -30,20 +30,28 @@ public final class FormParserHelper {
         return XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()), lastSavedSrc);
     }
 
-    static void serAndDeserializeForm(Path formName) throws IOException, DeserializationException {
+    static Path getSerializedFormPath(FormDef formDef) throws IOException {
         initSerialization();
-        FormDef formDef = parse(formName);
         Path p = Files.createTempFile("serialized-form", null);
 
-        final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));
-        formDef.writeExternal(dos);
-        dos.close();
+        final DataOutputStream outputStream = new DataOutputStream(Files.newOutputStream(p));
+        formDef.writeExternal(outputStream);
+        outputStream.close();
 
-        final DataInputStream dis = new DataInputStream(Files.newInputStream(p));
-        formDef.readExternal(dis, defaultPrototypes());
-        dis.close();
+        return p;
+    }
 
-        Files.delete(p);
+    static FormDef deserializeAndCleanUpSerializedForm(Path serializedFormPath) throws IOException, DeserializationException {
+        initSerialization();
+
+        final DataInputStream inputStream = new DataInputStream(Files.newInputStream(serializedFormPath));
+        FormDef formDef = new FormDef();
+        formDef.readExternal(inputStream, defaultPrototypes());
+        inputStream.close();
+
+        Files.delete(serializedFormPath);
+
+        return formDef;
     }
 
     private static void initSerialization() {

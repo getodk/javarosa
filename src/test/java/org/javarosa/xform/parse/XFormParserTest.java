@@ -43,6 +43,8 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
+import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -142,7 +144,12 @@ public class XFormParserTest {
 
     @Test
     public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException {
-        FormParserHelper.serAndDeserializeForm(r("Simpler_Cascading_Select_Form.xml"));
+        FormDef originalFormDef = parse(r("Simpler_Cascading_Select_Form.xml"));
+
+        Path serializedForm = getSerializedFormPath(originalFormDef);
+        FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
+
+        assertThat(originalFormDef.getTitle(), is(deserializedFormDef.getTitle()));
     }
 
     /**
@@ -151,7 +158,12 @@ public class XFormParserTest {
      */
     @Test
     public void rangeFormSavesAndRestores() throws IOException, DeserializationException {
-        FormParserHelper.serAndDeserializeForm(r("range-form.xml"));
+        FormDef originalFormDef = parse(r("range-form.xml"));
+
+        Path serializedForm = getSerializedFormPath(originalFormDef);
+        FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
+
+        assertThat(originalFormDef.getTitle(), is(deserializedFormDef.getTitle()));
     }
 
     @Test

@@ -21,8 +21,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
+import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.javarosa.xform.parse.FormParserHelper.serAndDeserializeForm;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 
@@ -46,10 +47,16 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void formWithExternalSecondaryXMLInstance_ShouldSerializeAndDeserializeWithoutError() throws IOException, DeserializationException {
+    public void formWithExternalSecondaryXMLInstance_ShouldSerializeAndDeserialize() throws IOException, DeserializationException {
         Path formPath = r("external-select-xml.xml");
         setUpSimpleReferenceManager(formPath.getParent(), "file");
-        serAndDeserializeForm(formPath);
+
+        FormDef originalFormDef = parse(formPath);
+
+        Path serializedForm = getSerializedFormPath(originalFormDef);
+        FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
+
+        assertThat(originalFormDef.getTitle(), is(deserializedFormDef.getTitle()));
     }
 
     @Test
