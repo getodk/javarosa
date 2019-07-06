@@ -44,13 +44,12 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void formWithExternalSecondaryXMLInstance_ShouldParseWithoutError() throws IOException, XPathSyntaxException {
+    public void itemsFromExternalSecondaryXMLInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
         Path formName = r("external-select-xml.xml");
         setUpSimpleReferenceManager(formName.getParent(), "file");
         FormDef formDef = parse(formName);
         assertEquals("XML External Secondary Instance", formDef.getTitle());
 
-        // Confirm that items are made available to the XPath parser
         TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-xml')/root/item")).getReference();
         EvaluationContext evaluationContext = formDef.getEvaluationContext();
         List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
@@ -63,7 +62,6 @@ public class ExternalSecondaryInstanceParseTest {
         setUpSimpleReferenceManager(formPath.getParent(), "file");
         serAndDeserializeForm(formPath);
     }
-
 
     @Test
     public void parsesExternalSecondaryInstanceForm() throws IOException, XPathSyntaxException {
