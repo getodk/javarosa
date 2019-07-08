@@ -38,10 +38,10 @@ public class InternalDataInstanceParser {
      * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
      * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
      */
-    public static HashMap<String, DataInstance<TreeElement>> buildInstances(String xFormSrc)
+    public static HashMap<String, DataInstance> buildInstances(String xFormSrc)
         {
 //throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException, InvalidReferenceException
-            HashMap<String, DataInstance<TreeElement>> internalDataInstances = new HashMap<>();
+            HashMap<String, DataInstance> internalDataInstances = new HashMap<>();
             try {
                 InputStream inputStream  = new FileInputStream(xFormSrc);
                 KXmlParser parser = ElementParser.instantiateParser(inputStream);
@@ -52,7 +52,7 @@ public class InternalDataInstanceParser {
                 new ArrayList<>();
                 for(TreeElement treeElement: internalInstancesTreeElementList){
                     String id = treeElement.getAttribute(null, "id").getAttributeValue();
-                    DataInstance<TreeElement> internalDataInstance  = new FormInstance(treeElement.getChildAt(0), id);
+                    DataInstance internalDataInstance  = new FormInstance(treeElement.getChildAt(0), id);
                     internalDataInstances.put(internalDataInstance.getInstanceId(), internalDataInstance);
                 }
             } catch (IOException | InvalidStructureException | XmlPullParserException | UnfullfilledRequirementsException e) {
