@@ -1037,6 +1037,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         if (matches == null) {
             throw new XPathException("Could not find references depended on by" + itemset.nodesetRef.getInstanceName());
+<<<<<<< HEAD
         }
 
         // Get the answer to the current question so that it can be compared with the new choice list. If the answer
@@ -1047,6 +1048,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             currentQuestionAnswer = rawValue.getDisplayText();
         }
 
+=======
+        }
+
+        // Get the answer to the current question so that it can be compared with the new choice list. If the answer
+        // to the question is no longer in the choice list, it will be cleared.
+        String currentQuestionAnswer = null;
+        IAnswerData rawValue = getMainInstance().resolveReference(curQRef).getValue();
+        if (rawValue != null) {
+            currentQuestionAnswer = rawValue.getDisplayText();
+        }
+
+>>>>>>> 196cd1808e8f983c5642a8f7617fc1b5812cef1f
         boolean currentAnswerIsInNewChoices = false;
         for (int i = 0; i < matches.size(); i++) {
             TreeReference item = matches.get(i);
@@ -1061,6 +1074,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             if (itemset.valueRef != null) {
                 value = itemset.valueExpr
                         .evalReadable(formInstance, new EvaluationContext(exprEvalContext, item));
+<<<<<<< HEAD
             }
 
             // Provide a default value if none is specified
@@ -1070,6 +1084,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 currentAnswerIsInNewChoices = true;
             }
 
+=======
+            }
+
+            // Provide a default value if none is specified
+            value = value != null ? value : "dynamic:" + i;
+
+            if (value.equals(currentQuestionAnswer)) {
+                currentAnswerIsInNewChoices = true;
+            }
+
+>>>>>>> 196cd1808e8f983c5642a8f7617fc1b5812cef1f
             SelectChoice choice = new SelectChoice(label, value, itemset.labelIsItext);
             choice.setIndex(i);
             if (itemset.copyMode)
@@ -1309,6 +1334,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));
 
         // for support of multi-instance forms
+<<<<<<< HEAD
         if(formXmlPath == null){
             //Serialize all instances of path of the form isn't known
             ExtUtil.write(dos, new ExtWrapMap(getFormInstances(), new ExtWrapTagged()));
@@ -1317,6 +1343,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             //so that internal secondary instances can be parsed again
             ExtUtil.write(dos, new ExtWrapMap(getExternalInstances(), new ExtWrapTagged()));
         }
+=======
+        ExtUtil.write(dos, new ExtWrapMap(formInstances, new ExtWrapTagged()));
+>>>>>>> 196cd1808e8f983c5642a8f7617fc1b5812cef1f
 
         ExtUtil.write(dos, new ExtWrapListPoly(extensions));
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
