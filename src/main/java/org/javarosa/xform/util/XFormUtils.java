@@ -111,16 +111,16 @@ public class XFormUtils {
 
     /**
      *
-     * @param xFormPath The path to the XForm that is to be parsed
+     * @param formXmlSrc The path to the XForm that is to be parsed
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public static FormDef getFormFromFile(String xFormPath, String lastSavedSrc) throws XFormParseException {
+    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws XFormParseException {
         InputStreamReader isr = null;
         try {
-            isr = new FileReader(xFormPath);
+            isr = new FileReader(formXmlSrc);
             XFormParser xFormParser = _factory.getXFormParser(isr);
-            return xFormParser.parse(xFormPath, lastSavedSrc);
+            return xFormParser.parse(formXmlSrc, lastSavedSrc);
         } catch(IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
@@ -195,7 +195,7 @@ public class XFormUtils {
         String warning = "Warning: ";
         List<String> unusedAttributes = getUnusedAttributes(e, usedAtts);
         warning += unusedAttributes.size() + " Unrecognized attributes found in Element [" + e.getName() +
-            "] and will be ignored: ";
+        "] and will be ignored: ";
         warning += "[";
         for (int i=0; i < unusedAttributes.size(); i++) {
             warning += unusedAttributes.get(i);

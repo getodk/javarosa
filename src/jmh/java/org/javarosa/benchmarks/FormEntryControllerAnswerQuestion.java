@@ -2,7 +2,6 @@ package org.javarosa.benchmarks;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 import static org.javarosa.benchmarks.BenchmarkUtils.getStubAnswer;
-import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,7 +12,6 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -36,9 +34,7 @@ public class FormEntryControllerAnswerQuestion {
 
         @Setup(Level.Trial)
         public void initialize() throws IOException {
-            Path assetsDir = prepareAssets("nigeria_wards_external.xml", "lgas.xml", "wards.xml");
-            Path formFile = assetsDir.resolve("nigeria_wards_external.xml");
-            ReferenceManagerTestUtils.setUpSimpleReferenceManager("file", assetsDir);
+            Path formFile = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             FormDef formDef = FormParserHelper.parse(formFile);
             formEntryModel = new FormEntryModel(formDef);
             formEntryController = new FormEntryController(formEntryModel);
@@ -59,7 +55,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
     @Benchmark
-    public void benchmark_FormEntryController_answerAndSaveAll(FormControllerAnswerQuestionState state) {
+    public void benchmarkAnswerAndSaveAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
             AnswerCurrentQuestionAction action = new AnswerCurrentQuestionAction(state).invoke();
@@ -72,7 +68,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
     @Benchmark
-    public void benchmark_FormEntryController_answerAll(FormControllerAnswerQuestionState state) {
+    public void benchmarkAnswerAll(FormControllerAnswerQuestionState state) {
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
             new AnswerCurrentQuestionAction(state).invoke();
@@ -82,7 +78,7 @@ public class FormEntryControllerAnswerQuestion {
     }
 
     @Benchmark
-    public void benchmark_FormEntryController_answerAllThenSaveAll(FormControllerAnswerQuestionState state) {
+    public void benchmarkAnswerAllThenSaveAll(FormControllerAnswerQuestionState state) {
         HashMap<FormIndex, IAnswerData> answers = new HashMap<>();
         state.formEntryController.stepToNextEvent();
         while (state.formEntryModel.getFormIndex().isInForm()) {
@@ -105,9 +101,8 @@ public class FormEntryControllerAnswerQuestion {
         state.formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
     }
 
-
     @Benchmark
-    public void benchmark_FormEntryController_answerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
+    public void benchmarkAnswerOne(FormControllerAnswerQuestionState state) throws RuntimeException {
         state.formEntryController.stepToNextEvent();
         if (state.formEntryModel.getFormIndex().isInForm()) {
             FormIndex questionIndex = state.formEntryController.getModel().getFormIndex();

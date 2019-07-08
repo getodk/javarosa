@@ -30,8 +30,10 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -60,7 +62,10 @@ import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.javarosa.xml.InternalDataInstanceParser;
 import org.javarosa.xpath.XPathException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -70,11 +75,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -143,6 +148,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /** The display title of the form */
     private String title;
 
+    /**
+     * The file path to the formXML file
+     * this is being used for deserialization of the internal instances
+     * during caching
+     * */
+    private String formXmlPath;
+
     private String name;
 
     private List<XFormExtension> extensions;
@@ -164,10 +176,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private HashMap<String, SubmissionProfile> submissionProfiles;
 
-    private HashMap<String, DataInstance> formInstances;
+    private HashMap<String, DataInstance> externalFormInstances = new HashMap<>();
+    private HashMap<String, DataInstance> internalFormInstances = new HashMap<>();
     private FormInstance mainInstance = null;
 
     private ActionController actionController;
+    /**
+     * The names of the action types that this form includes. This allows clients to do things like let users know if
+     * location is captured in the background. Actions can nest so to dynamically figure out which ones the form
+     * includes we'd have to query the actionController on every node.
+     */
+    private Set<String> actions;
 
     private EventNotifier eventNotifier;
 
@@ -209,9 +228,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         resetEvaluationContext();
         outputFragments = new ArrayList<>();
         submissionProfiles = new HashMap<>();
-        formInstances = new HashMap<>();
+        internalFormInstances = new HashMap<>();
+        externalFormInstances = new HashMap<>();
         extensions = new ArrayList<>();
         actionController = new ActionController();
+        actions = new HashSet<>();
 
         this.eventNotifier = eventNotifier;
     }
@@ -226,8 +247,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     /** Getters and setters for the lists */
     public void addNonMainInstance(DataInstance instance) {
-        formInstances.put(instance.getName(), instance);
+        if(instance instanceof ExternalDataInstance){
+            externalFormInstances.put(instance.getName(), instance);
+        } else {
+            internalFormInstances.put(instance.getName(), instance);
+        }
         resetEvaluationContext();
+    }
+
+    public void setFormXmlPath(String formXmlPath) {
+        this.formXmlPath = formXmlPath;
     }
 
     /**
@@ -237,6 +266,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * @return
      */
     public DataInstance getNonMainInstance(String name) {
+        HashMap<String, DataInstance> formInstances = getFormInstances();
         if (!formInstances.containsKey(name)) {
             return null;
         }
@@ -245,7 +275,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public Enumeration<DataInstance> getNonMainInstances() {
-        return Collections.enumeration(formInstances.values());
+        return Collections.enumeration(getFormInstances().values());
     }
 
     public void setInstance(FormInstance fi) {
@@ -741,7 +771,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private void resetEvaluationContext() {
         EvaluationContext ec = new EvaluationContext(null);
-        ec = new EvaluationContext(mainInstance, formInstances, ec);
+        ec = new EvaluationContext(mainInstance, getFormInstances(), ec);
         initEvalContext(ec);
         this.exprEvalContext = ec;
     }
@@ -995,32 +1025,33 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
                 new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 
-        DataInstance fi = null;
-        if (itemset.nodesetRef.getInstanceName() != null) // We're not dealing
-        // with the default
-        // instance
-        {
-            fi = getNonMainInstance(itemset.nodesetRef.getInstanceName());
-            if (fi == null) {
-                throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName()
-                        + " not found");
+        DataInstance formInstance;
+        if (itemset.nodesetRef.getInstanceName() != null) { // a secondary instance is specified
+            formInstance = getNonMainInstance(itemset.nodesetRef.getInstanceName());
+            if (formInstance == null) {
+                throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName() + " not found");
             }
         } else {
-            fi = getMainInstance();
+            formInstance = getMainInstance();
         }
 
         if (matches == null) {
-            throw new XPathException("Could not find references depended on by"
-                    + itemset.nodesetRef.getInstanceName());
+            throw new XPathException("Could not find references depended on by" + itemset.nodesetRef.getInstanceName());
         }
 
+        // Get the answer to the current question so that it can be compared with the new choice list. If the answer
+        // to the question is no longer in the choice list, it will be cleared.
+        String currentQuestionAnswer = null;
+        IAnswerData rawValue = getMainInstance().resolveReference(curQRef).getValue();
+        if (rawValue != null) {
+            currentQuestionAnswer = rawValue.getDisplayText();
+        }
+
+        boolean currentAnswerIsInNewChoices = false;
         for (int i = 0; i < matches.size(); i++) {
             TreeReference item = matches.get(i);
 
-            // String label =
-            // itemset.labelExpr.evalReadable(this.getMainInstance(), new
-            // EvaluationContext(exprEvalContext, item));
-            String label = itemset.labelExpr.evalReadable(fi, new EvaluationContext(exprEvalContext,
+            String label = itemset.labelExpr.evalReadable(formInstance, new EvaluationContext(exprEvalContext,
                     item));
             String value = null;
             TreeElement copyNode = null;
@@ -1028,15 +1059,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 copyNode = this.getMainInstance().resolveReference(itemset.copyRef.contextualize(item));
             }
             if (itemset.valueRef != null) {
-                // value = itemset.valueExpr.evalReadable(this.getMainInstance(),
-                // new EvaluationContext(exprEvalContext, item));
                 value = itemset.valueExpr
-                        .evalReadable(fi, new EvaluationContext(exprEvalContext, item));
+                        .evalReadable(formInstance, new EvaluationContext(exprEvalContext, item));
             }
-            // SelectChoice choice = new
-            // SelectChoice(labelID,labelInnerText,value,isLocalizable);
-            SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i,
-                    itemset.labelIsItext);
+
+            // Provide a default value if none is specified
+            value = value != null ? value : "dynamic:" + i;
+
+            if (value.equals(currentQuestionAnswer)) {
+                currentAnswerIsInNewChoices = true;
+            }
+
+            SelectChoice choice = new SelectChoice(label, value, itemset.labelIsItext);
             choice.setIndex(i);
             if (itemset.copyMode)
                 choice.copyNode = copyNode;
@@ -1045,21 +1079,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         if (choices.size() == 0) {
-            // throw new
-            // RuntimeException("dynamic select question has no choices! [" +
-            // itemset.nodesetRef + "]");
-            // When you exit a survey mid way through and want to save it, it seems
-            // that Collect wants to
-            // go through all the questions. Well of course not all the questions
-            // are going to have answers
-            // to chose from if the user hasn't filled them out. So I'm just going
-            // to make a note of this
-            // and not throw an exception.
             logger.info("Dynamic select question has no choices! [{}]. If this occurs while " +
                 "filling out a form (and not while saving an incomplete form), the filter " +
                 "condition may have eliminated all the choices. Is that what you intended?"
                 , itemset.nodesetRef);
 
+        }
+
+        // Clear the answer if it is no longer in the choice list.
+        if (!currentAnswerIsInNewChoices) {
+            getMainInstance().resolveReference(curQRef).setAnswer(new StringData(""));
         }
 
         itemset.clearChoices();
@@ -1178,6 +1207,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
         setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
         setChildren((List<IFormElement>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+        setFormXmlPath(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
         setInstance((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
 
         setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
@@ -1197,13 +1227,27 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         submissionProfiles = (HashMap<String, SubmissionProfile>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, SubmissionProfile.class));
 
-        formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
+        //For Backward compability
+        if(formXmlPath == null){
+            //The entire secondary instances were serialized 
+            HashMap<String, DataInstance> formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, new ExtWrapTagged()), pf);
+            for(Map.Entry<String, DataInstance>  formInstanceEntry :formInstances.entrySet()){
+                addNonMainInstance(formInstanceEntry.getValue());
+            }
+        } else {
+            //Only external secondary instances were serialized 
+            externalFormInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
+                String.class, new ExtWrapTagged()), pf);
+            //So internal instances can be parsed from the formXML file
+            internalFormInstances = InternalDataInstanceParser.buildInstances(getFormXmlPath());
+        }
 
         extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
         resetEvaluationContext();
         actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
+        actions = new HashSet<>((List<String>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
     }
 
     /**
@@ -1213,6 +1257,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      *                    false if it is using an existing IDataModel
      */
     public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
+        HashMap<String, DataInstance> formInstances = getFormInstances();
         for (String instanceId : formInstances.keySet()) {
             DataInstance instance = formInstances.get(instanceId);
             instance.initialize(factory, instanceId);
@@ -1250,6 +1295,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.writeString(dos, ExtUtil.emptyIfNull(getName()));
         ExtUtil.write(dos, new ExtWrapNullable(getTitle()));
         ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
+        ExtUtil.writeString(dos, ExtUtil.emptyIfNull(getFormXmlPath()));
         ExtUtil.write(dos, getMainInstance());
         ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
@@ -1263,10 +1309,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));
 
         // for support of multi-instance forms
+        if(formXmlPath == null){
+            //Serialize all instances of path of the form isn't known
+            ExtUtil.write(dos, new ExtWrapMap(getFormInstances(), new ExtWrapTagged()));
+        } else {
+            //Don't serialize internal instances, if the path of the form is known, 
+            //so that internal secondary instances can be parsed again
+            ExtUtil.write(dos, new ExtWrapMap(getExternalInstances(), new ExtWrapTagged()));
+        }
 
-        ExtUtil.write(dos, new ExtWrapMap(formInstances, new ExtWrapTagged()));
         ExtUtil.write(dos, new ExtWrapListPoly(extensions));
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
+        ExtUtil.write(dos, new ExtWrapListPoly(new ArrayList<>(actions)));
     }
 
     public void collapseIndex(FormIndex index, List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
@@ -1666,6 +1720,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     /**
+     * Records that the form definition includes an action of the given name. Clients may need to configure resources
+     * accordingly or communicate something to the user (e.g. in the case of setlocation).
+     */
+    public void registerAction(String actionName) {
+        actions.add(actionName);
+    }
+
+    /**
+     * Returns true if this form definition includes one or more action of the given name.
+     */
+    public boolean hasAction(String name) {
+        return actions.contains(name);
+    }
+
+    /**
      * Pull this in from FormOverview so that we can make fields private.
      *
      * @param instanceNode
@@ -1697,5 +1766,24 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public void addParseError(String error) {
         parseErrors.add(error);
+    }
+
+    private HashMap<String, DataInstance> getInternalInstances(){
+        return internalFormInstances;
+    }
+
+    private HashMap<String, DataInstance> getExternalInstances(){
+        return externalFormInstances;
+    }
+
+    public String getFormXmlPath() {
+        return formXmlPath;
+    }
+
+    private HashMap<String, DataInstance> getFormInstances(){
+        HashMap<String, DataInstance> formInstances = new HashMap<>();
+        formInstances.putAll(getInternalInstances());
+        formInstances.putAll(getExternalInstances());
+        return formInstances;
     }
 }

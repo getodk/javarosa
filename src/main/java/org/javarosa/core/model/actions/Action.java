@@ -49,6 +49,10 @@ public abstract class Action implements Externalizable {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     /**
      * Process actions that were triggered in the form.
      *

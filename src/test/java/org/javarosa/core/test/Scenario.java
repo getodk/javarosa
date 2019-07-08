@@ -29,6 +29,7 @@ import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,8 +98,12 @@ public class Scenario {
      * Creates and prepares the test scenario loading and parsing the given form
      */
     public static Scenario init(String formFileName) {
+        return init(r(formFileName));
+    }
+
+    public static Scenario init(Path formFile) {
         // TODO explain why this sequence of calls
-        FormParseInit fpi = new FormParseInit(r(formFileName));
+        FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());
         FormEntryModel formEntryModel = new FormEntryModel(formDef);
@@ -221,7 +226,7 @@ public class Scenario {
 
     /**
      * Returns the list of choices of the &lt;select&gt; or &lt;select1&gt; form controls.
-     * This method ensures that any dynamic choce lists are populated to reflect the status
+     * This method ensures that any dynamic choice lists are populated to reflect the status
      * of the form (already answered questions, etc.).
      */
     public List<SelectChoice> choicesOf(String xPath) {
@@ -281,7 +286,7 @@ public class Scenario {
      * Returns an absolute reference of the given xPath taking multiplicity of each
      * xPath part into account.
      */
-    private TreeReference absoluteRef(String xPath) {
+    public static TreeReference absoluteRef(String xPath) {
         TreeReference tr = new TreeReference();
         tr.setRefLevel(REF_ABSOLUTE);
         tr.setContext(CONTEXT_ABSOLUTE);
@@ -292,11 +297,11 @@ public class Scenario {
         return tr;
     }
 
-    private String parseName(String xPathPart) {
+    private static String parseName(String xPathPart) {
         return xPathPart.contains("[") ? xPathPart.substring(0, xPathPart.indexOf("[")) : xPathPart;
     }
 
-    private int parseMultiplicity(String xPathPart) {
+    private static int parseMultiplicity(String xPathPart) {
         return xPathPart.contains("[") ? Integer.parseInt(xPathPart.substring(xPathPart.indexOf("[") + 1, xPathPart.indexOf("]"))) : 0;
     }
 
