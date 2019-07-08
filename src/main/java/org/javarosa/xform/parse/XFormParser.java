@@ -173,6 +173,9 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> itextKnownForms;
     private static HashMap<String, IElementHandler> actionHandlers;
 
+    /** The string IDs of all instances that are referenced in a instance() function call in the primary instance **/
+    private static Set<String> referencedInstanceIds;
+
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
     private final List<ErrorCallback> errorCallbacks = new ArrayList<>();
 
@@ -201,6 +204,8 @@ public class XFormParser implements IXFormParserFunctions {
         initProcessingRules();
         modelPrototypes = new PrototypeFactoryDeprecated();
         submissionParsers = new ArrayList<>(1);
+
+        referencedInstanceIds = new HashSet<>();
     }
 
     private static void initProcessingRules() {
@@ -462,7 +467,10 @@ public class XFormParser implements IXFormParserFunctions {
 
         initState();
         final String defaultNamespace = _xmldoc.getRootElement().getNamespaceUri(null);
+
+        referencedInstanceIds.clear();
         parseElement(_xmldoc.getRootElement(), _f, topLevelHandlers);
+
         collapseRepeatGroups(_f);
 
         final FormInstanceParser instanceParser = new FormInstanceParser(_f, defaultNamespace,
@@ -478,25 +486,27 @@ public class XFormParser implements IXFormParserFunctions {
                 final String instanceId = instanceNodeIdStrs.get(instanceIndex);
                 final String instanceSrc = parseInstanceSrc(instance, lastSavedSrc);
 
-                // Disable jr://file-csv/ support by explicitly only supporting jr://file/
-                // until https://github.com/opendatakit/javarosa/issues/417 is addressed
-                if (instanceSrc != null && instanceSrc.toLowerCase().startsWith("jr://file/")) {
-                    final ExternalDataInstance externalDataInstance;
-                    try {
-                        externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
-                    } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
+                // Only read in an secondary instance if its ID is used in the primary instance as an argument to an
+                // instance() call
+                if (referencedInstanceIds.contains(instanceId)) {
+                    if (instanceSrc != null) {
+                        final ExternalDataInstance externalDataInstance;
+                        try {
+                            externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
+                        } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
                             XmlPullParserException | InvalidReferenceException e) {
-                        String msg = "Unable to parse external secondary instance";
-                        logger.error(msg, e);
-                        throw new XFormParseException(msg + ": " + e.toString(), instance);
+                            String msg = "Unable to parse external secondary instance";
+                            logger.error(msg, e);
+                            throw new XFormParseException(msg + ": " + e.toString(), instance);
+                        }
+                        _f.addNonMainInstance(externalDataInstance);
+                    } else {
+                        FormInstance fi = instanceParser.parseInstance(instance, false,
+                            instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
+                        loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
+                        loadInstanceData(instance, fi.getRoot(), _f);
+                        _f.addNonMainInstance(fi);
                     }
-                    _f.addNonMainInstance(externalDataInstance);
-                } else {
-                    FormInstance fi = instanceParser.parseInstance(instance, false,
-                        instanceNodeIdStrs.get(instanceNodes.indexOf(instance)), namespacePrefixesByUri);
-                    loadNamespaces(_xmldoc.getRootElement(), fi); // same situation as below
-                    loadInstanceData(instance, fi.getRoot(), _f);
-                    _f.addNonMainInstance(fi);
                 }
             }
         }
@@ -583,6 +593,13 @@ public class XFormParser implements IXFormParserFunctions {
                 }
             }
         }
+    }
+
+    /**
+     * Records that the given instance ID was used as the argument to an instance() function call.
+     */
+    public static void recordInstanceFunctionCall(String instanceId) {
+        referencedInstanceIds.add(instanceId);
     }
 
     private void parseTitle(Element e) {
@@ -815,13 +832,18 @@ public class XFormParser implements IXFormParserFunctions {
     private void saveInstanceNode(Element instance) {
         Element instanceNode = null;
         String instanceId = instance.getAttributeValue("", "id");
+        String instanceSrc = instance.getAttributeValue("", "src");
 
-        for (int i = 0; i < instance.getChildCount(); i++) {
-            if (instance.getType(i) == Node.ELEMENT) {
-                if (instanceNode != null) {
-                    throw new XFormParseException("XForm Parse: <instance> has more than one child element", instance);
-                } else {
-                    instanceNode = instance.getElement(i);
+        // Only consider child nodes if the instance declaration does not include a source.
+        // TODO: revisit this to allow for a mix of static and dynamic data but beware of https://github.com/opendatakit/javarosa/issues/451
+        if (instanceSrc == null) {
+            for (int i = 0; i < instance.getChildCount(); i++) {
+                if (instance.getType(i) == Node.ELEMENT) {
+                    if (instanceNode != null) {
+                        throw new XFormParseException("XForm Parse: <instance> has more than one child element", instance);
+                    } else {
+                        instanceNode = instance.getElement(i);
+                    }
                 }
             }
         }
