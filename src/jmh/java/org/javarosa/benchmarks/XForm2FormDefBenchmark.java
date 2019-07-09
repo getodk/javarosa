@@ -1,6 +1,5 @@
 package org.javarosa.benchmarks;
 
-import org.javarosa.benchmarks.utils.BenchmarkUtils;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.parse.FormParserHelper;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -15,8 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static org.javarosa.benchmarks.utils.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.utils.BenchmarkUtils.getWorkingDir;
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+import static org.javarosa.benchmarks.BenchmarkUtils.getWorkingDir;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 
 public class XForm2FormDefBenchmark {
@@ -35,13 +34,13 @@ public class XForm2FormDefBenchmark {
         @Param({"50", "500", "5000"})
         public int noOf2ndryInstanceElements;
         @Param({"0"})
-        public int noOfQuestionGroups = 1;
+        public int noOfQuestionGroups;
         @Param({"0"})
         public int noOfExternalSecondaryInstances;
         @Setup(Level.Trial)
         public void initialize() throws IOException {
             File xFormXmlFile = BenchmarkUtils.generateXFormFile(noOfQuestions, noOfQuestionGroups, noOfInternalSecondaryInstances, noOfExternalSecondaryInstances, noOf2ndryInstanceElements);
-            setUpSimpleReferenceManager("file", getWorkingDir());
+            setUpSimpleReferenceManager(getWorkingDir(),"file");
             xFormXmlPath = xFormXmlFile.toPath();
         }
     }

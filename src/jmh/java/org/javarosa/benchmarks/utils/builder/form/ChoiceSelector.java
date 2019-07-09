@@ -1,7 +1,5 @@
 package org.javarosa.benchmarks.utils.builder.form;
 
-import org.javarosa.benchmarks.utils.builder.form.Choice;
-
 import java.util.List;
 
 /**

@@ -14,7 +14,31 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import static org.javarosa.benchmarks.utils.builder.Constants.*;
+
+import static org.javarosa.benchmarks.utils.builder.Constants.BIND;
+import static org.javarosa.benchmarks.utils.builder.Constants.BODY;
+import static org.javarosa.benchmarks.utils.builder.Constants.CLOSE_TOKEN;
+import static org.javarosa.benchmarks.utils.builder.Constants.DOUBLE_QUOTE;
+import static org.javarosa.benchmarks.utils.builder.Constants.EMPTY_STRING;
+import static org.javarosa.benchmarks.utils.builder.Constants.EQUALS;
+import static org.javarosa.benchmarks.utils.builder.Constants.FORWARD_SLASH;
+import static org.javarosa.benchmarks.utils.builder.Constants.GROUP;
+import static org.javarosa.benchmarks.utils.builder.Constants.HEAD;
+import static org.javarosa.benchmarks.utils.builder.Constants.HINT;
+import static org.javarosa.benchmarks.utils.builder.Constants.HTML;
+import static org.javarosa.benchmarks.utils.builder.Constants.INPUT_TEXT;
+import static org.javarosa.benchmarks.utils.builder.Constants.INSTANCE;
+import static org.javarosa.benchmarks.utils.builder.Constants.ITEM;
+import static org.javarosa.benchmarks.utils.builder.Constants.ITEM_SET;
+import static org.javarosa.benchmarks.utils.builder.Constants.LABEL;
+import static org.javarosa.benchmarks.utils.builder.Constants.MODEL;
+import static org.javarosa.benchmarks.utils.builder.Constants.NEW_LINE;
+import static org.javarosa.benchmarks.utils.builder.Constants.NODE_SET;
+import static org.javarosa.benchmarks.utils.builder.Constants.OPEN_TOKEN;
+import static org.javarosa.benchmarks.utils.builder.Constants.REF;
+import static org.javarosa.benchmarks.utils.builder.Constants.SPACE;
+import static org.javarosa.benchmarks.utils.builder.Constants.TITLE;
+import static org.javarosa.benchmarks.utils.builder.Constants.VALUE;
 
 public class XFormBuilder {
 

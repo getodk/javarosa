@@ -23,11 +23,6 @@ public class Constants {
     public static String REF = "ref";
     public static String HINT = "hint";
     public static String VALUE = "value";
-    public static String UPLOAD = "upload";
-    public static String RANGE = "range";
-    public static String ODK_RANK = "odk:rank";
-    public static String SELECT_MULTIPLE = "select";
-    public static String SELECT_ONE = "select1";
     public static String INPUT_TEXT = "input";
     public static String GROUP = "group";
     public static String NEW_LINE = System.getProperty("line.separator");

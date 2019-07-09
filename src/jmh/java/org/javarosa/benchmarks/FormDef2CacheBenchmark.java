@@ -1,6 +1,5 @@
 package org.javarosa.benchmarks;
 
-import org.javarosa.benchmarks.utils.BenchmarkUtils;
 import org.javarosa.benchmarks.utils.FormDefCache;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.parse.FormParserHelper;
@@ -14,11 +13,11 @@ import org.openjdk.jmh.annotations.State;
 import java.io.File;
 import java.io.IOException;
 
-import static org.javarosa.benchmarks.utils.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.utils.BenchmarkUtils.getCachePath;
-import static org.javarosa.benchmarks.utils.BenchmarkUtils.getWorkingDir;
-import static org.javarosa.benchmarks.utils.BenchmarkUtils.registerCacheProtoTypes;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+import static org.javarosa.benchmarks.BenchmarkUtils.getCachePath;
+import static org.javarosa.benchmarks.BenchmarkUtils.getWorkingDir;
+import static org.javarosa.benchmarks.BenchmarkUtils.registerCacheProtoTypes;
 
 public class FormDef2CacheBenchmark {
 
@@ -45,7 +44,7 @@ public class FormDef2CacheBenchmark {
         public void initialize() throws IOException {
             CACHE_PATH = getCachePath().toString();
             File xFormXmlFile = BenchmarkUtils.generateXFormFile(noOfQuestions, noOfQuestionGroups, noOfInternalSecondaryInstances, noOfExternalSecondaryInstances, noOf2ndryInstanceElements);
-            setUpSimpleReferenceManager("file", getWorkingDir());
+            setUpSimpleReferenceManager(getWorkingDir(), "file");
             registerCacheProtoTypes();
             formPath = xFormXmlFile.getPath();
             formDef =  FormParserHelper.parse(xFormXmlFile.toPath());
