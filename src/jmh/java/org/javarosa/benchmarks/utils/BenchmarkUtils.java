@@ -17,10 +17,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.stream.Stream;
+
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.JavaRosaCoreModule;
+import org.javarosa.model.xform.XFormsModule;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -166,6 +171,31 @@ public class BenchmarkUtils {
         Path filePath = assetsPath.resolve("lgas.xml");
         return filePath;
     }
+
+
+    public static File generateXFormFile(int noOfQuestions, int noOfQuestionGroups, int noOfInternalSecondaryInstances, int noOfExternalSecondaryInstances, int noOf2ndryInstanceElements) throws IOException {
+        XFormFileGenerator xFormFileGenerator = new XFormFileGenerator();
+        String title = String.format("xform_%s_%sISI%sE_%sESI%sE", noOfQuestions,
+            noOfInternalSecondaryInstances, noOf2ndryInstanceElements,
+            noOfExternalSecondaryInstances, noOf2ndryInstanceElements
+        );
+        File existingFile = getWorkingDir().resolve(title + ".xml").toFile();
+        File xFormXmlFile;
+        if(existingFile.exists()){
+            xFormXmlFile = existingFile;
+        }else{
+            xFormXmlFile = xFormFileGenerator.generateXFormFile(title, noOfQuestions, noOfQuestionGroups, noOfInternalSecondaryInstances, noOfExternalSecondaryInstances, noOf2ndryInstanceElements, getWorkingDir());
+        }
+        return xFormXmlFile;
+    }
+
+    public static void registerCacheProtoTypes() {
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+        new XFormsModule().registerModule();
+    }
+
+
 
     public static Path getCachePath() throws IOException {
         if(CACHE_PATH == null){
