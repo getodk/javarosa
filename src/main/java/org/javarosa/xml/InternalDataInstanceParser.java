@@ -32,6 +32,7 @@ public class InternalDataInstanceParser {
      *
      * @param xFormSrc the path  of the Xform containing internal instances…
      * @return List of all the #InternalDataInstance in the XForm
+
      * @throws IOException                       if FileInputStream can’t find the file, or ElementParser can’t read the stream
      * @throws InvalidReferenceException         if the ReferenceManager in getPath(String srcLocation) can’t derive a reference
      * @throws UnfullfilledRequirementsException thrown by {@link TreeElementParser#parse()}
@@ -40,7 +41,6 @@ public class InternalDataInstanceParser {
      */
     public static HashMap<String, DataInstance> buildInstances(String xFormSrc)
         {
-//throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException, InvalidReferenceException
             HashMap<String, DataInstance> internalDataInstances = new HashMap<>();
             try {
                 InputStream inputStream  = new FileInputStream(xFormSrc);

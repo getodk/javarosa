@@ -176,8 +176,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private HashMap<String, SubmissionProfile> submissionProfiles;
 
-    private HashMap<String, DataInstance> externalFormInstances = new HashMap<>();
-    private HashMap<String, DataInstance> internalFormInstances = new HashMap<>();
+    private HashMap<String, DataInstance> formInstances;
     private FormInstance mainInstance = null;
 
     private ActionController actionController;
@@ -228,8 +227,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         resetEvaluationContext();
         outputFragments = new ArrayList<>();
         submissionProfiles = new HashMap<>();
-        internalFormInstances = new HashMap<>();
-        externalFormInstances = new HashMap<>();
+        formInstances = new HashMap<>();
         extensions = new ArrayList<>();
         actionController = new ActionController();
         actions = new HashSet<>();
@@ -247,11 +245,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     /** Getters and setters for the lists */
     public void addNonMainInstance(DataInstance instance) {
-        if(instance instanceof ExternalDataInstance){
-            externalFormInstances.put(instance.getName(), instance);
-        } else {
-            internalFormInstances.put(instance.getName(), instance);
-        }
+        formInstances.put(instance.getName(), instance);
         resetEvaluationContext();
     }
 
@@ -1237,10 +1231,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             }
         } else {
             //Only external secondary instances were serialized 
-            externalFormInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
+            HashMap<String, DataInstance> externalFormInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, new ExtWrapTagged()), pf);
             //So internal instances can be parsed from the formXML file
-            internalFormInstances = InternalDataInstanceParser.buildInstances(getFormXmlPath());
+            HashMap<String, DataInstance> internalFormInstances = InternalDataInstanceParser.buildInstances(getFormXmlPath());
+            formInstances.putAll(externalFormInstances);
+            formInstances.putAll(internalFormInstances);
         }
 
         extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
@@ -1768,12 +1764,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         parseErrors.add(error);
     }
 
-    private HashMap<String, DataInstance> getInternalInstances(){
-        return internalFormInstances;
-    }
-
     private HashMap<String, DataInstance> getExternalInstances(){
-        return externalFormInstances;
+        HashMap<String, DataInstance> internalFormInstances = new HashMap<>();
+        for(Map.Entry<String, DataInstance> formInstanceEntry: formInstances.entrySet()){
+            if(!(formInstanceEntry instanceof ExternalDataInstance)){
+                internalFormInstances.put(formInstanceEntry.getKey(), formInstanceEntry.getValue());
+            }
+        }
+        return internalFormInstances;
     }
 
     public String getFormXmlPath() {
@@ -1781,9 +1779,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     private HashMap<String, DataInstance> getFormInstances(){
-        HashMap<String, DataInstance> formInstances = new HashMap<>();
-        formInstances.putAll(getInternalInstances());
-        formInstances.putAll(getExternalInstances());
         return formInstances;
     }
 }
