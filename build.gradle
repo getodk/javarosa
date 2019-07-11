@@ -15,7 +15,6 @@ sourceSets {
     test.java.srcDirs = ['src/test/java']
     test.resources.srcDirs = ['src/test/resources']
 }
-compileJava {options.encoding = "UTF-8"}
 
 compileJava {
     options.compilerArgs << "-Xlint:deprecation"
