@@ -80,9 +80,11 @@ public class TreeElementParser extends ElementParser<TreeElement> {
         final int depth = parser.getDepth();
         if (depth > 0) {
             while (parser.getDepth() >= depth) {
-                boolean isInstanceNode = nextNonWhitespace() == Node.ELEMENT && parser.getName().equals(INSTANCE_ELEMENT);
-                if (isInstanceNode) {
+                nextNonWhitespace();
+
+                if (currentNodeIsInternalInstance()) {
                     TreeElement treeElement = new TreeElementParser(parser, 0, "").parse();
+
                     if (treeElement.getAttributeValue(null, ID_ATTR) != null) {
                         String instanceId = treeElement.getAttributeValue(null,  ID_ATTR);
                         if (instanceId != null) {
@@ -98,4 +100,9 @@ public class TreeElementParser extends ElementParser<TreeElement> {
         }
     }
 
+    private boolean currentNodeIsInternalInstance() throws XmlPullParserException {
+        return parser.getEventType() == Node.ELEMENT
+            && parser.getName().equals(INSTANCE_ELEMENT)
+            && parser.getAttributeValue(null,"src") == null;
+    }
 }

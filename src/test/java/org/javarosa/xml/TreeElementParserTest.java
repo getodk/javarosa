@@ -13,8 +13,11 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class TreeElementParserTest {
 
@@ -43,4 +46,13 @@ public class TreeElementParserTest {
 
     }
 
+    @Test
+    public void parseInternalSecondaryInstances_DoesNotIncludeExternalInstances() throws IOException, InvalidStructureException, XmlPullParserException {
+        InputStream inputStream = new FileInputStream(r("external-select-xml.xml").toString());
+        KXmlParser kXmlParser = ElementParser.instantiateParser(inputStream);
+        TreeElementParser treeElementParser = new TreeElementParser(kXmlParser, 0, "");
+        List<TreeElement> internalSecondaryInstances = treeElementParser.parseInternalSecondaryInstances();
+
+        assertThat(internalSecondaryInstances, is(empty()));
+    }
 }
