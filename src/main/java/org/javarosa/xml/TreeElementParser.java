@@ -79,18 +79,22 @@ public class TreeElementParser extends ElementParser<TreeElement> {
         List<TreeElement> internalInstances = new ArrayList<>();
         final int depth = parser.getDepth();
         if (depth > 0) {
+            boolean primaryInstanceSkipped = false;
             while (parser.getDepth() >= depth) {
                 nextNonWhitespace();
 
                 if (currentNodeIsInternalInstance()) {
-                    TreeElement treeElement = new TreeElementParser(parser, 0, "").parse();
-
-                    if (treeElement.getAttributeValue(null, ID_ATTR) != null) {
-                        String instanceId = treeElement.getAttributeValue(null,  ID_ATTR);
+                    // The primary instance is the first instance defined
+                    if (!primaryInstanceSkipped) {
+                        primaryInstanceSkipped = true;
+                    } else {
+                        TreeElement treeElement = new TreeElementParser(parser, 0, "").parse();
+                        String instanceId = treeElement.getAttributeValue(null, ID_ATTR);
                         if (instanceId != null) {
                             treeElement.setInstanceName(instanceId);
-                            internalInstances.add(treeElement);
                         }
+
+                        internalInstances.add(treeElement);
                     }
                 }
             }

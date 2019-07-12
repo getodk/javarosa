@@ -55,4 +55,14 @@ public class TreeElementParserTest {
 
         assertThat(internalSecondaryInstances, is(empty()));
     }
+
+    @Test
+    public void parseInternalSecondaryInstances_DoesNotIncludeThePrimaryInstance_WhenItHasAnId() throws IOException, InvalidStructureException, XmlPullParserException {
+        InputStream inputStream = new FileInputStream(r("primary-instance-with-id.xml").toString());
+        KXmlParser kXmlParser = ElementParser.instantiateParser(inputStream);
+        TreeElementParser treeElementParser = new TreeElementParser(kXmlParser, 0, "");
+        List<TreeElement> internalSecondaryInstances = treeElementParser.parseInternalSecondaryInstances();
+
+        assertThat(internalSecondaryInstances.size(), is(1));
+    }
 }
