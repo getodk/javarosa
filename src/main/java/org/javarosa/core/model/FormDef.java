@@ -1770,7 +1770,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return externalFormInstances;
     }
 
-    public String getFormXmlPath() {
+    private String getFormXmlPath() {
         return formXmlPath;
     }
 
