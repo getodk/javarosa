@@ -3,7 +3,6 @@ package org.javarosa.xml;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParserException;
@@ -32,9 +31,7 @@ public class TreeElementParser extends ElementParser<TreeElement> {
     }
 
     @Override
-    public TreeElement parse() throws InvalidStructureException, IOException,
-        XmlPullParserException, UnfullfilledRequirementsException {
-
+    public TreeElement parse() throws InvalidStructureException, IOException, XmlPullParserException {
         final int depth = parser.getDepth();
         final TreeElement element = new TreeElement(parser.getName(), multiplicity);
         element.setInstanceName(instanceId);
@@ -70,7 +67,6 @@ public class TreeElementParser extends ElementParser<TreeElement> {
     }
 
     /**
-     *
      * Parses the internal instances from an XForm (excluding the main instance)
      * @return List of #TreeElement representation of the internal
      * instance nodes.
@@ -78,19 +74,18 @@ public class TreeElementParser extends ElementParser<TreeElement> {
      * @throws IOException There was an error parsing the xml file
      * @throws InvalidStructureException
      * @throws XmlPullParserException
-     * @throws UnfullfilledRequirementsException
      */
-    public List<TreeElement> parseInternalSecondaryInstances() throws InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException, IOException {
+    public List<TreeElement> parseInternalSecondaryInstances() throws InvalidStructureException, XmlPullParserException, IOException {
         List<TreeElement> internalInstances = new ArrayList<>();
         final int depth = parser.getDepth();
         if (depth > 0) {
             while (parser.getDepth() >= depth) {
                 boolean isInstanceNode = nextNonWhitespace() == Node.ELEMENT && parser.getName().equals(INSTANCE_ELEMENT);
-                if(isInstanceNode){
+                if (isInstanceNode) {
                     TreeElement treeElement = new TreeElementParser(parser, 0, "").parse();
-                    if(treeElement.getAttributeValue(null, ID_ATTR) !=null){
-                        String instanceId = treeElement.getAttributeValue(null,ID_ATTR);
-                        if(instanceId != null){
+                    if (treeElement.getAttributeValue(null, ID_ATTR) != null) {
+                        String instanceId = treeElement.getAttributeValue(null,  ID_ATTR);
+                        if (instanceId != null) {
                             treeElement.setInstanceName(instanceId);
                             internalInstances.add(treeElement);
                         }

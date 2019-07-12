@@ -2,7 +2,6 @@ package org.javarosa.xml;
 
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.junit.Before;
 import org.junit.Test;
 import org.kxml2.io.KXmlParser;
@@ -27,7 +26,7 @@ public class TreeElementParserTest {
     }
 
     @Test
-    public void parseInternalInstances() throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+    public void parseInternalInstances() throws IOException, XmlPullParserException, InvalidStructureException {
 
         InputStream inputStream = new FileInputStream(SECONDARY_INSTANCE_XML.toString());
         KXmlParser kXmlParser = ElementParser.instantiateParser(inputStream);
@@ -36,11 +35,11 @@ public class TreeElementParserTest {
         assertEquals(treeElementList.size(), 1);
         TreeElement townsTreeElement = treeElementList.get(0);
         assertEquals(townsTreeElement.getInstanceName(), "towns");
-        assertEquals(townsTreeElement.getNumChildren(), 1); //Has only one root node - <towndata z="1">
-        assertEquals(townsTreeElement.getChildAt(0).getNumChildren(), 1); //Has only one data - <data_set>
+        assertEquals(townsTreeElement.getNumChildren(), 1); // Has only one root node - <towndata z="1">
+        assertEquals(townsTreeElement.getChildAt(0).getNumChildren(), 1); // Has only one data - <data_set>
         assertEquals(townsTreeElement.getChildAt(0)
-            .getChildAt(0) //<data_set>us_east</data_set>
-            .getValue().getDisplayText(), "us_east"); //Text Node - us_east
+            .getChildAt(0) // <data_set>us_east</data_set>
+            .getValue().getDisplayText(), "us_east"); // Text Node - us_east
 
     }
 
