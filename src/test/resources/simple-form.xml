@@ -11,25 +11,6 @@
                     </meta>
                 </data>
             </instance>
-            <instance id="options1">
-                <root>
-                    <item>
-                        One
-                    </item>
-                    <item>
-                        Two
-                    </item>
-                    <item>
-                        Three
-                    </item>
-                    <item>
-                        Four
-                    </item>
-                    <item>
-                        Five
-                    </item>
-                </root>
-            </instance>
             <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:',uuid())"/>
         </model>
     </h:head>

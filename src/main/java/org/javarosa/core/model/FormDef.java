@@ -149,10 +149,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private String title;
 
     /**
-     * The file path to the formXML file
-     * this is being used for deserialization of the internal instances
-     * during caching
-     * */
+     * The file path to the XML form definition. Used for serialization and deserialization of the internal instances.
+     **/
     private String formXmlPath;
 
     private String name;
@@ -1221,19 +1219,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         submissionProfiles = (HashMap<String, SubmissionProfile>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, SubmissionProfile.class));
 
-        //For Backward compability
-        if(formXmlPath == null){
-            //The entire secondary instances were serialized 
+        // For backwards compatibility
+        if (formXmlPath == null) {
+            // The entire internal secondary instances were serialized
             HashMap<String, DataInstance> formInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, new ExtWrapTagged()), pf);
-            for(Map.Entry<String, DataInstance>  formInstanceEntry :formInstances.entrySet()){
+            for (Map.Entry<String, DataInstance>  formInstanceEntry :formInstances.entrySet()) {
                 addNonMainInstance(formInstanceEntry.getValue());
             }
         } else {
-            //Only external secondary instances were serialized 
             HashMap<String, DataInstance> externalFormInstances = (HashMap<String, DataInstance>) ExtUtil.read(dis, new ExtWrapMap(
                 String.class, new ExtWrapTagged()), pf);
-            //So internal instances can be parsed from the formXML file
+            // Parse internal secondary instances from the formXML file
             HashMap<String, DataInstance> internalFormInstances = InternalDataInstanceParser.buildInstances(getFormXmlPath());
             formInstances.putAll(externalFormInstances);
             formInstances.putAll(internalFormInstances);
@@ -1305,12 +1302,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));
 
         // for support of multi-instance forms
-        if(formXmlPath == null){
-            //Serialize all instances of path of the form isn't known
+        if (formXmlPath == null){
+            // Serialize all instances if path of the form isn't known
             ExtUtil.write(dos, new ExtWrapMap(getFormInstances(), new ExtWrapTagged()));
         } else {
-            //Don't serialize internal instances, if the path of the form is known, 
-            //so that internal secondary instances can be parsed again
+            // Don't serialize internal instances so that they are parsed again
             ExtUtil.write(dos, new ExtWrapMap(getExternalInstances(), new ExtWrapTagged()));
         }
 
@@ -1766,15 +1762,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private HashMap<String, DataInstance> getExternalInstances(){
         HashMap<String, DataInstance> externalFormInstances = new HashMap<>();
-        for(Map.Entry<String, DataInstance> formInstanceEntry: formInstances.entrySet()){
-            if(formInstanceEntry instanceof ExternalDataInstance){
+        for (Map.Entry<String, DataInstance> formInstanceEntry: formInstances.entrySet()){
+            if (formInstanceEntry instanceof ExternalDataInstance) {
                 externalFormInstances.put(formInstanceEntry.getKey(), formInstanceEntry.getValue());
             }
         }
         return externalFormInstances;
     }
 
-    public String getFormXmlPath() {
+    private String getFormXmlPath() {
         return formXmlPath;
     }
 

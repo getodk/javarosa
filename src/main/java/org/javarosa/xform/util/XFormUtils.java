@@ -16,15 +16,6 @@
 
 package org.javarosa.xform.util;
 
-import java.io.DataInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -35,6 +26,15 @@ import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Static Utility methods pertaining to XForms.
@@ -121,7 +121,7 @@ public class XFormUtils {
             isr = new FileReader(formXmlSrc);
             XFormParser xFormParser = _factory.getXFormParser(isr);
             return xFormParser.parse(formXmlSrc, lastSavedSrc);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new XFormParseException("IO Exception during parse! " + e.getMessage());
         } finally {
             try {

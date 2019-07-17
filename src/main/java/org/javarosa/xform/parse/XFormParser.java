@@ -71,7 +71,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -361,10 +360,6 @@ public class XFormParser implements IXFormParserFunctions {
         _instDoc = instance;
     }
 
-    public FormDef parse(File formXmlSrc) throws IOException {
-        return parse(formXmlSrc.getPath(), null);
-    }
-
     public FormDef parse(String lastSavedSrc) throws IOException {
         return parse(null, lastSavedSrc);
     }
@@ -374,12 +369,8 @@ public class XFormParser implements IXFormParserFunctions {
         return parse(null, null);
     }
 
-
     /**
-     * @see #parse(File formXmlSrc)
-     * @see #parse(String lastSavedSrc)
-     * @see #parse()
-     *
+     * @param formXmlSrc The path of the form definition.
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
