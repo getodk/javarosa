@@ -17,8 +17,8 @@
 package org.javarosa.core.model.actions;
 
 import org.hamcrest.Matcher;
-import org.javarosa.core.model.actions.setlocation.SetLocationAction;
-import org.javarosa.core.model.actions.setlocation.StubSetLocationAction;
+import org.javarosa.core.model.actions.setgeopoint.SetGeopointAction;
+import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointAction;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -39,25 +39,25 @@ import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
-public class SetLocationActionTest {
+public class SetGeopointActionTest {
     private static final Matcher<StringData> EXPECTED_STUB_ANSWER =
         stringAnswer("no client implementation");
 
     @Test(expected = XFormParseException.class)
     public void when_namespaceIsNotOdk_exceptionIsThrown() throws IOException {
-        Scenario.init(r("setlocation-action-bad-namespace.xml"));
+        Scenario.init(r("setgeopoint-action-bad-namespace.xml"));
     }
 
     @Test
     public void when_instanceIsLoaded_locationIsSetAtTarget() throws IOException {
-        Scenario scenario = Scenario.init(r("setlocation-action-instance-load.xml"));
+        Scenario scenario = Scenario.init(r("setgeopoint-action-instance-load.xml"));
 
         assertThat(scenario.answerOf("/data/location"), is(EXPECTED_STUB_ANSWER));
     }
 
     @Test
     public void when_triggerNodeIsUpdated_locationIsSetAtTarget() throws IOException {
-        Scenario scenario = Scenario.init(r("setlocation-action-value-changed.xml"));
+        Scenario scenario = Scenario.init(r("setgeopoint-action-value-changed.xml"));
 
         // The test form has no default value at /data/location, and
         // no other event sets any value on it
@@ -71,19 +71,19 @@ public class SetLocationActionTest {
 
     @Test
     public void testSerializationAndDeserialization() throws IOException, DeserializationException {
-        StubSetLocationAction originalAction = new StubSetLocationAction(absoluteRef("/data/text"));
+        StubSetGeopointAction originalAction = new StubSetGeopointAction(absoluteRef("/data/text"));
 
         Path ser = Files.createTempFile("serialized-object", null);
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(ser))) {
             originalAction.writeExternal(dos);
         }
 
-        SetLocationAction deserializedAction = new StubSetLocationAction(null);
+        SetGeopointAction deserializedAction = new StubSetGeopointAction(null);
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(ser))) {
             deserializedAction.readExternal(dis, defaultPrototypes());
         }
 
-        // SetLocationAction only serializes the targetReference (and name, from its superclass) members
+        // SetGeopointAction only serializes the targetReference (and name, from its superclass) members
         assertThat(deserializedAction.getName(), is(originalAction.getName()));
 
         assertThat(deserializedAction.getTargetReference(), equalTo(originalAction.getTargetReference()));

@@ -29,8 +29,8 @@ import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.actions.setlocation.SetLocationActionHandler;
-import org.javarosa.core.model.actions.setlocation.StubSetLocationActionHandler;
+import org.javarosa.core.model.actions.setgeopoint.SetGeopointActionHandler;
+import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointActionHandler;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -316,9 +316,9 @@ public class XFormParser implements IXFormParserFunctions {
         actionHandlers = new HashMap<>();
         registerActionHandler(SetValueAction.ELEMENT_NAME, SetValueAction.getHandler());
 
-        // Register a stub odk:setlocation action handler. Clients that want to actually collect location need to
+        // Register a stub odk:setgeopoint action handler. Clients that want to actually collect location need to
         // register their own subclass handler which will replace this one.
-        registerActionHandler(SetLocationActionHandler.ELEMENT_NAME, new StubSetLocationActionHandler());
+        registerActionHandler(SetGeopointActionHandler.ELEMENT_NAME, new StubSetGeopointActionHandler());
     }
 
     private void initState() {
