@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.model.actions.setlocation;
+package org.javarosa.core.model.actions.setgeopoint;
 
 /**
  * Registering this stub allows for clients that only read forms such as ODK Validate to recognize the action. However,
  * acquiring location requires a platform-specific implementation so clients that enable form filling must provide a
  * subclass implementation that actually provides location information.
  */
-public final class StubSetLocationActionHandler extends SetLocationActionHandler {
+public final class StubSetGeopointActionHandler extends SetGeopointActionHandler {
     @Override
-    public SetLocationAction getSetLocationAction() {
+    public SetGeopointAction getSetGeopointAction() {
         // We'd like to use the default constructor but then the name wouldn't be set because the default constructor
         // has to have an empty body for serialization. Instead, set a null reference and let handle set the target.
-        return new StubSetLocationAction(null);
+        return new StubSetGeopointAction(null);
     }
 }

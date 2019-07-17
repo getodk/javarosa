@@ -1717,7 +1717,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     /**
      * Records that the form definition includes an action of the given name. Clients may need to configure resources
-     * accordingly or communicate something to the user (e.g. in the case of setlocation).
+     * accordingly or communicate something to the user (e.g. in the case of setgeopoint).
      */
     public void registerAction(String actionName) {
         actions.add(actionName);
