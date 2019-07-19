@@ -281,6 +281,19 @@ public class XPathEvalTest extends TestCase {
         testEval("ends-with('abc', 'c')",   true);
         testEval("ends-with('', '')",       true);
 
+        logTestCategory("other string functions");
+        testEval("normalize-space('')", "");
+        testEval("normalize-space('  ')", "");
+        testEval("normalize-space(' \t\n ')", "");
+        testEval("normalize-space(' a')", "a");
+        testEval("normalize-space(' a   ')", "a");
+        testEval("normalize-space(' ab ')", "ab");
+        testEval("normalize-space(' a    b ')", "a b");
+        testEval("normalize-space(' a\nb\n')", "a b");
+        testEval("normalize-space('\na\nb\n')", "a b");
+        testEval("normalize-space('\nab')", "ab");
+        testEval("normalize-space(' \ta\n\t  b \n\t c   \n')", "a b c");
+
         logTestCategory("date functions");
         testEval("date('2000-01-01')", DateUtils.getDate(2000, 1, 1));
         testEval("date('1945-04-26')", DateUtils.getDate(1945, 4, 26));
