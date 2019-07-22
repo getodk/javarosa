@@ -24,6 +24,7 @@ public class TreeReferenceLevel implements Externalizable, Serializable {
     private String name;
     private int multiplicity = MULT_UNINIT;
     private List<XPathExpression> predicates;
+    private boolean isRepeatable;
 
     /** A cache for reference levels, to avoid keeping a bunch of the same levels floating around at run-time. */
     private static CacheTable<TreeReferenceLevel> refs;
@@ -36,14 +37,15 @@ public class TreeReferenceLevel implements Externalizable, Serializable {
         // for externalization
     }
 
-    public TreeReferenceLevel(String name, int multiplicity, List<XPathExpression> predicates) {
+    public TreeReferenceLevel(String name, int multiplicity, List<XPathExpression> predicates, boolean isRepeatable) {
         this.name = name;
         this.multiplicity = multiplicity;
         this.predicates = predicates;
+        this.isRepeatable = isRepeatable;
     }
 
     public TreeReferenceLevel(String name, int multiplicity) {
-        this(name, multiplicity, null);
+        this(name, multiplicity, null, false);
     }
 
 
@@ -56,11 +58,11 @@ public class TreeReferenceLevel implements Externalizable, Serializable {
     }
 
     public TreeReferenceLevel setMultiplicity(int mult) {
-        return new TreeReferenceLevel(name, mult, predicates).intern();
+        return new TreeReferenceLevel(name, mult, predicates, isRepeatable).intern();
     }
 
     public TreeReferenceLevel setPredicates(List<XPathExpression> xpe) {
-        return new TreeReferenceLevel(name, multiplicity, xpe).intern();
+        return new TreeReferenceLevel(name, multiplicity, xpe, isRepeatable).intern();
     }
 
     public List<XPathExpression> getPredicates() {
@@ -68,11 +70,11 @@ public class TreeReferenceLevel implements Externalizable, Serializable {
     }
 
     public TreeReferenceLevel shallowCopy() {
-        return new TreeReferenceLevel(name, multiplicity, ArrayUtilities.listCopy(predicates)).intern();
+        return new TreeReferenceLevel(name, multiplicity, ArrayUtilities.listCopy(predicates), isRepeatable).intern();
     }
 
     public TreeReferenceLevel setName(String name) {
-        return new TreeReferenceLevel(name, multiplicity, predicates).intern();
+        return new TreeReferenceLevel(name, multiplicity, predicates, isRepeatable).intern();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
@@ -131,5 +133,16 @@ public class TreeReferenceLevel implements Externalizable, Serializable {
         } else{
             return refs.intern(this);
         }
+    }
+
+    void markAsRepeatable() {
+        isRepeatable = true;
+    }
+
+    /**
+     * @return true if the current level represents a repeatable group, otherwise false
+     */
+    boolean isRepeatable() {
+        return isRepeatable;
     }
 }

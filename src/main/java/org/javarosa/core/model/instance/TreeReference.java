@@ -512,8 +512,10 @@ public class TreeReference implements Externalizable, Serializable {
                     case INDEX_TEMPLATE: sb.append("[@template]"); break;
                     case INDEX_REPEAT_JUNCTURE: sb.append("[@juncture]"); break;
                     default:
-                        if ((i > 0 || mult != 0) && mult !=-4) {
-                            sb.append("[").append(mult + (zeroIndexMult ? 0 : 1)).append("]");
+                        if (data.get(i).isRepeatable()) {
+                            if ((i > 0 || mult != 0) && mult !=-4) {
+                                sb.append("[").append(mult + (zeroIndexMult ? 0 : 1)).append("]");
+                            }
                         }
                         break;
                 }
@@ -671,5 +673,9 @@ public class TreeReference implements Externalizable, Serializable {
             predicateless.data.set(i, predicateless.data.get(i).setPredicates(null));
         }
         return predicateless;
+    }
+
+    public void markAsRepeatable(int i) {
+        data.get(i).markAsRepeatable();
     }
 }
