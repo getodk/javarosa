@@ -28,7 +28,14 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 
-public class ItemsetBindingTest {
+/**
+ * When itemsets are dynamically generated, the choices available to a user in a select one question can change based on
+ * the answers given to other questions. These tests verify that when several select ones are chained in a cascading
+ * pattern, updating selections at root levels correctly updates the choices available in dependent selects all the way
+ * down the cascade. They also verify that if an answer that is no longer part of the available choices was previously
+ * selected, that answer is cleared.
+ */
+public class SelectOneChoiceFilterTest {
     private Scenario scenario;
 
     @Before

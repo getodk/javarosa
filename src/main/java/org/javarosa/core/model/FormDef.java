@@ -1031,15 +1031,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             throw new XPathException("Could not find references depended on by" + itemset.nodesetRef.getInstanceName());
         }
 
-        // Get the answer to the current question so that it can be compared with the new choice list. If the answer
-        // to the question is no longer in the choice list, it will be cleared.
-        String currentQuestionAnswer = null;
+        // Get the answer to the current question to remove selection(s) that are no longer in the choice list.
+        Map<String, Boolean> currentAnswersInNewChoices = null;
         IAnswerData rawValue = getMainInstance().resolveReference(curQRef).getValue();
         if (rawValue != null) {
-            currentQuestionAnswer = rawValue.getDisplayText();
+            currentAnswersInNewChoices = new HashMap<>();
+
+            if (rawValue instanceof MultipleItemsData) {
+                for (Selection selection : (List<Selection>) rawValue.getValue()) {
+                    currentAnswersInNewChoices.put(selection.choice != null ? selection.choice.getValue() : selection.xmlValue, false);
+                }
+            } else {
+                currentAnswersInNewChoices.put(rawValue.getDisplayText(), false);
+            }
         }
 
-        boolean currentAnswerIsInNewChoices = false;
         for (int i = 0; i < matches.size(); i++) {
             TreeReference item = matches.get(i);
 
@@ -1058,8 +1064,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             // Provide a default value if none is specified
             value = value != null ? value : "dynamic:" + i;
 
-            if (value.equals(currentQuestionAnswer)) {
-                currentAnswerIsInNewChoices = true;
+            if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.keySet().contains(value)) {
+                currentAnswersInNewChoices.put(value, true);
             }
 
             SelectChoice choice = new SelectChoice(label, value, itemset.labelIsItext);
@@ -1078,13 +1084,37 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         }
 
-        // Clear the answer if it is no longer in the choice list.
-        if (!currentAnswerIsInNewChoices) {
-            getMainInstance().resolveReference(curQRef).setAnswer(new StringData(""));
+        // Remove values that are no longer in choices.
+        if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.containsValue(false)) {
+            IAnswerData filteredAnswer;
+            if (rawValue instanceof MultipleItemsData) {
+                filteredAnswer = getFilteredSelections((MultipleItemsData) rawValue, currentAnswersInNewChoices);
+            } else {
+                filteredAnswer = new StringData("");
+            }
+
+            getMainInstance().resolveReference(curQRef).setAnswer(filteredAnswer);
         }
 
         itemset.clearChoices();
         itemset.setChoices(choices, getMainInstance(), exprEvalContext, this.getLocalizer());
+    }
+
+    /**
+     * @param selections an answer to a multiple selection question
+     * @param shouldKeepSelection maps each value that could be in @{code selections} to a boolean representing whether
+     *                            or not it should be kept
+     * @return a copy of {@code selections} without the values that were mapped to false in {@code shouldKeepSelection}
+     */
+    private MultipleItemsData getFilteredSelections(MultipleItemsData selections, Map<String, Boolean> shouldKeepSelection) {
+        List<Selection> newSelections = new ArrayList<>();
+        for (Selection oldSelection : (List<Selection>) selections.getValue()) {
+            if (shouldKeepSelection.get(oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue)) {
+                newSelections.add(oldSelection);
+            }
+        }
+
+        return new MultipleItemsData(newSelections);
     }
 
     public QuestionPreloader getPreloader() {

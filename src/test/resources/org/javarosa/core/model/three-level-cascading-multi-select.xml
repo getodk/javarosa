@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>Three level cascading multi select</h:title>
+        <model>
+            <instance>
+                <data id="three-level-cascading-multi-select">
+                    <level1/>
+                    <level2/>
+                    <level3/>
+                    <level1_contains/>
+                    <level2_contains/>
+                    <level3_contains/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <instance id="level1">
+                <root>
+                    <item>
+                        <label>A</label>
+                        <name>a</name>
+                    </item>
+                    <item>
+                        <label>B</label>
+                        <name>b</name>
+                    </item>
+                    <item>
+                        <label>C</label>
+                        <name>c</name>
+                    </item>
+                </root>
+            </instance>
+            <instance id="level2">
+                <root>
+                    <item>
+                        <label>AA</label>
+                        <level1>a</level1>
+                        <name>aa</name>
+                    </item>
+                    <item>
+                        <label>AB</label>
+                        <level1>a</level1>
+                        <name>ab</name>
+                    </item>
+                    <item>
+                        <label>AC</label>
+                        <level1>a</level1>
+                        <name>ac</name>
+                    </item>
+                    <item>
+                        <label>BA</label>
+                        <level1>b</level1>
+                        <name>ba</name>
+                    </item>
+                    <item>
+                        <label>BB</label>
+                        <level1>b</level1>
+                        <name>bb</name>
+                    </item>
+                    <item>
+                        <label>BC</label>
+                        <level1>b</level1>
+                        <name>bc</name>
+                    </item>
+                    <item>
+                        <label>CA</label>
+                        <level1>c</level1>
+                        <name>ca</name>
+                    </item>
+                    <item>
+                        <label>CB</label>
+                        <level1>c</level1>
+                        <name>cb</name>
+                    </item>
+                    <item>
+                        <label>CC</label>
+                        <level1>c</level1>
+                        <name>cc</name>
+                    </item>
+                    <item>
+                        <label>CD</label>
+                        <level1>c</level1>
+                        <name>cd</name>
+                    </item>
+                </root>
+            </instance>
+            <instance id="level3">
+                <root>
+                    <item>
+                        <label>AAA</label>
+                        <name>aaa</name>
+                        <level2>aa</level2>
+                    </item>
+                    <item>
+                        <label>AAB</label>
+                        <name>aab</name>
+                        <level2>aa</level2>
+                    </item>
+                    <item>
+                        <label>BAA</label>
+                        <name>baa</name>
+                        <level2>ba</level2>
+                    </item>
+                    <item>
+                        <label>BAB</label>
+                        <name>bab</name>
+                        <level2>ba</level2>
+                    </item>
+                </root>
+            </instance>
+            <bind nodeset="/data/level1" type="select"/>
+            <bind nodeset="/data/level2" type="select"/>
+            <bind nodeset="/data/level3" type="select"/>
+            <bind nodeset="/data/level1_contains" type="select"/>
+            <bind nodeset="/data/level2_contains" type="select"/>
+            <bind nodeset="/data/level3_contains" type="select"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <select ref="/data/level1">
+            <label>Level1</label>
+            <item>
+                <label>A</label>
+                <value>a</value>
+            </item>
+            <item>
+                <label>B</label>
+                <value>b</value>
+            </item>
+            <item>
+                <label>C</label>
+                <value>c</value>
+            </item>
+        </select>
+        <select ref="/data/level2">
+            <label>Level2</label>
+            <itemset nodeset="instance('level2')/root/item[selected(/data/level1, level1)]">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select>
+        <select ref="/data/level3">
+            <label>Level3</label>
+            <itemset nodeset="instance('level3')/root/item[selected(/data/level2, level2)]">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select>
+        <select ref="/data/level1_contains">
+            <label>Level1 contains</label>
+            <item>
+                <label>A</label>
+                <value>a</value>
+            </item>
+            <item>
+                <label>B</label>
+                <value>b</value>
+            </item>
+            <item>
+                <label>C</label>
+                <value>c</value>
+            </item>
+        </select>
+        <select ref="/data/level2_contains">
+            <label>Level2 contains</label>
+            <itemset nodeset="instance('level2')/root/item[contains(name,  /data/level1_contains )]">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select>
+        <select ref="/data/level3_contains">
+            <label>Level3 contains</label>
+            <itemset nodeset="instance('level3')/root/item[contains(name,  /data/level2_contains )]">
+                <value ref="name"/>
+                <label ref="label"/>
+            </itemset>
+        </select>
+    </h:body>
+</h:html>
