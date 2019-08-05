@@ -108,6 +108,16 @@
                         <name>bab</name>
                         <level2>ba</level2>
                     </item>
+                    <item>
+                        <label>CAA</label>
+                        <name>caa</name>
+                        <level2>ca</level2>
+                    </item>
+                    <item>
+                        <label>CAB</label>
+                        <name>cab</name>
+                        <level2>ca</level2>
+                    </item>
                 </root>
             </instance>
             <bind nodeset="/data/level1" type="select"/>

@@ -137,10 +137,15 @@ public class Scenario {
         formDef.setValue(new StringData(value), element.getRef(), true);
     }
 
-    public void answer(String xPath, List<Selection> selections) {
+    /**
+     * Sets the value of the element located at the given xPath in the main instance to a multiple select selection
+     * created from the given values.
+     */
+    public void answer(String xPath, String... selectionValues) {
         createMissingRepeats(xPath);
         TreeElement element = Objects.requireNonNull(resolve(xPath));
 
+        List<Selection> selections = Arrays.stream(selectionValues).map(Selection::new).collect(Collectors.toList());
         formDef.setValue(new MultipleItemsData(selections), element.getRef(), true);
     }
 

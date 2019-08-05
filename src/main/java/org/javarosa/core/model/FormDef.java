@@ -1106,10 +1106,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      *                            or not it should be kept
      * @return a copy of {@code selections} without the values that were mapped to false in {@code shouldKeepSelection}
      */
-    private MultipleItemsData getFilteredSelections(MultipleItemsData selections, Map<String, Boolean> shouldKeepSelection) {
+    private static MultipleItemsData getFilteredSelections(MultipleItemsData selections, Map<String, Boolean> shouldKeepSelection) {
         List<Selection> newSelections = new ArrayList<>();
         for (Selection oldSelection : (List<Selection>) selections.getValue()) {
-            if (shouldKeepSelection.get(oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue)) {
+            String key = oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue;
+            if (shouldKeepSelection.get(key)) {
                 newSelections.add(oldSelection);
             }
         }
