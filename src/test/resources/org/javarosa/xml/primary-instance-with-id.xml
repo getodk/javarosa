@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- from https://opendatakit.github.io/xforms-spec/#primary-instance: "The primary instance is the first instance
+defined by the form." In particular, there is no guarantee about whether or not the primary instance has an id. -->
+
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>My Survey</h:title>
+        <model>
+            <instance id="primary-instance">
+                <data id="mysurvey">
+                    <firstname>John</firstname>
+                    <lastname/>
+                    <age>10</age>
+                    <data_set_used/>
+                </data>
+            </instance>
+
+            <instance id="towns">
+                <towndata z="1">
+                    <data_set>us_east</data_set>
+                </towndata>
+            </instance>
+
+            <bind nodeset="/data/firstname" type="string" required="true()"  readonly="true()"  relevant="true()" />
+            <bind nodeset="/data/lastname"  type="string" required="false()" readonly="false()" relevant="false()" />
+            <bind nodeset="/data/age"       type="int"    required="abc"     readonly="abc"     relevant="abc" />
+
+            <bind nodeset="/data/data_set_used" calculate="instance('towns')/towndata/data_set"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/data/firstname">
+            <label>What is your first name?</label>
+        </input>
+        <input ref="/data/lastname">
+            <label>What is your last name?</label>
+        </input>
+        <input ref="/data/age">
+            <label>What is your age?</label>
+        </input>
+    </h:body>
+</h:html>

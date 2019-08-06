@@ -16,14 +16,6 @@
 
 package org.javarosa.xform.util;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -34,6 +26,15 @@ import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Static Utility methods pertaining to XForms.
@@ -108,6 +109,31 @@ public class XFormUtils {
         }
     }
 
+    /**
+     *
+     * @param formXmlSrc The path to the XForm that is to be parsed
+     * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
+     *                     no data will be loaded and the instance will be blank.
+     */
+    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws XFormParseException {
+        InputStreamReader isr = null;
+        try {
+            isr = new FileReader(formXmlSrc);
+            XFormParser xFormParser = _factory.getXFormParser(isr);
+            return xFormParser.parse(formXmlSrc, lastSavedSrc);
+        } catch (IOException e) {
+            throw new XFormParseException("IO Exception during parse! " + e.getMessage());
+        } finally {
+            try {
+                if (isr != null) {
+                    isr.close();
+                }
+            } catch (IOException e) {
+                logger.error("IO Exception while closing stream.", e);
+            }
+        }
+    }
+
     public static FormDef getFormFromSerializedResource(String resource) {
         FormDef returnForm = null;
         InputStream is = System.class.getResourceAsStream(resource);
@@ -155,7 +181,7 @@ public class XFormUtils {
     }
 
     public static List<String> getUnusedAttributes(Element e,List<String> usedAtts){
-      List<String> unusedAtts = getAttributeList(e);
+        List<String> unusedAtts = getAttributeList(e);
         for(int i=0;i<usedAtts.size();i++){
             if(unusedAtts.contains(usedAtts.get(i))){
                 unusedAtts.remove(usedAtts.get(i));
@@ -169,7 +195,7 @@ public class XFormUtils {
         String warning = "Warning: ";
         List<String> unusedAttributes = getUnusedAttributes(e, usedAtts);
         warning += unusedAttributes.size() + " Unrecognized attributes found in Element [" + e.getName() +
-                "] and will be ignored: ";
+        "] and will be ignored: ";
         warning += "[";
         for (int i=0; i < unusedAttributes.size(); i++) {
             warning += unusedAttributes.get(i);

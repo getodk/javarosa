@@ -50,7 +50,7 @@ public class CoreModelModule implements IModule {
             "org.javarosa.core.model.data.UncastData",
             "org.javarosa.core.model.data.helper.BasicDataPointer",
             "org.javarosa.core.model.actions.SetValueAction",
-            "org.javarosa.core.model.actions.setlocation.StubSetLocationAction"
+            "org.javarosa.core.model.actions.setgeopoint.StubSetGeopointAction"
     };
 
     @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.model.actions.setlocation;
+package org.javarosa.core.model.actions.setgeopoint;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
@@ -27,26 +27,26 @@ import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
 
-public abstract class SetLocationActionHandler implements IElementHandler {
-    public static final String ELEMENT_NAME = "setlocation";
+public abstract class SetGeopointActionHandler implements IElementHandler {
+    public static final String ELEMENT_NAME = "setgeopoint";
 
     @Override
     public final void handle(XFormParser p, Element e, Object parent) {
         if (!e.getNamespace().equals(XFormParser.NAMESPACE_ODK)) {
-            throw new XFormParseException("setlocation action must be in http://www.opendatakit.org/xforms namespace");
+            throw new XFormParseException("setgeopoint action must be in http://www.opendatakit.org/xforms namespace");
         }
 
         String ref = e.getAttributeValue(null, "ref");
 
         if (ref == null) {
-            throw new XFormParseException("odk:setlocation action must specify a ref");
+            throw new XFormParseException("odk:setgeopoint action must specify a ref");
         }
 
         IDataReference dataRef = FormDef.getAbsRef(new XPathReference(ref), TreeReference.rootRef());
         TreeReference target = FormInstance.unpackReference(dataRef);
         p.registerActionTarget(target);
 
-        SetLocationAction action = getSetLocationAction();
+        SetGeopointAction action = getSetGeopointAction();
         action.setTargetReference(target);
 
         String event = e.getAttributeValue(null, "event");
@@ -55,7 +55,7 @@ public abstract class SetLocationActionHandler implements IElementHandler {
     }
 
     /**
-     * Returns an implementation for the odk:setlocation action.
+     * Returns an implementation for the odk:setgeopoint action.
      */
-    public abstract SetLocationAction getSetLocationAction();
+    public abstract SetGeopointAction getSetGeopointAction();
 }

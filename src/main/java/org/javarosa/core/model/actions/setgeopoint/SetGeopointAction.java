@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.model.actions.setlocation;
+package org.javarosa.core.model.actions.setgeopoint;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.actions.Action;
@@ -34,24 +34,24 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * Abstract implementation of odk:setlocation action. Concrete implementations must:
+ * Abstract implementation of odk:setgeopoint action. Concrete implementations must:
  * - provide a way to request location updates when the action is triggered
  * - use {@link #saveLocationValue(String)} to write a location to the model
  * - provide a no-argument constructor with no body for serialization
  * - get registered by the {@link org.javarosa.core.services.PrototypeManager}
  */
-public abstract class SetLocationAction extends Action {
+public abstract class SetGeopointAction extends Action {
     private TreeReference targetReference;
     private TreeReference contextualizedTargetReference;
 
     private FormDef formDef;
 
-    public SetLocationAction() {
+    public SetGeopointAction() {
         // empty body for serialization
     }
 
-    public SetLocationAction(TreeReference targetReference) {
-        super(SetLocationActionHandler.ELEMENT_NAME);
+    public SetGeopointAction(TreeReference targetReference) {
+        super(SetGeopointActionHandler.ELEMENT_NAME);
         setTargetReference(targetReference);
     }
 

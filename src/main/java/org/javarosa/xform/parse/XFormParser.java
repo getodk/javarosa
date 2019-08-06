@@ -29,8 +29,8 @@ import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
-import org.javarosa.core.model.actions.setlocation.SetLocationActionHandler;
-import org.javarosa.core.model.actions.setlocation.StubSetLocationActionHandler;
+import org.javarosa.core.model.actions.setgeopoint.SetGeopointActionHandler;
+import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointActionHandler;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -315,9 +315,9 @@ public class XFormParser implements IXFormParserFunctions {
         actionHandlers = new HashMap<>();
         registerActionHandler(SetValueAction.ELEMENT_NAME, SetValueAction.getHandler());
 
-        // Register a stub odk:setlocation action handler. Clients that want to actually collect location need to
+        // Register a stub odk:setgeopoint action handler. Clients that want to actually collect location need to
         // register their own subclass handler which will replace this one.
-        registerActionHandler(SetLocationActionHandler.ELEMENT_NAME, new StubSetLocationActionHandler());
+        registerActionHandler(SetGeopointActionHandler.ELEMENT_NAME, new StubSetGeopointActionHandler());
     }
 
     private void initState() {
@@ -360,17 +360,21 @@ public class XFormParser implements IXFormParserFunctions {
         _instDoc = instance;
     }
 
+    public FormDef parse(String lastSavedSrc) throws IOException {
+        return parse(null, lastSavedSrc);
+    }
+
+
     public FormDef parse() throws IOException {
-        return parse(null);
+        return parse(null, null);
     }
 
     /**
-     * @see #parse()
-     *
+     * @param formXmlSrc The path of the form definition.
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public FormDef parse(String lastSavedSrc) throws IOException {
+    public FormDef parse(String formXmlSrc, String lastSavedSrc) throws IOException {
         if (_f == null) {
             logger.info("Parsing form...");
 
@@ -378,7 +382,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _xmldoc = getXMLDocument(_reader, stringCache);
             }
 
-            parseDoc(buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
+            parseDoc(formXmlSrc, buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
@@ -461,9 +465,10 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
+    private void parseDoc(String formXmlSrc, Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
+        _f.setFormXmlPath(formXmlSrc);
 
         initState();
         final String defaultNamespace = _xmldoc.getRootElement().getNamespaceUri(null);
@@ -718,7 +723,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (!(parent instanceof IFormElement)) {
             // parent must either be a FormDef or QuestionDef, both of which are IFormElements
             throw new XFormParseException("An action element occurred in an invalid location. " +
-                    "Must be either a child of a control element, or a child of the <model>");
+            "Must be either a child of a control element, or a child of the <model>");
         }
         
         _f.registerAction(e.getName());
