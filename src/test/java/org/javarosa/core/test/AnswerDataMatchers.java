@@ -44,4 +44,23 @@ public class AnswerDataMatchers {
             }
         };
     }
+
+    public static <T extends IAnswerData> Matcher<T> answerText(String expectedAnswerText) {
+        return new TypeSafeMatcher<T>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("answer " + expectedAnswerText);
+            }
+
+            @Override
+            protected void describeMismatchSafely(T item, Description mismatchDescription) {
+                mismatchDescription.appendText("was answer " + item.getDisplayText() + "(").appendValue(item.getValue()).appendText(")");
+            }
+
+            @Override
+            protected boolean matchesSafely(T item) {
+                return item.getDisplayText().matches(expectedAnswerText);
+            }
+        };
+    }
 }
