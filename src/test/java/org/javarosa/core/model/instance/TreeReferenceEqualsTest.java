@@ -30,13 +30,15 @@ public class TreeReferenceEqualsTest {
         return Arrays.asList(new Object[][]{
             // region Equality across same or different instances
 
-            // Prior to JR 1.15, the instance was not taken into account when comparing two TreeReferences. That meant
-            // two references representing the same path in two different instances would be considered the same reference.
             {"same path in primary instance are equal", "/foo/bar", "/foo/bar", true},
             {"same path in secondary instance are equal", "instance('foo')/bar/baz", "instance('foo')/bar/baz", true},
-            {"same path in primary and secondary instance are not equal", "/foo/bar", "instance('foo')/foo/bar", false},
-            {"same path in secondary and primary instance are not equal", "instance('foo')/foo/bar", "/foo/bar", false},
-            {"same path in different secondary instances are not equal", "instance('foo')/foo/bar", "instance('bar')/foo/bar", false},
+
+            // Prior to JR 1.15, attempted to take the instance into account when comparing two TreeReferences but
+            // this had unintended consequences. See https://github.com/opendatakit/javarosa/issues/475
+            // {"same path in primary and secondary instance are not equal", "/foo/bar", "instance('foo')/foo/bar", false},
+            // {"same path in secondary and primary instance are not equal", "instance('foo')/foo/bar", "/foo/bar", false},
+            // {"same path in different secondary instances are not equal", "instance('foo')/foo/bar", "instance('bar')/foo/bar", false},
+
             {"different paths in primary instance are not equal", "/foo/bar", "/foo/bar/quux", false},
             {"different paths in secondary instance are not equal", "instance('foo')/foo/bar", "instance('foo')/foo/bar/quux", false}
             //endregion

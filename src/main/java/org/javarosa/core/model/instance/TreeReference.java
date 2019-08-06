@@ -17,7 +17,6 @@
 package org.javarosa.core.model.instance;
 
 import org.javarosa.core.util.DataUtil;
-import org.javarosa.core.util.Objects;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -403,10 +402,6 @@ public class TreeReference implements Externalizable, Serializable {
             return true;
         } else if (o instanceof TreeReference) {
             TreeReference ref = (TreeReference)o;
-
-            if (!Objects.equals(getInstanceName(), ref.getInstanceName())) {
-                return false;
-            }
 
             if (this.refLevel == ref.refLevel && this.size() == ref.size()) {
                 for (int i = 0; i < this.size(); i++) {
