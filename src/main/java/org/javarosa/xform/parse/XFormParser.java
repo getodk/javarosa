@@ -31,6 +31,7 @@ import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.actions.setgeopoint.SetGeopointActionHandler;
 import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointActionHandler;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -58,8 +59,10 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathStep;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
@@ -1381,7 +1384,7 @@ public class XFormParser implements IXFormParserFunctions {
          * At this point in time, we cannot construct a valid nodesetRef
          *
          * Leave all ...Ref entries as null and test the ...Expr entries for null / non-null values.
-         *
+         *seedStr
          * We will patch this all up in the verifyItemsetBindings() method.
          */
         String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
@@ -1399,7 +1402,21 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
+
+        List<XPathPathExpr> xPathPathExprs = null;
+        for(int i = 0; i < path.steps.length; i++){
+            XPathStep xPathStep = path.steps[i];
+            if (xPathStep.predicates.length > 0){
+                if(xPathStep.predicates[0] instanceof XPathEqExpr){
+                    XPathEqExpr xPathEqExpr = (XPathEqExpr) xPathStep.predicates[0];
+                    XPathPathExpr compareKey = ((XPathPathExpr) xPathEqExpr.a);
+                    String filtExpr = (String) compareKey.filtExpr.eval(new EvaluationContext(_f.getNonMainInstance("")));
+                }
+            }
+        }
+
         itemset.nodesetExpr = new XPathConditional(path);
+
         itemset.contextRef = getFormElementRef(q);
         // this is not valid yet...
         itemset.nodesetRef = null;
