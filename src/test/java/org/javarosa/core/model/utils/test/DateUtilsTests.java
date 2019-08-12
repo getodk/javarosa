@@ -129,56 +129,64 @@ public class DateUtilsTests {
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        testTime("10:00", 1000 * 60 * 60 * 10 - getOffset());
-        testTime("10:00Z", 1000 * 60 * 60 * 10);
+        Calendar midnight = Calendar.getInstance();
+        midnight.set(Calendar.HOUR_OF_DAY, 0);
+        midnight.set(Calendar.MINUTE, 0);
+        midnight.set(Calendar.SECOND, 0);
+        midnight.set(Calendar.MILLISECOND, 0);
 
-        testTime("10:00+02", 1000 * 60 * 60 * 8);
-        testTime("10:00-02", 1000 * 60 * 60 * 12);
+        long midnightDate = midnight.getTime().getTime();
 
-        testTime("10:00+02:30", 1000 * 60 * (60 * 10 - 150));
-        testTime("10:00-02:30", 1000 * 60 * (60 * 10 + 150));
+        testTime("10:00", midnightDate + 1000 * 60 * 60 * 10 - getOffset());
+        testTime("10:00Z", midnightDate + 1000 * 60 * 60 * 10);
+
+        testTime("10:00+02", midnightDate + 1000 * 60 * 60 * 8);
+        testTime("10:00-02", midnightDate + 1000 * 60 * 60 * 12);
+
+        testTime("10:00+02:30", midnightDate + 1000 * 60 * (60 * 10 - 150));
+        testTime("10:00-02:30", midnightDate + 1000 * 60 * (60 * 10 + 150));
 
         TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
 
         TimeZone.setDefault(offsetTwoHours);
 
-        testTime("10:00", 1000 * 60 * 60 * 10 - getOffset());
-        testTime("10:00Z", 1000 * 60 * 60 * 10);
+        testTime("10:00", midnightDate + 1000 * 60 * 60 * 10 - getOffset());
+        testTime("10:00Z", midnightDate + 1000 * 60 * 60 * 10);
 
-        testTime("10:00+02", 1000 * 60 * 60 * 8);
-        testTime("10:00-02", 1000 * 60 * 60 * 12);
+        testTime("10:00+02", midnightDate + 1000 * 60 * 60 * 8);
+        testTime("10:00-02", midnightDate + 1000 * 60 * 60 * 12);
 
-        testTime("10:00+02:30", 1000 * 60 * (60 * 10 - 150));
-        testTime("10:00-02:30", 1000 * 60 * (60 * 10 + 150));
+        testTime("10:00+02:30", midnightDate + 1000 * 60 * (60 * 10 - 150));
+        testTime("10:00-02:30", midnightDate + 1000 * 60 * (60 * 10 + 150));
 
         TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-02");
 
         TimeZone.setDefault(offsetMinusTwoHours);
 
-        testTime("14:00", 1000 * 60 * 60 * 14 - getOffset());
-        testTime("14:00Z", 1000 * 60 * 60 * 14);
+        testTime("14:00", midnightDate + 1000 * 60 * 60 * 14 - getOffset());
+        testTime("14:00Z", midnightDate + 1000 * 60 * 60 * 14);
 
-        testTime("14:00+02", 1000 * 60 * 60 * 12);
-        testTime("14:00-02", 1000 * 60 * 60 * 16);
+        testTime("14:00+02", midnightDate + 1000 * 60 * 60 * 12);
+        testTime("14:00-02", midnightDate + 1000 * 60 * 60 * 16);
 
-        testTime("14:00+02:30", 1000 * 60 * (60 * 14 - 150));
-        testTime("14:00-02:30", 1000 * 60 * (60 * 14 + 150));
+        testTime("14:00+02:30", midnightDate + 1000 * 60 * (60 * 14 - 150));
+        testTime("14:00-02:30", midnightDate + 1000 * 60 * (60 * 14 + 150));
 
 
         TimeZone offsetPlusHalf = TimeZone.getTimeZone("GMT+0230");
 
         TimeZone.setDefault(offsetPlusHalf);
 
-        testTime("14:00", 1000 * 60 * 60 * 14 - getOffset());
-        testTime("14:00Z", 1000 * 60 * 60 * 14);
+        testTime("14:00", midnightDate + 1000 * 60 * 60 * 14 - getOffset());
+        testTime("14:00Z", midnightDate + 1000 * 60 * 60 * 14);
 
-        testTime("14:00+02", 1000 * 60 * 60 * 12);
-        testTime("14:00-02", 1000 * 60 * 60 * 16);
+        testTime("14:00+02", midnightDate + 1000 * 60 * 60 * 12);
+        testTime("14:00-02", midnightDate + 1000 * 60 * 60 * 16);
 
-        testTime("14:00+02:30", 1000 * 60 * (60 * 14 - 150));
-        testTime("14:00-02:30", 1000 * 60 * (60 * 14 + 150));
+        testTime("14:00+02:30", midnightDate + 1000 * 60 * (60 * 14 - 150));
+        testTime("14:00-02:30", midnightDate + 1000 * 60 * (60 * 14 + 150));
 
-        testTime("14:00+04:00", 1000 * 60 * 60 * 10);
+        testTime("14:00+04:00", midnightDate + 1000 * 60 * 60 * 10);
     }
 
     private void testTime(String in, long test) {
