@@ -31,6 +31,7 @@ import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.actions.setlocation.SetLocationActionHandler;
 import org.javarosa.core.model.actions.setlocation.StubSetLocationActionHandler;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -58,8 +59,10 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathStep;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
@@ -1356,6 +1359,15 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
+
+    public Map<String, List<TreeElement>> createPathIndex(XPathPathExpr xPathPathExpr){
+        DataInstance evaluationInstance = _f.getNonMainInstance("");
+        EvaluationContext ec = new EvaluationContext(evaluationInstance);
+        Object eval =  xPathPathExpr.eval(ec);
+        return new HashMap<>();
+    }
+
+
     private void parseItemset(QuestionDef q, Element e, IFormElement qparent) {
         ItemsetBinding itemset = new ItemsetBinding();
 
@@ -1394,6 +1406,20 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
+
+        List<XPathPathExpr> xPathPathExprs = null;
+        for(int i = 0; i < path.steps.length; i++){
+            XPathStep xPathStep = path.steps[i];
+            if(xPathStep.predicates.length > 0){
+                if(xPathStep.predicates[0] instanceof XPathPathExpr){
+                    XPathEqExpr xPathEqExpr = (XPathEqExpr) xPathStep.predicates[0];
+                    XPathPathExpr leftEqualizer = (XPathPathExpr) xPathEqExpr.a;
+                    Map<String, List<TreeElement>> pathDictionary = createPathIndex(leftEqualizer);
+                    itemset.populateChoicesDictionary(pathDictionary);
+                }
+            }
+        }
+
         itemset.nodesetExpr = new XPathConditional(path);
         itemset.contextRef = getFormElementRef(q);
         // this is not valid yet...
