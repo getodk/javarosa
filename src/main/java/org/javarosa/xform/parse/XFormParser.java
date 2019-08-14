@@ -1364,6 +1364,15 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
+
+    public Map<String, List<TreeElement>> createPathIndex(TreeReference list, TreeReference index){
+       TreeElement treeElement = (TreeElement) _f.getNonMainInstance(list.getInstanceName()).resolveReference(list);
+        Map<String,  List<TreeElement>> map = new HashMap<>();
+        map.put("", treeElement.getChildrenWithName("item"));
+        return map;
+    }
+
+
     private void parseItemset(QuestionDef q, Element e, IFormElement qparent) {
         ItemsetBinding itemset = new ItemsetBinding();
 
@@ -1403,17 +1412,6 @@ public class XFormParser implements IXFormParserFunctions {
 
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
 
-        List<XPathPathExpr> xPathPathExprs = null;
-        for(int i = 0; i < path.steps.length; i++){
-            XPathStep xPathStep = path.steps[i];
-            if (xPathStep.predicates.length > 0){
-                if(xPathStep.predicates[0] instanceof XPathEqExpr){
-                    XPathEqExpr xPathEqExpr = (XPathEqExpr) xPathStep.predicates[0];
-                    XPathPathExpr compareKey = ((XPathPathExpr) xPathEqExpr.a);
-                    String filtExpr = (String) compareKey.filtExpr.eval(new EvaluationContext(_f.getNonMainInstance("")));
-                }
-            }
-        }
 
         itemset.nodesetExpr = new XPathConditional(path);
 
@@ -1486,6 +1484,30 @@ public class XFormParser implements IXFormParserFunctions {
                 // itemset.valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valuePath), itemset.nodesetRef));
                 itemset.valueExpr = new XPathConditional(valuePath);
             }
+        }
+
+
+        List<XPathPathExpr> xPathPathExprs = null;
+        String pathType = "";
+        TreeReference queryRef = null;
+        XPathPathExpr xPathPathExpr = null;
+        for(int i = 0; i < path.steps.length; i++){
+            XPathStep xPathStep = path.steps[i];
+            if(xPathStep.predicates.length > 0){
+                if(xPathStep.predicates[0] instanceof XPathPathExpr){
+                    XPathEqExpr xPathEqExpr = (XPathEqExpr) xPathStep.predicates[0];
+                    XPathPathExpr leftEqualizer = (XPathPathExpr) xPathEqExpr.a;
+                    queryRef = leftEqualizer.getReference();
+                }
+            }
+        }
+
+        if (pathType == "HAS_PREDICATE") {
+            Map<String, List<TreeElement>> pathDictionary = createPathIndex(queryRef.getParentRef(), queryRef);
+            itemset.populateChoicesDictionary(pathDictionary, itemset.labelRef, itemset.valueRef,  queryRef);
+        } else {
+            Map<String, List<TreeElement>> pathDictionary = createPathIndex(path.getReference(), null);
+            itemset.populateChoicesDictionary(pathDictionary, itemset.labelRef, itemset.valueRef,  null);
         }
 
         if (itemset.labelExpr == null) {

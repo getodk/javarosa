@@ -25,6 +25,7 @@ import java.util.List;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
@@ -88,8 +89,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     // TODO see what’s required here from commented-out code removed 2017-04-23
 
     private static final int MASK_REQUIRED = 0x01;
-    private static final int MASK_REPEATABLE = 0x02;
-    private static final int MASK_ATTRIBUTE = 0x04;
+    private static final int MASK_REPEATABLE = 0x02;private static final int MASK_ATTRIBUTE = 0x04;
     private static final int MASK_RELEVANT = 0x08;
     private static final int MASK_ENABLED = 0x10;
     private static final int MASK_RELEVANT_INH = 0x20;

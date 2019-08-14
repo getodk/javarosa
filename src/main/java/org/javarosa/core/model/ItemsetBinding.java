@@ -7,11 +7,14 @@ import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
@@ -61,6 +64,26 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public boolean randomize = false;
     public XPathNumericLiteral randomSeedNumericExpr = null;
     public XPathPathExpr randomSeedPathExpr = null;
+
+    private static Map<String, List<SelectChoice>> choiceDictionary;
+
+    public static void  populateChoicesDictionary(Map<String, List<TreeElement>> choiceElementDictionary, TreeReference labelKey, TreeReference valueKey, TreeReference indexKey){
+        for(Map.Entry<String, List<TreeElement>> set : choiceElementDictionary.entrySet()){
+            List<SelectChoice> choices = choiceDictionary.get(set.getKey());
+            if(choices == null){ choices = new ArrayList<>(); choiceDictionary.put(set.getKey(), choices); }
+            for(TreeElement treeElement : set.getValue()){
+                String label = treeElement.getChild(labelKey.getNameLast(), 0).getChildAt(0).toString();
+                String value = treeElement.getChild(valueKey.getNameLast(), 0).getChildAt(0).toString();
+                String index = treeElement.getChild(indexKey.getNameLast(), 0).getChildAt(0).toString();
+                SelectChoice selectChoice = new SelectChoice(label, label, value, false);
+                choices.add(selectChoice);
+            }
+        }
+    }
+
+    public List<SelectChoice> getChoicesFromMap (String key) {
+        return choiceDictionary.get(key);
+    }
 
     public List<SelectChoice> getChoices () {
         return choices;
