@@ -3,7 +3,10 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -21,6 +24,9 @@ public class SelectChoice implements Externalizable, Localizable {
     private boolean isLocalizable;
     private String value;
     private int index = -1;
+
+
+    public Map<String, IAnswerData> map = new HashMap();
 
     public TreeElement copyNode; //if this choice represents part of an <itemset>, and the itemset uses 'copy'
                                  //answer mode, this points to the node to be copied if this selection is chosen
