@@ -27,8 +27,11 @@ public class StaticFormAnswerQ3Benchmark {
             formEntryController = BenchmarkUtils.getFormEntryController(BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance());
             formEntryController.stepToNextEvent();
             formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
         }
     }
 

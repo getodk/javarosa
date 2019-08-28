@@ -76,7 +76,7 @@ javadoc {
 }
 
 jmh {
-    include = "(StaticForm)"
+    include = "(StaticFormAnswer)"
     exclude = "(BenchmarkTemplate)"
     threads = 1
     fork = 1

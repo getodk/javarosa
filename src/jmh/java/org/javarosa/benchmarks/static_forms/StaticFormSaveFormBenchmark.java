@@ -29,9 +29,13 @@ public class StaticFormSaveFormBenchmark {
             formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
             formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
         }
     }

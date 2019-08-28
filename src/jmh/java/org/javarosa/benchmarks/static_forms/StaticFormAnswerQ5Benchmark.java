@@ -27,10 +27,15 @@ public class StaticFormAnswerQ5Benchmark {
             formEntryController = BenchmarkUtils.getFormEntryController(BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance());
             formEntryController.stepToNextEvent();
             formEntryController.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
             BenchmarkUtils.answerNextQuestion(formEntryController, false);
+            formEntryController.stepToNextEvent();
         }
     }
 

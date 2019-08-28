@@ -218,7 +218,6 @@ public class BenchmarkUtils {
     }
 
     public static boolean answerNextQuestion(FormEntryController formEntryController, boolean save){
-        formEntryController.stepToNextEvent();
         FormIndex questionIndex = formEntryController.getModel().getFormIndex();
         FormEntryPrompt formEntryPrompt = formEntryController.getModel().getQuestionPrompt(questionIndex);
         QuestionDef question = formEntryPrompt.getQuestion();
