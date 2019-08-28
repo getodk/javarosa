@@ -87,7 +87,7 @@ jmh {
     warmupForks = 1
     iterations = 1
     timeOnIteration = '2s'
-    timeUnit = 's'
+    timeUnit = 'ms'
     benchmarkMode = ['avgt','ss']
     includeTests = true
     resultFormat = 'CSV'
