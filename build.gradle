@@ -82,13 +82,13 @@ jmh {
     fork = 1
     timeout = '10s'
     warmup = '2s'
-    warmupIterations = 1
+    warmupIterations = 3
     warmupBatchSize = 1
     warmupForks = 1
-    iterations = 1
+    iterations = 6
     timeOnIteration = '2s'
     timeUnit = 'ms'
-    benchmarkMode = ['avgt','ss']
+    benchmarkMode = ['avgt']
     includeTests = true
     resultFormat = 'CSV'
     forceGC = true

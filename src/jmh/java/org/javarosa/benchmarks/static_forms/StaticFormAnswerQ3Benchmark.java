@@ -37,13 +37,11 @@ public class StaticFormAnswerQ3Benchmark {
 
     @Benchmark
     public void benchmarkAnswerQ1(FormControllerAnswerQuestionState state) {
-        state.formEntryController.stepToNextEvent();
         BenchmarkUtils.answerNextQuestion(state.formEntryController, false);
     }
 
     @Benchmark
     public void benchmarkAnswerSaveQ1(FormControllerAnswerQuestionState state) {
-        state.formEntryController.stepToNextEvent();
         BenchmarkUtils.answerNextQuestion(state.formEntryController, true);
     }
 
