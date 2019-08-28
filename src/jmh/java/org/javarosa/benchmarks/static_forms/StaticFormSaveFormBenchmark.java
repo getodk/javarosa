@@ -8,6 +8,7 @@ import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.infra.Blackhole;
 
 import java.io.IOException;
 
@@ -41,13 +42,13 @@ public class StaticFormSaveFormBenchmark {
     }
 
     @Benchmark
-    public void benchmarkAnswerQ1(FormControllerAnswerQuestionState state) {
-        BenchmarkUtils.answerNextQuestion(state.formEntryController, false);
+    public void benchmarkAnswerQ1(FormControllerAnswerQuestionState state, Blackhole bh) {
+        bh.consume(state.formEntryController.getModel().getForm().validate(true));
     }
 
     @Benchmark
-    public void benchmarkAnswerSaveQ1(FormControllerAnswerQuestionState state) {
-        BenchmarkUtils.answerNextQuestion(state.formEntryController, true);
+    public void benchmarkAnswerSaveQ1(FormControllerAnswerQuestionState state, Blackhole bh) {
+        bh.consume(state.formEntryController.getModel().getForm().validate(true));
     }
 
 }
