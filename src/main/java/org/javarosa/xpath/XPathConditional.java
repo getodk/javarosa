@@ -19,6 +19,7 @@ package org.javarosa.xpath;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
@@ -27,16 +28,20 @@ import org.javarosa.core.log.FatalException;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xpath.expr.XPathBinaryOpExpr;
+import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathStep;
 import org.javarosa.xpath.expr.XPathUnaryOpExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
@@ -68,16 +73,44 @@ public class XPathConditional implements IConditionExpr {
 
     public Object evalRaw (DataInstance model, EvaluationContext evalContext) {
         try{
-            return XPathFuncExpr.unpack(expr.eval(model, evalContext));
+            TreeReference treeReference = preEvaluateEqExprInContext(model, evalContext);
+            if(treeReference != null && TreeElementParser.indexed(treeReference)) {
+                IAnswerData answerData = treeReference == null ? null : TreeElementParser.getRVFromIndex(treeReference);
+                if (treeReference != null && answerData != null) {
+                    return answerData.getDisplayText();
+                }
+                return "";
+            }
+            else {
+                return XPathFuncExpr.unpack(expr.eval(model, evalContext));
+            }
         } catch(XPathUnsupportedException e){
             if(xpath != null){
                 throw new XPathUnsupportedException(xpath);
             }else{
                 throw e;
             }
-
-
         }
+    }
+
+    public TreeReference preEvaluateEqExprInContext(DataInstance model, EvaluationContext evalContext){
+        TreeReference treeReference = null;
+        if(expr instanceof XPathPathExpr){
+            XPathPathExpr xPathPathExpr =(XPathPathExpr) expr;
+            treeReference = xPathPathExpr.getReference();
+            for(int i = 0; i < xPathPathExpr.steps.length; i++){
+                XPathStep xPathStep = xPathPathExpr.steps[i];
+                if(xPathStep.predicates.length > 0){
+                    XPathExpression[] predicatePathExprs = xPathStep.predicates;
+                    if(predicatePathExprs.length == 1 && predicatePathExprs[0] instanceof XPathEqExpr){
+                        XPathEqExpr xpathEqExpr = (XPathEqExpr) predicatePathExprs[0];
+                        XPathEqExpr xpathEqExpr2 = xpathEqExpr.transformBValue(model, evalContext);
+                        treeReference.addPredicate(i, Arrays.asList(xpathEqExpr2));
+                    }
+                }
+            }
+        }
+        return treeReference;
     }
 
     public boolean eval (DataInstance model, EvaluationContext evalContext) {
@@ -90,7 +123,13 @@ public class XPathConditional implements IConditionExpr {
 
     public List<TreeReference> evalNodeset (DataInstance model, EvaluationContext evalContext) {
         if (expr instanceof XPathPathExpr) {
-            return ((XPathPathExpr)expr).eval(model, evalContext).getReferences();
+            TreeReference treeReference = preEvaluateEqExprInContext(model, evalContext);
+            List<TreeReference> resFromIndex = TreeElementParser.getNodeset(treeReference);
+            if(treeReference != null && resFromIndex != null){
+                return resFromIndex;
+            }else {
+                return ((XPathPathExpr)expr).eval(model, evalContext).getReferences();
+            }
         } else {
             throw new FatalException("evalNodeset: must be path expression");
         }

@@ -1,8 +1,9 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -16,10 +17,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.stream.Stream;
+
+import org.javarosa.core.model.CoreModelModule;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.JavaRosaCoreModule;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.xform.parse.FormParserHelper;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -27,6 +41,7 @@ import org.openjdk.jmh.infra.Blackhole;
 
 public class BenchmarkUtils {
     private static Path CACHE_PATH;
+    private static Path WORKING_DIR;
     public static Path prepareAssets(String... filenames) {
         try {
             Path assetsDir = Files.createTempDirectory("javarosa_benchmarks_");
@@ -126,7 +141,7 @@ public class BenchmarkUtils {
             case "Comments":
                 return new StringData("No Comment");
             case "What population do you want to search for?":
-                return new LongData(699967);
+                return new StringData("699967");
             default:
                 return new StringData("");
         }
@@ -146,30 +161,85 @@ public class BenchmarkUtils {
 
     public static Path getNigeriaWardsXMLWithExternal2ndryInstance(){
         Path assetsPath = prepareAssets("nigeria_wards_external_2ndry_instance.xml", "lgas.xml", "wards.xml");
-        setUpSimpleReferenceManager(assetsPath, "file");
+        setUpSimpleReferenceManager(assetsPath,"file");
         Path filePath = assetsPath.resolve("nigeria_wards_external_2ndry_instance.xml");
         return filePath;
     }
 
     public static Path getWardsExternalInstance(){
         Path assetsPath = prepareAssets( "wards.xml");
-        setUpSimpleReferenceManager(assetsPath, "file");
+        setUpSimpleReferenceManager( assetsPath,"file");
         Path filePath = assetsPath.resolve("wards.xml");
         return filePath;
     }
 
     public static Path getLGAsExternalInstance(){
         Path assetsPath = prepareAssets( "lgas.xml");
-        setUpSimpleReferenceManager(assetsPath, "file");
+        setUpSimpleReferenceManager( assetsPath,"file");
         Path filePath = assetsPath.resolve("lgas.xml");
         return filePath;
     }
 
+    public static void registerCacheProtoTypes() {
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+        new XFormsModule().registerModule();
+    }
+
     public static Path getCachePath() throws IOException {
         if(CACHE_PATH == null){
-            CACHE_PATH = Files.createTempDirectory("javarosa_benchmarks_cache");
+            File cacheDir = new File(getWorkingDir() + File.separator + "_cache");
+            cacheDir.mkdir();
+            CACHE_PATH = cacheDir.toPath();
         }
         return CACHE_PATH;
+    }
+
+    public static Path getWorkingDir() throws IOException {
+        if(WORKING_DIR == null){
+            String tempDir = System.getProperty("java.io.tmpdir");
+            File file = new File(tempDir + File.separator + "javarosa_benchmarks");
+            if(!file.exists()){
+                file.mkdir();
+            }
+            WORKING_DIR = file.toPath();
+        }
+        return WORKING_DIR;
+    }
+
+    public static FormEntryController getFormEntryController(Path formFile) throws IOException {
+        FormEntryController formEntryController;
+        FormEntryModel formEntryModel;
+        FormDef formDef = FormParserHelper.parse(formFile);
+        formDef.initialize(true, new InstanceInitializationFactory());
+        formEntryModel = new FormEntryModel(formDef);
+        formEntryController = new FormEntryController(formEntryModel);
+        return formEntryController;
+    }
+
+    public static boolean answerNextQuestion(FormEntryController formEntryController, boolean save){
+        FormIndex questionIndex = formEntryController.getModel().getFormIndex();
+        FormEntryPrompt formEntryPrompt = formEntryController.getModel().getQuestionPrompt(questionIndex);
+        QuestionDef question = formEntryPrompt.getQuestion();
+        IAnswerData answer = getStubAnswer(question);
+
+        //Load Dynamic Questions
+        ItemsetBinding itemsetBinding = question.getDynamicChoices();
+        if (itemsetBinding != null)
+            formEntryController.getModel().getForm().populateDynamicChoices(
+                itemsetBinding,
+                (TreeReference) question.getBind().getReference()
+            );
+
+        if(save){
+            return formEntryController.answerQuestion(questionIndex, answer, true) == FormEntryController.ANSWER_OK
+                &&
+                formEntryController.saveAnswer(questionIndex, answer, true);
+        }
+        else{
+            return formEntryController.answerQuestion(questionIndex, answer, true) == FormEntryController.ANSWER_OK;
+        }
+
     }
 
 }

@@ -58,6 +58,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.eval.Indexer;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -1070,6 +1071,7 @@ public class XFormParser implements IXFormParserFunctions {
                 parseItem(question, child);
             } else if (isItem && "itemset".equals(childName)) {
                 parseItemset(question, child, parent);
+                Indexer.keepIndex(question.getDynamicChoices().nodesetExpr);
             } else if (actionHandlers.containsKey(childName)) {
                 actionHandlers.get(childName).handle(this, child, question);
             }
@@ -1888,6 +1890,9 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         addBinding(binding);
+        if(binding.calculate != null){
+            Indexer.keepIndex(binding.calculate.getExpr());
+        }
     }
 
     private void addBinding(DataBinding binding) {
