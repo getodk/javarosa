@@ -56,7 +56,7 @@ jar {
     // Be sure to update version in pom.xml to match
     // snapshot release = x.x.x-SNAPSHOT
     // production release = x.x.x
-    version = '2.15.1'
+    version = '2.15.0'
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
@@ -76,18 +76,19 @@ javadoc {
 }
 
 jmh {
+    include = "(StaticForm)"
     exclude = "(BenchmarkTemplate)"
     threads = 1
     fork = 1
     timeout = '10s'
     warmup = '2s'
-    warmupIterations = 10
+    warmupIterations = 3
     warmupBatchSize = 1
     warmupForks = 1
-    iterations = 20
+    iterations = 6
     timeOnIteration = '2s'
-    timeUnit = 's'
-    benchmarkMode = ['avgt','ss']
+    timeUnit = 'ms'
+    benchmarkMode = ['avgt']
     includeTests = true
     resultFormat = 'CSV'
     forceGC = true
