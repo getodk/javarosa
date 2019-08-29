@@ -203,9 +203,6 @@ public class Indexer {
         if(instanceName != null && !instanceName.equals(expressionRef.getInstanceName())){
             return  false;
         }
-        if(expressionRef.size() != currentTreeReference.size()){
-            return false;
-        }
         String treeRefString = currentTreeReference.toString(false);
         if (indexerType.equals(IndexerType.GENERIC_PATH) ||
             indexerType.equals(IndexerType
