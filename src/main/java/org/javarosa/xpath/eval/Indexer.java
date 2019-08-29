@@ -37,7 +37,9 @@ import java.util.Map;
 public class Indexer {
 
     public TreeReference expressionRef; //The genericised expression to be indexed - used as the key
+    public String expressionString;
     public TreeReference resultRef;  //The genericised pattern of the result to be cached
+    public String resultString;
     public PredicateStep[] predicateSteps; //The predicates applied to the expression
     public IndexerType indexerType; // Used to determine how expression would be indexed
     public Map<TreeReference, List<TreeReference>> nodesetExprDict; // Map  used if result is a list of collated nodeset refs
@@ -53,7 +55,9 @@ public class Indexer {
 
     public Indexer(IndexerType indexType, TreeReference expressionRef, TreeReference resultRef, PredicateStep[] predicateSteps) {
         this.expressionRef = expressionRef.removePredicates().genericize();
+        this.expressionString = expressionRef.toString();
         this.resultRef = resultRef.removePredicates().genericize();
+        this.resultString = resultRef.toString();
         this.indexerType = indexType;
         this.predicateSteps = predicateSteps == null ? new PredicateStep[0] : predicateSteps;
         nodesetExprDict = new HashMap<>();
@@ -199,16 +203,19 @@ public class Indexer {
         if(instanceName != null && !instanceName.equals(expressionRef.getInstanceName())){
             return  false;
         }
+        if(expressionRef.size() != currentTreeReference.size()){
+            return false;
+        }
         String treeRefString = currentTreeReference.toString(false);
         if (indexerType.equals(IndexerType.GENERIC_PATH) ||
             indexerType.equals(IndexerType
                 .LAST_EQUAL_PREDICATE_PATH)
         ) {
-            return treeRefString.equals(expressionRef.toString(false)) ||
-                treeRefString.equals(resultRef.toString(false));
+            return treeRefString.equals(expressionString) ||
+                treeRefString.equals(resultString);
         }else if (indexerType.equals(IndexerType.SINGLE_MID_EQUAL_PREDICATE_PATH)) {
-            return treeRefString.equals(expressionRef.toString(false)) ||
-                treeRefString.equals(resultRef.toString(false));
+            return treeRefString.equals(expressionString) ||
+                treeRefString.equals(resultString);
         }
         return false;
     }
