@@ -1,5 +1,6 @@
 package org.javarosa.xml;
 
+import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -67,6 +68,12 @@ public class TreeElementParser extends ElementParser<TreeElement> {
                     break;
                 case KXmlParser.END_TAG:
                     currentTreeReference.removeLastLevel();
+                    if(currentTreeReference.size() == 0){
+                        for(Indexer indexer: indexers) {
+                            indexer.clearCaches();
+                            currentTreeReference = null;
+                        }
+                    }
                     return element;
                 case KXmlParser.TEXT:
                     element.setValue(new UncastData(parser.getText().trim()));
@@ -81,10 +88,8 @@ public class TreeElementParser extends ElementParser<TreeElement> {
                         "Exception while trying to parse an XML Tree, got something other than tags and text", parser);
             }
         }
-
         return element;
     }
-
 
     /**
      * Parses the internal instances from an XForm (excluding the main instance)
@@ -130,10 +135,10 @@ public class TreeElementParser extends ElementParser<TreeElement> {
             && parser.getAttributeValue(null,"src") == null;
     }
 
-
     // Added for indexing
-    public static TreeReference currentTreeReference = null;
+    private static TreeReference currentTreeReference = null;
     public static List<Indexer> indexers = new ArrayList<>();
+    public static List<IConditionExpr> indexedExpressions = new ArrayList<>();
 
     public static List<TreeReference> getNodeset(TreeReference treeReference){
         for (Indexer indexer : indexers) {

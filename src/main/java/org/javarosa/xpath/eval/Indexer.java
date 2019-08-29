@@ -268,18 +268,16 @@ public class Indexer {
         tempKeyKepper.clear();
     }
 
-
     public static void keepIndex(IConditionExpr xPathExpression){
         XPathPathExpr nodesetXPathPathExpr = Indexer.getXPathPathExpr(xPathExpression);
         if(nodesetXPathPathExpr != null){
             Indexer indexer = getIndexer(nodesetXPathPathExpr);
-            if(indexer != null){
+            if(indexer != null && !TreeElementParser.indexedExpressions.contains(xPathExpression)){
                 TreeElementParser
                     .indexers.add(indexer);
+                TreeElementParser.indexedExpressions.add(xPathExpression);
             }
         }
     }
-
-
 
 }
