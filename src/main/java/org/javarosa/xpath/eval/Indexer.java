@@ -136,8 +136,6 @@ public class Indexer {
 
     }
 
-
-
     public void addToIndex(TreeReference currentTreeReference, TreeElement currentTreeElement) {
         if (indexerType == IndexerType.GENERIC_PATH) {
             if (nodesetExprDict.get(expressionRef) == null) {
@@ -145,7 +143,8 @@ public class Indexer {
             }
             List<TreeReference> matches = nodesetExprDict.get(expressionRef);
             //TODO: equate with resultRef here instead of removing last, but this is correct since it's last - see trimToLevel
-            matches.add(currentTreeReference);
+            if(!matches.contains(currentTreeReference.clone()))
+            matches.add(currentTreeReference.clone());
         } else if (indexerType == IndexerType.LAST_EQUAL_PREDICATE_PATH) {
             if (currentTreeReference.genericize().removePredicates().equals(expressionRef)) {
                 //TODO: .genericise also clones

@@ -7,6 +7,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xpath.eval.Indexer;
+import org.javarosa.xpath.eval.IndexerType;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParserException;
@@ -74,11 +75,18 @@ public class TreeElementParser extends ElementParser<TreeElement> {
                             currentTreeReference = null;
                         }
                     }
+                    else if( parser.getDepth() == depth){
+                        for(Indexer indexer: indexers) {
+                            if(indexer.belong(currentTreeReference) && indexer.indexerType.equals(IndexerType.GENERIC_PATH)){
+                                indexer.addToIndex(currentTreeReference, element);
+                            }
+                        }
+                    }
                     return element;
                 case KXmlParser.TEXT:
                     element.setValue(new UncastData(parser.getText().trim()));
                     for(Indexer indexer: indexers) {
-                        if(indexer.belong(currentTreeReference)){
+                        if(indexer.belong(currentTreeReference) && !indexer.indexerType.equals(IndexerType.GENERIC_PATH)){
                             indexer.addToIndex(currentTreeReference, element);
                         }
                     }
