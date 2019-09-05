@@ -45,7 +45,7 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
     public XPathEqExpr(boolean equal, XPathExpression a, XPathExpression b) {
         super(a, b);
         this.equal = equal;
-        logger.debug("XPathEqExpr{}({}, {}, {})", id(), equal, a, b);
+        //logger.debug("XPathEqExpr{}({}, {}, {})", id(), equal, a, b);
     }
 
     @Override

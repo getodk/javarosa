@@ -59,6 +59,7 @@ import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.eval.Indexer;
+import org.javarosa.xpath.eval.IndexerCreator;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -981,6 +982,12 @@ public class XFormParser implements IXFormParserFunctions {
 
     private QuestionDef parseControl(IFormElement parent, Element e, int controlType) {
         return parseControl(parent, e, controlType, null, null);
+    }
+
+    public static IndexerCreator indexerCreatorr = null;
+
+    public static IndexerCreator setIndexCreator(IndexerCreator indexerCreator) {
+        indexerCreatorr = indexerCreator;
     }
 
     private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {

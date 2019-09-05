@@ -8,6 +8,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xpath.eval.Indexer;
 import org.javarosa.xpath.eval.IndexerType;
+import org.javarosa.xpath.eval.PredicateStep;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParserException;
@@ -75,9 +76,9 @@ public class TreeElementParser extends ElementParser<TreeElement> {
                             currentTreeReference = null;
                         }
                     }
-                    else if( parser.getDepth() == depth){
+                    else if ( parser.getDepth() == depth) {
                         for(Indexer indexer: indexers) {
-                            if(indexer.belong(currentTreeReference) && indexer.indexerType.equals(IndexerType.GENERIC_PATH)){
+                            if(indexer.belong(currentTreeReference) && indexer.getIndexerType().equals(IndexerType.GENERIC_PATH)){
                                 indexer.addToIndex(currentTreeReference, element);
                             }
                         }
@@ -86,7 +87,7 @@ public class TreeElementParser extends ElementParser<TreeElement> {
                 case KXmlParser.TEXT:
                     element.setValue(new UncastData(parser.getText().trim()));
                     for(Indexer indexer: indexers) {
-                        if(indexer.belong(currentTreeReference) && !indexer.indexerType.equals(IndexerType.GENERIC_PATH)){
+                        if(indexer.belong(currentTreeReference) && !indexer.getIndexerType().equals(IndexerType.GENERIC_PATH)){
                             indexer.addToIndex(currentTreeReference, element);
                         }
                     }
@@ -115,7 +116,6 @@ public class TreeElementParser extends ElementParser<TreeElement> {
             boolean primaryInstanceSkipped = false;
             while (parser.getDepth() >= depth) {
                 nextNonWhitespace();
-
                 if (currentNodeIsInternalInstance()) {
                     // The primary instance is the first instance defined
                     if (!primaryInstanceSkipped) {
@@ -177,8 +177,9 @@ public class TreeElementParser extends ElementParser<TreeElement> {
     public static boolean indexed(TreeReference treeReference){
         for(Indexer indexer : indexers ){
             if(indexer.belong(treeReference)){
-                if(indexer.predicateSteps.length > 0 &&
-                    treeReference.getPredicate(indexer.predicateSteps[0].stepIndex) != null)
+                PredicateStep[] predicateSteps = indexer.getPredicateSteps();
+                if(predicateSteps.length > 0 &&
+                    treeReference.getPredicate(predicateSteps[0].stepIndex) != null)
                     return true;
             }
         }
