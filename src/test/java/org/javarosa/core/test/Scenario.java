@@ -16,8 +16,30 @@
 
 package org.javarosa.core.test;
 
+import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
+import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
+import static org.javarosa.core.model.instance.utils.TreeElementNameComparator.elementMatchesName;
+import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
+import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -32,27 +54,6 @@ import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
-import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
-import static org.javarosa.core.model.instance.utils.TreeElementNameComparator.elementMatchesName;
-import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
-import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 /**
  * <div style="border: 1px 1px 1px 1px; background-color: #556B2F; color: white; padding: 20px">
@@ -160,9 +161,8 @@ public class Scenario {
     /**
      * Answers the current question.
      */
-    public Scenario answer(String value) {
-        formEntryController.answerQuestion(formEntryController.getModel().getFormIndex(), new StringData(value), true);
-        return this;
+    public AnswerResult answer(String value) {
+        return AnswerResult.from(formEntryController.answerQuestion(formEntryController.getModel().getFormIndex(), new StringData(value), true));
     }
 
     /**
@@ -170,7 +170,19 @@ public class Scenario {
      * </ul>
      */
     public void next() {
-        formEntryController.stepToNextEvent();
+        int i = formEntryController.stepToNextEvent();
+        String jumpResult = decodeJumpResult(i);
+        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        IFormElement child = formDef.getChild(formIndex);
+        String labelInnerText = Optional.ofNullable(child.getLabelInnerText()).map(s -> " " + s).orElse("");
+        String textId = Optional.ofNullable(child.getTextID()).map(s -> " itext:" + s).orElse("");
+        String reference = "";
+        try {
+            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> " ref:" + s).orElse("");
+        } catch (RuntimeException e) {
+            // Do nothing. Probably "method not implemented" in FormDef.getBind()
+        }
+        log.info("Jump to {}{}{}{}", jumpResult, labelInnerText, textId, reference);
     }
 
     /**
@@ -472,5 +484,22 @@ public class Scenario {
                 return "Repeat Juncture";
         }
         return "Unknown";
+    }
+
+    public enum AnswerResult {
+        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
+
+        private final int jrCode;
+
+        AnswerResult(int jrCode) {
+            this.jrCode = jrCode;
+        }
+
+        public static AnswerResult from(int jrCode) {
+            return Stream.of(values())
+                .filter(v -> v.jrCode == jrCode)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        }
     }
 }
