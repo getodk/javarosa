@@ -22,6 +22,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,6 +74,13 @@ public class XPathFuncExpr extends XPathExpression {
         if (id.name.equals("instance") && args[0] instanceof XPathStringLiteral) {
             XFormParser.recordInstanceFunctionCall(((XPathStringLiteral) args[0]).s);
         }
+    }
+
+    public static List<String> getKnownFunctionList() {
+        List<String> functions = new ArrayList<>();
+        for (XFormsFunction function : XFormsFunction.values())
+            functions.add(function.name);
+        return functions;
     }
 
     public String toString() {
@@ -1502,7 +1510,7 @@ public class XPathFuncExpr extends XPathExpression {
 
     }
 
-    enum XFormsFunction {
+    public enum XFormsFunction {
         IF("if"),
         COALESCE("coalesce"),
         INDEXED_REPEAT("indexed-repeat"),

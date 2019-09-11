@@ -16,12 +16,15 @@
 
 package org.javarosa.core.model;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.enumeration;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +79,15 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xml.InternalDataInstanceParser;
+import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
+import org.javarosa.xpath.expr.XPathBinaryOpExpr;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFilterExpr;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathStep;
+import org.javarosa.xpath.expr.XPathUnaryOpExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +105,66 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
     public List<String> getFunctionsWithoutHandlers() {
-        return Collections.emptyList();
+        Set<String> allFunctions = new HashSet<>();
+        for (QuickTriggerable triggerable : dagImpl.triggerablesDAG) {
+            Set<String> localFunctions = getFunctionNamesRecursively(((XPathConditional) triggerable.t.getExpr()).getExpr());
+            allFunctions.addAll(localFunctions);
+        }
+        List<String> knownFunctions = XPathFuncExpr.getKnownFunctionList();
+        List<String> unknownFunctions = new ArrayList<>();
+        for (String function : allFunctions) {
+            if (!knownFunctions.contains(function))
+                unknownFunctions.add(function);
+        }
+        return unknownFunctions;
+    }
+
+    private Set<String> getFunctionNamesRecursively(XPathExpression expression) {
+        if (expression == null)
+            return emptySet();
+
+        if (expression instanceof XPathUnaryOpExpr) {
+            XPathUnaryOpExpr unaryOp = (XPathUnaryOpExpr) expression;
+            return getFunctionNamesRecursively(unaryOp.a);
+        }
+
+        if (expression instanceof XPathBinaryOpExpr) {
+            XPathBinaryOpExpr binaryOp = (XPathBinaryOpExpr) expression;
+            Set<String> localFunctions = new HashSet<>();
+            localFunctions.addAll(getFunctionNamesRecursively(binaryOp.a));
+            localFunctions.addAll(getFunctionNamesRecursively(binaryOp.b));
+            return localFunctions;
+        }
+
+        if (expression instanceof XPathFuncExpr) {
+            XPathFuncExpr function = (XPathFuncExpr) expression;
+            Set<String> localFunctions = new HashSet<>();
+            localFunctions.add(function.id.name);
+            for (XPathExpression subExpression : function.args)
+                localFunctions.addAll(getFunctionNamesRecursively(subExpression));
+            return localFunctions;
+        }
+
+        if (expression instanceof XPathFilterExpr) {
+            XPathFilterExpr filterExpression = (XPathFilterExpr) expression;
+            Set<String> localFunctions = new HashSet<>();
+            localFunctions.addAll(getFunctionNamesRecursively(filterExpression.x));
+            for (XPathExpression subExpression : filterExpression.predicates)
+                localFunctions.addAll(getFunctionNamesRecursively(subExpression));
+            return localFunctions;
+        }
+
+        if (expression instanceof XPathPathExpr) {
+            XPathPathExpr xPathExpression = (XPathPathExpr) expression;
+            Set<String> localFunctions = new HashSet<>();
+            localFunctions.addAll(getFunctionNamesRecursively(xPathExpression.filtExpr));
+            for (XPathStep step : xPathExpression.steps)
+                for (XPathExpression subExpression : step.predicates)
+                    localFunctions.addAll(getFunctionNamesRecursively(subExpression));
+            return localFunctions;
+        }
+
+        return emptySet();
     }
 
     public enum EvalBehavior {
@@ -286,7 +356,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public Enumeration<DataInstance> getNonMainInstances() {
-        return Collections.enumeration(getFormInstances().values());
+        return enumeration(getFormInstances().values());
     }
 
     public void setInstance(FormInstance fi) {
@@ -1736,7 +1806,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     @Override
     public List<TreeElement> getAdditionalAttributes() {
         // Not supported.
-        return Collections.emptyList();
+        return emptyList();
     }
 
     public <X extends XFormExtension> X getExtension(Class<X> extension) {
