@@ -16,20 +16,13 @@
 
 package org.javarosa.core.model.test;
 
-import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
-import static org.javarosa.form.api.FormEntryController.ANSWER_OK;
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.junit.Assert.fail;
+import static org.javarosa.core.test.Scenario.AnswerResult.CONSTRAINT_VIOLATED;
+import static org.javarosa.core.test.Scenario.AnswerResult.OK;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertThat;
 
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.services.PrototypeManager;
-import org.javarosa.core.test.FormParseInit;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.form.api.FormEntryController;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.hamcrest.Matchers;
+import org.javarosa.core.test.Scenario;
 import org.junit.Test;
 
 /**
@@ -37,38 +30,15 @@ import org.junit.Test;
  * constraint unit type tests.
  */
 public class FormDefTest {
-    private FormParseInit fpi;
-
-    @BeforeClass
-    public static void init() {
-        PrototypeManager.registerPrototype("org.javarosa.model.xform.XPathReference");
-        ExtUtil.defaultPrototypes();
-    }
-
-    @Before
-    public void setUp() {
-        fpi = new FormParseInit();
-    }
-
     @Test
-    public void testAnswerConstraint() {
-        IntegerData ans = new IntegerData(13);
-        FormEntryController fec = fpi.getFormEntryController();
-        fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-
-        do {
-            QuestionDef q = fpi.getCurrentQuestion();
-            if (q == null || q.getTextID() == null || q.getTextID().length() == 0)
-                continue;
-            if (q.getTextID().equals("constraint-test")) {
-                int response = fec.answerQuestion(ans, true);
-                if (response == ANSWER_CONSTRAINT_VIOLATED)
-                    fail("Answer Constraint test failed.");
-                else if (response == ANSWER_OK)
-                    break;
-                else
-                    fail("Bad response from fec.answerQuestion()");
-            }
-        } while (fec.stepToNextEvent() != EVENT_END_OF_FORM);
+    public void enforces_constraints_defined_in_a_field() {
+        Scenario scenario = Scenario.init(r("ImageSelectTester.xhtml"));
+        scenario.next();
+        scenario.next();
+        scenario.next();
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.answer("10"), Matchers.is(CONSTRAINT_VIOLATED));
+        assertThat(scenario.answer("13"), Matchers.is(OK));
     }
 }
