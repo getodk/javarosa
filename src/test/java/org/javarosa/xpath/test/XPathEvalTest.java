@@ -43,6 +43,7 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.TimeZone;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
@@ -69,6 +70,7 @@ public class XPathEvalTest {
     public Locale locale;
 
     private Locale backupLocale;
+    private TimeZone backupTimeZone;
     private EvaluationContext ec;
 
     @Parameterized.Parameters(name = "Locale {0}")
@@ -83,6 +85,8 @@ public class XPathEvalTest {
     public void setUp() {
         backupLocale = Locale.getDefault();
         Locale.setDefault(locale);
+        backupTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         ec = new EvaluationContext(null);
     }
 
@@ -90,6 +94,8 @@ public class XPathEvalTest {
     public void tearDown() {
         Locale.setDefault(backupLocale);
         backupLocale = null;
+        TimeZone.setDefault(backupTimeZone);
+        backupTimeZone = null;
     }
 
     @Test
@@ -204,6 +210,22 @@ public class XPathEvalTest {
         testEval("string(date('1989-11-09'))", "1989-11-09");
         testEval("string(convertible())", null, ec, "hi");
         testEval("string(inconvertible())", null, ec, new XPathTypeMismatchException());
+        testEval("int('100')", 100.0);
+        testEval("int('100.001')", 100.0);
+        testEval("int('.1001')", 0.0);
+        testEval("int('1230000000000000000000')", 1.23e21);
+        testEval("int('0.00000000000000000123')", 1.23e-18);
+        testEval("int('0')", 0.0);
+        testEval("int('-0')", -0.0);
+        testEval("int(' -12345.6789  ')", -12345.0);
+        testEval("int('NaN')", NaN);
+        testEval("int('not a number')", NaN);
+        testEval("int('- 17')", NaN);
+        testEval("int('  ')", NaN);
+        testEval("int('')", NaN);
+        testEval("int('Infinity')", NaN);
+        testEval("int('1.1e6')", NaN);
+        testEval("int('34.56.7')", NaN);
     }
 
     @Test
@@ -260,6 +282,7 @@ public class XPathEvalTest {
         testEval("normalize-space('\na\nb\n')", "a b");
         testEval("normalize-space('\nab')", "ab");
         testEval("normalize-space(' \ta\n\t  b \n\t c   \n')", "a b c");
+        testEval("string-length('cocotero')", 8.0);
     }
 
     @Test
@@ -289,6 +312,9 @@ public class XPathEvalTest {
         testEval("date(true())", new XPathTypeMismatchException());
         testEval("date(convertible())", null, ec, new XPathTypeMismatchException());
         testEval("format-date('2018-01-02T10:20:30.123', \"%Y-%m-%e %H:%M:%S\")", "2018-01-2 10:20:30");
+        testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.getDateTimeFromString("2000-01-01T10:20:30.000"));
+        testEval("decimal-date-time('2000-01-01T10:20:30.000')", 10957.430902777778);
+        testEval("decimal-time('2000-01-01T10:20:30.000+03:00')", .30590277777810115);
     }
 
     @Test
@@ -318,6 +344,15 @@ public class XPathEvalTest {
         testEval("selected('apple', 'apple')", TRUE);
         testEval("selected('apple', 'ovoid')", FALSE);
         testEval("selected('', 'apple')", FALSE);
+        testEval("count-selected('apple baby crimson')", 3.0);
+        testEval("count-selected('')", 0.0);
+        testEval("selected-at('apple baby crimson', 2)", "crimson");
+        testEval("selected-at('apple baby', 2)", "");
+        testEval("checklist(1, 3, 'foo', 'bar')", true);
+        testEval("checklist(-1, 1, 'foo', 'bar')", false);
+        testEval("checklist(3, -1, 'foo', 'bar')", false);
+        testEval("checklist(3, 5, 'foo', 'bar')", false);
+        testEval("checklist(1, 2, 'foo', 'bar', 'baz')", false);
     }
 
     @Test
@@ -399,6 +434,22 @@ public class XPathEvalTest {
         testEval("pow(4, 0.5)", 2.0);
         testEval("pow(16, 0.25)", 2.0);
         testEval("cos(0)", 1.0);
+        testEval("cos(" + (Math.PI / 2) + ")", 0.0);
+        testEval("acos(0)", Math.PI / 2);
+        testEval("acos(1)", 0.0);
+        testEval("sin(0)", 0.0);
+        testEval("sin(" + (Math.PI / 2) + ")", 1.0);
+        testEval("asin(0)", 0.0);
+        testEval("asin(1)", Math.PI / 2);
+        testEval("tan(0)", 0.0);
+        testEval("atan(0)", 0.0);
+        testEval("atan2(0, 0)", 0.0);
+        testEval("exp(1)", Math.E);
+        testEval("exp10(2)", 100.0);
+        testEval("log(" + Math.exp(2) + ")", 2.0);
+        testEval("log10(100)", 2.0);
+        testEval("pi()", Math.PI);
+        testEval("sqrt(9)", 3.0);
     }
 
     @Test
