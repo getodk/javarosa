@@ -38,6 +38,7 @@ public class EvaluationContext {
      */
     private TreeReference contextNode;
     private HashMap<String, IFunctionHandler> functionHandlers;
+    private IFallbackFunctionHandler fallbackFunctionHandler;
     private HashMap<String, Object> variables;
 
     public boolean isConstraint; //true if we are evaluating a constraint
@@ -130,8 +131,16 @@ public class EvaluationContext {
         return (original == null) ? contextNode : original;
     }
 
+    public void addFallbackFunctionHandler(IFallbackFunctionHandler handler) {
+        fallbackFunctionHandler = handler;
+    }
+
     public void addFunctionHandler(IFunctionHandler fh) {
         functionHandlers.put(fh.getName(), fh);
+    }
+
+    public IFallbackFunctionHandler getFallbackFunctionHandler() {
+        return fallbackFunctionHandler;
     }
 
     public HashMap<String, IFunctionHandler> getFunctionHandlers() {

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.DataInstance;
@@ -477,11 +478,15 @@ public class XPathFuncExpr extends XPathExpression {
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
-            if (handler != null) {
+            if (handler != null)
                 return evalCustomFunction(handler, argVals, evalContext);
-            } else {
-                throw new XPathUnhandledException("function \'" + name + "\'");
-            }
+
+            // check for fallback handler
+            IFallbackFunctionHandler fallbackHandler = evalContext.getFallbackFunctionHandler();
+            if (fallbackHandler != null)
+                return evalCustomFunction(fallbackHandler, name, argVals, evalContext);
+
+            throw new XPathUnhandledException("function \'" + name + "\'");
         }
     }
 
@@ -520,6 +525,10 @@ public class XPathFuncExpr extends XPathExpression {
         } else {
             throw new XPathTypeMismatchException("for function \'" + handler.getName() + "\'");
         }
+    }
+
+    private static Object evalCustomFunction(IFallbackFunctionHandler handler, String name, Object[] args, EvaluationContext ec) {
+        return handler.eval(name, args, ec);
     }
 
     /**

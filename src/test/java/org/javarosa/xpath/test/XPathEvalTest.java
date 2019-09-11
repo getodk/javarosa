@@ -22,6 +22,7 @@ import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.NaN;
 import static java.lang.Double.POSITIVE_INFINITY;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_ADD;
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_CHECK_TYPES;
@@ -40,8 +41,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -646,6 +649,18 @@ public class XPathEvalTest {
         testEval("write('testing-write')", null, ec, TRUE);
         if (!"testing-write".equals(HANDLER_STATEFUL_WRITE.value))
             fail("Custom function handler did not successfully send data to external source");
+    }
+
+    @Test
+    public void fallback_function_handler() {
+        List<String> unknownFunctions = new ArrayList<>();
+        ec.addFallbackFunctionHandler((name, args, ec) -> {
+            unknownFunctions.add(name);
+            return "";
+        });
+        testEval("foo(bar(33))", null, ec, "");
+        assertThat(unknownFunctions, hasItem("foo"));
+        assertThat(unknownFunctions, hasItem("bar"));
     }
 
     private void testEval(String expr, Object expected) {
