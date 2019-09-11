@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Custom function form</h:title>
+        <model>
+            <instance>
+                <data id="custom-function-form">
+                    <some-field/>
+                    <some-field-trimmed/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <bind nodeset="/data/some-field" type="string"/>
+            <bind nodeset="/data/some-field-trimmed" type="string" calculate="trim(/data/some-field)"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/data/some-field">
+            <label>Some field</label>
+        </input>
+    </h:body>
+</h:html>

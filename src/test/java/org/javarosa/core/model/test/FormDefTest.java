@@ -16,12 +16,15 @@
 
 package org.javarosa.core.model.test;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.javarosa.core.test.Scenario.AnswerResult.CONSTRAINT_VIOLATED;
 import static org.javarosa.core.test.Scenario.AnswerResult.OK;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
 import org.hamcrest.Matchers;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.test.Scenario;
 import org.junit.Test;
 
@@ -40,5 +43,11 @@ public class FormDefTest {
         scenario.next();
         assertThat(scenario.answer("10"), Matchers.is(CONSTRAINT_VIOLATED));
         assertThat(scenario.answer("13"), Matchers.is(OK));
+    }
+
+    @Test
+    public void knows_how_to_return_a_list_of_functions_without_handler() {
+        FormDef formDef = new FormParseInit(r("custom-function-form.xml")).getFormDef();
+        assertThat(formDef.getFunctionsWithoutHandlers(), hasItem("trim"));
     }
 }

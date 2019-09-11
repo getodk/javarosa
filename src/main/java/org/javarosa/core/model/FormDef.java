@@ -94,6 +94,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final String STORAGE_KEY = "FORMDEF";
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
+    public List<String> getFunctionsWithoutHandlers() {
+        return Collections.emptyList();
+    }
+
     public enum EvalBehavior {
         Legacy,
         April_2014,
