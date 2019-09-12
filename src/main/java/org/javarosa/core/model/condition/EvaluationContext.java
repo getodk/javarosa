@@ -66,6 +66,7 @@ public class EvaluationContext {
     private EvaluationContext(EvaluationContext base) {
         //TODO: These should be deep, not shallow
         functionHandlers = base.functionHandlers;
+        fallbackFunctionHandler = base.fallbackFunctionHandler;
         formInstances = base.formInstances;
         variables = base.variables;
 
