@@ -31,6 +31,7 @@ import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.actions.setgeopoint.SetGeopointActionHandler;
 import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointActionHandler;
+import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -58,7 +59,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
-import org.javarosa.xpath.eval.Indexer;
+import org.javarosa.xpath.eval.IndexerResolver;
 import org.javarosa.xpath.eval.IndexerCreator;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -186,12 +187,22 @@ public class XFormParser implements IXFormParserFunctions {
 
     private static IAnswerResolver answerResolver;
 
+    private static IndexerResolver indexerResolver = null;
+
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
 
     public static void setAnswerResolver(IAnswerResolver answerResolver) {
         XFormParser.answerResolver = answerResolver;
+    }
+
+    public static void initIndexerResolver(IndexerCreator indexerCreator){
+        indexerResolver = new IndexerResolver(indexerCreator);
+    }
+
+    public  static IndexerResolver getIndexerResolver(){
+        return indexerResolver;
     }
 
     static {
@@ -465,6 +476,17 @@ public class XFormParser implements IXFormParserFunctions {
         logger.info(ctConsolidate.logLine("Consolidating text"));
 
         return doc;
+    }
+
+    private boolean isExternalInstance(String instanceName){
+        for (int instanceIndex = 1; instanceIndex < instanceNodes.size(); instanceIndex++) {
+            final Element instance = instanceNodes.get(instanceIndex);
+            final String instanceSrc = parseInstanceSrc(instance, null);
+            if(instanceName.equalsIgnoreCase(instanceName) && instanceSrc != null){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void parseDoc(String formXmlSrc, Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
@@ -984,11 +1006,6 @@ public class XFormParser implements IXFormParserFunctions {
         return parseControl(parent, e, controlType, null, null);
     }
 
-    public static IndexerCreator indexerCreatorr = null;
-
-    public static IndexerCreator setIndexCreator(IndexerCreator indexerCreator) {
-        indexerCreatorr = indexerCreator;
-    }
 
     private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
         return parseControl(parent, e, controlType, additionalUsedAtts, null);
@@ -1078,7 +1095,10 @@ public class XFormParser implements IXFormParserFunctions {
                 parseItem(question, child);
             } else if (isItem && "itemset".equals(childName)) {
                 parseItemset(question, child, parent);
-                Indexer.keepIndex(question.getDynamicChoices().nodesetExpr);
+                IConditionExpr iConditionExpr = question.getDynamicChoices().nodesetExpr;
+                if(iConditionExpr != null){
+                    indexExpression(iConditionExpr);
+                }
             } else if (actionHandlers.containsKey(childName)) {
                 actionHandlers.get(childName).handle(this, child, question);
             }
@@ -1100,6 +1120,18 @@ public class XFormParser implements IXFormParserFunctions {
         processAdditionalAttributes(question, e, usedAtts, passedThroughAtts);
 
         return question;
+    }
+
+    private void indexExpression(IConditionExpr iConditionExpr){
+        if(iConditionExpr instanceof XPathConditional){
+            XPathConditional xPathConditional = (XPathConditional) iConditionExpr;
+            if(xPathConditional.getExpr() instanceof  XPathPathExpr){
+                String instanceName = ((XPathPathExpr) xPathConditional.getExpr()).getReference().getInstanceName();
+                if(indexerResolver != null && isExternalInstance(instanceName)){
+                    indexerResolver.indexThisExpression(iConditionExpr);
+                }
+            }
+        }
     }
 
     private QuestionDef questionForControlType(int controlType) {
@@ -1897,8 +1929,11 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         addBinding(binding);
-        if(binding.calculate != null){
-            Indexer.keepIndex(binding.calculate.getExpr());
+
+        //#Indexation
+        //We index this expression
+        if(binding.calculate != null && indexerResolver != null){
+            indexExpression(binding.calculate.getExpr());
         }
     }
 
@@ -1995,7 +2030,6 @@ public class XFormParser implements IXFormParserFunctions {
             multiplicity = multiplicityFromGroup != null ? multiplicityFromGroup :
                 (parent == null ? 0 : parent.getChildMultiplicity(name));
         }
-
 
         String modelType = node.getAttributeValue(NAMESPACE_JAVAROSA, "modeltype");
         //create node; handle children

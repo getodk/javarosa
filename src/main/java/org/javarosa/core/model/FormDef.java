@@ -1016,7 +1016,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
                 new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
-
+        //select label, value where predicate
         DataInstance formInstance;
         if (itemset.nodesetRef.getInstanceName() != null) { // a secondary instance is specified
             formInstance = getNonMainInstance(itemset.nodesetRef.getInstanceName());

@@ -7,6 +7,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xpath.eval.Indexer;
+import org.javarosa.xpath.eval.IndexerResolver;
 import org.javarosa.xpath.eval.IndexerType;
 import org.javarosa.xpath.eval.PredicateStep;
 import org.kxml2.io.KXmlParser;
@@ -38,6 +39,11 @@ public class TreeElementParser extends ElementParser<TreeElement> {
 
     @Override
     public TreeElement parse() throws InvalidStructureException, IOException, XmlPullParserException {
+       return parse(null, null);
+    }
+
+    @Override
+    public TreeElement parse(TreeReference currentTreeReference, IndexerResolver indexerResolver) throws InvalidStructureException, IOException, XmlPullParserException {
         final int depth = parser.getDepth();
         final TreeElement element = new TreeElement(parser.getName(), multiplicity);
         element.setInstanceName(instanceId);
@@ -45,6 +51,8 @@ public class TreeElementParser extends ElementParser<TreeElement> {
             element.setAttribute(parser.getAttributeNamespace(i), parser.getAttributeName(i), parser.getAttributeValue(i));
         }
 
+        //#Indexation: Create a root TreeReference
+        if(indexerResolver != null && indexerResolver.getIndexers().size() > 0)
         if(currentTreeReference == null){
             currentTreeReference = TreeReference.rootRef();
             currentTreeReference.setInstanceName(element.getInstanceName());
@@ -62,31 +70,42 @@ public class TreeElementParser extends ElementParser<TreeElement> {
                     final Integer multiplicity = multiplicitiesByName.get(name);
                     int newMultiplicity = (multiplicity != null) ? multiplicity + 1 : 0;
 
+                    //#Indexation: update current TreeReference
+                    if(indexerResolver != null && indexerResolver.getIndexers().size() > 0)
                     currentTreeReference.add(name, newMultiplicity);
 
                     multiplicitiesByName.put(name, newMultiplicity);
-                    TreeElement childTreeElement = new TreeElementParser(parser, newMultiplicity, instanceId).parse();
+                    TreeElement childTreeElement = new TreeElementParser(parser, newMultiplicity, instanceId).parse(currentTreeReference,  indexerResolver);
                     element.addChild(childTreeElement);
                     break;
                 case KXmlParser.END_TAG:
-                    currentTreeReference.removeLastLevel();
-                    if(currentTreeReference.size() == 0){
-                        for(Indexer indexer: indexers) {
-                            indexer.clearCaches();
-                            currentTreeReference = null;
-                        }
-                    }
-                    else if ( parser.getDepth() == depth) {
-                        for(Indexer indexer: indexers) {
-                            if(indexer.belong(currentTreeReference) && indexer.getIndexerType().equals(IndexerType.GENERIC_PATH)){
-                                indexer.addToIndex(currentTreeReference, element);
+                    //#Indexation
+                    if(indexerResolver != null && indexerResolver.getIndexers().size() > 0) {
+                        //update current TreeReference
+                        currentTreeReference.removeLastLevel();
+                        //if the tree reference is at the end of the document
+                        //Call the finalize to persist the index if necessary
+                        if (currentTreeReference.size() == 0) {
+                            for (Indexer indexer : indexerResolver.getIndexers()) {
+                                indexer.finalizeIndex();
+                                currentTreeReference = null;
+                            }
+                        } else if (parser.getDepth() == depth) { //Index this element if it should be
+                            for (Indexer indexer : indexerResolver.getIndexers()) {
+                                if (indexer.belong(currentTreeReference) && indexer.getIndexerType().equals(IndexerType.GENERIC_PATH)) {
+                                    indexer.addToIndex(currentTreeReference, element);
+                                }
                             }
                         }
                     }
                     return element;
                 case KXmlParser.TEXT:
                     element.setValue(new UncastData(parser.getText().trim()));
-                    for(Indexer indexer: indexers) {
+
+                    //#Indexation
+                    //Only generic paths are refIsIndexed like this
+                    if(indexerResolver != null && indexerResolver.getIndexers().size() > 0)
+                    for(Indexer indexer: indexerResolver.getIndexers()) {
                         if(indexer.belong(currentTreeReference) && !indexer.getIndexerType().equals(IndexerType.GENERIC_PATH)){
                             indexer.addToIndex(currentTreeReference, element);
                         }
@@ -143,46 +162,4 @@ public class TreeElementParser extends ElementParser<TreeElement> {
             && parser.getAttributeValue(null,"src") == null;
     }
 
-    // Added for indexing
-    private static TreeReference currentTreeReference = null;
-    public static List<Indexer> indexers = new ArrayList<>();
-    public static List<IConditionExpr> indexedExpressions = new ArrayList<>();
-
-    public static List<TreeReference> getNodeset(TreeReference treeReference){
-        for (Indexer indexer : indexers) {
-            if(indexer.belong(treeReference)){
-                List<TreeReference> nodesetReferences = indexer.getFromIndex(treeReference);
-                if (nodesetReferences != null) {
-                    return nodesetReferences;
-                }
-            }
-        }
-        return null;
-    }
-
-    public static IAnswerData getRVFromIndex(TreeReference treeReference){
-
-        for (Indexer indexer : indexers) {
-            if(indexer.belong(treeReference)) {
-                IAnswerData rawValue = indexer.getRawValueFromIndex(treeReference);
-                if (rawValue != null) {
-                    return rawValue;
-                }
-            }
-        }
-        return null;
-    }
-
-    //TODO:This may not be entirely correct
-    public static boolean indexed(TreeReference treeReference){
-        for(Indexer indexer : indexers ){
-            if(indexer.belong(treeReference)){
-                PredicateStep[] predicateSteps = indexer.getPredicateSteps();
-                if(predicateSteps.length > 0 &&
-                    treeReference.getPredicate(predicateSteps[0].stepIndex) != null)
-                    return true;
-            }
-        }
-        return false;
-    }
 }

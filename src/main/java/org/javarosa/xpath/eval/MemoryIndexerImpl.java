@@ -18,38 +18,40 @@ import java.util.Map;
 /**
  * @johnthebeloved
  *
- * Represents an indexed xpath expression which could be used to make expression evaluation faster
- * since the pre-evaluated expressions are stored in this index
+ * Represents an xpath expression indexer which could be used to make expression evaluation faster
+ * the pre-evaluated expressions are stored in this index as an inmemory Map
  *
  * Used for pre-evaluating and indexing the pre-evaluated expression patterns,
  * so that results of expression evaluation during initialization and loading and filling of form can be
  * fetched from this index instead of
  *
- * Currently works for
- * ItemsetBinding.nodeset(nodeset attribute of <strong>itemsets</strong>) and
- * Recalculate(calculate attribute of <strong>bind</strong>)
+ * Currently used for
+ * ItemsetBinding#nodeset attribute of <strong>itemsets</strong>) and
+ * Recalculate#calculate attribute of <strong>bind</strong>
  *
  */
 public class MemoryIndexerImpl implements Indexer {
 
-    public TreeReference expressionRef; //The genericised expression to be indexed - used as the key
-    public String expressionString;
-    public TreeReference resultRef;  //The genericised pattern of the result to be cached
-    public String resultString;
-    public PredicateStep[] predicateSteps; //The predicates applied to the expression
-    public IndexerType indexerType; // Used to determine how expression would be indexed
-    public Map<TreeReference, List<TreeReference>> nodesetExprDict; // Map  used if result is a list of collated nodeset refs
-    public Map<TreeReference, IAnswerData> rawValueExprDict; // Used if indexed refs are single Answers
+    private XPathPathExpr xPathPathExpr;
+    private TreeReference expressionRef; //The genericised expression to be refIsIndexed - used as the key
+    private String expressionString;
+    private TreeReference resultRef;  //The genericised pattern of the result to be cached
+    private String resultString;
+    private PredicateStep[] predicateSteps; //The predicates applied to the expression
+    private IndexerType indexerType; // Used to determine how expression would be refIsIndexed
+    private Map<TreeReference, List<TreeReference>> nodesetExprDict; // Map  used if result is a list of collated nodeset refs
+    private Map<TreeReference, IAnswerData> rawValueExprDict; // Used if refIsIndexed refs are single Answers
 
    //Used to keep keys/values before values/keys are reached
     private Map<TreeReference, TreeReference> tempKeyKepper = new HashMap();
     private Map<TreeReference, IAnswerData> tempValueKepper = new HashMap();
 
-    public MemoryIndexerImpl(IndexerType indexType, TreeReference expressionRef, TreeReference resultRef) {
-        this(indexType, expressionRef, resultRef, null);
+    public MemoryIndexerImpl(IndexerType indexType, XPathPathExpr xPathPathExpr, TreeReference expressionRef, TreeReference resultRef) {
+        this(indexType, xPathPathExpr, expressionRef, resultRef, null);
     }
 
-    public MemoryIndexerImpl(IndexerType indexType, TreeReference expressionRef, TreeReference resultRef, PredicateStep[] predicateSteps) {
+    public MemoryIndexerImpl(IndexerType indexType, XPathPathExpr xPathPathExpr, TreeReference expressionRef, TreeReference resultRef, PredicateStep[] predicateSteps) {
+        this.xPathPathExpr = xPathPathExpr;
         this.expressionRef = expressionRef.removePredicates().genericize();
         this.expressionString = expressionRef.toString();
         this.resultRef = resultRef.removePredicates().genericize();
@@ -58,6 +60,11 @@ public class MemoryIndexerImpl implements Indexer {
         this.predicateSteps = predicateSteps == null ? new PredicateStep[0] : predicateSteps;
         nodesetExprDict = new HashMap<>();
         rawValueExprDict = new HashMap<>();
+    }
+
+    @Override
+    public void prepIndex() {
+
     }
 
     @Override
@@ -115,7 +122,7 @@ public class MemoryIndexerImpl implements Indexer {
     }
 
     @Override
-    public List<TreeReference> getFromIndex(TreeReference treeReference) {
+    public List<TreeReference> resolveFromIndex(TreeReference treeReference) {
         return nodesetExprDict.get(treeReference);
     }
 
@@ -142,6 +149,11 @@ public class MemoryIndexerImpl implements Indexer {
                 treeRefString.equals(resultString);
         }
         return false;
+    }
+
+    @Override
+    public XPathPathExpr getExpression() {
+        return xPathPathExpr;
     }
 
     TreeReference withPredicates(TreeReference refToIndex, String value) {
@@ -185,9 +197,14 @@ public class MemoryIndexerImpl implements Indexer {
     }
 
     @Override
-    public void clearCaches(){
+    public void finalizeIndex(){
         tempValueKepper.clear();
         tempKeyKepper.clear();
+    }
+
+    @Override
+    public void deleteIndex() {
+
     }
 
     @Override

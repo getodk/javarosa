@@ -1,7 +1,11 @@
 package org.javarosa.xml;
 
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
+import org.javarosa.xpath.eval.Indexer;
+import org.javarosa.xpath.eval.IndexerResolver;
 import org.kxml2.io.KXmlParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +13,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * <p>Element Parser is the core parsing element for XML files. Implementations
@@ -88,8 +93,9 @@ public abstract class ElementParser<T> {
      */
     public abstract T parse() throws InvalidStructureException, IOException, XmlPullParserException, UnfullfilledRequirementsException;
 
-
-    int nextNonWhitespace() throws XmlPullParserException, IOException {
+    //#Indexation
+    public abstract TreeElement parse(TreeReference currentTreeReference, IndexerResolver indexerResolver) throws InvalidStructureException, IOException, XmlPullParserException;
+        int nextNonWhitespace() throws XmlPullParserException, IOException {
         int ret = parser.next();
         if (ret == KXmlParser.TEXT && parser.isWhitespace()) {
             ret = parser.next();
