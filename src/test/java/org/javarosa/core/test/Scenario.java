@@ -121,6 +121,7 @@ public class Scenario {
 
     public static Scenario init(Path formFile) {
         // TODO explain why this sequence of calls
+        new XFormsModule().registerModule();
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());
