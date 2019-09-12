@@ -36,11 +36,10 @@ public class XPathPathExprCurrentGroupCountRefTest {
     public void current_in_repeat_count_should_work_as_expected() {
         // Since the form sets a count of 3 repeats, we should be at the end of the
         // form after answering three times
-        scenario
-            .jumpToFirst("name").answer("Janet")
-            .next("name").answer("Bob")
-            .next("name").answer("Kim")
-            .next();
+        scenario.jumpToFirst("name").answer("Janet");
+        scenario.next("name").answer("Bob");
+        scenario.next("name").answer("Kim");
+        scenario.next();
 
         assertThat(scenario.answerOf("/data/my_group[0]/name"), is(stringAnswer("Janet")));
         assertThat(scenario.answerOf("/data/my_group[1]/name"), is(stringAnswer("Bob")));
