@@ -302,6 +302,10 @@ public class Scenario {
         formDef.initialize(true, new InstanceInitializationFactory());
     }
 
+    public void setLanguage(String language) {
+        formEntryController.setLanguage(language);
+    }
+
     public void createMissingRepeats(String xPath) {
         // We will be looking to the parts in the xPath from left to right.
         // xPath.substring(1) makes the first "/" char go away, giving us an xPath relative to the root

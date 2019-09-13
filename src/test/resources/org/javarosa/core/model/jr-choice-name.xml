@@ -1,0 +1,325 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>jr-choice-name</h:title>
+        <model>
+            <itext>
+                <translation lang="French (fr)">
+                    <text id="/jr-choice-name/select_one_outside:label">
+                        <value>Faites un choix</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice1:label">
+                        <value>Choix 1</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice2:label">
+                        <value>Choix 2</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice3:label">
+                        <value>Choix 3</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice4:label">
+                        <value>Choix 4</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice5:label">
+                        <value>Choix 5</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one:label">
+                        <value>Faites un choix</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice1:label">
+                        <value>Choix 1</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice2:label">
+                        <value>Choix 2</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice3:label">
+                        <value>Choix 3</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice4:label">
+                        <value>Choix 4</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice5:label">
+                        <value>Choix 5</value>
+                    </text>
+                    <text id="/jr-choice-name/country:label">
+                        <value>Pays</value>
+                    </text>
+                    <text id="/jr-choice-name/country/canada:label">
+                        <value>Canada</value>
+                    </text>
+                    <text id="/jr-choice-name/country/france:label">
+                        <value>France</value>
+                    </text>
+                    <text id="/jr-choice-name/city:label">
+                        <value>Ville</value>
+                    </text>
+                    <text id="/jr-choice-name/city/montreal:label">
+                        <value>Montréal</value>
+                    </text>
+                    <text id="/jr-choice-name/city/grenoble:label">
+                        <value>Grenoble</value>
+                    </text>
+                    <text id="static_instance-choices-0">
+                        <value>Choix 1</value>
+                    </text>
+                    <text id="static_instance-choices-1">
+                        <value>Choix 2</value>
+                    </text>
+                    <text id="static_instance-choices-2">
+                        <value>Choix 3</value>
+                    </text>
+                    <text id="static_instance-choices-3">
+                        <value>Choix 4</value>
+                    </text>
+                    <text id="static_instance-choices-4">
+                        <value>Choix 5</value>
+                    </text>
+                    <text id="static_instance-countries-0">
+                        <value>Canada</value>
+                    </text>
+                    <text id="static_instance-countries-1">
+                        <value>France</value>
+                    </text>
+                    <text id="static_instance-cities-0">
+                        <value>Montréal</value>
+                    </text>
+                    <text id="static_instance-cities-1">
+                        <value>Grenoble</value>
+                    </text>
+                </translation>
+                <translation lang="English (en)" default="">
+                    <text id="/jr-choice-name/select_one_outside:label">
+                        <value>Select one</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice1:label">
+                        <value>Choice 1</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice2:label">
+                        <value>Choice 2</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice3:label">
+                        <value>Choice 3</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice4:label">
+                        <value>Choice 4</value>
+                    </text>
+                    <text id="/jr-choice-name/select_one_outside/choice5:label">
+                        <value>Choice 5</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one:label">
+                        <value>Select one</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice1:label">
+                        <value>Choice 1</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice2:label">
+                        <value>Choice 2</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice3:label">
+                        <value>Choice 3</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice4:label">
+                        <value>Choice 4</value>
+                    </text>
+                    <text id="/jr-choice-name/my-repeat/select_one/choice5:label">
+                        <value>Choice 5</value>
+                    </text>
+                    <text id="/jr-choice-name/country:label">
+                        <value>Country</value>
+                    </text>
+                    <text id="/jr-choice-name/country/canada:label">
+                        <value>Canada</value>
+                    </text>
+                    <text id="/jr-choice-name/country/france:label">
+                        <value>France</value>
+                    </text>
+                    <text id="/jr-choice-name/city:label">
+                        <value>City</value>
+                    </text>
+                    <text id="/jr-choice-name/city/montreal:label">
+                        <value>Montreal</value>
+                    </text>
+                    <text id="/jr-choice-name/city/grenoble:label">
+                        <value>Grenoble</value>
+                    </text>
+                    <text id="static_instance-choices-0">
+                        <value>Choice 1</value>
+                    </text>
+                    <text id="static_instance-choices-1">
+                        <value>Choice 2</value>
+                    </text>
+                    <text id="static_instance-choices-2">
+                        <value>Choice 3</value>
+                    </text>
+                    <text id="static_instance-choices-3">
+                        <value>Choice 4</value>
+                    </text>
+                    <text id="static_instance-choices-4">
+                        <value>Choice 5</value>
+                    </text>
+                    <text id="static_instance-countries-0">
+                        <value>Canada</value>
+                    </text>
+                    <text id="static_instance-countries-1">
+                        <value>France</value>
+                    </text>
+                    <text id="static_instance-cities-0">
+                        <value>Montreal</value>
+                    </text>
+                    <text id="static_instance-cities-1">
+                        <value>Grenoble</value>
+                    </text>
+                </translation>
+            </itext>
+            <instance>
+                <jr-choice-name id="jr-choice-name">
+                    <literal_choice_name/>
+                    <select_one_outside/>
+                    <select_one_name_outside/>
+                    <my-repeat>
+                        <select_one/>
+                        <select_one_name/>
+                    </my-repeat>
+                    <country/>
+                    <city/>
+                    <city_name/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </jr-choice-name>
+            </instance>
+            <instance id="choices">
+                <root>
+                    <item>
+                        <itextId>static_instance-choices-0</itextId>
+                        <name>choice1</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-choices-1</itextId>
+                        <name>choice2</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-choices-2</itextId>
+                        <name>choice3</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-choices-3</itextId>
+                        <name>choice4</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-choices-4</itextId>
+                        <name>choice5</name>
+                    </item>
+                </root>
+            </instance>
+            <instance id="countries">
+                <root>
+                    <item>
+                        <itextId>static_instance-countries-0</itextId>
+                        <name>canada</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-countries-1</itextId>
+                        <name>france</name>
+                    </item>
+                </root>
+            </instance>
+            <instance id="cities">
+                <root>
+                    <item>
+                        <itextId>static_instance-cities-0</itextId>
+                        <country>canada</country>
+                        <name>montreal</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-cities-1</itextId>
+                        <country>france</country>
+                        <name>grenoble</name>
+                    </item>
+                </root>
+            </instance>
+            <bind nodeset="/jr-choice-name/select_one_outside" type="select1"/>
+            <bind calculate="jr:choice-name('choice2', ' /jr-choice-name/select_one_outside ')" nodeset="/jr-choice-name/literal_choice_name" type="string"/>
+            <bind calculate="jr:choice-name(/jr-choice-name/select_one_outside , ' /jr-choice-name/select_one_outside')" nodeset="/jr-choice-name/select_one_name_outside" type="string"/>
+
+            <bind nodeset="/jr-choice-name/my-repeat/select_one" type="select1"/>
+            <bind calculate="jr:choice-name( ../select_one , ' ../select_one ')" nodeset="/jr-choice-name/my-repeat/select_one_name" type="string"/>
+
+            <bind nodeset="/jr-choice-name/country" type="select1"/>
+            <bind nodeset="/jr-choice-name/city" type="select1"/>
+            <bind calculate="jr:choice-name( /jr-choice-name/city , ' /jr-choice-name/city ')" nodeset="/jr-choice-name/city_name" type="string"/>
+            <bind jr:preload="uid" nodeset="/jr-choice-name/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/jr-choice-name/select_one_outside">
+            <label ref="jr:itext('/jr-choice-name/select_one_outside:label')"/>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/select_one_outside/choice1:label')"/>
+                <value>choice1</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/select_one_outside/choice2:label')"/>
+                <value>choice2</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/select_one_outside/choice3:label')"/>
+                <value>choice3</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/select_one_outside/choice4:label')"/>
+                <value>choice4</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/select_one_outside/choice5:label')"/>
+                <value>choice5</value>
+            </item>
+        </select1>
+        <group ref="/jr-choice-name/my-repeat">
+            <label/>
+            <repeat nodeset="/jr-choice-name/my-repeat">
+                <select1 ref="/jr-choice-name/my-repeat/select_one">
+                    <label ref="jr:itext('/jr-choice-name/my-repeat/select_one:label')"/>
+                    <item>
+                        <label ref="jr:itext('/jr-choice-name/my-repeat/select_one/choice1:label')"/>
+                        <value>choice1</value>
+                    </item>
+                    <item>
+                        <label ref="jr:itext('/jr-choice-name/my-repeat/select_one/choice2:label')"/>
+                        <value>choice2</value>
+                    </item>
+                    <item>
+                        <label ref="jr:itext('/jr-choice-name/my-repeat/select_one/choice3:label')"/>
+                        <value>choice3</value>
+                    </item>
+                    <item>
+                        <label ref="jr:itext('/jr-choice-name/my-repeat/select_one/choice4:label')"/>
+                        <value>choice4</value>
+                    </item>
+                    <item>
+                        <label ref="jr:itext('/jr-choice-name/my-repeat/select_one/choice5:label')"/>
+                        <value>choice5</value>
+                    </item>
+                </select1>
+            </repeat>
+        </group>
+        <select1 ref="/jr-choice-name/country">
+            <label ref="jr:itext('/jr-choice-name/country:label')"/>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/country/canada:label')"/>
+                <value>canada</value>
+            </item>
+            <item>
+                <label ref="jr:itext('/jr-choice-name/country/france:label')"/>
+                <value>france</value>
+            </item>
+        </select1>
+        <select1 ref="/jr-choice-name/city">
+            <label ref="jr:itext('/jr-choice-name/city:label')"/>
+            <itemset nodeset="instance('cities')/root/item[country =  /jr-choice-name/country ]">
+                <value ref="name"/>
+                <label ref="jr:itext(itextId)"/>
+            </itemset>
+        </select1>
+    </h:body>
+</h:html>
