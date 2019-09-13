@@ -891,30 +891,24 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                             return "";
                         }
 
-                        // NOTE: this is highly suspect. We have no context against
-                        // which to evaluate
-                        // a dynamic selection list. This will generally cause that
-                        // evaluation to break
-                        // if any filtering is done, or, worst case, give unexpected
-                        // results.
-                        //
-                        // We should hook into the existing code (FormEntryPrompt) for
-                        // pulling
-                        // display text for select choices. however, it's hard,
-                        // because we don't really have
-                        // any context to work with, and all the situations where that
-                        // context would be used
-                        // don't make sense for trying to reverse a select value back
-                        // to a label in an unrelated
-                        // expression
-
                         List<SelectChoice> choices;
+
                         ItemsetBinding itemset = q.getDynamicChoices();
                         if (itemset != null) {
+                            // 2019-HM: See ChoiceNameTest for test and more explanation
+
+                            // NOTE: We have no context against which to evaluate a dynamic selection list. This will
+                            // generally cause that evaluation to break if any filtering is done, or, worst case, give
+                            // unexpected results.
+                            //
+                            // We should hook into the existing code (FormEntryPrompt) for pulling display text for select
+                            // choices. however, it's hard, because we don't really have any context to work with, and all
+                            // the situations where that context would be used don't make sense for trying to reverse a
+                            // select value back to a label in an unrelated expression
                             if (itemset.getChoices() == null) {
-                                // NOTE: this will return incorrect results if the list
-                                // is filtered.
-                                // fortunately, they are ignored by FormEntryPrompt
+                                // NOTE: this will return incorrect results if the list is filtered. fortunately, they
+                                // are ignored by FormEntryPrompt.
+                                // 2019-HM: can't reproduce a case where filtered list would be anything other than empty
 
                                 if (ref.isAmbiguous()) {
                                     // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
@@ -932,15 +926,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         if (choices != null) {
                             for (SelectChoice ch : choices) {
                                 if (ch.getValue().equals(value)) {
-                                    // this is really not ideal. we should hook into the
-                                    // existing code (FormEntryPrompt) for pulling
-                                    // display text for select choices. however, it's
-                                    // hard, because we don't really have
-                                    // any context to work with, and all the situations
-                                    // where that context would be used
-                                    // don't make sense for trying to reverse a select
-                                    // value back to a label in an unrelated
-                                    // expression
+                                    // this is really not ideal. we should hook into the existing code (FormEntryPrompt)
+                                    // for pulling display text for select choices. however, it's hard, because we don't
+                                    // really have any context to work with, and all the situations where that context
+                                    // would be used don't make sense for trying to reverse a select value back to a
+                                    // label in an unrelated expression
 
                                     String textID = ch.getTextID();
                                     String templateStr;

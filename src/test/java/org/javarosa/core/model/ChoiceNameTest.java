@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
@@ -49,10 +50,14 @@ public class ChoiceNameTest {
         assertThat(scenario.answerOf("/jr-choice-name/my-repeat[1]/select_one_name"), is(stringAnswer("Choice 4")));
     }
 
-    @Test public void choiceNameCallWithDynamicChoices_getsChoiceName() {
+    // The handler for choice-name calls populateDynamicChoices and determines there are no matches. This is because
+    // when it tries to get the value for /jr-choice-name/country, the model that XPathEqExpr evaluates against is
+    // the cities secondary instance. That means that when evaluating the country = /jr-choice-name/country predicate,
+    // the right side is always null.
+    @Test public void choiceNameCallWithDynamicChoices_doesntWork() {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
-        scenario.answer("/jr-choice-name/country", "france"); // model.resolveReference(ref) doesn't get value
+        scenario.answer("/jr-choice-name/country", "france");
         scenario.answer("/jr-choice-name/city", "grenoble");
-        //assertThat(scenario.answerOf("/jr-choice-name/city_name"), is(stringAnswer("Montreal")));
+        assertThat(scenario.answerOf("/jr-choice-name/city_name"), is(nullValue()));
     }
 }
