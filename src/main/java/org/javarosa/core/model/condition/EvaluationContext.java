@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
@@ -40,15 +39,18 @@ import org.javarosa.xpath.expr.XPathStep;
  * function handlers and (not supported) variable bindings.
  */
 public class EvaluationContext {
-    /** Unambiguous anchor reference for relative paths */
+    /**
+     * Unambiguous anchor reference for relative paths
+     */
     private TreeReference contextNode;
     private HashMap<String, IFunctionHandler> functionHandlers;
+    private IFallbackFunctionHandler fallbackFunctionHandler;
     private HashMap<String, Object> variables;
 
     public boolean isConstraint; //true if we are evaluating a constraint
     public IAnswerData candidateValue; //if isConstraint, this is the value being validated
     public boolean isCheckAddChild; //if isConstraint, true if we are checking the constraint of a parent node on how
-                                    //  many children it may have
+    //  many children it may have
 
     private String outputTextForm = null; //Responsible for informing itext what form is requested if relevant
 
@@ -64,11 +66,13 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
-
-    /** Copy Constructor **/
-    private EvaluationContext (EvaluationContext base) {
+    /**
+     * Copy Constructor
+     **/
+    private EvaluationContext(EvaluationContext base) {
         //TODO: These should be deep, not shallow
         functionHandlers = base.functionHandlers;
+        fallbackFunctionHandler = base.fallbackFunctionHandler;
         formInstances = base.formInstances;
         variables = base.variables;
 
@@ -91,27 +95,27 @@ public class EvaluationContext {
         indexerResolver = base.getIndexerResolver();
     }
 
-    public EvaluationContext (EvaluationContext base, TreeReference context) {
+    public EvaluationContext(EvaluationContext base, TreeReference context) {
         this(base);
         this.contextNode = context;
     }
 
-    public EvaluationContext (EvaluationContext base, HashMap<String, DataInstance> formInstances, TreeReference context) {
+    public EvaluationContext(EvaluationContext base, HashMap<String, DataInstance> formInstances, TreeReference context) {
         this(base, context);
         this.formInstances = formInstances;
     }
 
-    public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances, EvaluationContext base) {
+    public EvaluationContext(DataInstance instance, HashMap<String, DataInstance> formInstances, EvaluationContext base) {
         this(base);
         this.formInstances = formInstances;
         this.instance = instance;
     }
 
-    public EvaluationContext (DataInstance instance) {
+    public EvaluationContext(DataInstance instance) {
         this(instance, new HashMap<String, DataInstance>());
     }
 
-    public EvaluationContext (DataInstance instance, HashMap<String, DataInstance> formInstances) {
+    public EvaluationContext(DataInstance instance, HashMap<String, DataInstance> formInstances) {
         this.formInstances = formInstances;
         this.instance = instance;
         this.contextNode = TreeReference.rootRef();
@@ -128,7 +132,7 @@ public class EvaluationContext {
             (instance != null && id.equals(instance.getName()) ? instance : null);
     }
 
-    public TreeReference getContextRef () {
+    public TreeReference getContextRef() {
         return contextNode;
     }
 
@@ -140,11 +144,19 @@ public class EvaluationContext {
         return (original == null) ? contextNode : original;
     }
 
-    public void addFunctionHandler (IFunctionHandler fh) {
+    public void addFallbackFunctionHandler(IFallbackFunctionHandler handler) {
+        fallbackFunctionHandler = handler;
+    }
+
+    public void addFunctionHandler(IFunctionHandler fh) {
         functionHandlers.put(fh.getName(), fh);
     }
 
-    public HashMap<String, IFunctionHandler> getFunctionHandlers () {
+    public IFallbackFunctionHandler getFallbackFunctionHandler() {
+        return fallbackFunctionHandler;
+    }
+
+    public HashMap<String, IFunctionHandler> getFunctionHandlers() {
         return functionHandlers;
     }
 
@@ -172,12 +184,12 @@ public class EvaluationContext {
         //Otherwise check whether the value is one of the normal first
         //order datatypes used in xpath evaluation
         if (value instanceof Boolean ||
-                   value instanceof Double  ||
-                   value instanceof String  ||
-                   value instanceof Date    ||
-                   value instanceof IExprDataType) {
-                variables.put(name, value);
-                return;
+            value instanceof Double ||
+            value instanceof String ||
+            value instanceof Date ||
+            value instanceof IExprDataType) {
+            variables.put(name, value);
+            return;
         }
 
         //Some datatypes can be trivially converted to a first order
@@ -202,16 +214,16 @@ public class EvaluationContext {
     /**
      * Searches for all repeated nodes that match the pattern of the 'ref'
      * argument.
-     *
+     * <p>
      * '/' returns {'/'}
      * can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
      *
      * @param ref Potentially ambiguous reference
      * @return Null if 'ref' is relative reference. Otherwise, returns a vector
-     * of references that point to nodes that match 'ref' argument. These
-     * references are unambiguous (no index will ever be INDEX_UNBOUND). Template
-     * nodes won't be included when matching INDEX_UNBOUND, but will be when
-     * INDEX_TEMPLATE is explicitly set.
+     *     of references that point to nodes that match 'ref' argument. These
+     *     references are unambiguous (no index will ever be INDEX_UNBOUND). Template
+     *     nodes won't be included when matching INDEX_UNBOUND, but will be when
+     *     INDEX_TEMPLATE is explicitly set.
      */
     public List<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
         if (!ref.isAbsolute()) {
@@ -222,7 +234,7 @@ public class EvaluationContext {
 
         if (baseInstance == null) {
             throw new RuntimeException("Unable to expand reference " + ref.toString(true) +
-                    ", no appropriate instance in evaluation context");
+                ", no appropriate instance in evaluation context");
         }
 
         List<TreeReference> treeReferences = new ArrayList<>(1);
