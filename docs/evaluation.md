@@ -225,10 +225,8 @@ Description:
   - There might be other ways to batch the insert statements to reduce load time
 - See whether, in solution 2, the index could be a string rather than a TreeReference
   - Cache serialized values rather than objects.
-
-- Making code compatible with Internal secondary instances
-
-
+- Implementing indexation code with Internal secondary instances during the creation of TreeElements
+- Adding a index attribute markers to elements that have xpath attributes so that javarosa detects using the markers
 
 <a name="sec_instance_xml" />
 The sample XML document used in the document is found below

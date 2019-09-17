@@ -1006,7 +1006,6 @@ public class XFormParser implements IXFormParserFunctions {
         return parseControl(parent, e, controlType, null, null);
     }
 
-
     private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
         return parseControl(parent, e, controlType, additionalUsedAtts, null);
     }

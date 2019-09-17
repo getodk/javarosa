@@ -15,21 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @johnthebeloved
- *
- * Represents an xpath expression indexer which could be used to make expression evaluation faster
- * the pre-evaluated expressions are stored in this index as an inmemory Map
- *
- * Used for pre-evaluating and indexing the pre-evaluated expression patterns,
- * so that results of expression evaluation during initialization and loading and filling of form can be
- * fetched from this index instead of
- *
- * Currently used for
- * ItemsetBinding#nodeset attribute of <strong>itemsets</strong>) and
- * Recalculate#calculate attribute of <strong>bind</strong>
- *
- */
 public class MemoryIndexerImpl implements Indexer {
 
     private XPathPathExpr xPathPathExpr;

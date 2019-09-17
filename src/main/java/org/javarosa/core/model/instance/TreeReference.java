@@ -469,8 +469,6 @@ public class TreeReference implements Externalizable, Serializable {
         return hash;
     }
 
-
-
     public String toString () {
         return toString(true);
     }

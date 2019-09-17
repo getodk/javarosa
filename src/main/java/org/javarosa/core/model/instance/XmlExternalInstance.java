@@ -3,7 +3,6 @@ package org.javarosa.core.model.instance;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xml.ElementParser;
 import org.javarosa.xml.TreeElementParser;
@@ -18,7 +17,7 @@ public class XmlExternalInstance {
         KXmlParser xmlParser = ElementParser.instantiateParser(inputStream);
         TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
         // #Indexation
-        // IndexerResolver should have been passed as an argument to this method
+        // Maybe IndexerResolver should be passed as an argument to this method instead  XFormParser.getIndexerResolver()
         if(XFormParser.getIndexerResolver() != null){
             return treeElementParser.parse(null, XFormParser.getIndexerResolver());
         }else{

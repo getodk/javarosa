@@ -56,7 +56,7 @@ jar {
     // Be sure to update version in pom.xml to match
     // snapshot release = x.x.x-SNAPSHOT
     // production release = x.x.x
-    version = '2.15.0'
+    version = '2.15.1'
     archiveName = baseName + '-' + version + '.jar'
 
     manifest {
@@ -76,16 +76,16 @@ javadoc {
 }
 
 jmh {
-    include = "(StaticForm)"
+    include = "(StaticForm)" //Limit run Benchmarks to ones that start with
     exclude = "(BenchmarkTemplate)"
     threads = 1
     fork = 1
     timeout = '10s'
     warmup = '2s'
-    warmupIterations = 3
+    warmupIterations = 3 //Reduced to run in lesser time
     warmupBatchSize = 1
     warmupForks = 1
-    iterations = 6
+    iterations = 6 //Reduced to run in lesser time
     timeOnIteration = '2s'
     timeUnit = 'ms'
     benchmarkMode = ['ss']
