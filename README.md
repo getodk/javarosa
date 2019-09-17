@@ -82,7 +82,7 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and g
 </settings>
 ```
 
-Official releases are typically done by @yanokwa who uses Oracle Java v1.8.x running on macOS Sierra. 
+Official releases are typically done by @yanokwa who uses AdoptOpenJDK v1.8.x running on macOS Sierra.
 
 To generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 
