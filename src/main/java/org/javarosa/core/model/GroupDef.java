@@ -16,12 +16,6 @@
 
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -37,6 +31,12 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** The definition of a group in a form or questionaire.
  *
@@ -72,6 +72,8 @@ public class GroupDef implements IFormElement, Localizable {
     public boolean noAddRemove = false;
     public IDataReference count = null;
 
+    private ActionController actionController;
+
     public GroupDef () {
         this(Constants.NULL_ID, null, false);
     }
@@ -81,6 +83,8 @@ public class GroupDef implements IFormElement, Localizable {
         setChildren(children);
         setRepeat(repeat);
         observers = new ArrayList<FormElementStateListener>(0);
+
+        actionController = new ActionController();
     }
 
     public int getID () {
@@ -165,7 +169,7 @@ public class GroupDef implements IFormElement, Localizable {
 
     @Override
     public ActionController getActionController() {
-        return null;
+        return actionController;
     }
 
     public void localeChanged(String locale, Localizer localizer) {
@@ -222,6 +226,8 @@ public class GroupDef implements IFormElement, Localizable {
             mainHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 
             additionalAttributes = ExtUtil.readAttributes(dis, null);
+
+            actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
         } catch ( OutOfMemoryError e ) {
             throw new DeserializationException("serialization format change caused misalignment and out-of-memory error");
         }
@@ -251,6 +257,8 @@ public class GroupDef implements IFormElement, Localizable {
         ExtUtil.writeString(dos, ExtUtil.emptyIfNull(mainHeader));
 
         ExtUtil.writeAttributes(dos, additionalAttributes);
+
+        ExtUtil.write(dos, new ExtWrapNullable(actionController));
     }
 
     public void registerStateObserver (FormElementStateListener qsl) {

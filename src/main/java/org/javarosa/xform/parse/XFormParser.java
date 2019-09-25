@@ -1563,25 +1563,31 @@ public class XFormParser implements IXFormParserFunctions {
             String childName = (child != null ? child.getName() : null);
             String childNamespace = (child != null ? child.getNamespace() : null);
 
-            if (group.getRepeat() && NAMESPACE_JAVAROSA.equals(childNamespace)) {
-                if ("chooseCaption".equals(childName)) {
-                    group.chooseCaption = getLabel(child);
-                } else if ("addCaption".equals(childName)) {
-                    group.addCaption = getLabel(child);
-                } else if ("delCaption".equals(childName)) {
-                    group.delCaption = getLabel(child);
-                } else if ("doneCaption".equals(childName)) {
-                    group.doneCaption = getLabel(child);
-                } else if ("addEmptyCaption".equals(childName)) {
-                    group.addEmptyCaption = getLabel(child);
-                } else if ("doneEmptyCaption".equals(childName)) {
-                    group.doneEmptyCaption = getLabel(child);
-                } else if ("entryHeader".equals(childName)) {
-                    group.entryHeader = getLabel(child);
-                } else if ("delHeader".equals(childName)) {
-                    group.delHeader = getLabel(child);
-                } else if ("mainHeader".equals(childName)) {
-                    group.mainHeader = getLabel(child);
+            if (group.getRepeat()) {
+                if (actionHandlers.containsKey(childName)) {
+                    actionHandlers.get(childName).handle(this, child, group);
+                }
+
+                if (NAMESPACE_JAVAROSA.equals(childNamespace)) {
+                    if ("chooseCaption".equals(childName)) {
+                        group.chooseCaption = getLabel(child);
+                    } else if ("addCaption".equals(childName)) {
+                        group.addCaption = getLabel(child);
+                    } else if ("delCaption".equals(childName)) {
+                        group.delCaption = getLabel(child);
+                    } else if ("doneCaption".equals(childName)) {
+                        group.doneCaption = getLabel(child);
+                    } else if ("addEmptyCaption".equals(childName)) {
+                        group.addEmptyCaption = getLabel(child);
+                    } else if ("doneEmptyCaption".equals(childName)) {
+                        group.doneEmptyCaption = getLabel(child);
+                    } else if ("entryHeader".equals(childName)) {
+                        group.entryHeader = getLabel(child);
+                    } else if ("delHeader".equals(childName)) {
+                        group.delHeader = getLabel(child);
+                    } else if ("mainHeader".equals(childName)) {
+                        group.mainHeader = getLabel(child);
+                    }
                 }
             }
         }
