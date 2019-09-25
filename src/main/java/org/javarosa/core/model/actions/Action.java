@@ -3,16 +3,16 @@
  */
 package org.javarosa.core.model.actions;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * @author ctsims
@@ -34,10 +34,18 @@ public abstract class Action implements Externalizable {
     @Deprecated
     public static final String EVENT_XFORMS_READY = "xforms-ready";
     public static final String EVENT_XFORMS_REVALIDATE = "xforms-revalidate";
+
+    public static final String EVENT_ODK_NEW_REPEAT = "odk-new-repeat";
+
+    /**
+     * @deprecated because it was never documented. Use {@link #EVENT_ODK_NEW_REPEAT} instead.
+     */
     public static final String EVENT_JR_INSERT = "jr-insert";
+
     public static final String EVENT_QUESTION_VALUE_CHANGED = "xforms-value-changed";
-    private static final String[] allEvents = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_JR_INSERT,
-                        EVENT_QUESTION_VALUE_CHANGED, EVENT_XFORMS_READY, EVENT_XFORMS_REVALIDATE};
+
+    private static final String[] allEvents = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_XFORMS_READY,
+                        EVENT_ODK_NEW_REPEAT, EVENT_JR_INSERT, EVENT_QUESTION_VALUE_CHANGED, EVENT_XFORMS_REVALIDATE};
 
     private String name;
 

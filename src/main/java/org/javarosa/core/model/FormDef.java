@@ -553,6 +553,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // 2013-05-14 - ctsims - Events should get fired _before_ calculate stuff
         // is fired, moved this above triggering triggerables
         actionController.triggerActionsFromEvent(Action.EVENT_JR_INSERT, this, repeatContextRef, this);
+        actionController.triggerActionsFromEvent(Action.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
 
         // trigger conditions that depend on the creation of this new node
         triggerTriggerables(repeatContextRef, true);
