@@ -318,6 +318,8 @@ public class XPathEvalTest {
         testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.getDateTimeFromString("2000-01-01T10:20:30.000"));
         testEval("decimal-date-time('2000-01-01T10:20:30.000')", 10957.430902777778);
         testEval("decimal-time('2000-01-01T10:20:30.000+03:00')", .30590277777810115);
+        testEval("decimal-date-time('-1000')", new XPathTypeMismatchException());
+        testEval("decimal-date-time('-01-2019')", new XPathTypeMismatchException());
     }
 
     @Test
