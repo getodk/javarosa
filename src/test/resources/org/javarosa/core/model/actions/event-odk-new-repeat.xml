@@ -1,9 +1,9 @@
 <h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
     <h:head>
-        <h:title>Repeat default now() in body</h:title>
+        <h:title>Event: odk-new-repeat</h:title>
         <model>
             <instance>
-                <data id="repeat-default-now-nested">
+                <data id="event-odk-new-repeat">
                     <meta>
                         <instanceID/>
                     </meta>
@@ -27,10 +27,6 @@
                     <my-repeat-without-template>
                         <my-value/>
                     </my-repeat-without-template>
-
-                    <my-other-repeat jr:template="">
-                        <my-value/>
-                    </my-other-repeat>
                 </data>
             </instance>
 
@@ -43,10 +39,6 @@
             <bind nodeset="/data/my-jr-count-repeat/defaults-to-position" type="string"/>
 
             <bind nodeset="/data/my-repeat-without-template/my-value" type="integer"/>
-
-            <bind nodeset="/data/my-other-repeat/my-value" type="string"/>
-            <!-- setvalue event in model; not part of ODK XForms specification -->
-            <setvalue event="odk-new-repeat" ref="/data/my-other-repeat/my-value" value="now()"/>
         </model>
     </h:head>
 
@@ -83,12 +75,6 @@
         <repeat nodeset="/data/my-repeat-without-template">
             <setvalue event="odk-new-repeat" ref="/data/my-repeat-without-template/my-value">2</setvalue>
             <input ref="/data/my-repeat-without-template/my-value">
-                <label>A value</label>
-            </input>
-        </repeat>
-
-        <repeat nodeset="/data/my-other-repeat">
-            <input ref="/data/my-other-repeat/my-value">
                 <label>A value</label>
             </input>
         </repeat>

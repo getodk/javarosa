@@ -550,7 +550,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         TreeElement newNode = mainInstance.resolveReference(repeatContextRef);
         preloadInstance(newNode);
 
-        // Fire events before form recomputation (calculates, relevance, etc). First trigger actions defined in the
+        // Fire events before form re-computation (calculates, relevance, etc). First trigger actions defined in the
         // model and then trigger actions defined in the body
         actionController.triggerActionsFromEvent(Action.EVENT_JR_INSERT, this, repeatContextRef, this);
         actionController.triggerActionsFromEvent(Action.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);

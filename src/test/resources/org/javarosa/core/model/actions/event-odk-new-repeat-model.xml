@@ -1,0 +1,30 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Event: odk-new-repeat in model</h:title>
+        <model>
+            <instance>
+                <data id="event-odk-new-repeat">
+                    <meta>
+                        <instanceID/>
+                    </meta>
+
+                    <my-repeat jr:template="">
+                        <my-value/>
+                    </my-repeat>
+                </data>
+            </instance>
+
+            <bind nodeset="/data/my-repeat/my-value" type="string"/>
+            <!-- setvalue event in model; not part of ODK XForms specification -->
+            <setvalue event="odk-new-repeat" ref="/data/my-repeat/my-value" value="now()"/>
+        </model>
+    </h:head>
+
+    <h:body>
+        <repeat nodeset="/data/my-repeat">
+            <input ref="/data/my-repeat/my-value">
+                <label>A value</label>
+            </input>
+        </repeat>
+    </h:body>
+</h:html>

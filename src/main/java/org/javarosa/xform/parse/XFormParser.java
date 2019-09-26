@@ -703,7 +703,11 @@ public class XFormParser implements IXFormParserFunctions {
                 parseSubmission(child);
             } else {
                 // For now, anything that isn't a submission is an action
-                actionHandlers.get(name).handle(this, child, _f);
+                if (actionHandlers.containsKey(name) && child.getAttributeValue(null, EVENT_ATTR).equals(Action.EVENT_ODK_NEW_REPEAT)) {
+                    throw new XFormParseException("Actions triggered by " + Action.EVENT_ODK_NEW_REPEAT + " must be nested in the repeat form control.", child);
+                } else {
+                    actionHandlers.get(name).handle(this, child, _f);
+                }
             }
         }
     }

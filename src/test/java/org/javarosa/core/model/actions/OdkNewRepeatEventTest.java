@@ -1,6 +1,7 @@
 package org.javarosa.core.model.actions;
 
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -77,14 +78,9 @@ public class OdkNewRepeatEventTest {
         assertThat(scenario.answerOf("/data/my-repeat-without-template[2]/my-value").getDisplayText(), is("2"));
     }
 
-    // Not part of ODK XForms spec but incidentally supported because of support for model-level setvalue. We could
-    // explicitly block this case but it feels less consistent.
-    @Test
-    public void setValueOnRepeatInsertInModel_setsValueInRepeat() {
-        Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
-
-        scenario.createMissingRepeats("/data/my-other-repeat[0]/my-value");
-        assertThat(scenario.answerOf("/data/my-other-repeat[0]/my-value"), is(notNullValue()));
+    // Not part of ODK XForms so throws parse exception.
+    @Test(expected = XFormParseException.class)
+    public void setValueOnRepeatInsertInModel_notAllowed() {
+        Scenario.init(r("event-odk-new-repeat-model.xml"));
     }
-
 }
