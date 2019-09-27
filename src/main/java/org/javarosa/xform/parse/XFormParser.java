@@ -725,6 +725,10 @@ public class XFormParser implements IXFormParserFunctions {
             throw new XFormParseException("An action element occurred in an invalid location. " +
             "Must be either a child of a control element, or a child of the <model>");
         }
+
+        if (!parent.equals(_f) && event.equals(Action.EVENT_ODK_INSTANCE_FIRST_LOAD)) {
+            _f.registerElementWithActionsTriggeredByToplevelEvent((IFormElement) parent);
+        }
         
         _f.registerAction(e.getName());
 

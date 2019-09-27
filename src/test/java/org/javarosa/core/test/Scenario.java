@@ -16,6 +16,10 @@
 
 package org.javarosa.core.test;
 
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
@@ -29,6 +33,9 @@ import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +44,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
@@ -49,9 +58,13 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.util.JavaRosaCoreModule;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormsModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -501,5 +514,26 @@ public class Scenario {
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
         }
+    }
+
+    public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
+        // Initialize serialization
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+        new XFormsModule().registerModule();
+
+        // Serialize form in a temp file
+        Path tempFile = createTempFile("javarosa", "test");
+        formDef.writeExternal(new DataOutputStream(newOutputStream(tempFile)));
+
+        // Create an empty FormDef and deserialize the form into it
+        FormDef deserializedFormDef = new FormDef();
+        deserializedFormDef.readExternal(
+            new DataInputStream(newInputStream(tempFile)),
+            PrototypeManager.getDefault()
+        );
+
+        delete(tempFile);
+        return new Scenario(deserializedFormDef, new FormEntryController(new FormEntryModel(deserializedFormDef)));
     }
 }
