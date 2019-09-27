@@ -1843,7 +1843,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * Records that this question or group has a nested action triggered by a top-level event so that the action can be
      * triggered without having to traverse all elements.
      */
-    public void registerElementWithActionsTriggeredByToplevelEvent(IFormElement element) {
+    public void registerElementWithActionTriggeredByToplevelEvent(IFormElement element) {
         elementsWithActionTriggeredByToplevelEvent.add(element);
     }
 

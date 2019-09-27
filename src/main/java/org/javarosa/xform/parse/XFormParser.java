@@ -138,7 +138,7 @@ public class XFormParser implements IXFormParserFunctions {
     private static final String DYNAMIC_ITEXT_OPEN = "jr:itext(";
     private static final String BIND_ATTR = "bind";
     private static final String REF_ATTR = "ref";
-    private static final String EVENT_ATTR = "event";
+    public static final String EVENT_ATTR = "event";
 
     private static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
@@ -714,20 +714,23 @@ public class XFormParser implements IXFormParserFunctions {
      * handler that is provided.
      */
     private void parseAction(Element e, Object parent, IElementHandler specificHandler) {
-        // Check that the event registered to trigger this action is a valid event that we support
-        String event = e.getAttributeValue(null, EVENT_ATTR);
-        if (!Action.isValidEvent(event)) {
-            throw new XFormParseException("An action was registered for an unsupported event: " + event);
-        }
-        // Check that the action was included in a valid place within the XForm
-        if (!(parent instanceof IFormElement)) {
-            // parent must either be a FormDef or QuestionDef, both of which are IFormElements
-            throw new XFormParseException("An action element occurred in an invalid location. " +
-            "Must be either a child of a control element, or a child of the <model>");
-        }
+        // Check that all events registered to trigger this action are valid events that we support
+        String eventList = e.getAttributeValue(null, EVENT_ATTR);
 
-        if (!parent.equals(_f) && event.equals(Action.EVENT_ODK_INSTANCE_FIRST_LOAD)) {
-            _f.registerElementWithActionsTriggeredByToplevelEvent((IFormElement) parent);
+        for (String event : eventList.split(" ")) {
+            if (!Action.isValidEvent(event)) {
+                throw new XFormParseException("An action was registered for an unsupported event: " + event);
+            }
+            // Check that the action was included in a valid place within the XForm
+            if (!(parent instanceof IFormElement)) {
+                // parent must either be a FormDef, GroupDef or QuestionDef
+                throw new XFormParseException("An action element occurred in an invalid location. " +
+                    "Must be either a child of a control element, or a child of the <model>");
+            }
+
+            if (!parent.equals(_f) && event.equals(Action.EVENT_ODK_INSTANCE_FIRST_LOAD)) {
+                _f.registerElementWithActionTriggeredByToplevelEvent((IFormElement) parent);
+            }
         }
         
         _f.registerAction(e.getName());
@@ -782,8 +785,8 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        String event = e.getAttributeValue(null, "event");
-        source.registerEventListener(event, action);
+        String eventList = e.getAttributeValue(null, EVENT_ATTR);
+        source.registerEventListener(eventList, action);
     }
 
     private void parseSubmission(Element submission) {

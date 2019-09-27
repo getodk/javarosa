@@ -49,9 +49,9 @@ public abstract class SetGeopointActionHandler implements IElementHandler {
         SetGeopointAction action = getSetGeopointAction();
         action.setTargetReference(target);
 
-        String event = e.getAttributeValue(null, "event");
+        String eventList = e.getAttributeValue(null, XFormParser.EVENT_ATTR);
         // XFormParser.parseAction already ensures parent is an IFormElement so we can safely cast
-        ((IFormElement) parent).getActionController().registerEventListener(event, action);
+        ((IFormElement) parent).getActionController().registerEventListener(eventList, action);
     }
 
     /**

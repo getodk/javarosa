@@ -39,15 +39,23 @@ public class ActionController implements Externalizable {
         return new ArrayList<>();
     }
 
-    public void registerEventListener(String event, Action action) {
-        List<Action> actions;
-        if (eventListeners.containsKey(event)) {
-            actions = eventListeners.get(event);
-        } else {
-            actions = new ArrayList<>();
-            eventListeners.put(event, actions);
+    /**
+     * Register an action to be triggered by the specified event(s).
+     *
+     * @param eventList space-separated list of event names defined in {@link Action}. All names must be valid.
+     * @param action the action to associate with each of the events.
+     */
+    public void registerEventListener(String eventList, Action action) {
+        for (String event : eventList.split(" ")) {
+            List<Action> actions;
+            if (eventListeners.containsKey(event)) {
+                actions = eventListeners.get(event);
+            } else {
+                actions = new ArrayList<>();
+                eventListeners.put(event, actions);
+            }
+            actions.add(action);
         }
-        actions.add(action);
     }
 
     public void triggerActionsFromEvent(String event, FormDef model) {
