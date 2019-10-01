@@ -818,7 +818,7 @@ public class XPathFuncExpr extends XPathExpression {
                 }
 
                 if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
-                    throw new XPathTypeMismatchException("converting out-of-range value to date");
+                    throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
                 }
 
                 long timeMillis = (long) (n * DateUtils.DAY_IN_MS);
@@ -833,7 +833,7 @@ public class XPathFuncExpr extends XPathExpression {
                 }
 
                 if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
-                    throw new XPathTypeMismatchException("converting out-of-range value to date");
+                    throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
                 }
 
                 return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
@@ -847,7 +847,7 @@ public class XPathFuncExpr extends XPathExpression {
 
             Date d = DateUtils.parseDateTime(s);
             if (d == null) {
-                throw new XPathTypeMismatchException("converting to date");
+                throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.");
             } else {
                 return d;
             }
@@ -858,7 +858,7 @@ public class XPathFuncExpr extends XPathExpression {
                 return DateUtils.roundDate((Date) input);
             }
         } else {
-            throw new XPathTypeMismatchException("converting to date");
+            throw new XPathTypeMismatchException("The value \"" + input.toString() + "\" can't be converted to a date.");
         }
     }
 
@@ -873,7 +873,7 @@ public class XPathFuncExpr extends XPathExpression {
             }
 
             if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
-                throw new XPathTypeMismatchException("converting out-of-range value to date");
+                throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
             }
 
             if (keepDate) {
@@ -890,7 +890,7 @@ public class XPathFuncExpr extends XPathExpression {
 
             Date d = DateUtils.parseDateTime(s);
             if (d == null) {
-                throw new XPathTypeMismatchException("converting to date");
+                throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.");
             } else {
                 if (keepDate) {
                     long milli = d.getTime();
@@ -910,7 +910,7 @@ public class XPathFuncExpr extends XPathExpression {
                 return DateUtils.decimalTimeOfLocalDay(d);
             }
         } else {
-            throw new XPathTypeMismatchException("converting to date");
+            throw new XPathTypeMismatchException("The value \"" + o.toString() + "\" can't be converted to a date.");
         }
     }
 
