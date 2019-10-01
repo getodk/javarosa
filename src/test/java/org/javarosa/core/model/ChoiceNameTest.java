@@ -50,11 +50,18 @@ public class ChoiceNameTest {
         assertThat(scenario.answerOf("/jr-choice-name/my-repeat[1]/select_one_name"), is(stringAnswer("Choice 4")));
     }
 
+    @Test public void choiceNameCallWithDynamicChoicesAndNoPredicate_selectsName() {
+        Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
+        scenario.answer("/jr-choice-name/cocotero_a", "a");
+        scenario.answer("/jr-choice-name/cocotero_b", "b");
+        assertThat(scenario.answerOf("/jr-choice-name/cocotero_name"), is(stringAnswer("Cocotero a-b")));
+    }
+
     // The handler for choice-name calls populateDynamicChoices and determines there are no matches. This is because
     // when it tries to get the value for /jr-choice-name/country, the model that XPathEqExpr evaluates against is
     // the cities secondary instance. That means that when evaluating the country = /jr-choice-name/country predicate,
     // the right side is always null.
-    @Test public void choiceNameCallWithDynamicChoices_doesntWork() {
+    @Test public void choiceNameCallWithDynamicChoicesAndPredicate_doesntWork() {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         scenario.answer("/jr-choice-name/country", "france");
         scenario.answer("/jr-choice-name/city", "grenoble");
