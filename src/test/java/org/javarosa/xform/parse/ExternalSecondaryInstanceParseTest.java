@@ -26,6 +26,7 @@ import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ExternalSecondaryInstanceParseTest {
     private static final Logger logger = LoggerFactory.getLogger(ExternalSecondaryInstanceParseTest.class);
@@ -57,6 +58,19 @@ public class ExternalSecondaryInstanceParseTest {
         FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
 
         assertThat(originalFormDef.getTitle(), is(deserializedFormDef.getTitle()));
+    }
+
+    @Test
+    public void deserializedFormDefCreatedFromAFormWithExternalSecondaryXMLInstance_ShouldContainThatExternalInstance() throws IOException, DeserializationException {
+        Path formPath = r("external-select-xml.xml");
+        setUpSimpleReferenceManager(formPath.getParent(), "file");
+
+        FormDef originalFormDef = parse(formPath);
+        originalFormDef.setFormXmlPath(formPath.toString());
+
+        Path serializedForm = getSerializedFormPath(originalFormDef);
+        FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
+        assertTrue(deserializedFormDef.getFormInstances().containsKey("external-xml"));
     }
 
     @Test
