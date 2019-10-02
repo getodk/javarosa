@@ -1,11 +1,12 @@
 package org.javarosa.core.model.actions;
 
 
+import static org.javarosa.xform.parse.XFormParser.getValidEventNames;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.javarosa.core.model.FormDef;
@@ -48,7 +49,7 @@ public class ActionController implements Externalizable {
      */
     public void registerEventListener(String event, Action action) {
         // event could be a single event or a space separated event list.
-        registerEventListener(Arrays.asList(event.split(" ")), action);
+        registerEventListener(getValidEventNames(event), action);
     }
 
     /**
