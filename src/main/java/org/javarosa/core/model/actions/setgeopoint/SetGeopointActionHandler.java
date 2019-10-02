@@ -16,6 +16,10 @@
 
 package org.javarosa.core.model.actions.setgeopoint;
 
+import static org.javarosa.xform.parse.XFormParser.EVENT_ATTR;
+
+import java.util.Arrays;
+import java.util.List;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
@@ -49,7 +53,7 @@ public abstract class SetGeopointActionHandler implements IElementHandler {
         SetGeopointAction action = getSetGeopointAction();
         action.setTargetReference(target);
 
-        String eventList = e.getAttributeValue(null, XFormParser.EVENT_ATTR);
+        List<String> eventList = Arrays.asList(e.getAttributeValue(null, EVENT_ATTR).split(" "));
         // XFormParser.parseAction already ensures parent is an IFormElement so we can safely cast
         ((IFormElement) parent).getActionController().registerEventListener(eventList, action);
     }

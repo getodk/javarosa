@@ -16,6 +16,7 @@
 
 package org.javarosa.xform.parse;
 
+import java.util.Arrays;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -732,7 +733,7 @@ public class XFormParser implements IXFormParserFunctions {
                 _f.registerElementWithActionTriggeredByToplevelEvent((IFormElement) parent);
             }
         }
-        
+
         _f.registerAction(e.getName());
 
         specificHandler.handle(this, e, parent);
@@ -785,7 +786,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        String eventList = e.getAttributeValue(null, EVENT_ATTR);
+        List<String> eventList = Arrays.asList(e.getAttributeValue(null, EVENT_ATTR).split(" "));
         source.registerEventListener(eventList, action);
     }
 
