@@ -1,5 +1,6 @@
 package org.javarosa.core.model.actions;
 
+import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.xform.parse.XFormParseException;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class OdkNewRepeatEventTest {
         assertThat(scenario.repeatInstancesOf("/data/my-repeat").size(), is(0));
         scenario.createMissingRepeats("/data/my-repeat[0]");
         assertThat(scenario.repeatInstancesOf("/data/my-repeat").size(), is(1));
-        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-now"), is(notNullValue()));
+        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
     }
 
     @Test
@@ -31,14 +32,12 @@ public class OdkNewRepeatEventTest {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         scenario.createMissingRepeats("/data/my-repeat[0]");
-        String firstRepeatDisplayText = scenario.answerOf("/data/my-repeat[0]/defaults-to-now").getDisplayText();
-        assertThat(firstRepeatDisplayText, is(not(isEmptyOrNullString())));
+        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
 
         scenario.createMissingRepeats("/data/my-repeat[1]");
-        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-now"), is(notNullValue()));
+        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-position").getDisplayText(), is("2"));
 
-        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-now").getDisplayText(), is(firstRepeatDisplayText));
-        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-now").getDisplayText(), is(not(firstRepeatDisplayText)));
+        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
     }
 
     @Test
@@ -55,16 +54,29 @@ public class OdkNewRepeatEventTest {
     public void setValueOnRepeatWithCount_setsValueForEachRepeat() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
+        scenario.answer("/data/repeat-count", 4);
+
         while (!scenario.atTheEndOfForm()) {
             scenario.next();
         }
 
         assertThat(scenario.repeatInstancesOf("/data/my-jr-count-repeat").size(), is(4));
 
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[1]/defaults-to-position").getDisplayText(), is("2"));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[2]/defaults-to-position").getDisplayText(), is("3"));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[3]/defaults-to-position").getDisplayText(), is("4"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[0]/defaults-to-position-again").getDisplayText(), is("1"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[1]/defaults-to-position-again").getDisplayText(), is("2"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[2]/defaults-to-position-again").getDisplayText(), is("3"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[3]/defaults-to-position-again").getDisplayText(), is("4"));
+
+        // Adding repeats should trigger odk-new-repeat for those new nodes
+        scenario.answer("/data/repeat-count", 6);
+
+        scenario.jumpToFirst("defaults-to-position-again");
+        while (!scenario.atTheEndOfForm()) {
+            scenario.next();
+        }
+        assertThat(scenario.repeatInstancesOf("/data/my-jr-count-repeat").size(), is(6));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[5]/defaults-to-position-again").getDisplayText(), is("6"));
+
     }
 
     @Test

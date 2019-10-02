@@ -9,6 +9,8 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,6 +26,7 @@ import java.util.List;
  * @author Aliza Stone
  */
 public class ActionController implements Externalizable {
+    private static final Logger log = LoggerFactory.getLogger(ActionController.class);
 
     // map from an event to the actions it should trigger
     private HashMap<String, List<Action>> eventListeners;
@@ -57,6 +60,7 @@ public class ActionController implements Externalizable {
     public void triggerActionsFromEvent(String event, FormDef model, TreeReference contextForAction,
                                         ActionResultProcessor resultProcessor) {
         for (Action action : getListenersForEvent(event)) {
+            log.info("Event {} triggering action {} in context {}", event, action.getName(), contextForAction);
             TreeReference refSetByAction = action.processAction(model, contextForAction);
             if (resultProcessor != null && refSetByAction != null) {
                 resultProcessor.processResultOfAction(refSetByAction, event);

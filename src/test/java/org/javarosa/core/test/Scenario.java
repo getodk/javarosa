@@ -43,6 +43,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
@@ -148,6 +149,17 @@ public class Scenario {
 
         List<Selection> selections = Arrays.stream(selectionValues).map(Selection::new).collect(Collectors.toList());
         formDef.setValue(new MultipleItemsData(selections), element.getRef(), true);
+    }
+
+    /**
+     * Sets the value of the element located at the given xPath in the main instance to the given integer value.
+     *
+     * @see #answer(String, String)
+     */
+    public void answer(String xPath, int value) {
+        createMissingRepeats(xPath);
+        TreeElement element = Objects.requireNonNull(resolve(xPath));
+        formDef.setValue(new IntegerData(value), element.getRef(), true);
     }
 
     /**
