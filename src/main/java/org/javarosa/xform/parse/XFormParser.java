@@ -1567,42 +1567,38 @@ public class XFormParser implements IXFormParserFunctions {
             String childName = (child != null ? child.getName() : null);
             String childNamespace = (child != null ? child.getNamespace() : null);
 
-            if (group.getRepeat()) {
-                if (actionHandlers.containsKey(childName)) {
-                    actionHandlers.get(childName).handle(this, child, group);
+            if (group.getRepeat() && NAMESPACE_JAVAROSA.equals(childNamespace)) {
+                if ("chooseCaption".equals(childName)) {
+                    group.chooseCaption = getLabel(child);
+                } else if ("addCaption".equals(childName)) {
+                    group.addCaption = getLabel(child);
+                } else if ("delCaption".equals(childName)) {
+                    group.delCaption = getLabel(child);
+                } else if ("doneCaption".equals(childName)) {
+                    group.doneCaption = getLabel(child);
+                } else if ("addEmptyCaption".equals(childName)) {
+                    group.addEmptyCaption = getLabel(child);
+                } else if ("doneEmptyCaption".equals(childName)) {
+                    group.doneEmptyCaption = getLabel(child);
+                } else if ("entryHeader".equals(childName)) {
+                    group.entryHeader = getLabel(child);
+                } else if ("delHeader".equals(childName)) {
+                    group.delHeader = getLabel(child);
+                } else if ("mainHeader".equals(childName)) {
+                    group.mainHeader = getLabel(child);
                 }
+            }
 
-                if (NAMESPACE_JAVAROSA.equals(childNamespace)) {
-                    if ("chooseCaption".equals(childName)) {
-                        group.chooseCaption = getLabel(child);
-                    } else if ("addCaption".equals(childName)) {
-                        group.addCaption = getLabel(child);
-                    } else if ("delCaption".equals(childName)) {
-                        group.delCaption = getLabel(child);
-                    } else if ("doneCaption".equals(childName)) {
-                        group.doneCaption = getLabel(child);
-                    } else if ("addEmptyCaption".equals(childName)) {
-                        group.addEmptyCaption = getLabel(child);
-                    } else if ("doneEmptyCaption".equals(childName)) {
-                        group.doneEmptyCaption = getLabel(child);
-                    } else if ("entryHeader".equals(childName)) {
-                        group.entryHeader = getLabel(child);
-                    } else if ("delHeader".equals(childName)) {
-                        group.delHeader = getLabel(child);
-                    } else if ("mainHeader".equals(childName)) {
-                        group.mainHeader = getLabel(child);
-                    }
+            if (type == Element.ELEMENT) {
+                if (group.getRepeat() && actionHandlers.containsKey(e.getElement(i).getName())) {
+                    actionHandlers.get(childName).handle(this, child, group);
+                } else {
+                    parseElement(e.getElement(i), group, groupLevelHandlers);
                 }
             }
         }
 
         //the case of a group wrapping a repeat is cleaned up in a post-processing step (collapseRepeatGroups)
-
-        for (int i = 0; i < e.getChildCount(); i++) {
-            if (e.getType(i) == Element.ELEMENT) {
-                parseElement(e.getElement(i), group, groupLevelHandlers);
-            }
-        }
 
         // save all the unused attributes verbatim...
         for (int i = 0; i < e.getAttributeCount(); i++) {
