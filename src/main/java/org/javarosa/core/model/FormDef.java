@@ -1827,7 +1827,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return formXmlPath;
     }
 
-    private HashMap<String, DataInstance> getFormInstances() {
+    public HashMap<String, DataInstance> getFormInstances() {
         return formInstances;
     }
 }
