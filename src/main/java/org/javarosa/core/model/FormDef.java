@@ -1816,7 +1816,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private HashMap<String, DataInstance> getExternalInstances() {
         HashMap<String, DataInstance> externalFormInstances = new HashMap<>();
         for (Map.Entry<String, DataInstance> formInstanceEntry : formInstances.entrySet()) {
-            if (formInstanceEntry instanceof ExternalDataInstance) {
+            if (formInstanceEntry.getValue() instanceof ExternalDataInstance) {
                 externalFormInstances.put(formInstanceEntry.getKey(), formInstanceEntry.getValue());
             }
         }
