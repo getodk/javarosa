@@ -190,6 +190,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private HashMap<String, DataInstance> formInstances;
     private FormInstance mainInstance = null;
 
+    //region Actions
     private ActionController actionController;
     /**
      * The names of the action types that this form includes. This allows clients to do things like let users know if
@@ -197,6 +198,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * includes we'd have to query the actionController on every node.
      */
     private Set<String> actions;
+    /**
+     * Questions and groups that have nested actions triggered by top-level events.
+     */
+    private Set<IFormElement> elementsWithActionTriggeredByToplevelEvent;
+    //endregion
 
     private EventNotifier eventNotifier;
 
@@ -240,8 +246,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         submissionProfiles = new HashMap<>();
         formInstances = new HashMap<>();
         extensions = new ArrayList<>();
+
         actionController = new ActionController();
         actions = new HashSet<>();
+        elementsWithActionTriggeredByToplevelEvent = new HashSet<>();
 
         this.eventNotifier = eventNotifier;
     }
@@ -1288,6 +1296,41 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         resetEvaluationContext();
         actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
         actions = new HashSet<>((List<String>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+
+        List<TreeReference> treeReferencesWithActions = (List<TreeReference>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+        elementsWithActionTriggeredByToplevelEvent = getElementsFromReferences(treeReferencesWithActions);
+    }
+
+    /**
+     * Given one or more {@link TreeReference}, return a set of questions and/or groups corresponding to the references
+     * that are found in this form definition.
+     *
+     * Note: this performs a recursive breadth-first search so is not intended to be used where performance matters.
+     */
+    private Set<IFormElement> getElementsFromReferences(Collection<TreeReference> references) {
+        Set<TreeReference> referencesRemaining = new HashSet<>();
+        referencesRemaining.addAll(references);
+
+        Set<IFormElement> elements = new HashSet<>();
+
+        getElementsFromReferences(referencesRemaining, this, elements);
+        return elements;
+    }
+
+    private static void getElementsFromReferences(Set<TreeReference> referencesRemaining, IFormElement fe, Set<IFormElement> elementsSoFar) {
+        if (referencesRemaining.size() > 0 && fe.getChildren() != null) {
+            for (IFormElement candidate : fe.getChildren()) {
+                TreeReference candidateReference = FormInstance.unpackReference(candidate.getBind());
+                for (TreeReference reference : referencesRemaining) {
+                    if (candidateReference.equals(reference)) {
+                        elementsSoFar.add(candidate);
+                        referencesRemaining.remove(candidate);
+                    }
+                }
+
+                getElementsFromReferences(referencesRemaining, candidate, elementsSoFar);
+            }
+        }
     }
 
     /**
@@ -1313,6 +1356,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         if (newInstance) {
             actionController.triggerActionsFromEvent(Action.EVENT_ODK_INSTANCE_FIRST_LOAD, this);
+            for (IFormElement element : elementsWithActionTriggeredByToplevelEvent) {
+                element.getActionController().triggerActionsFromEvent(Action.EVENT_ODK_INSTANCE_FIRST_LOAD, this, ((TreeReference) element.getBind().getReference()).getParentRef(), null);
+            }
 
             // xforms-ready is marked as deprecated as of JavaRosa 2.14.0 but is still dispatched for compatibility with
             // old form definitions
@@ -1360,6 +1406,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapListPoly(extensions));
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
         ExtUtil.write(dos, new ExtWrapListPoly(new ArrayList<>(actions)));
+        ExtUtil.write(dos, new ExtWrapListPoly(getReferencesFromElements(elementsWithActionTriggeredByToplevelEvent)));
+    }
+
+    /**
+     * Given a collection of form elements, build and return a list of corresponding TreeReferences.
+     */
+    private static List<TreeReference> getReferencesFromElements(Collection<IFormElement> elements) {
+        List<TreeReference> references = new ArrayList<>();
+
+        for (IFormElement element : elements) {
+            references.add(FormInstance.unpackReference(element.getBind()));
+        }
+
+        return references;
     }
 
     public void collapseIndex(FormIndex index, List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {
@@ -1777,6 +1837,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public boolean hasAction(String name) {
         return actions.contains(name);
+    }
+
+    /**
+     * Records that this question or group has a nested action triggered by a top-level event so that the action can be
+     * triggered without having to traverse all elements.
+     */
+    public void registerElementWithActionTriggeredByToplevelEvent(IFormElement element) {
+        elementsWithActionTriggeredByToplevelEvent.add(element);
     }
 
     /**

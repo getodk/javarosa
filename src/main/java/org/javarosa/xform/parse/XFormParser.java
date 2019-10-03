@@ -16,6 +16,48 @@
 
 package org.javarosa.xform.parse;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
+import static org.javarosa.core.model.Constants.CONTROL_INPUT;
+import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.model.Constants.CONTROL_SECRET;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
+import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
+import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
+import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
+import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
+import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
+import static org.javarosa.core.services.ProgramFlow.die;
+import static org.javarosa.xform.parse.Constants.ID_ATTR;
+import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
+import static org.javarosa.xform.parse.Constants.RANK;
+import static org.javarosa.xform.parse.Constants.SELECT;
+import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
+import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -70,49 +112,6 @@ import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
-import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
-import static org.javarosa.core.model.Constants.CONTROL_INPUT;
-import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_RANGE;
-import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.core.model.Constants.CONTROL_SECRET;
-import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
-import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
-import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
-import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
-import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
-import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
-import static org.javarosa.core.services.ProgramFlow.die;
-import static org.javarosa.xform.parse.Constants.ID_ATTR;
-import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
-import static org.javarosa.xform.parse.Constants.RANK;
-import static org.javarosa.xform.parse.Constants.SELECT;
-import static org.javarosa.xform.parse.Constants.SELECTONE;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
-import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
-
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
 /**
@@ -138,7 +137,7 @@ public class XFormParser implements IXFormParserFunctions {
     private static final String DYNAMIC_ITEXT_OPEN = "jr:itext(";
     private static final String BIND_ATTR = "bind";
     private static final String REF_ATTR = "ref";
-    private static final String EVENT_ATTR = "event";
+    public static final String EVENT_ATTR = "event";
 
     private static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
@@ -173,7 +172,9 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> itextKnownForms;
     private static HashMap<String, IElementHandler> actionHandlers;
 
-    /** The string IDs of all instances that are referenced in a instance() function call in the primary instance **/
+    /**
+     * The string IDs of all instances that are referenced in a instance() function call in the primary instance
+     **/
     private static Set<String> referencedInstanceIds;
 
     private final List<WarningCallback> warningCallbacks = new ArrayList<>();
@@ -241,7 +242,8 @@ public class XFormParser implements IXFormParserFunctions {
                 }
             });
             put(RANK, new IElementHandler() {
-                @Override public void handle(XFormParser p, Element e, Object parent) {
+                @Override
+                public void handle(XFormParser p, Element e, Object parent) {
                     p.parseControl((IFormElement) parent, e, CONTROL_RANK);
                 }
             });
@@ -370,7 +372,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     /**
-     * @param formXmlSrc The path of the form definition.
+     * @param formXmlSrc   The path of the form definition.
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
@@ -714,21 +716,38 @@ public class XFormParser implements IXFormParserFunctions {
      * handler that is provided.
      */
     private void parseAction(Element e, Object parent, IElementHandler specificHandler) {
-        // Check that the event registered to trigger this action is a valid event that we support
-        String event = e.getAttributeValue(null, EVENT_ATTR);
-        if (!Action.isValidEvent(event)) {
-            throw new XFormParseException("An action was registered for an unsupported event: " + event);
+        // Check that all events registered to trigger this action are valid events that we support
+        List<String> validEvents = getValidEventNames(e.getAttributeValue(null, EVENT_ATTR));
+
+        for (String event : validEvents) {
+            // Check that the action was included in a valid place within the XForm
+            if (!(parent instanceof IFormElement)) {
+                // parent must either be a FormDef, GroupDef or QuestionDef
+                throw new XFormParseException("An action element occurred in an invalid location. " +
+                    "Must be either a child of a control element, or a child of the <model>");
+            }
+
+            if (!parent.equals(_f) && event.equals(Action.EVENT_ODK_INSTANCE_FIRST_LOAD)) {
+                _f.registerElementWithActionTriggeredByToplevelEvent((IFormElement) parent);
+            }
         }
-        // Check that the action was included in a valid place within the XForm
-        if (!(parent instanceof IFormElement)) {
-            // parent must either be a FormDef or QuestionDef, both of which are IFormElements
-            throw new XFormParseException("An action element occurred in an invalid location. " +
-            "Must be either a child of a control element, or a child of the <model>");
-        }
-        
+
         _f.registerAction(e.getName());
 
         specificHandler.handle(this, e, parent);
+    }
+
+    public static List<String> getValidEventNames(String eventsString) {
+        List<String> validEvents = new ArrayList<>();
+        List<String> invalidEventList = new ArrayList<>();
+        for (String event : eventsString.split(" "))
+            if (Action.isValidEvent(event))
+                validEvents.add(event);
+            else
+                invalidEventList.add(event);
+        if (!invalidEventList.isEmpty())
+            throw new XFormParseException("An action was registered for unsupported events: " + String.join(", ", invalidEventList));
+        return validEvents;
     }
 
     public void parseSetValueAction(ActionController source, Element e) {
@@ -778,8 +797,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        String event = e.getAttributeValue(null, "event");
-        source.registerEventListener(event, action);
+        source.registerEventListener(getValidEventNames(e.getAttributeValue(null, EVENT_ATTR)), action);
     }
 
     private void parseSubmission(Element submission) {
@@ -1051,8 +1069,8 @@ public class XFormParser implements IXFormParserFunctions {
 
         boolean isItem =
             controlType == CONTROL_SELECT_MULTI
-            || controlType == CONTROL_RANK
-            || controlType == CONTROL_SELECT_ONE;
+                || controlType == CONTROL_RANK
+                || controlType == CONTROL_SELECT_ONE;
 
         question.setControlType(controlType);
         question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
@@ -2182,12 +2200,12 @@ public class XFormParser implements IXFormParserFunctions {
      */
     public static void registerActionHandler(String name, final IElementHandler specificHandler) {
         actionHandlers.put(
-                name,
-                new IElementHandler() {
-                    public void handle(XFormParser p, Element e, Object parent) {
-                        p.parseAction(e, parent, specificHandler);
-                    }
+            name,
+            new IElementHandler() {
+                public void handle(XFormParser p, Element e, Object parent) {
+                    p.parseAction(e, parent, specificHandler);
                 }
+            }
         );
     }
 

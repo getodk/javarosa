@@ -29,6 +29,7 @@ public class CoreModelModule implements IModule {
             "org.javarosa.core.model.QuestionDef",
             "org.javarosa.core.model.RangeQuestion",
             "org.javarosa.core.model.GroupDef",
+            "org.javarosa.core.model.instance.TreeReference",
             "org.javarosa.core.model.instance.FormInstance",
             "org.javarosa.core.model.instance.ExternalDataInstance",
             "org.javarosa.core.model.data.BooleanData",
