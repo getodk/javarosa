@@ -705,7 +705,11 @@ public class XFormParser implements IXFormParserFunctions {
                 parseSubmission(child);
             } else {
                 // For now, anything that isn't a submission is an action
-                actionHandlers.get(name).handle(this, child, _f);
+                if (actionHandlers.containsKey(name) && child.getAttributeValue(null, EVENT_ATTR).equals(Action.EVENT_ODK_NEW_REPEAT)) {
+                    throw new XFormParseException("Actions triggered by " + Action.EVENT_ODK_NEW_REPEAT + " must be nested in the repeat form control.", child);
+                } else {
+                    actionHandlers.get(name).handle(this, child, _f);
+                }
             }
         }
     }
@@ -1602,15 +1606,17 @@ public class XFormParser implements IXFormParserFunctions {
                     group.mainHeader = getLabel(child);
                 }
             }
+
+            if (type == Element.ELEMENT) {
+                if (group.getRepeat() && actionHandlers.containsKey(e.getElement(i).getName())) {
+                    actionHandlers.get(childName).handle(this, child, group);
+                } else {
+                    parseElement(e.getElement(i), group, groupLevelHandlers);
+                }
+            }
         }
 
         //the case of a group wrapping a repeat is cleaned up in a post-processing step (collapseRepeatGroups)
-
-        for (int i = 0; i < e.getChildCount(); i++) {
-            if (e.getType(i) == Element.ELEMENT) {
-                parseElement(e.getElement(i), group, groupLevelHandlers);
-            }
-        }
 
         // save all the unused attributes verbatim...
         for (int i = 0; i < e.getAttributeCount(); i++) {

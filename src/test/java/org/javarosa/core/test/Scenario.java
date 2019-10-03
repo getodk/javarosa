@@ -52,6 +52,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
@@ -161,6 +162,17 @@ public class Scenario {
 
         List<Selection> selections = Arrays.stream(selectionValues).map(Selection::new).collect(Collectors.toList());
         formDef.setValue(new MultipleItemsData(selections), element.getRef(), true);
+    }
+
+    /**
+     * Sets the value of the element located at the given xPath in the main instance to the given integer value.
+     *
+     * @see #answer(String, String)
+     */
+    public void answer(String xPath, int value) {
+        createMissingRepeats(xPath);
+        TreeElement element = Objects.requireNonNull(resolve(xPath));
+        formDef.setValue(new IntegerData(value), element.getRef(), true);
     }
 
     /**
@@ -289,7 +301,7 @@ public class Scenario {
         formDef.initialize(true, new InstanceInitializationFactory());
     }
 
-    private void createMissingRepeats(String xPath) {
+    public void createMissingRepeats(String xPath) {
         // We will be looking to the parts in the xPath from left to right.
         // xPath.substring(1) makes the first "/" char go away, giving us an xPath relative to the root
         List<String> parts = Arrays.asList(xPath.substring(1).split("/"));
