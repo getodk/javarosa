@@ -121,6 +121,7 @@ public class Scenario {
 
     public static Scenario init(Path formFile) {
         // TODO explain why this sequence of calls
+        new XFormsModule().registerModule();
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());
@@ -299,6 +300,10 @@ public class Scenario {
      */
     public void newInstance() {
         formDef.initialize(true, new InstanceInitializationFactory());
+    }
+
+    public void setLanguage(String language) {
+        formEntryController.setLanguage(language);
     }
 
     public void createMissingRepeats(String xPath) {

@@ -852,17 +852,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         /*
-         * function to reverse a select value into the display label for that
-         * choice in the question it came from
+         * Given a select value, looks the label up in the choice list defined by the given question and returns it in
+         * the currently-set language.
          *
-         * arg 1: select value arg 2: string xpath referring to origin question;
-         * must be absolute path
+         * arg 1: select value
+         * arg 2: string xpath referring to question that defines the select
          *
          * this won't work at all if the original label needed to be
          * processed/calculated in some way (<output>s, etc.) (is this even
          * allowed?) likely won't work with multi-media labels _might_ work for
          * itemsets, but probably not very well or at all; could potentially work
-         * better if we had some context info DOES work with localization
+         * better if we had some context info
          *
          * it's mainly intended for the simple case of reversing a question with
          * compile-time-static fields, for use inside an <output>
@@ -881,6 +881,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         String value = (String) args[0];
                         String questionXpath = (String) args[1];
                         TreeReference ref = RestoreUtils.xfFact.ref(questionXpath);
+                        ref = ref.anchor(ec.getContextRef());
 
                         QuestionDef q = findQuestionByRef(ref, f);
                         if (q == null
@@ -890,30 +891,24 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                             return "";
                         }
 
-                        // NOTE: this is highly suspect. We have no context against
-                        // which to evaluate
-                        // a dynamic selection list. This will generally cause that
-                        // evaluation to break
-                        // if any filtering is done, or, worst case, give unexpected
-                        // results.
-                        //
-                        // We should hook into the existing code (FormEntryPrompt) for
-                        // pulling
-                        // display text for select choices. however, it's hard,
-                        // because we don't really have
-                        // any context to work with, and all the situations where that
-                        // context would be used
-                        // don't make sense for trying to reverse a select value back
-                        // to a label in an unrelated
-                        // expression
-
                         List<SelectChoice> choices;
+
                         ItemsetBinding itemset = q.getDynamicChoices();
                         if (itemset != null) {
+                            // 2019-HM: See ChoiceNameTest for test and more explanation
+
+                            // NOTE: We have no context against which to evaluate a dynamic selection list. This will
+                            // generally cause that evaluation to break if any filtering is done, or, worst case, give
+                            // unexpected results.
+                            //
+                            // We should hook into the existing code (FormEntryPrompt) for pulling display text for select
+                            // choices. however, it's hard, because we don't really have any context to work with, and all
+                            // the situations where that context would be used don't make sense for trying to reverse a
+                            // select value back to a label in an unrelated expression
                             if (itemset.getChoices() == null) {
-                                // NOTE: this will return incorrect results if the list
-                                // is filtered.
-                                // fortunately, they are ignored by FormEntryPrompt
+                                // NOTE: this will return incorrect results if the list is filtered. fortunately, they
+                                // are ignored by FormEntryPrompt.
+                                // 2019-HM: can't reproduce a case where filtered list would be anything other than empty
 
                                 if (ref.isAmbiguous()) {
                                     // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
@@ -931,15 +926,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         if (choices != null) {
                             for (SelectChoice ch : choices) {
                                 if (ch.getValue().equals(value)) {
-                                    // this is really not ideal. we should hook into the
-                                    // existing code (FormEntryPrompt) for pulling
-                                    // display text for select choices. however, it's
-                                    // hard, because we don't really have
-                                    // any context to work with, and all the situations
-                                    // where that context would be used
-                                    // don't make sense for trying to reverse a select
-                                    // value back to a label in an unrelated
-                                    // expression
+                                    // this is really not ideal. we should hook into the existing code (FormEntryPrompt)
+                                    // for pulling display text for select choices. however, it's hard, because we don't
+                                    // really have any context to work with, and all the situations where that context
+                                    // would be used don't make sense for trying to reverse a select value back to a
+                                    // label in an unrelated expression
 
                                     String textID = ch.getTextID();
                                     String templateStr;
