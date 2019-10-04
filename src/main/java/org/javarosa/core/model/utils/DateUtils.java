@@ -355,10 +355,14 @@ public class DateUtils {
         if (!parseTime(str, fields)) {
             return null;
         }
-        // time zone may wrap time across midnight. Clear that.
-        fields.year = 1970;
-        fields.month = 1;
-        fields.day = 1;
+        return getDate(fields);
+    }
+
+
+    public static Date parseTimeWithFixedDate(String str, DateFields fields) {
+        if (!parseTime(str, fields)) {
+            return null;
+        }
         return getDate(fields);
     }
 
