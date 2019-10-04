@@ -358,6 +358,14 @@ public class DateUtils {
         return getDate(fields);
     }
 
+
+    public static Date parseTimeWithFixedDate(String str, DateFields fields) {
+        if (!parseTime(str, fields)) {
+            return null;
+        }
+        return getDate(fields);
+    }
+
     private static boolean parseDate (String dateStr, DateFields f) {
       List<String> pieces = split(dateStr, "-", false);
         if (pieces.size() != 3)
