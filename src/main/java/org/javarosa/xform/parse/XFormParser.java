@@ -100,6 +100,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -750,7 +751,7 @@ public class XFormParser implements IXFormParserFunctions {
             else
                 invalidEventList.add(event);
         if (!invalidEventList.isEmpty())
-            throw new XFormParseException("An action was registered for unsupported events: " + String.join(", ", invalidEventList));
+            throw new XFormParseException("An action was registered for unsupported events: " + XPathFuncExpr.join(", ", invalidEventList.toArray()));
         return validEvents;
     }
 
