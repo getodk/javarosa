@@ -92,3 +92,5 @@ jmh {
     resultFormat = 'CSV'
     forceGC = true
 }
+
+apply from: 'android-api-level-checker.gradle'
