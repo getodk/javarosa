@@ -26,6 +26,13 @@ jobs:
           destination: libs
       - store_test_results:
           path: build/test-results
+  check-android-api-level:
+    working_directory: ~/work
+    docker:
+      - image: circleci/openjdk:latest
+    steps:
+      - checkout
+      - run: ./gradlew androidLint
   package:
     working_directory: ~/work
     docker:
@@ -36,13 +43,13 @@ jobs:
           key: m2-{{ checksum "pom.xml" }}
       - run: mvn package
       - save_cache:
-          paths: 
+          paths:
             - ~/.m2
           key: m2-{{ checksum "pom.xml" }}
       - store_artifacts:
           path: target/apidocs
           destination: apidocs
-      - store_artifacts: 
+      - store_artifacts:
           path: target/libs
           destination: libs
       - store_test_results:
@@ -52,4 +59,5 @@ workflows:
   build_and_package:
     jobs:
       - build
+      - check-android-api-level
       - package
