@@ -2,17 +2,17 @@ task androidClean(type: Delete) {
     delete "$buildDir/android-api-level-checker"
 }
 
-task androidUnpackBlankProject(type: Copy) {
+task androidUnpackBlankProject(dependsOn: [androidClean], type: Copy) {
     from zipTree("javarosa-android-api-level-checker.zip")
     into "$buildDir/android-api-level-checker"
 }
 
-task androidCopySources(type: Copy) {
+task androidCopySources(dependsOn: [androidUnpackBlankProject], type: Copy) {
     from "${sourceSets.main.java.srcDirs[0]}"
     into "$buildDir/android-api-level-checker/app/src/main/java"
 }
 
-task androidLint(type: GradleBuild) {
+task androidLint(dependsOn: [androidCopySources], type: GradleBuild) {
     buildFile = "$buildDir/android-api-level-checker/build.gradle"
     tasks = ['lint']
 }
