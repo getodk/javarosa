@@ -1,4 +1,18 @@
 version: 2
+
+references:
+    accept_licenses : &accept_licenses
+        run:
+            name: Accept licenses
+            command: yes | sdkmanager --licenses || true
+    workspace: &workspace
+                   ~/work
+
+    android_config: &android_config
+        working_directory: *workspace
+        docker:
+            - image: circleci/android:api-27
+
 jobs:
   build:
     working_directory: ~/work
@@ -27,12 +41,13 @@ jobs:
       - store_test_results:
           path: build/test-results
   check-android-api-level:
-    working_directory: ~/work
-    docker:
-      - image: circleci/openjdk:latest
+    <<: *android_config
     steps:
       - checkout
-      - run: ./gradlew androidLint
+      - *accept_licenses
+      - run:
+          name: Android Lint
+          command: ./gradlew androidLint
   package:
     working_directory: ~/work
     docker:
