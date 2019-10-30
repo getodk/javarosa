@@ -14,9 +14,6 @@
  * the License.
  */
 
-/**
- *
- */
 package org.javarosa.model.xform;
 
 import java.io.DataInputStream;
@@ -37,9 +34,6 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- */
 public class XPathReference implements IDataReference {
     private static final Logger logger = LoggerFactory.getLogger(XPathReference.class);
 
@@ -47,7 +41,6 @@ public class XPathReference implements IDataReference {
     private String nodeset;
 
     public XPathReference () {
-
     }
 
     public XPathReference (String nodeset) {
@@ -60,20 +53,18 @@ public class XPathReference implements IDataReference {
         boolean validNonPathExpr = false;
 
         try {
-        path = XPathParseTool.parseXPath(nodeset);
-        if (!(path instanceof XPathPathExpr)) {
-            validNonPathExpr = true;
-            throw new XPathSyntaxException();
-        }
-
+            path = XPathParseTool.parseXPath(nodeset);
+            if (!(path instanceof XPathPathExpr)) {
+                validNonPathExpr = true;
+                throw new XPathSyntaxException();
+            }
         } catch (XPathSyntaxException xse) {
             //make these checked exceptions?
             if (validNonPathExpr) {
                 throw new XPathTypeMismatchException("Expected XPath path, got XPath expression: [" + nodeset + "]," + xse.getMessage());
-            } else {
-                logger.error("Error", xse);
-                throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
             }
+            logger.error("Error", xse);
+            throw new XPathException("Parse error in XPath path: [" + nodeset + "]." + (xse.getMessage() == null ? "" : "\n" + xse.getMessage()));
         }
 
         return (XPathPathExpr)path;
@@ -98,26 +89,19 @@ public class XPathReference implements IDataReference {
     public boolean equals (Object o) {
         if (o instanceof XPathReference) {
             return ref.equals(((XPathReference)o).ref);
-        } else {
-            return false;
         }
+        return false;
     }
 
     public int hashCode () {
         return ref.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
-     */
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         nodeset = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
         ref = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
     }
 
-    /* (non-Javadoc)
-     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
-     */
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, ExtUtil.emptyIfNull(nodeset));
         ExtUtil.write(out, ref);
