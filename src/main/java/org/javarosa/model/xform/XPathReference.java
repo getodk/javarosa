@@ -53,7 +53,7 @@ public class XPathReference implements IDataReference {
         boolean validNonPathExpr = false;
 
         try {
-            path = XPathParseTool.parseXPath(nodeset);
+            path = XPathParseTool.parseXPath(applyShortcuts(nodeset));
             if (!(path instanceof XPathPathExpr)) {
                 validNonPathExpr = true;
                 throw new XPathSyntaxException();
@@ -68,6 +68,11 @@ public class XPathReference implements IDataReference {
         }
 
         return (XPathPathExpr)path;
+    }
+
+    private static String applyShortcuts(String nodeset) {
+        // Assume any sequence of digits inside square brackets is a position predicate shortcut
+        return nodeset.replaceAll("\\[(\\d+)\\]", "[position() = $1]");
     }
 
     public XPathReference (XPathPathExpr path) {

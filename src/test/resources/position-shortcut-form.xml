@@ -1,0 +1,22 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Position Shortcut Test</h:title>
+        <model>
+            <instance>
+                <data id="1">
+                    <house>
+                        <yard/>
+                        <yard/>
+                    </house>
+                    <house>
+                        <yard/>
+                        <yard/>
+                    </house>
+                </data>
+            </instance>
+            <bind nodeset="/data/house[position() = 1]/yard[position() = 1]" type="string" calculate="string('House 1 Yard 1')"/>
+            <bind nodeset="/data/house[2]/yard[2]"                           type="string" calculate="string('House 2 Yard 2')"/>
+        </model>
+    </h:head>
+    <h:body/>
+</h:html>

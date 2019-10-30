@@ -92,6 +92,17 @@ public class XFormParserTest {
     }
 
     @Test
+    public void parsesPositionShortcut() throws IOException {
+        FormDef formDef = parse(r("position-shortcut-form.xml"));
+        formDef.initialize(true, new InstanceInitializationFactory());
+        TreeElement root = formDef.getMainInstance().getRoot();
+        TreeElement house1Yard1 = root.getChild("house", 0).getChild("yard", 0);
+        assertEquals("House 1 Yard 1", house1Yard1.getValue().getDisplayText());
+        TreeElement house2Yard2 = root.getChild("house", 1).getChild("yard", 1);
+        assertEquals("House 2 Yard 2", house2Yard2.getValue().getDisplayText());
+    }
+
+    @Test
     public void parsesForm2() throws IOException {
         FormDef formDef = parse(r("form2.xml"));
         assertEquals("My Survey", formDef.getTitle());
