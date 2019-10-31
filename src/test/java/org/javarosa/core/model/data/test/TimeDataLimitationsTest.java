@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +47,9 @@ public class TimeDataLimitationsTest {
     public void editingFormsSavedInDifferentTimezoneTest() {
         // A user is in Warsaw (GMT+2) saved a form with the time question
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Warsaw"));
-        String savedTime = "10:00:00.000+02:00";
+
+        boolean isSummerTime = TimeZone.getDefault().inDaylightTime(new Date());
+        String savedTime = isSummerTime ? "10:00:00.000+02:00" : "10:00:00.000+01:00";
 
         // A user opens saved form in Warsaw as well - the hour should be the same
         TimeData timeData = new TimeData(DateUtils.parseTime(savedTime));
