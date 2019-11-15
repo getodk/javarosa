@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>CountNonEmpty</h:title>
+        <model>
+            <instance>
+                <test id="test">
+                    <details>
+                        <group2>
+                            <weight />
+                        </group2>
+                    </details>
+                    <weight_mean2 />
+                </test>
+            </instance>
+            <bind nodeset="/test/details/group2/weight" type="decimal" />
+            <bind calculate="count-non-empty( /test/details/group2/weight )" nodeset="/test/weight_mean2" type="string" />
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/test/details">
+            <repeat nodeset="/test/details">
+                <group ref="/test/details/group2">
+                    <input ref="/test/details/group2/weight">
+                        <label>weight (kg)</label>
+                    </input>
+                </group>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>

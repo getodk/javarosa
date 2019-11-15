@@ -191,6 +191,12 @@ public class XFormParserTest {
     }
 
     @Test
+    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException {
+        FormDef formDef = parse(r("countNonEmptyForm.xml"));
+        formDef.initialize(false, new InstanceInitializationFactory());
+    }
+
+    @Test
     public void parsesMetaNamespaceForm() throws IOException {
         FormDef formDef = parse(r("meta-namespace-form.xml"));
         assertEquals(formDef.getTitle(), "Namespace for Metadata");
