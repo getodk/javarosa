@@ -104,7 +104,7 @@ public class XPathEvalTest {
     @Test
     public void counting_functions() {
         testEval("count(/data/path)", buildInstance(), null, 5.0);
-        testEval("count-non-empty(/data/path)", buildInstance(), null, 3);
+        testEval("count-non-empty(/data/path)", buildInstance(), null, 3.0);
     }
 
     @Test

@@ -1068,9 +1068,9 @@ public class XPathFuncExpr extends XPathExpression {
      * @param o NodeSet to evaluate. Throws if not a NodeSet
      * @return the number of non-empty nodes in argument node-set.
      */
-    private int countNonEmpty(Object o) {
+    private static Double countNonEmpty(Object o) {
         if (o instanceof XPathNodeset) {
-            return ((XPathNodeset) o).getNonEmptySize();
+            return (double) ((XPathNodeset) o).getNonEmptySize();
         }
 
         throw new XPathTypeMismatchException("not a nodeset");
