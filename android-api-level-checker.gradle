@@ -7,7 +7,19 @@ task androidUnpackBlankProject(dependsOn: [androidClean], type: Copy) {
     into "$buildDir/android-api-level-checker"
 }
 
-task androidCopySources(dependsOn: [androidUnpackBlankProject], type: Copy) {
+task androidSetMinSdkVersion(dependsOn: [androidUnpackBlankProject]) {
+    doLast {
+        def buildFile = new File("$buildDir/android-api-level-checker/app/build.gradle")
+        def oldBuildContents = buildFile.getText("UTF-8")
+        def newBuildContents = oldBuildContents.replace(
+            "minSdkVersion 16",
+            "minSdkVersion ${getValue("androidMinSdkVersion", "16")}"
+        )
+        buildFile.write(newBuildContents)
+    }
+}
+
+task androidCopySources(dependsOn: [androidSetMinSdkVersion], type: Copy) {
     from "${sourceSets.main.java.srcDirs[0]}"
     into "$buildDir/android-api-level-checker/app/src/main/java"
 }
