@@ -1798,7 +1798,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         X newEx;
         try {
             newEx = extension.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException e) {
+            throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
+        } catch (IllegalAccessException e) {
             throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
         }
         extensions.add(newEx);
