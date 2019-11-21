@@ -1,4 +1,18 @@
 version: 2
+
+references:
+    accept_licenses : &accept_licenses
+        run:
+            name: Accept licenses
+            command: yes | sdkmanager --licenses || true
+    workspace: &workspace
+                   ~/work
+
+    android_config: &android_config
+        working_directory: *workspace
+        docker:
+            - image: circleci/android:api-29
+
 jobs:
   build:
     working_directory: ~/work
@@ -26,6 +40,17 @@ jobs:
           destination: libs
       - store_test_results:
           path: build/test-results
+  check-android-api-level:
+    <<: *android_config
+    steps:
+      - checkout
+      - *accept_licenses
+      - run:
+          name: Android Lint
+          command: ./gradlew androidLint --max-workers=1
+      - store_artifacts:
+          path: build/android-api-level-checker/app/build/reports/lint-results.html
+          destination: lint-results.html
   package:
     working_directory: ~/work
     docker:
@@ -36,13 +61,13 @@ jobs:
           key: m2-{{ checksum "pom.xml" }}
       - run: mvn package
       - save_cache:
-          paths: 
+          paths:
             - ~/.m2
           key: m2-{{ checksum "pom.xml" }}
       - store_artifacts:
           path: target/apidocs
           destination: apidocs
-      - store_artifacts: 
+      - store_artifacts:
           path: target/libs
           destination: libs
       - store_test_results:
@@ -52,4 +77,5 @@ workflows:
   build_and_package:
     jobs:
       - build
+      - check-android-api-level
       - package

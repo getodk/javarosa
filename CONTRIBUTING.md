@@ -5,6 +5,8 @@ This is a living document. If you see something that could be improved, edit thi
 ## Beware of Java APIs not available in Android
 JavaRosa is used primarily as a dependency for Android apps, and its main client is [ODK Collect](http://github.com/opendatakit/collect). That means [only the subset of Java 8](https://developer.android.com/studio/write/java8-support) available in Android can be used. Furthermore, many Java 8 APIs are only available for apps that have a minimum API level of 24 or 26. Collect's minimum API level is 16.
 
+If you want to make sure that your project will comply with Collect's requirements, you can run the `androidLint` Gradle task. This task is automatically run by our CircleCI continuous integration project and will prevent unsupported code merged to the upstream git repo. 
+
 ## Submitting a pull request
 To contribute code to ODK JavaRosa, you will need to open a [pull request](https://help.github.com/articles/about-pull-requests/) which will be reviewed by the community and then merged into the core project.
 

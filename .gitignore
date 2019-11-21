@@ -4,6 +4,7 @@
 # gradle
 .gradle
 build
+gradle.properties
 
 # intellij
 .idea

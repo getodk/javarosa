@@ -92,3 +92,18 @@ jmh {
     resultFormat = 'CSV'
     forceGC = true
 }
+
+/**
+ * Returns the value of a property of this build if it exists. Otherwise,
+ * returns the provided devault value.
+ *
+ * This method is used as a safe way to get properties that might or might not
+ * be defined in the gradle.properties file.
+ */
+String getValue(String key, String defaultValue) {
+    if (this.hasProperty(key))
+        return this.getProperty(key)
+    return defaultValue
+}
+
+apply from: 'android-api-level-checker.gradle'
