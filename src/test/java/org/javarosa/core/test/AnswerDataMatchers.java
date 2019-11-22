@@ -4,6 +4,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 
 public class AnswerDataMatchers {
@@ -21,6 +22,25 @@ public class AnswerDataMatchers {
 
             @Override
             protected boolean matchesSafely(StringData item) {
+                return item.getValue().equals(expectedAnswer);
+            }
+        };
+    }
+
+    public static Matcher<IntegerData> intAnswer(int expectedAnswer) {
+        return new TypeSafeMatcher<IntegerData>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("answer with value " + expectedAnswer);
+            }
+
+            @Override
+            protected void describeMismatchSafely(IntegerData item, Description mismatchDescription) {
+                mismatchDescription.appendText("was answer " + item.getDisplayText() + "(").appendValue(item.getValue()).appendText(")");
+            }
+
+            @Override
+            protected boolean matchesSafely(IntegerData item) {
                 return item.getValue().equals(expectedAnswer);
             }
         };
