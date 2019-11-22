@@ -1,5 +1,27 @@
 package org.javarosa.xform.parse;
 
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.readAllBytes;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
+import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
@@ -17,6 +39,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
@@ -27,28 +50,6 @@ import org.junit.Test;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import static java.nio.file.Files.copy;
-import static java.nio.file.Files.readAllBytes;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.javarosa.core.model.Constants.CONTROL_RANGE;
-import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
-import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
     private static final Logger logger = LoggerFactory.getLogger(XFormParserTest.class);
@@ -192,8 +193,9 @@ public class XFormParserTest {
 
     @Test
     public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException {
-        FormDef formDef = parse(r("countNonEmptyForm.xml"));
-        formDef.initialize(false, new InstanceInitializationFactory());
+        Scenario scenario = Scenario.init("countNonEmptyForm.xml");
+        assertThat(scenario.answerOf("/test/count_value"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/test/count_non_empty_value"), is(intAnswer(2)));
     }
 
     @Test

@@ -7,14 +7,31 @@
                 <test id="test">
                     <details>
                         <group2>
-                            <weight />
+                            <weight>1</weight>
                         </group2>
                     </details>
-                    <weight_mean2 />
+                    <details>
+                        <group2>
+                            <weight>2</weight>
+                        </group2>
+                    </details>
+                    <details>
+                        <group2>
+                            <weight/>
+                        </group2>
+                    </details>
+                    <details>
+                        <group2>
+                            <weight/>
+                        </group2>
+                    </details>
+                    <count_value/>
+                    <count_non_empty_value/>
                 </test>
             </instance>
-            <bind nodeset="/test/details/group2/weight" type="decimal" />
-            <bind calculate="count-non-empty( /test/details/group2/weight )" nodeset="/test/weight_mean2" type="string" />
+            <bind nodeset="/test/details/group2/weight" type="string"/>
+            <bind calculate="count( /test/details/group2/weight )" nodeset="/test/count_value" type="int"/>
+            <bind calculate="count-non-empty( /test/details/group2/weight )" nodeset="/test/count_non_empty_value" type="int"/>
         </model>
     </h:head>
     <h:body>
