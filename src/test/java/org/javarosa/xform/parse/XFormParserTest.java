@@ -8,6 +8,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
@@ -196,6 +197,15 @@ public class XFormParserTest {
         Scenario scenario = Scenario.init("countNonEmptyForm.xml");
         assertThat(scenario.answerOf("/test/count_value"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/test/count_non_empty_value"), is(intAnswer(2)));
+    }
+
+    @Test
+    public void operatorsShouldBeCaseInsensitive() throws IOException {
+        Scenario scenario = Scenario.init("operators.xml");
+        assertThat(scenario.answerOf("/operators/c1"), is(booleanAnswer(true)));
+        assertThat(scenario.answerOf("/operators/c2"), is(booleanAnswer(false)));
+        assertThat(scenario.answerOf("/operators/c3"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/operators/c4"), is(intAnswer(0)));
     }
 
     @Test

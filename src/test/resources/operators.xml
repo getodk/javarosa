@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<h:html
+    xmlns="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:jr="http://openrosa.org/javarosa"
+    xmlns:odk="http://www.opendatakit.org/xforms"
+    xmlns:orx="http://openrosa.org/xforms"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>operators</h:title>
+        <model>
+            <instance>
+                <operators id="operators">
+                    <q1>4</q1>
+                    <q2>2</q2>
+                    <q3>1</q3>
+                    <c1/>
+                    <c2/>
+                    <c3/>
+                    <c4/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </operators>
+            </instance>
+            <bind nodeset="/operators/q1" type="int"/>
+            <bind nodeset="/operators/q2" type="int"/>
+            <bind nodeset="/operators/q3" type="int"/>
+            <bind calculate=" /operators/q1 &gt;10 OR  /operators/q1 &lt;-10 or  /operators/q1 =4" nodeset="/operators/c1" type="string"/>
+            <bind calculate=" /operators/q1 &gt;10 AND  /operators/q2 &gt;10 and  /operators/q3 &gt;10" nodeset="/operators/c2" type="string"/>
+            <bind calculate=" /operators/q1  DIV  /operators/q2  div  /operators/q3 " nodeset="/operators/c3" type="string"/>
+            <bind calculate=" /operators/q1  MOD  /operators/q2  mod  /operators/q3 " nodeset="/operators/c4" type="string"/>
+            <bind jr:preload="uid" nodeset="/operators/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/operators/q1">
+            <label>Q1</label>
+        </input>
+        <input ref="/operators/q2">
+            <label>Q2</label>
+        </input>
+        <input ref="/operators/q3">
+            <label>Q3</label>
+        </input>
+    </h:body>
+</h:html>

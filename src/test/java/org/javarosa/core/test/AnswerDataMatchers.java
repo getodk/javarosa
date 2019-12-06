@@ -3,6 +3,7 @@ package org.javarosa.core.test;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
@@ -41,6 +42,25 @@ public class AnswerDataMatchers {
 
             @Override
             protected boolean matchesSafely(IntegerData item) {
+                return item.getValue().equals(expectedAnswer);
+            }
+        };
+    }
+
+    public static Matcher<BooleanData> booleanAnswer(boolean expectedAnswer) {
+        return new TypeSafeMatcher<BooleanData>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("answer with value " + expectedAnswer);
+            }
+
+            @Override
+            protected void describeMismatchSafely(BooleanData item, Description mismatchDescription) {
+                mismatchDescription.appendText("was answer " + item.getDisplayText() + "(").appendValue(item.getValue()).appendText(")");
+            }
+
+            @Override
+            protected boolean matchesSafely(BooleanData item) {
                 return item.getValue().equals(expectedAnswer);
             }
         };
