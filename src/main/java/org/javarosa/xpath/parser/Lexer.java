@@ -101,16 +101,16 @@ public class Lexer {
             } else if (c == ':' && d == ':') {
                 token = new Token(Token.DBL_COLON);
                 skip = 2;
-            } else if (context == LEX_CONTEXT_OP && i + 3 <= expr.length() && "and".equals(expr.substring(i, i + 3))) {
+            } else if (context == LEX_CONTEXT_OP && i + 3 <= expr.length() && "and".equalsIgnoreCase(expr.substring(i, i + 3))) {
                 token = new Token(Token.AND);
                 skip = 3;
-            } else if (context == LEX_CONTEXT_OP && i + 2 <= expr.length() && "or".equals(expr.substring(i, i + 2))) {
+            } else if (context == LEX_CONTEXT_OP && i + 2 <= expr.length() && "or".equalsIgnoreCase(expr.substring(i, i + 2))) {
                 token = new Token(Token.OR);
                 skip = 2;
-            } else if (context == LEX_CONTEXT_OP && i + 3 <= expr.length() && "div".equals(expr.substring(i, i + 3))) {
+            } else if (context == LEX_CONTEXT_OP && i + 3 <= expr.length() && "div".equalsIgnoreCase(expr.substring(i, i + 3))) {
                 token = new Token(Token.DIV);
                 skip = 3;
-            } else if (context == LEX_CONTEXT_OP && i + 3 <= expr.length() && "mod".equals(expr.substring(i, i + 3))) {
+            } else if (context == LEX_CONTEXT_OP && i + 3 <= expr.length() && "mod".equalsIgnoreCase(expr.substring(i, i + 3))) {
                 token = new Token(Token.MOD);
                 skip = 3;
             } else if (c == '$') {
