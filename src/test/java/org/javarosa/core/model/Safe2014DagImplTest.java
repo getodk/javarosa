@@ -15,6 +15,7 @@ import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
@@ -34,6 +35,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.joda.time.LocalTime;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -448,6 +450,80 @@ public class Safe2014DagImplTest {
         scenario.answer("1"); // Label: "yes"
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
+    }
+
+    /**
+     * Ignored because the assertions about non-null next-numbers will fail because our DAG
+     * doesn't evaluate calculations in repeat instances that are previous siblings to the
+     * one that has changed.
+     */
+    @Test
+    @Ignore
+    public void calculate_expressions_should_be_evaluated_on_previous_repeat_siblings() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group jr:template=\"\"", t("prev-number"), t("number"), t("next-number")),
+                        t("meta", t("instanceID"))
+                    )),
+                    bind("/data/group/prev-number").type("int").calculate("/data/group[position() = (position(current()/..) - 1)]/number"),
+                    bind("/data/group/number").type("int").required(),
+                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number"),
+                    bind("/data/meta/instanceID").type("string").preload("uid").readonly()
+                )
+            ),
+            body(
+                group("/data/group",
+                    repeat("/data/group",
+                        input("/data/group/number")
+                    )
+                )
+            )
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(11);
+
+        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
+
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(22);
+
+        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(33);
+
+        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(22)));
+
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[2]/number"), is(intAnswer(33)));
+
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
     }
 
     /**

@@ -120,7 +120,9 @@ public class Scenario {
 
     public static Scenario init(String formName, XFormsElement form) throws IOException {
         Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
-        write(formFile, form.asXml().getBytes(UTF_8), CREATE);
+        String xml = form.asXml();
+        System.out.println(xml);
+        write(formFile, xml.getBytes(UTF_8), CREATE);
         return Scenario.init(formFile);
     }
 
@@ -214,9 +216,6 @@ public class Scenario {
         return AnswerResult.from(jrCode);
     }
 
-    /**
-     * Answers the current question.
-     */
     public AnswerResult answer(int value) {
         FormIndex formIndex = formEntryController.getModel().getFormIndex();
         IntegerData data = new IntegerData(value);
@@ -555,6 +554,20 @@ public class Scenario {
                 return "Repeat Juncture";
         }
         return "Unknown";
+    }
+
+    public void createNewRepeat() {
+        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        IFormElement child = formDef.getChild(formIndex);
+        String reference = "";
+        try {
+            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
+        } catch (RuntimeException e) {
+            // Do nothing. Probably "method not implemented" in FormDef.getBind()
+        }
+
+        log.info("Create repeat instance {}", reference);
+        formEntryController.newRepeat();
     }
 
     public enum AnswerResult {
