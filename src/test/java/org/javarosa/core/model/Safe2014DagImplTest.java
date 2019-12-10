@@ -1,25 +1,42 @@
 package org.javarosa.core.model;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.group;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.item;
+import static org.javarosa.core.util.XFormsElement.label;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.select1;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.junit.Assert.assertThat;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.test.Scenario;
 import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.joda.time.LocalTime;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.junit.Assert.assertThat;
 
 public class Safe2014DagImplTest {
     private static final Logger logger = LoggerFactory.getLogger(Safe2014DagImplTest.class);
@@ -38,7 +55,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnFollowingRepeatGroupSiblings() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-children-position-calculation.xml"));
+            parse(r("repeat-group-with-children-position-calculation.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -69,13 +86,13 @@ public class Safe2014DagImplTest {
 
         // check that correct calculations were triggered
         final String[] expectedMessages = {
-                "Processing 'Recalculate' for no [2_1] (2.0)",
-                "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
-                "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [3_1] (3.0)",
-                "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [4_1] (4.0)",
-                "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [2_1] (2.0)",
+            "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [3_1] (3.0)",
+            "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [4_1] (4.0)",
+            "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for ",
         };
 
         assertThat(dagEvents.size(), equalTo(expectedMessages.length));
@@ -90,7 +107,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-children-calculations-dependent-on-the-parent.xml"));
+            parse(r("repeat-group-with-children-calculations-dependent-on-the-parent.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -125,18 +142,18 @@ public class Safe2014DagImplTest {
 
         // check that correct calculations were triggered
         final String[] expectedMessages = {
-                "Processing 'Recalculate' for no [2_1] (2.0)",
-                "Processing 'Recalculate' for name_and_no [2_1] (C2)",
-                "Processing 'Deleted: houseM [2]: 2 triggerables were fired.' for ",
-                "Processing 'Deleted: no [2_1]: 0 triggerables were fired.' for ",
-                "Processing 'Deleted: name [2_1]: 0 triggerables were fired.' for ",
-                "Processing 'Deleted: name_and_no [2_1]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [3_1] (3.0)",
-                "Processing 'Recalculate' for name_and_no [3_1] (D3)",
-                "Processing 'Deleted: houseM [3]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [4_1] (4.0)",
-                "Processing 'Recalculate' for name_and_no [4_1] (E4)",
-                "Processing 'Deleted: houseM [4]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [2_1] (2.0)",
+            "Processing 'Recalculate' for name_and_no [2_1] (C2)",
+            "Processing 'Deleted: houseM [2]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: no [2_1]: 0 triggerables were fired.' for ",
+            "Processing 'Deleted: name [2_1]: 0 triggerables were fired.' for ",
+            "Processing 'Deleted: name_and_no [2_1]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [3_1] (3.0)",
+            "Processing 'Recalculate' for name_and_no [3_1] (D3)",
+            "Processing 'Deleted: houseM [3]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [4_1] (4.0)",
+            "Processing 'Recalculate' for name_and_no [4_1] (E4)",
+            "Processing 'Deleted: houseM [4]: 2 triggerables were fired.' for ",
         };
 
         assertThat(dagEvents.size(), equalTo(expectedMessages.length));
@@ -151,7 +168,7 @@ public class Safe2014DagImplTest {
     public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml"));
+            parse(r("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -186,16 +203,16 @@ public class Safe2014DagImplTest {
 
         // check that correct calculations were triggered
         final String[] expectedMessages = {
-                "Processing 'Recalculate' for no [2_1] (2.0)",
-                "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
-                "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
-                "Processing 'Recalculate' for name_concat [2_1] (CX)",
-                "Processing 'Deleted: name [2_1]: 1 triggerables were fired.' for ",
-                "Processing 'Deleted: name_concat [2_1]: 1 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [3_1] (3.0)",
-                "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [4_1] (4.0)",
-                "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for "
+            "Processing 'Recalculate' for no [2_1] (2.0)",
+            "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for name_concat [2_1] (CX)",
+            "Processing 'Deleted: name [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: name_concat [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [3_1] (3.0)",
+            "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [4_1] (4.0)",
+            "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for "
         };
 
         assertThat(dagEvents.size(), equalTo(expectedMessages.length));
@@ -210,7 +227,7 @@ public class Safe2014DagImplTest {
     public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("calculation-dependent-on-the-repeat-groups-number.xml"));
+            parse(r("calculation-dependent-on-the-repeat-groups-number.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -251,28 +268,28 @@ public class Safe2014DagImplTest {
 
         // check that correct calculations were triggered
         final String[] expectedMessages = {
-                "Processing 'Recalculate' for no [3_1] (3.0)",
-                "Processing 'Recalculate' for summary [1] (51.0)",
-                "Processing 'Deleted: houseM [3]: 2 triggerables were fired.' for ",
-                "Processing 'Deleted: no [3_1]: 0 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [4_1] (4.0)",
-                "Processing 'Recalculate' for summary [1] (50.0)",
-                "Processing 'Deleted: houseM [4]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [5_1] (5.0)",
-                "Processing 'Recalculate' for summary [1] (49.0)",
-                "Processing 'Deleted: houseM [5]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [6_1] (6.0)",
-                "Processing 'Recalculate' for summary [1] (48.0)",
-                "Processing 'Deleted: houseM [6]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [7_1] (7.0)",
-                "Processing 'Recalculate' for summary [1] (47.0)",
-                "Processing 'Deleted: houseM [7]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [8_1] (8.0)",
-                "Processing 'Recalculate' for summary [1] (46.0)",
-                "Processing 'Deleted: houseM [8]: 2 triggerables were fired.' for ",
-                "Processing 'Recalculate' for no [9_1] (9.0)",
-                "Processing 'Recalculate' for summary [1] (45.0)",
-                "Processing 'Deleted: houseM [9]: 2 triggerables were fired.' for "
+            "Processing 'Recalculate' for no [3_1] (3.0)",
+            "Processing 'Recalculate' for summary [1] (51.0)",
+            "Processing 'Deleted: houseM [3]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: no [3_1]: 0 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [4_1] (4.0)",
+            "Processing 'Recalculate' for summary [1] (50.0)",
+            "Processing 'Deleted: houseM [4]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [5_1] (5.0)",
+            "Processing 'Recalculate' for summary [1] (49.0)",
+            "Processing 'Deleted: houseM [5]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [6_1] (6.0)",
+            "Processing 'Recalculate' for summary [1] (48.0)",
+            "Processing 'Deleted: houseM [6]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [7_1] (7.0)",
+            "Processing 'Recalculate' for summary [1] (47.0)",
+            "Processing 'Deleted: houseM [7]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [8_1] (8.0)",
+            "Processing 'Recalculate' for summary [1] (46.0)",
+            "Processing 'Deleted: houseM [8]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for no [9_1] (9.0)",
+            "Processing 'Recalculate' for summary [1] (45.0)",
+            "Processing 'Deleted: houseM [9]: 2 triggerables were fired.' for "
         };
 
         assertThat(dagEvents.size(), equalTo(expectedMessages.length));
@@ -294,7 +311,7 @@ public class Safe2014DagImplTest {
     public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("calculation-indirectly-dependent-on-the-repeat-groups-number.xml"));
+            parse(r("calculation-indirectly-dependent-on-the-repeat-groups-number.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -329,10 +346,10 @@ public class Safe2014DagImplTest {
 
         // check that correct calculations were triggered
         final String[] expectedMessages = {
-                "Processing 'Deleted: houseM [3]: 0 triggerables were fired.' for ",
-                "Processing 'Recalculate' for summary [1] (ABDE)",
-                "Processing 'Deleted: name [3_1]: 1 triggerables were fired.' for ",
-                "Processing 'Deleted: houseM [4]: 0 triggerables were fired.' for "
+            "Processing 'Deleted: houseM [3]: 0 triggerables were fired.' for ",
+            "Processing 'Recalculate' for summary [1] (ABDE)",
+            "Processing 'Deleted: name [3_1]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: houseM [4]: 0 triggerables were fired.' for "
         };
 
         assertThat(dagEvents.size(), equalTo(expectedMessages.length));
@@ -347,7 +364,7 @@ public class Safe2014DagImplTest {
     public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
         // Given
         final FormDef formDef =
-                parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
+            parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
 
         assertIDagImplUnderTest(formDef);
 
@@ -383,6 +400,54 @@ public class Safe2014DagImplTest {
         // Then
         LocalTime duration = LocalTime.fromMillisOfDay((System.nanoTime() - start) / 1_000_000);
         logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
+    }
+
+    @Test
+    public void verify_relation_between_calculate_expressions_and_relevancy_conditions() throws IOException {
+        Scenario scenario = Scenario.init("Interdependencies test", html(
+            head(
+                title("Interdependencies test"),
+                model(
+                    mainInstance(
+                        t("data id=\"interdependencies-test\"",
+                            t("number1"),
+                            t("continue"),
+                            t("group", t("number1_x2"), t("number1_x2_x2"), t("number2")),
+                            t("meta", t("instanceID"))
+                        )
+                    ),
+                    bind("/data/number1").type("int").constraint(". > 0").required(),
+                    bind("/data/continue").type("string").required(),
+                    bind("/data/group").relevant("/data/continue = '1'"),
+                    bind("/data/group/number1_x2").type("int").calculate("/data/number1 * 2"),
+                    bind("/data/group/number1_x2_x2").type("int").calculate("/data/group/number1_x2 * 2"),
+                    bind("/data/group/number2").type("int").relevant("/data/group/number1_x2 > 0").required(),
+                    bind("/data/meta/instanceID").type("string").preload("uid").readonly()
+                )
+            ),
+            body(
+                input("/data/number1"),
+                select1("/data/continue",
+                    label("Continue?"),
+                    item(1, "Yes"),
+                    item(0, "No")
+                ),
+                group("/data/group",
+                    input("/data/group/number2")
+                )
+            )
+        ));
+        scenario.next();
+        scenario.answer(2);
+        // Notice how the calculate at number1_x2 gets evaluated even though it's in a non-relevant group
+        // and number1_x2_x2 doesn't get evaluated. The difference could be that the second field depends
+        // on a field that is inside a non-relevant group.
+        assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(nullValue()));
+        scenario.next();
+        scenario.answer("1"); // Label: "yes"
+        assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
     }
 
     /**

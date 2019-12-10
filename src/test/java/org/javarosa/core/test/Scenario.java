@@ -16,10 +16,14 @@
 
 package org.javarosa.core.test;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.delete;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.write;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
@@ -42,9 +46,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -61,7 +65,9 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.JavaRosaCoreModule;
+import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -110,6 +116,12 @@ public class Scenario {
     private Scenario(FormDef formDef, FormEntryController formEntryController) {
         this.formDef = formDef;
         this.formEntryController = formEntryController;
+    }
+
+    public static Scenario init(String formName, XFormsElement form) throws IOException {
+        Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
+        write(formFile, form.asXml().getBytes(UTF_8), CREATE);
+        return Scenario.init(formFile);
     }
 
     /**
@@ -188,7 +200,36 @@ public class Scenario {
      * Answers the current question.
      */
     public AnswerResult answer(String value) {
-        return AnswerResult.from(formEntryController.answerQuestion(formEntryController.getModel().getFormIndex(), new StringData(value), true));
+        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        StringData data = new StringData(value);
+        IFormElement child = formDef.getChild(formIndex);
+        String reference = "";
+        try {
+            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
+        } catch (RuntimeException e) {
+            // Do nothing. Probably "method not implemented" in FormDef.getBind()
+        }
+        log.info("Answer {} at {}", data, reference);
+        int jrCode = formEntryController.answerQuestion(formIndex, data, true);
+        return AnswerResult.from(jrCode);
+    }
+
+    /**
+     * Answers the current question.
+     */
+    public AnswerResult answer(int value) {
+        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        IntegerData data = new IntegerData(value);
+        IFormElement child = formDef.getChild(formIndex);
+        String reference = "";
+        try {
+            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
+        } catch (RuntimeException e) {
+            // Do nothing. Probably "method not implemented" in FormDef.getBind()
+        }
+        log.info("Answer {} at {}", data, reference);
+        int jrCode = formEntryController.answerQuestion(formIndex, data, true);
+        return AnswerResult.from(jrCode);
     }
 
     /**
@@ -531,6 +572,11 @@ public class Scenario {
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
         }
+    }
+
+    public Scenario onDagEvent(Consumer<Event> callback) {
+        formDef.setEventNotifier(callback::accept);
+        return this;
     }
 
     public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
