@@ -328,6 +328,7 @@ public class TreeReference implements Externalizable, Serializable {
                 //may have been done.
                 if(newRef.getPredicate(i) == null) {
                     newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
+                    newRef.addPredicate(i, contextRef.getPredicate(i));
                 }
             } else {
                 break;
