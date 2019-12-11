@@ -4,44 +4,44 @@
         <h:title>Repeat group with children calculation NOT dependent on the parent</h:title>
         <model>
             <instance>
-                <rgwp id="rgwp">
-                    <houseM>
-                        <no/>
+                <data id="data">
+                    <house>
+                        <number/>
                         <name>A</name>
-                        <name_concat/>
-                    </houseM>
-                    <houseM>
-                        <no/>
+                        <name_and_number/>
+                    </house>
+                    <house>
+                        <number/>
                         <name>B</name>
-                        <name_concat/>
-                    </houseM>
-                    <houseM>
-                        <no/>
+                        <name_and_number/>
+                    </house>
+                    <house>
+                        <number/>
                         <name>C</name>
-                        <name_concat/>
-                    </houseM>
-                    <houseM>
-                        <no/>
+                        <name_and_number/>
+                    </house>
+                    <house>
+                        <number/>
                         <name>D</name>
-                        <name_concat/>
-                    </houseM>
-                    <houseM>
-                        <no/>
+                        <name_and_number/>
+                    </house>
+                    <house>
+                        <number/>
                         <name>E</name>
-                        <name_concat/>
-                    </houseM>
-                </rgwp>
+                        <name_and_number/>
+                    </house>
+                </data>
             </instance>
-            <bind calculate="position(..)" nodeset="/rgwp/houseM/no" type="int"/>
-            <bind nodeset="/rgwp/houseM/name" type="string"/>
-            <bind calculate="concat(/rgwp/houseM/name, 'X')" nodeset="/rgwp/houseM/name_concat" type="string"/>
+            <bind calculate="position(..)" nodeset="/data/house/number" type="int"/>
+            <bind nodeset="/data/house/name" type="string"/>
+            <bind calculate="concat(/data/house/name, 'X')" nodeset="/data/house/name_and_number" type="string"/>
         </model>
     </h:head>
     <h:body>
-        <group ref="/rgwp/houseM">
-            <label>members</label>
-            <repeat nodeset="/rgwp/houseM">
-                <input ref="/rgwp/houseM/name">
+        <group ref="/data/house">
+            <label>Houses</label>
+            <repeat nodeset="/data/house">
+                <input ref="/data/house/name">
                     <label>Name</label>
                 </input>
             </repeat>

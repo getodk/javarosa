@@ -4,50 +4,50 @@
         <h:title>Calculation dependent on the repeat groups number</h:title>
         <model>
             <instance>
-                <rgwp id="rgwp">
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
+                <data id="data">
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
                     <summary/>
-                </rgwp>
+                </data>
             </instance>
-            <bind calculate= "position(..)" nodeset="/rgwp/houseM/no" type="string"/>
-            <bind calculate="sum(/rgwp/houseM/no)" nodeset="/rgwp/summary" type="int"/>
+            <bind calculate="position(..)" nodeset="/data/house/number" type="int"/>
+            <bind calculate="sum(/data/house/number)" nodeset="/data/summary" type="int"/>
         </model>
     </h:head>
     <h:body>
-        <group ref="/rgwp/houseM">
-            <label>members</label>
-            <repeat nodeset="/rgwp/houseM">
-                <input ref="/rgwp/houseM/no">
-                    <label>No</label>
+        <group ref="/data/house">
+            <label>Houses</label>
+            <repeat nodeset="/data/house">
+                <input ref="/data/house/number">
+                    <label>Number</label>
                 </input>
             </repeat>
         </group>

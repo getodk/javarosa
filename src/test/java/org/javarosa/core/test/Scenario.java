@@ -556,6 +556,11 @@ public class Scenario {
         return "Unknown";
     }
 
+    public Scenario removeRepeat(String xpath) {
+        formDef.deleteRepeat(getIndexOf(xpath));
+        return this;
+    }
+
     public void createNewRepeat() {
         FormIndex formIndex = formEntryController.getModel().getFormIndex();
         IFormElement child = formDef.getChild(formIndex);

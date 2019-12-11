@@ -1,10 +1,12 @@
 package org.javarosa.core.model;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.joining;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.group;
@@ -24,7 +26,6 @@ import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import org.javarosa.core.model.instance.FormInstance;
@@ -33,375 +34,281 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.debug.Event;
-import org.javarosa.debug.EventNotifier;
 import org.joda.time.LocalTime;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Safe2014DagImplTest {
-    private static final Logger logger = LoggerFactory.getLogger(Safe2014DagImplTest.class);
+    private static Logger logger = LoggerFactory.getLogger(Safe2014DagImplTest.class);
 
-    private final List<Event> dagEvents = new ArrayList<>();
+    private List<Event> dagEvents = new ArrayList<>();
 
-    private final EventNotifier eventNotifier = new EventNotifier() {
-
-        @Override
-        public void publishEvent(Event event) {
-            dagEvents.add(event);
-        }
-    };
-
-    @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnFollowingRepeatGroupSiblings() throws Exception {
-        // Given
-        final FormDef formDef =
-            parse(r("repeat-group-with-children-position-calculation.xml"));
-
-        assertIDagImplUnderTest(formDef);
-
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-        formDef.setEventNotifier(eventNotifier); // it's important to set the test event notifier now to avoid storing events from the above initialization
-
-        final FormInstance mainInstance = formDef.getMainInstance();
-
-        final TreeElement elementToBeDeleted = mainInstance.getRoot().getChildAt(2);
-        final TreeReference elementToBeDeletedRef = elementToBeDeleted.getRef();
-
-        // Index pointing to the second repeat group
-        final FormIndex indexToBeDeleted = new FormIndex(0, 1, elementToBeDeletedRef);
-
-        // When
-
-        // Safe2014DagImplTest.deleteRepeatGroup is called by the below method
-        formDef.deleteRepeat(indexToBeDeleted);
-
-        // Then
-        final List<TreeElement> repeats = mainInstance.getRoot().getChildrenWithName("houseM");
-
-        // check the values based on the position of the parents
-        assertThat(repeats.get(0).getChildAt(0).getValue().getDisplayText(), equalTo("1"));
-        assertThat(repeats.get(1).getChildAt(0).getValue().getDisplayText(), equalTo("2"));
-        assertThat(repeats.get(2).getChildAt(0).getValue().getDisplayText(), equalTo("3"));
-        assertThat(repeats.get(3).getChildAt(0).getValue().getDisplayText(), equalTo("4"));
-
-        // check that correct calculations were triggered
-        final String[] expectedMessages = {
-            "Processing 'Recalculate' for no [2_1] (2.0)",
-            "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [3_1] (3.0)",
-            "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [4_1] (4.0)",
-            "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for ",
-        };
-
-        assertThat(dagEvents.size(), equalTo(expectedMessages.length));
-
-        int messageIndex = 0;
-        for (String expectedMessage : expectedMessages) {
-            assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
-        }
+    @Before
+    public void setUp() {
+        dagEvents.clear();
     }
 
     @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() throws Exception {
-        // Given
-        final FormDef formDef =
-            parse(r("repeat-group-with-children-calculations-dependent-on-the-parent.xml"));
+    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnFollowingRepeatGroupSiblings() {
+        // Set scenario and dag event listener
+        Scenario scenario = Scenario
+            .init("repeat-group-with-children-position-calculation.xml")
+            .onDagEvent(dagEvents::add);
 
-        assertIDagImplUnderTest(formDef);
+        // Assert initial values in the form's main instance after initialization
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
 
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-        formDef.setEventNotifier(eventNotifier); // it's important to set the test event notifier now to avoid storing events from the above initialization
+        // Remove second repeat
+        scenario.removeRepeat("/data/house[1]");
 
-        final FormInstance mainInstance = formDef.getMainInstance();
+        // Assert values after removing the second repeat
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
 
-        final TreeElement elementToBeDeleted = mainInstance.getRoot().getChildAt(2);
-        final TreeReference elementToBeDeletedRef = elementToBeDeleted.getRef();
+        // Assert dag events
+        assertDagEvents(dagEvents,
+            "Processing 'Recalculate' for number [2_1] (2.0)",
+            "Processing 'Deleted: house [2]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [3_1] (3.0)",
+            "Processing 'Deleted: house [3]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [4_1] (4.0)",
+            "Processing 'Deleted: house [4]: 1 triggerables were fired.' for "
+        );
+    }
 
-        // Index pointing to the second repeat group
-        final FormIndex indexToBeDeleted = new FormIndex(0, 1, elementToBeDeletedRef);
+    @Test
+    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() {
+        // Set scenario and dag event listener
+        Scenario scenario = Scenario
+            .init("repeat-group-with-children-calculations-dependent-on-the-parent.xml")
+            .onDagEvent(dagEvents::add);
 
-        // When
+        // Assert initial values in the form's main instance after initialization
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("A1")));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("B2")));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("C")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("C3")));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("D")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("D4")));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
+        assertThat(scenario.answerOf("/data/house[4]/name"), is(stringAnswer("E")));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("E5")));
 
-        // Safe2014DagImplTest.deleteRepeatGroup is called by the below method
-        formDef.deleteRepeat(indexToBeDeleted);
+        // Remove second repeat
+        scenario.removeRepeat("/data/house[1]");
 
-        // Then
-        final List<TreeElement> repeats = mainInstance.getRoot().getChildrenWithName("houseM");
+        // Assert values after removing the second repeat: number and name_and_number should change
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("A1")));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("C")));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("C2")));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("D")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("D3")));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("E")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("E4")));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[4]/name"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
 
-        // check the values based on the position of the parents
-        assertThat(repeats.get(0).getChildAt(0).getValue().getDisplayText(), equalTo("1"));
-        assertThat(repeats.get(0).getChildAt(2).getValue().getDisplayText(), equalTo("A1"));
-        assertThat(repeats.get(1).getChildAt(0).getValue().getDisplayText(), equalTo("2"));
-        assertThat(repeats.get(1).getChildAt(2).getValue().getDisplayText(), equalTo("C2"));
-        assertThat(repeats.get(2).getChildAt(0).getValue().getDisplayText(), equalTo("3"));
-        assertThat(repeats.get(2).getChildAt(2).getValue().getDisplayText(), equalTo("D3"));
-        assertThat(repeats.get(3).getChildAt(0).getValue().getDisplayText(), equalTo("4"));
-        assertThat(repeats.get(3).getChildAt(2).getValue().getDisplayText(), equalTo("E4"));
-
-        // check that correct calculations were triggered
-        final String[] expectedMessages = {
-            "Processing 'Recalculate' for no [2_1] (2.0)",
-            "Processing 'Recalculate' for name_and_no [2_1] (C2)",
-            "Processing 'Deleted: houseM [2]: 2 triggerables were fired.' for ",
-            "Processing 'Deleted: no [2_1]: 0 triggerables were fired.' for ",
+        // Assert dag events
+        assertDagEvents(dagEvents,
+            "Processing 'Recalculate' for number [2_1] (2.0)",
+            "Processing 'Recalculate' for name_and_number [2_1] (C2)",
+            "Processing 'Deleted: house [2]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: number [2_1]: 0 triggerables were fired.' for ",
             "Processing 'Deleted: name [2_1]: 0 triggerables were fired.' for ",
-            "Processing 'Deleted: name_and_no [2_1]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [3_1] (3.0)",
-            "Processing 'Recalculate' for name_and_no [3_1] (D3)",
-            "Processing 'Deleted: houseM [3]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [4_1] (4.0)",
-            "Processing 'Recalculate' for name_and_no [4_1] (E4)",
-            "Processing 'Deleted: houseM [4]: 2 triggerables were fired.' for ",
-        };
-
-        assertThat(dagEvents.size(), equalTo(expectedMessages.length));
-
-        int messageIndex = 0;
-        for (String expectedMessage : expectedMessages) {
-            assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
-        }
+            "Processing 'Deleted: name_and_number [2_1]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [3_1] (3.0)",
+            "Processing 'Recalculate' for name_and_number [3_1] (D3)",
+            "Processing 'Deleted: house [3]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [4_1] (4.0)",
+            "Processing 'Recalculate' for name_and_number [4_1] (E4)",
+            "Processing 'Deleted: house [4]: 2 triggerables were fired.' for "
+        );
     }
 
     @Test
-    public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() throws Exception {
-        // Given
-        final FormDef formDef =
-            parse(r("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml"));
+    public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() {
+        // Set scenario and dag event listener
+        Scenario scenario = Scenario
+            .init("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml")
+            .onDagEvent(dagEvents::add);
 
-        assertIDagImplUnderTest(formDef);
+        // Assert initial values in the form's main instance after initialization
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("AX")));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("BX")));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("C")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("CX")));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("D")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("DX")));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
+        assertThat(scenario.answerOf("/data/house[4]/name"), is(stringAnswer("E")));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("EX")));
 
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-        formDef.setEventNotifier(eventNotifier); // it's important to set the test event notifier now to avoid storing events from the above initialization
+        // Remove second repeat
+        scenario.removeRepeat("/data/house[1]");
 
-        final FormInstance mainInstance = formDef.getMainInstance();
+        // Assert values after removing the second repeat: number should change, name_and_number shouldn't change
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("AX")));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("C")));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("CX")));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("D")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("DX")));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("E")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("EX")));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[4]/name"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
 
-        final TreeElement elementToBeDeleted = mainInstance.getRoot().getChildAt(2);
-        final TreeReference elementToBeDeletedRef = elementToBeDeleted.getRef();
-
-        // Index pointing to the second repeat group
-        final FormIndex indexToBeDeleted = new FormIndex(0, 1, elementToBeDeletedRef);
-
-        // When
-
-        // Safe2014DagImplTest.deleteRepeatGroup is called by the below method
-        formDef.deleteRepeat(indexToBeDeleted);
-
-        // Then
-        final List<TreeElement> repeats = mainInstance.getRoot().getChildrenWithName("houseM");
-
-        // check the values based on the position of the parents
-        assertThat(repeats.get(0).getChildAt(0).getValue().getDisplayText(), equalTo("1"));
-        assertThat(repeats.get(0).getChildAt(2).getValue().getDisplayText(), equalTo("AX"));
-        assertThat(repeats.get(1).getChildAt(0).getValue().getDisplayText(), equalTo("2"));
-        assertThat(repeats.get(1).getChildAt(2).getValue().getDisplayText(), equalTo("CX"));
-        assertThat(repeats.get(2).getChildAt(0).getValue().getDisplayText(), equalTo("3"));
-        assertThat(repeats.get(2).getChildAt(2).getValue().getDisplayText(), equalTo("DX"));
-        assertThat(repeats.get(3).getChildAt(0).getValue().getDisplayText(), equalTo("4"));
-        assertThat(repeats.get(3).getChildAt(2).getValue().getDisplayText(), equalTo("EX"));
-
-        // check that correct calculations were triggered
-        final String[] expectedMessages = {
-            "Processing 'Recalculate' for no [2_1] (2.0)",
-            "Processing 'Deleted: houseM [2]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: no [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for name_concat [2_1] (CX)",
+        // Assert dag events
+        assertDagEvents(dagEvents,
+            "Processing 'Recalculate' for number [2_1] (2.0)",
+            "Processing 'Deleted: house [2]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for name_and_number [2_1] (CX)",
             "Processing 'Deleted: name [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: name_concat [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [3_1] (3.0)",
-            "Processing 'Deleted: houseM [3]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [4_1] (4.0)",
-            "Processing 'Deleted: houseM [4]: 1 triggerables were fired.' for "
-        };
-
-        assertThat(dagEvents.size(), equalTo(expectedMessages.length));
-
-        int messageIndex = 0;
-        for (String expectedMessage : expectedMessages) {
-            assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
-        }
+            "Processing 'Deleted: name_and_number [2_1]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [3_1] (3.0)",
+            "Processing 'Deleted: house [3]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [4_1] (4.0)",
+            "Processing 'Deleted: house [4]: 1 triggerables were fired.' for "
+        );
     }
 
     @Test
-    public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() throws Exception {
-        // Given
-        final FormDef formDef =
-            parse(r("calculation-dependent-on-the-repeat-groups-number.xml"));
+    public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() {
+        // Set scenario and dag event listener
+        Scenario scenario = Scenario
+            .init("calculation-dependent-on-the-repeat-groups-number.xml")
+            .onDagEvent(dagEvents::add);
 
-        assertIDagImplUnderTest(formDef);
+        // Assert initial values in the form's main instance after initialization
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
+        assertThat(scenario.answerOf("/data/house[5]/number"), is(intAnswer(6)));
+        assertThat(scenario.answerOf("/data/house[6]/number"), is(intAnswer(7)));
+        assertThat(scenario.answerOf("/data/house[7]/number"), is(intAnswer(8)));
+        assertThat(scenario.answerOf("/data/house[8]/number"), is(intAnswer(9)));
+        assertThat(scenario.answerOf("/data/house[9]/number"), is(intAnswer(10)));
 
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-        formDef.setEventNotifier(eventNotifier); // it's important to set the test event notifier now to avoid storing events from the above initialization
+        // Remove third repeat
+        scenario.removeRepeat("/data/house[2]");
 
-        final FormInstance mainInstance = formDef.getMainInstance();
+        // Assert values after removing the third repeat
+        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
+        assertThat(scenario.answerOf("/data/house[5]/number"), is(intAnswer(6)));
+        assertThat(scenario.answerOf("/data/house[6]/number"), is(intAnswer(7)));
+        assertThat(scenario.answerOf("/data/house[7]/number"), is(intAnswer(8)));
+        assertThat(scenario.answerOf("/data/house[8]/number"), is(intAnswer(9)));
+        assertThat(scenario.answerOf("/data/house[9]/number"), is(nullValue()));
 
-        final TreeElement elementToBeDeleted = mainInstance.getRoot().getChildAt(2);
-        final TreeReference elementToBeDeletedRef = elementToBeDeleted.getRef();
-
-        // Index pointing to the second repeat group
-        final FormIndex indexToBeDeleted = new FormIndex(0, 2, elementToBeDeletedRef);
-
-        // When
-
-        TreeElement summaryNode = mainInstance.getRoot().getChildrenWithName("summary").get(0);
-        assertThat(summaryNode.getValue().getDisplayText(), equalTo("55")); // check the calculation result for 10 repeat groups
-
-        // Safe2014DagImplTest.deleteRepeatGroup is called by the below method
-        formDef.deleteRepeat(indexToBeDeleted);
-
-        // Then
-        final List<TreeElement> repeats = mainInstance.getRoot().getChildrenWithName("houseM");
-
-        // check the values based on the position of the parents
-        assertThat(repeats.get(0).getChildAt(0).getValue().getDisplayText(), equalTo("1"));
-        assertThat(repeats.get(1).getChildAt(0).getValue().getDisplayText(), equalTo("2"));
-        assertThat(repeats.get(2).getChildAt(0).getValue().getDisplayText(), equalTo("3"));
-        assertThat(repeats.get(3).getChildAt(0).getValue().getDisplayText(), equalTo("4"));
-        assertThat(repeats.get(4).getChildAt(0).getValue().getDisplayText(), equalTo("5"));
-        assertThat(repeats.get(5).getChildAt(0).getValue().getDisplayText(), equalTo("6"));
-        assertThat(repeats.get(6).getChildAt(0).getValue().getDisplayText(), equalTo("7"));
-        assertThat(repeats.get(7).getChildAt(0).getValue().getDisplayText(), equalTo("8"));
-        assertThat(repeats.get(8).getChildAt(0).getValue().getDisplayText(), equalTo("9"));
-
-        assertThat(summaryNode.getValue().getDisplayText(), equalTo("45"));
-
-        // check that correct calculations were triggered
-        final String[] expectedMessages = {
-            "Processing 'Recalculate' for no [3_1] (3.0)",
+        // Assert dag events
+        assertDagEvents(dagEvents,
+            "Processing 'Recalculate' for number [3_1] (3.0)",
             "Processing 'Recalculate' for summary [1] (51.0)",
-            "Processing 'Deleted: houseM [3]: 2 triggerables were fired.' for ",
-            "Processing 'Deleted: no [3_1]: 0 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [4_1] (4.0)",
+            "Processing 'Deleted: house [3]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: number [3_1]: 0 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [4_1] (4.0)",
             "Processing 'Recalculate' for summary [1] (50.0)",
-            "Processing 'Deleted: houseM [4]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [5_1] (5.0)",
+            "Processing 'Deleted: house [4]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [5_1] (5.0)",
             "Processing 'Recalculate' for summary [1] (49.0)",
-            "Processing 'Deleted: houseM [5]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [6_1] (6.0)",
+            "Processing 'Deleted: house [5]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [6_1] (6.0)",
             "Processing 'Recalculate' for summary [1] (48.0)",
-            "Processing 'Deleted: houseM [6]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [7_1] (7.0)",
+            "Processing 'Deleted: house [6]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [7_1] (7.0)",
             "Processing 'Recalculate' for summary [1] (47.0)",
-            "Processing 'Deleted: houseM [7]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [8_1] (8.0)",
+            "Processing 'Deleted: house [7]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [8_1] (8.0)",
             "Processing 'Recalculate' for summary [1] (46.0)",
-            "Processing 'Deleted: houseM [8]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for no [9_1] (9.0)",
+            "Processing 'Deleted: house [8]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [9_1] (9.0)",
             "Processing 'Recalculate' for summary [1] (45.0)",
-            "Processing 'Deleted: houseM [9]: 2 triggerables were fired.' for "
-        };
-
-        assertThat(dagEvents.size(), equalTo(expectedMessages.length));
-
-        int messageIndex = 0;
-        for (String expectedMessage : expectedMessages) {
-            assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
-        }
+            "Processing 'Deleted: house [9]: 2 triggerables were fired.' for "
+        );
     }
 
     /**
-     * Indirectly means that the calculation - `concat(/rgwp/houseM/name)` - does not take the
-     * `/rgwp/houseM` nodeset (the repeat group) as an argument
+     * Indirectly means that the calculation - `concat(/data/house/name)` - does not take the
+     * `/data/house` nodeset (the repeat group) as an argument
      * but since it takes one of its children (`name` children),
      * the calculation must re-evaluated once after a repeat group deletion because one of the children
      * has been deleted along with its parent (the repeat group instance).
      */
     @Test
-    public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() throws Exception {
-        // Given
-        final FormDef formDef =
-            parse(r("calculation-indirectly-dependent-on-the-repeat-groups-number.xml"));
+    public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() {
+        // Set scenario and dag event listener
+        Scenario scenario = Scenario
+            .init("calculation-indirectly-dependent-on-the-repeat-groups-number.xml")
+            .onDagEvent(dagEvents::add);
 
-        assertIDagImplUnderTest(formDef);
+        // Assert initial values in the form's main instance after initialization
+        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
+        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("C")));
+        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("D")));
+        assertThat(scenario.answerOf("/data/house[4]/name"), is(stringAnswer("E")));
+        assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABCDE")));
 
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-        formDef.setEventNotifier(eventNotifier); // it's important to set the test event notifier now to avoid storing events from the above initialization
+        // Remove second repeat
+        scenario.removeRepeat("/data/house[2]");
 
-        final FormInstance mainInstance = formDef.getMainInstance();
+        // Assert values after removing the second repeat
+        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
+        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("D")));
+        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("E")));
+        assertThat(scenario.answerOf("/data/house[4]/name"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABDE")));
 
-        final TreeElement elementToBeDeleted = mainInstance.getRoot().getChildAt(2);
-        final TreeReference elementToBeDeletedRef = elementToBeDeleted.getRef();
-
-        // Index pointing to the second repeat group
-        final FormIndex indexToBeDeleted = new FormIndex(0, 2, elementToBeDeletedRef);
-
-        // When
-        TreeElement summaryNode = mainInstance.getRoot().getChildrenWithName("summary").get(0);
-        assertThat(summaryNode.getValue().getDisplayText(), equalTo("ABCDE"));
-
-        // Safe2014DagImplTest.deleteRepeatGroup is called by the below method
-        formDef.deleteRepeat(indexToBeDeleted);
-
-        // Then
-        final List<TreeElement> repeats = mainInstance.getRoot().getChildrenWithName("houseM");
-
-        assertThat(repeats.size(), equalTo(4));
-        assertThat(repeats.get(0).getChildAt(0).getValue().getDisplayText(), equalTo("A"));
-        assertThat(repeats.get(1).getChildAt(0).getValue().getDisplayText(), equalTo("B"));
-        assertThat(repeats.get(2).getChildAt(0).getValue().getDisplayText(), equalTo("D"));
-        assertThat(repeats.get(3).getChildAt(0).getValue().getDisplayText(), equalTo("E"));
-
-        assertThat(summaryNode.getValue().getDisplayText(), equalTo("ABDE"));
-
-        // check that correct calculations were triggered
-        final String[] expectedMessages = {
-            "Processing 'Deleted: houseM [3]: 0 triggerables were fired.' for ",
+        // Assert dag events
+        assertDagEvents(dagEvents,
+            "Processing 'Deleted: house [3]: 0 triggerables were fired.' for ",
             "Processing 'Recalculate' for summary [1] (ABDE)",
             "Processing 'Deleted: name [3_1]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: houseM [4]: 0 triggerables were fired.' for "
-        };
+            "Processing 'Deleted: house [4]: 0 triggerables were fired.' for "
+        );
 
-        assertThat(dagEvents.size(), equalTo(expectedMessages.length));
-
-        int messageIndex = 0;
-        for (String expectedMessage : expectedMessages) {
-            assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
-        }
-    }
-
-    @Test
-    public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
-        // Given
-        final FormDef formDef =
-            parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
-
-        assertIDagImplUnderTest(formDef);
-
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-
-        final FormInstance mainInstance = formDef.getMainInstance();
-
-        // Construct the required amount of repeats
-        final TreeElement templateRepeat = mainInstance.getRoot().getChildAt(0);
-        final int numberOfRepeats = 10; // Raise this value to really measure
-        for (int i = 0; i < numberOfRepeats; i++) {
-            final TreeReference refToNewRepeat = templateRepeat.getRef();
-            refToNewRepeat.setMultiplicity(1, i); // set the correct multiplicity
-
-            final FormIndex indexOfNewRepeat = new FormIndex(0, i, refToNewRepeat);
-            formDef.createNewRepeat(indexOfNewRepeat);
-        }
-
-        final TreeElement firstRepeat = mainInstance.getRoot().getChildAt(1);
-        final TreeReference firstRepeatRef = firstRepeat.getRef();
-        final FormIndex firstRepeatIndex = new FormIndex(0, 0, firstRepeatRef);
-
-        // When
-        long start = System.nanoTime();
-
-        for (int i = 0; i < numberOfRepeats; i++) {
-            long currentIterationStart = System.nanoTime();
-            formDef.deleteRepeat(firstRepeatIndex);
-            double tookMs = (System.nanoTime() - currentIterationStart) / 1000000D;
-            logger.info(String.format("%d\t%.3f\n", i, tookMs));
-        }
-
-        // Then
-        LocalTime duration = LocalTime.fromMillisOfDay((System.nanoTime() - start) / 1_000_000);
-        logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
     }
 
     @Test
@@ -526,14 +433,49 @@ public class Safe2014DagImplTest {
         assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
     }
 
-    /**
-     * Assert that {@param formDef} holds the expected {@link IDag} implementation.
-     * The field is private in {@link FormDef} so the reflection must be used.
-     */
-    private void assertIDagImplUnderTest(FormDef formDef) throws NoSuchFieldException, IllegalAccessException {
-        Field dagImplFromFormDef = FormDef.class.getDeclaredField("dagImpl");
-        dagImplFromFormDef.setAccessible(true);
-        assertThat(dagImplFromFormDef.get(formDef), instanceOf(Safe2014DagImpl.class));
+    private void assertDagEvents(List<Event> dagEvents, String... lines) {
+        assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
+
+    // TODO Replace this test with a benchmark
+    @Test
+    public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
+        // Given
+        FormDef formDef = parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
+
+        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
+
+        FormInstance mainInstance = formDef.getMainInstance();
+
+        // Construct the required amount of repeats
+        TreeElement templateRepeat = mainInstance.getRoot().getChildAt(0);
+        int numberOfRepeats = 10; // Raise this value to really measure
+        for (int i = 0; i < numberOfRepeats; i++) {
+            TreeReference refToNewRepeat = templateRepeat.getRef();
+            refToNewRepeat.setMultiplicity(1, i); // set the correct multiplicity
+
+            FormIndex indexOfNewRepeat = new FormIndex(0, i, refToNewRepeat);
+            formDef.createNewRepeat(indexOfNewRepeat);
+        }
+
+        TreeElement firstRepeat = mainInstance.getRoot().getChildAt(1);
+        TreeReference firstRepeatRef = firstRepeat.getRef();
+        FormIndex firstRepeatIndex = new FormIndex(0, 0, firstRepeatRef);
+
+        // When
+        long start = System.nanoTime();
+
+        for (int i = 0; i < numberOfRepeats; i++) {
+            long currentIterationStart = System.nanoTime();
+            formDef.deleteRepeat(firstRepeatIndex);
+            double tookMs = (System.nanoTime() - currentIterationStart) / 1000000D;
+            logger.info(format("%d\t%.3f\n", i, tookMs));
+        }
+
+        // Then
+        LocalTime duration = LocalTime.fromMillisOfDay((System.nanoTime() - start) / 1_000_000);
+        logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
+    }
+
 
 }

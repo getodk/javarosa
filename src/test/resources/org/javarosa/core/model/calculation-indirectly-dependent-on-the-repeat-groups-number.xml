@@ -4,35 +4,35 @@
         <h:title>Calculation indirectly dependent on the repeat groups number</h:title>
         <model>
             <instance>
-                <rgwp id="rgwp">
-                    <houseM>
+                <data id="data">
+                    <house>
                         <name>A</name>
-                    </houseM>
-                    <houseM>
+                    </house>
+                    <house>
                         <name>B</name>
-                    </houseM>
-                    <houseM>
+                    </house>
+                    <house>
                         <name>C</name>
-                    </houseM>
-                    <houseM>
+                    </house>
+                    <house>
                         <name>D</name>
-                    </houseM>
-                    <houseM>
+                    </house>
+                    <house>
                         <name>E</name>
-                    </houseM>
+                    </house>
                     <summary/>
-                </rgwp>
+                </data>
             </instance>
-            <bind nodeset="/rgwp/houseM/name" type="string"/>
-            <bind calculate="concat(/rgwp/houseM/name)" nodeset="/rgwp/summary" type="string"/>
+            <bind nodeset="/data/house/name" type="string"/>
+            <bind calculate="concat(/data/house/name)" nodeset="/data/summary" type="string"/>
         </model>
     </h:head>
     <h:body>
-        <group ref="/rgwp/houseM">
-            <label>members</label>
-            <repeat nodeset="/rgwp/houseM">
-                <input ref="/rgwp/houseM/name">
-                    <label>No</label>
+        <group ref="/data/house">
+            <label>Houses</label>
+            <repeat nodeset="/data/house">
+                <input ref="/data/house/name">
+                    <label>Name</label>
                 </input>
             </repeat>
         </group>

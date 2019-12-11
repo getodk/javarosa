@@ -1,36 +1,36 @@
 <?xml version="1.0"?>
-<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
     <h:head>
         <h:title>Repeat group with position calculation</h:title>
         <model>
             <instance>
-                <rgwp id="rgwp">
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                    <houseM>
-                        <no/>
-                    </houseM>
-                </rgwp>
+                <data id="data">
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                    <house>
+                        <number/>
+                    </house>
+                </data>
             </instance>
-            <bind calculate="position(..)" nodeset="/rgwp/houseM/no" type="int"/>
+            <bind calculate="position(..)" nodeset="/data/house/number" type="int"/>
         </model>
     </h:head>
     <h:body>
-        <group ref="/rgwp/houseM">
-            <label>members</label>
-            <repeat nodeset="/rgwp/houseM">
-                <input ref="/rgwp/houseM/no">
-                    <label>No</label>
+        <group ref="/data/house">
+            <label>Houses</label>
+            <repeat nodeset="/data/house">
+                <input ref="/data/house/number">
+                    <label>Number</label>
                 </input>
             </repeat>
         </group>
