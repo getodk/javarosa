@@ -7,7 +7,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStep;
 
 public class TestHelpers {
-    static TreeReference buildRef(String xpath) {
+    public static TreeReference buildRef(String xpath) {
         return xpath.isEmpty()
             // Support for an empty xpath, mapping it to a relative TreeReference with no steps in it.
             ? new XPathPathExpr(INIT_CONTEXT_RELATIVE, new XPathStep[0]).getReference()

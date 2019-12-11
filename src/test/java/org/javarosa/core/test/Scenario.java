@@ -55,6 +55,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -588,6 +589,10 @@ public class Scenario {
 
         log.info("Create repeat instance {}", reference);
         formEntryController.newRepeat();
+    }
+
+    public EvaluationContext getEvaluationContext() {
+        return formDef.getEvaluationContext();
     }
 
     public enum AnswerResult {
