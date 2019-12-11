@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
@@ -14,7 +15,6 @@ import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.item;
-import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
@@ -52,30 +52,39 @@ public class Safe2014DagImplTest {
     }
 
     @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnFollowingRepeatGroupSiblings() {
-        // Set scenario and dag event listener
-        Scenario scenario = Scenario
-            .init("repeat-group-with-children-position-calculation.xml")
-            .onDagEvent(dagEvents::add);
-
-        // Assert initial values in the form's main instance after initialization
+    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnPrecedingRepeatGroupSiblings() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("house jr:template=\"\"", t("number"))
+                    )),
+                    bind("/data/house/number").type("int").calculate("position(..)")
+                )
+            ),
+            body(group("/data/house", repeat("/data/house")))
+        )).onDagEvent(dagEvents::add);
+        range(0, 5).forEach(__ -> {
+            scenario.next();
+            scenario.createNewRepeat();
+        });
         assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
         assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
         assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
 
-        // Remove second repeat
+        // Start recording DAG events now
+        dagEvents.clear();
+
         scenario.removeRepeat("/data/house[1]");
 
-        // Assert values after removing the second repeat
         assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
         assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
         assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
-
-        // Assert dag events
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [2_1] (2.0)",
             "Processing 'Deleted: house [2]: 1 triggerables were fired.' for ",
@@ -88,50 +97,47 @@ public class Safe2014DagImplTest {
     }
 
     @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() {
-        // Set scenario and dag event listener
-        Scenario scenario = Scenario
-            .init("repeat-group-with-children-calculations-dependent-on-the-parent.xml")
-            .onDagEvent(dagEvents::add);
-
-        // Assert initial values in the form's main instance after initialization
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("house jr:template=\"\"",
+                            t("number"),
+                            t("name"),
+                            t("name_and_number")
+                        )
+                    )),
+                    bind("/data/house/number").type("int").calculate("position(..)"),
+                    bind("/data/house/name").type("string").required(),
+                    bind("/data/house/name_and_number").type("string").calculate("concat(/data/house/name, /data/house/number)")
+                )
+            ),
+            body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
+        )).onDagEvent(dagEvents::add);
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            scenario.next();
+            scenario.answer((char) (65 + n));
+        });
         assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("A1")));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
         assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("B2")));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("C")));
         assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("C3")));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("D")));
         assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("D4")));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
-        assertThat(scenario.answerOf("/data/house[4]/name"), is(stringAnswer("E")));
         assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("E5")));
 
-        // Remove second repeat
+        // Start recording DAG events now
+        dagEvents.clear();
+
         scenario.removeRepeat("/data/house[1]");
 
-        // Assert values after removing the second repeat: number and name_and_number should change
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
         assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("A1")));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("C")));
         assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("C2")));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("D")));
         assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("D3")));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("E")));
         assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("E4")));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/house[4]/name"), is(nullValue()));
         assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
-
-        // Assert dag events
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [2_1] (2.0)",
             "Processing 'Recalculate' for name_and_number [2_1] (C2)",
@@ -149,50 +155,47 @@ public class Safe2014DagImplTest {
     }
 
     @Test
-    public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() {
-        // Set scenario and dag event listener
-        Scenario scenario = Scenario
-            .init("repeat-group-with-children-calculations-not-dependent-on-the-parent.xml")
-            .onDagEvent(dagEvents::add);
-
-        // Assert initial values in the form's main instance after initialization
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
+    public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("house jr:template=\"\"",
+                            t("number"),
+                            t("name"),
+                            t("name_and_number")
+                        )
+                    )),
+                    bind("/data/house/number").type("int").calculate("position(..)"),
+                    bind("/data/house/name").type("string").required(),
+                    bind("/data/house/name_and_number").type("string").calculate("concat(/data/house/name, 'X')")
+                )
+            ),
+            body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
+        )).onDagEvent(dagEvents::add);
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            scenario.next();
+            scenario.answer((char) (65 + n));
+        });
         assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("AX")));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
         assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("BX")));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("C")));
         assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("CX")));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("D")));
         assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("DX")));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
-        assertThat(scenario.answerOf("/data/house[4]/name"), is(stringAnswer("E")));
         assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("EX")));
 
-        // Remove second repeat
+        // Start recording DAG events now
+        dagEvents.clear();
+
         scenario.removeRepeat("/data/house[1]");
 
-        // Assert values after removing the second repeat: number should change, name_and_number shouldn't change
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
         assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("AX")));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("C")));
         assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("CX")));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("D")));
         assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("DX")));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("E")));
         assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("EX")));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/house[4]/name"), is(nullValue()));
         assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
-
-        // Assert dag events
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [2_1] (2.0)",
             "Processing 'Deleted: house [2]: 1 triggerables were fired.' for ",
@@ -208,40 +211,33 @@ public class Safe2014DagImplTest {
     }
 
     @Test
-    public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() {
-        // Set scenario and dag event listener
-        Scenario scenario = Scenario
-            .init("calculation-dependent-on-the-repeat-groups-number.xml")
-            .onDagEvent(dagEvents::add);
+    public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("house jr:template=\"\"", t("number")),
+                        t("summary")
+                    )),
+                    bind("/data/house/number").type("int").calculate("position(..)"),
+                    bind("/data/summary").type("int").calculate("sum(/data/house/number)")
+                )
+            ),
+            body(group("/data/house", repeat("/data/house")))
+        )).onDagEvent(dagEvents::add);
+        range(0, 10).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+        });
+        assertThat(scenario.answerOf("/data/summary"), is(intAnswer(55)));
 
-        // Assert initial values in the form's main instance after initialization
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
-        assertThat(scenario.answerOf("/data/house[5]/number"), is(intAnswer(6)));
-        assertThat(scenario.answerOf("/data/house[6]/number"), is(intAnswer(7)));
-        assertThat(scenario.answerOf("/data/house[7]/number"), is(intAnswer(8)));
-        assertThat(scenario.answerOf("/data/house[8]/number"), is(intAnswer(9)));
-        assertThat(scenario.answerOf("/data/house[9]/number"), is(intAnswer(10)));
+        // Start recording DAG events now
+        dagEvents.clear();
 
-        // Remove third repeat
         scenario.removeRepeat("/data/house[2]");
 
-        // Assert values after removing the third repeat
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
-        assertThat(scenario.answerOf("/data/house[5]/number"), is(intAnswer(6)));
-        assertThat(scenario.answerOf("/data/house[6]/number"), is(intAnswer(7)));
-        assertThat(scenario.answerOf("/data/house[7]/number"), is(intAnswer(8)));
-        assertThat(scenario.answerOf("/data/house[8]/number"), is(intAnswer(9)));
-        assertThat(scenario.answerOf("/data/house[9]/number"), is(nullValue()));
-
-        // Assert dag events
+        assertThat(scenario.answerOf("/data/summary"), is(intAnswer(45)));
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [3_1] (3.0)",
             "Processing 'Recalculate' for summary [1] (51.0)",
@@ -276,32 +272,35 @@ public class Safe2014DagImplTest {
      * has been deleted along with its parent (the repeat group instance).
      */
     @Test
-    public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() {
-        // Set scenario and dag event listener
-        Scenario scenario = Scenario
-            .init("calculation-indirectly-dependent-on-the-repeat-groups-number.xml")
-            .onDagEvent(dagEvents::add);
-
-        // Assert initial values in the form's main instance after initialization
-        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
-        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
-        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("C")));
-        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("D")));
-        assertThat(scenario.answerOf("/data/house[4]/name"), is(stringAnswer("E")));
+    public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("house jr:template=\"\"", t("name")),
+                        t("summary")
+                    )),
+                    bind("/data/house/name").type("string").required(),
+                    bind("/data/summary").type("string").calculate("concat(/data/house/name)")
+                )
+            ),
+            body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
+        )).onDagEvent(dagEvents::add);
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            scenario.next();
+            scenario.answer((char) (65 + n));
+        });
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABCDE")));
 
-        // Remove second repeat
+        // Start recording DAG events now
+        dagEvents.clear();
+
         scenario.removeRepeat("/data/house[2]");
 
-        // Assert values after removing the second repeat
-        assertThat(scenario.answerOf("/data/house[0]/name"), is(stringAnswer("A")));
-        assertThat(scenario.answerOf("/data/house[1]/name"), is(stringAnswer("B")));
-        assertThat(scenario.answerOf("/data/house[2]/name"), is(stringAnswer("D")));
-        assertThat(scenario.answerOf("/data/house[3]/name"), is(stringAnswer("E")));
-        assertThat(scenario.answerOf("/data/house[4]/name"), is(nullValue()));
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABDE")));
-
-        // Assert dag events
         assertDagEvents(dagEvents,
             "Processing 'Deleted: house [3]: 0 triggerables were fired.' for ",
             "Processing 'Recalculate' for summary [1] (ABDE)",
@@ -313,16 +312,15 @@ public class Safe2014DagImplTest {
 
     @Test
     public void verify_relation_between_calculate_expressions_and_relevancy_conditions() throws IOException {
-        Scenario scenario = Scenario.init("Interdependencies test", html(
+        Scenario scenario = Scenario.init("Some form", html(
             head(
-                title("Interdependencies test"),
+                title("Some form"),
                 model(
                     mainInstance(
-                        t("data id=\"interdependencies-test\"",
+                        t("data id=\"some-form\"",
                             t("number1"),
                             t("continue"),
-                            t("group", t("number1_x2"), t("number1_x2_x2"), t("number2")),
-                            t("meta", t("instanceID"))
+                            t("group", t("number1_x2"), t("number1_x2_x2"), t("number2"))
                         )
                     ),
                     bind("/data/number1").type("int").constraint(". > 0").required(),
@@ -330,14 +328,12 @@ public class Safe2014DagImplTest {
                     bind("/data/group").relevant("/data/continue = '1'"),
                     bind("/data/group/number1_x2").type("int").calculate("/data/number1 * 2"),
                     bind("/data/group/number1_x2_x2").type("int").calculate("/data/group/number1_x2 * 2"),
-                    bind("/data/group/number2").type("int").relevant("/data/group/number1_x2 > 0").required(),
-                    bind("/data/meta/instanceID").type("string").preload("uid").readonly()
+                    bind("/data/group/number2").type("int").relevant("/data/group/number1_x2 > 0").required()
                 )
             ),
             body(
                 input("/data/number1"),
                 select1("/data/continue",
-                    label("Continue?"),
                     item(1, "Yes"),
                     item(0, "No")
                 ),
@@ -372,22 +368,18 @@ public class Safe2014DagImplTest {
                 title("Some form"),
                 model(
                     mainInstance(t("data id=\"some-form\"",
-                        t("group jr:template=\"\"", t("prev-number"), t("number"), t("next-number")),
-                        t("meta", t("instanceID"))
+                        t("group jr:template=\"\"",
+                            t("prev-number"),
+                            t("number"),
+                            t("next-number")
+                        )
                     )),
                     bind("/data/group/prev-number").type("int").calculate("/data/group[position() = (position(current()/..) - 1)]/number"),
                     bind("/data/group/number").type("int").required(),
-                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number"),
-                    bind("/data/meta/instanceID").type("string").preload("uid").readonly()
+                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number")
                 )
             ),
-            body(
-                group("/data/group",
-                    repeat("/data/group",
-                        input("/data/group/number")
-                    )
-                )
-            )
+            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
         ));
 
         scenario.next();

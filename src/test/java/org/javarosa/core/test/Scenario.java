@@ -231,6 +231,21 @@ public class Scenario {
         return AnswerResult.from(jrCode);
     }
 
+    public AnswerResult answer(char value) {
+        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        StringData data = new StringData(String.valueOf(value));
+        IFormElement child = formDef.getChild(formIndex);
+        String reference = "";
+        try {
+            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
+        } catch (RuntimeException e) {
+            // Do nothing. Probably "method not implemented" in FormDef.getBind()
+        }
+        log.info("Answer {} at {}", data, reference);
+        int jrCode = formEntryController.answerQuestion(formIndex, data, true);
+        return AnswerResult.from(jrCode);
+    }
+
     /**
      * Jumps to next event
      * </ul>
