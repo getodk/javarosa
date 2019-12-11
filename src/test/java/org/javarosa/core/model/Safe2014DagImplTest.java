@@ -425,6 +425,51 @@ public class Safe2014DagImplTest {
         assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
     }
 
+    /**
+     * Ignored because the count() function inside the predicate of the result_2 calculate
+     * expression isn't evaled correctly, as opposed to the predicate of the result_1 calculate
+     * that uses an interim field as a proxy for the same computation
+     */
+    @Test
+    @Ignore
+    public void equivalent_predicates_with_function_calls_should_produce_the_same_results() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group jr:template=\"\"", t("number")),
+                        t("count"),
+                        t("result_1"),
+                        t("result_2")
+                    )),
+                    bind("/data/group/number").type("int").required(),
+                    bind("/data/count").type("int").calculate("count(/data/group)"),
+                    bind("/data/result_1").type("int").calculate("10 + /data/group[position() = /data/count]/number"),
+                    bind("/data/result_2").type("int").calculate("10 + /data/group[position() = count(/data/group)]/number")
+                )
+            ),
+            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
+        ));
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(10);
+
+        assertThat(scenario.answerOf("/data/count"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(20)));
+        assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(20)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(20);
+
+        assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
+        assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
+    }
+
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
