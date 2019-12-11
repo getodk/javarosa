@@ -272,7 +272,7 @@ class FormInstanceParser {
             TreeReference childBind = FormInstance.unpackReference(child.getBind());
 
             //check if current binding is within scope of repeat binding
-            if (!repeatBind.isParentOf(childBind, false)) {
+            if (!repeatBind.isAncestorOf(childBind, false)) {
                 //catch <repeat nodeset="/a/b"><input ref="/a/c" /></repeat>: repeat question is not a child of the repeated node
                 throw new XFormParseException("<repeat> member's binding [" + childBind.toString() + "] is not a descendant of <repeat> binding [" + repeatBind.toString() + "]!");
             } else if (repeatBind.equals(childBind) && isRepeat) {
@@ -313,16 +313,16 @@ class FormInstanceParser {
     private void verifyItemsetBindings (FormInstance instance) {
         for (ItemsetBinding itemset : itemsets) {
             //check proper parent/child relationship
-            if (!itemset.nodesetRef.isParentOf(itemset.labelRef, false)) {
+            if (!itemset.nodesetRef.isAncestorOf(itemset.labelRef, false)) {
                 throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
-            } else if (itemset.copyRef != null && !itemset.nodesetRef.isParentOf(itemset.copyRef, false)) {
+            } else if (itemset.copyRef != null && !itemset.nodesetRef.isAncestorOf(itemset.copyRef, false)) {
                 throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
-            } else if (itemset.valueRef != null && !itemset.nodesetRef.isParentOf(itemset.valueRef, false)) {
+            } else if (itemset.valueRef != null && !itemset.nodesetRef.isAncestorOf(itemset.valueRef, false)) {
                 throw new XFormParseException("itemset nodeset ref is not a parent of value ref");
             }
 
             if (itemset.copyRef != null && itemset.valueRef != null) {
-                if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
+                if (!itemset.copyRef.isAncestorOf(itemset.valueRef, false)) {
                     throw new XFormParseException("itemset <copy> is not a parent of <value>");
                 }
             }

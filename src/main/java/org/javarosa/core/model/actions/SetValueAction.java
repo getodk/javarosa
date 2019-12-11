@@ -80,7 +80,7 @@ public class SetValueAction extends Action {
             //Note: right now we're qualifying then testing parentage to see whether
             //there was a conflict, but it's not super clear whether this is a perfect
             //strategy
-            if (!contextRef.isParentOf(targetReference, false)) {
+            if (!contextRef.isAncestorOf(targetReference, false)) {
                 return null;
             }
         }

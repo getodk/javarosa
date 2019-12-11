@@ -338,7 +338,7 @@ public class TreeReference implements Externalizable, Serializable {
     }
 
     public TreeReference relativize (TreeReference parent) {
-        if (parent.isParentOf(this, false)) {
+        if (parent.isAncestorOf(this, false)) {
             TreeReference relRef = selfRef();
             for (int i = parent.size(); i < this.size(); i++) {
                 relRef.add(this.getName(i), INDEX_UNBOUND);
@@ -362,7 +362,7 @@ public class TreeReference implements Externalizable, Serializable {
 
     //returns true if 'this' is parent of 'child'
     //return true if 'this' equals 'child' only if properParent is false
-    public boolean isParentOf (TreeReference child, boolean properParent) {
+    public boolean isAncestorOf(TreeReference child, boolean properParent) {
         //Instances and context types;
         if (refLevel != child.refLevel)
             return false;

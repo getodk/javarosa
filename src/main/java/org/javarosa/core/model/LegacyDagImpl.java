@@ -209,7 +209,7 @@ public class LegacyDagImpl extends IDag {
             QuickTriggerable qt = triggerablesDAG.get(i);
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                 TreeReference target = qt.t.getTargets().get(j);
-                if (genericRoot.isParentOf(target, false)) {
+                if (genericRoot.isAncestorOf(target, false)) {
                     applicable.add(qt);
                     break;
                 }

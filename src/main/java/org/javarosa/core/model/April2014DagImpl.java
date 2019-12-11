@@ -179,7 +179,7 @@ public class April2014DagImpl extends IDag {
    /**
     * Get all of the elements which will need to be evaluated (in order) when
     * the triggerable is fired.
-    * 
+    *
     * @param qt
     */
    private void fillTriggeredElements(EvaluationContext evalContext, QuickTriggerable qt,
@@ -191,7 +191,7 @@ public class April2014DagImpl extends IDag {
             updatedNodes.add(target);
 
             // For certain types of triggerables, the update will affect not
-            // only the target, but also the children of the target. In that 
+            // only the target, but also the children of the target. In that
             // case, we want to add all of those nodes to the list of updated
             // elements as well.
             if (qt.t.isCascadingToChildren()) {
@@ -208,7 +208,7 @@ public class April2014DagImpl extends IDag {
                // relevancy calc
 
                // We can't make this reference generic before now or we'll
-               // lose the target information, so we'll be more inclusive 
+               // lose the target information, so we'll be more inclusive
                // than needed and see if any of our triggers are keyed on
                // the predicate-less path of this ref
                ArrayList<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref
@@ -266,7 +266,7 @@ public class April2014DagImpl extends IDag {
          QuickTriggerable qt = triggerablesDAG.get(i);
          for (int j = 0; j < qt.t.getTargets().size(); j++) {
             TreeReference target = qt.t.getTargets().get(j);
-            if (genericRoot.isParentOf(target, false)) {
+            if (genericRoot.isAncestorOf(target, false)) {
                applicable.add(qt);
                break;
             }

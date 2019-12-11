@@ -978,7 +978,7 @@ public class XPathFuncExpr extends XPathExpression {
             }
             // confirm that the passed XPath is a parent of our overall target path
             TreeReference groupRef = ((XPathPathExpr) args[pathargi]).getReference();
-            if (!groupRef.isParentOf(targetRef, true)) {
+            if (!groupRef.isAncestorOf(targetRef, true)) {
                 throw new XPathTypeMismatchException("indexed-repeat(): parameter " + (pathargi + 1) + " must be a parent of the field in parameter 1");
             }
 
