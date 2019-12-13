@@ -577,9 +577,7 @@ public class IDag {
         int event;
         while ((event =
             formEntryControllerToBeValidated.stepToNextEvent()) != FormEntryController.EVENT_END_OF_FORM) {
-            if (event != FormEntryController.EVENT_QUESTION) {
-                continue;
-            } else {
+            if (event == FormEntryController.EVENT_QUESTION) {
                 FormIndex formControllerToBeValidatedFormIndex = formEntryControllerToBeValidated.getModel().getFormIndex();
 
                 int saveStatus = formEntryControllerToBeValidated.answerQuestion(
