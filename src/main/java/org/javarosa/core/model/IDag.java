@@ -184,8 +184,7 @@ public class IDag {
         TreeReference genericRoot = rootRef.genericize();
 
         Set<QuickTriggerable> applicable = new HashSet<>();
-        for (int i = 0; i < triggerablesDAG.size(); i++) {
-            QuickTriggerable qt = triggerablesDAG.get(i);
+        for (QuickTriggerable qt : triggerablesDAG) {
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                 TreeReference target = qt.t.getTargets().get(j);
                 if (genericRoot.isAncestorOf(target, false)) {
@@ -369,8 +368,7 @@ public class IDag {
             // determine root nodes
             roots.clear();
             roots.addAll(vertices);
-            for (int i = 0; i < partialOrdering.size(); i++) {
-                QuickTriggerable[] edge = partialOrdering.get(i);
+            for (QuickTriggerable[] edge : partialOrdering) {
                 roots.remove(edge[1]);
             }
 
@@ -397,8 +395,7 @@ public class IDag {
 
             // remove root nodes and edges originating from them
             // add them to the triggerablesDAG.
-            for (int i = 0; i < orderedRoots.size(); i++) {
-                QuickTriggerable root = orderedRoots.get(i);
+            for (QuickTriggerable root : orderedRoots) {
                 root.t.setWaveCount(waveCount);
                 triggerablesDAG.add(root);
                 vertices.remove(root);
@@ -735,8 +732,7 @@ public class IDag {
                 }
             }
 
-            for (int i = 0; i < targets.size(); i++) {
-                TreeReference target = targets.get(i);
+            for (TreeReference target : targets) {
                 vertices.add(target);
 
                 TreeReference[] edge = {trigger, target};
@@ -751,8 +747,7 @@ public class IDag {
             //determine leaf nodes
             leaves.clear();
             leaves.addAll(vertices);
-            for (int i = 0; i < edges.size(); i++) {
-                TreeReference[] edge = edges.get(i);
+            for (TreeReference[] edge : edges) {
                 leaves.remove(edge[0]);
             }
 
@@ -776,8 +771,7 @@ public class IDag {
         if (!acyclic) {
             StringBuilder b = new StringBuilder();
             b.append("XPath Dependency Cycle:\n");
-            for (int i = 0; i < edges.size(); i++) {
-                TreeReference[] edge = edges.get(i);
+            for (TreeReference[] edge : edges) {
                 b.append(edge[0].toString()).append(" => ").append(edge[1].toString()).append("\n");
             }
             logger.error("XForm Parse Error: {}", b.toString());
