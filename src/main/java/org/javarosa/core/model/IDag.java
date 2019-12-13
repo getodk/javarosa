@@ -211,7 +211,7 @@ public class IDag {
      * @param ref The full contextualized unambiguous reference of the value
      *            that was changed.
      */
-    public Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref, boolean midSurvey) {
+    public Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref) {
         return this.triggerTriggerables(mainInstance, evalContext, ref, new HashSet<>(1));
     }
 
@@ -264,7 +264,7 @@ public class IDag {
         }
     }
 
-    public void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference copyRef, TreeElement copyToElement, boolean midSurvey) {
+    public void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference copyRef, TreeElement copyToElement) {
         TreeReference targetRef = copyToElement.getRef();
 
         // trigger conditions that depend on the creation of these new nodes
@@ -566,7 +566,7 @@ public class IDag {
      * Walks the current set of conditions, and evaluates each of them with the
      * current context.
      */
-    public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef, boolean midSurvey) {
+    public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef) {
         return initializeTriggerables(mainInstance, evalContext, rootRef, new HashSet<>(1));
     }
 

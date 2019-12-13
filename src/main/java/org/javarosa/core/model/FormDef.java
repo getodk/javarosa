@@ -437,7 +437,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 ref.getParentRef(), null);
         }
 
-        Collection<QuickTriggerable> qts = triggerTriggerables(ref, midSurvey);
+        Collection<QuickTriggerable> qts = triggerTriggerables(ref);
         dagImpl.publishSummary("New value", ref, qts);
         // TODO: pre-populate fix-count repeats here?
     }
@@ -557,7 +557,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         getChild(index).getActionController().triggerActionsFromEvent(Action.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
 
         // trigger conditions that depend on the creation of this new node
-        triggerTriggerables(repeatContextRef, true);
+        triggerTriggerables(repeatContextRef);
 
         TreeReference parentRef = repeatContextRef.getParentRef();
         TreeElement parentElement = mainInstance.resolveReference(parentRef);
@@ -632,8 +632,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return true;
     }
 
-    public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data,
-                                  boolean midSurvey) throws InvalidReferenceException {
+    public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) throws InvalidReferenceException {
         ItemsetBinding itemset = q.getDynamicChoices();
         TreeReference targetRef = targetNode.getRef();
         TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
@@ -694,7 +693,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 getMainInstance().copyItemsetNode(ch.copyNode, destRef, this);
             }
         }
-        dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode, midSurvey);
+        dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode);
     }
 
     /**
@@ -734,9 +733,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * Walks the current set of conditions, and evaluates each of them with the
      * current context.
      */
-    private Collection<QuickTriggerable> initializeTriggerables(TreeReference rootRef, boolean midSurvey) {
+    private Collection<QuickTriggerable> initializeTriggerables(TreeReference rootRef) {
 
-        return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, midSurvey);
+        return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef);
     }
 
     /**
@@ -745,8 +744,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * @param ref The full contextualized unambiguous reference of the value that
      *            was changed.
      */
-    public Collection<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean midSurvey) {
-        return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, midSurvey);
+    public Collection<QuickTriggerable> triggerTriggerables(TreeReference ref) {
+        return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref);
     }
 
     public ValidateOutcome validate(boolean markCompleted) {
@@ -1350,7 +1349,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             actionController.triggerActionsFromEvent(Action.EVENT_XFORMS_READY, this);
         }
 
-        Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef(), false);
+        Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef());
         dagImpl.publishSummary("Form initialized", qts);
     }
 

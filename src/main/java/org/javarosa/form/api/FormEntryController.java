@@ -59,7 +59,7 @@ public class FormEntryController {
         return model;
     }
 
-    
+
     /**
      * Attempts to save answer at the current FormIndex into the datamodel.
      *
@@ -112,7 +112,7 @@ public class FormEntryController {
             throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
         } else {
             try {
-                model.getForm().copyItemsetAnswer(q, element, data, midSurvey);
+                model.getForm().copyItemsetAnswer(q, element, data);
             } catch (InvalidReferenceException ire) {
                 logger.error("Error", ire);
                 throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
