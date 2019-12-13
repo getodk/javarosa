@@ -226,7 +226,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         switch (mode) {
             case Safe_2014:
-                dagImpl = new Safe2014DagImpl(ia);
+                dagImpl = new IDag(ia);
                 break;
             default:
                 throw new IllegalStateException("Unexpected mode: " + mode);
