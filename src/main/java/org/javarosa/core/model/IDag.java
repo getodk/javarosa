@@ -430,7 +430,6 @@ public class IDag {
      */
     public void fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, Set<QuickTriggerable> destinationSet, Set<QuickTriggerable> newDestinationSet) {
         if (qt.t.canCascade()) {
-            boolean expandRepeatables = true;
 
             for (int j = 0; j < qt.t.getTargets().size(); j++) {
                 TreeReference target = qt.t.getTargets().get(j);
@@ -443,7 +442,7 @@ public class IDag {
                 // to the list of updated elements as well.
                 if (qt.t.isCascadingToChildren()) {
                     addChildrenOfReference(mainInstance, evalContext,
-                        target, updatedNodes, expandRepeatables);
+                        target, updatedNodes, true);
                 }
 
                 // Now go through each of these updated nodes (generally
