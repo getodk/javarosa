@@ -374,14 +374,14 @@ public class IDag {
 
             // if no root nodes while graph still has nodes, graph has cycles
             if (roots.size() == 0) {
-                String hints = "";
+                StringBuilder hints = new StringBuilder();
                 for (QuickTriggerable qt : vertices) {
                     for (TreeReference r : qt.t.getTargets()) {
-                        hints += "\n" + r.toString(true);
+                        hints.append("\n").append(r.toString(true));
                     }
                 }
                 String message = "Cycle detected in form's relevant and calculation logic!";
-                if (!hints.equals("")) {
+                if (!hints.toString().equals("")) {
                     message += "\nThe following nodes are likely involved in the loop:"
                         + hints;
                 }
