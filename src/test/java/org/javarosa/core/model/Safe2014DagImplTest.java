@@ -482,6 +482,8 @@ public class Safe2014DagImplTest {
 
         assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
+        // The following assertion is the one that fails with the current implementation
+        // TODO Explore the difference between the calculations in result_1 and result_2 and unify them
         assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
 
