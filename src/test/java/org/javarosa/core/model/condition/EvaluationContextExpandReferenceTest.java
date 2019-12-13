@@ -53,8 +53,7 @@ public class EvaluationContextExpandReferenceTest {
                 title("Some form"),
                 model(
                     mainInstance(t("data id=\"some-form\"",
-                        t("group jr:template=\"\"", t("number")),
-                        t("meta", t("instanceID"))
+                        t("group jr:template=\"\"", t("number"))
                     )),
                     bind("/data/group/number").type("int")
                 )
