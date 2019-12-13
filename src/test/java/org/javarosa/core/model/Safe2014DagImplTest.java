@@ -312,7 +312,7 @@ public class Safe2014DagImplTest {
 
     /**
      * This test was inspired by the issue reported at https://code.google.com/archive/p/opendatakit/issues/888
-     *
+     * <p>
      * We want to focus on the relationship between relevancy and other calculations because relevancy can be
      * defined for fields **and groups**, which is a special case of expression evaluation in our DAG.
      */
@@ -366,6 +366,12 @@ public class Safe2014DagImplTest {
      * Ignored because the assertions about non-null next-numbers will fail because our DAG
      * doesn't evaluate calculations in repeat instances that are previous siblings to the
      * one that has changed.
+     * <p>
+     * The expeculation is that, originally, only forward references might have been considered
+     * to speed up repeat group intance deletion because it was assumed that back references
+     * were a marginal use case.
+     * <p>
+     * This test explores how the issue affects to value changes too.
      */
     @Test
     @Ignore
@@ -411,6 +417,7 @@ public class Safe2014DagImplTest {
         assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
         assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
 
+        // This assertion is the one that fails with the current implementation
         assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
         assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
 
@@ -427,6 +434,7 @@ public class Safe2014DagImplTest {
         assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
         assertThat(scenario.answerOf("/data/group[2]/number"), is(intAnswer(33)));
 
+        // The following couple of assertions are the ones that fail with the current implementation
         assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
         assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
         assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
