@@ -1764,12 +1764,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public SubmissionProfile getSubmissionProfile() {
-        // At some point these profiles will be set by the <submit> control in the
-        // form.
-        // In the mean time, though, we can only promise that the default one will
-        // be used.
-
-        return submissionProfiles.get(DEFAULT_SUBMISSION_PROFILE);
+        return submissionProfiles.size() > 0
+            ? submissionProfiles.entrySet().iterator().next().getValue()
+            : null;
     }
 
     @Override
