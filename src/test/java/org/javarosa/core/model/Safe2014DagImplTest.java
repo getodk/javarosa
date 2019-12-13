@@ -310,6 +310,12 @@ public class Safe2014DagImplTest {
 
     }
 
+    /**
+     * This test was inspired by the issue reported at https://code.google.com/archive/p/opendatakit/issues/888
+     *
+     * We want to focus on the relationship between relevancy and other calculations because relevancy can be
+     * defined for fields **and groups**, which is a special case of expression evaluation in our DAG.
+     */
     @Test
     public void verify_relation_between_calculate_expressions_and_relevancy_conditions() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
@@ -348,6 +354,7 @@ public class Safe2014DagImplTest {
         // and number1_x2_x2 doesn't get evaluated. The difference could be that the second field depends
         // on a field that is inside a non-relevant group.
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
+        // TODO figure out why group/number1_x2_x2 isn't evaluated once number1 gets a value. Should all expressions be evaluated regardless of relevance? In any case, describe and document which expressions are evaluated when
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(nullValue()));
         scenario.next();
         scenario.answer("1"); // Label: "yes"
