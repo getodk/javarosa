@@ -225,17 +225,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         };
 
         switch (mode) {
-            case Legacy:
-                dagImpl = new LegacyDagImpl(ia);
-                break;
-            case April_2014:
-                dagImpl = new April2014DagImpl(ia);
-                break;
             case Safe_2014:
                 dagImpl = new Safe2014DagImpl(ia);
-                break;
-            case Fast_2014:
-                dagImpl = new Fast2014DagImpl(ia);
                 break;
             default:
                 throw new IllegalStateException("Unexpected mode: " + mode);
@@ -1298,7 +1289,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /**
      * Given one or more {@link TreeReference}, return a set of questions and/or groups corresponding to the references
      * that are found in this form definition.
-     *
+     * <p>
      * Note: this performs a recursive breadth-first search so is not intended to be used where performance matters.
      */
     private Set<IFormElement> getElementsFromReferences(Collection<TreeReference> references) {
