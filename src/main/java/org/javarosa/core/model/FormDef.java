@@ -1814,13 +1814,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action);
     }
 
-    /**
-     * For debugging
-     */
-    public final void printTriggerables(String path) {
-        dagImpl.printTriggerables(path);
-    }
-
     public List<String> getParseWarnings() {
         return parseWarnings;
     }

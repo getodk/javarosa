@@ -16,12 +16,6 @@
 
 package org.javarosa.core.model;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -619,37 +613,6 @@ public class IDag {
 
     protected final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
-    }
-
-    /**
-     * For debugging
-     */
-    public final void printTriggerables(String path) {
-        OutputStreamWriter w = null;
-        try {
-            w = new OutputStreamWriter(new FileOutputStream(new File(
-                path)), "UTF-8");
-            for (int i = 0; i < triggerablesDAG.size(); i++) {
-                QuickTriggerable qt = triggerablesDAG.get(i);
-                w.write(Integer.toString(i) + ": ");
-                qt.t.print(w);
-            }
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Error", e);
-        } catch (FileNotFoundException e) {
-            logger.error("Error", e);
-        } catch (IOException e) {
-            logger.error("Error", e);
-        } finally {
-            if (w != null) {
-                try {
-                    w.flush();
-                    w.close();
-                } catch (IOException e) {
-                    logger.error("Error", e);
-                }
-            }
-        }
     }
 
     /**
