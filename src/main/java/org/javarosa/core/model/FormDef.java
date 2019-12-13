@@ -1320,7 +1320,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef());
-        dagImpl.publishSummary("Form initialized", qts);
+        dagImpl.publishSummary("Form initialized", null, qts);
     }
 
     /**

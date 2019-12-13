@@ -607,10 +607,6 @@ public class IDag {
         return false;
     }
 
-    protected void publishSummary(String lead, Collection<QuickTriggerable> quickTriggerables) {
-        publishSummary(lead, null, quickTriggerables);
-    }
-
     protected final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
     }
