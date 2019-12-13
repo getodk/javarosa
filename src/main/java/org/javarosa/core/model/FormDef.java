@@ -93,31 +93,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final String STORAGE_KEY = "FORMDEF";
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
-    public enum EvalBehavior {
-        Legacy,
-        April_2014,
-        Safe_2014,
-        Fast_2014
-    }
-
-    public static final EvalBehavior recommendedMode = EvalBehavior.Safe_2014;
-
-    /**
-     * used by FormDef() constructor
-     */
-    private static EvalBehavior defaultMode = recommendedMode;
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
-
-    /**
-     * Changes the mode used for evaluations
-     */
-    public static final void setEvalBehavior(EvalBehavior mode) {
-        defaultMode = mode;
-    }
-
-    public static void setDefaultEventNotifier(EventNotifier eventNotifier) {
-        defaultEventNotifier = eventNotifier;
-    }
 
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
@@ -210,27 +186,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private List<String> parseErrors = new ArrayList<>();
 
     public FormDef() {
-        this(defaultMode, defaultEventNotifier);
+        this(defaultEventNotifier);
     }
 
-    public FormDef(EvalBehavior mode, EventNotifier eventNotifier) {
+    public FormDef(EventNotifier eventNotifier) {
         setID(-1);
         setChildren(null);
         final EventNotifierAccessor ia = new EventNotifierAccessor() {
-
             @Override
             public EventNotifier getEventNotifier() {
                 return FormDef.this.getEventNotifier();
             }
         };
 
-        switch (mode) {
-            case Safe_2014:
-                dagImpl = new IDag(ia);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected mode: " + mode);
-        }
+        dagImpl = new IDag(ia);
+
         // This is kind of a wreck...
         resetEvaluationContext();
         outputFragments = new ArrayList<>();

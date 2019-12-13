@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.javarosa.core.model.FormDef.EvalBehavior;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
@@ -51,7 +50,6 @@ import org.slf4j.LoggerFactory;
 
 public class IDag {
     private static final Logger logger = LoggerFactory.getLogger(IDag.class);
-    private final EvalBehavior mode = EvalBehavior.Safe_2014;
 
     public interface EventNotifierAccessor {
         EventNotifier getEventNotifier();
@@ -173,10 +171,6 @@ public class IDag {
         }
 
         return evaluationResults;
-    }
-
-    public EvalBehavior getEvalBehavior() {
-        return mode;
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
