@@ -19,7 +19,7 @@ package org.javarosa.core.model;
 /**
  * @author Meletis Margaritis
  */
-public abstract class LatestDagBase extends IDag {
+public class LatestDagBase extends IDag {
 
     protected LatestDagBase(EventNotifierAccessor accessor) {
         super(accessor);
