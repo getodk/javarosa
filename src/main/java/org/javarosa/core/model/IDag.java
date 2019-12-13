@@ -525,30 +525,30 @@ public class IDag {
             for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
                 TreeElement child = repeatTemplate.getChildAt(i);
                 toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, evalContext, child, toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, child, toAdd, expandRepeatables);
             }
         } else {
             List<TreeReference> refSet = evalContext.expandReference(original);
             for (TreeReference ref : refSet) {
-                addChildrenOfElement(mainInstance, evalContext, evalContext.resolveReference(ref), toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, evalContext.resolveReference(ref), toAdd, expandRepeatables);
             }
         }
     }
 
     // Recursive step of utility method
-    private void addChildrenOfElement(FormInstance mainInstance, EvaluationContext evalContext, AbstractTreeElement<?> el, Set<TreeReference> toAdd, boolean expandRepeatables) {
+    private void addChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> el, Set<TreeReference> toAdd, boolean expandRepeatables) {
         TreeElement repeatTemplate = expandRepeatables ? mainInstance.getTemplatePath(el.getRef()) : null;
         if (repeatTemplate != null) {
             for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
                 TreeElement child = repeatTemplate.getChildAt(i);
                 toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, evalContext, child, toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, child, toAdd, expandRepeatables);
             }
         } else {
             for (int i = 0; i < el.getNumChildren(); ++i) {
                 AbstractTreeElement<?> child = el.getChildAt(i);
                 toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, evalContext, child, toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, child, toAdd, expandRepeatables);
             }
         }
     }
