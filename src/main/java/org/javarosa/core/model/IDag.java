@@ -232,7 +232,7 @@ public class IDag {
         }
     }
 
-    public void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement parentElement, TreeElement createdElement) {
+    public void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement createdElement) {
         // trigger conditions that depend on the creation of this new node
         Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0));
         publishSummary("Created (phase 1)", createRef, qtSet1);

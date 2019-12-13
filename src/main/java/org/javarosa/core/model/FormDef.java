@@ -531,7 +531,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         TreeReference parentRef = repeatContextRef.getParentRef();
         TreeElement parentElement = mainInstance.resolveReference(parentRef);
-        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, parentElement, newNode);
+        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
     }
 
     @Override
