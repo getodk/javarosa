@@ -171,10 +171,7 @@ public class IDag {
         return conditionRepeatTargetIndex.get(repeatRef.genericize());
     }
 
-    private Set<QuickTriggerable> initializeTriggerables(
-        FormInstance mainInstance, EvaluationContext evalContext,
-        TreeReference rootRef,
-        Set<QuickTriggerable> alreadyEvaluated) {
+    private Set<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef, Set<QuickTriggerable> alreadyEvaluated) {
         TreeReference genericRoot = rootRef.genericize();
 
         Set<QuickTriggerable> applicable = new HashSet<>();
