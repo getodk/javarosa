@@ -261,7 +261,7 @@ public class Safe2014DagImpl extends LatestDagBase {
    /**
     * Get all of the elements which will need to be evaluated (in order) when
     * the triggerable is fired.
-    * 
+    *
     * @param qt
     * @param destinationSet
     *            where to store the triggerables
@@ -330,7 +330,7 @@ public class Safe2014DagImpl extends LatestDagBase {
     * directly triggered conditions, identifying which conditions should
     * further be triggered due to their update, and then dispatching all of the
     * evaluations.
-    * 
+    *
     * @param tv
     *            A set of all of the trigerrables directly triggered by the
     *            value changed
@@ -442,7 +442,7 @@ public class Safe2014DagImpl extends LatestDagBase {
          QuickTriggerable qt = triggerablesDAG.get(i);
          for (int j = 0; j < qt.t.getTargets().size(); j++) {
             TreeReference target = qt.t.getTargets().get(j);
-            if (genericRoot.isParentOf(target, false)) {
+            if (genericRoot.isAncestorOf(target, false)) {
                applicable.add(qt);
                break;
             }

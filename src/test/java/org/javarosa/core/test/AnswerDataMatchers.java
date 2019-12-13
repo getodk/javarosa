@@ -46,6 +46,25 @@ public class AnswerDataMatchers {
         };
     }
 
+    public static Matcher<IntegerData> intAnswer(Integer expectedAnswer) {
+        return new TypeSafeMatcher<IntegerData>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("answer with value " + expectedAnswer);
+            }
+
+            @Override
+            protected void describeMismatchSafely(IntegerData item, Description mismatchDescription) {
+                mismatchDescription.appendText("was answer " + item.getDisplayText() + "(").appendValue(item.getValue()).appendText(")");
+            }
+
+            @Override
+            protected boolean matchesSafely(IntegerData item) {
+                return item.getValue().equals(expectedAnswer);
+            }
+        };
+    }
+
     public static <T extends IAnswerData> Matcher<T> answer(T expectedAnswer) {
         return new TypeSafeMatcher<T>() {
             @Override

@@ -393,7 +393,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             IFormElement temp = elements.get(i);
             if (temp instanceof GroupDef && ((GroupDef) temp).getRepeat()) {
                 TreeReference repRef = FormInstance.unpackReference(temp.getBind());
-                if (repRef.isParentOf(ref, false)) {
+                if (repRef.isAncestorOf(ref, false)) {
                     int repMult = multiplicities.get(i);
                     ref.setMultiplicity(repRef.size() - 1, repMult);
                 } else {
