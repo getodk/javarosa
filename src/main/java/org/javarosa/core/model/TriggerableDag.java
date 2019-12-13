@@ -42,8 +42,8 @@ import org.javarosa.model.xform.XPathReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IDag {
-    private static final Logger logger = LoggerFactory.getLogger(IDag.class);
+public class TriggerableDag {
+    private static final Logger logger = LoggerFactory.getLogger(TriggerableDag.class);
 
     public interface EventNotifierAccessor {
         EventNotifier getEventNotifier();
@@ -79,7 +79,7 @@ public class IDag {
      */
     protected final List<QuickTriggerable> unorderedTriggerables = new ArrayList<>();
 
-    protected IDag(EventNotifierAccessor accessor) {
+    protected TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
     }
 

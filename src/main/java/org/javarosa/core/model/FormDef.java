@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.javarosa.core.log.WrappedException;
-import org.javarosa.core.model.IDag.EventNotifierAccessor;
+import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.condition.Condition;
@@ -152,7 +152,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     private List<IConditionExpr> outputFragments;
 
-    private IDag dagImpl;
+    private TriggerableDag dagImpl;
 
     private EvaluationContext exprEvalContext;
 
@@ -199,7 +199,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             }
         };
 
-        dagImpl = new IDag(ia);
+        dagImpl = new TriggerableDag(ia);
 
         // This is kind of a wreck...
         resetEvaluationContext();
