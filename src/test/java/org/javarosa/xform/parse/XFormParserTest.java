@@ -300,6 +300,22 @@ public class XFormParserTest {
         assertEquals("/data/text", submissionProfile.getRef().getReference().toString());
     }
 
+    @Test
+    public void parseFormWithSubmissionElementWithId() throws IOException {
+        // Given & When
+        FormDef formDef = parse(r("submission-element-with-id.xml"));
+
+        // Then
+        assertEquals(formDef.getTitle(), "Single Submission Element");
+        assertNoParseErrors(formDef);
+
+        SubmissionProfile submissionProfile = formDef.getSubmissionProfile();
+        assertEquals("http://some.destination.com", submissionProfile.getAction());
+        assertEquals("form-data-post", submissionProfile.getMethod());
+        assertNull(submissionProfile.getMediaType());
+        assertEquals("/data/text", submissionProfile.getRef().getReference().toString());
+    }
+
     /**
      * Simple tests that documents assumption that the model has to come before the body tag.
      * According to the comment above {@link XFormParser#parseModel(Element)} method,

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml">
+    <h:head>
+        <h:title>Single Submission Element</h:title>
+        <model>
+            <submission id="submissionId" action="http://some.destination.com" method="form-data-post" bind="text-data-binding" />
+            <instance>
+                <data id="single-submission-test">
+                    <text/>
+                </data>
+            </instance>
+            <bind id="text-data-binding" nodeset="/data/text" type="string"/>
+        </model>
+    </h:head>
+    <h:body/>
+</h:html>
