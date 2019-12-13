@@ -442,7 +442,7 @@ public class IDag {
                 // to the list of updated elements as well.
                 if (qt.t.isCascadingToChildren()) {
                     addChildrenOfReference(mainInstance, evalContext,
-                        target, updatedNodes, true);
+                        target, updatedNodes);
                 }
 
                 // Now go through each of these updated nodes (generally
@@ -516,38 +516,38 @@ public class IDag {
      * This is a utility method to get all of the references of a node. It can
      * be replaced when we support dependent XPath Steps (IE: /path/to//)
      */
-    private void addChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original, Set<TreeReference> toAdd, boolean expandRepeatables) {
+    private void addChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original, Set<TreeReference> toAdd) {
         // original has already been added to the 'toAdd' list.
 
-        TreeElement repeatTemplate = expandRepeatables ? mainInstance.getTemplatePath(original) : null;
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
         if (repeatTemplate != null) {
             for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
                 TreeElement child = repeatTemplate.getChildAt(i);
                 toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, child, toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, child, toAdd);
             }
         } else {
             List<TreeReference> refSet = evalContext.expandReference(original);
             for (TreeReference ref : refSet) {
-                addChildrenOfElement(mainInstance, evalContext.resolveReference(ref), toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, evalContext.resolveReference(ref), toAdd);
             }
         }
     }
 
     // Recursive step of utility method
-    private void addChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> el, Set<TreeReference> toAdd, boolean expandRepeatables) {
-        TreeElement repeatTemplate = expandRepeatables ? mainInstance.getTemplatePath(el.getRef()) : null;
+    private void addChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> el, Set<TreeReference> toAdd) {
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
         if (repeatTemplate != null) {
             for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
                 TreeElement child = repeatTemplate.getChildAt(i);
                 toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, child, toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, child, toAdd);
             }
         } else {
             for (int i = 0; i < el.getNumChildren(); ++i) {
                 AbstractTreeElement<?> child = el.getChildAt(i);
                 toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, child, toAdd, expandRepeatables);
+                addChildrenOfElement(mainInstance, child, toAdd);
             }
         }
     }
