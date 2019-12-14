@@ -5,6 +5,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
@@ -91,7 +92,7 @@ class StandardBindAttributesProcessor {
             }
         }
 
-        
+
         final String xpathConstr = element.getAttributeValue(null, "constraint");
         if (xpathConstr != null) {
             try {
@@ -157,11 +158,11 @@ class StandardBindAttributesProcessor {
                     contextRef.getReference().toString() + "] at line: " + xpath + ", " +  xse.getMessage());
         }
 
-        return new Condition(xPathConditional, trueAction, falseAction, FormInstance.unpackReference(contextRef));
+        return Triggerable.condition(xPathConditional, trueAction, falseAction, FormInstance.unpackReference(contextRef));
     }
 
     private Recalculate buildCalculate(String xpath, IDataReference contextRef) throws XPathSyntaxException {
-        return new Recalculate(new XPathConditional(xpath), FormInstance.unpackReference(contextRef));
+        return Triggerable.recalculate(new XPathConditional(xpath), FormInstance.unpackReference(contextRef));
     }
 
     /** Returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown */

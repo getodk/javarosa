@@ -74,8 +74,8 @@ public class Recalculate extends Triggerable {
 
     }
 
-    public Recalculate(IConditionExpr expr, TreeReference contextRef) {
-        super(expr, contextRef);
+    protected Recalculate(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+        super(expr, contextRef, originalContextRef, targets, immediateCascades);
     }
 
     @Override
@@ -272,15 +272,6 @@ public class Recalculate extends Triggerable {
             absTriggers.add(r.anchor(originalContextRef));
         }
         return absTriggers;
-    }
-
-    Boolean evalPredicate(FormInstance model, EvaluationContext evalContext) {
-        try {
-            return expr.eval(model, evalContext);
-        } catch (XPathException e) {
-            e.setSource("Relevant expression for " + contextRef.toString(true));
-            throw e;
-        }
     }
 
     Object evalRaw(FormInstance model, EvaluationContext evalContext) {

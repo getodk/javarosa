@@ -17,7 +17,7 @@
 package org.javarosa.core.model.condition;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +26,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.debug.EvaluationResult;
+import org.javarosa.xpath.XPathConditional;
 
 /**
  * A triggerable represents an action that should be processed based
@@ -68,15 +69,20 @@ public abstract class Triggerable implements Externalizable {
 
     }
 
-    public Triggerable(IConditionExpr expr, TreeReference contextRef, ArrayList<TreeReference> targets) {
+    public Triggerable(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         this.expr = expr;
-        this.contextRef = contextRef;
-        this.originalContextRef = contextRef;
         this.targets = targets;
+        this.contextRef = contextRef;
+        this.originalContextRef = originalContextRef;
+        this.immediateCascades = immediateCascades;
     }
 
-    public Triggerable(IConditionExpr expr, TreeReference contextRef) {
-        this(expr, contextRef, new ArrayList<>(0));
+    public static Condition condition(XPathConditional expr, int trueAction, int falseAction, TreeReference contextRef) {
+        return new Condition(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>(), trueAction, falseAction);
+    }
+
+    public static Recalculate recalculate(XPathConditional expr, TreeReference contextRef) {
+        return new Recalculate(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>());
     }
 
     protected abstract Object eval(FormInstance instance, EvaluationContext ec);

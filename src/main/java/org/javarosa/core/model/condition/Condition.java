@@ -58,12 +58,8 @@ public class Condition extends Triggerable {
 
     }
 
-    public Condition(IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
-        this(expr, trueAction, falseAction, contextRef, new ArrayList<>(0));
-    }
-
-    public Condition(IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, ArrayList<TreeReference> targets) {
-        super(expr, contextRef, targets);
+    protected Condition(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, int trueAction, int falseAction) {
+        super(expr, contextRef, originalContextRef, targets, immediateCascades);
         this.trueAction = trueAction;
         this.falseAction = falseAction;
     }
@@ -261,15 +257,6 @@ public class Condition extends Triggerable {
             return expr.eval(model, evalContext);
         } catch (XPathException e) {
             e.setSource("Relevant expression for " + contextRef.toString(true));
-            throw e;
-        }
-    }
-
-    Object evalRaw(FormInstance model, EvaluationContext evalContext) {
-        try {
-            return expr.evalRaw(model, evalContext);
-        } catch (XPathException e) {
-            e.setSource("calculate expression for " + contextRef.toString(true));
             throw e;
         }
     }
