@@ -112,6 +112,7 @@ public abstract class Triggerable implements Externalizable {
     public TreeReference getOriginalContext() {
         return originalContextRef;
     }
+
     /**
      * Not for re-implementation, dispatches all of the evaluation
      *

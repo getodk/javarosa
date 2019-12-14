@@ -20,7 +20,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -42,34 +41,34 @@ public class Condition extends Triggerable {
     public int trueAction;
     public int falseAction;
 
-    public Condition () {
+    public Condition() {
 
     }
 
-    public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
+    public Condition(IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
         this(expr, trueAction, falseAction, contextRef, new ArrayList<TreeReference>(0));
     }
 
-    public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, ArrayList<TreeReference> targets) {
+    public Condition(IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, ArrayList<TreeReference> targets) {
         super(expr, contextRef, targets);
         this.trueAction = trueAction;
         this.falseAction = falseAction;
     }
 
-    public Object eval (FormInstance model, EvaluationContext evalContext) {
+    public Object eval(FormInstance model, EvaluationContext evalContext) {
         return evalPredicate(model, evalContext);
     }
 
-    public boolean evalBool (FormInstance model, EvaluationContext evalContext) {
-        return ((Boolean)eval(model, evalContext)).booleanValue();
+    public boolean evalBool(FormInstance model, EvaluationContext evalContext) {
+        return ((Boolean) eval(model, evalContext)).booleanValue();
     }
 
-    public void apply (TreeReference ref, Object rawResult, FormInstance mainInstance) {
-        boolean result = ((Boolean)rawResult).booleanValue();
+    public void apply(TreeReference ref, Object rawResult, FormInstance mainInstance) {
+        boolean result = ((Boolean) rawResult).booleanValue();
         performAction(mainInstance.resolveReference(ref), result ? trueAction : falseAction);
     }
 
-    public boolean canCascade () {
+    public boolean canCascade() {
         return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
     }
 
@@ -78,24 +77,41 @@ public class Condition extends Triggerable {
     }
 
 
-    private void performAction (TreeElement node, int action) {
+    private void performAction(TreeElement node, int action) {
         switch (action) {
-        case ACTION_NULL: break;
-        case ACTION_SHOW:         node.setRelevant(true); break;
-        case ACTION_HIDE:         node.setRelevant(false); break;
-        case ACTION_ENABLE:       node.setEnabled(true); break;
-        case ACTION_DISABLE:      node.setEnabled(false); break;
-        case ACTION_LOCK:         /* not supported */; break;
-        case ACTION_UNLOCK:       /* not supported */; break;
-        case ACTION_REQUIRE:      node.setRequired(true); break;
-        case ACTION_DONT_REQUIRE: node.setRequired(false); break;
+            case ACTION_NULL:
+                break;
+            case ACTION_SHOW:
+                node.setRelevant(true);
+                break;
+            case ACTION_HIDE:
+                node.setRelevant(false);
+                break;
+            case ACTION_ENABLE:
+                node.setEnabled(true);
+                break;
+            case ACTION_DISABLE:
+                node.setEnabled(false);
+                break;
+            case ACTION_LOCK:         /* not supported */
+                ;
+                break;
+            case ACTION_UNLOCK:       /* not supported */
+                ;
+                break;
+            case ACTION_REQUIRE:
+                node.setRequired(true);
+                break;
+            case ACTION_DONT_REQUIRE:
+                node.setRequired(false);
+                break;
         }
     }
 
     //conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
-    public boolean equals (Object o) {
+    public boolean equals(Object o) {
         if (o instanceof Condition) {
-            Condition c = (Condition)o;
+            Condition c = (Condition) o;
             if (this == c)
                 return true;
 
