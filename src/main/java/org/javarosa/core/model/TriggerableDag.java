@@ -353,9 +353,7 @@ public class TriggerableDag {
         List<QuickTriggerable> orderedRoots = new ArrayList<>();
         Set<QuickTriggerable> roots = new HashSet<>(
             vertices.size());
-        int waveCount = -1;
         while (vertices.size() > 0) {
-            ++waveCount;
             // determine root nodes
             roots.clear();
             roots.addAll(vertices);
@@ -387,7 +385,6 @@ public class TriggerableDag {
             // remove root nodes and edges originating from them
             // add them to the triggerablesDAG.
             for (QuickTriggerable root : orderedRoots) {
-                root.t.setWaveCount(waveCount);
                 triggerablesDAG.add(root);
                 vertices.remove(root);
             }

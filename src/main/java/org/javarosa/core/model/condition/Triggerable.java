@@ -19,7 +19,6 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,8 +70,6 @@ public abstract class Triggerable implements Externalizable {
      * The first context provided to this triggerable before reducing to the common root.
      */
     private TreeReference originalContextRef;
-
-    private int waveCount = 0;
 
     private Set<QuickTriggerable> immediateCascades = null;
 
@@ -151,10 +148,6 @@ public abstract class Triggerable implements Externalizable {
 
     public List<TreeReference> getTargets() {
         return targets;
-    }
-
-    public void setWaveCount(int waveCount) {
-        this.waveCount = waveCount;
     }
 
     /**
@@ -267,25 +260,6 @@ public abstract class Triggerable implements Externalizable {
                 sb.append(",");
         }
         return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
-    }
-
-    public void print(OutputStreamWriter w) throws IOException {
-        w.write("   waveCount: " + waveCount + "\n");
-        w.write("   isCascading: "
-            + (isCascadingToChildren() ? "true" : "false") + "\n");
-        w.write("   expr: " + expr.toString() + "\n");
-        w.write("   contextRef: "
-            + ((contextRef != null) ? contextRef.toString(true) : "null")
-            + "\n");
-        w.write("   originalContextRef: "
-            + ((originalContextRef != null) ? originalContextRef
-            .toString(true) : "null") + "\n");
-        int j;
-        for (j = 0; j < getTargets().size(); ++j) {
-            TreeReference r = getTargets().get(j);
-            w.write("   targets[" + j + "] :"
-                + r.toString(true) + "\n");
-        }
     }
 
     /**
