@@ -96,7 +96,7 @@ public abstract class Triggerable implements Externalizable {
     }
 
     public Triggerable(IConditionExpr expr, TreeReference contextRef) {
-        this(expr, contextRef, new ArrayList<TreeReference>(0));
+        this(expr, contextRef, new ArrayList<>(0));
     }
 
     protected abstract Object eval(FormInstance instance, EvaluationContext ec);
@@ -114,11 +114,7 @@ public abstract class Triggerable implements Externalizable {
     }
 
     /**
-     * Not for re-implementation, dispatches all of the evaluation
-     *
-     * @param mainInstance
-     * @param parentContext
-     * @param context
+     * Dispatches all of the evaluation
      */
     public final List<EvaluationResult> apply(FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
         //The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
@@ -128,7 +124,7 @@ public abstract class Triggerable implements Externalizable {
 
         Object result = eval(mainInstance, ec);
 
-        List<EvaluationResult> affectedNodes = new ArrayList<EvaluationResult>(0);
+        List<EvaluationResult> affectedNodes = new ArrayList<>(0);
         for (TreeReference target : targets) {
             TreeReference targetRef = target.contextualize(ec.getContextRef());
             List<TreeReference> v = ec.expandReference(targetRef);
@@ -175,7 +171,7 @@ public abstract class Triggerable implements Externalizable {
 
     public Set<TreeReference> getTriggers() {
         Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
-        Set<TreeReference> absTriggers = new HashSet<TreeReference>();
+        Set<TreeReference> absTriggers = new HashSet<>();
         for (TreeReference r : relTriggers) {
             absTriggers.add(r.anchor(originalContextRef));
         }
@@ -184,7 +180,7 @@ public abstract class Triggerable implements Externalizable {
 
     Boolean evalPredicate(FormInstance model, EvaluationContext evalContext) {
         try {
-            return new Boolean(expr.eval(model, evalContext));
+            return expr.eval(model, evalContext);
         } catch (XPathException e) {
             e.setSource("Relevant expression for " + contextRef.toString(true));
             throw e;
@@ -210,6 +206,7 @@ public abstract class Triggerable implements Externalizable {
         return contextRef.contextualize(anchorRef);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Triggerable) {
             Triggerable t = (Triggerable) o;
@@ -238,22 +235,30 @@ public abstract class Triggerable implements Externalizable {
         }
     }
 
+    // region External serialization
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
         contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
-        targets = new ArrayList<TreeReference>(tlist);
+        targets = new ArrayList<>(tlist);
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.write(out, new ExtWrapTagged(expr));
         ExtUtil.write(out, contextRef);
         ExtUtil.write(out, originalContextRef);
-        List<TreeReference> tlist = new ArrayList<TreeReference>(targets);
+        List<TreeReference> tlist = new ArrayList<>(targets);
         ExtUtil.write(out, new ExtWrapList(tlist));
     }
 
+    // endregion
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < targets.size(); i++) {
@@ -265,7 +270,7 @@ public abstract class Triggerable implements Externalizable {
     }
 
     public void print(OutputStreamWriter w) throws IOException {
-        w.write("   waveCount: " + Integer.toString(waveCount) + "\n");
+        w.write("   waveCount: " + waveCount + "\n");
         w.write("   isCascading: "
             + (isCascadingToChildren() ? "true" : "false") + "\n");
         w.write("   expr: " + expr.toString() + "\n");
@@ -278,7 +283,7 @@ public abstract class Triggerable implements Externalizable {
         int j;
         for (j = 0; j < getTargets().size(); ++j) {
             TreeReference r = getTargets().get(j);
-            w.write("   targets[" + Integer.toString(j) + "] :"
+            w.write("   targets[" + j + "] :"
                 + r.toString(true) + "\n");
         }
     }
@@ -291,7 +296,7 @@ public abstract class Triggerable implements Externalizable {
      * @return a list of affected nodes.
      */
     public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
-        List<TreeReference> affectedTriggers = new ArrayList<TreeReference>(0);
+        List<TreeReference> affectedTriggers = new ArrayList<>(0);
 
         Set<TreeReference> triggers = this.getTriggers();
         for (TreeReference trigger : triggers) {

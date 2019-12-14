@@ -50,6 +50,9 @@ import org.javarosa.core.model.instance.TreeReference;
 
 public class Recalculate extends Triggerable {
 
+    /**
+     * Constructor required for deserialization
+     */
     @SuppressWarnings("unused")
     public Recalculate() {
 
@@ -59,20 +62,24 @@ public class Recalculate extends Triggerable {
         super(expr, contextRef);
     }
 
+    @Override
     public Object eval(FormInstance model, EvaluationContext ec) {
         return evalRaw(model, ec);
     }
 
+    @Override
     public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
         int dataType = element.getDataType();
         element.setAnswer(wrapData(result, dataType));
     }
 
+    @Override
     public boolean canCascade() {
         return true;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Recalculate) {
             Recalculate r = (Recalculate) o;
@@ -114,7 +121,7 @@ public class Recalculate extends Triggerable {
             if (val instanceof Boolean) {
                 b = (Boolean) val;
             } else if (val instanceof Double) {
-                Double d = (Double) val;
+                double d = (Double) val;
                 b = Math.abs(d) > 1.0e-12 && !Double.isNaN(d);
             } else if (val instanceof String) {
                 String s = (String) val;

@@ -41,12 +41,16 @@ public class Condition extends Triggerable {
     public int trueAction;
     public int falseAction;
 
+    /**
+     * Constructor required for deserialization
+     */
+    @SuppressWarnings("unused")
     public Condition() {
 
     }
 
     public Condition(IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
-        this(expr, trueAction, falseAction, contextRef, new ArrayList<TreeReference>(0));
+        this(expr, trueAction, falseAction, contextRef, new ArrayList<>(0));
     }
 
     public Condition(IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, ArrayList<TreeReference> targets) {
@@ -55,23 +59,27 @@ public class Condition extends Triggerable {
         this.falseAction = falseAction;
     }
 
+    @Override
     public Object eval(FormInstance model, EvaluationContext evalContext) {
         return evalPredicate(model, evalContext);
     }
 
     public boolean evalBool(FormInstance model, EvaluationContext evalContext) {
-        return ((Boolean) eval(model, evalContext)).booleanValue();
+        return (Boolean) eval(model, evalContext);
     }
 
+    @Override
     public void apply(TreeReference ref, Object rawResult, FormInstance mainInstance) {
-        boolean result = ((Boolean) rawResult).booleanValue();
+        boolean result = (Boolean) rawResult;
         performAction(mainInstance.resolveReference(ref), result ? trueAction : falseAction);
     }
 
+    @Override
     public boolean canCascade() {
         return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
     }
 
+    @Override
     public boolean isCascadingToChildren() {
         return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
     }
@@ -94,10 +102,8 @@ public class Condition extends Triggerable {
                 node.setEnabled(false);
                 break;
             case ACTION_LOCK:         /* not supported */
-                ;
                 break;
             case ACTION_UNLOCK:       /* not supported */
-                ;
                 break;
             case ACTION_REQUIRE:
                 node.setRequired(true);
@@ -108,7 +114,10 @@ public class Condition extends Triggerable {
         }
     }
 
-    //conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
+    /**
+     * conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
+     */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Condition) {
             Condition c = (Condition) o;
@@ -121,15 +130,21 @@ public class Condition extends Triggerable {
         }
     }
 
+    // region External serialization
+
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         super.readExternal(in, pf);
         trueAction = ExtUtil.readInt(in);
         falseAction = ExtUtil.readInt(in);
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         super.writeExternal(out);
         ExtUtil.writeNumeric(out, trueAction);
         ExtUtil.writeNumeric(out, falseAction);
     }
+
+    // endregion
 }
