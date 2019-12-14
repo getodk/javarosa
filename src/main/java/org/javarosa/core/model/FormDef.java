@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.javarosa.core.log.WrappedException;
-import org.javarosa.core.model.IDag.EventNotifierAccessor;
+import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.condition.Condition;
@@ -93,31 +93,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final String STORAGE_KEY = "FORMDEF";
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
-    public enum EvalBehavior {
-        Legacy,
-        April_2014,
-        Safe_2014,
-        Fast_2014
-    }
-
-    public static final EvalBehavior recommendedMode = EvalBehavior.Safe_2014;
-
-    /**
-     * used by FormDef() constructor
-     */
-    private static EvalBehavior defaultMode = recommendedMode;
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
-
-    /**
-     * Changes the mode used for evaluations
-     */
-    public static final void setEvalBehavior(EvalBehavior mode) {
-        defaultMode = mode;
-    }
-
-    public static void setDefaultEventNotifier(EventNotifier eventNotifier) {
-        defaultEventNotifier = eventNotifier;
-    }
 
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
@@ -176,7 +152,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     private List<IConditionExpr> outputFragments;
 
-    private IDag dagImpl;
+    private TriggerableDag dagImpl;
 
     private EvaluationContext exprEvalContext;
 
@@ -210,36 +186,21 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private List<String> parseErrors = new ArrayList<>();
 
     public FormDef() {
-        this(defaultMode, defaultEventNotifier);
+        this(defaultEventNotifier);
     }
 
-    public FormDef(EvalBehavior mode, EventNotifier eventNotifier) {
+    public FormDef(EventNotifier eventNotifier) {
         setID(-1);
         setChildren(null);
         final EventNotifierAccessor ia = new EventNotifierAccessor() {
-
             @Override
             public EventNotifier getEventNotifier() {
                 return FormDef.this.getEventNotifier();
             }
         };
 
-        switch (mode) {
-            case Legacy:
-                dagImpl = new LegacyDagImpl(ia);
-                break;
-            case April_2014:
-                dagImpl = new April2014DagImpl(ia);
-                break;
-            case Safe_2014:
-                dagImpl = new Safe2014DagImpl(ia);
-                break;
-            case Fast_2014:
-                dagImpl = new Fast2014DagImpl(ia);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected mode: " + mode);
-        }
+        dagImpl = new TriggerableDag(ia);
+
         // This is kind of a wreck...
         resetEvaluationContext();
         outputFragments = new ArrayList<>();
@@ -446,7 +407,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 ref.getParentRef(), null);
         }
 
-        Collection<QuickTriggerable> qts = triggerTriggerables(ref, midSurvey);
+        Collection<QuickTriggerable> qts = triggerTriggerables(ref);
         dagImpl.publishSummary("New value", ref, qts);
         // TODO: pre-populate fix-count repeats here?
     }
@@ -566,11 +527,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         getChild(index).getActionController().triggerActionsFromEvent(Action.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
 
         // trigger conditions that depend on the creation of this new node
-        triggerTriggerables(repeatContextRef, true);
+        triggerTriggerables(repeatContextRef);
 
         TreeReference parentRef = repeatContextRef.getParentRef();
         TreeElement parentElement = mainInstance.resolveReference(parentRef);
-        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, parentElement, newNode);
+        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
     }
 
     @Override
@@ -641,8 +602,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return true;
     }
 
-    public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data,
-                                  boolean midSurvey) throws InvalidReferenceException {
+    public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) throws InvalidReferenceException {
         ItemsetBinding itemset = q.getDynamicChoices();
         TreeReference targetRef = targetNode.getRef();
         TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
@@ -703,7 +663,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 getMainInstance().copyItemsetNode(ch.copyNode, destRef, this);
             }
         }
-        dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode, midSurvey);
+        dagImpl.copyItemsetAnswer(getMainInstance(), getEvaluationContext(), destRef, targetNode);
     }
 
     /**
@@ -743,9 +703,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * Walks the current set of conditions, and evaluates each of them with the
      * current context.
      */
-    private Collection<QuickTriggerable> initializeTriggerables(TreeReference rootRef, boolean midSurvey) {
+    private Collection<QuickTriggerable> initializeTriggerables(TreeReference rootRef) {
 
-        return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef, midSurvey);
+        return dagImpl.initializeTriggerables(getMainInstance(), getEvaluationContext(), rootRef);
     }
 
     /**
@@ -754,8 +714,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * @param ref The full contextualized unambiguous reference of the value that
      *            was changed.
      */
-    public Collection<QuickTriggerable> triggerTriggerables(TreeReference ref, boolean midSurvey) {
-        return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref, midSurvey);
+    public Collection<QuickTriggerable> triggerTriggerables(TreeReference ref) {
+        return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref);
     }
 
     public ValidateOutcome validate(boolean markCompleted) {
@@ -1298,7 +1258,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /**
      * Given one or more {@link TreeReference}, return a set of questions and/or groups corresponding to the references
      * that are found in this form definition.
-     *
+     * <p>
      * Note: this performs a recursive breadth-first search so is not intended to be used where performance matters.
      */
     private Set<IFormElement> getElementsFromReferences(Collection<TreeReference> references) {
@@ -1359,8 +1319,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             actionController.triggerActionsFromEvent(Action.EVENT_XFORMS_READY, this);
         }
 
-        Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef(), false);
-        dagImpl.publishSummary("Form initialized", qts);
+        Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef());
+        dagImpl.publishSummary("Form initialized", null, qts);
     }
 
     /**
@@ -1852,13 +1812,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, int action) {
         return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action);
-    }
-
-    /**
-     * For debugging
-     */
-    public final void printTriggerables(String path) {
-        dagImpl.printTriggerables(path);
     }
 
     public List<String> getParseWarnings() {
