@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,33 +50,6 @@ import org.javarosa.xpath.XPathException;
  * @author ctsims
  */
 public abstract class Triggerable implements Externalizable {
-    public static final Comparator<Triggerable> triggerablesRootOrdering = new Comparator<Triggerable>() {
-        @Override
-        public int compare(Triggerable lhs, Triggerable rhs) {
-            int cmp;
-            cmp = lhs.contextRef.toString(false).compareTo(rhs.contextRef.toString(false));
-            if (cmp != 0) {
-                return cmp;
-            }
-            cmp = lhs.originalContextRef.toString(false).compareTo(rhs.originalContextRef.toString(false));
-            if (cmp != 0) {
-                return cmp;
-            }
-
-            // bias toward cascading targets....
-            if (lhs.isCascadingToChildren()) {
-                if (!rhs.isCascadingToChildren()) {
-                    return -1;
-                }
-            } else if (rhs.isCascadingToChildren()) {
-                return 1;
-            }
-
-            int lhsHash = lhs.hashCode();
-            int rhsHash = rhs.hashCode();
-            return (lhsHash < rhsHash) ? -1 : ((lhsHash == rhsHash) ? 0 : 1);
-        }
-    };
     /**
      * The expression which will be evaluated to produce a result
      */
@@ -133,6 +105,13 @@ public abstract class Triggerable implements Externalizable {
 
     public abstract boolean canCascade();
 
+    public TreeReference getContext() {
+        return contextRef;
+    }
+
+    public TreeReference getOriginalContext() {
+        return originalContextRef;
+    }
     /**
      * Not for re-implementation, dispatches all of the evaluation
      *
