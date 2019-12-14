@@ -73,14 +73,6 @@ public abstract class Triggerable implements Externalizable {
 
     private Set<QuickTriggerable> immediateCascades = null;
 
-    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
-        immediateCascades = new HashSet<>(cascades);
-    }
-
-    public Set<QuickTriggerable> getImmediateCascades() {
-        return immediateCascades;
-    }
-
     public Triggerable() {
 
     }
@@ -101,6 +93,26 @@ public abstract class Triggerable implements Externalizable {
     protected abstract void apply(TreeReference ref, Object result, FormInstance mainInstance);
 
     public abstract boolean canCascade();
+
+    /**
+     * This should return true if this triggerable's targets will implicity modify the
+     * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
+     * expressions which care about the value of this node's children should be triggered.
+     *
+     * @return True if this condition should trigger expressions whose targets include
+     *     nodes which are the children of this node's targets.
+     */
+    public boolean isCascadingToChildren() {
+        return false;
+    }
+
+    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
+        immediateCascades = new HashSet<>(cascades);
+    }
+
+    public Set<QuickTriggerable> getImmediateCascades() {
+        return immediateCascades;
+    }
 
     public TreeReference getContext() {
         return contextRef;
@@ -148,18 +160,6 @@ public abstract class Triggerable implements Externalizable {
 
     public List<TreeReference> getTargets() {
         return targets;
-    }
-
-    /**
-     * This should return true if this triggerable's targets will implicity modify the
-     * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
-     * expressions which care about the value of this node's children should be triggered.
-     *
-     * @return True if this condition should trigger expressions whose targets include
-     *     nodes which are the children of this node's targets.
-     */
-    public boolean isCascadingToChildren() {
-        return false;
     }
 
     public Set<TreeReference> getTriggers() {
