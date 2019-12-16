@@ -34,6 +34,7 @@ import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.ConditionAction;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
@@ -1810,7 +1811,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * @param action
      * @return
      */
-    public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, int action) {
+    public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, ConditionAction action) {
         return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action);
     }
 

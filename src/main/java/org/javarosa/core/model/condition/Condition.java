@@ -37,19 +37,8 @@ import org.javarosa.debug.EvaluationResult;
 import org.javarosa.xpath.XPathException;
 
 public class Condition extends Triggerable {
-    // TODO Create an enum to take all these constants out from this class
-    public static final int ACTION_NULL = 0;
-    public static final int ACTION_SHOW = 1;
-    public static final int ACTION_HIDE = 2;
-    public static final int ACTION_ENABLE = 3;
-    public static final int ACTION_DISABLE = 4;
-    public static final int ACTION_LOCK = 5;
-    public static final int ACTION_UNLOCK = 6;
-    public static final int ACTION_REQUIRE = 7;
-    public static final int ACTION_DONT_REQUIRE = 8;
-
-    public int trueAction;
-    public int falseAction;
+    public ConditionAction trueAction;
+    public ConditionAction falseAction;
 
     /**
      * Constructor required for deserialization
@@ -59,7 +48,7 @@ public class Condition extends Triggerable {
 
     }
 
-    protected Condition(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, int trueAction, int falseAction) {
+    protected Condition(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
         this.trueAction = trueAction;
         this.falseAction = falseAction;
@@ -80,18 +69,20 @@ public class Condition extends Triggerable {
         performAction(mainInstance.resolveReference(ref), result ? trueAction : falseAction);
     }
 
+    // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
     @Override
     public boolean canCascade() {
-        return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
+        return trueAction.isCascading();
     }
 
+    // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
     @Override
     public boolean isCascadingToChildren() {
-        return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
+        return trueAction.isCascading();
     }
 
 
-    private void performAction(TreeElement node, int action) {
+    private void performAction(TreeElement node, ConditionAction action) {
         switch (action) {
             case ACTION_NULL:
                 break;
@@ -168,8 +159,8 @@ public class Condition extends Triggerable {
         originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
         targets = new ArrayList<>(tlist);
-        trueAction = ExtUtil.readInt(in);
-        falseAction = ExtUtil.readInt(in);
+        trueAction = ConditionAction.from(ExtUtil.readInt(in));
+        falseAction = ConditionAction.from(ExtUtil.readInt(in));
     }
 
     @Override
@@ -179,8 +170,8 @@ public class Condition extends Triggerable {
         ExtUtil.write(out, originalContextRef);
         List<TreeReference> tlist = new ArrayList<>(targets);
         ExtUtil.write(out, new ExtWrapList(tlist));
-        ExtUtil.writeNumeric(out, trueAction);
-        ExtUtil.writeNumeric(out, falseAction);
+        ExtUtil.writeNumeric(out, trueAction.getCode());
+        ExtUtil.writeNumeric(out, falseAction.getCode());
     }
 
     @Override

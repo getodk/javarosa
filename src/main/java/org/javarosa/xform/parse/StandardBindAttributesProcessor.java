@@ -10,6 +10,7 @@ import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.ConditionAction;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.model.xform.XPathReference;
@@ -124,25 +125,25 @@ class StandardBindAttributesProcessor {
     }
 
     private Triggerable buildCondition(String xpath, String type, IDataReference contextRef) {
-        final int trueAction;
-        final int falseAction;
+        final ConditionAction trueAction;
+        final ConditionAction falseAction;
         final String prettyType;
 
         switch (type) {
             case "relevant":
                 prettyType = "display";
-                trueAction = Condition.ACTION_SHOW;
-                falseAction = Condition.ACTION_HIDE;
+                trueAction = ConditionAction.ACTION_SHOW;
+                falseAction = ConditionAction.ACTION_HIDE;
                 break;
             case "required":
                 prettyType = "require";
-                trueAction = Condition.ACTION_REQUIRE;
-                falseAction = Condition.ACTION_DONT_REQUIRE;
+                trueAction = ConditionAction.ACTION_REQUIRE;
+                falseAction = ConditionAction.ACTION_DONT_REQUIRE;
                 break;
             case "readonly":
                 prettyType = "readonly";
-                trueAction = Condition.ACTION_DISABLE;
-                falseAction = Condition.ACTION_ENABLE;
+                trueAction = ConditionAction.ACTION_DISABLE;
+                falseAction = ConditionAction.ACTION_ENABLE;
                 break;
             default:
                 throw new XFormParseException("Unsupported type " + type + " passed to buildCondition");

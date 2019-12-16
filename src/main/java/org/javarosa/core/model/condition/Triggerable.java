@@ -77,7 +77,7 @@ public abstract class Triggerable implements Externalizable {
         this.immediateCascades = immediateCascades;
     }
 
-    public static Triggerable condition(XPathConditional expr, int trueAction, int falseAction, TreeReference contextRef) {
+    public static Triggerable condition(XPathConditional expr, ConditionAction trueAction, ConditionAction falseAction, TreeReference contextRef) {
         return new Condition(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>(), trueAction, falseAction);
     }
 

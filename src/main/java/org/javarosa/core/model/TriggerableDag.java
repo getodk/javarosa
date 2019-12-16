@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.ConditionAction;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.Recalculate;
@@ -608,7 +609,7 @@ public class TriggerableDag {
     /**
      * Pull this in from FormOverview so that we can make fields private.
      */
-    public final IConditionExpr getConditionExpressionForTrueAction(FormInstance mainInstance, TreeElement instanceNode, int action) {
+    public final IConditionExpr getConditionExpressionForTrueAction(FormInstance mainInstance, TreeElement instanceNode, ConditionAction action) {
         IConditionExpr expr = null;
         for (int i = 0; i < triggerablesDAG.size() && expr == null; i++) {
             // Clayton Sims - Jun 1, 2009 : Not sure how legitimate this
