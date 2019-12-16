@@ -56,17 +56,43 @@ public class Condition extends Triggerable {
 
     @Override
     public Object eval(FormInstance model, EvaluationContext evalContext) {
-        return evalPredicate(model, evalContext);
-    }
-
-    public boolean evalBool(FormInstance model, EvaluationContext evalContext) {
-        return (Boolean) eval(model, evalContext);
+        try {
+            return expr.eval(model, evalContext);
+        } catch (XPathException e) {
+            e.setSource("Condition expression for " + contextRef.toString(true));
+            throw e;
+        }
     }
 
     @Override
-    public void apply(TreeReference ref, Object rawResult, FormInstance mainInstance) {
-        boolean result = (Boolean) rawResult;
-        performAction(mainInstance.resolveReference(ref), result ? trueAction : falseAction);
+    public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
+        TreeElement element = mainInstance.resolveReference(ref);
+        switch ((boolean) result ? trueAction : falseAction) {
+            case NULL:
+                break;
+            case SHOW:
+                element.setRelevant(true);
+                break;
+            case HIDE:
+                element.setRelevant(false);
+                break;
+            case ENABLE:
+                element.setEnabled(true);
+                break;
+            case DISABLE:
+                element.setEnabled(false);
+                break;
+            case LOCK:         /* not supported */
+                break;
+            case UNLOCK:       /* not supported */
+                break;
+            case REQUIRE:
+                element.setRequired(true);
+                break;
+            case DONT_REQUIRE:
+                element.setRequired(false);
+                break;
+        }
     }
 
     // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
@@ -79,36 +105,6 @@ public class Condition extends Triggerable {
     @Override
     public boolean isCascadingToChildren() {
         return trueAction.isCascading();
-    }
-
-
-    private void performAction(TreeElement node, ConditionAction action) {
-        switch (action) {
-            case NULL:
-                break;
-            case SHOW:
-                node.setRelevant(true);
-                break;
-            case HIDE:
-                node.setRelevant(false);
-                break;
-            case ENABLE:
-                node.setEnabled(true);
-                break;
-            case DISABLE:
-                node.setEnabled(false);
-                break;
-            case LOCK:         /* not supported */
-                break;
-            case UNLOCK:       /* not supported */
-                break;
-            case REQUIRE:
-                node.setRequired(true);
-                break;
-            case DONT_REQUIRE:
-                node.setRequired(false);
-                break;
-        }
     }
 
     /**
@@ -147,31 +143,6 @@ public class Condition extends Triggerable {
         } else {
             return false;
         }
-    }
-
-    // region External serialization
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
-        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
-        targets = new ArrayList<>(tlist);
-        trueAction = ConditionAction.from(ExtUtil.readInt(in));
-        falseAction = ConditionAction.from(ExtUtil.readInt(in));
-    }
-
-    @Override
-    public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.write(out, new ExtWrapTagged(expr));
-        ExtUtil.write(out, contextRef);
-        ExtUtil.write(out, originalContextRef);
-        List<TreeReference> tlist = new ArrayList<>(targets);
-        ExtUtil.write(out, new ExtWrapList(tlist));
-        ExtUtil.writeNumeric(out, trueAction.getCode());
-        ExtUtil.writeNumeric(out, falseAction.getCode());
     }
 
     @Override
@@ -246,15 +217,6 @@ public class Condition extends Triggerable {
         return absTriggers;
     }
 
-    Boolean evalPredicate(FormInstance model, EvaluationContext evalContext) {
-        try {
-            return expr.eval(model, evalContext);
-        } catch (XPathException e) {
-            e.setSource("Relevant expression for " + contextRef.toString(true));
-            throw e;
-        }
-    }
-
     @Override
     public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
         contextRef = contextRef.intersect(t.contextRef);
@@ -265,17 +227,6 @@ public class Condition extends Triggerable {
         // Contextualize the reference used by the triggerable against
         // the anchor
         return contextRef.contextualize(anchorRef);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < targets.size(); i++) {
-            sb.append(targets.get(i).toString());
-            if (i < targets.size() - 1)
-                sb.append(",");
-        }
-        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
     }
 
     /**
@@ -302,5 +253,42 @@ public class Condition extends Triggerable {
         return affectedTriggers;
     }
 
+    // region External serialization
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
+        targets = new ArrayList<>(tlist);
+        trueAction = ConditionAction.from(ExtUtil.readInt(in));
+        falseAction = ConditionAction.from(ExtUtil.readInt(in));
+    }
+
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(expr));
+        ExtUtil.write(out, contextRef);
+        ExtUtil.write(out, originalContextRef);
+        List<TreeReference> tlist = new ArrayList<>(targets);
+        ExtUtil.write(out, new ExtWrapList(tlist));
+        ExtUtil.writeNumeric(out, trueAction.getCode());
+        ExtUtil.writeNumeric(out, falseAction.getCode());
+    }
+
     // endregion
+
+    // TODO Improve this to make it more human friendly
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < targets.size(); i++) {
+            sb.append(targets.get(i).toString());
+            if (i < targets.size() - 1)
+                sb.append(",");
+        }
+        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
+    }
 }

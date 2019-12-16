@@ -53,19 +53,28 @@ public class Recalculate extends Triggerable {
 
     @Override
     public Object eval(FormInstance model, EvaluationContext ec) {
-        return evalRaw(model, ec);
+        try {
+            return expr.evalRaw(model, ec);
+        } catch (XPathException e) {
+            e.setSource("Calculate expression for " + contextRef.toString(true));
+            throw e;
+        }
     }
 
     @Override
     public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
-        int dataType = element.getDataType();
-        element.setAnswer(IAnswerData.wrapData(result, dataType));
+        element.setAnswer(IAnswerData.wrapData(result, element.getDataType()));
     }
 
     @Override
     public boolean canCascade() {
         return true;
+    }
+
+    @Override
+    public boolean isCascadingToChildren() {
+        return false;
     }
 
     // TODO Improve this method and simplify
@@ -100,16 +109,6 @@ public class Recalculate extends Triggerable {
             return false;
         }
     }
-
-    //droos 1/29/10: we need to come up with a consistent rule for whether the resulting data is determined
-    //by the type of the instance node, or the type of the expression result. right now it's a mix and a mess
-    //note a caveat with going solely by instance node type is that untyped nodes default to string!
-
-    //for now, these are the rules:
-    // if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; empty string = f, all other datatypes -> error)
-    // if numeric data, convert to int if node type is int OR data is an integer; else convert to double
-    // if string data or date data, keep as is
-    // if NaN or empty string, null
 
     @Override
     public Set<QuickTriggerable> getImmediateCascades() {
@@ -183,15 +182,6 @@ public class Recalculate extends Triggerable {
         return absTriggers;
     }
 
-    Object evalRaw(FormInstance model, EvaluationContext evalContext) {
-        try {
-            return expr.evalRaw(model, evalContext);
-        } catch (XPathException e) {
-            e.setSource("calculate expression for " + contextRef.toString(true));
-            throw e;
-        }
-    }
-
     @Override
     public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
         contextRef = contextRef.intersect(t.contextRef);
@@ -202,36 +192,6 @@ public class Recalculate extends Triggerable {
         // Contextualize the reference used by the triggerable against
         // the anchor
         return contextRef.contextualize(anchorRef);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
-        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
-        targets = new ArrayList<>(tlist);
-    }
-
-    @Override
-    public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.write(out, new ExtWrapTagged(expr));
-        ExtUtil.write(out, contextRef);
-        ExtUtil.write(out, originalContextRef);
-        List<TreeReference> tlist = new ArrayList<>(targets);
-        ExtUtil.write(out, new ExtWrapList(tlist));
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < targets.size(); i++) {
-            sb.append(targets.get(i).toString());
-            if (i < targets.size() - 1)
-                sb.append(",");
-        }
-        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
     }
 
     /**
@@ -258,8 +218,38 @@ public class Recalculate extends Triggerable {
         return affectedTriggers;
     }
 
+    // region External serialization
+
     @Override
-    public boolean isCascadingToChildren() {
-        return false;
+    @SuppressWarnings("unchecked")
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
+        targets = new ArrayList<>(tlist);
+    }
+
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(expr));
+        ExtUtil.write(out, contextRef);
+        ExtUtil.write(out, originalContextRef);
+        List<TreeReference> tlist = new ArrayList<>(targets);
+        ExtUtil.write(out, new ExtWrapList(tlist));
+    }
+
+    // endregion
+
+    // TODO Improve this to make it more human friendly
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < targets.size(); i++) {
+            sb.append(targets.get(i).toString());
+            if (i < targets.size() - 1)
+                sb.append(",");
+        }
+        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
     }
 }
