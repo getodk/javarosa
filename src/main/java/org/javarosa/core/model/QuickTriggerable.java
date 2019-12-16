@@ -2,6 +2,8 @@ package org.javarosa.core.model;
 
 import java.util.Comparator;
 
+import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 
 /**
@@ -77,5 +79,13 @@ public final class QuickTriggerable {
 
     QuickTriggerable(Triggerable t) {
         this.t = t;
+    }
+
+    public boolean isCondition() {
+        return t instanceof Condition;
+    }
+
+    public boolean isRecalculate() {
+        return t instanceof Recalculate;
     }
 }

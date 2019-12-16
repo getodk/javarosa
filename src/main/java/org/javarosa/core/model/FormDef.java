@@ -33,12 +33,10 @@ import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
-import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.IFunctionHandler;
-import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -1213,11 +1211,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
-        List<Triggerable> vcond = (List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
+        List<Triggerable> vcond = Triggerable.readExternalConditions(dis, pf);
         for (Triggerable condition : vcond) {
             addTriggerable(condition);
         }
-        List<Triggerable> vcalc = (List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
+        List<Triggerable> vcalc = Triggerable.readExternalRecalculates(dis, pf);
         for (Triggerable recalculate : vcalc) {
             addTriggerable(recalculate);
         }

@@ -25,9 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
@@ -399,7 +397,7 @@ public class TriggerableDag {
 
         conditionRepeatTargetIndex.clear();
         for (QuickTriggerable qt : triggerablesDAG) {
-            if (qt.t instanceof Condition) {
+            if (qt.isCondition()) {
                 List<TreeReference> targets = qt.t.getTargets();
                 for (TreeReference target : targets) {
                     if (mainInstance.getTemplate(target) != null) {
@@ -610,7 +608,7 @@ public class TriggerableDag {
     public List<Triggerable> getConditions() {
         List<Triggerable> conditions = new ArrayList<>();
         for (QuickTriggerable qt : unorderedTriggerables) {
-            if (qt.t instanceof Condition) {
+            if (qt.isCondition()) {
                 conditions.add(qt.t);
             }
         }
@@ -624,7 +622,7 @@ public class TriggerableDag {
     public final List<Triggerable> getRecalculates() {
         List<Triggerable> recalculates = new ArrayList<>();
         for (QuickTriggerable qt : unorderedTriggerables) {
-            if (qt.t instanceof Recalculate) {
+            if (qt.isRecalculate()) {
                 recalculates.add(qt.t);
             }
         }
