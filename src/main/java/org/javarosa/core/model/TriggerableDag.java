@@ -84,7 +84,7 @@ public class TriggerableDag {
     /**
      * List of all the triggerables in the form. Unordered.
      */
-    protected final List<QuickTriggerable> unorderedTriggerables = new ArrayList<>();
+    protected final Set<QuickTriggerable> unorderedTriggerables = new HashSet<>();
 
     protected TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
