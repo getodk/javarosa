@@ -16,6 +16,9 @@
 
 package org.javarosa.core.model.condition;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +27,12 @@ import java.util.Set;
 import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.xpath.XPathConditional;
 
@@ -202,4 +210,46 @@ public abstract class Triggerable implements Externalizable {
         }
         return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (!(o instanceof Triggerable))
+            return false;
+
+        Triggerable other = (Triggerable) o;
+
+        // Both must have the same expression
+        if (!expr.equals(other.expr))
+            return false;
+
+        // Both must have the same set of triggers
+        if (getTriggers().size() != other.getTriggers().size())
+            return false;
+        if (!getTriggers().containsAll(other.getTriggers()))
+            return false;
+
+        return true;
+    }
+
+    // region External serialization
+
+    @SuppressWarnings("unchecked")
+    public static void readExternal(Triggerable t, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        t.expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        t.contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        t.originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        t.targets = new ArrayList<>((List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf));
+    }
+
+    public void writeExternal(Triggerable t, DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(t.expr));
+        ExtUtil.write(out, t.contextRef);
+        ExtUtil.write(out, t.originalContextRef);
+        ExtUtil.write(out, new ExtWrapList(new ArrayList<>(t.targets)));
+    }
+
+    // endregion
 }

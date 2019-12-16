@@ -19,10 +19,7 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.data.IAnswerData;
@@ -30,11 +27,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.debug.EvaluationResult;
 import org.javarosa.xpath.XPathException;
 
 public class Recalculate extends Triggerable {
@@ -77,60 +70,23 @@ public class Recalculate extends Triggerable {
         return false;
     }
 
-    // TODO Improve this method and simplify
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Recalculate) {
-            Recalculate r = (Recalculate) o;
-            boolean result = false;
-            if (r instanceof Triggerable) {
-                Triggerable t = r;
-                if (this == t) {
-                    result = true;
-                } else if (expr.equals(t.getExpr())) {
-
-                    // The original logic did not make any sense --
-                    // the
-                    try {
-                        // resolved triggers should match...
-                        Set<TreeReference> Atriggers = this.getTriggers();
-                        Set<TreeReference> Btriggers = t.getTriggers();
-
-                        result = (Atriggers.size() == Btriggers.size()) &&
-                            Atriggers.containsAll(Btriggers);
-                    } catch (XPathException e) {
-                    }
-                }
-
-            }
-            return this == r || result;
-
-        } else {
-            return false;
-        }
+        return o instanceof Recalculate
+            && super.equals(o);
     }
 
-    // region External serialization
+    // region External Serialization
 
     @Override
-    @SuppressWarnings("unchecked")
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
-        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
-        targets = new ArrayList<>(tlist);
+        readExternal(this, in, pf);
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.write(out, new ExtWrapTagged(getExpr()));
-        ExtUtil.write(out, contextRef);
-        ExtUtil.write(out, originalContextRef);
-        List<TreeReference> tlist = new ArrayList<>(targets);
-        ExtUtil.write(out, new ExtWrapList(tlist));
+        writeExternal(this, out);
     }
 
     // endregion
-
 }

@@ -19,7 +19,6 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.javarosa.core.model.QuickTriggerable;
@@ -28,8 +27,6 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathException;
 
@@ -64,8 +61,6 @@ public class Condition extends Triggerable {
     public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
         switch ((boolean) result ? trueAction : falseAction) {
-            case NULL:
-                break;
             case SHOW:
                 element.setRelevant(true);
                 break;
@@ -77,10 +72,6 @@ public class Condition extends Triggerable {
                 break;
             case DISABLE:
                 element.setEnabled(false);
-                break;
-            case LOCK:         /* not supported */
-                break;
-            case UNLOCK:       /* not supported */
                 break;
             case REQUIRE:
                 element.setRequired(true);
@@ -103,65 +94,26 @@ public class Condition extends Triggerable {
         return trueAction.isCascading();
     }
 
-    /**
-     * conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
-     */
-    // TODO Improve this method and simplify
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Condition) {
-            Condition c = (Condition) o;
-            if (this == c)
-                return true;
-
-            boolean result = false;
-            if (c instanceof Triggerable) {
-                Triggerable t = c;
-                if (this == t) {
-                    result = true;
-                } else if (expr.equals(t.getExpr())) {
-
-                    // The original logic did not make any sense --
-                    // the
-                    try {
-                        // resolved triggers should match...
-                        Set<TreeReference> Atriggers = this.getTriggers();
-                        Set<TreeReference> Btriggers = t.getTriggers();
-
-                        result = (Atriggers.size() == Btriggers.size()) &&
-                            Atriggers.containsAll(Btriggers);
-                    } catch (XPathException e) {
-                    }
-                }
-
-            }
-            return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && result);
-        } else {
-            return false;
-        }
+        return o instanceof Condition
+            && super.equals(o)
+            && trueAction == ((Condition) o).trueAction
+            && falseAction == ((Condition) o).falseAction;
     }
 
-    // region External serialization
+    // region External Serialization
 
     @Override
-    @SuppressWarnings("unchecked")
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
-        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        List<TreeReference> tlist = (List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
-        targets = new ArrayList<>(tlist);
+        readExternal(this, in, pf);
         trueAction = ConditionAction.from(ExtUtil.readInt(in));
         falseAction = ConditionAction.from(ExtUtil.readInt(in));
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.write(out, new ExtWrapTagged(getExpr()));
-        ExtUtil.write(out, contextRef);
-        ExtUtil.write(out, originalContextRef);
-        List<TreeReference> tlist = new ArrayList<>(targets);
-        ExtUtil.write(out, new ExtWrapList(tlist));
+        writeExternal(this, out);
         ExtUtil.writeNumeric(out, trueAction.getCode());
         ExtUtil.writeNumeric(out, falseAction.getCode());
     }
