@@ -12,103 +12,109 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.debug.EvaluationResult;
 
 /**
- * Triggerable implementations have a deep equals() comparison operator. Once
- * the DAG is built, we only need a shallow compare since we are not creating
- * any new Triggerable objects.
+ * This is a thin wrapper class over Triggerable that provides quicker implementation of the equals() method.
  * <p>
- * This class serves that purpose.
- *
- * @author mitchellsundt@gmail.com
+ * Triggerable has a deep equals() comparison operator, required while building the DAG. Once the DAG gets
+ * built, object references are enough, since no new Triggerables should be created after that.
  */
 public final class QuickTriggerable {
+    private final Triggerable triggerable;
+    private final int hashCode;
 
-    private final Triggerable t;
-    private Integer hashCode = null;
-
-    public final int hashCode() {
-        if (hashCode == null) {
-            hashCode = System.identityHashCode(t);
-        }
-        return hashCode;
+    private QuickTriggerable(Triggerable triggerable, int hashCode) {
+        this.triggerable = triggerable;
+        this.hashCode = hashCode;
     }
 
-    @Override
-    public final boolean equals(Object obj) {
-        if (obj instanceof QuickTriggerable) {
-            QuickTriggerable other = (QuickTriggerable) obj;
-            return other.t == t;
-        }
-        return false;
-    }
-
-    QuickTriggerable(Triggerable t) {
-        this.t = t;
+    static QuickTriggerable of(Triggerable triggerable) {
+        return new QuickTriggerable(triggerable, System.identityHashCode(triggerable));
     }
 
     public boolean isCondition() {
-        return t instanceof Condition;
+        return triggerable instanceof Condition;
     }
 
     public boolean isRecalculate() {
-        return t instanceof Recalculate;
+        return triggerable instanceof Recalculate;
     }
 
     public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchors) {
-        return t.findAffectedTriggers(firedAnchors);
+        return triggerable.findAffectedTriggers(firedAnchors);
     }
 
     public TreeReference contextualizeContextRef(TreeReference anchorRef) {
-        return t.contextualizeContextRef(anchorRef);
+        return triggerable.contextualizeContextRef(anchorRef);
     }
 
     public List<EvaluationResult> apply(FormInstance mainInstance, EvaluationContext ec, TreeReference qualified) {
-        return t.apply(mainInstance, ec, qualified);
+        return triggerable.apply(mainInstance, ec, qualified);
     }
 
     public List<TreeReference> getTargets() {
-        return t.getTargets();
+        return triggerable.getTargets();
     }
 
-    public boolean contains(Triggerable t) {
-        return this.t.equals(t);
+    public boolean contains(Triggerable triggerable) {
+        return this.triggerable.equals(triggerable);
     }
 
     public Triggerable changeContextRefToIntersectWithTriggerable(Triggerable other) {
         // TODO It's fishy to mutate the Triggerable here. We might prefer to return a copy of the original Triggerable
-        t.changeContextRefToIntersectWithTriggerable(other);
-        return t;
+        triggerable.changeContextRefToIntersectWithTriggerable(other);
+        return triggerable;
     }
 
     public void setImmediateCascades(Set<QuickTriggerable> deps) {
-        t.setImmediateCascades(deps);
+        triggerable.setImmediateCascades(deps);
     }
 
     public boolean canCascade() {
-        return t.canCascade();
+        return triggerable.canCascade();
     }
 
     public boolean isCascadingToChildren() {
-        return t.isCascadingToChildren();
+        return triggerable.isCascadingToChildren();
     }
 
     public Set<QuickTriggerable> getImmediateCascades() {
-        return t.getImmediateCascades();
+        return triggerable.getImmediateCascades();
     }
 
-    // TODO Think how we can avoid breaking encapsulation here
     public Triggerable getTriggerable() {
-        return t;
+        // TODO Think how we can avoid breaking encapsulation here
+        return triggerable;
     }
 
     public Object eval(FormInstance mainInstance, EvaluationContext evaluationContext) {
-        return t.eval(mainInstance, evaluationContext);
+        return triggerable.eval(mainInstance, evaluationContext);
     }
 
     public TreeReference getContext() {
-        return t.getContext();
+        return triggerable.getContext();
     }
 
     public TreeReference getOriginalContext() {
-        return t.getOriginalContext();
+        return triggerable.getOriginalContext();
+    }
+
+    /**
+     * Quicker implementation of Triggerable.equals() that only consider object references.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof QuickTriggerable))
+            return false;
+        return triggerable == ((QuickTriggerable) obj).triggerable;
+    }
+
+    /**
+     * Returns the hashCode of the wrapped Triggerable object based on {@link System#identityHashCode(Object)},
+     * which should be quicker than the original hashCode method in Triggerable.
+     * <p>
+     * The actual return value is computed once during object creation at {@link QuickTriggerable#of(Triggerable)}
+     */
+    @Override
+    public int hashCode() {
+        return hashCode;
     }
 }

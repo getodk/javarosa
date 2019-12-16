@@ -291,7 +291,7 @@ public class TriggerableDag {
             // and use that one instead?
 
         } else {
-            qt = new QuickTriggerable(t);
+            qt = QuickTriggerable.of(t);
             unorderedTriggerables.add(qt);
 
             Set<TreeReference> triggers = t.getTriggers();
