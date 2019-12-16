@@ -9,7 +9,6 @@ import java.util.Map;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.ConditionAction;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.FormInstance;
@@ -132,18 +131,18 @@ class StandardBindAttributesProcessor {
         switch (type) {
             case "relevant":
                 prettyType = "display";
-                trueAction = ConditionAction.ACTION_SHOW;
-                falseAction = ConditionAction.ACTION_HIDE;
+                trueAction = ConditionAction.SHOW;
+                falseAction = ConditionAction.HIDE;
                 break;
             case "required":
                 prettyType = "require";
-                trueAction = ConditionAction.ACTION_REQUIRE;
-                falseAction = ConditionAction.ACTION_DONT_REQUIRE;
+                trueAction = ConditionAction.REQUIRE;
+                falseAction = ConditionAction.DONT_REQUIRE;
                 break;
             case "readonly":
                 prettyType = "readonly";
-                trueAction = ConditionAction.ACTION_DISABLE;
-                falseAction = ConditionAction.ACTION_ENABLE;
+                trueAction = ConditionAction.DISABLE;
+                falseAction = ConditionAction.ENABLE;
                 break;
             default:
                 throw new XFormParseException("Unsupported type " + type + " passed to buildCondition");

@@ -17,15 +17,15 @@
 package org.javarosa.core.model.condition;
 
 public enum ConditionAction {
-    ACTION_NULL(0, false),
-    ACTION_SHOW(1, true),
-    ACTION_HIDE(2, true),
-    ACTION_ENABLE(3, false),
-    ACTION_DISABLE(4, false),
-    ACTION_LOCK(5, false),
-    ACTION_UNLOCK(6, false),
-    ACTION_REQUIRE(7, false),
-    ACTION_DONT_REQUIRE(8, false);
+    NULL(0, false),
+    SHOW(1, true),
+    HIDE(2, true),
+    ENABLE(3, false),
+    DISABLE(4, false),
+    LOCK(5, false),
+    UNLOCK(6, false),
+    REQUIRE(7, false),
+    DONT_REQUIRE(8, false);
 
     private final int code;
     private final boolean cascading;
