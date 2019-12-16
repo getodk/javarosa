@@ -91,7 +91,7 @@ public class TriggerableDag {
         for (QuickTriggerable qt : triggerablesDAG) {
             if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
 
-                List<TreeReference> affectedTriggers = qt.t.findAffectedTriggers(firedAnchors);
+                List<TreeReference> affectedTriggers = qt.findAffectedTriggers(firedAnchors);
                 if (affectedTriggers.isEmpty()) {
                     affectedTriggers.add(anchorRef);
                 }
@@ -132,7 +132,7 @@ public class TriggerableDag {
         Set<TreeReference> updatedContextRef = new HashSet<>();
 
         for (TreeReference anchorRef : anchorRefs) {
-            TreeReference contextRef = qt.t.contextualizeContextRef(anchorRef);
+            TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
             if (updatedContextRef.contains(contextRef)) {
                 continue;
             }
@@ -146,12 +146,12 @@ public class TriggerableDag {
                 // Go through each one and evaluate the trigger expression
                 for (TreeReference qualified : qualifiedList) {
                     EvaluationContext ec = new EvaluationContext(evalContext, qualified);
-                    evaluationResults.addAll(qt.t.apply(mainInstance, ec, qualified));
+                    evaluationResults.addAll(qt.apply(mainInstance, ec, qualified));
                 }
 
                 boolean fired = evaluationResults.size() > 0;
                 if (fired) {
-                    accessor.getEventNotifier().publishEvent(new Event(qt.t.getClass().getSimpleName(), evaluationResults));
+                    accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
                 }
 
                 updatedContextRef.add(contextRef);
@@ -172,8 +172,8 @@ public class TriggerableDag {
 
         Set<QuickTriggerable> applicable = new HashSet<>();
         for (QuickTriggerable qt : triggerablesDAG) {
-            for (int j = 0; j < qt.t.getTargets().size(); j++) {
-                TreeReference target = qt.t.getTargets().get(j);
+            for (int j = 0; j < qt.getTargets().size(); j++) {
+                TreeReference target = qt.getTargets().get(j);
                 if (genericRoot.isAncestorOf(target, false)) {
                     applicable.add(qt);
                     break;
@@ -261,7 +261,7 @@ public class TriggerableDag {
 
     private QuickTriggerable findTriggerable(Triggerable t) {
         for (QuickTriggerable qt : unorderedTriggerables) {
-            if (t.equals(qt.t)) {
+            if (qt.contains(t)) {
                 return qt;
             }
         }
@@ -282,11 +282,8 @@ public class TriggerableDag {
             // trigger when the ignored context
             // exists and the used one doesn't
 
-            Triggerable existingTriggerable = qt.t;
-
-            existingTriggerable.changeContextRefToIntersectWithTriggerable(t);
-
-            return existingTriggerable;
+            // TODO It's fishy to mutate the Triggerable here. We might prefer to return a copy of the original Triggerable
+            return qt.changeContextRefToIntersectWithTriggerable(t);
 
             // note, if the contextRef is unnecessarily deep, the condition will be
             // evaluated more times than needed
@@ -343,7 +340,7 @@ public class TriggerableDag {
             }
 
             // save for aggressive 2014 behavior
-            qt.t.setImmediateCascades(deps);
+            qt.setImmediateCascades(deps);
         }
 
         List<QuickTriggerable> orderedRoots = new ArrayList<>();
@@ -361,7 +358,7 @@ public class TriggerableDag {
             if (roots.size() == 0) {
                 StringBuilder hints = new StringBuilder();
                 for (QuickTriggerable qt : vertices) {
-                    for (TreeReference r : qt.t.getTargets()) {
+                    for (TreeReference r : qt.getTargets()) {
                         hints.append("\n").append(r.toString(true));
                     }
                 }
@@ -398,7 +395,7 @@ public class TriggerableDag {
         conditionRepeatTargetIndex.clear();
         for (QuickTriggerable qt : triggerablesDAG) {
             if (qt.isCondition()) {
-                List<TreeReference> targets = qt.t.getTargets();
+                List<TreeReference> targets = qt.getTargets();
                 for (TreeReference target : targets) {
                     if (mainInstance.getTemplate(target) != null) {
                         conditionRepeatTargetIndex.put(target, qt);
@@ -413,10 +410,10 @@ public class TriggerableDag {
      * the triggerable is fired.
      */
     public void fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, Set<QuickTriggerable> destinationSet, Set<QuickTriggerable> newDestinationSet) {
-        if (qt.t.canCascade()) {
+        if (qt.canCascade()) {
 
-            for (int j = 0; j < qt.t.getTargets().size(); j++) {
-                TreeReference target = qt.t.getTargets().get(j);
+            for (int j = 0; j < qt.getTargets().size(); j++) {
+                TreeReference target = qt.getTargets().get(j);
                 Set<TreeReference> updatedNodes = new HashSet<>();
                 updatedNodes.add(target);
 
@@ -424,7 +421,7 @@ public class TriggerableDag {
                 // not only the target, but also the children of the target.
                 // In that case, we want to add all of those nodes
                 // to the list of updated elements as well.
-                if (qt.t.isCascadingToChildren()) {
+                if (qt.isCascadingToChildren()) {
                     addChildrenOfReference(mainInstance, evalContext,
                         target, updatedNodes);
                 }
@@ -483,7 +480,7 @@ public class TriggerableDag {
                 // but should be faster than recomputing the edges.
                 // with value-change optimizations, this should be
                 // much faster.
-                for (QuickTriggerable qu : qt.t.getImmediateCascades()) {
+                for (QuickTriggerable qu : qt.getImmediateCascades()) {
                     if (!tv.contains(qu)) {
                         tv.add(qu);
                         newSet.add(qu);
@@ -609,7 +606,7 @@ public class TriggerableDag {
         List<Triggerable> conditions = new ArrayList<>();
         for (QuickTriggerable qt : unorderedTriggerables) {
             if (qt.isCondition()) {
-                conditions.add(qt.t);
+                conditions.add(qt.getTriggerable());
             }
         }
         return conditions;
@@ -623,7 +620,7 @@ public class TriggerableDag {
         List<Triggerable> recalculates = new ArrayList<>();
         for (QuickTriggerable qt : unorderedTriggerables) {
             if (qt.isRecalculate()) {
-                recalculates.add(qt.t);
+                recalculates.add(qt.getTriggerable());
             }
         }
         return recalculates;
@@ -640,9 +637,8 @@ public class TriggerableDag {
             List<QuickTriggerable> triggered = triggerIndex.get(trigger);
             targets.clear();
             for (QuickTriggerable qt : triggered) {
-                Triggerable t = qt.t;
-                for (int j = 0; j < t.getTargets().size(); j++) {
-                    TreeReference target = t.getTargets().get(j);
+                for (int j = 0; j < qt.getTargets().size(); j++) {
+                    TreeReference target = qt.getTargets().get(j);
                     if (!targets.contains(target))
                         targets.add(target);
                 }

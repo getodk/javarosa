@@ -544,8 +544,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         QuickTriggerable qc = dagImpl.getTriggerableForRepeatGroup(repeatRef.genericize());
         if (qc != null) {
-            Triggerable c = qc.t;
-            relev = (boolean) c.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
+            relev = (boolean) qc.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
         }
 
         // check the relevancy of the immediate parent

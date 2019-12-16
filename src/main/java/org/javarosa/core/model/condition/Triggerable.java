@@ -72,6 +72,7 @@ public abstract class Triggerable implements Externalizable {
      */
     protected TreeReference originalContextRef;
 
+    // TODO Move this into the DAG. This shouldn't be here.
     protected Set<QuickTriggerable> immediateCascades = null;
 
     protected Triggerable() {

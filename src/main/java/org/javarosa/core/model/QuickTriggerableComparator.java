@@ -28,27 +28,27 @@ public class QuickTriggerableComparator implements Comparator<QuickTriggerable> 
     public int compare(QuickTriggerable lhs, QuickTriggerable rhs) {
         int cmp;
         // TODO Study if there's a better way to compare refs other than using their string representation
-        cmp = lhs.t.getContext().toString(false).compareTo(rhs.t.getContext().toString(false));
+        cmp = lhs.getContext().toString(false).compareTo(rhs.getContext().toString(false));
         if (cmp != 0) {
             return cmp;
         }
         // TODO Study if we ever need this, since the origintal context ref should always equal the context ref.
-        cmp = lhs.t.getOriginalContext().toString(false).compareTo(rhs.t.getOriginalContext().toString(false));
+        cmp = lhs.getOriginalContext().toString(false).compareTo(rhs.getOriginalContext().toString(false));
         if (cmp != 0) {
             return cmp;
         }
 
         // bias toward cascading targets....
-        if (lhs.t.isCascadingToChildren()) {
-            if (!rhs.t.isCascadingToChildren()) {
+        if (lhs.isCascadingToChildren()) {
+            if (!rhs.isCascadingToChildren()) {
                 return -1;
             }
-        } else if (rhs.t.isCascadingToChildren()) {
+        } else if (rhs.isCascadingToChildren()) {
             return 1;
         }
 
-        int lhsHash = lhs.t.hashCode();
-        int rhsHash = rhs.t.hashCode();
+        int lhsHash = lhs.getTriggerable().hashCode();
+        int rhsHash = rhs.getTriggerable().hashCode();
         return (lhsHash < rhsHash) ? -1 : ((lhsHash == rhsHash) ? 0 : 1);
     }
 }
