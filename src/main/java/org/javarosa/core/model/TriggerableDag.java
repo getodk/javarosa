@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class TriggerableDag {
      * the list, where tA comes before tB, evaluating tA cannot depend on any
      * result from evaluating tB.
      */
-    protected final List<QuickTriggerable> triggerablesDAG = new ArrayList<>();
+    protected final Set<QuickTriggerable> triggerablesDAG = new LinkedHashSet<>();
 
     /**
      * NOT VALID UNTIL finalizeTriggerables() is called!!
