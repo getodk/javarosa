@@ -1,6 +1,5 @@
 package org.javarosa.core.model;
 
-import java.util.Comparator;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
@@ -18,36 +17,6 @@ public final class QuickTriggerable {
 
     public final Triggerable t;
     private Integer hashCode = null;
-
-    public static Comparator<QuickTriggerable> quickTriggerablesRootOrdering = new Comparator<QuickTriggerable>() {
-        @Override
-        public int compare(QuickTriggerable lhs, QuickTriggerable rhs) {
-            int cmp;
-            // TODO Study if there's a better way to compare refs other than using their string representation
-            cmp = lhs.t.getContext().toString(false).compareTo(rhs.t.getContext().toString(false));
-            if (cmp != 0) {
-                return cmp;
-            }
-            // TODO Study if we ever need this, since the origintal context ref should always equal the context ref.
-            cmp = lhs.t.getOriginalContext().toString(false).compareTo(rhs.t.getOriginalContext().toString(false));
-            if (cmp != 0) {
-                return cmp;
-            }
-
-            // bias toward cascading targets....
-            if (lhs.t.isCascadingToChildren()) {
-                if (!rhs.t.isCascadingToChildren()) {
-                    return -1;
-                }
-            } else if (rhs.t.isCascadingToChildren()) {
-                return 1;
-            }
-
-            int lhsHash = lhs.t.hashCode();
-            int rhsHash = rhs.t.hashCode();
-            return (lhsHash < rhsHash) ? -1 : ((lhsHash == rhsHash) ? 0 : 1);
-        }
-    };
 
     @Override
     public final int hashCode() {

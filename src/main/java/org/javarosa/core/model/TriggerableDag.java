@@ -376,7 +376,7 @@ public class TriggerableDag {
             // order the root nodes - so the order is fixed
             orderedRoots.clear();
             orderedRoots.addAll(roots);
-            Collections.sort(orderedRoots, QuickTriggerable.quickTriggerablesRootOrdering);
+            Collections.sort(orderedRoots, QuickTriggerableComparator.INSTANCE);
 
             // remove root nodes and edges originating from them
             // add them to the triggerablesDAG.
