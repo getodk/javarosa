@@ -75,7 +75,7 @@ public class Recalculate extends Triggerable {
             Recalculate r = (Recalculate) o;
             boolean result = false;
             if (r instanceof Triggerable) {
-                Triggerable t = (Triggerable) r;
+                Triggerable t = r;
                 if (this == t) {
                     result = true;
                 } else if (this.expr.equals(t.expr)) {
@@ -112,13 +112,13 @@ public class Recalculate extends Triggerable {
     // if NaN or empty string, null
 
     @Override
-    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
-        immediateCascades = new HashSet<>(cascades);
+    public Set<QuickTriggerable> getImmediateCascades() {
+        return immediateCascades;
     }
 
     @Override
-    public Set<QuickTriggerable> getImmediateCascades() {
-        return immediateCascades;
+    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
+        immediateCascades = new HashSet<>(cascades);
     }
 
     @Override

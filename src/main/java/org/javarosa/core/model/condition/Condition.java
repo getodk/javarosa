@@ -124,7 +124,7 @@ public class Condition extends Triggerable {
 
             boolean result = false;
             if (c instanceof Triggerable) {
-                Triggerable t = (Triggerable) c;
+                Triggerable t = c;
                 if (this == t) {
                     result = true;
                 } else if (this.expr.equals(t.expr)) {
@@ -175,13 +175,13 @@ public class Condition extends Triggerable {
     }
 
     @Override
-    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
-        immediateCascades = new HashSet<>(cascades);
+    public Set<QuickTriggerable> getImmediateCascades() {
+        return immediateCascades;
     }
 
     @Override
-    public Set<QuickTriggerable> getImmediateCascades() {
-        return immediateCascades;
+    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
+        immediateCascades = new HashSet<>(cascades);
     }
 
     @Override
