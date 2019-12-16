@@ -95,6 +95,7 @@ public class Recalculate extends Triggerable {
         return true;
     }
 
+    // TODO Improve this method and simplify
     @Override
     public boolean equals(Object o) {
         if (o instanceof Recalculate) {
@@ -141,6 +142,7 @@ public class Recalculate extends Triggerable {
      * convert the data object returned by the xpath expression into an IAnswerData suitable for
      * storage in the FormInstance
      */
+    // TODO Move this method into IAnswerData
     public static IAnswerData wrapData(Object val, int intDataType) {
         if ((val instanceof String && ((String) val).length() == 0) ||
             (val instanceof Double && ((Double) val).isNaN())) {
@@ -254,6 +256,7 @@ public class Recalculate extends Triggerable {
         return expr;
     }
 
+    @Override
     public void addTarget(TreeReference target) {
         if (targets.indexOf(target) == -1) {
             targets.add(target);

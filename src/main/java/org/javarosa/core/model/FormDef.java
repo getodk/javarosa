@@ -546,8 +546,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         QuickTriggerable qc = dagImpl.getTriggerableForRepeatGroup(repeatRef.genericize());
         if (qc != null) {
-            Condition c = (Condition) qc.t;
-            relev = c.evalBool(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
+            Triggerable c = qc.t;
+            relev = (boolean) c.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
         }
 
         // check the relevancy of the immediate parent
@@ -1213,12 +1213,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
-        List<Condition> vcond = (List<Condition>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
-        for (Condition condition : vcond) {
+        List<Triggerable> vcond = (List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
+        for (Triggerable condition : vcond) {
             addTriggerable(condition);
         }
-        List<Recalculate> vcalc = (List<Recalculate>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
-        for (Recalculate recalculate : vcalc) {
+        List<Triggerable> vcalc = (List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
+        for (Triggerable recalculate : vcalc) {
             addTriggerable(recalculate);
         }
         finalizeTriggerables();
@@ -1339,8 +1339,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, getMainInstance());
         ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
-        List<Condition> conditions = dagImpl.getConditions();
-        List<Recalculate> recalcs = dagImpl.getRecalculates();
+        List<Triggerable> conditions = dagImpl.getConditions();
+        List<Triggerable> recalcs = dagImpl.getRecalculates();
 
         ExtUtil.write(dos, new ExtWrapList(conditions));
         ExtUtil.write(dos, new ExtWrapList(recalcs));

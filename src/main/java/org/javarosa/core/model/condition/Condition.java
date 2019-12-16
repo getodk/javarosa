@@ -37,6 +37,7 @@ import org.javarosa.debug.EvaluationResult;
 import org.javarosa.xpath.XPathException;
 
 public class Condition extends Triggerable {
+    // TODO Create an enum to take all these constants out from this class
     public static final int ACTION_NULL = 0;
     public static final int ACTION_SHOW = 1;
     public static final int ACTION_HIDE = 2;
@@ -122,6 +123,7 @@ public class Condition extends Triggerable {
     /**
      * conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
      */
+    // TODO Improve this method and simplify
     @Override
     public boolean equals(Object o) {
         if (o instanceof Condition) {
@@ -232,6 +234,7 @@ public class Condition extends Triggerable {
         return expr;
     }
 
+    @Override
     public void addTarget(TreeReference target) {
         if (targets.indexOf(target) == -1) {
             targets.add(target);

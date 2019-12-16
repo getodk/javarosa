@@ -641,11 +641,11 @@ public class TriggerableDag {
      * API for retrieving the list of conditions, for use when
      * serializing the form definition (e.g., into .cache file).
      */
-    public List<Condition> getConditions() {
-        List<Condition> conditions = new ArrayList<>();
+    public List<Triggerable> getConditions() {
+        List<Triggerable> conditions = new ArrayList<>();
         for (QuickTriggerable qt : unorderedTriggerables) {
             if (qt.t instanceof Condition) {
-                conditions.add((Condition) qt.t);
+                conditions.add(qt.t);
             }
         }
         return conditions;
@@ -655,11 +655,11 @@ public class TriggerableDag {
      * API for retrieving thelist of recalculates, for use when
      * serializing the form definition (e.g., into .cache file).
      */
-    public final ArrayList<Recalculate> getRecalculates() {
-        ArrayList<Recalculate> recalculates = new ArrayList<>();
+    public final List<Triggerable> getRecalculates() {
+        List<Triggerable> recalculates = new ArrayList<>();
         for (QuickTriggerable qt : unorderedTriggerables) {
             if (qt.t instanceof Recalculate) {
-                recalculates.add((Recalculate) qt.t);
+                recalculates.add(qt.t);
             }
         }
         return recalculates;

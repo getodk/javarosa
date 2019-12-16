@@ -21,10 +21,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -36,31 +34,30 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 /**
  * A data binding is an object that represents how a
  * data element is to be used in a form entry interaction.
- *
+ * <p>
  * It contains a reference to where the data should be retreived
  * and stored, as well as the preload parameters, and the
  * conditional logic for the question.
- *
+ * <p>
  * The class relies on any Data References that are used
  * in a form to be registered with the FormDefRMSUtility's
  * prototype factory in order to properly deserialize.
  *
  * @author Drew Roos
- *
  */
-public class DataBinding  implements Externalizable {
+public class DataBinding implements Externalizable {
     private String id;
     private IDataReference ref;
     private int dataType;
 
-    public Condition relevancyCondition;
+    public Triggerable relevancyCondition;
     public boolean relevantAbsolute;
-    public Condition requiredCondition;
+    public Triggerable requiredCondition;
     public boolean requiredAbsolute;
-    public Condition readonlyCondition;
+    public Triggerable readonlyCondition;
     public boolean readonlyAbsolute;
     public IConditionExpr constraint;
-    public Recalculate calculate;
+    public Triggerable calculate;
 
     private String preload;
     private String preloadParams;
@@ -68,7 +65,7 @@ public class DataBinding  implements Externalizable {
 
     private List<TreeElement> additionalAttrs = new ArrayList<TreeElement>(0);
 
-    public DataBinding () {
+    public DataBinding() {
         relevantAbsolute = true;
         requiredAbsolute = false;
         readonlyAbsolute = false;
@@ -156,11 +153,11 @@ public class DataBinding  implements Externalizable {
      * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        setId((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+        setId((String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
         setDataType(ExtUtil.readInt(in));
-        setPreload((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
-        setPreloadParams((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
-        ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged());
+        setPreload((String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+        setPreloadParams((String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+        ref = (IDataReference) ExtUtil.read(in, new ExtWrapTagged());
 
         //don't bother reading relevancy/required/readonly/constraint/calculate/additionalAttrs right now; they're only used during parse anyway
     }

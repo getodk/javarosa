@@ -77,15 +77,15 @@ public abstract class Triggerable implements Externalizable {
         this.immediateCascades = immediateCascades;
     }
 
-    public static Condition condition(XPathConditional expr, int trueAction, int falseAction, TreeReference contextRef) {
+    public static Triggerable condition(XPathConditional expr, int trueAction, int falseAction, TreeReference contextRef) {
         return new Condition(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>(), trueAction, falseAction);
     }
 
-    public static Recalculate recalculate(XPathConditional expr, TreeReference contextRef) {
+    public static Triggerable recalculate(XPathConditional expr, TreeReference contextRef) {
         return new Recalculate(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>());
     }
 
-    protected abstract Object eval(FormInstance instance, EvaluationContext ec);
+    public abstract Object eval(FormInstance instance, EvaluationContext ec);
 
     protected abstract void apply(TreeReference ref, Object result, FormInstance mainInstance);
 
@@ -120,4 +120,6 @@ public abstract class Triggerable implements Externalizable {
     public abstract void setImmediateCascades(Set<QuickTriggerable> deps);
 
     public abstract Set<QuickTriggerable> getImmediateCascades();
+
+    public abstract void addTarget(TreeReference ref);
 }
