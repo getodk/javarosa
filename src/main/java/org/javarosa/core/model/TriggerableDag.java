@@ -79,7 +79,7 @@ public class TriggerableDag {
      * Maps a tree reference to the set of triggerables that need to be
      * processed when the value at this reference changes.
      */
-    protected final Map<TreeReference, List<QuickTriggerable>> triggerIndex = new HashMap<>();
+    protected final Map<TreeReference, Set<QuickTriggerable>> triggerIndex = new HashMap<>();
 
     /**
      * List of all the triggerables in the form. Unordered.
@@ -306,14 +306,12 @@ public class TriggerableDag {
 
             Set<TreeReference> triggers = t.getTriggers();
             for (TreeReference trigger : triggers) {
-                List<QuickTriggerable> triggered = triggerIndex.get(trigger);
+                Set<QuickTriggerable> triggered = triggerIndex.get(trigger);
                 if (triggered == null) {
-                    triggered = new ArrayList<>();
+                    triggered = new HashSet<>();
                     triggerIndex.put(trigger.clone(), triggered);
                 }
-                if (!triggered.contains(qt)) {
-                    triggered.add(qt);
-                }
+                triggered.add(qt);
             }
 
             return t;
@@ -452,7 +450,7 @@ public class TriggerableDag {
                 // so we'll be more inclusive than needed and see if any
                 // of our triggers are keyed on the predicate-less path
                 // of this ref
-                List<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
+                    Set<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
 
                 if (triggered != null) {
                     // If so, walk all of these triggerables that we
@@ -590,7 +588,7 @@ public class TriggerableDag {
         TreeReference genericRef = ref.genericize();
 
         // get triggerables which are activated by the generic reference
-        List<QuickTriggerable> triggered = triggerIndex.get(genericRef);
+        Set<QuickTriggerable> triggered = triggerIndex.get(genericRef);
         if (triggered == null) {
             return alreadyEvaluated;
         }
@@ -617,7 +615,7 @@ public class TriggerableDag {
         List<TreeReference> targets = new ArrayList<>();
         for (TreeReference trigger : triggerIndex.keySet()) {
             vertices.add(trigger);
-            List<QuickTriggerable> triggered = triggerIndex.get(trigger);
+            Set<QuickTriggerable> triggered = triggerIndex.get(trigger);
             targets.clear();
             for (QuickTriggerable qt : triggered) {
                 for (TreeReference target : qt.getTargets()) {
