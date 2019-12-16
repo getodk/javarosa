@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.javarosa.core.model.condition.Condition;
-import org.javarosa.core.model.condition.ConditionAction;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -39,7 +37,6 @@ import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.model.xform.XPathReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -604,38 +601,6 @@ public class TriggerableDag {
 
     protected final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
-    }
-
-    /**
-     * Pull this in from FormOverview so that we can make fields private.
-     */
-    public final IConditionExpr getConditionExpressionForTrueAction(FormInstance mainInstance, TreeElement instanceNode, ConditionAction action) {
-        IConditionExpr expr = null;
-        for (int i = 0; i < triggerablesDAG.size() && expr == null; i++) {
-            // Clayton Sims - Jun 1, 2009 : Not sure how legitimate this
-            // cast is. It might work now, but break later.
-            // Clayton Sims - Jun 24, 2009 : Yeah, that change broke things.
-            // For now, we won't bother to print out anything that isn't
-            // a condition.
-            QuickTriggerable qt = triggerablesDAG.get(i);
-            if (qt.t instanceof Condition) {
-                Condition c = (Condition) qt.t;
-
-                if (c.trueAction == action) {
-                    List<TreeReference> targets = c.getTargets();
-                    for (int j = 0; j < targets.size() && expr == null; j++) {
-                        TreeReference target = targets.get(j);
-
-                        TreeReference tr = (TreeReference) (new XPathReference(target)).getReference();
-                        TreeElement element = mainInstance.getTemplatePath(tr);
-                        if (instanceNode == element) {
-                            expr = c.getExpr();
-                        }
-                    }
-                }
-            }
-        }
-        return expr;
     }
 
     /**
