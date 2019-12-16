@@ -28,6 +28,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
 
 public class Recalculate extends Triggerable {
@@ -40,7 +41,7 @@ public class Recalculate extends Triggerable {
 
     }
 
-    protected Recalculate(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    protected Recalculate(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
     }
 

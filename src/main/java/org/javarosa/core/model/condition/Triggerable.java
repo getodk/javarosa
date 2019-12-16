@@ -52,7 +52,7 @@ public abstract class Triggerable implements Externalizable {
     /**
      * The expression which will be evaluated to produce a result
      */
-    protected IConditionExpr expr;
+    protected XPathConditional expr;
 
     /**
      * References to all of the (non-contextualized) nodes which should be
@@ -77,7 +77,7 @@ public abstract class Triggerable implements Externalizable {
 
     }
 
-    protected Triggerable(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    protected Triggerable(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         this.expr = expr;
         this.targets = targets;
         this.contextRef = contextRef;
@@ -209,16 +209,16 @@ public abstract class Triggerable implements Externalizable {
         }
     }
 
-    // TODO Improve this to make it more human friendly
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < targets.size(); i++) {
-            sb.append(targets.get(i).toString());
-            if (i < targets.size() - 1)
-                sb.append(",");
-        }
-        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
+        StringBuilder targetsBuilder = new StringBuilder();
+        for (TreeReference t : targets)
+            targetsBuilder.append(t.toString(true, true)).append(", ");
+        String targets = targetsBuilder.toString();
+        String prettyTargets = targets.isEmpty()
+            ? "unknown refs (no targets added yet)"
+            : targets.substring(0, targets.length() - 2);
+        return String.format("\"%s\" into %s", expr.xpath, prettyTargets);
     }
 
     @Override
@@ -248,7 +248,7 @@ public abstract class Triggerable implements Externalizable {
 
     @SuppressWarnings("unchecked")
     public static void readExternal(Triggerable t, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        t.expr = (IConditionExpr) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        t.expr = (XPathConditional) ExtUtil.read(in, new ExtWrapTagged(), pf);
         t.contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         t.originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         t.targets = new ArrayList<>((List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf));

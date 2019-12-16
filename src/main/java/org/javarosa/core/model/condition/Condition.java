@@ -28,6 +28,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
 
 public class Condition extends Triggerable {
@@ -41,7 +42,7 @@ public class Condition extends Triggerable {
     public Condition() {
     }
 
-    protected Condition(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
+    protected Condition(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
         this.trueAction = trueAction;
         this.falseAction = falseAction;
