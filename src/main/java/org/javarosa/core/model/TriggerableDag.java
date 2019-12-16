@@ -182,8 +182,7 @@ public class TriggerableDag {
 
         Set<QuickTriggerable> applicable = new HashSet<>();
         for (QuickTriggerable qt : triggerablesDAG) {
-            for (int j = 0; j < qt.getTargets().size(); j++) {
-                TreeReference target = qt.getTargets().get(j);
+            for (TreeReference target : qt.getTargets()) {
                 if (genericRoot.isAncestorOf(target, false)) {
                     applicable.add(qt);
                     break;
@@ -394,8 +393,7 @@ public class TriggerableDag {
         conditionRepeatTargetIndex.clear();
         for (QuickTriggerable qt : triggerablesDAG) {
             if (qt.isCondition()) {
-                List<TreeReference> targets = qt.getTargets();
-                for (TreeReference target : targets) {
+                for (TreeReference target : qt.getTargets()) {
                     if (mainInstance.getTemplate(target) != null) {
                         conditionRepeatTargetIndex.put(target, qt);
                     }
@@ -426,8 +424,7 @@ public class TriggerableDag {
     public void fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, Set<QuickTriggerable> destinationSet, Set<QuickTriggerable> newDestinationSet) {
 
 
-        for (int j = 0; j < qt.getTargets().size(); j++) {
-            TreeReference target = qt.getTargets().get(j);
+            for (TreeReference target : qt.getTargets()) {
             Set<TreeReference> updatedNodes = new HashSet<>();
             updatedNodes.add(target);
 
@@ -622,8 +619,7 @@ public class TriggerableDag {
             List<QuickTriggerable> triggered = triggerIndex.get(trigger);
             targets.clear();
             for (QuickTriggerable qt : triggered) {
-                for (int j = 0; j < qt.getTargets().size(); j++) {
-                    TreeReference target = qt.getTargets().get(j);
+                for (TreeReference target : qt.getTargets()) {
                     if (!targets.contains(target))
                         targets.add(target);
                 }

@@ -50,7 +50,7 @@ public final class QuickTriggerable {
         return triggerable.apply(mainInstance, ec, qualified);
     }
 
-    public List<TreeReference> getTargets() {
+    public Set<TreeReference> getTargets() {
         return triggerable.getTargets();
     }
 

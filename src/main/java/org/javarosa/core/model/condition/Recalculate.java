@@ -41,7 +41,7 @@ public class Recalculate extends Triggerable {
 
     }
 
-    protected Recalculate(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    protected Recalculate(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
     }
 
