@@ -11,7 +11,6 @@ import java.util.List;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -133,7 +132,7 @@ public class SetValueAction extends Action {
         }
 
         int dataType = node.getDataType();
-        IAnswerData val = Recalculate.wrapData(result, dataType);
+        IAnswerData val = IAnswerData.wrapData(result, dataType);
 
         if (val == null) {
             model.setValue(null, targetReference, true);

@@ -16,43 +16,16 @@
 
 package org.javarosa.core.model.condition;
 
-import static org.javarosa.core.model.DataType.BOOLEAN;
-import static org.javarosa.core.model.DataType.CHOICE;
-import static org.javarosa.core.model.DataType.DATE;
-import static org.javarosa.core.model.DataType.GEOPOINT;
-import static org.javarosa.core.model.DataType.GEOSHAPE;
-import static org.javarosa.core.model.DataType.GEOTRACE;
-import static org.javarosa.core.model.DataType.INTEGER;
-import static org.javarosa.core.model.DataType.LONG;
-import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
-import static org.javarosa.core.model.DataType.TIME;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.javarosa.core.model.DataType;
 import org.javarosa.core.model.QuickTriggerable;
-import org.javarosa.core.model.data.BooleanData;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoPointData;
-import org.javarosa.core.model.data.GeoShapeData;
-import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.MultipleItemsData;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -87,7 +60,7 @@ public class Recalculate extends Triggerable {
     public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
         int dataType = element.getDataType();
-        element.setAnswer(wrapData(result, dataType));
+        element.setAnswer(IAnswerData.wrapData(result, dataType));
     }
 
     @Override
@@ -137,73 +110,6 @@ public class Recalculate extends Triggerable {
     // if numeric data, convert to int if node type is int OR data is an integer; else convert to double
     // if string data or date data, keep as is
     // if NaN or empty string, null
-
-    /**
-     * convert the data object returned by the xpath expression into an IAnswerData suitable for
-     * storage in the FormInstance
-     */
-    // TODO Move this method into IAnswerData
-    public static IAnswerData wrapData(Object val, int intDataType) {
-        if ((val instanceof String && ((String) val).length() == 0) ||
-            (val instanceof Double && ((Double) val).isNaN())) {
-            return null;
-        }
-
-        final DataType dataType = DataType.from(intDataType);
-
-        if (BOOLEAN == dataType || val instanceof Boolean) {
-            //ctsims: We should really be using the boolean datatype for real, it's
-            //necessary for backend calculations and XSD compliance
-
-            boolean b;
-
-            if (val instanceof Boolean) {
-                b = (Boolean) val;
-            } else if (val instanceof Double) {
-                double d = (Double) val;
-                b = Math.abs(d) > 1.0e-12 && !Double.isNaN(d);
-            } else if (val instanceof String) {
-                String s = (String) val;
-                b = s.length() > 0;
-            } else {
-                throw new RuntimeException("unrecognized data representation while trying to convert to BOOLEAN");
-            }
-
-            return new BooleanData(b);
-        } else if (val instanceof Double) {
-            double d = (Double) val;
-            long l = (long) d;
-            boolean isIntegral = Math.abs(d - l) < 1.0e-9;
-            if (INTEGER == dataType ||
-                (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
-                return new IntegerData((int) d);
-            } else if (LONG == dataType || isIntegral) {
-                return new LongData((long) d);
-            } else {
-                return new DecimalData(d);
-            }
-        } else if (dataType == GEOPOINT) {
-            return new GeoPointData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == GEOSHAPE) {
-            return new GeoShapeData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == GEOTRACE) {
-            return new GeoTraceData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == CHOICE) {
-            return new SelectOneData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == MULTIPLE_ITEMS) {
-            return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
-        } else if (val instanceof String) {
-            return new StringData((String) val);
-        } else if (val instanceof Date) {
-            if (dataType == TIME)
-                return new TimeData((Date) val);
-            if (dataType == DATE)
-                return new DateData((Date) val);
-            return new DateTimeData((Date) val);
-        } else {
-            throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
-        }
-    }
 
     @Override
     public void setImmediateCascades(Set<QuickTriggerable> cascades) {
