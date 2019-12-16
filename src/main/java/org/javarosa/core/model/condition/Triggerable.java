@@ -65,11 +65,11 @@ public abstract class Triggerable implements Externalizable {
 
     protected Set<QuickTriggerable> immediateCascades = null;
 
-    public Triggerable() {
+    protected Triggerable() {
 
     }
 
-    public Triggerable(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    protected Triggerable(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         this.expr = expr;
         this.targets = targets;
         this.contextRef = contextRef;
@@ -91,35 +91,115 @@ public abstract class Triggerable implements Externalizable {
 
     public abstract boolean canCascade();
 
-    /**
-     * This should return true if this triggerable's targets will implicity modify the
-     * value of their children. IE: if this triggerable makes a node relevant/irrelevant,
-     * expressions which care about the value of this node's children should be triggered.
-     *
-     * @return True if this condition should trigger expressions whose targets include
-     *     nodes which are the children of this node's targets.
-     */
     public abstract boolean isCascadingToChildren();
 
-    public abstract Set<TreeReference> getTriggers();
+    public Set<TreeReference> getTriggers() {
+        Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
+        Set<TreeReference> absTriggers = new HashSet<>();
+        for (TreeReference r : relTriggers) {
+            absTriggers.add(r.anchor(originalContextRef));
+        }
+        return absTriggers;
+    }
 
-    public abstract List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchors);
+    /**
+     * Searches in the triggers of this Triggerable, trying to find the ones that are
+     * contained in the given list of contextualized refs.
+     *
+     * @param firedAnchorsMap a map of absolute refs
+     * @return a list of affected nodes.
+     */
+    public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
+        List<TreeReference> affectedTriggers = new ArrayList<>(0);
 
-    public abstract TreeReference contextualizeContextRef(TreeReference anchorRef);
+        Set<TreeReference> triggers = this.getTriggers();
+        for (TreeReference trigger : triggers) {
+            List<TreeReference> firedAnchors = firedAnchorsMap.get(trigger.genericize());
+            if (firedAnchors == null) {
+                continue;
+            }
 
-    public abstract List<EvaluationResult> apply(FormInstance mainInstance, EvaluationContext ec, TreeReference qualified);
+            affectedTriggers.addAll(firedAnchors);
+        }
 
-    public abstract List<TreeReference> getTargets();
+        return affectedTriggers;
+    }
 
-    public abstract void changeContextRefToIntersectWithTriggerable(Triggerable t);
+    public TreeReference contextualizeContextRef(TreeReference anchorRef) {
+        // Contextualize the reference used by the triggerable against
+        // the anchor
+        return contextRef.contextualize(anchorRef);
+    }
 
-    public abstract TreeReference getContext();
+    /**
+     * Dispatches all of the evaluation
+     */
+    public final List<EvaluationResult> apply(FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
+        //The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
+        //for the actual expressions, so we need genericize that ref against the current context
+        TreeReference ungenericised = originalContextRef.contextualize(context);
+        EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
 
-    public abstract TreeReference getOriginalContext();
+        Object result = eval(mainInstance, ec);
 
-    public abstract void setImmediateCascades(Set<QuickTriggerable> deps);
+        List<EvaluationResult> affectedNodes = new ArrayList<>(0);
+        for (TreeReference target : targets) {
+            TreeReference targetRef = target.contextualize(ec.getContextRef());
+            List<TreeReference> v = ec.expandReference(targetRef);
 
-    public abstract Set<QuickTriggerable> getImmediateCascades();
+            for (TreeReference affectedRef : v) {
+                apply(affectedRef, result, mainInstance);
 
-    public abstract void addTarget(TreeReference ref);
+                affectedNodes.add(new EvaluationResult(affectedRef, result));
+            }
+        }
+
+        return affectedNodes;
+    }
+
+    public List<TreeReference> getTargets() {
+        return targets;
+    }
+
+    public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
+        contextRef = contextRef.intersect(t.contextRef);
+    }
+
+    public TreeReference getContext() {
+        return contextRef;
+    }
+
+    public TreeReference getOriginalContext() {
+        return originalContextRef;
+    }
+
+    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
+        immediateCascades = new HashSet<>(cascades);
+    }
+
+    public Set<QuickTriggerable> getImmediateCascades() {
+        return immediateCascades;
+    }
+
+    public IConditionExpr getExpr() {
+        return expr;
+    }
+
+    public void addTarget(TreeReference target) {
+        if (targets.indexOf(target) == -1) {
+            targets.add(target);
+        }
+    }
+
+    // TODO Improve this to make it more human friendly
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < targets.size(); i++) {
+            sb.append(targets.get(i).toString());
+            if (i < targets.size() - 1)
+                sb.append(",");
+        }
+        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
+    }
 }

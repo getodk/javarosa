@@ -20,9 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
@@ -33,7 +31,6 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.debug.EvaluationResult;
 import org.javarosa.xpath.XPathException;
 
 public class Condition extends Triggerable {
@@ -45,7 +42,6 @@ public class Condition extends Triggerable {
      */
     @SuppressWarnings("unused")
     public Condition() {
-
     }
 
     protected Condition(IConditionExpr expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
@@ -95,15 +91,15 @@ public class Condition extends Triggerable {
         }
     }
 
-    // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
     @Override
     public boolean canCascade() {
+        // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
         return trueAction.isCascading();
     }
 
-    // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
     @Override
     public boolean isCascadingToChildren() {
+        // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
         return trueAction.isCascading();
     }
 
@@ -123,7 +119,7 @@ public class Condition extends Triggerable {
                 Triggerable t = c;
                 if (this == t) {
                     result = true;
-                } else if (this.expr.equals(t.expr)) {
+                } else if (expr.equals(t.getExpr())) {
 
                     // The original logic did not make any sense --
                     // the
@@ -145,114 +141,6 @@ public class Condition extends Triggerable {
         }
     }
 
-    @Override
-    public Set<QuickTriggerable> getImmediateCascades() {
-        return immediateCascades;
-    }
-
-    @Override
-    public void setImmediateCascades(Set<QuickTriggerable> cascades) {
-        immediateCascades = new HashSet<>(cascades);
-    }
-
-    @Override
-    public TreeReference getContext() {
-        return contextRef;
-    }
-
-    @Override
-    public TreeReference getOriginalContext() {
-        return originalContextRef;
-    }
-
-    /**
-     * Dispatches all of the evaluation
-     */
-    @Override
-    public final List<EvaluationResult> apply(FormInstance mainInstance, EvaluationContext parentContext, TreeReference context) {
-        //The triggeringRoot is the highest level of actual data we can inquire about, but it _isn't_ necessarily the basis
-        //for the actual expressions, so we need genericize that ref against the current context
-        TreeReference ungenericised = originalContextRef.contextualize(context);
-        EvaluationContext ec = new EvaluationContext(parentContext, ungenericised);
-
-        Object result = eval(mainInstance, ec);
-
-        List<EvaluationResult> affectedNodes = new ArrayList<>(0);
-        for (TreeReference target : targets) {
-            TreeReference targetRef = target.contextualize(ec.getContextRef());
-            List<TreeReference> v = ec.expandReference(targetRef);
-
-            for (TreeReference affectedRef : v) {
-                apply(affectedRef, result, mainInstance);
-
-                affectedNodes.add(new EvaluationResult(affectedRef, result));
-            }
-        }
-
-        return affectedNodes;
-    }
-
-    public IConditionExpr getExpr() {
-        return expr;
-    }
-
-    @Override
-    public void addTarget(TreeReference target) {
-        if (targets.indexOf(target) == -1) {
-            targets.add(target);
-        }
-    }
-
-    @Override
-    public List<TreeReference> getTargets() {
-        return targets;
-    }
-
-    public Set<TreeReference> getTriggers() {
-        Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
-        Set<TreeReference> absTriggers = new HashSet<>();
-        for (TreeReference r : relTriggers) {
-            absTriggers.add(r.anchor(originalContextRef));
-        }
-        return absTriggers;
-    }
-
-    @Override
-    public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
-        contextRef = contextRef.intersect(t.contextRef);
-    }
-
-    @Override
-    public TreeReference contextualizeContextRef(TreeReference anchorRef) {
-        // Contextualize the reference used by the triggerable against
-        // the anchor
-        return contextRef.contextualize(anchorRef);
-    }
-
-    /**
-     * Searches in the triggers of this Triggerable, trying to find the ones that are
-     * contained in the given list of contextualized refs.
-     *
-     * @param firedAnchorsMap a map of absolute refs
-     * @return a list of affected nodes.
-     */
-    @Override
-    public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
-        List<TreeReference> affectedTriggers = new ArrayList<>(0);
-
-        Set<TreeReference> triggers = this.getTriggers();
-        for (TreeReference trigger : triggers) {
-            List<TreeReference> firedAnchors = firedAnchorsMap.get(trigger.genericize());
-            if (firedAnchors == null) {
-                continue;
-            }
-
-            affectedTriggers.addAll(firedAnchors);
-        }
-
-        return affectedTriggers;
-    }
-
     // region External serialization
 
     @Override
@@ -269,7 +157,7 @@ public class Condition extends Triggerable {
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.write(out, new ExtWrapTagged(expr));
+        ExtUtil.write(out, new ExtWrapTagged(getExpr()));
         ExtUtil.write(out, contextRef);
         ExtUtil.write(out, originalContextRef);
         List<TreeReference> tlist = new ArrayList<>(targets);
@@ -279,16 +167,4 @@ public class Condition extends Triggerable {
     }
 
     // endregion
-
-    // TODO Improve this to make it more human friendly
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < targets.size(); i++) {
-            sb.append(targets.get(i).toString());
-            if (i < targets.size() - 1)
-                sb.append(",");
-        }
-        return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
-    }
 }
