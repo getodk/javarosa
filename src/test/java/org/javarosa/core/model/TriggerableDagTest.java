@@ -529,6 +529,40 @@ public class TriggerableDagTest {
         ));
     }
 
+    @Test
+    public void parsing_forms_with_cycles_by_self_reference_in_relevance_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", html(head(
+            title("Some form"),
+            model(
+                mainInstance(t("data id=\"some-form\"",
+                    t("count", "1")
+                )),
+                bind("/data/count").type("int").relevant(". + 1")
+            ))
+        ));
+    }
+
+    @Test
+    public void parsing_forms_with_cycles_in_relevance_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", html(head(
+            title("Some form"),
+            model(
+                mainInstance(t("data id=\"some-form\"",
+                    t("a", "1"),
+                    t("b", "1")
+                )),
+                bind("/data/a").type("int").relevant("/data/b + 1"),
+                bind("/data/b").type("int").relevant("/data/a + 1")
+            ))
+        ));
+    }
+
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
