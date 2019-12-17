@@ -74,7 +74,7 @@ public class TriggerableDag {
      * Associates repeatable nodes with the Condition that determines their
      * relevance.
      */
-    protected final Map<TreeReference, QuickTriggerable> conditionRepeatTargetIndex = new HashMap<>();
+    protected Map<TreeReference, QuickTriggerable> conditionRepeatTargetIndex = new HashMap<>();
 
     /**
      * Maps a tree reference to the set of triggerables that need to be
@@ -333,16 +333,17 @@ public class TriggerableDag {
             getDagEdges(mainInstance, evalContext, unorderedTriggerables, triggerIndex)
         );
 
-        conditionRepeatTargetIndex.clear();
+        Map<TreeReference, QuickTriggerable> newRepeatConditionsPerTarget = new HashMap<>();
         for (QuickTriggerable qt : triggerablesDAG) {
             if (qt.isCondition()) {
                 for (TreeReference target : qt.getTargets()) {
                     if (mainInstance.getTemplate(target) != null) {
-                        conditionRepeatTargetIndex.put(target, qt);
+                        newRepeatConditionsPerTarget.put(target, qt);
                     }
                 }
             }
         }
+        conditionRepeatTargetIndex = newRepeatConditionsPerTarget;
     }
 
     // TODO We can avoid having to resolve dependant refs using the mainInstance by adding descendant refs as targets of relevance triggerables
