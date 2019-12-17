@@ -334,30 +334,30 @@ public class TriggerableDag {
         // DAGify the triggerables based on dependencies and sort them so that
         // triggerables come only after the triggerables they depend on
         List<QuickTriggerable> vertices = new ArrayList<>(unorderedTriggerables);
-        List<QuickTriggerable[]> partialOrdering = new ArrayList<>();
-        for (QuickTriggerable qt : vertices) {
-            Set<QuickTriggerable> deps = fillTriggeredElements(mainInstance, evalContext, qt);
+        List<QuickTriggerable[]> edges = new ArrayList<>();
+        for (QuickTriggerable triggerable : vertices) {
+            Set<QuickTriggerable> dependantTriggerables = getDependantTriggerables(mainInstance, evalContext, triggerable);
 
-            if (deps.contains(qt))
-                throwCyclesInDagException(deps);
+            if (dependantTriggerables.contains(triggerable))
+                throwCyclesInDagException(dependantTriggerables);
 
-            if (qt.canCascade())
-                for (QuickTriggerable qu : deps) {
-                    QuickTriggerable[] edge = {qt, qu};
-                    partialOrdering.add(edge);
+            if (triggerable.canCascade())
+                for (QuickTriggerable dependantTriggerable : dependantTriggerables) {
+                    QuickTriggerable[] edge = {triggerable, dependantTriggerable};
+                    edges.add(edge);
                 }
 
-            qt.setImmediateCascades(deps);
+            // TODO Move this from Triggerable to TriggerableDag
+            triggerable.setImmediateCascades(dependantTriggerables);
         }
 
         List<QuickTriggerable> orderedRoots = new ArrayList<>();
-        Set<QuickTriggerable> roots = new HashSet<>(
-            vertices.size());
+        Set<QuickTriggerable> roots = new HashSet<>(vertices.size());
         while (vertices.size() > 0) {
             // determine root nodes
             roots.clear();
             roots.addAll(vertices);
-            for (QuickTriggerable[] edge : partialOrdering) {
+            for (QuickTriggerable[] edge : edges) {
                 roots.remove(edge[1]);
             }
 
@@ -368,6 +368,7 @@ public class TriggerableDag {
             // order the root nodes - so the order is fixed
             orderedRoots.clear();
             orderedRoots.addAll(roots);
+            // TODO Study if insertion order & using LinkedSets would suffice to ensure proper triggerable chaining
             Collections.sort(orderedRoots, QuickTriggerableComparator.INSTANCE);
 
             // remove root nodes and edges originating from them
@@ -376,17 +377,16 @@ public class TriggerableDag {
                 triggerablesDAG.add(root);
                 vertices.remove(root);
             }
-            for (int i = partialOrdering.size() - 1; i >= 0; i--) {
-                QuickTriggerable[] edge = partialOrdering.get(i);
+            for (int i = edges.size() - 1; i >= 0; i--) {
+                QuickTriggerable[] edge = edges.get(i);
                 if (roots.contains(edge[0]))
-                    partialOrdering.remove(i);
+                    edges.remove(i);
             }
         }
 
         //
         // build the condition index for repeatable nodes
         //
-
         conditionRepeatTargetIndex.clear();
         for (QuickTriggerable qt : triggerablesDAG) {
             if (qt.isCondition()) {
@@ -418,25 +418,25 @@ public class TriggerableDag {
      * Get all of the elements which will need to be evaluated (in order) when
      * the triggerable is fired.
      */
-    public Set<QuickTriggerable> fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt) {
-        Set<QuickTriggerable> dependantTriggerables = new LinkedHashSet<>();
+    public Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable) {
+        Set<QuickTriggerable> allDependantTriggerables = new LinkedHashSet<>();
 
-        for (TreeReference target : qt.getTargets()) {
-            Set<TreeReference> updatedNodes = new HashSet<>();
-            updatedNodes.add(target);
+        for (TreeReference target : triggerable.getTargets()) {
+            Set<TreeReference> targets = new HashSet<>();
+            targets.add(target);
 
             // For certain types of triggerables, the update will affect
             // not only the target, but also the children of the target.
             // In that case, we want to add all of those nodes
             // to the list of updated elements as well.
-            if (qt.isCascadingToChildren()) {
-                updatedNodes.addAll(getChildrenOfReference(mainInstance, evalContext, target));
+            if (triggerable.isCascadingToChildren()) {
+                targets.addAll(getChildrenOfReference(mainInstance, ec, target));
             }
 
             // Now go through each of these updated nodes (generally
             // just 1 for a normal calculation,
             // multiple nodes if there's a relevance cascade.
-            for (TreeReference ref : updatedNodes) {
+            for (TreeReference ref : targets) {
                 // Check our index to see if that target is a Trigger
                 // for other conditions
                 // IE: if they are an element of a different calculation
@@ -447,12 +447,12 @@ public class TriggerableDag {
                 // so we'll be more inclusive than needed and see if any
                 // of our triggers are keyed on the predicate-less path
                 // of this ref
-                Set<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
-                    if (triggered != null)
-                        dependantTriggerables.addAll(triggered);
+                Set<QuickTriggerable> dependantTriggerables = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
+                if (dependantTriggerables != null)
+                    allDependantTriggerables.addAll(dependantTriggerables);
             }
         }
-        return dependantTriggerables;
+        return allDependantTriggerables;
     }
 
     /**
@@ -495,42 +495,41 @@ public class TriggerableDag {
      *
      * @return
      */
-    private Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
-        // original has already been added to the 'toAdd' list.
-
-        Set<TreeReference> descendantRefs = new HashSet<>();
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                descendantRefs.add(child.getRef().genericize());
-                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
-            }
-        } else {
-            List<TreeReference> refSet = evalContext.expandReference(original);
-            for (TreeReference ref : refSet) {
-                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, evalContext.resolveReference(ref)));
-            }
-        }
-        return descendantRefs;
+    private Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext ec, TreeReference ref) {
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(ref);
+        if (repeatTemplate != null)
+            return getChildrenRefsByTemplate(mainInstance, repeatTemplate);
+        // TODO Write a test that goes through this path and see how and why childrenRef can be different than child.getRef()
+        return getChildrenByExpandedRef(mainInstance, ec, ref);
     }
 
-    // Recursive step of utility method
-    private Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> el) {
+    private Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(element.getRef());
+        if (repeatTemplate != null)
+            return getChildrenRefsByTemplate(mainInstance, repeatTemplate);
+        return getChildrenOfElement(mainInstance, element);
+    }
+
+    private Set<TreeReference> getChildrenRefsByTemplate(FormInstance mainInstance, TreeElement repeatTemplate) {
+        return getChildrenOfElement(mainInstance, repeatTemplate);
+    }
+
+    private Set<TreeReference> getChildrenByExpandedRef(FormInstance mainInstance, EvaluationContext ec, TreeReference initialRef) {
+        Set<TreeReference> descendants = new HashSet<>();
+        for (TreeReference childrenRef : ec.expandReference(initialRef)) {
+            AbstractTreeElement<?> child = ec.resolveReference(childrenRef);
+            descendants.add(child.getRef().genericize());
+            descendants.addAll(getChildrenRefsOfElement(mainInstance, child));
+        }
+        return descendants;
+    }
+
+    private Set<TreeReference> getChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
         Set<TreeReference> childrenRefs = new HashSet<>();
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
-            }
-        } else {
-            for (int i = 0; i < el.getNumChildren(); ++i) {
-                AbstractTreeElement<?> child = el.getChildAt(i);
-                childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
-            }
+        for (int i = 0; i < element.getNumChildren(); ++i) {
+            AbstractTreeElement<?> child = element.getChildAt(i);
+            childrenRefs.add(child.getRef().genericize());
+            childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
         }
         return childrenRefs;
     }
