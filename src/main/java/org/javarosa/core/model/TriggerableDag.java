@@ -329,6 +329,8 @@ public class TriggerableDag {
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
         triggerablesDAG.clear();
 
+        // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
+
         // DAGify the triggerables based on dependencies and sort them so that
         // triggerables come only after the triggerables they depend on
         List<QuickTriggerable> vertices = new ArrayList<>(unorderedTriggerables);
