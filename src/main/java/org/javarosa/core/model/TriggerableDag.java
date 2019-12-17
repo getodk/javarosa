@@ -364,20 +364,8 @@ public class TriggerableDag {
             }
 
             // if no root nodes while graph still has nodes, graph has cycles
-            if (roots.size() == 0) {
-                StringBuilder hints = new StringBuilder();
-                for (QuickTriggerable qt : vertices) {
-                    for (TreeReference r : qt.t.getTargets()) {
-                        hints.append("\n").append(r.toString(true));
-                    }
-                }
-                String message = "Cycle detected in form's relevant and calculation logic!";
-                if (!hints.toString().equals("")) {
-                    message += "\nThe following nodes are likely involved in the loop:"
-                        + hints;
-                }
-                throw new IllegalStateException(message);
-            }
+            if (roots.size() == 0)
+                throwCycleInDagException(vertices);
 
             // order the root nodes - so the order is fixed
             orderedRoots.clear();
@@ -413,6 +401,21 @@ public class TriggerableDag {
                 }
             }
         }
+    }
+
+    public void throwCycleInDagException(Collection<QuickTriggerable> vertices) {
+        StringBuilder hints = new StringBuilder();
+        for (QuickTriggerable qt : vertices) {
+            for (TreeReference r : qt.t.getTargets()) {
+                hints.append("\n").append(r.toString(true));
+            }
+        }
+        String message = "Cycle detected in form's relevant and calculation logic!";
+        if (!hints.toString().equals("")) {
+            message += "\nThe following nodes are likely involved in the loop:"
+                + hints;
+        }
+        throw new IllegalStateException(message);
     }
 
     /**
