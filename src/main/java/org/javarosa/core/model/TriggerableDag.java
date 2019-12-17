@@ -420,9 +420,9 @@ public class TriggerableDag {
      */
     public Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable) {
         Set<QuickTriggerable> allDependantTriggerables = new LinkedHashSet<>();
-
+        Set<TreeReference> targets = new HashSet<>();
         for (TreeReference target : triggerable.getTargets()) {
-            Set<TreeReference> targets = new HashSet<>();
+
             targets.add(target);
 
             // For certain types of triggerables, the update will affect
@@ -432,25 +432,25 @@ public class TriggerableDag {
             if (triggerable.isCascadingToChildren()) {
                 targets.addAll(getChildrenOfReference(mainInstance, ec, target));
             }
+        }
 
-            // Now go through each of these updated nodes (generally
-            // just 1 for a normal calculation,
-            // multiple nodes if there's a relevance cascade.
-            for (TreeReference ref : targets) {
-                // Check our index to see if that target is a Trigger
-                // for other conditions
-                // IE: if they are an element of a different calculation
-                // or relevancy calc
+        // Now go through each of these updated nodes (generally
+        // just 1 for a normal calculation,
+        // multiple nodes if there's a relevance cascade.
+        for (TreeReference target : targets) {
+            // Check our index to see if that target is a Trigger
+            // for other conditions
+            // IE: if they are an element of a different calculation
+            // or relevancy calc
 
-                // We can't make this reference generic before now or
-                // we'll lose the target information,
-                // so we'll be more inclusive than needed and see if any
-                // of our triggers are keyed on the predicate-less path
-                // of this ref
-                Set<QuickTriggerable> dependantTriggerables = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
-                if (dependantTriggerables != null)
-                    allDependantTriggerables.addAll(dependantTriggerables);
-            }
+            // We can't make this reference generic before now or
+            // we'll lose the target information,
+            // so we'll be more inclusive than needed and see if any
+            // of our triggers are keyed on the predicate-less path
+            // of this ref
+            Set<QuickTriggerable> dependantTriggerables = triggerIndex.get(target.hasPredicates() ? target.removePredicates() : target);
+            if (dependantTriggerables != null)
+                allDependantTriggerables.addAll(dependantTriggerables);
         }
         return allDependantTriggerables;
     }
