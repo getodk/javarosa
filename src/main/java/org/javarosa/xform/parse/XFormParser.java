@@ -1931,7 +1931,6 @@ public class XFormParser implements IXFormParserFunctions {
     private void addMainInstanceToFormDef(Element e, FormInstance instanceModel) {
         loadInstanceData(e, instanceModel.getRoot(), _f);
 
-        checkDependencyCycles();
         _f.setInstance(instanceModel);
         _f.setLocalizer(localizer);
 
@@ -2156,10 +2155,6 @@ public class XFormParser implements IXFormParserFunctions {
         } else {
             return null;
         }
-    }
-
-    private void checkDependencyCycles() {
-        _f.reportDependencyCycles();
     }
 
     private void loadXmlInstance(FormDef f, Reader xmlReader) throws IOException {

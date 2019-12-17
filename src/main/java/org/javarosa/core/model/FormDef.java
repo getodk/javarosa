@@ -676,14 +676,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     /**
-     * Reports any dependency cycles based upon the triggerIndex array.
-     * (Does not require that the DAG be finalized).
-     */
-    public void reportDependencyCycles() {
-        dagImpl.reportDependencyCycles();
-    }
-
-    /**
      * Finalizes the DAG associated with the form's triggered conditions. This
      * will create the appropriate ordering and dependencies to ensure the
      * conditions will be evaluated in the appropriate orders.
