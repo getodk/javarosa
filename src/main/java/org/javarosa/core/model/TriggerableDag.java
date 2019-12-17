@@ -74,7 +74,7 @@ public class TriggerableDag {
      * Associates repeatable nodes with the Condition that determines their
      * relevance.
      */
-    protected Map<TreeReference, QuickTriggerable> conditionRepeatTargetIndex = new HashMap<>();
+    protected Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
 
     /**
      * Maps a tree reference to the set of triggerables that need to be
@@ -176,7 +176,7 @@ public class TriggerableDag {
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
-        return conditionRepeatTargetIndex.get(repeatRef.genericize());
+        return repeatConditionsPerTargets.get(repeatRef.genericize());
     }
 
     private Set<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef, Set<QuickTriggerable> alreadyEvaluated) {
@@ -323,27 +323,21 @@ public class TriggerableDag {
      * Finalize the DAG associated with the form's triggered conditions. This
      * will create the appropriate ordering and dependencies to ensure the
      * conditions will be evaluated in the appropriate orders.
-     *
-     * @throws IllegalStateException - If the trigger ordering contains an illegal cycle and the
-     *                               triggers can't be laid out appropriately
      */
-    public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
-        triggerablesDAG = buildDag(
-            unorderedTriggerables,
-            getDagEdges(mainInstance, evalContext, unorderedTriggerables, triggerIndex)
-        );
+    public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
+        List<QuickTriggerable[]> edges = getDagEdges(mainInstance, ec, unorderedTriggerables, triggerIndex);
+        triggerablesDAG = buildDag(unorderedTriggerables, edges);
+        repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
+    }
 
-        Map<TreeReference, QuickTriggerable> newRepeatConditionsPerTarget = new HashMap<>();
-        for (QuickTriggerable qt : triggerablesDAG) {
-            if (qt.isCondition()) {
-                for (TreeReference target : qt.getTargets()) {
-                    if (mainInstance.getTemplate(target) != null) {
-                        newRepeatConditionsPerTarget.put(target, qt);
-                    }
-                }
-            }
-        }
-        conditionRepeatTargetIndex = newRepeatConditionsPerTarget;
+    private static Map<TreeReference, QuickTriggerable> getRepeatConditionsPerTargets(FormInstance mainInstance, Set<QuickTriggerable> triggerables) {
+        Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
+        for (QuickTriggerable triggerable : triggerables)
+            if (triggerable.isCondition())
+                for (TreeReference target : triggerable.getTargets())
+                    if (mainInstance.getTemplate(target) != null)
+                        repeatConditionsPerTargets.put(target, triggerable);
+        return repeatConditionsPerTargets;
     }
 
     // TODO We can avoid having to resolve dependant refs using the mainInstance by adding descendant refs as targets of relevance triggerables
