@@ -59,32 +59,12 @@ public class TriggerableDag {
 
     protected final EventNotifierAccessor accessor;
 
-    /**
-     * NOT VALID UNTIL finalizeTriggerables() is called!!
-     * <p>
-     * Topologically ordered list, meaning that for any tA and tB in
-     * the list, where tA comes before tB, evaluating tA cannot depend on any
-     * result from evaluating tB.
-     */
     protected Set<QuickTriggerable> triggerablesDAG = emptySet();
 
-    /**
-     * NOT VALID UNTIL finalizeTriggerables() is called!!
-     * <p>
-     * Associates repeatable nodes with the Condition that determines their
-     * relevance.
-     */
     protected Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
 
-    /**
-     * Maps a tree reference to the set of triggerables that need to be
-     * processed when the value at this reference changes.
-     */
     protected final Map<TreeReference, Set<QuickTriggerable>> triggerIndex = new HashMap<>();
 
-    /**
-     * List of all the triggerables in the form. Unordered.
-     */
     protected final Set<QuickTriggerable> unorderedTriggerables = new HashSet<>();
 
     protected TriggerableDag(EventNotifierAccessor accessor) {
@@ -282,25 +262,7 @@ public class TriggerableDag {
     public final Triggerable addTriggerable(Triggerable t) {
         QuickTriggerable qt = findTriggerable(t);
         if (qt != null) {
-            // one node may control access to many nodes; this means many nodes
-            // effectively have the same condition
-            // let's identify when conditions are the same, and store and calculate
-            // it only once
-
-            // nov-2-2011: ctsims - We need to merge the context nodes together
-            // whenever we do this (finding the highest
-            // common ground between the two), otherwise we can end up failing to
-            // trigger when the ignored context
-            // exists and the used one doesn't
-
-            // TODO It's fishy to mutate the Triggerable here. We might prefer to return a copy of the original Triggerable
             return qt.changeContextRefToIntersectWithTriggerable(t);
-
-            // note, if the contextRef is unnecessarily deep, the condition will be
-            // evaluated more times than needed
-            // perhaps detect when 'identical' condition has a shorter contextRef,
-            // and use that one instead?
-
         } else {
             qt = QuickTriggerable.of(t);
             unorderedTriggerables.add(qt);
