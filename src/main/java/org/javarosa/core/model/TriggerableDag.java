@@ -63,9 +63,9 @@ public class TriggerableDag {
 
     protected Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
 
-    protected final Map<TreeReference, Set<QuickTriggerable>> triggerIndex = new HashMap<>();
+    protected final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
-    protected final Set<QuickTriggerable> unorderedTriggerables = new HashSet<>();
+    protected final Set<QuickTriggerable> allTriggerables = new HashSet<>();
 
     protected TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -251,7 +251,7 @@ public class TriggerableDag {
     }
 
     private QuickTriggerable findTriggerable(Triggerable t) {
-        for (QuickTriggerable qt : unorderedTriggerables) {
+        for (QuickTriggerable qt : allTriggerables) {
             if (qt.contains(t)) {
                 return qt;
             }
@@ -265,14 +265,14 @@ public class TriggerableDag {
             return qt.changeContextRefToIntersectWithTriggerable(t);
         } else {
             qt = QuickTriggerable.of(t);
-            unorderedTriggerables.add(qt);
+            allTriggerables.add(qt);
 
             Set<TreeReference> triggers = t.getTriggers();
             for (TreeReference trigger : triggers) {
-                Set<QuickTriggerable> triggered = triggerIndex.get(trigger);
+                Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(trigger);
                 if (triggered == null) {
                     triggered = new HashSet<>();
-                    triggerIndex.put(trigger.clone(), triggered);
+                    triggerablesPerTrigger.put(trigger.clone(), triggered);
                 }
                 triggered.add(qt);
             }
@@ -287,8 +287,8 @@ public class TriggerableDag {
      * conditions will be evaluated in the appropriate orders.
      */
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
-        List<QuickTriggerable[]> edges = getDagEdges(mainInstance, ec, unorderedTriggerables, triggerIndex);
-        triggerablesDAG = buildDag(unorderedTriggerables, edges);
+        List<QuickTriggerable[]> edges = getDagEdges(mainInstance, ec, allTriggerables, triggerablesPerTrigger);
+        triggerablesDAG = buildDag(allTriggerables, edges);
         repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
     }
 
@@ -532,7 +532,7 @@ public class TriggerableDag {
         TreeReference genericRef = ref.genericize();
 
         // get triggerables which are activated by the generic reference
-        Set<QuickTriggerable> triggered = triggerIndex.get(genericRef);
+        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRef);
         if (triggered == null) {
             return alreadyEvaluated;
         }
@@ -557,9 +557,9 @@ public class TriggerableDag {
 
         //build graph
         List<TreeReference> targets = new ArrayList<>();
-        for (TreeReference trigger : triggerIndex.keySet()) {
+        for (TreeReference trigger : triggerablesPerTrigger.keySet()) {
             vertices.add(trigger);
-            Set<QuickTriggerable> triggered = triggerIndex.get(trigger);
+            Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(trigger);
             targets.clear();
             for (QuickTriggerable qt : triggered) {
                 for (TreeReference target : qt.getTargets()) {
@@ -635,7 +635,7 @@ public class TriggerableDag {
 
     private List<Condition> getConditions() {
         List<Condition> conditions = new ArrayList<>();
-        for (QuickTriggerable qt : unorderedTriggerables) {
+        for (QuickTriggerable qt : allTriggerables) {
             if (qt.isCondition()) {
                 conditions.add((Condition) qt.getTriggerable());
             }
@@ -645,7 +645,7 @@ public class TriggerableDag {
 
     private List<Recalculate> getRecalculates() {
         List<Recalculate> recalculates = new ArrayList<>();
-        for (QuickTriggerable qt : unorderedTriggerables) {
+        for (QuickTriggerable qt : allTriggerables) {
             if (qt.isRecalculate()) {
                 recalculates.add((Recalculate) qt.getTriggerable());
             }
