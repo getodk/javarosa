@@ -335,8 +335,7 @@ public class TriggerableDag {
         triggerablesDAG.clear();
         List<QuickTriggerable[]> partialOrdering = new ArrayList<>();
         for (QuickTriggerable qt : vertices) {
-            Set<QuickTriggerable> deps = new HashSet<>();
-            Set<QuickTriggerable> newDestinationSet = fillTriggeredElements(mainInstance, evalContext, qt, deps);
+            Set<QuickTriggerable> deps = fillTriggeredElements(mainInstance, evalContext, qt, new HashSet<>());
 
             if (deps.contains(qt))
                 throwCyclesInDagException(deps);
