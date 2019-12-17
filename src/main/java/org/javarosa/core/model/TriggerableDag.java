@@ -343,8 +343,7 @@ public class TriggerableDag {
 
             if (triggerable.canCascade())
                 for (QuickTriggerable dependantTriggerable : dependantTriggerables) {
-                    QuickTriggerable[] edge = {triggerable, dependantTriggerable};
-                    edges.add(edge);
+                    edges.add(new QuickTriggerable[]{triggerable, dependantTriggerable});
                 }
 
             // TODO Move this from Triggerable to TriggerableDag
