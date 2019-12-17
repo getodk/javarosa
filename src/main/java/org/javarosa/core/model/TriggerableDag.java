@@ -447,18 +447,8 @@ public class TriggerableDag {
                 // of our triggers are keyed on the predicate-less path
                 // of this ref
                 Set<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
-
-                if (triggered != null) {
-                    // If so, walk all of these triggerables that we
-                    // found
-                    for (QuickTriggerable qu : triggered) {
-                        // And add them to the queue if they aren't
-                        // there already
-                            if (!dependantTriggerables.contains(qu)) {
-                            dependantTriggerables.add(qu);
-                        }
-                    }
-                }
+                    if (triggered != null)
+                        dependantTriggerables.addAll(triggered);
             }
         }
         return dependantTriggerables;
