@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
@@ -27,14 +28,18 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.core.util.BindBuilderXFormsElement;
+import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
-import org.javarosa.xform.parse.XFormParseException;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -499,14 +504,8 @@ public class TriggerableDagTest {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
-        Scenario.init("Some form", html(head(
-            title("Some form"),
-            model(
-                mainInstance(t("data id=\"some-form\"",
-                    t("count", "1")
-                )),
-                bind("/data/count").type("int").calculate(". + 1")
-            ))
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/count").type("int").calculate(". + 1")
         ));
     }
 
@@ -515,16 +514,9 @@ public class TriggerableDagTest {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
-        Scenario.init("Some form", html(head(
-            title("Some form"),
-            model(
-                mainInstance(t("data id=\"some-form\"",
-                    t("a", "1"),
-                    t("b", "1")
-                )),
-                bind("/data/a").type("int").calculate("/data/b + 1"),
-                bind("/data/b").type("int").calculate("/data/a + 1")
-            ))
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/a").type("int").calculate("/data/b + 1"),
+            bind("/data/b").type("int").calculate("/data/a + 1")
         ));
     }
 
@@ -533,14 +525,8 @@ public class TriggerableDagTest {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
-        Scenario.init("Some form", html(head(
-            title("Some form"),
-            model(
-                mainInstance(t("data id=\"some-form\"",
-                    t("count", "1")
-                )),
-                bind("/data/count").type("int").relevant(". + 1")
-            ))
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/count").type("int").relevant(". + 1")
         ));
     }
 
@@ -549,21 +535,54 @@ public class TriggerableDagTest {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
-        Scenario.init("Some form", html(head(
-            title("Some form"),
-            model(
-                mainInstance(t("data id=\"some-form\"",
-                    t("a", "1"),
-                    t("b", "1")
-                )),
-                bind("/data/a").type("int").relevant("/data/b + 1"),
-                bind("/data/b").type("int").relevant("/data/a + 1")
-            ))
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/a").type("int").relevant("/data/b + 1"),
+            bind("/data/b").type("int").relevant("/data/a + 1")
         ));
     }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
+    }
+
+    public XFormsElement buildFormForDagCyclesCheck(BindBuilderXFormsElement... binds) {
+        return buildFormForDagCyclesCheck(null, binds);
+    }
+
+    public XFormsElement buildFormForDagCyclesCheck(String initialValue, BindBuilderXFormsElement... binds) {
+        // Map the last part of each bind's nodeset to model fields
+        // They will get an initial value if provided
+        List<XFormsElement> modelFields = Stream.of(binds)
+            .map(bind -> {
+                String[] parts = bind.getNodeset().split("/");
+                return parts[parts.length - 1];
+            })
+            .map(name -> {
+                if (initialValue == null)
+                    return t(name);
+                return t(name, initialValue);
+            })
+            .collect(toList());
+
+        // Build the main instance with the model fields we've just built
+        XFormsElement mainInstance = mainInstance(t("data id=\"some-form\"", modelFields.toArray(new XFormsElement[]{})));
+
+        // Build the model including the main instance we've just built and the provided binds
+        List<XFormsElement> modelChildren = new LinkedList<>();
+        modelChildren.add(mainInstance);
+        modelChildren.addAll(Arrays.asList(binds));
+
+        // Map each bind's nodeset to body fields (inputs)
+        List<XFormsElement> inputs = Stream.of(binds)
+            .map(BindBuilderXFormsElement::getNodeset)
+            .map(name -> input(name))
+            .collect(toList());
+
+        // Return the complete form including model fields, binds, and body inputs
+        return html(head(
+            title("Some form"),
+            model(modelChildren.toArray(new XFormsElement[]{}))
+        ), body(inputs.toArray(new XFormsElement[]{})));
     }
 
     // TODO Replace this test with a benchmark
