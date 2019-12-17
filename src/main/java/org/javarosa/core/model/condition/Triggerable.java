@@ -171,8 +171,8 @@ public abstract class Triggerable implements Externalizable {
         return targets;
     }
 
-    public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
-        contextRef = contextRef.intersect(t.contextRef);
+    public void intersectContextWith(Triggerable other) {
+        contextRef = contextRef.intersect(other.contextRef);
     }
 
     public TreeReference getContext() {
