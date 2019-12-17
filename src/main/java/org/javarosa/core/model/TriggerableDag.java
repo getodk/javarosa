@@ -258,26 +258,39 @@ public class TriggerableDag {
         return null;
     }
 
-    public final Triggerable addTriggerable(Triggerable t) {
-        QuickTriggerable qt = findTriggerable(t);
-        if (qt != null) {
-            return qt.changeContextRefToIntersectWithTriggerable(t);
-        } else {
-            qt = QuickTriggerable.of(t);
-            allTriggerables.add(qt);
-
-            Set<TreeReference> triggers = t.getTriggers();
-            for (TreeReference trigger : triggers) {
-                Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(trigger);
-                if (triggered == null) {
-                    triggered = new HashSet<>();
-                    triggerablesPerTrigger.put(trigger.clone(), triggered);
-                }
-                triggered.add(qt);
-            }
-
-            return t;
+    /**
+     * Adds the provided triggerable to the DAG.
+     * <p>
+     * This method has side-effects:
+     * <ul>
+     *     <li>If a similar triggerable has been already added, its context gets intersected with the provided triggerable to cover both using only one entry</li>
+     *     <li>This method builds the index of triggerables per trigger ref</li>
+     * </ul>
+     */
+    Triggerable addTriggerable(Triggerable triggerable) {
+        QuickTriggerable existingQuickTriggerable = findTriggerable(triggerable);
+        if (existingQuickTriggerable != null) {
+            // We found a quick triggerable wrapping a triggerable matching the provided one.
+            // Since Triggerable.equals() doesn't have into account contexts or targets, the
+            // safest thing to do would be to create a new quick triggerable for the incoming
+            // triggerable, but we could cover both triggerables if we compute the intersection
+            // between their respective context and reuse the one we've already stored.
+            existingQuickTriggerable.intersectContextWith(triggerable);
+            return existingQuickTriggerable.getTriggerable();
         }
+
+        QuickTriggerable newQuickTriggerable = QuickTriggerable.of(triggerable);
+        allTriggerables.add(newQuickTriggerable);
+
+        // Build the triggerable per trigger index
+        Set<TreeReference> triggers = triggerable.getTriggers();
+        for (TreeReference trigger : triggers) {
+            if (!triggerablesPerTrigger.containsKey(trigger))
+                triggerablesPerTrigger.put(trigger, new HashSet<>());
+            triggerablesPerTrigger.get(trigger).add(newQuickTriggerable);
+        }
+
+        return triggerable;
     }
 
     /**
