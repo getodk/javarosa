@@ -339,8 +339,9 @@ public class TriggerableDag {
             newDestinationSet.clear();
             fillTriggeredElements(mainInstance, evalContext, qt, deps, newDestinationSet);
 
-            // remove any self-reference if we have one...
-            deps.remove(qt);
+            if (deps.contains(qt))
+                throwCycleInDagException(deps);
+
             for (QuickTriggerable qu : deps) {
                 QuickTriggerable[] edge = {qt, qu};
                 partialOrdering.add(edge);
