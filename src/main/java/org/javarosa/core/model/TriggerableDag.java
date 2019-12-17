@@ -335,7 +335,7 @@ public class TriggerableDag {
         triggerablesDAG.clear();
         List<QuickTriggerable[]> partialOrdering = new ArrayList<>();
         for (QuickTriggerable qt : vertices) {
-            Set<QuickTriggerable> deps = fillTriggeredElements(mainInstance, evalContext, qt, new HashSet<>());
+            Set<QuickTriggerable> deps = fillTriggeredElements(mainInstance, evalContext, qt);
 
             if (deps.contains(qt))
                 throwCyclesInDagException(deps);
@@ -417,7 +417,7 @@ public class TriggerableDag {
      * Get all of the elements which will need to be evaluated (in order) when
      * the triggerable is fired.
      */
-    public Set<QuickTriggerable> fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, Set<QuickTriggerable> destinationSet) {
+    public Set<QuickTriggerable> fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt) {
         Set<QuickTriggerable> dependantTriggerables = new LinkedHashSet<>();
 
         for (TreeReference target : qt.getTargets()) {
@@ -454,8 +454,7 @@ public class TriggerableDag {
                     for (QuickTriggerable qu : triggered) {
                         // And add them to the queue if they aren't
                         // there already
-                        if (!destinationSet.contains(qu)) {
-                            destinationSet.add(qu);
+                            if (!dependantTriggerables.contains(qu)) {
                             dependantTriggerables.add(qu);
                         }
                     }
