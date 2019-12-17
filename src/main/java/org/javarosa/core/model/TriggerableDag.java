@@ -315,6 +315,16 @@ public class TriggerableDag {
     }
 
     // TODO We can avoid having to resolve dependant refs using the mainInstance by adding descendant refs as targets of relevance triggerables
+
+    /**
+     * Returns the list of edges in the DAG that can be built from the provided vertices.
+     * <p>
+     * This method has side-effects:
+     * <ul>
+     *     <li>Throws IllegalStateException when cycles are detected, either due to a self-reference or more complex cycle chains</li>
+     *     <li>Builds a cache of immediate cascades of each vertex, meaning that we will remember the dependant vertices without having to traverse the DAG again</li>
+     * </ul>
+     */
     private static List<QuickTriggerable[]> getDagEdges(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
         List<QuickTriggerable[]> edges = new ArrayList<>();
         for (QuickTriggerable vertex : vertices) {
