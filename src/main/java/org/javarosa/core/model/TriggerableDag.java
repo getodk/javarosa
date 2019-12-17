@@ -327,12 +327,11 @@ public class TriggerableDag {
      *                               triggers can't be laid out appropriately
      */
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
-        //
+        triggerablesDAG.clear();
+
         // DAGify the triggerables based on dependencies and sort them so that
         // triggerables come only after the triggerables they depend on
-        //
         List<QuickTriggerable> vertices = new ArrayList<>(unorderedTriggerables);
-        triggerablesDAG.clear();
         List<QuickTriggerable[]> partialOrdering = new ArrayList<>();
         for (QuickTriggerable qt : vertices) {
             Set<QuickTriggerable> deps = fillTriggeredElements(mainInstance, evalContext, qt);
