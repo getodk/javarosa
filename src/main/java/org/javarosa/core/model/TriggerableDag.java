@@ -59,13 +59,12 @@ public class TriggerableDag {
 
     protected final EventNotifierAccessor accessor;
 
+    protected final Set<QuickTriggerable> allTriggerables = new HashSet<>();
     protected Set<QuickTriggerable> triggerablesDAG = emptySet();
 
     protected Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
-
     protected final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
-    protected final Set<QuickTriggerable> allTriggerables = new HashSet<>();
 
     protected TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
