@@ -35,15 +35,18 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.debug.Event;
+import org.javarosa.xform.parse.XFormParseException;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Safe2014DagImplTest {
-    private static Logger logger = LoggerFactory.getLogger(Safe2014DagImplTest.class);
+public class TriggerableDagTest {
+    private static Logger logger = LoggerFactory.getLogger(TriggerableDagTest.class);
 
     private List<Event> dagEvents = new ArrayList<>();
 
@@ -51,6 +54,9 @@ public class Safe2014DagImplTest {
     public void setUp() {
         dagEvents.clear();
     }
+
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
     public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnPrecedingRepeatGroupSiblings() throws IOException {
@@ -486,6 +492,41 @@ public class Safe2014DagImplTest {
         // The following assertion is the one that fails with the current implementation
         // TODO Explore the difference between the calculations in result_1 and result_2 and unify them
         assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
+    }
+
+
+    @Test
+    public void parsing_forms_with_cycles_by_self_reference_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", html(head(
+            title("Some form"),
+            model(
+                mainInstance(t("data id=\"some-form\"",
+                    t("count", "1")
+                )),
+                bind("/data/count").type("int").calculate(". + 1")
+            ))
+        ));
+    }
+
+    @Test
+    public void parsing_forms_with_cycles_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", html(head(
+            title("Some form"),
+            model(
+                mainInstance(t("data id=\"some-form\"",
+                    t("a", "1"),
+                    t("b", "1")
+                )),
+                bind("/data/a").type("int").calculate("/data/b + 1"),
+                bind("/data/b").type("int").calculate("/data/a + 1")
+            ))
+        ));
     }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
