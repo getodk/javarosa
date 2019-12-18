@@ -498,9 +498,8 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
 
-
     @Test
-    public void parsing_forms_with_cycles_by_self_reference_should_fail() throws IOException {
+    public void parsing_forms_with_cycles_by_self_reference_in_calculate_should_fail() throws IOException {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
@@ -510,13 +509,14 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void parsing_forms_with_cycles_should_fail() throws IOException {
+    public void parsing_forms_with_cycles_in_calculate_should_fail() throws IOException {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
             bind("/data/a").type("int").calculate("/data/b + 1"),
-            bind("/data/b").type("int").calculate("/data/a + 1")
+            bind("/data/b").type("int").calculate("/data/c + 1"),
+            bind("/data/c").type("int").calculate("/data/a + 1")
         ));
     }
 
@@ -531,15 +531,236 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void parsing_forms_with_cycles_in_relevance_should_fail() throws IOException {
+    public void parsing_forms_with_cycles_by_self_reference_in_read_only_condition_should_fail() throws IOException {
         exceptionRule.expect(RuntimeException.class);
         exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
-            bind("/data/a").type("int").relevant("/data/b + 1"),
-            bind("/data/b").type("int").relevant("/data/a + 1")
+            bind("/data/count").type("int").readonly(". > 10")
         ));
     }
+
+    @Test
+    public void parsing_forms_with_cycles_by_self_reference_in_required_condition_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/count").type("int").required(". > 10")
+        ));
+    }
+
+    @Test
+    public void supports_self_references_in_constraints() throws IOException {
+        Scenario scenario = Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/count").type("int").constraint(". > 10")
+        ));
+        scenario.next();
+        scenario.answer(5);
+        assertThat(scenario.answerOf("/data/count"), is(nullValue()));
+        scenario.answer(20);
+        assertThat(scenario.answerOf("/data/count"), is(intAnswer(20)));
+        scenario.answer(5);
+        assertThat(scenario.answerOf("/data/count"), is(intAnswer(20)));
+    }
+
+    /**
+     * This test is here to represent a use case that might seem like it
+     * has a cycle, but it doesn't.
+     * <p>
+     * This test is ignored because the current implementation incorrectly
+     * detects a cycle given the relevance conditions we have used. Once
+     * this is fixed, this test would be a regression test to ensure we
+     * never rollback on the fix.
+     * <p>
+     * The relevance conditions used here a co-dependant(field a depends
+     * on b, b depends on a), but they depend on the field's value, not on
+     * the field's relevance expression. This is why there's no cycle here.
+     * <p>
+     * To have a cycle using relevance conditions exclusively, we would need
+     * a isRelevant() xpath function that doesn't exist and change the revelance
+     * expressions to:
+     *
+     * <code>
+     * bind("/data/a").type("int").relevant("isRelevant(/data/b) > 0")
+     * bind("/data/b").type("int").relevant("isRelevant(/data/a) > 0")
+     * </code>
+     */
+    @Test
+    @Ignore
+    public void supports_codependant_relevant_expressions() throws IOException {
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/a").type("int").relevant("/data/b > 0"),
+            bind("/data/b").type("int").relevant("/data/a > 0")));
+        // TODO Complete the test adding some assertions that verify that the form works as we would expect
+    }
+
+    /**
+     * This test is here to represent a use case that might seem like it
+     * has a cycle, but it doesn't.
+     * <p>
+     * This test is ignored because the current implementation incorrectly
+     * detects a cycle given the required conditions we have used. Once
+     * this is fixed, this test would be a regression test to ensure we
+     * never rollback on the fix.
+     * <p>
+     * The required conditions used here a co-dependant(field a depends
+     * on b, b depends on a), but they depend on the field's value, not on
+     * the field's required conditions. This is why there's no cycle here.
+     * <p>
+     * To have a cycle using required conditions exclusively, we would need
+     * a isRequired() xpath function that doesn't exist and change the required
+     * expressions to:
+     *
+     * <code>
+     * bind("/data/a").type("int").required("isRequired(/data/b) > 0")
+     * bind("/data/b").type("int").required("isRequired(/data/a) > 0")
+     * </code>
+     */
+    @Test
+    @Ignore
+    public void supports_codependant_required_conditions() throws IOException {
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/a").type("int").required("/data/b > 0"),
+            bind("/data/b").type("int").required("/data/a > 0")));
+        // TODO Complete the test adding some assertions that verify that the form works as we would expect
+    }
+
+    /**
+     * This test is here to represent a use case that might seem like it
+     * has a cycle, but it doesn't.
+     * <p>
+     * This test is ignored because the current implementation incorrectly
+     * detects a cycle given the readonly conditions we have used. Once
+     * this is fixed, this test would be a regression test to ensure we
+     * never rollback on the fix.
+     * <p>
+     * The readonly conditions used here a co-dependant(field a depends
+     * on b, b depends on a), but they depend on the field's value, not on
+     * the field's readonly conditions. This is why there's no cycle here.
+     * <p>
+     * To have a cycle using readonly conditions exclusively, we would need
+     * a isReadonly() xpath function that doesn't exist and change the readonly
+     * expressions to:
+     *
+     * <code>
+     * bind("/data/a").type("int").readonly("isReadonly(/data/b) > 0")
+     * bind("/data/b").type("int").readonly("isReadonly(/data/a) > 0")
+     * </code>
+     */
+    @Test
+    @Ignore
+    public void supports_codependant_readonly_conditions() throws IOException {
+        Scenario.init("Some form", buildFormForDagCyclesCheck(
+            bind("/data/a").type("int").readonly("/data/b > 0"),
+            bind("/data/b").type("int").readonly("/data/a > 0")));
+        // TODO Complete the test adding some assertions that verify that the form works as we would expect
+    }
+
+    @Test
+    public void parsing_forms_with_cycles_involving_fields_inside_and_outside_of_repeat_groups_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group", t("a", "1")),
+                        t("b", "1")
+                    )),
+                    bind("/data/group/a").type("int").calculate("/data/b + 1"),
+                    bind("/data/b").type("int").calculate("/data/group[position() = 1]/a + 1")
+                )
+            ),
+            body(
+                group("/data/group",
+                    repeat("/data/group",
+                        input("/data/group/a")
+                    )
+                ),
+                input("/data/b")
+            )
+        ));
+    }
+
+    @Test
+    public void parsing_forms_with_self_reference_cycles_in_fields_of_repeat_groups_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+
+        Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group",
+                            t("a", "1")
+                        )
+                    )),
+                    bind("/data/group/a").type("int").calculate("/data/group[position() = position(current()/..)]/a + 1")
+                )
+            ),
+            body(group("/data/group", repeat("/data/group",
+                input("/data/group/a")
+            )))
+        ));
+    }
+
+    /**
+     * This test fails to parse the form because it thinks there's a self-reference cycle in /data/group/a,
+     * but this would be incorrect because each it depends on the same field belonging to the previous
+     * repeat instance, which wouldn't be a cycle, but an autoincremental feature.
+     */
+    @Test
+    @Ignore
+    public void supports_self_reference_dependency_when_targeting_different_repeat_instance_siblings() throws IOException {
+        Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group",
+                            t("a", "1")
+                        )
+                    )),
+                    bind("/data/group/a").type("int").calculate("/data/group[position() = (position(current()) - 1)]/a + 1")
+                )
+            ),
+            body(group("/data/group", repeat("/data/group",
+                input("/data/group/a")
+            )))
+        ));
+    }
+
+
+    @Test
+    public void parsing_forms_with_cycles_between_fields_of_the_same_repeat_instance_should_fail() throws IOException {
+        exceptionRule.expect(RuntimeException.class);
+        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        
+        Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group",
+                            t("a", "1"),
+                            t("b", "1")
+                        )
+                    )),
+                    bind("/data/group/a").type("int").calculate("/data/group[position() = position(current())]/b + 1"),
+                    bind("/data/group/b").type("int").calculate("/data/group[position() = position(current())]/a + 1")
+                )
+            ),
+            body(group("/data/group", repeat("/data/group",
+                input("/data/group/a"),
+                input("/data/group/b")
+            )))
+        ));
+    }
+
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
