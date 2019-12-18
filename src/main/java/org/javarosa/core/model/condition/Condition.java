@@ -107,14 +107,14 @@ public class Condition extends Triggerable {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        readExternal(this, in, pf);
+        super.readExternal(in, pf);
         trueAction = ConditionAction.from(ExtUtil.readInt(in));
         falseAction = ConditionAction.from(ExtUtil.readInt(in));
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        writeExternal(this, out);
+        super.writeExternal(out);
         ExtUtil.writeNumeric(out, trueAction.getCode());
         ExtUtil.writeNumeric(out, falseAction.getCode());
     }

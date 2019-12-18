@@ -238,19 +238,21 @@ public abstract class Triggerable implements Externalizable {
 
     // region External serialization
 
+    @Override
     @SuppressWarnings("unchecked")
-    public static void readExternal(Triggerable t, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        t.expr = (XPathConditional) ExtUtil.read(in, new ExtWrapTagged(), pf);
-        t.contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        t.originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        t.targets = new ArrayList<>((List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf));
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        expr = (XPathConditional) ExtUtil.read(in, new ExtWrapTagged(), pf);
+        contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
+        targets = new ArrayList<>((List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf));
     }
 
-    public void writeExternal(Triggerable t, DataOutputStream out) throws IOException {
-        ExtUtil.write(out, new ExtWrapTagged(t.expr));
-        ExtUtil.write(out, t.contextRef);
-        ExtUtil.write(out, t.originalContextRef);
-        ExtUtil.write(out, new ExtWrapList(new ArrayList<>(t.targets)));
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        ExtUtil.write(out, new ExtWrapTagged(expr));
+        ExtUtil.write(out, contextRef);
+        ExtUtil.write(out, originalContextRef);
+        ExtUtil.write(out, new ExtWrapList(new ArrayList<>(targets)));
     }
 
     // endregion

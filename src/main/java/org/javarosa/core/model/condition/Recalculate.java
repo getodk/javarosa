@@ -81,12 +81,12 @@ public class Recalculate extends Triggerable {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        readExternal(this, in, pf);
+        super.readExternal(in, pf);
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        writeExternal(this, out);
+        super.writeExternal(out);
     }
 
     // endregion
