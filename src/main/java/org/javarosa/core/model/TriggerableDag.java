@@ -349,7 +349,6 @@ public class TriggerableDag {
                 partialOrdering.add(edge);
             }
 
-            // save for aggressive 2014 behavior
             qt.setImmediateCascades(deps);
         }
 
