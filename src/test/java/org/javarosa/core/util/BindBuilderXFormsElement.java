@@ -75,6 +75,11 @@ public class BindBuilderXFormsElement implements XFormsElement {
         return this;
     }
 
+    public BindBuilderXFormsElement readonly(String expression) {
+        attributes.put("readonly", expression);
+        return this;
+    }
+
     @Override
     public String getName() {
         return "bind";

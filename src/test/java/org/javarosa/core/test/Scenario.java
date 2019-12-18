@@ -595,6 +595,10 @@ public class Scenario {
         return formDef.getEvaluationContext();
     }
 
+    public QuestionDef questionAt(String xpath) {
+        return null;
+    }
+
     public enum AnswerResult {
         OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
 
