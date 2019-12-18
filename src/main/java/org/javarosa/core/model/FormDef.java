@@ -58,7 +58,6 @@ import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -1210,14 +1209,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
-        List<Triggerable> vcond = Triggerable.readExternalConditions(dis, pf);
-        for (Triggerable condition : vcond) {
+        for (Triggerable condition : TriggerableDag.readExternalTriggerables(dis, pf))
             addTriggerable(condition);
-        }
-        List<Triggerable> vcalc = Triggerable.readExternalRecalculates(dis, pf);
-        for (Triggerable recalculate : vcalc) {
-            addTriggerable(recalculate);
-        }
         finalizeTriggerables();
 
         outputFragments = (List<IConditionExpr>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
@@ -1336,11 +1329,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, getMainInstance());
         ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
-        List<Triggerable> conditions = dagImpl.getConditions();
-        List<Triggerable> recalcs = dagImpl.getRecalculates();
-
-        ExtUtil.write(dos, new ExtWrapList(conditions));
-        ExtUtil.write(dos, new ExtWrapList(recalcs));
+        dagImpl.writeExternalTriggerables(dos);
 
         ExtUtil.write(dos, new ExtWrapListPoly(outputFragments));
         ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));

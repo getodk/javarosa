@@ -16,21 +16,31 @@
 
 package org.javarosa.core.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
@@ -598,34 +608,6 @@ public class TriggerableDag {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
     }
 
-    /**
-     * API for retrieving the list of conditions, for use when
-     * serializing the form definition (e.g., into .cache file).
-     */
-    public List<Triggerable> getConditions() {
-        List<Triggerable> conditions = new ArrayList<>();
-        for (QuickTriggerable qt : unorderedTriggerables) {
-            if (qt.isCondition()) {
-                conditions.add(qt.getTriggerable());
-            }
-        }
-        return conditions;
-    }
-
-    /**
-     * API for retrieving thelist of recalculates, for use when
-     * serializing the form definition (e.g., into .cache file).
-     */
-    public final List<Triggerable> getRecalculates() {
-        List<Triggerable> recalculates = new ArrayList<>();
-        for (QuickTriggerable qt : unorderedTriggerables) {
-            if (qt.isRecalculate()) {
-                recalculates.add(qt.getTriggerable());
-            }
-        }
-        return recalculates;
-    }
-
     public void reportDependencyCycles() {
         Set<TreeReference> vertices = new HashSet<>();
         List<TreeReference[]> edges = new ArrayList<>();
@@ -691,5 +673,44 @@ public class TriggerableDag {
             throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
         }
     }
+
+    // region External Serialization
+
+    public void writeExternalTriggerables(DataOutputStream dos) throws IOException {
+        // Order of writes must match order of reads in readExternalTriggerables
+        ExtUtil.write(dos, new ExtWrapList(getConditions()));
+        ExtUtil.write(dos, new ExtWrapList(getRecalculates()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Triggerable> readExternalTriggerables(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+        // Order of reads must match order of writes in writeExternalTriggerables
+        List<Triggerable> triggerables = new LinkedList<>();
+        triggerables.addAll((List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf));
+        triggerables.addAll((List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf));
+        return triggerables;
+    }
+
+    private List<Condition> getConditions() {
+        List<Condition> conditions = new ArrayList<>();
+        for (QuickTriggerable qt : unorderedTriggerables) {
+            if (qt.isCondition()) {
+                conditions.add((Condition) qt.getTriggerable());
+            }
+        }
+        return conditions;
+    }
+
+    private List<Recalculate> getRecalculates() {
+        List<Recalculate> recalculates = new ArrayList<>();
+        for (QuickTriggerable qt : unorderedTriggerables) {
+            if (qt.isRecalculate()) {
+                recalculates.add((Recalculate) qt.getTriggerable());
+            }
+        }
+        return recalculates;
+    }
+
+    // endregion
 
 }

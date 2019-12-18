@@ -95,16 +95,6 @@ public abstract class Triggerable implements Externalizable {
         return new Recalculate(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>());
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<Triggerable> readExternalConditions(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-        return (List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<Triggerable> readExternalRecalculates(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-        return (List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
-    }
-
     public abstract Object eval(FormInstance instance, EvaluationContext ec);
 
     protected abstract void apply(TreeReference ref, Object result, FormInstance mainInstance);
