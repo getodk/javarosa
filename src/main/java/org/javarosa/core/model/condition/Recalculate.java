@@ -16,146 +16,78 @@
 
 package org.javarosa.core.model.condition;
 
-import java.util.Date;
-import org.javarosa.core.model.DataType;
-import org.javarosa.core.model.data.BooleanData;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoPointData;
-import org.javarosa.core.model.data.GeoShapeData;
-import org.javarosa.core.model.data.GeoTraceData;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.LongData;
-import org.javarosa.core.model.data.MultipleItemsData;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-
-import static org.javarosa.core.model.DataType.BOOLEAN;
-import static org.javarosa.core.model.DataType.CHOICE;
-import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
-import static org.javarosa.core.model.DataType.DATE;
-import static org.javarosa.core.model.DataType.GEOPOINT;
-import static org.javarosa.core.model.DataType.GEOSHAPE;
-import static org.javarosa.core.model.DataType.GEOTRACE;
-import static org.javarosa.core.model.DataType.INTEGER;
-import static org.javarosa.core.model.DataType.LONG;
-import static org.javarosa.core.model.DataType.TIME;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.XPathException;
 
 public class Recalculate extends Triggerable {
 
+    /**
+     * Constructor required for deserialization
+     */
     @SuppressWarnings("unused")
-    public Recalculate () {
+    public Recalculate() {
 
     }
 
-    public Recalculate (IConditionExpr expr, TreeReference contextRef) {
-        super(expr, contextRef);
+    protected Recalculate(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+        super(expr, contextRef, originalContextRef, targets, immediateCascades);
     }
 
+    @Override
     public Object eval(FormInstance model, EvaluationContext ec) {
-        return evalRaw(model, ec);
+        try {
+            return expr.evalRaw(model, ec);
+        } catch (XPathException e) {
+            e.setSource("Calculate expression for " + contextRef.toString(true));
+            throw e;
+        }
     }
 
+    @Override
     public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
-        int dataType = element.getDataType();
-        element.setAnswer(wrapData(result, dataType));
+        element.setAnswer(IAnswerData.wrapData(result, element.getDataType()));
     }
 
+    @Override
     public boolean canCascade() {
         return true;
     }
 
+    @Override
+    public boolean isCascadingToChildren() {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (o instanceof Recalculate) {
-            Recalculate r = (Recalculate) o;
-            return this == r || super.equals(r);
-
-        } else {
-            return false;
-        }
+        return o instanceof Recalculate
+            && super.equals(o);
     }
 
-    //droos 1/29/10: we need to come up with a consistent rule for whether the resulting data is determined
-    //by the type of the instance node, or the type of the expression result. right now it's a mix and a mess
-    //note a caveat with going solely by instance node type is that untyped nodes default to string!
+    // region External Serialization
 
-    //for now, these are the rules:
-    // if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; empty string = f, all other datatypes -> error)
-    // if numeric data, convert to int if node type is int OR data is an integer; else convert to double
-    // if string data or date data, keep as is
-    // if NaN or empty string, null
-
-    /**
-     * convert the data object returned by the xpath expression into an IAnswerData suitable for
-     * storage in the FormInstance
-     */
-    public static IAnswerData wrapData(Object val, int intDataType) {
-        if ((val instanceof String && ((String) val).length() == 0) ||
-                (val instanceof Double && ((Double) val).isNaN())) {
-            return null;
-        }
-
-        final DataType dataType = DataType.from(intDataType);
-
-        if (BOOLEAN == dataType || val instanceof Boolean) {
-            //ctsims: We should really be using the boolean datatype for real, it's
-            //necessary for backend calculations and XSD compliance
-
-            boolean b;
-
-            if (val instanceof Boolean) {
-                b = (Boolean) val;
-            } else if (val instanceof Double) {
-                Double d = (Double) val;
-                b = Math.abs(d) > 1.0e-12 && !Double.isNaN(d);
-            } else if (val instanceof String) {
-                String s = (String) val;
-                b = s.length() > 0;
-            } else {
-                throw new RuntimeException("unrecognized data representation while trying to convert to BOOLEAN");
-            }
-
-            return new BooleanData(b);
-        } else if (val instanceof Double) {
-            double d = (Double) val;
-            long l = (long) d;
-            boolean isIntegral = Math.abs(d - l) < 1.0e-9;
-            if (INTEGER == dataType ||
-                    (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
-                return new IntegerData((int) d);
-            } else if (LONG == dataType || isIntegral) {
-                return new LongData((long) d);
-            } else {
-                return new DecimalData(d);
-            }
-        } else if (dataType == GEOPOINT) {
-            return new GeoPointData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == GEOSHAPE) {
-            return new GeoShapeData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == GEOTRACE) {
-            return new GeoTraceData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == CHOICE) {
-            return new SelectOneData().cast(new UncastData(String.valueOf(val)));
-        } else if (dataType == MULTIPLE_ITEMS) {
-            return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
-        } else if (val instanceof String) {
-            return new StringData((String) val);
-        } else if (val instanceof Date) {
-            if (dataType == TIME)
-                return new TimeData((Date) val);
-            if (dataType == DATE)
-                return new DateData((Date) val);
-            return new DateTimeData((Date) val);
-        } else {
-            throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
-        }
+    @Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        super.readExternal(in, pf);
     }
+
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        super.writeExternal(out);
+    }
+
+    // endregion
 }

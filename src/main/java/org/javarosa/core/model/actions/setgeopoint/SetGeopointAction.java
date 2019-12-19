@@ -19,7 +19,6 @@ package org.javarosa.core.model.actions.setgeopoint;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.data.AnswerDataFactory;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -92,7 +91,7 @@ public abstract class SetGeopointAction extends Action {
         AbstractTreeElement node = context.resolveReference(contextualizedTargetReference);
         if (node != null) {
             int dataType = node.getDataType();
-            IAnswerData val = Recalculate.wrapData(location, dataType);
+            IAnswerData val = IAnswerData.wrapData(location, dataType);
 
             IAnswerData answer = val != null
                 ? AnswerDataFactory.templateByDataType(dataType).cast(val.uncast())

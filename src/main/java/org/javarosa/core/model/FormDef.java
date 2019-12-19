@@ -33,12 +33,10 @@ import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
-import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.IFunctionHandler;
-import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -60,7 +58,6 @@ import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -546,8 +543,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         QuickTriggerable qc = dagImpl.getTriggerableForRepeatGroup(repeatRef.genericize());
         if (qc != null) {
-            Condition c = (Condition) qc.t;
-            relev = c.evalBool(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
+            relev = (boolean) qc.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
         }
 
         // check the relevancy of the immediate parent
@@ -1213,14 +1209,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
-        List<Condition> vcond = (List<Condition>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
-        for (Condition condition : vcond) {
+        for (Triggerable condition : TriggerableDag.readExternalTriggerables(dis, pf))
             addTriggerable(condition);
-        }
-        List<Recalculate> vcalc = (List<Recalculate>) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
-        for (Recalculate recalculate : vcalc) {
-            addTriggerable(recalculate);
-        }
         finalizeTriggerables();
 
         outputFragments = (List<IConditionExpr>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
@@ -1339,11 +1329,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, getMainInstance());
         ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
-        List<Condition> conditions = dagImpl.getConditions();
-        List<Recalculate> recalcs = dagImpl.getRecalculates();
-
-        ExtUtil.write(dos, new ExtWrapList(conditions));
-        ExtUtil.write(dos, new ExtWrapList(recalcs));
+        dagImpl.writeExternalTriggerables(dos);
 
         ExtUtil.write(dos, new ExtWrapListPoly(outputFragments));
         ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));
@@ -1801,17 +1787,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public void registerElementWithActionTriggeredByToplevelEvent(IFormElement element) {
         elementsWithActionTriggeredByToplevelEvent.add(element);
-    }
-
-    /**
-     * Pull this in from FormOverview so that we can make fields private.
-     *
-     * @param instanceNode
-     * @param action
-     * @return
-     */
-    public IConditionExpr getConditionExpressionForTrueAction(TreeElement instanceNode, int action) {
-        return dagImpl.getConditionExpressionForTrueAction(getMainInstance(), instanceNode, action);
     }
 
     public List<String> getParseWarnings() {
