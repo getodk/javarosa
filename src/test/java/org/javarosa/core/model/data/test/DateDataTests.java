@@ -24,11 +24,12 @@ import java.util.Date;
 
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.utils.DateUtils;
-import org.junit.Test;import org.junit.Before;
+import org.junit.Before;
+import org.junit.Test;
 
 public class DateDataTests {
 
-	Date today;
+    Date today;
     Date notToday;
 
 
