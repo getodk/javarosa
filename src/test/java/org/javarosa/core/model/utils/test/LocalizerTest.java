@@ -32,15 +32,13 @@ import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;import org.junit.Test;
 
-import junit.framework.TestCase;
-
 public class LocalizerTest {
 
 
     private void testSerialize (Localizer l, String msg) {
         PrototypeFactory pf = new PrototypeFactory();
         pf.addClass(TableLocaleSource.class);
-        ExternalizableTest.testExternalizable(l, this, pf, "Localizer [" + msg + "]");
+        ExternalizableTest.testExternalizable(l, pf, "Localizer [" + msg + "]");
     }
 
     @Test

@@ -17,9 +17,6 @@
 package org.javarosa.core.model.instance.test;
 
 
-import junit.framework.TestCase;
-
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -36,8 +33,8 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.junit.Test;import org.junit.Before;
+import org.javarosa.core.util.externalizable.PrototypeFactory;import org.junit.Before;
+import org.junit.Test;
 
 public class QuestionDataGroupTests {
     private final String stringElementName = "String Data Element";

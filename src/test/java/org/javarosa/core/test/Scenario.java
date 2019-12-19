@@ -73,7 +73,7 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
-import org.slf4j.Logger;import org.junit.Test;import org.junit.Before;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**

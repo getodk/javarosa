@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.javarosa.core.model.instance.TreeReference;
-import org.junit.Test;import org.junit.Before;
+import org.junit.Test;
 
 public class XPathNodesetShuffleTest {
     @Test

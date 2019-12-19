@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.javarosa.xpath.XPathException;
 import org.junit.Test;
+
 public class TreeReferenceAnchorTest {
 
     @Test

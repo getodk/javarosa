@@ -1,6 +1,10 @@
 package org.javarosa.core.form.api.test;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
@@ -17,16 +21,9 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;import org.junit.Before;
-import org.slf4j.Logger;import org.junit.Test;import org.junit.Before;
-import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class TextFormTests {
-    private static final Logger logger = LoggerFactory.getLogger(TextFormTests.class);
 
     QuestionDef q = null;
     FormEntryPrompt fep = null;
