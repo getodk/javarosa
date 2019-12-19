@@ -16,61 +16,36 @@
 
 package org.javarosa.core.model.data.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-import org.javarosa.core.model.data.StringData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class StringDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(StringDataTests.class);
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.javarosa.core.model.data.StringData;import org.junit.Before;import org.junit.Test;
+
+public class StringDataTests {
     String stringA;
     String stringB;
 
-    private static int NUM_TESTS = 3;
 
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before    public void setUp() throws Exception {
+
 
         stringA = "string A";
         stringB = "string B";
     }
 
-    public StringDataTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new StringDataTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testGetData";
-        case 2: return "testSetData";
-        case 3: return "testNullData";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testGetData() {
         StringData data = new StringData(stringA);
         assertEquals("StringData's getValue returned an incorrect String", data.getValue(), stringA);
 
     }
+    @Test
     public void testSetData() {
         StringData data = new StringData(stringA);
         data.setValue(stringB);
@@ -82,6 +57,7 @@ public class StringDataTests extends TestCase {
         assertTrue("StringData did not set value properly. Maintained old value.", !(data.getValue().equals(stringB)));
         assertEquals("StringData did not properly reset value ", data.getValue(), stringA);
     }
+    @Test
     public void testNullData() {
         boolean exceptionThrown = false;
         StringData data = new StringData();

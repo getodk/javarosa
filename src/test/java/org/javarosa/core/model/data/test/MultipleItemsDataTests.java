@@ -16,21 +16,19 @@
 
 package org.javarosa.core.model.data.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.helper.Selection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javarosa.core.model.data.helper.Selection;import org.junit.Before;import org.junit.Test;
 
-public class MultipleItemsDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(MultipleItemsDataTests.class);
+public class MultipleItemsDataTests {
     QuestionDef question;
 
     Selection one;
@@ -41,13 +39,11 @@ public class MultipleItemsDataTests extends TestCase {
    List<Selection> lastTwo;
    List invalid;
 
-    private static int NUM_TESTS = 5;
 
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before    public void setUp() throws Exception {
 
         question = new QuestionDef();
 
@@ -76,40 +72,14 @@ public class MultipleItemsDataTests extends TestCase {
         invalid.add(one);
     }
 
-    public MultipleItemsDataTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new MultipleItemsDataTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-
-    public static String testMaster(int testID) {
-        switch (testID) {
-        case 1: return "testGetData";
-        case 2: return "testSetData";
-        case 3: return "testNullData";
-        case 4: return "testBadDataTypes";
-        case 5: return "testVectorImmutability";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testGetData() {
         SelectOneData data = new SelectOneData(one);
         assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
 
     }
 
+    @Test
     public void testSetData() {
         MultipleItemsData data = new MultipleItemsData(firstTwo);
         data.setValue(lastTwo);
@@ -123,6 +93,7 @@ public class MultipleItemsDataTests extends TestCase {
 
     }
 
+    @Test
     public void testNullData() {
         boolean exceptionThrown = false;
         MultipleItemsData data = new MultipleItemsData();
@@ -136,6 +107,7 @@ public class MultipleItemsDataTests extends TestCase {
         assertTrue("MultipleItemsData overwrote existing value on incorrect input", data.getValue().equals(firstTwo));
     }
 
+    @Test
     public void testVectorImmutability() {
         MultipleItemsData data = new MultipleItemsData(firstTwo);
         Selection[] copy = new Selection[firstTwo.size()];
@@ -171,6 +143,7 @@ public class MultipleItemsDataTests extends TestCase {
         }
     }
 
+    @Test
     public void testBadDataTypes() {
         boolean failure = false;
         MultipleItemsData data = new MultipleItemsData(firstTwo);

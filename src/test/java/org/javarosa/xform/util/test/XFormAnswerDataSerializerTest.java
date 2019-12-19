@@ -16,9 +16,10 @@
 
 package org.javarosa.xform.util.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -28,9 +29,7 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.xform.util.XFormAnswerDataSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;import org.junit.Before;import org.junit.Test;
 
 /**
  * Note that this is just a start and doesn't cover direct comparisons
@@ -39,8 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Clayton Sims
  *
  */
-public class XFormAnswerDataSerializerTest extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(XFormAnswerDataSerializerTest.class);
+public class XFormAnswerDataSerializerTest {
 
     final String stringDataValue = "String Data Value";
     final Integer integerDataValue = new Integer(5);
@@ -61,10 +59,9 @@ public class XFormAnswerDataSerializerTest extends TestCase {
 
     XFormAnswerDataSerializer serializer;
 
-    private static int NUM_TESTS = 5;
 
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before    public void setUp() throws Exception {
+
         stringData = new StringData(stringDataValue);
         stringElement.setValue(stringData);
 
@@ -80,33 +77,7 @@ public class XFormAnswerDataSerializerTest extends TestCase {
         serializer = new XFormAnswerDataSerializer();
     }
 
-    public XFormAnswerDataSerializerTest(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new XFormAnswerDataSerializerTest(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-            case 1: return "testString";
-            case 2: return "testInteger";
-            case 3: return "testDate";
-            case 4: return "testTime";
-            case 5: return "testSelect";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testString() {
         assertTrue("Serializer Incorrectly Reports Inability to Serializer String", serializer.canSerialize(stringElement.getValue()));
         Object answerData = serializer.serializeAnswerData(stringData);
@@ -114,6 +85,7 @@ public class XFormAnswerDataSerializerTest extends TestCase {
         assertEquals("Serializer returns incorrect string serialization", answerData, stringDataValue);
     }
 
+    @Test
     public void testInteger() {
         assertTrue("Serializer Incorrectly Reports Inability to Serializer Integer", serializer.canSerialize(intElement.getValue()));
         Object answerData = serializer.serializeAnswerData(integerData);
@@ -121,18 +93,21 @@ public class XFormAnswerDataSerializerTest extends TestCase {
         //assertEquals("Serializer returns incorrect Integer serialization", answerData, integerDataValue);
     }
 
+    @Test
     public void testDate() {
         assertTrue("Serializer Incorrectly Reports Inability to Serializer Date", serializer.canSerialize(dateElement.getValue()));
         Object answerData = serializer.serializeAnswerData(dateData);
         assertNotNull("Serializer returns Null for valid Date Data", answerData);
     }
 
+    @Test
     public void testTime() {
         assertTrue("Serializer Incorrectly Reports Inability to Serializer Time", serializer.canSerialize(timeElement.getValue()));
         Object answerData = serializer.serializeAnswerData(timeData);
         assertNotNull("Serializer returns Null for valid Time Data", answerData);
     }
 
+    @Test
     public void testSelect() {
         //No select tests yet.
     }

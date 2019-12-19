@@ -1,7 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.test.Scenario;
-import org.junit.Test;
+import org.junit.Test;import org.junit.Before;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

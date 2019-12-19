@@ -16,9 +16,13 @@
 
 package org.javarosa.core.model.instance.test;
 
-import junit.framework.Test;
+
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -33,11 +37,9 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;import org.junit.Before;
 
-public class QuestionDataGroupTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(QuestionDataGroupTests.class);
+public class QuestionDataGroupTests {
     private final String stringElementName = "String Data Element";
     private final String groupName = "TestGroup";
 
@@ -53,10 +55,8 @@ public class QuestionDataGroupTests extends TestCase {
 
     TreeElement group;
 
-    private static int NUM_TESTS = 8;
+    @Before    public void setUp() throws Exception {
 
-    public void setUp() throws Exception {
-        super.setUp();
         stringData = new StringData("Answer Value");
         integerData = new IntegerData(4);
 
@@ -138,44 +138,14 @@ public class QuestionDataGroupTests extends TestCase {
 
         group = new TreeElement(groupName);
     }
-
-    public QuestionDataGroupTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new QuestionDataGroupTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-            case 1: return "testIsLeaf";
-            case 2: return "testGetName";
-            case 3: return "testSetName";
-            case 4: return "testAcceptsVisitor";
-            case 5: return "testAddLeafChild";
-            case 6: return "testAddTreeChild";
-            case 7: return "testContains";
-            case 8: return "testSuperclassMethods";
-
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testIsLeaf() {
         assertTrue("A Group with no children should report being a leaf", group.isLeaf());
         group.addChild(stringElement);
         assertTrue("A Group with children should not report being a leaf", !group.isLeaf());
     }
 
+    @Test
     public void testGetName() {
         String name = "TestGroup";
         assertEquals("Question Data Group did not properly get its name", group.getName(), name);
@@ -183,6 +153,7 @@ public class QuestionDataGroupTests extends TestCase {
         assertEquals("Question Data Group's name was changed improperly", group.getName(), name);
     }
 
+    @Test
     public void testSetName() {
         String name = "TestGroup";
         group = new TreeElement(name);
@@ -207,6 +178,7 @@ public class QuestionDataGroupTests extends TestCase {
         }
     }
 
+    @Test
     public void testAcceptsVisitor() {
         final MutableBoolean visitorAccepted = new MutableBoolean(false);
         final MutableBoolean dispatchedWrong = new MutableBoolean(false);
@@ -227,12 +199,14 @@ public class QuestionDataGroupTests extends TestCase {
         assertTrue("The visitor was dispatched incorrectly by the QuestionDataElement",!dispatchedWrong.getValue());
     }
 
+    @Test
     public void testSuperclassMethods() {
         //stringElement should not have a root at this point.
 
         //TODO: Implement tests for the 'attribute' system.
     }
 
+    @Test
     public void testAddLeafChild() {
 
 
@@ -263,6 +237,7 @@ public class QuestionDataGroupTests extends TestCase {
         }
     }
 
+    @Test
     public void testAddTreeChild() {
         //TreeElement subTree = new TreeElement("subtree");
         //TreeElement firstRootTree = new TreeElement("firstRoot");
@@ -279,6 +254,7 @@ public class QuestionDataGroupTests extends TestCase {
 
     }
 
+    @Test
     public void testContains() {
 
     }

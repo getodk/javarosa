@@ -16,17 +16,16 @@
 
 package org.javarosa.core.model;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.test.SelectChoiceMatchers.choice;
+
 import org.javarosa.core.test.Scenario;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-
-import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
-import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 
 /**
  * When itemsets are dynamically generated, the choices available to a user in a select one question can change based on
@@ -38,8 +37,7 @@ import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 public class SelectOneChoiceFilterTest {
     private Scenario scenario;
 
-    @Before
-    public void setUp() {
+    @Before    public void setUp() {
         scenario = Scenario.init("three-level-cascading-select.xml");
     }
 

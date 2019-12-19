@@ -16,61 +16,33 @@
 
 package org.javarosa.core.model.data.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-import org.javarosa.core.model.data.IntegerData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class IntegerDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(IntegerDataTests.class);
+import org.javarosa.core.model.data.IntegerData;import org.junit.Before;import org.junit.Test;
+
+public class IntegerDataTests {
 
     Integer one;
     Integer two;
 
-    private static int NUM_TESTS = 3;
-
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before    public void setUp() throws Exception {
 
         one = new Integer(1);
         two = new Integer(2);
     }
 
-    public IntegerDataTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
 
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new IntegerDataTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testGetData";
-        case 2: return "testSetData";
-        case 3: return "testNullData";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testGetData() {
         IntegerData data = new IntegerData(one);
         assertEquals("IntegerData's getValue returned an incorrect integer", data.getValue(), one);
     }
+    @Test
     public void testSetData() {
         IntegerData data = new IntegerData(one);
         data.setValue(two);
@@ -83,6 +55,7 @@ public class IntegerDataTests extends TestCase {
         assertEquals("IntegerData did not properly reset value ", data.getValue(), one);
 
     }
+    @Test
     public void testNullData() {
         boolean exceptionThrown = false;
         IntegerData data = new IntegerData();

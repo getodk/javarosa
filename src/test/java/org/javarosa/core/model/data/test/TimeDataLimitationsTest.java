@@ -5,7 +5,6 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -33,8 +32,7 @@ public class TimeDataLimitationsTest {
 
     private TimeZone backupTimeZone;
 
-    @Before
-    public void setUp() {
+    @Before    public void setUp() {
         backupTimeZone = TimeZone.getDefault();
     }
 

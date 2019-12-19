@@ -16,11 +16,14 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.BeforeClass;
+import org.junit.Test;import org.junit.Before;
+import org.slf4j.Logger;import org.junit.Test;import org.junit.Before;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class TextFormTests {
     private static final Logger logger = LoggerFactory.getLogger(TextFormTests.class);
@@ -31,14 +34,14 @@ public class TextFormTests {
 
     static PrototypeFactory pf;
 
-    static {
+    @BeforeClass
+    public static void classSetup() {
         PrototypeManager.registerPrototype("org.javarosa.model.xform.XPathReference");
         pf = ExtUtil.defaultPrototypes();
     }
 
 
-    @Before
-    public void setUp(){
+    @Before    public void setUp(){
         fpi = new FormParseInit();
         q = fpi.getFirstQuestionDef();
         fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());

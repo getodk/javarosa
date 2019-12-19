@@ -1,15 +1,15 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.test.Scenario;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.answerText;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
+
+import org.javarosa.core.test.Scenario;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * When itemsets are dynamically generated, the choices available to a user in a select multiple question can change
@@ -23,7 +23,7 @@ import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 public class SelectMultipleChoiceFilterTest {
     private Scenario scenario;
 
-    @Before public void setUp() {
+    @Before    public void setUp() {
         scenario = Scenario.init("three-level-cascading-multi-select.xml");
     }
 

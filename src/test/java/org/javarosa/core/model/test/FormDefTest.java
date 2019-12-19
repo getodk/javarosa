@@ -24,7 +24,6 @@ import static org.junit.Assert.assertThat;
 import org.hamcrest.Matchers;
 import org.javarosa.core.test.Scenario;
 import org.junit.Test;
-
 /**
  * See testAnswerConstraint() for an example of how to write the
  * constraint unit type tests.
