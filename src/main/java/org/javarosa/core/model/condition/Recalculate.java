@@ -77,6 +77,18 @@ public class Recalculate extends Triggerable {
             && super.equals(o);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder targetsBuilder = new StringBuilder();
+        for (TreeReference t : targets)
+            targetsBuilder.append(t.toString(true, true)).append(", ");
+        String targets = targetsBuilder.toString();
+        String prettyTargets = targets.isEmpty()
+            ? "unknown refs (no targets added yet)"
+            : targets.substring(0, targets.length() - 2);
+        return String.format("Recalculate %s with (%s)", prettyTargets, expr.xpath);
+    }
+
     // region External Serialization
 
     @Override
