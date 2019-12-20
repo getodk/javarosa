@@ -40,6 +40,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
+import org.javarosa.xform.parse.XFormParseException;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -500,8 +501,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_calculate_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
             bind("/data/count").type("int").calculate(". + 1")
@@ -510,8 +511,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_in_calculate_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
             bind("/data/a").type("int").calculate("/data/b + 1"),
@@ -522,8 +523,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_relevance_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
             bind("/data/count").type("int").relevant(". + 1")
@@ -532,8 +533,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_read_only_condition_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
             bind("/data/count").type("int").readonly(". > 10")
@@ -542,8 +543,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_required_condition_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
             bind("/data/count").type("int").required(". > 10")
@@ -659,8 +660,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_involving_fields_inside_and_outside_of_repeat_groups_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", html(
             head(
@@ -687,8 +688,8 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_self_reference_cycles_in_fields_of_repeat_groups_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", html(
             head(
@@ -737,9 +738,9 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_between_fields_of_the_same_repeat_instance_should_fail() throws IOException {
-        exceptionRule.expect(RuntimeException.class);
-        exceptionRule.expectMessage("Dependency cycles amongst the xpath expressions in relevant/calculate");
-        
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
+
         Scenario.init("Some form", html(
             head(
                 title("Some form"),
