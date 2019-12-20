@@ -523,11 +523,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // Trigger actions nested in the new repeat
         getChild(index).getActionController().triggerActionsFromEvent(Action.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
 
-        // trigger conditions that depend on the creation of this new node
-        triggerTriggerables(repeatContextRef);
-
-        TreeReference parentRef = repeatContextRef.getParentRef();
-        TreeElement parentElement = mainInstance.resolveReference(parentRef);
         dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
     }
 
