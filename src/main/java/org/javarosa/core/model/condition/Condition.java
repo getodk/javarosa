@@ -113,25 +113,7 @@ public class Condition extends Triggerable {
             ? "unknown refs (no targets added yet)"
             : targets.substring(0, targets.length() - 2);
 
-        String verb = "";
-        switch (trueAction) {
-            // relevant
-            case SHOW: {
-                verb = "Show";
-                break;
-            }
-            // require
-            case REQUIRE: {
-                verb = "Require";
-                break;
-            }
-            // readonly
-            case DISABLE: {
-                verb = "Disable";
-                break;
-            }
-        }
-        return String.format("%s %s if (%s)", verb, prettyTargets, expr.xpath);
+        return String.format("%s %s if (%s)", trueAction.getVerb(), prettyTargets, expr.xpath);
     }
 
     // region External Serialization
