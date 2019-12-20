@@ -224,6 +224,16 @@ public abstract class Triggerable implements Externalizable {
         return true;
     }
 
+    protected String buildHumanReadableTargetList() {
+        StringBuilder targetsBuilder = new StringBuilder();
+        for (TreeReference t : getTargets())
+            targetsBuilder.append(t.toString(true, true)).append(", ");
+        String targetsString = targetsBuilder.toString();
+        return targetsString.isEmpty()
+            ? "unknown refs (no targets added yet)"
+            : targetsString.substring(0, targetsString.length() - 2);
+    }
+
     // region External serialization
 
     @Override

@@ -105,15 +105,7 @@ public class Condition extends Triggerable {
 
     @Override
     public String toString() {
-        StringBuilder targetsBuilder = new StringBuilder();
-        for (TreeReference t : targets)
-            targetsBuilder.append(t.toString(true, true)).append(", ");
-        String targets = targetsBuilder.toString();
-        String prettyTargets = targets.isEmpty()
-            ? "unknown refs (no targets added yet)"
-            : targets.substring(0, targets.length() - 2);
-
-        return String.format("%s %s if (%s)", trueAction.getVerb(), prettyTargets, expr.xpath);
+        return String.format("%s %s if (%s)", trueAction.getVerb(), buildHumanReadableTargetList(), expr.xpath);
     }
 
     // region External Serialization
