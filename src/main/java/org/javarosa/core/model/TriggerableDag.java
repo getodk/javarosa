@@ -342,20 +342,8 @@ public class TriggerableDag {
             newDestinationSet.clear();
             fillTriggeredElements(mainInstance, evalContext, qt, deps, newDestinationSet);
 
-            if (deps.contains(qt)) {
-                StringBuilder hints = new StringBuilder();
-                for (QuickTriggerable qt2 : vertices) {
-                    for (TreeReference r : qt2.getTargets()) {
-                        hints.append("\n").append(r.toString(true));
-                    }
-                }
-                String message = "Cycle detected in form's relevant and calculation logic!";
-                if (!hints.toString().equals("")) {
-                    message += "\nThe following nodes are likely involved in the loop:"
-                        + hints;
-                }
-                throw new IllegalStateException(message);
-            }
+            if (deps.contains(qt))
+                throwCyclesInDagException(deps);
 
             for (QuickTriggerable qu : deps) {
                 QuickTriggerable[] edge = {qt, qu};
@@ -377,20 +365,8 @@ public class TriggerableDag {
             }
 
             // if no root nodes while graph still has nodes, graph has cycles
-            if (roots.size() == 0) {
-                StringBuilder hints = new StringBuilder();
-                for (QuickTriggerable qt : vertices) {
-                    for (TreeReference r : qt.getTargets()) {
-                        hints.append("\n").append(r.toString(true));
-                    }
-                }
-                String message = "Cycle detected in form's relevant and calculation logic!";
-                if (!hints.toString().equals("")) {
-                    message += "\nThe following nodes are likely involved in the loop:"
-                        + hints;
-                }
-                throw new IllegalStateException(message);
-            }
+            if (roots.size() == 0)
+                throwCyclesInDagException(vertices);
 
             // order the root nodes - so the order is fixed
             orderedRoots.clear();
@@ -425,6 +401,21 @@ public class TriggerableDag {
                 }
             }
         }
+    }
+
+    public void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
+        StringBuilder hints = new StringBuilder();
+        for (QuickTriggerable qt2 : vertices) {
+            for (TreeReference r : qt2.getTargets()) {
+                hints.append("\n").append(r.toString(true));
+            }
+        }
+        String message = "Cycle detected in form's relevant and calculation logic!";
+        if (!hints.toString().equals("")) {
+            message += "\nThe following nodes are likely involved in the loop:"
+                + hints;
+        }
+        throw new IllegalStateException(message);
     }
 
     /**
