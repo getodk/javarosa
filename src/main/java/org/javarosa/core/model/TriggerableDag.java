@@ -345,10 +345,11 @@ public class TriggerableDag {
             if (deps.contains(qt))
                 throwCyclesInDagException(deps);
 
-            for (QuickTriggerable qu : deps) {
-                QuickTriggerable[] edge = {qt, qu};
-                partialOrdering.add(edge);
-            }
+            if (qt.canCascade())
+                for (QuickTriggerable qu : deps) {
+                    QuickTriggerable[] edge = {qt, qu};
+                    partialOrdering.add(edge);
+                }
 
             qt.setImmediateCascades(deps);
         }
