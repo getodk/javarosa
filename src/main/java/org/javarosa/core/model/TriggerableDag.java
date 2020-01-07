@@ -340,11 +340,23 @@ public class TriggerableDag {
         for (QuickTriggerable qt : vertices) {
             Set<QuickTriggerable> deps = new HashSet<>();
             newDestinationSet.clear();
-            if (qt.canCascade())
-                fillTriggeredElements(mainInstance, evalContext, qt, deps, newDestinationSet);
+            fillTriggeredElements(mainInstance, evalContext, qt, deps, newDestinationSet);
 
-            // remove any self-reference if we have one...
-            deps.remove(qt);
+            if (deps.contains(qt)) {
+                StringBuilder hints = new StringBuilder();
+                for (QuickTriggerable qt2 : vertices) {
+                    for (TreeReference r : qt2.getTargets()) {
+                        hints.append("\n").append(r.toString(true));
+                    }
+                }
+                String message = "Cycle detected in form's relevant and calculation logic!";
+                if (!hints.toString().equals("")) {
+                    message += "\nThe following nodes are likely involved in the loop:"
+                        + hints;
+                }
+                throw new IllegalStateException(message);
+            }
+
             for (QuickTriggerable qu : deps) {
                 QuickTriggerable[] edge = {qt, qu};
                 partialOrdering.add(edge);
