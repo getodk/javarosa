@@ -35,7 +35,6 @@ import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
-import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -436,51 +435,6 @@ public class TriggerableDag {
         }
 
         return doEvaluateTriggerables(mainInstance, evalContext, tv, anchorRef, alreadyEvaluated);
-    }
-
-    /**
-     * This is a utility method to get all of the references of a node. It can
-     * be replaced when we support dependent XPath Steps (IE: /path/to//)
-     *
-     * @return
-     */
-    private static Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext ec, TreeReference ref) {
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(ref);
-        if (repeatTemplate != null)
-            return getChildrenRefsByTemplate(mainInstance, repeatTemplate);
-        // TODO Write a test that goes through this path and see how and why childrenRef can be different than child.getRef()
-        return getChildrenByExpandedRef(mainInstance, ec, ref);
-    }
-
-    private static Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(element.getRef());
-        if (repeatTemplate != null)
-            return getChildrenRefsByTemplate(mainInstance, repeatTemplate);
-        return getChildrenOfElement(mainInstance, element);
-    }
-
-    private static Set<TreeReference> getChildrenRefsByTemplate(FormInstance mainInstance, TreeElement repeatTemplate) {
-        return getChildrenOfElement(mainInstance, repeatTemplate);
-    }
-
-    private static Set<TreeReference> getChildrenByExpandedRef(FormInstance mainInstance, EvaluationContext ec, TreeReference initialRef) {
-        Set<TreeReference> descendants = new HashSet<>();
-        for (TreeReference childrenRef : ec.expandReference(initialRef)) {
-            AbstractTreeElement<?> child = ec.resolveReference(childrenRef);
-            descendants.add(child.getRef().genericize());
-            descendants.addAll(getChildrenRefsOfElement(mainInstance, child));
-        }
-        return descendants;
-    }
-
-    private static Set<TreeReference> getChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
-        Set<TreeReference> childrenRefs = new HashSet<>();
-        for (int i = 0; i < element.getNumChildren(); ++i) {
-            AbstractTreeElement<?> child = element.getChildAt(i);
-            childrenRefs.add(child.getRef().genericize());
-            childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
-        }
-        return childrenRefs;
     }
 
     /**
