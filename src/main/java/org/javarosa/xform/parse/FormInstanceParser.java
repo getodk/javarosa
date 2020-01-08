@@ -388,10 +388,11 @@ class FormInstanceParser {
 
     private void applyInstanceProperties(FormInstance instance) {
         for (DataBinding bind : bindings) {
-            final TreeReference ref = FormInstance.unpackReference(bind.getReference());
+            TreeReference ref = FormInstance.unpackReference(bind.getReference());
             EvaluationContext ec = new EvaluationContext(instance);
-            final List<TreeReference> nodes = ec.expandReference(ref, true);
+            List<TreeReference> nodeRefs = ec.expandReference(ref, true);
 
+            // Add triggerable targets if needed
             if (bind.relevancyCondition != null) {
                 bind.relevancyCondition.addTarget(ref);
                 // Since relevancy can affect not only to individual fields, but also to
@@ -401,31 +402,26 @@ class FormInstanceParser {
                 for (TreeReference r : getDescendantRefs(instance, ec, ref))
                     bind.relevancyCondition.addTarget(r);
             }
-            if (bind.requiredCondition != null) {
+            if (bind.requiredCondition != null)
                 bind.requiredCondition.addTarget(ref);
-            }
-            if (bind.readonlyCondition != null) {
+            if (bind.readonlyCondition != null)
                 bind.readonlyCondition.addTarget(ref);
-            }
-            if (bind.calculate != null) {
+            if (bind.calculate != null)
                 bind.calculate.addTarget(ref);
-            }
-            for (TreeReference nref : nodes) {
-                TreeElement node = instance.resolveReference(nref);
+
+            // Initialize present nodes under the provided ref
+            for (TreeReference nodeRef : nodeRefs) {
+                TreeElement node = instance.resolveReference(nodeRef);
                 node.setDataType(bind.getDataType());
 
-                if (bind.relevancyCondition == null) {
+                if (bind.relevancyCondition == null)
                     node.setRelevant(bind.relevantAbsolute);
-                }
-                if (bind.requiredCondition == null) {
+                if (bind.requiredCondition == null)
                     node.setRequired(bind.requiredAbsolute);
-                }
-                if (bind.readonlyCondition == null) {
+                if (bind.readonlyCondition == null)
                     node.setEnabled(!bind.readonlyAbsolute);
-                }
-                if (bind.constraint != null) {
+                if (bind.constraint != null)
                     node.setConstraint(new Constraint(bind.constraint, bind.constraintMessage));
-                }
 
                 node.setPreloadHandler(bind.getPreload());
                 node.setPreloadParams(bind.getPreloadParams());
