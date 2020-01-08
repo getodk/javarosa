@@ -16,6 +16,8 @@
 
 package org.javarosa.core.model;
 
+import static java.util.Collections.emptySet;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -65,7 +67,7 @@ public class TriggerableDag {
      * the list, where tA comes before tB, evaluating tA cannot depend on any
      * result from evaluating tB.
      */
-    protected Set<QuickTriggerable> triggerablesDAG = new LinkedHashSet<>();
+    protected Set<QuickTriggerable> triggerablesDAG = emptySet();
 
     /**
      * NOT VALID UNTIL finalizeTriggerables() is called!!
@@ -344,8 +346,27 @@ public class TriggerableDag {
         }
     }
 
+    // TODO We can avoid having to resolve dependant refs using the mainInstance by adding descendant refs as targets of relevance triggerables
+    private static List<QuickTriggerable[]> getDagEdges(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+        List<QuickTriggerable[]> edges = new ArrayList<>();
+        for (QuickTriggerable vertex : vertices) {
+            Set<QuickTriggerable> dependants = getDependantTriggerables(mainInstance, evalContext, vertex, triggerIndex);
+
+            if (dependants.contains(vertex))
+                throwCyclesInDagException(dependants);
+
+            if (vertex.canCascade())
+                for (QuickTriggerable dependantVertex : dependants)
+                    edges.add(new QuickTriggerable[]{vertex, dependantVertex});
+
+            // TODO Move this from Triggerable to TriggerableDag
+            vertex.setImmediateCascades(dependants);
+        }
+        return edges;
+    }
+
     public static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> unorderedTriggerables, List<QuickTriggerable[]> edges) {
-        Set<QuickTriggerable> newTriggerablesDAG = new LinkedHashSet<>();
+        Set<QuickTriggerable> dag = new LinkedHashSet<>();
         // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
 
         // DAGify the triggerables based on dependencies and sort them so that
@@ -375,7 +396,7 @@ public class TriggerableDag {
             // remove root nodes and edges originating from them
             // add them to the triggerablesDAG.
             for (QuickTriggerable root : orderedRoots) {
-                newTriggerablesDAG.add(root);
+                dag.add(root);
                 vertices.remove(root);
             }
             for (int i = edges.size() - 1; i >= 0; i--) {
@@ -384,32 +405,13 @@ public class TriggerableDag {
                     edges.remove(i);
             }
         }
-        return newTriggerablesDAG;
+        return dag;
     }
 
-    public static List<QuickTriggerable[]> getDagEdges(FormInstance mainInstance, EvaluationContext evalContext, Collection<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
-        List<QuickTriggerable[]> edges = new ArrayList<>();
-        for (QuickTriggerable triggerable : vertices) {
-            Set<QuickTriggerable> dependantTriggerables = getDependantTriggerables(mainInstance, evalContext, triggerable, triggerIndex);
-
-            if (dependantTriggerables.contains(triggerable))
-                throwCyclesInDagException(dependantTriggerables);
-
-            if (triggerable.canCascade())
-                for (QuickTriggerable dependantTriggerable : dependantTriggerables) {
-                    edges.add(new QuickTriggerable[]{triggerable, dependantTriggerable});
-                }
-
-            // TODO Move this from Triggerable to TriggerableDag
-            triggerable.setImmediateCascades(dependantTriggerables);
-        }
-        return edges;
-    }
-
-    public static void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
+    private static void throwCyclesInDagException(Collection<QuickTriggerable> triggerables) {
         StringBuilder hints = new StringBuilder();
-        for (QuickTriggerable qt2 : vertices) {
-            for (TreeReference r : qt2.getTargets()) {
+        for (QuickTriggerable qt : triggerables) {
+            for (TreeReference r : qt.getTargets()) {
                 hints.append("\n").append(r.toString(true));
             }
         }
@@ -425,7 +427,7 @@ public class TriggerableDag {
      * Get all of the elements which will need to be evaluated (in order) when
      * the triggerable is fired.
      */
-    public static Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+    private static Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
         Set<QuickTriggerable> allDependantTriggerables = new LinkedHashSet<>();
         Set<TreeReference> targets = new HashSet<>();
         for (TreeReference target : triggerable.getTargets()) {
