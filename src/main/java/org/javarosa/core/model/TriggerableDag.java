@@ -298,8 +298,8 @@ public class TriggerableDag {
      * will create the appropriate ordering and dependencies to ensure the
      * conditions will be evaluated in the appropriate orders.
      */
-    public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
-        List<QuickTriggerable[]> edges = getDagEdges(mainInstance, ec, allTriggerables, triggerablesPerTrigger);
+    public void finalizeTriggerables(FormInstance mainInstance) throws IllegalStateException {
+        List<QuickTriggerable[]> edges = getDagEdges(allTriggerables, triggerablesPerTrigger);
         triggerablesDAG = buildDag(allTriggerables, edges);
         repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
     }
@@ -325,10 +325,10 @@ public class TriggerableDag {
      *     <li>Builds a cache of immediate cascades of each vertex, meaning that we will remember the dependant vertices without having to traverse the DAG again</li>
      * </ul>
      */
-    private static List<QuickTriggerable[]> getDagEdges(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+    private static List<QuickTriggerable[]> getDagEdges(Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
         List<QuickTriggerable[]> edges = new ArrayList<>();
         for (QuickTriggerable vertex : vertices) {
-            Set<QuickTriggerable> dependants = getDependantTriggerables(mainInstance, evalContext, vertex, triggerIndex);
+            Set<QuickTriggerable> dependants = getDependantTriggerables(vertex, triggerIndex);
 
             if (dependants.contains(vertex))
                 throwCyclesInDagException(dependants);
@@ -392,41 +392,16 @@ public class TriggerableDag {
      * Get all of the elements which will need to be evaluated (in order) when
      * the triggerable is fired.
      */
-    private static Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
-        Set<QuickTriggerable> allDependantTriggerables = new LinkedHashSet<>();
-        Set<TreeReference> targets = new HashSet<>();
-        for (TreeReference target : triggerable.getTargets()) {
-
-            targets.add(target);
-
-            // For certain types of triggerables, the update will affect
-            // not only the target, but also the children of the target.
-            // In that case, we want to add all of those nodes
-            // to the list of updated elements as well.
-            if (triggerable.isCascadingToChildren()) {
-                targets.addAll(getChildrenOfReference(mainInstance, ec, target));
-            }
+    private static Set<QuickTriggerable> getDependantTriggerables(QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+        Set<QuickTriggerable> result = new HashSet<>();
+        for (TreeReference targetRef : triggerable.getTargets()) {
+            Set<QuickTriggerable> children = triggerIndex.getOrDefault(targetRef, emptySet());
+            result.addAll(children);
+            for (QuickTriggerable child : children)
+                if (child != triggerable && !result.contains(child))
+                    result.addAll(getDependantTriggerables(child, triggerIndex));
         }
-
-        // Now go through each of these updated nodes (generally
-        // just 1 for a normal calculation,
-        // multiple nodes if there's a relevance cascade.
-        for (TreeReference target : targets) {
-            // Check our index to see if that target is a Trigger
-            // for other conditions
-            // IE: if they are an element of a different calculation
-            // or relevancy calc
-
-            // We can't make this reference generic before now or
-            // we'll lose the target information,
-            // so we'll be more inclusive than needed and see if any
-            // of our triggers are keyed on the predicate-less path
-            // of this ref
-            Set<QuickTriggerable> dependantTriggerables = triggerIndex.get(target.hasPredicates() ? target.removePredicates() : target);
-            if (dependantTriggerables != null)
-                allDependantTriggerables.addAll(dependantTriggerables);
-        }
-        return allDependantTriggerables;
+        return result;
     }
 
     /**
