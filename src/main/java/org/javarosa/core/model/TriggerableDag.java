@@ -327,6 +327,27 @@ public class TriggerableDag {
      *                               triggers can't be laid out appropriately
      */
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
+        Set<QuickTriggerable> newTriggerablesDAG = buildDag(mainInstance, evalContext);
+
+        triggerablesDAG.clear();
+        triggerablesDAG = newTriggerablesDAG;
+
+        //
+        // build the condition index for repeatable nodes
+        //
+        conditionRepeatTargetIndex.clear();
+        for (QuickTriggerable qt : triggerablesDAG) {
+            if (qt.isCondition()) {
+                for (TreeReference target : qt.getTargets()) {
+                    if (mainInstance.getTemplate(target) != null) {
+                        conditionRepeatTargetIndex.put(target, qt);
+                    }
+                }
+            }
+        }
+    }
+
+    public Set<QuickTriggerable> buildDag(FormInstance mainInstance, EvaluationContext evalContext) {
         Set<QuickTriggerable> newTriggerablesDAG = new LinkedHashSet<>();
         // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
 
@@ -381,23 +402,7 @@ public class TriggerableDag {
                     edges.remove(i);
             }
         }
-
-        triggerablesDAG.clear();
-        triggerablesDAG = newTriggerablesDAG;
-
-        //
-        // build the condition index for repeatable nodes
-        //
-        conditionRepeatTargetIndex.clear();
-        for (QuickTriggerable qt : triggerablesDAG) {
-            if (qt.isCondition()) {
-                for (TreeReference target : qt.getTargets()) {
-                    if (mainInstance.getTemplate(target) != null) {
-                        conditionRepeatTargetIndex.put(target, qt);
-                    }
-                }
-            }
-        }
+        return newTriggerablesDAG;
     }
 
     public void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
