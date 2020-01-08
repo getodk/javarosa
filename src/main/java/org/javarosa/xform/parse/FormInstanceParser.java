@@ -1,5 +1,15 @@
 package org.javarosa.xform.parse;
 
+import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
+import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -10,6 +20,7 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -17,17 +28,8 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xform.util.XFormUtils;
 import org.kxml2.kdom.Element;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
-import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
 
 class FormInstanceParser {
     private static final Logger logger = LoggerFactory.getLogger(FormInstanceParser.class);
@@ -40,7 +42,9 @@ class FormInstanceParser {
     private final List<TreeReference> selectOnes;
     private final List<TreeReference> selectMultis;
     private final List<TreeReference> actionTargets;
-    /** pseudo-data model tree that describes the repeat structure of the instance; useful during instance processing and validation */
+    /**
+     * pseudo-data model tree that describes the repeat structure of the instance; useful during instance processing and validation
+     */
     private FormInstance repeatTree;
 
     FormInstanceParser(FormDef formDef, String defaultNamespace,
@@ -59,12 +63,12 @@ class FormInstanceParser {
 
     FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) {
         TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace(),
-                namespacePrefixesByUri, null);
+            namespacePrefixesByUri, null);
         FormInstance instanceModel = new FormInstance(root);
         instanceModel.setName(isMainInstance ? formDef.getTitle() : name);
 
         final List<String> usedAtts = Collections.unmodifiableList(Arrays.asList("id", "version", "uiVersion", "name",
-                "prefix", "delimiter"));
+            "prefix", "delimiter"));
 
         String schema = e.getNamespace();
         if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
@@ -87,7 +91,7 @@ class FormInstanceParser {
         applyInstanceProperties(instanceModel);
 
         //print unused attribute warning message for parent element
-        if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+        if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)) {
             String xmlLocation = getVagueLocation(e);
             logger.warn("XForm Parse Warning: {}{}", XFormUtils.unusedAttWarning(e, usedAtts), (xmlLocation == null ? "" : xmlLocation));
         }
@@ -111,7 +115,9 @@ class FormInstanceParser {
         checkHomogeneity(instance);
     }
 
-    /** Flags all nodes identified by repeat bindings as repeatable */
+    /**
+     * Flags all nodes identified by repeat bindings as repeatable
+     */
     private void flagRepeatables(FormInstance instance) {
         for (TreeReference ref : getRepeatableRefs()) {
             for (TreeReference nref : new EvaluationContext(instance).expandReference(ref, true)) {
@@ -123,7 +129,7 @@ class FormInstanceParser {
         }
     }
 
-    private void processTemplates (FormInstance instance) {
+    private void processTemplates(FormInstance instance) {
         repeatTree = buildRepeatTree(getRepeatableRefs(), instance.getRoot().getName());
 
         List<TreeReference> missingTemplates = new ArrayList<>();
@@ -179,7 +185,7 @@ class FormInstanceParser {
         verifyItemsetSrcDstCompatibility(instance);
     }
 
-    private void verifyActions (FormInstance instance) {
+    private void verifyActions(FormInstance instance) {
         //check the target of actions which are manipulating real values
         for (TreeReference target : actionTargets) {
             List<TreeReference> nodes = new EvaluationContext(instance).expandReference(target, true);
@@ -189,12 +195,12 @@ class FormInstanceParser {
         }
     }
 
-    private static void checkDuplicateNodesAreRepeatable (TreeElement node) {
+    private static void checkDuplicateNodesAreRepeatable(TreeElement node) {
         int mult = node.getMult();
         if (mult > 0) { //repeated node
             if (!node.isRepeatable()) {
                 logger.warn("repeated nodes [{}] detected that have no repeat binding " +
-                    "in the form; DO NOT bind questions to these nodes or their children!",
+                        "in the form; DO NOT bind questions to these nodes or their children!",
                     node.getName());
                 //we could do a more comprehensive safety check in the future
             }
@@ -205,8 +211,10 @@ class FormInstanceParser {
         }
     }
 
-    /** Checks repeat sets for homogeneity */
-    private void checkHomogeneity (FormInstance instance) {
+    /**
+     * Checks repeat sets for homogeneity
+     */
+    private void checkHomogeneity(FormInstance instance) {
         for (TreeReference ref : getRepeatableRefs()) {
             TreeElement template = null;
             for (TreeReference nref : new EvaluationContext(instance).expandReference(ref)) {
@@ -224,7 +232,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyControlBindings (IFormElement fe, FormInstance instance, List<String> errors) { //throws XmlPullParserException {
+    private void verifyControlBindings(IFormElement fe, FormInstance instance, List<String> errors) { //throws XmlPullParserException {
         if (fe.getChildren() == null)
             return;
 
@@ -235,7 +243,7 @@ class FormInstanceParser {
 
             if (child instanceof GroupDef) {
                 ref = child.getBind();
-                type = (((GroupDef)child).getRepeat() ? "Repeat" : "Group");
+                type = (((GroupDef) child).getRepeat() ? "Repeat" : "Group");
             } else if (child instanceof QuestionDef) {
                 ref = child.getBind();
                 type = "Question";
@@ -259,13 +267,13 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyRepeatMemberBindings (IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
+    private void verifyRepeatMemberBindings(IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
         if (fe.getChildren() == null)
             return;
 
         for (int i = 0; i < fe.getChildren().size(); i++) {
             IFormElement child = fe.getChildren().get(i);
-            boolean isRepeat = (child instanceof GroupDef && ((GroupDef)child).getRepeat());
+            boolean isRepeat = (child instanceof GroupDef && ((GroupDef) child).getRepeat());
 
             //get bindings of current node and nearest enclosing repeat
             TreeReference repeatBind = (parentRepeat == null ? TreeReference.rootRef() : FormInstance.unpackReference(parentRepeat.getBind()));
@@ -306,11 +314,11 @@ class FormInstanceParser {
                 }
             }
 
-            verifyRepeatMemberBindings(child, instance, (isRepeat ? (GroupDef)child : parentRepeat));
+            verifyRepeatMemberBindings(child, instance, (isRepeat ? (GroupDef) child : parentRepeat));
         }
     }
 
-    private void verifyItemsetBindings (FormInstance instance) {
+    private void verifyItemsetBindings(FormInstance instance) {
         for (ItemsetBinding itemset : itemsets) {
             //check proper parent/child relationship
             if (!itemset.nodesetRef.isAncestorOf(itemset.labelRef, false)) {
@@ -350,7 +358,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyItemsetSrcDstCompatibility (FormInstance instance) {
+    private void verifyItemsetSrcDstCompatibility(FormInstance instance) {
         for (ItemsetBinding itemset : itemsets) {
             boolean destRepeatable = (instance.getTemplate(itemset.getDestRef()) != null);
             if (itemset.copyMode) {
@@ -378,13 +386,14 @@ class FormInstanceParser {
         }
     }
 
-    private void applyInstanceProperties (FormInstance instance) {
+    private void applyInstanceProperties(FormInstance instance) {
         for (DataBinding bind : bindings) {
             final TreeReference ref = FormInstance.unpackReference(bind.getReference());
-            final List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
+            EvaluationContext ec = new EvaluationContext(instance);
+            final List<TreeReference> nodes = ec.expandReference(ref, true);
 
             if (nodes.size() > 0) {
-                attachBindGeneral(bind);
+                attachBindGeneral(bind, instance, ec);
             }
             for (TreeReference nref : nodes) {
                 attachBind(instance.resolveReference(nref), bind);
@@ -394,11 +403,17 @@ class FormInstanceParser {
         applyControlProperties(instance);
     }
 
-    private static void attachBindGeneral (DataBinding bind) {
+    private static void attachBindGeneral(DataBinding bind, FormInstance instance, EvaluationContext ec) {
         TreeReference ref = FormInstance.unpackReference(bind.getReference());
 
         if (bind.relevancyCondition != null) {
             bind.relevancyCondition.addTarget(ref);
+            // Since relevancy can affect not only to individual fields, but also to
+            // groups, we need to register all descendant refs as targets for relevancy
+            // conditions to allow for chained reactions in triggerables registered in
+            // any of those descendants
+            for (TreeReference r : getDescendantRefs(instance, ec, ref))
+                bind.relevancyCondition.addTarget(r);
         }
         if (bind.requiredCondition != null) {
             bind.requiredCondition.addTarget(ref);
@@ -432,14 +447,54 @@ class FormInstanceParser {
         node.setBindAttributes(bind.getAdditionalAttributes());
     }
 
-    /** Checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not */
-    private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
+    private static Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference target) {
+        Set<TreeReference> allDescendants = new HashSet<>();
+        for (AbstractTreeElement<?> child : getChildrenElements(mainInstance, evalContext, target)) {
+            allDescendants.add(child.getRef().genericize());
+            allDescendants.addAll(getDescendantRefs(child));
+        }
+        return allDescendants;
+    }
+
+    private static Set<TreeReference> getDescendantRefs(AbstractTreeElement<?> element) {
+        Set<TreeReference> allDescendants = new HashSet<>();
+        for (int i = 0; i < element.getNumChildren(); ++i) {
+            AbstractTreeElement<?> child = element.getChildAt(i);
+            allDescendants.add(child.getRef().genericize());
+            allDescendants.addAll(getDescendantRefs(child));
+        }
+        return allDescendants;
+    }
+
+
+    private static Set<AbstractTreeElement<?>> getChildrenElements(FormInstance mainInstance, EvaluationContext evalContext, TreeReference target) {
+        AbstractTreeElement<?> repeatTemplate = mainInstance.getTemplatePath(target);
+        if (repeatTemplate != null) {
+            Set<AbstractTreeElement<?>> elements = new HashSet<>();
+            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i)
+                elements.add(repeatTemplate.getChildAt(i));
+            return elements;
+        }
+        Set<AbstractTreeElement<?>> elements = new HashSet<>();
+        List<TreeReference> refSet = evalContext.expandReference(target);
+        for (TreeReference ref : refSet)
+            elements.add(evalContext.resolveReference(ref));
+        return elements;
+    }
+
+
+    /**
+     * Checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not
+     */
+    private static void checkRepeatsForTemplate(FormInstance instance, FormInstance repeatTree, List<TreeReference> missingTemplates) {
         if (repeatTree != null)
             checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
     }
 
-    /** Helper function for checkRepeatsForTemplate */
-    private static void checkRepeatsForTemplate (TreeElement repeatTreeNode, TreeReference ref, FormInstance instance, List<TreeReference> missing) {
+    /**
+     * Helper function for checkRepeatsForTemplate
+     */
+    private static void checkRepeatsForTemplate(TreeElement repeatTreeNode, TreeReference ref, FormInstance instance, List<TreeReference> missing) {
         String name = repeatTreeNode.getName();
         int mult = (repeatTreeNode.isRepeatable() ? TreeReference.INDEX_TEMPLATE : 0);
         ref = ref.extendRef(name, mult);
@@ -459,12 +514,12 @@ class FormInstanceParser {
     //iterates through instance and removes template nodes that are not valid. a template is invalid if:
     //  it is declared for a node that is not repeatable
     //  it is for a repeat that is a child of another repeat and is not located within the parent's template node
-    private void removeInvalidTemplates (FormInstance instance, FormInstance repeatTree) {
+    private void removeInvalidTemplates(FormInstance instance, FormInstance repeatTree) {
         removeInvalidTemplates(instance.getRoot(), (repeatTree == null ? null : repeatTree.getRoot()), true);
     }
 
     //helper function for removeInvalidTemplates
-    private boolean removeInvalidTemplates (TreeElement instanceNode, TreeElement repeatTreeNode, boolean templateAllowed) {
+    private boolean removeInvalidTemplates(TreeElement instanceNode, TreeElement repeatTreeNode, boolean templateAllowed) {
         int mult = instanceNode.getMult();
         boolean repeatable = repeatTreeNode != null && repeatTreeNode.isRepeatable();
 
@@ -496,7 +551,7 @@ class FormInstanceParser {
     }
 
     //if repeatables have no template node, duplicate first as template
-    private void createMissingTemplates (FormInstance instance, List<TreeReference> missingTemplates) {
+    private void createMissingTemplates(FormInstance instance, List<TreeReference> missingTemplates) {
         //it is VERY important that the missing template refs are listed in depth-first or breadth-first order... namely, that
         //every ref is listed after a ref that could be its parent. checkRepeatsForTemplate currently behaves this way
         for (TreeReference templRef : missingTemplates) {
@@ -529,7 +584,7 @@ class FormInstanceParser {
      * Trims repeatable children of newly created template nodes; we trim because the templates are supposed to be devoid of 'data',
      * and # of repeats for a given repeat node is a kind of data.
      */
-    private static void trimRepeatChildren (TreeElement node) {
+    private static void trimRepeatChildren(TreeElement node) {
         for (int i = 0; i < node.getNumChildren(); i++) {
             TreeElement child = node.getChildAt(i);
             if (child.isRepeatable()) {
@@ -567,7 +622,7 @@ class FormInstanceParser {
         }
     }
 
-    private List<TreeReference> getRepeatableRefs () {
+    private List<TreeReference> getRepeatableRefs() {
         List<TreeReference> refs = new ArrayList<>(repeats);
 
         for (ItemsetBinding itemset : itemsets) {
@@ -611,7 +666,7 @@ class FormInstanceParser {
      * result is a FormInstance collapsed where all indexes are 0, and repeatable nodes are flagged as such.
      * Ignores (invalid) repeats that bind outside the top-level instance data node. Returns null if no repeats.
      */
-    private static FormInstance buildRepeatTree (List<TreeReference> repeatRefs, String topLevelName) {
+    private static FormInstance buildRepeatTree(List<TreeReference> repeatRefs, String topLevelName) {
         TreeElement root = new TreeElement(null, 0);
 
         for (TreeReference repeatRef : repeatRefs) {
@@ -639,6 +694,6 @@ class FormInstanceParser {
         }
 
         return (root.getNumChildren() == 0) ? null :
-                new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MULTIPLICITY));
+            new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MULTIPLICITY));
     }
 }
