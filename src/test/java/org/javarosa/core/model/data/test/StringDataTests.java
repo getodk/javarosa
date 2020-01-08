@@ -22,7 +22,9 @@ package org.javarosa.core.model.data.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.javarosa.core.model.data.StringData;import org.junit.Before;import org.junit.Test;
+import org.javarosa.core.model.data.StringData;
+import org.junit.Before;
+import org.junit.Test;
 
 public class StringDataTests {
     String stringA;
@@ -32,7 +34,8 @@ public class StringDataTests {
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
 
         stringA = "string A";

@@ -38,7 +38,8 @@ public class TextFormTests {
     }
 
 
-    @Before    public void setUp(){
+    @Before
+    public void setUp(){
         fpi = new FormParseInit();
         q = fpi.getFirstQuestionDef();
         fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());

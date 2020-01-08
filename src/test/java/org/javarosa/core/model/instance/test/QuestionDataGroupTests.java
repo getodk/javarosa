@@ -33,7 +33,8 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.PrototypeFactory;import org.junit.Before;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.junit.Before;
 import org.junit.Test;
 
 public class QuestionDataGroupTests {
@@ -52,7 +53,8 @@ public class QuestionDataGroupTests {
 
     TreeElement group;
 
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         stringData = new StringData("Answer Value");
         integerData = new IntegerData(4);

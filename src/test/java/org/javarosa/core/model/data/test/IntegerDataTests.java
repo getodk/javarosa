@@ -20,7 +20,9 @@ package org.javarosa.core.model.data.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.javarosa.core.model.data.IntegerData;import org.junit.Before;import org.junit.Test;
+import org.javarosa.core.model.data.IntegerData;
+import org.junit.Before;
+import org.junit.Test;
 
 public class IntegerDataTests {
 
@@ -30,7 +32,8 @@ public class IntegerDataTests {
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         one = new Integer(1);
         two = new Integer(2);

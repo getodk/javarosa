@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.util.Random;
 
 import org.javarosa.core.io.BufferedInputStream;
-import org.javarosa.core.util.ArrayUtilities;import org.junit.Before;
+import org.javarosa.core.util.ArrayUtilities;
+import org.junit.Before;
 import org.junit.Test;
 
 public class BufferedInputStreamTests {
@@ -36,7 +37,8 @@ public class BufferedInputStreamTests {
     byte[][] arraysToTest;
 
 
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
 
         Random r = new Random();

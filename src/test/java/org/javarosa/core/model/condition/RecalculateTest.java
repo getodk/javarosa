@@ -13,7 +13,8 @@ import org.junit.Test;
 public class RecalculateTest {
     private FormDef formDef;
 
-    @Before    public void setUp() {
+    @Before
+    public void setUp() {
         FormParseInit fpi = new FormParseInit(r("calculate-now.xml"));
         formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());

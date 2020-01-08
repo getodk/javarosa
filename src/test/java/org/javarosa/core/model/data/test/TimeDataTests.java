@@ -33,7 +33,8 @@ public class TimeDataTests {
     Date minusOneHour;
 
 
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
 
         now = new Date();

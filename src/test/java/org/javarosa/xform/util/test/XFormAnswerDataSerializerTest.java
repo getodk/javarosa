@@ -29,7 +29,9 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.xform.util.XFormAnswerDataSerializer;import org.junit.Before;import org.junit.Test;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Note that this is just a start and doesn't cover direct comparisons
@@ -60,7 +62,8 @@ public class XFormAnswerDataSerializerTest {
     XFormAnswerDataSerializer serializer;
 
 
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         stringData = new StringData(stringDataValue);
         stringElement.setValue(stringData);

@@ -51,7 +51,8 @@ public class QuestionDataElementTests {
     TreeElement stringElement;
     TreeElement intElement;
 
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         stringData = new StringData("Answer Value");
         integerData = new IntegerData(4);

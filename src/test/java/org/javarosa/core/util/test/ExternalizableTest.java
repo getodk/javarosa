@@ -37,7 +37,8 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableWrapper;
-import org.javarosa.core.util.externalizable.PrototypeFactory;import org.junit.Test;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

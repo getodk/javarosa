@@ -32,7 +32,8 @@ public class TimeDataLimitationsTest {
 
     private TimeZone backupTimeZone;
 
-    @Before    public void setUp() {
+    @Before
+    public void setUp() {
         backupTimeZone = TimeZone.getDefault();
     }
 

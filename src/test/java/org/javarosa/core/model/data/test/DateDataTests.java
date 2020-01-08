@@ -33,7 +33,8 @@ public class DateDataTests {
     Date notToday;
 
 
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         today = DateUtils.roundDate(new Date());
         notToday = DateUtils.roundDate(new Date(today.getTime() - today.getTime()/2));

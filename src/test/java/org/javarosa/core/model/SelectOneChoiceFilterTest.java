@@ -37,7 +37,8 @@ import org.junit.Test;
 public class SelectOneChoiceFilterTest {
     private Scenario scenario;
 
-    @Before    public void setUp() {
+    @Before
+    public void setUp() {
         scenario = Scenario.init("three-level-cascading-select.xml");
     }
 

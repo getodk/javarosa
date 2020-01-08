@@ -30,7 +30,8 @@ import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.test.ExternalizableTest;import org.junit.Test;
+import org.javarosa.core.util.test.ExternalizableTest;
+import org.junit.Test;
 
 public class LocalizerTest {
 

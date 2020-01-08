@@ -4,7 +4,8 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.XFormParseException;
 import org.junit.Rule;
-import org.junit.Test;import org.junit.rules.ExpectedException;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 

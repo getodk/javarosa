@@ -23,7 +23,9 @@ import static org.junit.Assert.assertTrue;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.helper.Selection;import org.junit.Before;import org.junit.Test;
+import org.javarosa.core.model.data.helper.Selection;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SelectOneDataTests {
     QuestionDef question;
@@ -34,7 +36,8 @@ public class SelectOneDataTests {
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
-    @Before    public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
 
         question = new QuestionDef();
