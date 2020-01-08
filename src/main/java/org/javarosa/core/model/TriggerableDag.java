@@ -327,10 +327,7 @@ public class TriggerableDag {
      *                               triggers can't be laid out appropriately
      */
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
-        Set<QuickTriggerable> newTriggerablesDAG = buildDag(mainInstance, evalContext);
-
-        triggerablesDAG.clear();
-        triggerablesDAG = newTriggerablesDAG;
+        triggerablesDAG = buildDag(mainInstance, evalContext);
 
         //
         // build the condition index for repeatable nodes
