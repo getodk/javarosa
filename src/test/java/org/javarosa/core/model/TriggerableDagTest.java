@@ -527,7 +527,7 @@ public class TriggerableDagTest {
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
-            bind("/data/count").type("int").relevant(". + 1")
+            bind("/data/count").type("int").relevant(". > 0")
         ));
     }
 
