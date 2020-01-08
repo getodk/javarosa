@@ -700,7 +700,7 @@ public class TriggerableDagTest {
                             t("a", "1")
                         )
                     )),
-                    bind("/data/group/a").type("int").calculate("/data/group[position() = position(current()/..)]/a + 1")
+                    bind("/data/group/a").type("int").calculate("../a + 1")
                 )
             ),
             body(group("/data/group", repeat("/data/group",
@@ -751,8 +751,8 @@ public class TriggerableDagTest {
                             t("b", "1")
                         )
                     )),
-                    bind("/data/group/a").type("int").calculate("/data/group[position() = position(current())]/b + 1"),
-                    bind("/data/group/b").type("int").calculate("/data/group[position() = position(current())]/a + 1")
+                    bind("/data/group/a").type("int").calculate("../b + 1"),
+                    bind("/data/group/b").type("int").calculate("../a + 1")
                 )
             ),
             body(group("/data/group", repeat("/data/group",
