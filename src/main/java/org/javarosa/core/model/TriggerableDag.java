@@ -23,7 +23,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -367,7 +366,6 @@ public class TriggerableDag {
 
     private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, List<QuickTriggerable[]> edges) {
         Set<QuickTriggerable> dag = new LinkedHashSet<>();
-        // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
 
         Set<QuickTriggerable> remainingVertices = new HashSet<>(vertices);
         Set<QuickTriggerable[]> remainingEdges = new HashSet<>(edges);
@@ -381,8 +379,6 @@ public class TriggerableDag {
                 throwCyclesInDagException(vertices);
 
             List<QuickTriggerable> orderedRoots = new ArrayList<>(roots);
-            // TODO Study if insertion order & using LinkedSets would suffice to ensure proper triggerable chaining
-            Collections.sort(orderedRoots, QuickTriggerableComparator.INSTANCE);
             dag.addAll(orderedRoots);
 
             Set<QuickTriggerable> newRemainingVertices = new HashSet<>();
