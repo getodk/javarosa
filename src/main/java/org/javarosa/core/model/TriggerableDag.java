@@ -65,7 +65,7 @@ public class TriggerableDag {
      * the list, where tA comes before tB, evaluating tA cannot depend on any
      * result from evaluating tB.
      */
-    protected final Set<QuickTriggerable> triggerablesDAG = new LinkedHashSet<>();
+    protected Set<QuickTriggerable> triggerablesDAG = new LinkedHashSet<>();
 
     /**
      * NOT VALID UNTIL finalizeTriggerables() is called!!
@@ -327,8 +327,7 @@ public class TriggerableDag {
      *                               triggers can't be laid out appropriately
      */
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
-        triggerablesDAG.clear();
-
+        Set<QuickTriggerable> newTriggerablesDAG = new LinkedHashSet<>();
         // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
 
         // DAGify the triggerables based on dependencies and sort them so that
@@ -373,7 +372,7 @@ public class TriggerableDag {
             // remove root nodes and edges originating from them
             // add them to the triggerablesDAG.
             for (QuickTriggerable root : orderedRoots) {
-                triggerablesDAG.add(root);
+                newTriggerablesDAG.add(root);
                 vertices.remove(root);
             }
             for (int i = edges.size() - 1; i >= 0; i--) {
@@ -382,6 +381,9 @@ public class TriggerableDag {
                     edges.remove(i);
             }
         }
+
+        triggerablesDAG.clear();
+        triggerablesDAG = newTriggerablesDAG;
 
         //
         // build the condition index for repeatable nodes
