@@ -327,11 +327,11 @@ public class TriggerableDag {
      *                               triggers can't be laid out appropriately
      */
     public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
-        triggerablesDAG = buildDag(mainInstance, evalContext);
+        triggerablesDAG = buildDag(
+            unorderedTriggerables,
+            getDagEdges(mainInstance, evalContext, unorderedTriggerables, triggerIndex)
+        );
 
-        //
-        // build the condition index for repeatable nodes
-        //
         conditionRepeatTargetIndex.clear();
         for (QuickTriggerable qt : triggerablesDAG) {
             if (qt.isCondition()) {
@@ -344,28 +344,13 @@ public class TriggerableDag {
         }
     }
 
-    public Set<QuickTriggerable> buildDag(FormInstance mainInstance, EvaluationContext evalContext) {
+    public static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> unorderedTriggerables, List<QuickTriggerable[]> edges) {
         Set<QuickTriggerable> newTriggerablesDAG = new LinkedHashSet<>();
         // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
 
         // DAGify the triggerables based on dependencies and sort them so that
         // triggerables come only after the triggerables they depend on
         List<QuickTriggerable> vertices = new ArrayList<>(unorderedTriggerables);
-        List<QuickTriggerable[]> edges = new ArrayList<>();
-        for (QuickTriggerable triggerable : vertices) {
-            Set<QuickTriggerable> dependantTriggerables = getDependantTriggerables(mainInstance, evalContext, triggerable);
-
-            if (dependantTriggerables.contains(triggerable))
-                throwCyclesInDagException(dependantTriggerables);
-
-            if (triggerable.canCascade())
-                for (QuickTriggerable dependantTriggerable : dependantTriggerables) {
-                    edges.add(new QuickTriggerable[]{triggerable, dependantTriggerable});
-                }
-
-            // TODO Move this from Triggerable to TriggerableDag
-            triggerable.setImmediateCascades(dependantTriggerables);
-        }
 
         List<QuickTriggerable> orderedRoots = new ArrayList<>();
         Set<QuickTriggerable> roots = new HashSet<>(vertices.size());
@@ -402,7 +387,26 @@ public class TriggerableDag {
         return newTriggerablesDAG;
     }
 
-    public void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
+    public static List<QuickTriggerable[]> getDagEdges(FormInstance mainInstance, EvaluationContext evalContext, Collection<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+        List<QuickTriggerable[]> edges = new ArrayList<>();
+        for (QuickTriggerable triggerable : vertices) {
+            Set<QuickTriggerable> dependantTriggerables = getDependantTriggerables(mainInstance, evalContext, triggerable, triggerIndex);
+
+            if (dependantTriggerables.contains(triggerable))
+                throwCyclesInDagException(dependantTriggerables);
+
+            if (triggerable.canCascade())
+                for (QuickTriggerable dependantTriggerable : dependantTriggerables) {
+                    edges.add(new QuickTriggerable[]{triggerable, dependantTriggerable});
+                }
+
+            // TODO Move this from Triggerable to TriggerableDag
+            triggerable.setImmediateCascades(dependantTriggerables);
+        }
+        return edges;
+    }
+
+    public static void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
         StringBuilder hints = new StringBuilder();
         for (QuickTriggerable qt2 : vertices) {
             for (TreeReference r : qt2.getTargets()) {
@@ -421,7 +425,7 @@ public class TriggerableDag {
      * Get all of the elements which will need to be evaluated (in order) when
      * the triggerable is fired.
      */
-    public Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable) {
+    public static Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
         Set<QuickTriggerable> allDependantTriggerables = new LinkedHashSet<>();
         Set<TreeReference> targets = new HashSet<>();
         for (TreeReference target : triggerable.getTargets()) {
@@ -498,7 +502,7 @@ public class TriggerableDag {
      *
      * @return
      */
-    private Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext ec, TreeReference ref) {
+    private static Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext ec, TreeReference ref) {
         TreeElement repeatTemplate = mainInstance.getTemplatePath(ref);
         if (repeatTemplate != null)
             return getChildrenRefsByTemplate(mainInstance, repeatTemplate);
@@ -506,18 +510,18 @@ public class TriggerableDag {
         return getChildrenByExpandedRef(mainInstance, ec, ref);
     }
 
-    private Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
+    private static Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
         TreeElement repeatTemplate = mainInstance.getTemplatePath(element.getRef());
         if (repeatTemplate != null)
             return getChildrenRefsByTemplate(mainInstance, repeatTemplate);
         return getChildrenOfElement(mainInstance, element);
     }
 
-    private Set<TreeReference> getChildrenRefsByTemplate(FormInstance mainInstance, TreeElement repeatTemplate) {
+    private static Set<TreeReference> getChildrenRefsByTemplate(FormInstance mainInstance, TreeElement repeatTemplate) {
         return getChildrenOfElement(mainInstance, repeatTemplate);
     }
 
-    private Set<TreeReference> getChildrenByExpandedRef(FormInstance mainInstance, EvaluationContext ec, TreeReference initialRef) {
+    private static Set<TreeReference> getChildrenByExpandedRef(FormInstance mainInstance, EvaluationContext ec, TreeReference initialRef) {
         Set<TreeReference> descendants = new HashSet<>();
         for (TreeReference childrenRef : ec.expandReference(initialRef)) {
             AbstractTreeElement<?> child = ec.resolveReference(childrenRef);
@@ -527,7 +531,7 @@ public class TriggerableDag {
         return descendants;
     }
 
-    private Set<TreeReference> getChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
+    private static Set<TreeReference> getChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> element) {
         Set<TreeReference> childrenRefs = new HashSet<>();
         for (int i = 0; i < element.getNumChildren(); ++i) {
             AbstractTreeElement<?> child = element.getChildAt(i);
