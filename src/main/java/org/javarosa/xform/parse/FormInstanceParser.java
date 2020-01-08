@@ -393,25 +393,23 @@ class FormInstanceParser {
             final List<TreeReference> nodes = ec.expandReference(ref, true);
 
             if (nodes.size() > 0) {
-                TreeReference ref1 = FormInstance.unpackReference(bind.getReference());
-
                 if (bind.relevancyCondition != null) {
-                    bind.relevancyCondition.addTarget(ref1);
+                    bind.relevancyCondition.addTarget(ref);
                     // Since relevancy can affect not only to individual fields, but also to
                     // groups, we need to register all descendant refs as targets for relevancy
                     // conditions to allow for chained reactions in triggerables registered in
                     // any of those descendants
-                    for (TreeReference r : getDescendantRefs(instance, ec, ref1))
+                    for (TreeReference r : getDescendantRefs(instance, ec, ref))
                         bind.relevancyCondition.addTarget(r);
                 }
                 if (bind.requiredCondition != null) {
-                    bind.requiredCondition.addTarget(ref1);
+                    bind.requiredCondition.addTarget(ref);
                 }
                 if (bind.readonlyCondition != null) {
-                    bind.readonlyCondition.addTarget(ref1);
+                    bind.readonlyCondition.addTarget(ref);
                 }
                 if (bind.calculate != null) {
-                    bind.calculate.addTarget(ref1);
+                    bind.calculate.addTarget(ref);
                 }
             }
             for (TreeReference nref : nodes) {
