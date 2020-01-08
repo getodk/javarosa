@@ -393,58 +393,51 @@ class FormInstanceParser {
             final List<TreeReference> nodes = ec.expandReference(ref, true);
 
             if (nodes.size() > 0) {
-                attachBindGeneral(bind, instance, ec);
+                TreeReference ref1 = FormInstance.unpackReference(bind.getReference());
+
+                if (bind.relevancyCondition != null) {
+                    bind.relevancyCondition.addTarget(ref1);
+                    // Since relevancy can affect not only to individual fields, but also to
+                    // groups, we need to register all descendant refs as targets for relevancy
+                    // conditions to allow for chained reactions in triggerables registered in
+                    // any of those descendants
+                    for (TreeReference r : getDescendantRefs(instance, ec, ref1))
+                        bind.relevancyCondition.addTarget(r);
+                }
+                if (bind.requiredCondition != null) {
+                    bind.requiredCondition.addTarget(ref1);
+                }
+                if (bind.readonlyCondition != null) {
+                    bind.readonlyCondition.addTarget(ref1);
+                }
+                if (bind.calculate != null) {
+                    bind.calculate.addTarget(ref1);
+                }
             }
             for (TreeReference nref : nodes) {
-                attachBind(instance.resolveReference(nref), bind);
+                TreeElement node = instance.resolveReference(nref);
+                node.setDataType(bind.getDataType());
+
+                if (bind.relevancyCondition == null) {
+                    node.setRelevant(bind.relevantAbsolute);
+                }
+                if (bind.requiredCondition == null) {
+                    node.setRequired(bind.requiredAbsolute);
+                }
+                if (bind.readonlyCondition == null) {
+                    node.setEnabled(!bind.readonlyAbsolute);
+                }
+                if (bind.constraint != null) {
+                    node.setConstraint(new Constraint(bind.constraint, bind.constraintMessage));
+                }
+
+                node.setPreloadHandler(bind.getPreload());
+                node.setPreloadParams(bind.getPreloadParams());
+                node.setBindAttributes(bind.getAdditionalAttributes());
             }
         }
 
         applyControlProperties(instance);
-    }
-
-    private static void attachBindGeneral(DataBinding bind, FormInstance instance, EvaluationContext ec) {
-        TreeReference ref = FormInstance.unpackReference(bind.getReference());
-
-        if (bind.relevancyCondition != null) {
-            bind.relevancyCondition.addTarget(ref);
-            // Since relevancy can affect not only to individual fields, but also to
-            // groups, we need to register all descendant refs as targets for relevancy
-            // conditions to allow for chained reactions in triggerables registered in
-            // any of those descendants
-            for (TreeReference r : getDescendantRefs(instance, ec, ref))
-                bind.relevancyCondition.addTarget(r);
-        }
-        if (bind.requiredCondition != null) {
-            bind.requiredCondition.addTarget(ref);
-        }
-        if (bind.readonlyCondition != null) {
-            bind.readonlyCondition.addTarget(ref);
-        }
-        if (bind.calculate != null) {
-            bind.calculate.addTarget(ref);
-        }
-    }
-
-    private static void attachBind(TreeElement node, DataBinding bind) {
-        node.setDataType(bind.getDataType());
-
-        if (bind.relevancyCondition == null) {
-            node.setRelevant(bind.relevantAbsolute);
-        }
-        if (bind.requiredCondition == null) {
-            node.setRequired(bind.requiredAbsolute);
-        }
-        if (bind.readonlyCondition == null) {
-            node.setEnabled(!bind.readonlyAbsolute);
-        }
-        if (bind.constraint != null) {
-            node.setConstraint(new Constraint(bind.constraint, bind.constraintMessage));
-        }
-
-        node.setPreloadHandler(bind.getPreload());
-        node.setPreloadParams(bind.getPreloadParams());
-        node.setBindAttributes(bind.getAdditionalAttributes());
     }
 
     private static Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference target) {
