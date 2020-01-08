@@ -392,25 +392,23 @@ class FormInstanceParser {
             EvaluationContext ec = new EvaluationContext(instance);
             final List<TreeReference> nodes = ec.expandReference(ref, true);
 
-            if (nodes.size() > 0) {
-                if (bind.relevancyCondition != null) {
-                    bind.relevancyCondition.addTarget(ref);
-                    // Since relevancy can affect not only to individual fields, but also to
-                    // groups, we need to register all descendant refs as targets for relevancy
-                    // conditions to allow for chained reactions in triggerables registered in
-                    // any of those descendants
-                    for (TreeReference r : getDescendantRefs(instance, ec, ref))
-                        bind.relevancyCondition.addTarget(r);
-                }
-                if (bind.requiredCondition != null) {
-                    bind.requiredCondition.addTarget(ref);
-                }
-                if (bind.readonlyCondition != null) {
-                    bind.readonlyCondition.addTarget(ref);
-                }
-                if (bind.calculate != null) {
-                    bind.calculate.addTarget(ref);
-                }
+            if (bind.relevancyCondition != null) {
+                bind.relevancyCondition.addTarget(ref);
+                // Since relevancy can affect not only to individual fields, but also to
+                // groups, we need to register all descendant refs as targets for relevancy
+                // conditions to allow for chained reactions in triggerables registered in
+                // any of those descendants
+                for (TreeReference r : getDescendantRefs(instance, ec, ref))
+                    bind.relevancyCondition.addTarget(r);
+            }
+            if (bind.requiredCondition != null) {
+                bind.requiredCondition.addTarget(ref);
+            }
+            if (bind.readonlyCondition != null) {
+                bind.readonlyCondition.addTarget(ref);
+            }
+            if (bind.calculate != null) {
+                bind.calculate.addTarget(ref);
             }
             for (TreeReference nref : nodes) {
                 TreeElement node = instance.resolveReference(nref);
