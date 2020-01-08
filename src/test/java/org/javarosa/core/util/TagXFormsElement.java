@@ -34,6 +34,11 @@ public class TagXFormsElement implements XFormsElement {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public String asXml() {
         String attributesString = buildAttributesString(attributes);
         StringBuilder childrenStringBuilder = new StringBuilder();

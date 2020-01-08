@@ -62,16 +62,16 @@ public class Condition extends Triggerable {
     public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
         TreeElement element = mainInstance.resolveReference(ref);
         switch ((boolean) result ? trueAction : falseAction) {
-            case SHOW:
+            case RELEVANT:
                 element.setRelevant(true);
                 break;
-            case HIDE:
+            case NOT_RELEVANT:
                 element.setRelevant(false);
                 break;
             case ENABLE:
                 element.setEnabled(true);
                 break;
-            case DISABLE:
+            case READ_ONLY:
                 element.setEnabled(false);
                 break;
             case REQUIRE:
@@ -101,6 +101,11 @@ public class Condition extends Triggerable {
             && super.equals(o)
             && trueAction == ((Condition) o).trueAction
             && falseAction == ((Condition) o).falseAction;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s if (%s)", trueAction.getVerb(), buildHumanReadableTargetList(), expr.xpath);
     }
 
     // region External Serialization

@@ -342,12 +342,14 @@ public class TriggerableDag {
             newDestinationSet.clear();
             fillTriggeredElements(mainInstance, evalContext, qt, deps, newDestinationSet);
 
-            // remove any self-reference if we have one...
-            deps.remove(qt);
-            for (QuickTriggerable qu : deps) {
-                QuickTriggerable[] edge = {qt, qu};
-                partialOrdering.add(edge);
-            }
+            if (deps.contains(qt))
+                throwCyclesInDagException(deps);
+
+            if (qt.canCascade())
+                for (QuickTriggerable qu : deps) {
+                    QuickTriggerable[] edge = {qt, qu};
+                    partialOrdering.add(edge);
+                }
 
             qt.setImmediateCascades(deps);
         }
@@ -364,20 +366,8 @@ public class TriggerableDag {
             }
 
             // if no root nodes while graph still has nodes, graph has cycles
-            if (roots.size() == 0) {
-                StringBuilder hints = new StringBuilder();
-                for (QuickTriggerable qt : vertices) {
-                    for (TreeReference r : qt.getTargets()) {
-                        hints.append("\n").append(r.toString(true));
-                    }
-                }
-                String message = "Cycle detected in form's relevant and calculation logic!";
-                if (!hints.toString().equals("")) {
-                    message += "\nThe following nodes are likely involved in the loop:"
-                        + hints;
-                }
-                throw new IllegalStateException(message);
-            }
+            if (roots.size() == 0)
+                throwCyclesInDagException(vertices);
 
             // order the root nodes - so the order is fixed
             orderedRoots.clear();
@@ -414,53 +404,67 @@ public class TriggerableDag {
         }
     }
 
+    public void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
+        StringBuilder hints = new StringBuilder();
+        for (QuickTriggerable qt2 : vertices) {
+            for (TreeReference r : qt2.getTargets()) {
+                hints.append("\n").append(r.toString(true));
+            }
+        }
+        String message = "Cycle detected in form's relevant and calculation logic!";
+        if (!hints.toString().equals("")) {
+            message += "\nThe following nodes are likely involved in the loop:"
+                + hints;
+        }
+        throw new IllegalStateException(message);
+    }
+
     /**
      * Get all of the elements which will need to be evaluated (in order) when
      * the triggerable is fired.
      */
     public void fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, Set<QuickTriggerable> destinationSet, Set<QuickTriggerable> newDestinationSet) {
-        if (qt.canCascade()) {
 
-            for (int j = 0; j < qt.getTargets().size(); j++) {
-                TreeReference target = qt.getTargets().get(j);
-                Set<TreeReference> updatedNodes = new HashSet<>();
-                updatedNodes.add(target);
 
-                // For certain types of triggerables, the update will affect
-                // not only the target, but also the children of the target.
-                // In that case, we want to add all of those nodes
-                // to the list of updated elements as well.
-                if (qt.isCascadingToChildren()) {
-                    addChildrenOfReference(mainInstance, evalContext,
-                        target, updatedNodes);
-                }
+        for (int j = 0; j < qt.getTargets().size(); j++) {
+            TreeReference target = qt.getTargets().get(j);
+            Set<TreeReference> updatedNodes = new HashSet<>();
+            updatedNodes.add(target);
 
-                // Now go through each of these updated nodes (generally
-                // just 1 for a normal calculation,
-                // multiple nodes if there's a relevance cascade.
-                for (TreeReference ref : updatedNodes) {
-                    // Check our index to see if that target is a Trigger
-                    // for other conditions
-                    // IE: if they are an element of a different calculation
-                    // or relevancy calc
+            // For certain types of triggerables, the update will affect
+            // not only the target, but also the children of the target.
+            // In that case, we want to add all of those nodes
+            // to the list of updated elements as well.
+            if (qt.isCascadingToChildren()) {
+                addChildrenOfReference(mainInstance, evalContext,
+                    target, updatedNodes);
+            }
 
-                    // We can't make this reference generic before now or
-                    // we'll lose the target information,
-                    // so we'll be more inclusive than needed and see if any
-                    // of our triggers are keyed on the predicate-less path
-                    // of this ref
-                    List<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
+            // Now go through each of these updated nodes (generally
+            // just 1 for a normal calculation,
+            // multiple nodes if there's a relevance cascade.
+            for (TreeReference ref : updatedNodes) {
+                // Check our index to see if that target is a Trigger
+                // for other conditions
+                // IE: if they are an element of a different calculation
+                // or relevancy calc
 
-                    if (triggered != null) {
-                        // If so, walk all of these triggerables that we
-                        // found
-                        for (QuickTriggerable qu : triggered) {
-                            // And add them to the queue if they aren't
-                            // there already
-                            if (!destinationSet.contains(qu)) {
-                                destinationSet.add(qu);
-                                newDestinationSet.add(qu);
-                            }
+                // We can't make this reference generic before now or
+                // we'll lose the target information,
+                // so we'll be more inclusive than needed and see if any
+                // of our triggers are keyed on the predicate-less path
+                // of this ref
+                List<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
+
+                if (triggered != null) {
+                    // If so, walk all of these triggerables that we
+                    // found
+                    for (QuickTriggerable qu : triggered) {
+                        // And add them to the queue if they aren't
+                        // there already
+                        if (!destinationSet.contains(qu)) {
+                            destinationSet.add(qu);
+                            newDestinationSet.add(qu);
                         }
                     }
                 }

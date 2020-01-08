@@ -30,6 +30,8 @@ public interface XFormsElement {
         return attributesStringBuilder.toString().trim();
     }
 
+    String getName();
+
     String asXml();
 
     static Map<String, String> parseAttributes(String name) {

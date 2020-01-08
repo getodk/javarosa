@@ -1931,7 +1931,6 @@ public class XFormParser implements IXFormParserFunctions {
     private void addMainInstanceToFormDef(Element e, FormInstance instanceModel) {
         loadInstanceData(e, instanceModel.getRoot(), _f);
 
-        checkDependencyCycles();
         _f.setInstance(instanceModel);
         _f.setLocalizer(localizer);
 

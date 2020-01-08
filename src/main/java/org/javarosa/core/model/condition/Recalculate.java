@@ -77,6 +77,11 @@ public class Recalculate extends Triggerable {
             && super.equals(o);
     }
 
+    @Override
+    public String toString() {
+        return String.format("Recalculate %s with (%s)", buildHumanReadableTargetList(), expr.xpath);
+    }
+
     // region External Serialization
 
     @Override

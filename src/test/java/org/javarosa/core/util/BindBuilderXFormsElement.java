@@ -26,6 +26,10 @@ public class BindBuilderXFormsElement implements XFormsElement {
         attributes.put("nodeset", nodeset);
     }
 
+    public String getNodeset() {
+        return attributes.getOrDefault("nodeset", "");
+    }
+
     public static BindBuilderXFormsElement bind(String nodeset) {
         return new BindBuilderXFormsElement(nodeset);
     }
@@ -69,6 +73,16 @@ public class BindBuilderXFormsElement implements XFormsElement {
     public BindBuilderXFormsElement readonly() {
         attributes.put("readonly", "true()");
         return this;
+    }
+
+    public BindBuilderXFormsElement readonly(String expression) {
+        attributes.put("readonly", expression);
+        return this;
+    }
+
+    @Override
+    public String getName() {
+        return "bind";
     }
 
     @Override

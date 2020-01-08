@@ -131,8 +131,8 @@ class StandardBindAttributesProcessor {
         switch (type) {
             case "relevant":
                 prettyType = "display";
-                trueAction = ConditionAction.SHOW;
-                falseAction = ConditionAction.HIDE;
+                trueAction = ConditionAction.RELEVANT;
+                falseAction = ConditionAction.NOT_RELEVANT;
                 break;
             case "required":
                 prettyType = "require";
@@ -141,7 +141,7 @@ class StandardBindAttributesProcessor {
                 break;
             case "readonly":
                 prettyType = "readonly";
-                trueAction = ConditionAction.DISABLE;
+                trueAction = ConditionAction.READ_ONLY;
                 falseAction = ConditionAction.ENABLE;
                 break;
             default:

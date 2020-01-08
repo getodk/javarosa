@@ -29,6 +29,12 @@ public class EmptyXFormsElement implements XFormsElement {
         this.attributes = attributes;
     }
 
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String asXml() {
         String attributesString = buildAttributesString(attributes);

@@ -202,18 +202,6 @@ public abstract class Triggerable implements Externalizable {
     }
 
     @Override
-    public String toString() {
-        StringBuilder targetsBuilder = new StringBuilder();
-        for (TreeReference t : targets)
-            targetsBuilder.append(t.toString(true, true)).append(", ");
-        String targets = targetsBuilder.toString();
-        String prettyTargets = targets.isEmpty()
-            ? "unknown refs (no targets added yet)"
-            : targets.substring(0, targets.length() - 2);
-        return String.format("\"%s\" into %s", expr.xpath, prettyTargets);
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == this)
             return true;
@@ -234,6 +222,16 @@ public abstract class Triggerable implements Externalizable {
             return false;
 
         return true;
+    }
+
+    protected String buildHumanReadableTargetList() {
+        StringBuilder targetsBuilder = new StringBuilder();
+        for (TreeReference t : getTargets())
+            targetsBuilder.append(t.toString(true, true)).append(", ");
+        String targetsString = targetsBuilder.toString();
+        return targetsString.isEmpty()
+            ? "unknown refs (no targets added yet)"
+            : targetsString.substring(0, targetsString.length() - 2);
     }
 
     // region External serialization

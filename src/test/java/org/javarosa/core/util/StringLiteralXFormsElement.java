@@ -32,6 +32,11 @@ public class StringLiteralXFormsElement implements XFormsElement {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public String asXml() {
         String attributesString = buildAttributesString(attributes);
         return String.format(
