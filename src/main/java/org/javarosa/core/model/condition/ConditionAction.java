@@ -16,16 +16,17 @@
 
 package org.javarosa.core.model.condition;
 
+// TODO For a less confusing enum, have just one value for each attribute we can find in the xform XML: relevant, readonly, require. Then, encode the true and false actions and textual descriptions inside them for a better encapsulation.
 public enum ConditionAction {
     NULL(0, false, ""),
-    SHOW(1, true, "Show"),
-    HIDE(2, true, "Hide"),
+    RELEVANT(1, true, "Make relevant"),
+    NOT_RELEVANT(2, true, "Make not relevant"),
     ENABLE(3, false, "Enable"),
-    DISABLE(4, false, "Disable"),
+    READ_ONLY(4, false, "Make read-only"),
     LOCK(5, false, "Lock"),
     UNLOCK(6, false, "Unlock"),
     REQUIRE(7, false, "Require"),
-    DONT_REQUIRE(8, false, "Don't require");
+    DONT_REQUIRE(8, false, "Make not required");
 
     private final int code;
     private final boolean cascading;
