@@ -365,45 +365,37 @@ public class TriggerableDag {
         return edges;
     }
 
-    public static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> unorderedTriggerables, List<QuickTriggerable[]> edges) {
+    private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, List<QuickTriggerable[]> edges) {
         Set<QuickTriggerable> dag = new LinkedHashSet<>();
         // TODO Study how this algorithm ensures that we follow the ancestor >>> descendant direction and if the sorting step is strictly required
 
-        // DAGify the triggerables based on dependencies and sort them so that
-        // triggerables come only after the triggerables they depend on
-        List<QuickTriggerable> vertices = new ArrayList<>(unorderedTriggerables);
+        Set<QuickTriggerable> remainingVertices = new HashSet<>(vertices);
+        Set<QuickTriggerable[]> remainingEdges = new HashSet<>(edges);
+        while (remainingVertices.size() > 0) {
 
-        List<QuickTriggerable> orderedRoots = new ArrayList<>();
-        Set<QuickTriggerable> roots = new HashSet<>(vertices.size());
-        while (vertices.size() > 0) {
-            // determine root nodes
-            roots.clear();
-            roots.addAll(vertices);
-            for (QuickTriggerable[] edge : edges) {
+            Set<QuickTriggerable> roots = new HashSet<>(remainingVertices);
+            for (QuickTriggerable[] edge : remainingEdges)
                 roots.remove(edge[1]);
-            }
 
-            // if no root nodes while graph still has nodes, graph has cycles
             if (roots.size() == 0)
                 throwCyclesInDagException(vertices);
 
-            // order the root nodes - so the order is fixed
-            orderedRoots.clear();
-            orderedRoots.addAll(roots);
+            List<QuickTriggerable> orderedRoots = new ArrayList<>(roots);
             // TODO Study if insertion order & using LinkedSets would suffice to ensure proper triggerable chaining
             Collections.sort(orderedRoots, QuickTriggerableComparator.INSTANCE);
+            dag.addAll(orderedRoots);
 
-            // remove root nodes and edges originating from them
-            // add them to the triggerablesDAG.
-            for (QuickTriggerable root : orderedRoots) {
-                dag.add(root);
-                vertices.remove(root);
-            }
-            for (int i = edges.size() - 1; i >= 0; i--) {
-                QuickTriggerable[] edge = edges.get(i);
-                if (roots.contains(edge[0]))
-                    edges.remove(i);
-            }
+            Set<QuickTriggerable> newRemainingVertices = new HashSet<>();
+            for (QuickTriggerable vertex : vertices)
+                if (!dag.contains(vertex))
+                    newRemainingVertices.add(vertex);
+            remainingVertices = newRemainingVertices;
+
+            Set<QuickTriggerable[]> newRemainingEdges = new HashSet<>();
+            for (QuickTriggerable[] edge : remainingEdges)
+                if (!roots.contains(edge[0]))
+                    newRemainingEdges.add(edge);
+            remainingEdges = newRemainingEdges;
         }
         return dag;
     }
