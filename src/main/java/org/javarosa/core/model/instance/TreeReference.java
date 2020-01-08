@@ -361,6 +361,9 @@ public class TreeReference implements Externalizable, Serializable {
         return genericRef;
     }
 
+    /**
+     * @deprecated replaced by {@link #isAncestorOf(TreeReference, boolean)}
+     */
     @Deprecated
     public boolean isParentOf(TreeReference child, boolean properParent) {
         return isAncestorOf(child, properParent);
