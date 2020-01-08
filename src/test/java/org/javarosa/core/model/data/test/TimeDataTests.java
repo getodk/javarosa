@@ -16,55 +16,32 @@
 
 package org.javarosa.core.model.data.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
 import org.javarosa.core.model.data.TimeData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Before;
+import org.junit.Test;
 
-public class TimeDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(TimeDataTests.class);
+public class TimeDataTests {
     Date now;
     Date minusOneHour;
 
-    private static int NUM_TESTS = 3;
 
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
+
 
         now = new Date();
         minusOneHour = new Date(new Date().getTime() - (1000*60));
     }
 
-    public TimeDataTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new TimeDataTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testGetData";
-        case 2: return "testSetData";
-        case 3: return "testNullData";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testGetData() {
         TimeData data = new TimeData(now);
         assertEquals("TimeData's getValue returned an incorrect Time", data.getValue(), now);
@@ -78,6 +55,7 @@ public class TimeDataTests extends TestCase {
         assertEquals("TimeData's getValue was mutated incorrectly", data.getValue(), temp);
 
     }
+    @Test
     public void testSetData() {
         TimeData data = new TimeData(now);
         data.setValue(minusOneHour);
@@ -94,6 +72,7 @@ public class TimeDataTests extends TestCase {
 
         assertEquals("TimeData's value was mutated incorrectly", data.getValue(), temp);
     }
+    @Test
     public void testNullData() {
         boolean exceptionThrown = false;
         TimeData data = new TimeData();

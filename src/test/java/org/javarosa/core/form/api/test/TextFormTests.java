@@ -1,8 +1,10 @@
 package org.javarosa.core.form.api.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
@@ -17,11 +19,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-public class TextFormTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(TextFormTests.class);
+public class TextFormTests {
 
     QuestionDef q = null;
     FormEntryPrompt fep = null;
@@ -29,53 +31,21 @@ public class TextFormTests extends TestCase {
 
     static PrototypeFactory pf;
 
-    static {
+    @BeforeClass
+    public static void classSetup() {
         PrototypeManager.registerPrototype("org.javarosa.model.xform.XPathReference");
         pf = ExtUtil.defaultPrototypes();
     }
 
 
-    public TextFormTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
+    @Before
     public void setUp(){
         fpi = new FormParseInit();
         q = fpi.getFirstQuestionDef();
         fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());
     }
 
-
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-        logger.info("Running TextFormTests...");
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-            aSuite.addTest(new TextFormTests(doTest(testID)));
-        }
-
-        return aSuite;
-    }
-
-
-
-    public final static int NUM_TESTS = 8;
-    public static String doTest (int i) {
-        switch (i) {
-        case 1: return "testConstructors";
-        case 2: return "testPromptsNoLocalizer";
-        case 3: return "testPromptIDsNoLocalizer";
-        case 4: return "testPromptsWithLocalizer";
-        case 5: return "testSelectChoicesNoLocalizer";
-        case 6: return "testSelectChoiceIDsNoLocalizer";
-        case 7: return "testNonLocalizedText";
-        case 8: return "testTextForms";
-        }
-        throw new IllegalStateException("unexpected index");
-    }
-
+    @Test
     public void testConstructors () {
         QuestionDef q;
 
@@ -98,6 +68,7 @@ public class TextFormTests extends TestCase {
      * (fallback to default for example).
      * Test being able to retrieve other exotic forms
      */
+    @Test
     public void testTextForms(){
         FormEntryController fec = fpi.getFormEntryController();
         fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
@@ -129,6 +100,7 @@ public class TextFormTests extends TestCase {
 
     }
 
+    @Test
     public void testNonLocalizedText(){
         FormEntryController fec = fpi.getFormEntryController();
         fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
@@ -152,6 +124,7 @@ public class TextFormTests extends TestCase {
         if(!testFlag) fail("Failed to fallback to labelInnerText in testNonLocalizedText()");
     }
 
+    @Test
     public void testSelectChoiceIDsNoLocalizer () {
 
         QuestionDef q = fpi.getFirstQuestionDef();
@@ -169,6 +142,7 @@ public class TextFormTests extends TestCase {
         q.removeSelectChoice(q.getChoices().get(0));
     }
 
+    @Test
     public void testSelectChoicesNoLocalizer () {
         QuestionDef q = fpi.getFirstQuestionDef();
         if (q.getNumChoices() != 0) {
@@ -203,6 +177,7 @@ public class TextFormTests extends TestCase {
         q.removeSelectChoice(q.getChoice(0));
     }
 
+    @Test
     public void testPromptsWithLocalizer () {
         Localizer l = new Localizer();
 
@@ -231,6 +206,7 @@ public class TextFormTests extends TestCase {
 
     }
 
+    @Test
     public void testPromptIDsNoLocalizer () {
         QuestionDef q = new QuestionDef();
 
@@ -245,6 +221,7 @@ public class TextFormTests extends TestCase {
         }
     }
 
+    @Test
     public void testPromptsNoLocalizer () {
         QuestionDef q = new QuestionDef();
 

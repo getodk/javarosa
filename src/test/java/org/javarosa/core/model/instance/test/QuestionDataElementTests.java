@@ -16,9 +16,10 @@
 
 package org.javarosa.core.model.instance.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,11 +35,10 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Before;
+import org.junit.Test;
 
-public class QuestionDataElementTests extends TestCase{
-    private static final Logger logger = LoggerFactory.getLogger(QuestionDataElementTests.class);
+public class QuestionDataElementTests {
     private final String stringElementName = "String Data Element";
 
     StringData stringData;
@@ -51,10 +51,9 @@ public class QuestionDataElementTests extends TestCase{
     TreeElement stringElement;
     TreeElement intElement;
 
-    private static int NUM_TESTS = 7;
-
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
+
         stringData = new StringData("Answer Value");
         integerData = new IntegerData(4);
 
@@ -135,45 +134,17 @@ public class QuestionDataElementTests extends TestCase{
         stringElement.setValue(stringData);
 
     }
-
-    public QuestionDataElementTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new QuestionDataElementTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-            case 1: return "testIsLeaf";
-            case 2: return "testGetName";
-            case 3: return "testSetName";
-            case 4: return "testGetValue";
-            case 5: return "testSetValue";
-            case 6: return "testAcceptsVisitor";
-            case 7: return "testSuperclassMethods";
-
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testIsLeaf() {
         assertTrue("Question Data Element returned negative for being a leaf",stringElement.isLeaf());
     }
 
+    @Test
     public void testGetName() {
         assertEquals("Question Data Element 'string' did not properly get its name", stringElement.getName(), stringElementName);
     }
 
+    @Test
     public void testSetName() {
         String newName = new String("New Name");
         stringElement.setName(newName);
@@ -181,11 +152,13 @@ public class QuestionDataElementTests extends TestCase{
         assertEquals("Question Data Element 'string' did not properly set its name", stringElement.getName(), newName);
     }
 
+    @Test
     public void testGetValue() {
         IAnswerData data = stringElement.getValue();
         assertEquals("Question Data Element did not return the correct value",data,stringData);
     }
 
+    @Test
     public void testSetValue() {
         stringElement.setValue(integerData);
         assertEquals("Question Data Element did not set value correctly",stringElement.getValue(),integerData);
@@ -217,6 +190,7 @@ public class QuestionDataElementTests extends TestCase{
         }
     }
 
+    @Test
     public void testAcceptsVisitor() {
         final MutableBoolean visitorAccepted = new MutableBoolean(false);
         final MutableBoolean dispatchedWrong = new MutableBoolean(false);
@@ -236,6 +210,7 @@ public class QuestionDataElementTests extends TestCase{
         assertTrue("The visitor was dispatched incorrectly by the QuestionDataElement",!dispatchedWrong.getValue());
     }
 
+    @Test
     public void testSuperclassMethods() {
         //stringElement should not have a root at this point.
 

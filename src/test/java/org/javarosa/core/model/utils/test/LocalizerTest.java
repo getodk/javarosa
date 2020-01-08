@@ -16,9 +16,10 @@
 
 package org.javarosa.core.model.utils.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 
@@ -30,75 +31,18 @@ import org.javarosa.core.util.OrderedMap;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
 
-public class LocalizerTest extends TestCase  {
-    private static final Logger logger = LoggerFactory.getLogger(LocalizerTest.class);
+public class LocalizerTest {
 
-    public LocalizerTest(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new LocalizerTest(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-
-    public static final int NUM_TESTS = 31;
-
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testEmpty";
-        case 2: return "testAddLocale";
-        case 3: return "testAddLocaleWithData";
-        case 4: return "testAddExistingLocale";
-        case 5: return "testSetCurrentLocaleExists";
-        case 6: return "testSetCurrentLocaleNotExists";
-        case 7: return "testUnsetCurrentLocale";
-        case 8: return "testSetDefaultLocaleExists";
-        case 9: return "testSetDefaultLocaleNotExists";
-        case 10: return "testUnsetDefaultLocale";
-        case 11: return "testSetToDefault";
-        case 12: return "testSetToDefaultNoDefault";
-        case 13: return "testDestroyLocale";
-        case 14: return "testDestroyLocaleNotExist";
-        case 15: return "testDestroyCurrentLocale";
-        case 16: return "testDestroyDefaultLocale";
-        case 17: return "testAvailableLocales";
-        case 18: return "testGetNextLocale";
-        case 19: return "testGetLocaleMap";
-        case 20: return "testGetLocaleMapNotExist";
-        case 21: return "testTextMapping";
-        case 22: return "testTextMappingOverwrite";
-        case 23: return "testGetText";
-        case 24: return "testGetTextNoCurrentLocale";
-        case 25: return "testLocalizationObservers";
-        case 26: return "testLocalizationObserverUpdateOnRegister";
-        case 27: return "testNullArgs";
-        case 28: return "testSerialization";
-        case 29: return "testLinearSub";
-        case 30: return "testHashSub";
-        case 31: return "testFallbacks";
-
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
 
     private void testSerialize (Localizer l, String msg) {
         PrototypeFactory pf = new PrototypeFactory();
         pf.addClass(TableLocaleSource.class);
-        ExternalizableTest.testExternalizable(l, this, pf, "Localizer [" + msg + "]");
+        ExternalizableTest.testExternalizable(l, pf, "Localizer [" + msg + "]");
     }
 
+    @Test
     public void testEmpty () {
         Localizer l = new Localizer();
 
@@ -116,6 +60,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testAddLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -136,6 +81,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testAddLocaleWithData () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -159,6 +105,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testAddExistingLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -181,6 +128,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSetCurrentLocaleExists () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -192,6 +140,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSetCurrentLocaleNotExists () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -205,6 +154,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testUnsetCurrentLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -220,6 +170,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSetDefaultLocaleExists () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -231,6 +182,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSetDefaultLocaleNotExists () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -244,6 +196,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testUnsetDefaultLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -261,6 +214,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSetToDefault () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -273,6 +227,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSetToDefaultNoDefault () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -287,6 +242,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testDestroyLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -298,6 +254,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testDestroyLocaleNotExist () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -308,6 +265,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testDestroyCurrentLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -323,6 +281,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testDestroyDefaultLocale () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -335,6 +294,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testAvailableLocales () {
         Localizer l = new Localizer();
         String[] locales;
@@ -376,6 +336,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testGetNextLocale () {
         Localizer l = new Localizer();
         l.addAvailableLocale("test1");
@@ -406,6 +367,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testGetLocaleMap () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -416,6 +378,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testGetLocaleMapNotExist () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -429,6 +392,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testTextMapping () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -450,6 +414,7 @@ public class LocalizerTest extends TestCase  {
     }
 
 
+    @Test
     public void testTextMappingOverwrite () {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
@@ -471,6 +436,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testGetText () {
         for (int localeCase = 1; localeCase <= 3; localeCase++) {
             for (int formCase = 1; formCase <= 2; formCase++) {
@@ -486,7 +452,7 @@ public class LocalizerTest extends TestCase  {
     //private static final int BASE_FORM = 1;
     private static final int CUSTOM_FORM = 2;
 
-    public void testGetText (int localeCase, int formCase) {
+    private void testGetText (int localeCase, int formCase) {
         String ourLocale = null;
         String otherLocale = null;
 
@@ -511,7 +477,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
-    public void testGetText (int i, int j, int k, String ourLocale, String otherLocale, String textID, int localeCase, int formCase) {
+    private void testGetText (int i, int j, int k, String ourLocale, String otherLocale, String textID, int localeCase, int formCase) {
         Localizer l = buildLocalizer(i, j, k, ourLocale, otherLocale);
         String expected = expectedText(textID, l);
         String text, text2;
@@ -599,6 +565,7 @@ public class LocalizerTest extends TestCase  {
         return text;
     }
 
+    @Test
     public void testGetTextNoCurrentLocale () {
         Localizer l = new Localizer();
         TableLocaleSource table = new TableLocaleSource();
@@ -629,6 +596,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testLocalizationObservers () {
         Localizer l = new Localizer();
         l.addAvailableLocale("test1");
@@ -664,6 +632,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testLocalizationObserverUpdateOnRegister () {
         Localizer l = new Localizer();
         l.addAvailableLocale("test1");
@@ -677,6 +646,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testNullArgs () {
         Localizer l = new Localizer();
         l.addAvailableLocale("test");
@@ -776,6 +746,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testSerialization () {
         Localizer l = new Localizer(true, true);
         TableLocaleSource firstLocale = new TableLocaleSource();
@@ -829,6 +800,7 @@ public class LocalizerTest extends TestCase  {
         testSerialize(l, "locales with data 6");
     }
 
+    @Test
     public void testLinearSub() {
         final String F = "first";
         final String S = "second";
@@ -888,6 +860,7 @@ public class LocalizerTest extends TestCase  {
         }
     }
 
+    @Test
     public void testHashSub() {
         final String F = "first";
         final String S = "second";
@@ -904,6 +877,7 @@ public class LocalizerTest extends TestCase  {
     }
 
 
+    @Test
     public void testFallbacks() {
         Localizer localizer =  new Localizer(true,true);
 

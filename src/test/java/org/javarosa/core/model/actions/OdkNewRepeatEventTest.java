@@ -1,13 +1,13 @@
 package org.javarosa.core.model.actions;
 
-import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParseException;
-import org.junit.Test;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
+
+import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
+import org.junit.Test;
 
 /**
  * Specification: https://opendatakit.github.io/xforms-spec/#the-odk-new-repeat-event.

@@ -10,7 +10,6 @@ import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Before;
 import org.junit.Test;
-
 public class RecalculateTest {
     private FormDef formDef;
 

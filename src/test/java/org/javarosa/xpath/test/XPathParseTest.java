@@ -246,7 +246,7 @@ public class XPathParseTest extends TestCase {
             }
 
             //test serialization of parse tree
-            ExternalizableTest.testExternalizable(new ExtWrapTagged(xpe), new ExtWrapTagged(), pf, this, "XPath");
+            ExternalizableTest.testExternalizable(new ExtWrapTagged(xpe), new ExtWrapTagged(), pf, "XPath");
         } catch (XPathSyntaxException xse) {
             fail("XPath Parse Failed! Unexpected syntax error." +
                         "\n    expression:[" + expr + "]");
