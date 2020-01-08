@@ -370,7 +370,6 @@ public class TriggerableDag {
         Set<QuickTriggerable> remainingVertices = new HashSet<>(vertices);
         Set<QuickTriggerable[]> remainingEdges = new HashSet<>(edges);
         while (remainingVertices.size() > 0) {
-
             Set<QuickTriggerable> roots = new HashSet<>(remainingVertices);
             for (QuickTriggerable[] edge : remainingEdges)
                 roots.remove(edge[1]);
@@ -378,8 +377,7 @@ public class TriggerableDag {
             if (roots.size() == 0)
                 throwCyclesInDagException(vertices);
 
-            List<QuickTriggerable> orderedRoots = new ArrayList<>(roots);
-            dag.addAll(orderedRoots);
+            dag.addAll(roots);
 
             Set<QuickTriggerable> newRemainingVertices = new HashSet<>();
             for (QuickTriggerable vertex : vertices)
