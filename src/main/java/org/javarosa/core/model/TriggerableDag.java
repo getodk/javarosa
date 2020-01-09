@@ -395,7 +395,9 @@ public class TriggerableDag {
     private static Set<QuickTriggerable> getDependantTriggerables(QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
         Set<QuickTriggerable> result = new HashSet<>();
         for (TreeReference targetRef : triggerable.getTargets()) {
-            Set<QuickTriggerable> children = triggerIndex.getOrDefault(targetRef, emptySet());
+            Set<QuickTriggerable> children = triggerIndex.containsKey(targetRef)
+                ? triggerIndex.get(targetRef)
+                : emptySet();
             result.addAll(children);
             for (QuickTriggerable child : children)
                 if (child != triggerable && !result.contains(child))
