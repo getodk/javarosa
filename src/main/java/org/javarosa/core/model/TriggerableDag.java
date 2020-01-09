@@ -35,7 +35,6 @@ import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
-import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -344,11 +343,18 @@ public class TriggerableDag {
     }
 
     private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, List<QuickTriggerable[]> edges) {
+        // The dag and the set of remaining vertices will be mutated
+        // inside the while loop's block
         Set<QuickTriggerable> dag = new LinkedHashSet<>();
-
         Set<QuickTriggerable> remainingVertices = new HashSet<>(vertices);
+
+        // The set of remaining edges will be replaced inside
+        // the while loop's block
         Set<QuickTriggerable[]> remainingEdges = new HashSet<>(edges);
+
         while (remainingVertices.size() > 0) {
+            // Compute the set of roots (nodes that don't show up
+            // as edge targets) with the remaining vertices
             Set<QuickTriggerable> roots = new HashSet<>(remainingVertices);
             for (QuickTriggerable[] edge : remainingEdges)
                 roots.remove(edge[1]);
@@ -356,14 +362,12 @@ public class TriggerableDag {
             if (roots.size() == 0)
                 throwCyclesInDagException(vertices);
 
+            // "Move" the roots detected during this iteration
+            // from the remainingVertices to the DAG
+            remainingVertices.removeAll(roots);
             dag.addAll(roots);
 
-            Set<QuickTriggerable> newRemainingVertices = new HashSet<>();
-            for (QuickTriggerable vertex : vertices)
-                if (!dag.contains(vertex))
-                    newRemainingVertices.add(vertex);
-            remainingVertices = newRemainingVertices;
-
+            // Compute the new set of remaining edges to continue the iteration
             Set<QuickTriggerable[]> newRemainingEdges = new HashSet<>();
             for (QuickTriggerable[] edge : remainingEdges)
                 if (!roots.contains(edge[0]))
