@@ -357,8 +357,6 @@ public class TriggerableDag {
         return repeatConditionsPerTargets;
     }
 
-    // TODO We can avoid having to resolve dependant refs using the mainInstance by adding descendant refs as targets of relevance triggerables
-
     /**
      * Returns the list of edges in the DAG that can be built from the provided
      * vertices.
@@ -374,18 +372,24 @@ public class TriggerableDag {
      */
     private static List<QuickTriggerable[]> getDagEdges(Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
         List<QuickTriggerable[]> edges = new ArrayList<>();
-        for (QuickTriggerable vertex : vertices) {
-            Set<QuickTriggerable> dependants = getDependantTriggerables(vertex, triggerIndex);
+        for (QuickTriggerable source : vertices) {
+            // Compute the set of direct children triggerables of this source vertex
+            Set<QuickTriggerable> targets = new HashSet<>();
+            for (TreeReference targetRef : source.getTargets())
+                targets.addAll(triggerIndex.containsKey(targetRef)
+                    ? triggerIndex.get(targetRef)
+                    : emptySet());
 
-            if (dependants.contains(vertex))
-                throwCyclesInDagException(dependants);
+            // Account for cycles by self-reference
+            if (targets.contains(source))
+                throwCyclesInDagException(targets);
 
-            if (vertex.canCascade())
-                for (QuickTriggerable dependantVertex : dependants)
-                    edges.add(new QuickTriggerable[]{vertex, dependantVertex});
+            if (source.canCascade())
+                for (QuickTriggerable target : targets)
+                    edges.add(new QuickTriggerable[]{source, target});
 
             // TODO Move this from Triggerable to TriggerableDag
-            vertex.setImmediateCascades(dependants);
+            source.setImmediateCascades(targets);
         }
         return edges;
     }
@@ -438,24 +442,6 @@ public class TriggerableDag {
                 + hints;
         }
         throw new IllegalStateException(message);
-    }
-
-    /**
-     * Get all of the elements which will need to be evaluated (in order) when
-     * the triggerable is fired.
-     */
-    private static Set<QuickTriggerable> getDependantTriggerables(QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
-        Set<QuickTriggerable> result = new HashSet<>();
-        for (TreeReference targetRef : triggerable.getTargets()) {
-            Set<QuickTriggerable> children = triggerIndex.containsKey(targetRef)
-                ? triggerIndex.get(targetRef)
-                : emptySet();
-            result.addAll(children);
-            for (QuickTriggerable child : children)
-                if (child != triggerable && !result.contains(child))
-                    result.addAll(getDependantTriggerables(child, triggerIndex));
-        }
-        return result;
     }
 
     /**
