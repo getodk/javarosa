@@ -384,9 +384,8 @@ public class TriggerableDag {
             if (targets.contains(source))
                 throwCyclesInDagException(targets);
 
-            if (source.canCascade())
-                for (QuickTriggerable target : targets)
-                    edges.add(new QuickTriggerable[]{source, target});
+            for (QuickTriggerable target : targets)
+                edges.add(new QuickTriggerable[]{source, target});
 
             // TODO Move this from Triggerable to TriggerableDag
             source.setImmediateCascades(targets);
