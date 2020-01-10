@@ -370,14 +370,14 @@ public class TriggerableDag {
      *     the DAG again</li>
      * </ul>
      */
-    private static List<QuickTriggerable[]> getDagEdges(Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+    private static List<QuickTriggerable[]> getDagEdges(Set<QuickTriggerable> triggerables, Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger) {
         List<QuickTriggerable[]> edges = new ArrayList<>();
-        for (QuickTriggerable source : vertices) {
+        for (QuickTriggerable source : triggerables) {
             // Compute the set of direct children triggerables of this source vertex
             Set<QuickTriggerable> targets = new HashSet<>();
             for (TreeReference targetRef : source.getTargets())
-                targets.addAll(triggerIndex.containsKey(targetRef)
-                    ? triggerIndex.get(targetRef)
+                targets.addAll(triggerablesPerTrigger.containsKey(targetRef)
+                    ? triggerablesPerTrigger.get(targetRef)
                     : emptySet());
 
             // Account for cycles by self-reference
