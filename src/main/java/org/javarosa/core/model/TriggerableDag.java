@@ -56,12 +56,54 @@ public class TriggerableDag {
         EventNotifier getEventNotifier();
     }
 
+    /**
+     * Stores the event notifier required to create instances of this class.
+     * <p>
+     * The event notifier is used to publish events that serve as a form for
+     * loose coupling between processes that could be running at the same time
+     * in a JavaRosa client.
+     */
     protected final EventNotifierAccessor accessor;
 
+    /**
+     * Stores the unsorted set of all triggerables present in the form.
+     * <p>
+     * This set is used during the DAG build process.
+     */
     protected final Set<QuickTriggerable> allTriggerables = new HashSet<>();
+
+    /**
+     * Stores the sorted set of all triggerables using the dependency direction
+     * as ordering.
+     * <p>
+     * Triggerables present in this set depend exclusively on preceding
+     * triggerables.
+     */
     protected Set<QuickTriggerable> triggerablesDAG = emptySet();
 
+    // TODO Make this member fit the expected behavior on calling sites by containing only relevance conditions
+    /**
+     * Stores an index for conditions (triggerables declared in
+     * <code>readonly</code>, <code>required</code>, or <code>relevant</code>
+     * attributes) belonging to repeat groups.
+     * <p>
+     * This index is used to determine whether a repeat group instance is
+     * relevant or not.
+     * <p>
+     * <b>Warning</b>: Calling site assumes that a repeat group would only have
+     * one object stored for its reference in this map. This is because, so
+     * far, <code>relevant</code> is the only attribute that makes sense adding
+     * to a repeat group, but a form could declare other conditions as well,
+     * leading to an unexpected scenario.
+     */
     protected Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
+    /**
+     * Stores an index to resolve triggerables by their corresponding trigger's
+     * reference.
+     * <p>
+     * Note that there's a m:n relationship between trigger references and
+     * triggerables.
+     */
     protected final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
 
@@ -262,7 +304,9 @@ public class TriggerableDag {
      * <p>
      * This method has side-effects:
      * <ul>
-     *     <li>If a similar triggerable has been already added, its context gets intersected with the provided triggerable to cover both using only one entry</li>
+     *     <li>If a similar triggerable has been already added, its context gets
+     *     intersected with the provided triggerable to cover both using only
+     *     one entry</li>
      *     <li>This method builds the index of triggerables per trigger ref</li>
      * </ul>
      */
@@ -316,12 +360,16 @@ public class TriggerableDag {
     // TODO We can avoid having to resolve dependant refs using the mainInstance by adding descendant refs as targets of relevance triggerables
 
     /**
-     * Returns the list of edges in the DAG that can be built from the provided vertices.
+     * Returns the list of edges in the DAG that can be built from the provided
+     * vertices.
      * <p>
      * This method has side-effects:
      * <ul>
-     *     <li>Throws IllegalStateException when cycles are detected, either due to a self-reference or more complex cycle chains</li>
-     *     <li>Builds a cache of immediate cascades of each vertex, meaning that we will remember the dependant vertices without having to traverse the DAG again</li>
+     *     <li>Throws IllegalStateException when cycles are detected, either due
+     *     to a self-reference or more complex cycle chains</li>
+     *     <li>Builds a cache of immediate cascades of each vertex, meaning that
+     *     we will remember the dependant vertices without having to traverse
+     *     the DAG again</li>
      * </ul>
      */
     private static List<QuickTriggerable[]> getDagEdges(Set<QuickTriggerable> vertices, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
@@ -453,10 +501,10 @@ public class TriggerableDag {
     }
 
     /**
-     * Invoked to validate a filled-in form. Sweeps through from beginning
-     * to end, confirming that the entered values satisfy all constraints.
-     * The FormEntryController is based upon the FormDef, but has its own
-     * model and controller independent of anything at the UI layer.
+     * Invoked to validate a filled-in form. Sweeps through from beginning to
+     * end, confirming that the entered values satisfy all constraints. The
+     * FormEntryController is based upon the FormDef, but has its own model and
+     * controller independent of anything at the UI layer.
      */
     public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
 
