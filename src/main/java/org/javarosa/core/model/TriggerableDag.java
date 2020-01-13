@@ -370,8 +370,8 @@ public class TriggerableDag {
      *     the DAG again {@link Triggerable#getImmediateCascades()}</li>
      * </ul>
      */
-    private List<QuickTriggerable[]> getDagEdges() {
-        List<QuickTriggerable[]> edges = new ArrayList<>();
+    private Set<QuickTriggerable[]> getDagEdges() {
+        Set<QuickTriggerable[]> edges = new HashSet<>();
         for (QuickTriggerable source : allTriggerables) {
             // Compute the set of edge targets from the source vertex in this
             // loop using the triggerable's target tree reference set.
@@ -406,7 +406,7 @@ public class TriggerableDag {
      *     more than one node</li>
      * </ul>
      */
-    private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, List<QuickTriggerable[]> edges) {
+    private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, Set<QuickTriggerable[]> edges) {
         // The dag and the set of remaining vertices will be mutated
         // inside the while loop's block
         Set<QuickTriggerable> dag = new LinkedHashSet<>();
