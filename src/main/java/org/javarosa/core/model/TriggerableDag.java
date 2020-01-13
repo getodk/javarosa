@@ -307,7 +307,8 @@ public class TriggerableDag {
      *     <li>If a similar triggerable has been already added, its context gets
      *     intersected with the provided triggerable to cover both using only
      *     one entry</li>
-     *     <li>This method builds the index of triggerables per trigger ref</li>
+     *     <li>This method builds the index of triggerables per trigger ref
+     *     at {@link #triggerablesPerTrigger}</li>
      * </ul>
      */
     Triggerable addTriggerable(Triggerable triggerable) {
@@ -342,8 +343,7 @@ public class TriggerableDag {
      * conditions will be evaluated in the appropriate orders.
      */
     public void finalizeTriggerables(FormInstance mainInstance) throws IllegalStateException {
-        List<QuickTriggerable[]> edges = getDagEdges(allTriggerables, triggerablesPerTrigger);
-        triggerablesDAG = buildDag(allTriggerables, edges);
+        triggerablesDAG = buildDag(allTriggerables, getDagEdges());
         repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
     }
 
@@ -358,21 +358,21 @@ public class TriggerableDag {
     }
 
     /**
-     * Returns the list of edges in the DAG that can be built from the provided
-     * vertices.
+     * Returns the list of edges in the DAG that can be built from all the
+     * triggerables added to the DAG while parsing the form.
      * <p>
      * This method has side-effects:
      * <ul>
-     *     <li>Throws IllegalStateException when cycles are detected, either due
-     *     to a self-reference or more complex cycle chains</li>
+     *     <li>Throws IllegalStateException when cycles are detected involving
+     *     self-references</li>
      *     <li>Builds a cache of immediate cascades of each vertex, meaning that
      *     we will remember the dependant vertices without having to traverse
-     *     the DAG again</li>
+     *     the DAG again {@link Triggerable#getImmediateCascades()}</li>
      * </ul>
      */
-    private static List<QuickTriggerable[]> getDagEdges(Set<QuickTriggerable> triggerables, Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger) {
+    private List<QuickTriggerable[]> getDagEdges() {
         List<QuickTriggerable[]> edges = new ArrayList<>();
-        for (QuickTriggerable source : triggerables) {
+        for (QuickTriggerable source : allTriggerables) {
             // Compute the set of direct children triggerables of this source vertex
             Set<QuickTriggerable> targets = new HashSet<>();
             for (TreeReference targetRef : source.getTargets())
@@ -393,6 +393,16 @@ public class TriggerableDag {
         return edges;
     }
 
+    /**
+     * Returns a set with the DAG that can be build using the provided vertices
+     * and edges.
+     * <p>
+     * This method has side-effects:
+     * <ul>
+     *     <li>Throws IllegalStateException when cycles are detected involving
+     *     more than one node</li>
+     * </ul>
+     */
     private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, List<QuickTriggerable[]> edges) {
         // The dag and the set of remaining vertices will be mutated
         // inside the while loop's block
