@@ -373,7 +373,10 @@ public class TriggerableDag {
     private List<QuickTriggerable[]> getDagEdges() {
         List<QuickTriggerable[]> edges = new ArrayList<>();
         for (QuickTriggerable source : allTriggerables) {
-            // Compute the set of direct children triggerables of this source vertex
+            // Compute the set of edge targets from the source vertex in this
+            // loop using the triggerable's target tree reference set.
+            // We will create an edge for all the source's target references
+            // that, in turn, trigger another triggerable.
             Set<QuickTriggerable> targets = new HashSet<>();
             for (TreeReference targetRef : source.getTargets())
                 targets.addAll(triggerablesPerTrigger.containsKey(targetRef)
