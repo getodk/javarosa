@@ -277,10 +277,12 @@ public class TriggerableDagTest {
     }
 
     /**
-     * Indirectly means that the calculation - `concat(/data/house/name)` - does not take the
+     * Indirectly means that the calculation - `concat(/data/house/name)` - does
+     * not take the
      * `/data/house` nodeset (the repeat group) as an argument
      * but since it takes one of its children (`name` children),
-     * the calculation must re-evaluated once after a repeat group deletion because one of the children
+     * the calculation must re-evaluated once after a repeat group deletion
+     * because one of the children
      * has been deleted along with its parent (the repeat group instance).
      */
     @Test
@@ -325,8 +327,10 @@ public class TriggerableDagTest {
     /**
      * This test was inspired by the issue reported at https://code.google.com/archive/p/opendatakit/issues/888
      * <p>
-     * We want to focus on the relationship between relevancy and other calculations because relevancy can be
-     * defined for fields **and groups**, which is a special case of expression evaluation in our DAG.
+     * We want to focus on the relationship between relevancy and other
+     * calculations because relevancy can be
+     * defined for fields **and groups**, which is a special case of expression
+     * evaluation in our DAG.
      */
     @Test
     public void verify_relation_between_calculate_expressions_and_relevancy_conditions() throws IOException {
@@ -375,12 +379,16 @@ public class TriggerableDagTest {
     }
 
     /**
-     * Ignored because the assertions about non-null next-numbers will fail because our DAG
-     * doesn't evaluate calculations in repeat instances that are previous siblings to the
+     * Ignored because the assertions about non-null next-numbers will fail
+     * because our DAG
+     * doesn't evaluate calculations in repeat instances that are previous
+     * siblings to the
      * one that has changed.
      * <p>
-     * The expeculation is that, originally, only forward references might have been considered
-     * to speed up repeat group intance deletion because it was assumed that back references
+     * The expeculation is that, originally, only forward references might have
+     * been considered
+     * to speed up repeat group intance deletion because it was assumed that
+     * back references
      * were a marginal use case.
      * <p>
      * This test explores how the issue affects to value changes too.
@@ -453,8 +461,10 @@ public class TriggerableDagTest {
     }
 
     /**
-     * Ignored because the count() function inside the predicate of the result_2 calculate
-     * expression isn't evaled correctly, as opposed to the predicate of the result_1 calculate
+     * Ignored because the count() function inside the predicate of the result_2
+     * calculate
+     * expression isn't evaled correctly, as opposed to the predicate of the
+     * result_1 calculate
      * that uses an interim field as a proxy for the same computation
      */
     @Test
@@ -710,9 +720,12 @@ public class TriggerableDagTest {
     }
 
     /**
-     * This test fails to parse the form because it thinks there's a self-reference cycle in /data/group/a,
-     * but this would be incorrect because each it depends on the same field belonging to the previous
-     * repeat instance, which wouldn't be a cycle, but an autoincremental feature.
+     * This test fails to parse the form because it thinks there's a
+     * self-reference cycle in /data/group/a,
+     * but this would be incorrect because each it depends on the same field
+     * belonging to the previous
+     * repeat instance, which wouldn't be a cycle, but an autoincremental
+     * feature.
      */
     @Test
     @Ignore
@@ -762,6 +775,36 @@ public class TriggerableDagTest {
         ));
     }
 
+    @Test
+    public void order_of_the_DAG_is_ensured() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a", "2"),
+                        t("b"),
+                        t("c")
+                    )),
+                    bind("/data/a").type("int"),
+                    bind("/data/b").type("int").calculate("/data/a * 3"),
+                    bind("/data/c").type("int").calculate("(/data/a + /data/b) * 5")
+                )
+            ),
+            body(input("/data/a"))
+        ));
+
+        assertThat(scenario.answerOf("/data/a"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/b"), is(intAnswer(6)));
+        assertThat(scenario.answerOf("/data/c"), is(intAnswer(40)));
+
+        scenario.answer("/data/a", 3);
+
+        assertThat(scenario.answerOf("/data/a"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/b"), is(intAnswer(9)));
+        // Verify that c gets computed using the updated value of b.
+        assertThat(scenario.answerOf("/data/c"), is(intAnswer(60)));
+    }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
