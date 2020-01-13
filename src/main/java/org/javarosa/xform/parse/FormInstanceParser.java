@@ -399,7 +399,7 @@ class FormInstanceParser {
                 // groups, we need to register all descendant refs as targets for relevancy
                 // conditions to allow for chained reactions in triggerables registered in
                 // any of those descendants
-                for (TreeReference r : getDescendantRefs(instance, ec, ref))
+                for (TreeReference r : getChildrenOfReference(instance, ec, ref))
                     bind.relevancyCondition.addTarget(r);
             }
             if (bind.requiredCondition != null)
@@ -432,39 +432,44 @@ class FormInstanceParser {
         applyControlProperties(instance);
     }
 
-    private static Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference target) {
-        Set<TreeReference> allDescendants = new HashSet<>();
-        for (AbstractTreeElement<?> child : getChildrenElements(mainInstance, evalContext, target)) {
-            allDescendants.add(child.getRef().genericize());
-            allDescendants.addAll(getDescendantRefs(child));
-        }
-        return allDescendants;
-    }
+    private Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
+        // original has already been added to the 'toAdd' list.
 
-    private static Set<TreeReference> getDescendantRefs(AbstractTreeElement<?> element) {
-        Set<TreeReference> allDescendants = new HashSet<>();
-        for (int i = 0; i < element.getNumChildren(); ++i) {
-            AbstractTreeElement<?> child = element.getChildAt(i);
-            allDescendants.add(child.getRef().genericize());
-            allDescendants.addAll(getDescendantRefs(child));
-        }
-        return allDescendants;
-    }
-
-
-    private static Set<AbstractTreeElement<?>> getChildrenElements(FormInstance mainInstance, EvaluationContext evalContext, TreeReference target) {
-        AbstractTreeElement<?> repeatTemplate = mainInstance.getTemplatePath(target);
+        Set<TreeReference> descendantRefs = new HashSet<>();
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
         if (repeatTemplate != null) {
-            Set<AbstractTreeElement<?>> elements = new HashSet<>();
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i)
-                elements.add(repeatTemplate.getChildAt(i));
-            return elements;
+            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
+                TreeElement child = repeatTemplate.getChildAt(i);
+                descendantRefs.add(child.getRef().genericize());
+                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+            }
+        } else {
+            List<TreeReference> refSet = evalContext.expandReference(original);
+            for (TreeReference ref : refSet) {
+                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, evalContext.resolveReference(ref)));
+            }
         }
-        Set<AbstractTreeElement<?>> elements = new HashSet<>();
-        List<TreeReference> refSet = evalContext.expandReference(target);
-        for (TreeReference ref : refSet)
-            elements.add(evalContext.resolveReference(ref));
-        return elements;
+        return descendantRefs;
+    }
+
+    // Recursive step of utility method
+    private Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> el) {
+        Set<TreeReference> childrenRefs = new HashSet<>();
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
+        if (repeatTemplate != null) {
+            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
+                TreeElement child = repeatTemplate.getChildAt(i);
+                childrenRefs.add(child.getRef().genericize());
+                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+            }
+        } else {
+            for (int i = 0; i < el.getNumChildren(); ++i) {
+                AbstractTreeElement<?> child = el.getChildAt(i);
+                childrenRefs.add(child.getRef().genericize());
+                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+            }
+        }
+        return childrenRefs;
     }
 
 
