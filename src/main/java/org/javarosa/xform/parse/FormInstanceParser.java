@@ -399,7 +399,7 @@ class FormInstanceParser {
                 // groups, we need to register all descendant refs as targets for relevancy
                 // conditions to allow for chained reactions in triggerables registered in
                 // any of those descendants
-                for (TreeReference r : getChildrenOfReference(instance, ec, ref))
+                for (TreeReference r : getDescendantRefs(instance, ec, ref))
                     bind.relevancyCondition.addTarget(r);
             }
             if (bind.requiredCondition != null)
@@ -432,7 +432,7 @@ class FormInstanceParser {
         applyControlProperties(instance);
     }
 
-    private Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
+    private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
         // original has already been added to the 'toAdd' list.
 
         Set<TreeReference> descendantRefs = new HashSet<>();
@@ -441,32 +441,32 @@ class FormInstanceParser {
             for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
                 TreeElement child = repeatTemplate.getChildAt(i);
                 descendantRefs.add(child.getRef().genericize());
-                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+                descendantRefs.addAll(getDescendantRefs(mainInstance, child));
             }
         } else {
             List<TreeReference> refSet = evalContext.expandReference(original);
             for (TreeReference ref : refSet) {
-                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, evalContext.resolveReference(ref)));
+                descendantRefs.addAll(getDescendantRefs(mainInstance, evalContext.resolveReference(ref)));
             }
         }
         return descendantRefs;
     }
 
     // Recursive step of utility method
-    private Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> el) {
+    private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, AbstractTreeElement<?> el) {
         Set<TreeReference> childrenRefs = new HashSet<>();
         TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
         if (repeatTemplate != null) {
             for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
                 TreeElement child = repeatTemplate.getChildAt(i);
                 childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+                childrenRefs.addAll(getDescendantRefs(mainInstance, child));
             }
         } else {
             for (int i = 0; i < el.getNumChildren(); ++i) {
                 AbstractTreeElement<?> child = el.getChildAt(i);
                 childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+                childrenRefs.addAll(getDescendantRefs(mainInstance, child));
             }
         }
         return childrenRefs;
