@@ -63,14 +63,14 @@ public class TriggerableDag {
      * loose coupling between processes that could be running at the same time
      * in a JavaRosa client.
      */
-    protected final EventNotifierAccessor accessor;
+    private final EventNotifierAccessor accessor;
 
     /**
      * Stores the unsorted set of all triggerables present in the form.
      * <p>
      * This set is used during the DAG build process.
      */
-    protected final Set<QuickTriggerable> allTriggerables = new HashSet<>();
+    private final Set<QuickTriggerable> allTriggerables = new HashSet<>();
 
     /**
      * Stores the sorted set of all triggerables using the dependency direction
@@ -79,7 +79,7 @@ public class TriggerableDag {
      * Triggerables present in this set depend exclusively on preceding
      * triggerables.
      */
-    protected Set<QuickTriggerable> triggerablesDAG = emptySet();
+    private Set<QuickTriggerable> triggerablesDAG = emptySet();
 
     // TODO Make this member fit the expected behavior on calling sites by containing only relevance conditions
     /**
@@ -96,7 +96,7 @@ public class TriggerableDag {
      * to a repeat group, but a form could declare other conditions as well,
      * leading to an unexpected scenario.
      */
-    protected Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
+    private Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
     /**
      * Stores an index to resolve triggerables by their corresponding trigger's
      * reference.
@@ -104,14 +104,13 @@ public class TriggerableDag {
      * Note that there's a m:n relationship between trigger references and
      * triggerables.
      */
-    protected final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
+    private final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
-
-    protected TriggerableDag(EventNotifierAccessor accessor) {
+    public TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
     }
 
-    protected Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> tv, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
+    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> tv, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
         // tv should now contain all of the triggerable components which are going
         // to need to be addressed by this update.
         // 'triggerables' is topologically-ordered by dependencies, so evaluate
@@ -554,7 +553,7 @@ public class TriggerableDag {
         return false;
     }
 
-    protected final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
+    final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
     }
 
