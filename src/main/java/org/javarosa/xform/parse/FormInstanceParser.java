@@ -442,6 +442,7 @@ class FormInstanceParser {
                 descendantRefs.addAll(getDescendantRefs(mainInstance, child));
             }
         } else {
+            // TODO Eventually remove this branch because a parsed form can't force the program flow throw it
             List<TreeReference> refSet = evalContext.expandReference(original);
             for (TreeReference ref : refSet) {
                 descendantRefs.addAll(getDescendantRefs(mainInstance, evalContext.resolveReference(ref)));

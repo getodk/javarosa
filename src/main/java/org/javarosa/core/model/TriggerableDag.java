@@ -212,6 +212,9 @@ public class TriggerableDag {
             }
         }
 
+        // TODO Call doEvaluateTriggerables directly instead to avoid a redundant extra indirection level
+        // return doEvaluateTriggerables(mainInstance, evalContext, applicable, rootRef, alreadyEvaluated);
+
         return evaluateTriggerables(mainInstance, evalContext, applicable, rootRef, alreadyEvaluated);
     }
 
