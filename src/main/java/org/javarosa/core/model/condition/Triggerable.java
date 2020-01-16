@@ -58,7 +58,7 @@ public abstract class Triggerable implements Externalizable {
      * References to all of the (non-contextualized) nodes which should be
      * updated by the result of this triggerable
      */
-    protected List<TreeReference> targets;
+    protected Set<TreeReference> targets;
 
     /**
      * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
@@ -79,7 +79,7 @@ public abstract class Triggerable implements Externalizable {
 
     }
 
-    protected Triggerable(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    protected Triggerable(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         this.expr = expr;
         this.targets = targets;
         this.contextRef = contextRef;
@@ -88,11 +88,11 @@ public abstract class Triggerable implements Externalizable {
     }
 
     public static Triggerable condition(XPathConditional expr, ConditionAction trueAction, ConditionAction falseAction, TreeReference contextRef) {
-        return new Condition(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>(), trueAction, falseAction);
+        return new Condition(expr, contextRef, contextRef, new HashSet<>(), new HashSet<>(), trueAction, falseAction);
     }
 
     public static Triggerable recalculate(XPathConditional expr, TreeReference contextRef) {
-        return new Recalculate(expr, contextRef, contextRef, new ArrayList<>(), new HashSet<>());
+        return new Recalculate(expr, contextRef, contextRef, new HashSet<>(), new HashSet<>());
     }
 
     public abstract Object eval(FormInstance instance, EvaluationContext ec);
@@ -167,12 +167,12 @@ public abstract class Triggerable implements Externalizable {
         return affectedNodes;
     }
 
-    public List<TreeReference> getTargets() {
+    public Set<TreeReference> getTargets() {
         return targets;
     }
 
-    public void changeContextRefToIntersectWithTriggerable(Triggerable t) {
-        contextRef = contextRef.intersect(t.contextRef);
+    public void intersectContextWith(Triggerable other) {
+        contextRef = contextRef.intersect(other.contextRef);
     }
 
     public TreeReference getContext() {
@@ -196,9 +196,7 @@ public abstract class Triggerable implements Externalizable {
     }
 
     public void addTarget(TreeReference target) {
-        if (targets.indexOf(target) == -1) {
-            targets.add(target);
-        }
+        targets.add(target);
     }
 
     @Override
@@ -242,7 +240,7 @@ public abstract class Triggerable implements Externalizable {
         expr = (XPathConditional) ExtUtil.read(in, new ExtWrapTagged(), pf);
         contextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
         originalContextRef = (TreeReference) ExtUtil.read(in, TreeReference.class, pf);
-        targets = new ArrayList<>((List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf));
+        targets = new HashSet<>((List<TreeReference>) ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf));
     }
 
     @Override

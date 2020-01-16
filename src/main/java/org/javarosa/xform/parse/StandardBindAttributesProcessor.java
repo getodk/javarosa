@@ -59,9 +59,7 @@ class StandardBindAttributesProcessor {
             } else if ("false()".equals(xpathRel)) {
                 binding.relevantAbsolute = false;
             } else {
-                Triggerable c = buildCondition(xpathRel, "relevant", ref);
-                c = formDef.addTriggerable(c);
-                binding.relevancyCondition = c;
+                binding.relevancyCondition = formDef.addTriggerable(buildCondition(xpathRel, "relevant", ref));
             }
         }
 
@@ -72,9 +70,7 @@ class StandardBindAttributesProcessor {
             } else if ("false()".equals(xpathReq)) {
                 binding.requiredAbsolute = false;
             } else {
-                Triggerable c = buildCondition(xpathReq, "required", ref);
-                c = formDef.addTriggerable(c);
-                binding.requiredCondition = c;
+                binding.requiredCondition = formDef.addTriggerable(buildCondition(xpathReq, "required", ref));
             }
         }
 
@@ -85,9 +81,7 @@ class StandardBindAttributesProcessor {
             } else if ("false()".equals(xpathRO)) {
                 binding.readonlyAbsolute = false;
             } else {
-                Triggerable c = buildCondition(xpathRO, "readonly", ref);
-                c = formDef.addTriggerable(c);
-                binding.readonlyCondition = c;
+                binding.readonlyCondition = formDef.addTriggerable(buildCondition(xpathRO, "readonly", ref));
             }
         }
 
@@ -104,15 +98,13 @@ class StandardBindAttributesProcessor {
 
         final String xpathCalc = element.getAttributeValue(null, "calculate");
         if (xpathCalc != null) {
-            Triggerable r;
             try {
-                r = buildCalculate(xpathCalc, ref);
+                binding.calculate = formDef.addTriggerable(buildCalculate(xpathCalc, ref));
             } catch (XPathSyntaxException xpse) {
                 throw new XFormParseException("Invalid calculate for the bind attached to \"" + nodeset +
                     "\" : " + xpse.getMessage() + " in expression " + xpathCalc);
             }
-            r = formDef.addTriggerable(r);
-            binding.calculate = r;
+
         }
 
         binding.setPreload(element.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));

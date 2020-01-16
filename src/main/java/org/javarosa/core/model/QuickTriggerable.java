@@ -50,7 +50,7 @@ public final class QuickTriggerable {
         return triggerable.apply(mainInstance, ec, qualified);
     }
 
-    public List<TreeReference> getTargets() {
+    public Set<TreeReference> getTargets() {
         return triggerable.getTargets();
     }
 
@@ -58,10 +58,8 @@ public final class QuickTriggerable {
         return this.triggerable.equals(triggerable);
     }
 
-    public Triggerable changeContextRefToIntersectWithTriggerable(Triggerable other) {
-        // TODO It's fishy to mutate the Triggerable here. We might prefer to return a copy of the original Triggerable
-        triggerable.changeContextRefToIntersectWithTriggerable(other);
-        return triggerable;
+    public void intersectContextWith(Triggerable other) {
+        triggerable.intersectContextWith(other);
     }
 
     public void setImmediateCascades(Set<QuickTriggerable> deps) {

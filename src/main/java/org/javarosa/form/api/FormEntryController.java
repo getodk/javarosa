@@ -112,6 +112,7 @@ public class FormEntryController {
             throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
         } else {
             try {
+                // TODO Design a test that exercizes this branch.
                 model.getForm().copyItemsetAnswer(q, element, data);
             } catch (InvalidReferenceException ire) {
                 logger.error("Error", ire);

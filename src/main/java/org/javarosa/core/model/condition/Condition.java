@@ -19,7 +19,6 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
@@ -42,7 +41,7 @@ public class Condition extends Triggerable {
     public Condition() {
     }
 
-    protected Condition(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, List<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
+    protected Condition(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
         this.trueAction = trueAction;
         this.falseAction = falseAction;

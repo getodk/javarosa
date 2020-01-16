@@ -687,7 +687,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // DAGify the triggerables based on dependencies and sort them so that
         // triggerables come only after the triggerables they depend on
         //
-        dagImpl.finalizeTriggerables(getMainInstance(), getEvaluationContext());
+        dagImpl.finalizeTriggerables(getMainInstance());
     }
 
     /**

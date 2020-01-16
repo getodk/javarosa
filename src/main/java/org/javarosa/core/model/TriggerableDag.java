@@ -16,15 +16,17 @@
 
 package org.javarosa.core.model;
 
+import static java.util.Collections.emptySet;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +35,6 @@ import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
-import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -55,41 +56,61 @@ public class TriggerableDag {
         EventNotifier getEventNotifier();
     }
 
-    protected final EventNotifierAccessor accessor;
-
     /**
-     * NOT VALID UNTIL finalizeTriggerables() is called!!
+     * Stores the event notifier required to create instances of this class.
      * <p>
-     * Topologically ordered list, meaning that for any tA and tB in
-     * the list, where tA comes before tB, evaluating tA cannot depend on any
-     * result from evaluating tB.
+     * The event notifier is used to publish events that serve as a form for
+     * loose coupling between processes that could be running at the same time
+     * in a JavaRosa client.
      */
-    protected final List<QuickTriggerable> triggerablesDAG = new ArrayList<>();
+    private final EventNotifierAccessor accessor;
 
     /**
-     * NOT VALID UNTIL finalizeTriggerables() is called!!
+     * Stores the unsorted set of all triggerables present in the form.
      * <p>
-     * Associates repeatable nodes with the Condition that determines their
-     * relevance.
+     * This set is used during the DAG build process.
      */
-    protected final Map<TreeReference, QuickTriggerable> conditionRepeatTargetIndex = new HashMap<>();
+    private final Set<QuickTriggerable> allTriggerables = new HashSet<>();
 
     /**
-     * Maps a tree reference to the set of triggerables that need to be
-     * processed when the value at this reference changes.
+     * Stores the sorted set of all triggerables using the dependency direction
+     * as ordering.
+     * <p>
+     * Triggerables present in this set depend exclusively on preceding
+     * triggerables.
      */
-    protected final Map<TreeReference, List<QuickTriggerable>> triggerIndex = new HashMap<>();
+    private Set<QuickTriggerable> triggerablesDAG = emptySet();
 
+    // TODO Make this member fit the expected behavior on calling sites by containing only relevance conditions
     /**
-     * List of all the triggerables in the form. Unordered.
+     * Stores an index for conditions (triggerables declared in
+     * <code>readonly</code>, <code>required</code>, or <code>relevant</code>
+     * attributes) belonging to repeat groups.
+     * <p>
+     * This index is used to determine whether a repeat group instance is
+     * relevant or not.
+     * <p>
+     * <b>Warning</b>: Calling site assumes that a repeat group would only have
+     * one object stored for its reference in this map. This is because, so
+     * far, <code>relevant</code> is the only attribute that makes sense adding
+     * to a repeat group, but a form could declare other conditions as well,
+     * leading to an unexpected scenario.
      */
-    protected final List<QuickTriggerable> unorderedTriggerables = new ArrayList<>();
+    private Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
+    /**
+     * Stores an index to resolve triggerables by their corresponding trigger's
+     * reference.
+     * <p>
+     * Note that there's a m:n relationship between trigger references and
+     * triggerables.
+     */
+    private final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
-    protected TriggerableDag(EventNotifierAccessor accessor) {
+    public TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
     }
 
-    protected Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> tv, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
+    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> tv, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
         // tv should now contain all of the triggerable components which are going
         // to need to be addressed by this update.
         // 'triggerables' is topologically-ordered by dependencies, so evaluate
@@ -174,7 +195,7 @@ public class TriggerableDag {
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
-        return conditionRepeatTargetIndex.get(repeatRef.genericize());
+        return repeatConditionsPerTargets.get(repeatRef.genericize());
     }
 
     private Set<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef, Set<QuickTriggerable> alreadyEvaluated) {
@@ -182,14 +203,16 @@ public class TriggerableDag {
 
         Set<QuickTriggerable> applicable = new HashSet<>();
         for (QuickTriggerable qt : triggerablesDAG) {
-            for (int j = 0; j < qt.getTargets().size(); j++) {
-                TreeReference target = qt.getTargets().get(j);
+            for (TreeReference target : qt.getTargets()) {
                 if (genericRoot.isAncestorOf(target, false)) {
                     applicable.add(qt);
                     break;
                 }
             }
         }
+
+        // TODO Call doEvaluateTriggerables directly instead to avoid a redundant extra indirection level
+        // return doEvaluateTriggerables(mainInstance, evalContext, applicable, rootRef, alreadyEvaluated);
 
         return evaluateTriggerables(mainInstance, evalContext, applicable, rootRef, alreadyEvaluated);
     }
@@ -270,7 +293,7 @@ public class TriggerableDag {
     }
 
     private QuickTriggerable findTriggerable(Triggerable t) {
-        for (QuickTriggerable qt : unorderedTriggerables) {
+        for (QuickTriggerable qt : allTriggerables) {
             if (qt.contains(t)) {
                 return qt;
             }
@@ -278,136 +301,152 @@ public class TriggerableDag {
         return null;
     }
 
-    public final Triggerable addTriggerable(Triggerable t) {
-        QuickTriggerable qt = findTriggerable(t);
-        if (qt != null) {
-            // one node may control access to many nodes; this means many nodes
-            // effectively have the same condition
-            // let's identify when conditions are the same, and store and calculate
-            // it only once
-
-            // nov-2-2011: ctsims - We need to merge the context nodes together
-            // whenever we do this (finding the highest
-            // common ground between the two), otherwise we can end up failing to
-            // trigger when the ignored context
-            // exists and the used one doesn't
-
-            // TODO It's fishy to mutate the Triggerable here. We might prefer to return a copy of the original Triggerable
-            return qt.changeContextRefToIntersectWithTriggerable(t);
-
-            // note, if the contextRef is unnecessarily deep, the condition will be
-            // evaluated more times than needed
-            // perhaps detect when 'identical' condition has a shorter contextRef,
-            // and use that one instead?
-
-        } else {
-            qt = QuickTriggerable.of(t);
-            unorderedTriggerables.add(qt);
-
-            Set<TreeReference> triggers = t.getTriggers();
-            for (TreeReference trigger : triggers) {
-                List<QuickTriggerable> triggered = triggerIndex.get(trigger);
-                if (triggered == null) {
-                    triggered = new ArrayList<>();
-                    triggerIndex.put(trigger.clone(), triggered);
-                }
-                if (!triggered.contains(qt)) {
-                    triggered.add(qt);
-                }
-            }
-
-            return t;
+    /**
+     * Adds the provided triggerable to the DAG.
+     * <p>
+     * This method has side-effects:
+     * <ul>
+     *     <li>If a similar triggerable has been already added, its context gets
+     *     intersected with the provided triggerable to cover both using only
+     *     one entry</li>
+     *     <li>This method builds the index of triggerables per trigger ref
+     *     at {@link #triggerablesPerTrigger}</li>
+     * </ul>
+     */
+    Triggerable addTriggerable(Triggerable triggerable) {
+        QuickTriggerable existingQuickTriggerable = findTriggerable(triggerable);
+        if (existingQuickTriggerable != null) {
+            // We found a quick triggerable wrapping a triggerable matching the provided one.
+            // Since Triggerable.equals() doesn't have into account contexts or targets, the
+            // safest thing to do would be to create a new quick triggerable for the incoming
+            // triggerable, but we could cover both triggerables if we compute the intersection
+            // between their respective context and reuse the one we've already stored.
+            existingQuickTriggerable.intersectContextWith(triggerable);
+            return existingQuickTriggerable.getTriggerable();
         }
+
+        QuickTriggerable newQuickTriggerable = QuickTriggerable.of(triggerable);
+        allTriggerables.add(newQuickTriggerable);
+
+        // Build the triggerable per trigger index
+        Set<TreeReference> triggers = triggerable.getTriggers();
+        for (TreeReference trigger : triggers) {
+            if (!triggerablesPerTrigger.containsKey(trigger))
+                triggerablesPerTrigger.put(trigger, new HashSet<>());
+            triggerablesPerTrigger.get(trigger).add(newQuickTriggerable);
+        }
+
+        return triggerable;
     }
 
     /**
      * Finalize the DAG associated with the form's triggered conditions. This
      * will create the appropriate ordering and dependencies to ensure the
      * conditions will be evaluated in the appropriate orders.
-     *
-     * @throws IllegalStateException - If the trigger ordering contains an illegal cycle and the
-     *                               triggers can't be laid out appropriately
      */
-    public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext evalContext) throws IllegalStateException {
-        //
-        // DAGify the triggerables based on dependencies and sort them so that
-        // triggerables come only after the triggerables they depend on
-        //
-        List<QuickTriggerable> vertices = new ArrayList<>(unorderedTriggerables);
-        triggerablesDAG.clear();
-        List<QuickTriggerable[]> partialOrdering = new ArrayList<>();
-        Set<QuickTriggerable> newDestinationSet = new HashSet<>();
-        for (QuickTriggerable qt : vertices) {
-            Set<QuickTriggerable> deps = new HashSet<>();
-            newDestinationSet.clear();
-            fillTriggeredElements(mainInstance, evalContext, qt, deps, newDestinationSet);
+    public void finalizeTriggerables(FormInstance mainInstance) throws IllegalStateException {
+        triggerablesDAG = buildDag(allTriggerables, getDagEdges());
+        repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
+    }
 
-            if (deps.contains(qt))
-                throwCyclesInDagException(deps);
+    private static Map<TreeReference, QuickTriggerable> getRepeatConditionsPerTargets(FormInstance mainInstance, Set<QuickTriggerable> triggerables) {
+        Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
+        for (QuickTriggerable triggerable : triggerables)
+            if (triggerable.isCondition())
+                for (TreeReference target : triggerable.getTargets())
+                    if (mainInstance.getTemplate(target) != null)
+                        repeatConditionsPerTargets.put(target, triggerable);
+        return repeatConditionsPerTargets;
+    }
 
-            if (qt.canCascade())
-                for (QuickTriggerable qu : deps) {
-                    QuickTriggerable[] edge = {qt, qu};
-                    partialOrdering.add(edge);
-                }
+    /**
+     * Returns the list of edges in the DAG that can be built from all the
+     * triggerables added to the DAG while parsing the form.
+     * <p>
+     * This method has side-effects:
+     * <ul>
+     *     <li>Throws IllegalStateException when cycles are detected involving
+     *     self-references</li>
+     *     <li>Builds a cache of immediate cascades of each vertex, meaning that
+     *     we will remember the dependant vertices without having to traverse
+     *     the DAG again {@link Triggerable#getImmediateCascades()}</li>
+     * </ul>
+     */
+    private Set<QuickTriggerable[]> getDagEdges() {
+        Set<QuickTriggerable[]> edges = new HashSet<>();
+        for (QuickTriggerable source : allTriggerables) {
+            // Compute the set of edge targets from the source vertex in this
+            // loop using the triggerable's target tree reference set.
+            // We will create an edge for all the source's target references
+            // that, in turn, trigger another triggerable.
+            Set<QuickTriggerable> targets = new HashSet<>();
+            for (TreeReference targetRef : source.getTargets())
+                targets.addAll(triggerablesPerTrigger.containsKey(targetRef)
+                    ? triggerablesPerTrigger.get(targetRef)
+                    : emptySet());
 
-            qt.setImmediateCascades(deps);
+            // Account for cycles by self-reference
+            if (targets.contains(source))
+                throwCyclesInDagException(targets);
+
+            for (QuickTriggerable target : targets)
+                edges.add(new QuickTriggerable[]{source, target});
+
+            // TODO Move this from Triggerable to TriggerableDag
+            source.setImmediateCascades(targets);
         }
+        return edges;
+    }
 
-        List<QuickTriggerable> orderedRoots = new ArrayList<>();
-        Set<QuickTriggerable> roots = new HashSet<>(
-            vertices.size());
-        while (vertices.size() > 0) {
-            // determine root nodes
-            roots.clear();
-            roots.addAll(vertices);
-            for (QuickTriggerable[] edge : partialOrdering) {
+    /**
+     * Returns a set with the DAG that can be build using the provided vertices
+     * and edges.
+     * <p>
+     * This method has side-effects:
+     * <ul>
+     *     <li>Throws IllegalStateException when cycles are detected involving
+     *     more than one node</li>
+     * </ul>
+     */
+    private static Set<QuickTriggerable> buildDag(Set<QuickTriggerable> vertices, Set<QuickTriggerable[]> edges) {
+        // The dag and the set of remaining vertices will be mutated
+        // inside the while loop's block
+        Set<QuickTriggerable> dag = new LinkedHashSet<>();
+        Set<QuickTriggerable> remainingVertices = new HashSet<>(vertices);
+
+        // The set of remaining edges will be replaced inside
+        // the while loop's block
+        Set<QuickTriggerable[]> remainingEdges = new HashSet<>(edges);
+
+        while (remainingVertices.size() > 0) {
+            // Compute the set of roots (nodes that don't show up
+            // as edge targets) with the remaining vertices
+            Set<QuickTriggerable> roots = new HashSet<>(remainingVertices);
+            for (QuickTriggerable[] edge : remainingEdges)
                 roots.remove(edge[1]);
-            }
 
-            // if no root nodes while graph still has nodes, graph has cycles
             if (roots.size() == 0)
                 throwCyclesInDagException(vertices);
 
-            // order the root nodes - so the order is fixed
-            orderedRoots.clear();
-            orderedRoots.addAll(roots);
-            Collections.sort(orderedRoots, QuickTriggerableComparator.INSTANCE);
+            // "Move" the roots detected during this iteration
+            // from the remainingVertices to the DAG
+            remainingVertices.removeAll(roots);
+            dag.addAll(roots);
 
-            // remove root nodes and edges originating from them
-            // add them to the triggerablesDAG.
-            for (QuickTriggerable root : orderedRoots) {
-                triggerablesDAG.add(root);
-                vertices.remove(root);
-            }
-            for (int i = partialOrdering.size() - 1; i >= 0; i--) {
-                QuickTriggerable[] edge = partialOrdering.get(i);
-                if (roots.contains(edge[0]))
-                    partialOrdering.remove(i);
-            }
+            // Compute the new set of remaining edges to continue the iteration
+            Set<QuickTriggerable[]> newRemainingEdges = new HashSet<>();
+            for (QuickTriggerable[] edge : remainingEdges)
+                if (!roots.contains(edge[0]))
+                    newRemainingEdges.add(edge);
+            remainingEdges = newRemainingEdges;
         }
-
-        //
-        // build the condition index for repeatable nodes
-        //
-
-        conditionRepeatTargetIndex.clear();
-        for (QuickTriggerable qt : triggerablesDAG) {
-            if (qt.isCondition()) {
-                List<TreeReference> targets = qt.getTargets();
-                for (TreeReference target : targets) {
-                    if (mainInstance.getTemplate(target) != null) {
-                        conditionRepeatTargetIndex.put(target, qt);
-                    }
-                }
-            }
-        }
+        return dag;
     }
 
-    public void throwCyclesInDagException(Collection<QuickTriggerable> vertices) {
+    private static void throwCyclesInDagException(Collection<QuickTriggerable> triggerables) {
         StringBuilder hints = new StringBuilder();
-        for (QuickTriggerable qt2 : vertices) {
-            for (TreeReference r : qt2.getTargets()) {
+        for (QuickTriggerable qt : triggerables) {
+            for (TreeReference r : qt.getTargets()) {
                 hints.append("\n").append(r.toString(true));
             }
         }
@@ -417,59 +456,6 @@ public class TriggerableDag {
                 + hints;
         }
         throw new IllegalStateException(message);
-    }
-
-    /**
-     * Get all of the elements which will need to be evaluated (in order) when
-     * the triggerable is fired.
-     */
-    public void fillTriggeredElements(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, Set<QuickTriggerable> destinationSet, Set<QuickTriggerable> newDestinationSet) {
-
-
-        for (int j = 0; j < qt.getTargets().size(); j++) {
-            TreeReference target = qt.getTargets().get(j);
-            Set<TreeReference> updatedNodes = new HashSet<>();
-            updatedNodes.add(target);
-
-            // For certain types of triggerables, the update will affect
-            // not only the target, but also the children of the target.
-            // In that case, we want to add all of those nodes
-            // to the list of updated elements as well.
-            if (qt.isCascadingToChildren()) {
-                addChildrenOfReference(mainInstance, evalContext,
-                    target, updatedNodes);
-            }
-
-            // Now go through each of these updated nodes (generally
-            // just 1 for a normal calculation,
-            // multiple nodes if there's a relevance cascade.
-            for (TreeReference ref : updatedNodes) {
-                // Check our index to see if that target is a Trigger
-                // for other conditions
-                // IE: if they are an element of a different calculation
-                // or relevancy calc
-
-                // We can't make this reference generic before now or
-                // we'll lose the target information,
-                // so we'll be more inclusive than needed and see if any
-                // of our triggers are keyed on the predicate-less path
-                // of this ref
-                List<QuickTriggerable> triggered = triggerIndex.get(ref.hasPredicates() ? ref.removePredicates() : ref);
-
-                if (triggered != null) {
-                    // If so, walk all of these triggerables that we
-                    // found
-                    for (QuickTriggerable qu : triggered) {
-                        // And add them to the queue if they aren't
-                        // there already
-                        if (!destinationSet.contains(qu)) {
-                            destinationSet.add(qu);
-                            newDestinationSet.add(qu);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -507,46 +493,6 @@ public class TriggerableDag {
     }
 
     /**
-     * This is a utility method to get all of the references of a node. It can
-     * be replaced when we support dependent XPath Steps (IE: /path/to//)
-     */
-    private void addChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original, Set<TreeReference> toAdd) {
-        // original has already been added to the 'toAdd' list.
-
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, child, toAdd);
-            }
-        } else {
-            List<TreeReference> refSet = evalContext.expandReference(original);
-            for (TreeReference ref : refSet) {
-                addChildrenOfElement(mainInstance, evalContext.resolveReference(ref), toAdd);
-            }
-        }
-    }
-
-    // Recursive step of utility method
-    private void addChildrenOfElement(FormInstance mainInstance, AbstractTreeElement<?> el, Set<TreeReference> toAdd) {
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, child, toAdd);
-            }
-        } else {
-            for (int i = 0; i < el.getNumChildren(); ++i) {
-                AbstractTreeElement<?> child = el.getChildAt(i);
-                toAdd.add(child.getRef().genericize());
-                addChildrenOfElement(mainInstance, child, toAdd);
-            }
-        }
-    }
-
-    /**
      * Walks the current set of conditions, and evaluates each of them with the
      * current context.
      */
@@ -555,10 +501,10 @@ public class TriggerableDag {
     }
 
     /**
-     * Invoked to validate a filled-in form. Sweeps through from beginning
-     * to end, confirming that the entered values satisfy all constraints.
-     * The FormEntryController is based upon the FormDef, but has its own
-     * model and controller independent of anything at the UI layer.
+     * Invoked to validate a filled-in form. Sweeps through from beginning to
+     * end, confirming that the entered values satisfy all constraints. The
+     * FormEntryController is based upon the FormDef, but has its own model and
+     * controller independent of anything at the UI layer.
      */
     public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
 
@@ -592,7 +538,7 @@ public class TriggerableDag {
         TreeReference genericRef = ref.genericize();
 
         // get triggerables which are activated by the generic reference
-        List<QuickTriggerable> triggered = triggerIndex.get(genericRef);
+        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRef);
         if (triggered == null) {
             return alreadyEvaluated;
         }
@@ -607,7 +553,7 @@ public class TriggerableDag {
         return false;
     }
 
-    protected final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
+    final void publishSummary(String lead, TreeReference ref, Collection<QuickTriggerable> quickTriggerables) {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
     }
 
@@ -617,13 +563,12 @@ public class TriggerableDag {
 
         //build graph
         List<TreeReference> targets = new ArrayList<>();
-        for (TreeReference trigger : triggerIndex.keySet()) {
+        for (TreeReference trigger : triggerablesPerTrigger.keySet()) {
             vertices.add(trigger);
-            List<QuickTriggerable> triggered = triggerIndex.get(trigger);
+            Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(trigger);
             targets.clear();
             for (QuickTriggerable qt : triggered) {
-                for (int j = 0; j < qt.getTargets().size(); j++) {
-                    TreeReference target = qt.getTargets().get(j);
+                for (TreeReference target : qt.getTargets()) {
                     if (!targets.contains(target))
                         targets.add(target);
                 }
@@ -696,7 +641,7 @@ public class TriggerableDag {
 
     private List<Condition> getConditions() {
         List<Condition> conditions = new ArrayList<>();
-        for (QuickTriggerable qt : unorderedTriggerables) {
+        for (QuickTriggerable qt : allTriggerables) {
             if (qt.isCondition()) {
                 conditions.add((Condition) qt.getTriggerable());
             }
@@ -706,7 +651,7 @@ public class TriggerableDag {
 
     private List<Recalculate> getRecalculates() {
         List<Recalculate> recalculates = new ArrayList<>();
-        for (QuickTriggerable qt : unorderedTriggerables) {
+        for (QuickTriggerable qt : allTriggerables) {
             if (qt.isRecalculate()) {
                 recalculates.add((Recalculate) qt.getTriggerable());
             }
