@@ -433,8 +433,6 @@ class FormInstanceParser {
     }
 
     private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
-        // original has already been added to the 'toAdd' list.
-
         Set<TreeReference> descendantRefs = new HashSet<>();
         TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
         if (repeatTemplate != null) {
