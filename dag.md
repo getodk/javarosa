@@ -122,13 +122,64 @@ This is done to prepare the new elements in case they have computed values.
 
 Once the DAG has configured a set of triggerables affected by the user's action, their evaluation starts in `TriggerableDag.doEvaluateTriggerables(...)`
 
-To ensure the ordered evaluation of triggerables, the whole DAG is iterated and only the triggerables inside the selected set are evaluated, and if they are not present in the set of triggerables already evaluated.
+To ensure the ordered evaluation of triggerables, the whole DAG is iterated and only the triggerables inside the selected set are evaluated (if they haven't been already already evaluated).
 
-It's uncertain how and why the `firedAnchors` map is used, so I'll completely ignore it for this explanation.
+It's uncertain how and why the `firedAnchors` map is used, so I'll completely ignore it for this explanation (see my analysis below).
 
 Each time we iterate over a triggerable, a list of expanded affected references is computed by an `EvaluationContext` using the triggerable to contextualize the provided `anchorRef`. Then the triggerable is applied to each one of these expanded affected references.
- 
 
+### Analysis of the `firedAnchors` map
+ 
+Let's focus on a couple of blocks in `doEvaluateTriggerables` where this firedAnchors map is used:
+
+Lines 125-128:
+```java
+List<TreeReference> affectedTriggers = qt.findAffectedTriggers(firedAnchors);
+if (affectedTriggers.isEmpty()) {
+    affectedTriggers.add(anchorRef);
+}
+```
+
+In this block, we use the `firedAnchors` map to build the `affectedTriggers` reference list, which is used by `evaluateTriggerable` to know where to apply a triggerable.
+
+Given a populated `firedAnchors` map, the resulting list would include all the values that have the triggerable's trigger generic references as keys.
+
+At this point, I'm not sure why we are mixing trigger references with what I would expect to be target references (where the triggerables are applied). My understanding is that triggers are used by the callers of `doEvaluateTriggerables` to get the set of triggerables that must be evaluated. Once this is done, I don't expect to use triggers anymore because I would be interested only in knowing the targets where those must be applied.
+
+Putting aside this confusing detail, we have to continue with the second block and what `evaluateTriggerable` does with these references to get the big picture.
+
+Lines 135-145:
+```java
+for (EvaluationResult evaluationResult : evaluationResults) {
+    TreeReference affectedRef = evaluationResult.getAffectedRef();
+
+    TreeReference key = affectedRef.genericize();
+    List<TreeReference> values = firedAnchors.get(key);
+    if (values == null) {
+        values = new ArrayList<>();
+        firedAnchors.put(key, values);
+    }
+    values.add(affectedRef);
+}
+```
+
+In this block we see how we add new entries to the `firedAnchors`  map using the affected reference inside each of the evaluation results.
+
+The affected refs are fully qualified expanded references that `evaluateTriggerable` gets from calling `EvaluationContext.expandReference` with the incoming `affectedTriggers` list of references.
+
+This is where we see that the map uses generic references as keys and their corresponding set of fully qualified expanded references as values, which means that `firedAnchors` is basically a cache of `expandReference` output.
+
+This is unexpected because, given a populated `firedAnchors` map, (fully qualified) expanded references would be fed into `evaluateTriggerable` where they are expanded again with the `EvaluationContext` IMO defeating its purpose.
+
+If this was done to get performance gains, it looks like it's doing just the opposite of that, because `evaluateTriggerable` will have more work (not less) as the map is populated.
+
+This is not helping me understand why we're adding fully qualified expanded trigger references into the mix in the first block either.
+
+I think we should review the naming/language to try to be more explicit and mix less concepts and, if you agree with my analysis above, we should change it to whether not use any cache or use it in a way that we get the performance advantages from it.
+
+I tested removing the cache and I've confirmed that no tests break, and I'd wager that now JR is faster because we will have to expand less references.
+
+We could explore using a cache  and using it too, but that would come with the tradeoff of having to iterate triggerables twice, and we would get benefits only in case more than one triggerable in the provided set produces the same fully qualified reference with the incoming `anchorRef`. I'm not sure what are the odds of that, though.
 
 
  
