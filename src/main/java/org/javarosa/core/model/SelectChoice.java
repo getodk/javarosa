@@ -95,7 +95,7 @@ public class SelectChoice implements Externalizable, Localizable {
         isLocalizable = ExtUtil.readBool(in);
         setLabelInnerText(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
         setTextID(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
-        value = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+        value = ExtUtil.readString(in);
         //index will be set by questiondef
     }
 
