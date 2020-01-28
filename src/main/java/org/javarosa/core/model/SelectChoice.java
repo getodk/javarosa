@@ -3,7 +3,6 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -22,58 +21,61 @@ public class SelectChoice implements Externalizable, Localizable {
     private String value;
     private int index = -1;
 
-    public TreeElement copyNode; //if this choice represents part of an <itemset>, and the itemset uses 'copy'
-                                 //answer mode, this points to the node to be copied if this selection is chosen
-                                 //this field only has meaning for dynamic choices, thus is unserialized
+    /**
+     * if this choice represents part of an <itemset>, and the itemset uses
+     * 'copy' answer mode, this points to the node to be copied if this
+     * selection is chosen this field only has meaning for dynamic choices, thus
+     * is unserialized
+     */
+    public TreeElement copyNode;
 
-    //for deserialization only
-    public SelectChoice () {
+    /**
+     * for deserialization only
+     */
+    public SelectChoice() {
 
     }
 
-    public SelectChoice (String labelID, String value) {
+    public SelectChoice(String labelID, String value) {
         this(labelID, null, value, true);
     }
 
     /**
-     *
-     * @param labelID can be null
+     * @param labelID        can be null
      * @param labelInnerText can be null
-     * @param value should not be null
-     * @param isLocalizable
+     * @param value          should not be null
      * @throws XFormParseException if value is null
      */
-    public SelectChoice (String labelID, String labelInnerText, String value, boolean isLocalizable) {
+    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
         this.isLocalizable = isLocalizable;
         this.textID = labelID;
         this.labelInnerText = labelInnerText;
-        if(value != null){
+        if (value != null) {
             this.value = value;
-        }else{
-            throw new XFormParseException("SelectChoice{id,innerText}:{"+labelID+","+labelInnerText+"}, has null Value!");
+        } else {
+            throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
         }
     }
 
-    public SelectChoice(String labelOrID,String Value, boolean isLocalizable){
+    public SelectChoice(String labelOrID, String Value, boolean isLocalizable) {
         this(isLocalizable ? labelOrID : null,
-             isLocalizable ? null : labelOrID,
-             Value,isLocalizable);
+            isLocalizable ? null : labelOrID,
+            Value, isLocalizable);
     }
 
-    public void setIndex (int index) {
+    public void setIndex(int index) {
         this.index = index;
     }
 
-
-    public String getLabelInnerText () {
+    public String getLabelInnerText() {
         return labelInnerText;
     }
 
-    public String getValue () {
+    public String getValue() {
         return value;
     }
 
-    public int getIndex () {
+    public int getIndex() {
         if (index == -1) {
             throw new RuntimeException("trying to access choice index before it has been set!");
         }
@@ -83,9 +85,10 @@ public class SelectChoice implements Externalizable, Localizable {
 
 
     public void localeChanged(String locale, Localizer localizer) {
-//        if (captionLocalizable) {
-//            caption = localizer.getLocalizedText(captionID);
-//        }
+        // TODO Review this commented block
+        // if (captionLocalizable) {
+        //     caption = localizer.getLocalizedText(captionID);
+        // }
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
@@ -104,23 +107,23 @@ public class SelectChoice implements Externalizable, Localizable {
         //don't serialize index; it will be restored from questiondef
     }
 
-    private void setLabelInnerText (String labelInnerText) {
+    private void setLabelInnerText(String labelInnerText) {
         this.labelInnerText = labelInnerText;
     }
 
-    public Selection selection () {
+    public Selection selection() {
         return new Selection(this);
     }
 
-    public boolean isLocalizable(){
+    public boolean isLocalizable() {
         return isLocalizable;
     }
 
-    public void setLocalizable(boolean localizable){
+    public void setLocalizable(boolean localizable) {
         this.isLocalizable = localizable;
     }
 
-    public String toString () {
+    public String toString() {
         return ((textID != null && textID.length() > 0) ? "{" + textID + "}" : "") + (labelInnerText != null ? labelInnerText : "") + " => " + value;
     }
 
@@ -131,5 +134,4 @@ public class SelectChoice implements Externalizable, Localizable {
     public void setTextID(String textID) {
         this.textID = textID;
     }
-
 }
