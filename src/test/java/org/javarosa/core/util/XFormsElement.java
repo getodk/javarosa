@@ -113,9 +113,13 @@ public interface XFormsElement {
     }
 
     static XFormsElement item(int value, String label) {
+        return item(String.valueOf(value), label);
+    }
+
+    static XFormsElement item(String value, String label) {
         return t("item",
             t("label", label),
-            t("value", String.valueOf(value))
+            t("value", value)
         );
     }
 

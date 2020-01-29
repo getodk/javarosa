@@ -595,8 +595,8 @@ public class Scenario {
         return formDef.getEvaluationContext();
     }
 
-    public QuestionDef questionAt(String xpath) {
-        return null;
+    public QuestionDef getQuestionAtIndex() {
+        return formEntryController.getModel().getQuestionPrompt().getQuestion();
     }
 
     public enum AnswerResult {
