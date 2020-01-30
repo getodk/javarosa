@@ -29,6 +29,7 @@ import java.time.OffsetDateTime;
 import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
+import java.util.function.Consumer;
 import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
 
@@ -52,13 +53,9 @@ public class DateUtilsTests {
         class LangJanSun {
             private LangJanSun(Locale locale) {
                 this.locale = locale;
-                this.january = JANUARY.getDisplayName(TextStyle.SHORT, locale);
-                this.sunday = SUNDAY.getDisplayName(TextStyle.SHORT, locale);
             }
 
             private Locale locale;
-            private String january;
-            private String sunday;
         }
 
         LangJanSun langJanSuns[] = new LangJanSun[]{
@@ -68,24 +65,27 @@ public class DateUtilsTests {
         };
 
         for (LangJanSun ljs : langJanSuns) {
-            withLocale(ljs.locale, () -> {
+            withLocale(ljs.locale, locale -> {
+                String expectedJanuary = JANUARY.getDisplayName(TextStyle.SHORT, locale);
+                String expectedSunday = SUNDAY.getDisplayName(TextStyle.SHORT, locale);
+
                 // Use a Sunday in January for our test
                 LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
                 Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
 
                 String month = DateUtils.format(date, "%b");
-                assertEquals(ljs.january, month);
+                assertEquals(expectedJanuary, month);
 
                 String day = DateUtils.format(date, "%a");
-                assertEquals(ljs.sunday, day);
+                assertEquals(expectedSunday, day);
             });
         }
     }
 
-    public void withLocale(Locale locale, Runnable block) {
+    public void withLocale(Locale locale, Consumer<Locale> block) {
         Locale backupLocale = Locale.getDefault();
         Locale.setDefault(locale);
-        block.run();
+        block.accept(locale);
         Locale.setDefault(backupLocale);
     }
 }
