@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.text.DateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,7 +30,6 @@ import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
-import org.joda.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -45,8 +46,8 @@ public class DateUtilsTests {
     public void setUp() {
         backupLocale = Locale.getDefault();
         backupZone = TimeZone.getDefault();
-        testLocalDateTime = new LocalDateTime(2018, 1, 1, 10, 20, 30, 400);
-        testDate = testLocalDateTime.toDate();
+        testLocalDateTime = LocalDateTime.of(2018, 1, 1, 10, 20, 30, 400);
+        testDate = Date.from(testLocalDateTime.toInstant(OffsetDateTime.now().getOffset()));
     }
 
     @After
@@ -66,7 +67,7 @@ public class DateUtilsTests {
         assertEquals("The date string was not of the proper length", currentDate.length(), "YYYY-MM-DD".length());
         assertEquals("The date string does not have proper year formatting", currentDate.indexOf("-"), "YYYY-".indexOf("-"));
         assertEquals(testLocalDateTime.getYear(), Integer.parseInt(currentDate.substring(0, 4)));
-        assertEquals(testLocalDateTime.getMonthOfYear(), Integer.parseInt(currentDate.substring(5, 7)));
+        assertEquals(testLocalDateTime.getMonth().getValue(), Integer.parseInt(currentDate.substring(5, 7)));
         assertEquals(testLocalDateTime.getDayOfMonth(), Integer.parseInt(currentDate.substring(8, 10)));
     }
 
@@ -147,6 +148,7 @@ public class DateUtilsTests {
         TimeZone.setDefault(offsetTwoHours);
 
         startOfDayDate = getTodayStartOfDayUTCEpoch();
+
 
         testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
         testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
