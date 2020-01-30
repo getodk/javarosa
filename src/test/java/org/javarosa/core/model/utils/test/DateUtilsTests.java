@@ -69,14 +69,6 @@ public class DateUtilsTests {
         assertEquals(testLocalDateTime.getDayOfMonth(), Integer.parseInt(currentDate.substring(8, 10)));
     }
 
-    private void testTime(String in, long test) {
-        Date d = DateUtils.parseTime(in);
-
-        long value = d.getTime();
-
-        assertEquals("Fail: " + in + "(" + TimeZone.getDefault().getDisplayName() + ")", test, value);
-    }
-
     @Test
     public void testParity() {
 
@@ -111,39 +103,6 @@ public class DateUtilsTests {
         testCycle(new Date(0));
 
 
-    }
-
-    @Test
-    @Ignore
-    // This test doesn't make sense:
-    // - A time has no offset nor zone. It can only have one
-    //   when bound to a date, which is not the case
-    // - We're effectively binding all times to the EPOCH date
-    //   (1970-01-01, UTC), which has no DST
-    public void testParseTime_with_DST() {// testFormatting
-        Locale.setDefault(Locale.US);
-
-        // this is a timezone that operates DST every day of the year!
-        SimpleTimeZone dstTimezone = new SimpleTimeZone(
-            2 * 60 * 60 * 1000,
-            "Europe/Athens",
-            Calendar.JANUARY, 1, 0,
-            0, SimpleTimeZone.UTC_TIME,
-            Calendar.DECEMBER, 31, 0,
-            24 * 60 * 60 * 1000, SimpleTimeZone.UTC_TIME,
-            60 * 60 * 1000);
-        TimeZone.setDefault(dstTimezone);
-
-        String time = "12:03:05.000Z";
-        testTime(time, 43385000L);
-
-        Date date = DateUtils.parseTime(time);
-
-        DateFormat formatter = DateFormat.getTimeInstance();
-        String formatted = formatter.format(date);
-
-        // It should shift 3 hours, 2 for the zone and 1 for DST.
-        assertEquals("3:03:05 PM", formatted);
     }
 
     private void testCycle(Date in) {
