@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.utils.test;
 
+import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -27,22 +28,16 @@ import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 import org.javarosa.core.model.utils.DateUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class DateUtilsParseTimeTests {
-    private Locale backupLocale;
-    private TimeZone backupZone;
-
     @Parameterized.Parameter(value = 0)
     public String input;
 
@@ -59,18 +54,6 @@ public class DateUtilsParseTimeTests {
             {"14:00+02:30", OffsetTime.parse("14:00+02:30")},
             {"14:00-02:30", OffsetTime.parse("14:00-02:30")},
         });
-    }
-
-    @Before
-    public void setUp() {
-        backupLocale = Locale.getDefault();
-        backupZone = TimeZone.getDefault();
-    }
-
-    @After
-    public void tearDown() {
-        TimeZone.setDefault(backupZone);
-        Locale.setDefault(backupLocale);
     }
 
     @Test
@@ -94,16 +77,19 @@ public class DateUtilsParseTimeTests {
         // to the same time declaration from the input string (ignoring their date part,
         // of course).
         Stream.of(
-            TimeZone.getTimeZone("UTC"),
-            TimeZone.getTimeZone("GMT+12"),
-            TimeZone.getTimeZone("GMT-13"),
-            TimeZone.getTimeZone("GMT+0230")
-        ).forEach(timeZone -> {
-            TimeZone backupZone = TimeZone.getDefault();
-            TimeZone.setDefault(timeZone);
-            assertThat(parseTime(input), is(expectedTime));
-            TimeZone.setDefault(backupZone);
-        });
+            TimeZone.getDefault(),
+            getTimeZone("UTC"),
+            getTimeZone("GMT+12"),
+            getTimeZone("GMT-13"),
+            getTimeZone("GMT+0230")
+        ).forEach(tz -> withTimeZone(tz, () -> assertThat(parseTime(input), is(expectedTime))));
+    }
+
+    private void withTimeZone(TimeZone timeZone, Runnable block) {
+        TimeZone backupZone = TimeZone.getDefault();
+        TimeZone.setDefault(timeZone);
+        block.run();
+        TimeZone.setDefault(backupZone);
     }
 
     /**
