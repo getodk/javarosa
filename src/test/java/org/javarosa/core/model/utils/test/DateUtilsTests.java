@@ -16,13 +16,9 @@
 
 package org.javarosa.core.model.utils.test;
 
-import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.utils.DateUtils.FORMAT_ISO8601;
 import static org.javarosa.core.model.utils.DateUtils.format;
-import static org.javarosa.core.model.utils.DateUtils.formatDateTime;
 import static org.javarosa.core.model.utils.DateUtils.getXMLStringValue;
-import static org.javarosa.core.model.utils.DateUtils.parseDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -32,7 +28,6 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.stream.Stream;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
 import org.junit.After;
 import org.junit.Before;
@@ -67,29 +62,6 @@ public class DateUtilsTests {
         Date nowDate = Date.from(nowDateTime.toInstant(OffsetDateTime.now().getOffset()));
         String nowXmlFormatterDate = getXMLStringValue(nowDate);
         assertThat(LocalDate.parse(nowXmlFormatterDate), is(nowDateTime.toLocalDate()));
-    }
-
-    @Test
-    public void sanity_check_iso_format_and_parse_back() {
-        Stream.of(
-            TimeZone.getDefault(),
-            getTimeZone("UTC"),
-            getTimeZone("GMT+12"),
-            getTimeZone("GMT-13"),
-            getTimeZone("GMT+0230")
-        ).forEach(timeZone -> withTimeZone(timeZone, () ->
-            Stream.of(
-                new Date(1300139579000L),
-                new Date(0)
-            ).forEach(input ->
-                assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input)))));
-    }
-
-    private void withTimeZone(TimeZone timeZone, Runnable block) {
-        TimeZone backupZone = TimeZone.getDefault();
-        TimeZone.setDefault(timeZone);
-        block.run();
-        TimeZone.setDefault(backupZone);
     }
 
     @Test
