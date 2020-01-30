@@ -29,29 +29,10 @@ import java.time.OffsetDateTime;
 import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class DateUtilsTests {
-    private Locale backupLocale;
-    private TimeZone backupZone;
-
-    @Before
-    public void setUp() {
-        backupLocale = Locale.getDefault();
-        backupZone = TimeZone.getDefault();
-
-    }
-
-    @After
-    public void tearDown() {
-        TimeZone.setDefault(backupZone);
-        Locale.setDefault(backupLocale);
-    }
-
     /**
      * This test ensures that the Strings returned
      * by the getXMLStringValue function are in
@@ -87,17 +68,24 @@ public class DateUtilsTests {
         };
 
         for (LangJanSun ljs : langJanSuns) {
-            Locale.setDefault(ljs.locale);
+            withLocale(ljs.locale, () -> {
+                // Use a Sunday in January for our test
+                LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
+                Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
 
-            // Use a Sunday in January for our test
-            LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
-            Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
+                String month = DateUtils.format(date, "%b");
+                assertEquals(ljs.january, month);
 
-            String month = DateUtils.format(date, "%b");
-            assertEquals(ljs.january, month);
-
-            String day = DateUtils.format(date, "%a");
-            assertEquals(ljs.sunday, day);
+                String day = DateUtils.format(date, "%a");
+                assertEquals(ljs.sunday, day);
+            });
         }
+    }
+
+    public void withLocale(Locale locale, Runnable block) {
+        Locale backupLocale = Locale.getDefault();
+        Locale.setDefault(locale);
+        block.run();
+        Locale.setDefault(backupLocale);
     }
 }
