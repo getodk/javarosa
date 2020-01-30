@@ -17,6 +17,11 @@
 package org.javarosa.core.model.utils.test;
 
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.model.utils.DateUtils.FORMAT_ISO8601;
+import static org.javarosa.core.model.utils.DateUtils.format;
+import static org.javarosa.core.model.utils.DateUtils.formatDateTime;
+import static org.javarosa.core.model.utils.DateUtils.getXMLStringValue;
+import static org.javarosa.core.model.utils.DateUtils.parseDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -26,7 +31,7 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import org.javarosa.core.model.utils.DateUtils;
+import java.util.stream.Stream;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
 import org.junit.After;
 import org.junit.Before;
@@ -59,50 +64,43 @@ public class DateUtilsTests {
     public void testGetXMLStringValueFormat() {
         LocalDateTime nowDateTime = LocalDateTime.now();
         Date nowDate = Date.from(nowDateTime.toInstant(OffsetDateTime.now().getOffset()));
-        String nowXmlFormatterDate = DateUtils.getXMLStringValue(nowDate);
+        String nowXmlFormatterDate = getXMLStringValue(nowDate);
         assertThat(LocalDate.parse(nowXmlFormatterDate), is(nowDateTime.toLocalDate()));
     }
 
     @Test
-    public void testParity() {
+    public void sanity_check_iso_format_and_parse_back() {
 
-        testCycle(new Date(1300139579000L));
-        testCycle(new Date(0));
+        Stream.of(new Date(1300139579000L), new Date(0)).forEach(input ->
+            assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input)));
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        testCycle(new Date(1300139579000L));
-        testCycle(new Date(0));
+        Stream.of(new Date(1300139579000L), new Date(0)).forEach(input ->
+            assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input)));
 
         TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
 
         TimeZone.setDefault(offsetTwoHours);
 
-        testCycle(new Date(1300139579000L));
-        testCycle(new Date(0));
-
+        Stream.of(new Date(1300139579000L), new Date(0)).forEach(input ->
+            assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input)));
 
         TimeZone offTwoHalf = TimeZone.getTimeZone("GMT+0230");
 
         TimeZone.setDefault(offTwoHalf);
 
-        testCycle(new Date(1300139579000L));
-        testCycle(new Date(0));
+        Stream.of(new Date(1300139579000L), new Date(0)).forEach(input ->
+            assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input)));
 
         TimeZone offMinTwoHalf = TimeZone.getTimeZone("GMT-0230");
 
         TimeZone.setDefault(offMinTwoHalf);
 
-        testCycle(new Date(1300139579000L));
-        testCycle(new Date(0));
+        Stream.of(new Date(1300139579000L), new Date(0)).forEach(input ->
+            assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input)));
 
 
-    }
-
-    private void testCycle(Date in) {
-        String formatted = DateUtils.formatDateTime(in, DateUtils.FORMAT_ISO8601);
-        Date out = DateUtils.parseDateTime(formatted);
-        assertEquals("Fail:", in.getTime(), out.getTime());
     }
 
     @Test
@@ -128,11 +126,11 @@ public class DateUtilsTests {
         for (LangJanSun ljs : langJanSuns) {
             Locale.setDefault(Locale.forLanguageTag(ljs.language));
 
-            String month = DateUtils.format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%b");
+            String month = format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%b");
             assertEquals(ljs.january, month);
 
             // 2018-04-01 was sunday
-            String day = DateUtils.format(DateFields.of(2018, 4, 1, 10, 20, 30, 400), "%a");
+            String day = format(DateFields.of(2018, 4, 1, 10, 20, 30, 400), "%a");
             assertEquals(ljs.sunday, day);
         }
     }
