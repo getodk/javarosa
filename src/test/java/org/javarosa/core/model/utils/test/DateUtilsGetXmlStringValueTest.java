@@ -26,7 +26,7 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import org.junit.Test;
 
-public class DateUtilsTests {
+public class DateUtilsGetXmlStringValueTest {
     /**
      * This test ensures that the Strings returned
      * by the getXMLStringValue function are in
