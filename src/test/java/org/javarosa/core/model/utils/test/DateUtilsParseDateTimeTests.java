@@ -46,6 +46,7 @@ public class DateUtilsParseDateTimeTests {
     @Parameterized.Parameters(name = "Input: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
+            {"2016-04-13T16:26:00.000", LocalDateTime.parse("2016-04-13T16:26:00.000")},
             {"2016-04-13T16:26:00.000-07", OffsetDateTime.parse("2016-04-13T16:26:00.000-07:00")},
             {"2015-12-16T16:09:00.000-08", OffsetDateTime.parse("2015-12-16T16:09:00.000-08:00")},
             {"2015-12-16T07:09:00.000+08", OffsetDateTime.parse("2015-12-16T07:09:00.000+08:00")},
