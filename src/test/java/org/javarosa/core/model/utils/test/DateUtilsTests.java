@@ -54,8 +54,7 @@ public class DateUtilsTests {
     @Test
     public void testGetXMLStringValueFormat() {
         LocalDateTime testLocalDateTime = LocalDateTime.of(2018, 1, 1, 10, 20, 30, 400);
-        Date testDate = Date.from(testLocalDateTime.toInstant(OffsetDateTime.now().getOffset()));
-        String currentDate = DateUtils.getXMLStringValue(testDate);
+        String currentDate = DateUtils.getXMLStringValue(Date.from(testLocalDateTime.toInstant(OffsetDateTime.now().getOffset())));
         assertEquals("The date string was not of the proper length", currentDate.length(), "YYYY-MM-DD".length());
         assertEquals("The date string does not have proper year formatting", currentDate.indexOf("-"), "YYYY-".indexOf("-"));
         assertEquals(testLocalDateTime.getYear(), Integer.parseInt(currentDate.substring(0, 4)));
