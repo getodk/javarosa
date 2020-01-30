@@ -18,14 +18,23 @@ package org.javarosa.test.utils;
 
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class SystemHelper {
     public static void withTimeZone(TimeZone timeZone, Runnable block) {
+        withTimeZone(timeZone, __ -> block.run());
+    }
+
+    public static void withTimeZone(TimeZone timeZone, Consumer<TimeZone> block) {
         TimeZone backupZone = TimeZone.getDefault();
         TimeZone.setDefault(timeZone);
-        block.run();
+        block.accept(timeZone);
         TimeZone.setDefault(backupZone);
+    }
+
+    public static void withLocale(Locale locale, Runnable block) {
+        withLocale(locale, __ -> block.run());
     }
 
     public static void withLocale(Locale locale, Consumer<Locale> block) {
@@ -33,5 +42,13 @@ public class SystemHelper {
         Locale.setDefault(locale);
         block.accept(locale);
         Locale.setDefault(backupLocale);
+    }
+
+    public static void withLocaleAndTimeZone(Locale locale, TimeZone timeZone, Runnable block) {
+        withLocaleAndTimeZone(locale, timeZone, (__, ___) -> block.run());
+    }
+
+    public static void withLocaleAndTimeZone(Locale locale, TimeZone timeZone, BiConsumer<Locale, TimeZone> block) {
+        withLocale(locale, l -> withTimeZone(timeZone, () -> block.accept(l, timeZone)));
     }
 }

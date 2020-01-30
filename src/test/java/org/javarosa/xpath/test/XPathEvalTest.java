@@ -24,6 +24,7 @@ import static java.lang.Double.POSITIVE_INFINITY;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.utils.SystemHelper.withLocaleAndTimeZone;
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_ADD;
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_CHECK_TYPES;
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_CONCAT;
@@ -61,7 +62,6 @@ import org.javarosa.xpath.XPathUnhandledException;
 import org.javarosa.xpath.XPathUnsupportedException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,11 +69,10 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class XPathEvalTest {
+    public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     @Parameterized.Parameter(value = 0)
     public Locale locale;
 
-    private Locale backupLocale;
-    private TimeZone backupTimeZone;
     private EvaluationContext ec;
 
     @Parameterized.Parameters(name = "Locale {0}")
@@ -86,19 +85,7 @@ public class XPathEvalTest {
 
     @Before
     public void setUp() {
-        backupLocale = Locale.getDefault();
-        Locale.setDefault(locale);
-        backupTimeZone = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         ec = new EvaluationContext(null);
-    }
-
-    @After
-    public void tearDown() {
-        Locale.setDefault(backupLocale);
-        backupLocale = null;
-        TimeZone.setDefault(backupTimeZone);
-        backupTimeZone = null;
     }
 
     @Test
@@ -299,27 +286,29 @@ public class XPathEvalTest {
         dates cannot reliably be compared/used across time zones (an issue with the code)
         any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
         */
-        ec.addFunctionHandler(HANDLER_CONVERTIBLE);
-        testEval("date('2000-01-01')", DateUtils.getDate(2000, 1, 1));
-        testEval("date('1945-04-26')", DateUtils.getDate(1945, 4, 26));
-        testEval("date('1996-02-29')", DateUtils.getDate(1996, 2, 29));
-        testEval("date('1983-09-31')", new XPathTypeMismatchException());
-        testEval("date('not a date')", new XPathTypeMismatchException());
-        testEval("date(0)", DateUtils.getDate(1970, 1, 1));
-        testEval("date(6.5)", DateUtils.getDate(1970, 1, 7));
-        testEval("date(1)", DateUtils.getDate(1970, 1, 2));
-        testEval("date(-1)", DateUtils.getDate(1969, 12, 31));
-        testEval("date(14127)", DateUtils.getDate(2008, 9, 5));
-        testEval("date(-10252)", DateUtils.getDate(1941, 12, 7));
-        testEval("date(date('1989-11-09'))", DateUtils.getDate(1989, 11, 9));
-        testEval("date(true())", new XPathTypeMismatchException());
-        testEval("date(convertible())", null, ec, new XPathTypeMismatchException());
-        testEval("format-date('2018-01-02T10:20:30.123', \"%Y-%m-%e %H:%M:%S\")", "2018-01-2 10:20:30");
-        testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.getDateTimeFromString("2000-01-01T10:20:30.000"));
-        testEval("decimal-date-time('2000-01-01T10:20:30.000')", 10957.430902777778);
-        testEval("decimal-time('2000-01-01T10:20:30.000+03:00')", .30590277777810115);
-        testEval("decimal-date-time('-1000')", new XPathTypeMismatchException());
-        testEval("decimal-date-time('-01-2019')", new XPathTypeMismatchException());
+        withLocaleAndTimeZone(locale, GMT, () -> {
+            ec.addFunctionHandler(HANDLER_CONVERTIBLE);
+            testEval("date('2000-01-01')", DateUtils.getDate(2000, 1, 1));
+            testEval("date('1945-04-26')", DateUtils.getDate(1945, 4, 26));
+            testEval("date('1996-02-29')", DateUtils.getDate(1996, 2, 29));
+            testEval("date('1983-09-31')", new XPathTypeMismatchException());
+            testEval("date('not a date')", new XPathTypeMismatchException());
+            testEval("date(0)", DateUtils.getDate(1970, 1, 1));
+            testEval("date(6.5)", DateUtils.getDate(1970, 1, 7));
+            testEval("date(1)", DateUtils.getDate(1970, 1, 2));
+            testEval("date(-1)", DateUtils.getDate(1969, 12, 31));
+            testEval("date(14127)", DateUtils.getDate(2008, 9, 5));
+            testEval("date(-10252)", DateUtils.getDate(1941, 12, 7));
+            testEval("date(date('1989-11-09'))", DateUtils.getDate(1989, 11, 9));
+            testEval("date(true())", new XPathTypeMismatchException());
+            testEval("date(convertible())", null, ec, new XPathTypeMismatchException());
+            testEval("format-date('2018-01-02T10:20:30.123', \"%Y-%m-%e %H:%M:%S\")", "2018-01-2 10:20:30");
+            testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.getDateTimeFromString("2000-01-01T10:20:30.000"));
+            testEval("decimal-date-time('2000-01-01T10:20:30.000')", 10957.430902777778);
+            testEval("decimal-time('2000-01-01T10:20:30.000+03:00')", .30590277777810115);
+            testEval("decimal-date-time('-1000')", new XPathTypeMismatchException());
+            testEval("decimal-date-time('-01-2019')", new XPathTypeMismatchException());
+        });
     }
 
     @Test
