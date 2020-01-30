@@ -19,6 +19,8 @@ package org.javarosa.core.model.utils.test;
 import static org.junit.Assert.assertEquals;
 
 import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -129,13 +131,7 @@ public class DateUtilsTests {
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        Calendar startOfDay = Calendar.getInstance();
-        startOfDay.set(Calendar.HOUR_OF_DAY, 0);
-        startOfDay.set(Calendar.MINUTE, 0);
-        startOfDay.set(Calendar.SECOND, 0);
-        startOfDay.set(Calendar.MILLISECOND, 0);
-
-        long startOfDayDate = startOfDay.getTime().getTime();
+        long startOfDayDate = getTodayStartOfDayUTCEpoch();
 
         testTime("10:00", startOfDayDate + 1000 * 60 * 60 * 10 - getOffset());
         testTime("10:00Z", startOfDayDate + 1000 * 60 * 60 * 10);
@@ -150,6 +146,8 @@ public class DateUtilsTests {
 
         TimeZone.setDefault(offsetTwoHours);
 
+        startOfDayDate = getTodayStartOfDayUTCEpoch();
+
         testTime("10:00", startOfDayDate + 1000 * 60 * 60 * 10 - getOffset());
         testTime("10:00Z", startOfDayDate + 1000 * 60 * 60 * 10);
 
@@ -162,6 +160,8 @@ public class DateUtilsTests {
         TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-13");
 
         TimeZone.setDefault(offsetMinusTwoHours);
+
+        startOfDayDate = getTodayStartOfDayUTCEpoch();
 
         testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
         testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
@@ -177,6 +177,8 @@ public class DateUtilsTests {
 
         TimeZone.setDefault(offsetPlusHalf);
 
+        startOfDayDate = getTodayStartOfDayUTCEpoch();
+
         testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
         testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
 
@@ -187,6 +189,10 @@ public class DateUtilsTests {
         testTime("14:00-02:30", startOfDayDate + 1000 * 60 * (60 * 14 + 150));
 
         testTime("14:00+04:00", startOfDayDate + 1000 * 60 * 60 * 10);
+    }
+
+    public long getTodayStartOfDayUTCEpoch() {
+        return LocalDate.now().atStartOfDay().atOffset(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
     private void testTime(String in, long test) {
