@@ -16,16 +16,22 @@
 
 package org.javarosa.core.model.utils.test;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.text.DateFormat;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
@@ -126,75 +132,87 @@ public class DateUtilsTests {
 
     @Test
     public void testTimeParses() {
-        //This is all kind of tricky. We need to assume J2ME level compliance, so
-        //dates won't every be assumed to have an intrinsic timezone, they'll be
-        //assumed to be in the phone's default timezone
+        // The tricky part of DateUtils.parseTime is that we allow for input time
+        // values to include time offset declarations, which has issues at different
+        // levels:
+        // - Conceptually, time values with offsets don't make sense until they're
+        //   paired with a date so, how can we reason about what "10:00+02:00" means,
+        //   and what should be a valid expected output for that input value?
+        // - Next, DateUtils.parseTime() produces Date values, which are a date and a
+        //   time in the system's default time zone. Then, which date would we have to
+        //   expect?
+        //
+        // To solve these issues, DateUtils.parseTime() will use the system's current
+        // date as a base for its output value whenever that is and whichever time zone
+        // the system's at.
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        long startOfDayDate = getTodayStartOfDayUTCEpoch();
-
-        testTime("10:00", startOfDayDate + 1000 * 60 * 60 * 10 - getOffset());
-        testTime("10:00Z", startOfDayDate + 1000 * 60 * 60 * 10);
-
-        testTime("10:00+02", startOfDayDate + 1000 * 60 * 60 * 8);
-        testTime("10:00-02", startOfDayDate + 1000 * 60 * 60 * 12);
-
-        testTime("10:00+02:30", startOfDayDate + 1000 * 60 * (60 * 10 - 150));
-        testTime("10:00-02:30", startOfDayDate + 1000 * 60 * (60 * 10 + 150));
+        assertThat(parseTime("14:00"), is(LocalTime.parse("14:00")));
+        assertThat(parseTime("14:00Z"), is(OffsetTime.parse("14:00Z")));
+        assertThat(parseTime("14:00+02"), is(OffsetTime.parse("14:00+02:00")));
+        assertThat(parseTime("14:00-02"), is(OffsetTime.parse("14:00-02:00")));
+        assertThat(parseTime("14:00+02:30"), is(OffsetTime.parse("14:00+02:30")));
+        assertThat(parseTime("14:00-02:30"), is(OffsetTime.parse("14:00-02:30")));
 
         TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+12");
 
         TimeZone.setDefault(offsetTwoHours);
 
-        startOfDayDate = getTodayStartOfDayUTCEpoch();
-
-
-        testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
-        testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
-
-        testTime("14:00+02", startOfDayDate + 1000 * 60 * 60 * 12);
-        testTime("14:00-02", startOfDayDate + 1000 * 60 * 60 * 16);
-
-        testTime("14:00+02:30", startOfDayDate + 1000 * 60 * (60 * 14 - 150));
-        testTime("14:00-02:30", startOfDayDate + 1000 * 60 * (60 * 14 + 150));
+        assertThat(parseTime("14:00"), is(LocalTime.parse("14:00")));
+        assertThat(parseTime("14:00Z"), is(OffsetTime.parse("14:00Z")));
+        assertThat(parseTime("14:00+02"), is(OffsetTime.parse("14:00+02:00")));
+        assertThat(parseTime("14:00-02"), is(OffsetTime.parse("14:00-02:00")));
+        assertThat(parseTime("14:00+02:30"), is(OffsetTime.parse("14:00+02:30")));
+        assertThat(parseTime("14:00-02:30"), is(OffsetTime.parse("14:00-02:30")));
 
         TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-13");
 
         TimeZone.setDefault(offsetMinusTwoHours);
 
-        startOfDayDate = getTodayStartOfDayUTCEpoch();
-
-        testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
-        testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
-
-        testTime("14:00+02", startOfDayDate + 1000 * 60 * 60 * 12);
-        testTime("14:00-02", startOfDayDate + 1000 * 60 * 60 * 16);
-
-        testTime("14:00+02:30", startOfDayDate + 1000 * 60 * (60 * 14 - 150));
-        testTime("14:00-02:30", startOfDayDate + 1000 * 60 * (60 * 14 + 150));
-
+        assertThat(parseTime("14:00"), is(LocalTime.parse("14:00")));
+        assertThat(parseTime("14:00Z"), is(OffsetTime.parse("14:00Z")));
+        assertThat(parseTime("14:00+02"), is(OffsetTime.parse("14:00+02:00")));
+        assertThat(parseTime("14:00-02"), is(OffsetTime.parse("14:00-02:00")));
+        assertThat(parseTime("14:00+02:30"), is(OffsetTime.parse("14:00+02:30")));
+        assertThat(parseTime("14:00-02:30"), is(OffsetTime.parse("14:00-02:30")));
 
         TimeZone offsetPlusHalf = TimeZone.getTimeZone("GMT+0230");
 
         TimeZone.setDefault(offsetPlusHalf);
 
-        startOfDayDate = getTodayStartOfDayUTCEpoch();
-
-        testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
-        testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
-
-        testTime("14:00+02", startOfDayDate + 1000 * 60 * 60 * 12);
-        testTime("14:00-02", startOfDayDate + 1000 * 60 * 60 * 16);
-
-        testTime("14:00+02:30", startOfDayDate + 1000 * 60 * (60 * 14 - 150));
-        testTime("14:00-02:30", startOfDayDate + 1000 * 60 * (60 * 14 + 150));
-
-        testTime("14:00+04:00", startOfDayDate + 1000 * 60 * 60 * 10);
+        assertThat(parseTime("14:00"), is(LocalTime.parse("14:00")));
+        assertThat(parseTime("14:00Z"), is(OffsetTime.parse("14:00Z")));
+        assertThat(parseTime("14:00+02"), is(OffsetTime.parse("14:00+02:00")));
+        assertThat(parseTime("14:00-02"), is(OffsetTime.parse("14:00-02:00")));
+        assertThat(parseTime("14:00+02:30"), is(OffsetTime.parse("14:00+02:30")));
+        assertThat(parseTime("14:00-02:30"), is(OffsetTime.parse("14:00-02:30")));
+        assertThat(parseTime("14:00+04:00"), is(OffsetTime.parse("14:00+04:00")));
     }
 
-    public long getTodayStartOfDayUTCEpoch() {
-        return LocalDate.now().atStartOfDay().atOffset(ZoneOffset.UTC).toInstant().toEpochMilli();
+    /**
+     * Returns a LocalTime or a OffsetTime obtained from the result of
+     * calling DateUtils.parseTime() with the provided input.
+     * <p>
+     * The interim OffsetDateTime value ensures that it represents the
+     * same instant as the Date from the call to DateUtils.parseTime().
+     */
+    public Temporal parseTime(String input) {
+        Instant inputInstant = Objects.requireNonNull(DateUtils.parseTime(input)).toInstant();
+
+        // No time offset declared. Return a LocalTime
+        if (input.length() == 5)
+            return OffsetDateTime.ofInstant(inputInstant, ZoneId.systemDefault()).toLocalTime();
+
+        // The input time is at UTC
+        if (input.charAt(5) == 'Z')
+            return OffsetDateTime.ofInstant(inputInstant, ZoneId.of("Z")).toOffsetTime();
+
+        // The input declares some positive or negative time offset
+        String offsetPart = input.substring(5);
+        // Fix for unparseable short offset notations such as +02
+        String offset = offsetPart.length() == 3 ? offsetPart + ":00" : offsetPart;
+        return OffsetDateTime.ofInstant(inputInstant, ZoneId.of(offset)).toOffsetTime();
     }
 
     private void testTime(String in, long test) {
@@ -203,13 +221,6 @@ public class DateUtilsTests {
         long value = d.getTime();
 
         assertEquals("Fail: " + in + "(" + TimeZone.getDefault().getDisplayName() + ")", test, value);
-    }
-
-    private long getOffset() {
-        DateFields df = new DateFields();
-        Date d = DateUtils.getDate(df);
-
-        return -d.getTime();
     }
 
     @Test
