@@ -148,14 +148,14 @@ public class DateUtilsTests {
 
         startOfDayDate = getTodayStartOfDayUTCEpoch();
 
-        testTime("10:00", startOfDayDate + 1000 * 60 * 60 * 10 - getOffset());
-        testTime("10:00Z", startOfDayDate + 1000 * 60 * 60 * 10);
+        testTime("14:00", startOfDayDate + 1000 * 60 * 60 * 14 - getOffset());
+        testTime("14:00Z", startOfDayDate + 1000 * 60 * 60 * 14);
 
-        testTime("10:00+02", startOfDayDate + 1000 * 60 * 60 * 8);
-        testTime("10:00-02", startOfDayDate + 1000 * 60 * 60 * 12);
+        testTime("14:00+02", startOfDayDate + 1000 * 60 * 60 * 12);
+        testTime("14:00-02", startOfDayDate + 1000 * 60 * 60 * 16);
 
-        testTime("10:00+02:30", startOfDayDate + 1000 * 60 * (60 * 10 - 150));
-        testTime("10:00-02:30", startOfDayDate + 1000 * 60 * (60 * 10 + 150));
+        testTime("14:00+02:30", startOfDayDate + 1000 * 60 * (60 * 14 - 150));
+        testTime("14:00-02:30", startOfDayDate + 1000 * 60 * (60 * 14 + 150));
 
         TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-13");
 
