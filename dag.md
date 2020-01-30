@@ -34,7 +34,7 @@ The `Triggerable` abstraction represents an expression, references updated by it
 
   > "Specifically, the depList for a vertex v is assigned to be the vertices other than v whose computational expressions reference v (described below). Vertex v is excluded from its own depList to allow self-references to occur without causing a circular reference exception."
 
-  JavaRosa only allows for self-references in `readonly`, `required`, and `constraint` conditions.
+  JavaRosa only allows for self-references in `constraint` conditions implicitly due to not storing them in the DAG.
 
 - https://www.w3.org/TR/xforms11/#rpm-processing-recalc-compute
 
