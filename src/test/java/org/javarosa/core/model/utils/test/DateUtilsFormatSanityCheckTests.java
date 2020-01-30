@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.model.utils.DateUtils.FORMAT_ISO8601;
 import static org.javarosa.core.model.utils.DateUtils.formatDateTime;
 import static org.javarosa.core.model.utils.DateUtils.parseDateTime;
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -56,12 +57,5 @@ public class DateUtilsFormatSanityCheckTests {
             getTimeZone("GMT+0230")
         ).forEach(timeZone -> withTimeZone(timeZone, () ->
             assertThat(parseDateTime(formatDateTime(input, FORMAT_ISO8601)), is(input))));
-    }
-
-    private void withTimeZone(TimeZone timeZone, Runnable block) {
-        TimeZone backupZone = TimeZone.getDefault();
-        TimeZone.setDefault(timeZone);
-        block.run();
-        TimeZone.setDefault(backupZone);
     }
 }

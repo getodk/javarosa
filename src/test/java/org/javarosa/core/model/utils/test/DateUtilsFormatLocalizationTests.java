@@ -18,15 +18,15 @@ package org.javarosa.core.model.utils.test;
 
 import static java.time.DayOfWeek.SUNDAY;
 import static java.time.Month.JANUARY;
+import static java.time.format.TextStyle.SHORT;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.utils.SystemHelper.withLocale;
 import static org.junit.Assert.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
@@ -43,15 +43,9 @@ public class DateUtilsFormatLocalizationTests {
             Locale.forLanguageTag("es-ES"),
             Locale.FRENCH
         ).forEach(locale -> withLocale(locale, l -> {
-            assertThat(DateUtils.format(date, "%b"), is(JANUARY.getDisplayName(TextStyle.SHORT, l)));
-            assertThat(DateUtils.format(date, "%a"), is(SUNDAY.getDisplayName(TextStyle.SHORT, l)));
+            assertThat(DateUtils.format(date, "%b"), is(JANUARY.getDisplayName(SHORT, l)));
+            assertThat(DateUtils.format(date, "%a"), is(SUNDAY.getDisplayName(SHORT, l)));
         }));
     }
 
-    public void withLocale(Locale locale, Consumer<Locale> block) {
-        Locale backupLocale = Locale.getDefault();
-        Locale.setDefault(locale);
-        block.accept(locale);
-        Locale.setDefault(backupLocale);
-    }
 }

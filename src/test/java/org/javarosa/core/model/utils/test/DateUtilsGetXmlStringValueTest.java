@@ -34,7 +34,7 @@ public class DateUtilsGetXmlStringValueTest {
      * parsed by LocalDate.parse()
      */
     @Test
-    public void testGetXMLStringValueFormat() {
+    public void xml_string_is_well_formatted() {
         LocalDateTime nowDateTime = LocalDateTime.now();
         Date nowDate = Date.from(nowDateTime.toInstant(OffsetDateTime.now().getOffset()));
         String nowXmlFormatterDate = getXMLStringValue(nowDate);

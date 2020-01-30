@@ -18,6 +18,7 @@ package org.javarosa.core.model.utils.test;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertThat;
 
 import java.time.Instant;
@@ -57,7 +58,7 @@ public class DateUtilsParseDateTimeTests {
     }
 
     @Test
-    public void testTimeParses() {
+    public void parseDateTime_produces_expected_results_in_all_time_zones() {
         Stream.of(
             TimeZone.getDefault(),
             getTimeZone("UTC"),
@@ -65,13 +66,6 @@ public class DateUtilsParseDateTimeTests {
             getTimeZone("GMT-13"),
             getTimeZone("GMT+0230")
         ).forEach(tz -> withTimeZone(tz, () -> assertThat(parseDateTime(input), is(expectedDateTime))));
-    }
-
-    private void withTimeZone(TimeZone timeZone, Runnable block) {
-        TimeZone backupZone = TimeZone.getDefault();
-        TimeZone.setDefault(timeZone);
-        block.run();
-        TimeZone.setDefault(backupZone);
     }
 
     /**
