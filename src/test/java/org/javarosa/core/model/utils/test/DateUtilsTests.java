@@ -16,8 +16,11 @@
 
 package org.javarosa.core.model.utils.test;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -49,17 +52,15 @@ public class DateUtilsTests {
     /**
      * This test ensures that the Strings returned
      * by the getXMLStringValue function are in
-     * the proper XML compliant format.
+     * the proper XML compliant format, which can be
+     * parsed by LocalDate.parse()
      */
     @Test
     public void testGetXMLStringValueFormat() {
-        LocalDateTime testLocalDateTime = LocalDateTime.of(2018, 1, 1, 10, 20, 30, 400);
-        String currentDate = DateUtils.getXMLStringValue(Date.from(testLocalDateTime.toInstant(OffsetDateTime.now().getOffset())));
-        assertEquals("The date string was not of the proper length", currentDate.length(), "YYYY-MM-DD".length());
-        assertEquals("The date string does not have proper year formatting", currentDate.indexOf("-"), "YYYY-".indexOf("-"));
-        assertEquals(testLocalDateTime.getYear(), Integer.parseInt(currentDate.substring(0, 4)));
-        assertEquals(testLocalDateTime.getMonth().getValue(), Integer.parseInt(currentDate.substring(5, 7)));
-        assertEquals(testLocalDateTime.getDayOfMonth(), Integer.parseInt(currentDate.substring(8, 10)));
+        LocalDateTime nowDateTime = LocalDateTime.now();
+        Date nowDate = Date.from(nowDateTime.toInstant(OffsetDateTime.now().getOffset()));
+        String nowXmlFormatterDate = DateUtils.getXMLStringValue(nowDate);
+        assertThat(LocalDate.parse(nowXmlFormatterDate), is(nowDateTime.toLocalDate()));
     }
 
     @Test
