@@ -1,5 +1,57 @@
 # DAG
 
+Forms used by JavaRosa can use expressions to compute dynamic values while a form is answered. This values can be used in a range of applications including, among others, setting values for other fields, validation, or conditionally hiding non-relevant fields.
+
+`calculate`, `relevant`, `readonly`, and `required` expressions used in `<bind>` attributes are stored in a directed acyclic graph (DAG from now on) of `Triggerable` objects.
+
+The `Triggerable` abstraction represents an expression, all the references that are updated by it, and all the references that trigger its evaluation when their values change.
+
+## Deviations from specs
+
+### Recalculation Sequence Algorithm from XForms 1.1
+
+- https://www.w3.org/TR/xforms11/#recalc
+
+  > "The XForms recalculation algorithm considers model items and model item properties to be vertices in a directed graph. Edges between the vertices represent computational dependencies between vertices."
+
+  JavaRosa's underlying DAG tracks `Triggerable` instances (vertices) and cascading evaluations of triggerables when one of their trigger refs is changed by another (edges).
+  
+  Nevertheless, further reading of the specs reveals that the DAG should have computations as vertices and their computational dependencies as edges, which is similiar to what JavaRosa does.
+
+- https://www.w3.org/TR/xforms11/#model-prop-calculate
+
+  > "An XForms Model may include model items whose string values are computed from other values. For example, the sum over line items for quantity times unit price, or the amount of tax to be paid on an order. The formula for such a computed value can be expressed with a calculate property, whose XPath expression is evaluated, converted to a string with the XPath string() function, and stored as the value content of the calculated data node. Chapter 4 Processing Model contains details of when and how the calculation is performed."
+
+  JavaRosa casts expression output values to types other than strings before commiting them to the instance.
+
+- https://www.w3.org/TR/xforms11/#rpm-event-seq-vc
+
+  > "3. xforms-refresh performs reevaluation of UI binding expressions then dispatches these events according to value changes, model item property changes and validity changes:"
+
+  JavaRosa doesn't emit `xforms-valid`, `xforms-valid`, `xforms-invalid`, `xforms-enabled`, `xforms-disabled`, `xforms-optional`, `xforms-required`, `xforms-readonly`, `xforms-readwrite`, `xforms-out-of-range`, or `xforms-in-range` events.
+  
+- https://www.w3.org/TR/xforms11/#rpm-processing-recalc-mddg
+
+  > "Specifically, the depList for a vertex v is assigned to be the vertices other than v whose computational expressions reference v (described below). Vertex v is excluded from its own depList to allow self-references to occur without causing a circular reference exception."
+
+  JavaRosa only allows for self-references in `readonly`, `required` and `constraint` conditions.
+
+- https://www.w3.org/TR/xforms11/#rpm-processing-recalc-compute
+
+  > "2.b. relevant, readonly, required, constraint: If any or all of these computed properties change, the new settings are placed into effect for associated form controls."
+
+  JavaRosa doesn't include `constraint` condition expressions in the DAG, nor it keeps track of its result in the node's internal state. 
+  
+  JavaRosa doesn't update the internal state of form controls associated to nodes when evaluating these expressions. 
+
+- https://www.w3.org/TR/xforms11/#rpm-processing-recalc-example
+
+  > "... When x is removed, its neighbor y drops to in-degree zero. The fourth and fifth iterations of this process recalculate the validity of w and y, both of which change to false."
+
+  The specs describe an evaluation sequence that would evaluate constraints on fields changed during the cascade of evaluations, and flagging them as invalid as a result, which JavaRosa doesn't do.
+  
+  JavaRosa only evaluates constraints to prevent committing to the instance values that don't match their constraint expressions.
+   
 ## DAG lifecycle
 
 ### 1 - The form is parsed
