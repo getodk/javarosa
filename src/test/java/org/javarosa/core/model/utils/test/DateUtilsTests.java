@@ -63,12 +63,12 @@ public class DateUtilsTests {
             new LangJanSun(Locale.FRENCH)
         };
 
+        // Use a Sunday in January for our test
+        LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
+        Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
+
         for (LangJanSun ljs : langJanSuns) {
             withLocale(ljs.locale, locale -> {
-                // Use a Sunday in January for our test
-                LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
-                Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
-
                 assertThat(DateUtils.format(date, "%b"), is(JANUARY.getDisplayName(TextStyle.SHORT, locale)));
                 assertThat(DateUtils.format(date, "%a"), is(SUNDAY.getDisplayName(TextStyle.SHORT, locale)));
             });
