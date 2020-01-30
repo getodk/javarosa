@@ -21,9 +21,12 @@ import static org.javarosa.core.model.utils.DateUtils.getXMLStringValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -66,25 +69,25 @@ public class DateUtilsTests {
     @Test
     public void format_is_localized() {
         class LangJanSun {
-            private LangJanSun(String language, String january, String sunday) {
-                this.language = language;
+            private LangJanSun(Locale locale, String january, String sunday) {
+                this.locale = locale;
                 this.january = january;
                 this.sunday = sunday;
             }
 
-            private String language;
+            private Locale locale;
             private String january;
             private String sunday;
         }
 
         LangJanSun langJanSuns[] = new LangJanSun[]{
-            new LangJanSun("en", "Jan", "Sun"),
-            new LangJanSun("es", "ene", "dom"),
-            new LangJanSun("fr", "janv.", "dim.")
+            new LangJanSun(Locale.ENGLISH, Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.ENGLISH), DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)),
+            new LangJanSun(Locale.forLanguageTag("es-ES"), Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.forLanguageTag("es-ES")), DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, Locale.forLanguageTag("es-ES"))),
+            new LangJanSun(Locale.FRENCH, Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.FRENCH), DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, Locale.FRENCH))
         };
 
         for (LangJanSun ljs : langJanSuns) {
-            Locale.setDefault(Locale.forLanguageTag(ljs.language));
+            Locale.setDefault(ljs.locale);
 
             // Use a Sunday in January for our test
             LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
