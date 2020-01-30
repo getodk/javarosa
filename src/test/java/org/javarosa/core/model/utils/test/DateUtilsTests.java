@@ -16,20 +16,14 @@
 
 package org.javarosa.core.model.utils.test;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.text.DateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
@@ -73,63 +67,6 @@ public class DateUtilsTests {
         assertEquals(testLocalDateTime.getYear(), Integer.parseInt(currentDate.substring(0, 4)));
         assertEquals(testLocalDateTime.getMonth().getValue(), Integer.parseInt(currentDate.substring(5, 7)));
         assertEquals(testLocalDateTime.getDayOfMonth(), Integer.parseInt(currentDate.substring(8, 10)));
-    }
-
-    @Test
-    public void testDateTimeParses() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-
-        assertThat(parseDateTime("2016-04-13T16:26:00.000-07"), is(OffsetDateTime.parse("2016-04-13T16:26:00.000-07:00")));
-        assertThat(parseDateTime("2015-12-16T16:09:00.000-08"), is(OffsetDateTime.parse("2015-12-16T16:09:00.000-08:00"))); // wraps day!!!
-        assertThat(parseDateTime("2015-12-16T07:09:00.000+08"), is(OffsetDateTime.parse("2015-12-16T07:09:00.000+08:00"))); // wraps day!!!
-        assertThat(parseDateTime("2015-11-30T16:09:00.000-08"), is(OffsetDateTime.parse("2015-11-30T16:09:00.000-08:00"))); // wraps month!!!
-        assertThat(parseDateTime("2015-11-01T07:09:00.000+08"), is(OffsetDateTime.parse("2015-11-01T07:09:00.000+08:00"))); // wraps month!!!
-        assertThat(parseDateTime("2015-12-31T16:09:00.000-08"), is(OffsetDateTime.parse("2015-12-31T16:09:00.000-08:00"))); // wraps year!!!
-        assertThat(parseDateTime("2015-01-01T07:09:00.000+08"), is(OffsetDateTime.parse("2015-01-01T07:09:00.000+08:00"))); // wraps year!!!
-        assertThat(parseDateTime("2016-01-26T10:39:00.000-08"), is(OffsetDateTime.parse("2016-01-26T10:39:00.000-08:00")));
-
-        TimeZone.setDefault(TimeZone.getTimeZone("PST"));
-
-        assertThat(parseDateTime("2016-04-13T16:26:00.000-07"), is(OffsetDateTime.parse("2016-04-13T16:26:00.000-07:00")));
-        assertThat(parseDateTime("2015-12-16T16:09:00.000-08"), is(OffsetDateTime.parse("2015-12-16T16:09:00.000-08:00"))); // wraps day!!!
-        assertThat(parseDateTime("2015-12-16T07:09:00.000+08"), is(OffsetDateTime.parse("2015-12-16T07:09:00.000+08:00"))); // wraps day!!!
-        assertThat(parseDateTime("2015-11-30T16:09:00.000-08"), is(OffsetDateTime.parse("2015-11-30T16:09:00.000-08:00"))); // wraps month!!!
-        assertThat(parseDateTime("2015-11-01T07:09:00.000+08"), is(OffsetDateTime.parse("2015-11-01T07:09:00.000+08:00"))); // wraps month!!!
-        assertThat(parseDateTime("2015-12-31T16:09:00.000-08"), is(OffsetDateTime.parse("2015-12-31T16:09:00.000-08:00"))); // wraps year!!!
-        assertThat(parseDateTime("2015-01-01T07:09:00.000+08"), is(OffsetDateTime.parse("2015-01-01T07:09:00.000+08:00"))); // wraps year!!!
-        assertThat(parseDateTime("2016-01-26T10:39:00.000-08"), is(OffsetDateTime.parse("2016-01-26T10:39:00.000-08:00")));
-
-        TimeZone.setDefault(TimeZone.getTimeZone("PDT"));
-
-        assertThat(parseDateTime("2016-04-13T16:26:00.000-07"), is(OffsetDateTime.parse("2016-04-13T16:26:00.000-07:00")));
-        assertThat(parseDateTime("2015-12-16T16:09:00.000-08"), is(OffsetDateTime.parse("2015-12-16T16:09:00.000-08:00"))); // wraps day!!!
-        assertThat(parseDateTime("2015-12-16T07:09:00.000+08"), is(OffsetDateTime.parse("2015-12-16T07:09:00.000+08:00"))); // wraps day!!!
-        assertThat(parseDateTime("2015-11-30T16:09:00.000-08"), is(OffsetDateTime.parse("2015-11-30T16:09:00.000-08:00"))); // wraps month!!!
-        assertThat(parseDateTime("2015-11-01T07:09:00.000+08"), is(OffsetDateTime.parse("2015-11-01T07:09:00.000+08:00"))); // wraps month!!!
-        assertThat(parseDateTime("2015-12-31T16:09:00.000-08"), is(OffsetDateTime.parse("2015-12-31T16:09:00.000-08:00"))); // wraps year!!!
-        assertThat(parseDateTime("2015-01-01T07:09:00.000+08"), is(OffsetDateTime.parse("2015-01-01T07:09:00.000+08:00"))); // wraps year!!!
-        assertThat(parseDateTime("2016-01-26T10:39:00.000-08"), is(OffsetDateTime.parse("2016-01-26T10:39:00.000-08:00")));
-    }
-
-    private Temporal parseDateTime(String input) {
-        Instant inputInstant = Objects.requireNonNull(DateUtils.parseDateTime(input)).toInstant();
-
-        String timePart = input.substring(11);
-        if (timePart.contains("+") || timePart.contains("-")) {
-            // The input declares some positive or negative time offset
-            int beginOfOffsetPart = timePart.contains("+") ? timePart.indexOf("+") : timePart.indexOf("-");
-            String offsetPart = timePart.substring(beginOfOffsetPart);
-            // The input declares some positive or negative time offset
-            String offset = offsetPart.length() == 3 ? offsetPart + ":00" : offsetPart;
-            return OffsetDateTime.ofInstant(inputInstant, ZoneId.of(offset));
-        }
-
-        if (input.endsWith("Z"))
-            // The input time is at UTC
-            return OffsetDateTime.ofInstant(inputInstant, ZoneId.of("Z"));
-
-        // No time offset declared. Return a LocalTime
-        return LocalDateTime.ofInstant(inputInstant, ZoneId.systemDefault());
     }
 
     private void testTime(String in, long test) {
