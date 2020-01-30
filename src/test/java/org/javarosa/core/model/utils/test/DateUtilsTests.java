@@ -146,7 +146,7 @@ public class DateUtilsTests {
         testTime("10:00+02:30", startOfDayDate + 1000 * 60 * (60 * 10 - 150));
         testTime("10:00-02:30", startOfDayDate + 1000 * 60 * (60 * 10 + 150));
 
-        TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
+        TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+12");
 
         TimeZone.setDefault(offsetTwoHours);
 
@@ -159,7 +159,7 @@ public class DateUtilsTests {
         testTime("10:00+02:30", startOfDayDate + 1000 * 60 * (60 * 10 - 150));
         testTime("10:00-02:30", startOfDayDate + 1000 * 60 * (60 * 10 + 150));
 
-        TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-02");
+        TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-13");
 
         TimeZone.setDefault(offsetMinusTwoHours);
 
@@ -294,8 +294,8 @@ public class DateUtilsTests {
         }
 
         LangJanSun langJanSuns[] = new LangJanSun[]{
-            new LangJanSun("en", "Jan",   "Sun"),
-            new LangJanSun("es", "ene",   "dom"),
+            new LangJanSun("en", "Jan", "Sun"),
+            new LangJanSun("es", "ene", "dom"),
             new LangJanSun("fr", "janv.", "dim.")
         };
 
