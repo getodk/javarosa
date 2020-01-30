@@ -18,34 +18,26 @@ package org.javarosa.core.model.utils.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DateUtilsTests {
-
     private Locale backupLocale;
     private TimeZone backupZone;
-    private Date testDate;
-    private LocalDateTime testLocalDateTime;
 
     @Before
     public void setUp() {
         backupLocale = Locale.getDefault();
         backupZone = TimeZone.getDefault();
-        testLocalDateTime = LocalDateTime.of(2018, 1, 1, 10, 20, 30, 400);
-        testDate = Date.from(testLocalDateTime.toInstant(OffsetDateTime.now().getOffset()));
+
     }
 
     @After
@@ -61,6 +53,8 @@ public class DateUtilsTests {
      */
     @Test
     public void testGetXMLStringValueFormat() {
+        LocalDateTime testLocalDateTime = LocalDateTime.of(2018, 1, 1, 10, 20, 30, 400);
+        Date testDate = Date.from(testLocalDateTime.toInstant(OffsetDateTime.now().getOffset()));
         String currentDate = DateUtils.getXMLStringValue(testDate);
         assertEquals("The date string was not of the proper length", currentDate.length(), "YYYY-MM-DD".length());
         assertEquals("The date string does not have proper year formatting", currentDate.indexOf("-"), "YYYY-".indexOf("-"));
