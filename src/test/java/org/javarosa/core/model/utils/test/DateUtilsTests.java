@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.model.utils.DateUtils.DateFields;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,11 +86,14 @@ public class DateUtilsTests {
         for (LangJanSun ljs : langJanSuns) {
             Locale.setDefault(Locale.forLanguageTag(ljs.language));
 
-            String month = DateUtils.format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%b");
+            // Use a Sunday in January for our test
+            LocalDateTime localDateTime = LocalDateTime.parse("2018-01-07T10:20:30.400");
+            Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
+
+            String month = DateUtils.format(date, "%b");
             assertEquals(ljs.january, month);
 
-            // 2018-04-01 was sunday
-            String day = DateUtils.format(DateFields.of(2018, 4, 1, 10, 20, 30, 400), "%a");
+            String day = DateUtils.format(date, "%a");
             assertEquals(ljs.sunday, day);
         }
     }
