@@ -16,15 +16,15 @@
 
 package org.javarosa.core.model.utils.test;
 
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.Month.JANUARY;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.model.utils.DateUtils.getXMLStringValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.format.TextStyle;
 import java.util.Date;
@@ -69,10 +69,10 @@ public class DateUtilsTests {
     @Test
     public void format_is_localized() {
         class LangJanSun {
-            private LangJanSun(Locale locale, String january, String sunday) {
+            private LangJanSun(Locale locale) {
                 this.locale = locale;
-                this.january = january;
-                this.sunday = sunday;
+                this.january = JANUARY.getDisplayName(TextStyle.SHORT, locale);
+                this.sunday = SUNDAY.getDisplayName(TextStyle.SHORT, locale);
             }
 
             private Locale locale;
@@ -81,9 +81,9 @@ public class DateUtilsTests {
         }
 
         LangJanSun langJanSuns[] = new LangJanSun[]{
-            new LangJanSun(Locale.ENGLISH, Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.ENGLISH), DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)),
-            new LangJanSun(Locale.forLanguageTag("es-ES"), Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.forLanguageTag("es-ES")), DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, Locale.forLanguageTag("es-ES"))),
-            new LangJanSun(Locale.FRENCH, Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.FRENCH), DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, Locale.FRENCH))
+            new LangJanSun(Locale.ENGLISH),
+            new LangJanSun(Locale.forLanguageTag("es-ES")),
+            new LangJanSun(Locale.FRENCH)
         };
 
         for (LangJanSun ljs : langJanSuns) {
