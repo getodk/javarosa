@@ -17,7 +17,6 @@
 package org.javarosa.core.model.utils.test;
 
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.utils.DateUtils.format;
 import static org.javarosa.core.model.utils.DateUtils.getXMLStringValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -28,6 +27,7 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.DateUtils.DateFields;
 import org.junit.After;
 import org.junit.Before;
@@ -65,7 +65,7 @@ public class DateUtilsTests {
     }
 
     @Test
-    public void testFormatting() {
+    public void format_is_localized() {
         class LangJanSun {
             private LangJanSun(String language, String january, String sunday) {
                 this.language = language;
@@ -87,11 +87,11 @@ public class DateUtilsTests {
         for (LangJanSun ljs : langJanSuns) {
             Locale.setDefault(Locale.forLanguageTag(ljs.language));
 
-            String month = format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%b");
+            String month = DateUtils.format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%b");
             assertEquals(ljs.january, month);
 
             // 2018-04-01 was sunday
-            String day = format(DateFields.of(2018, 4, 1, 10, 20, 30, 400), "%a");
+            String day = DateUtils.format(DateFields.of(2018, 4, 1, 10, 20, 30, 400), "%a");
             assertEquals(ljs.sunday, day);
         }
     }
