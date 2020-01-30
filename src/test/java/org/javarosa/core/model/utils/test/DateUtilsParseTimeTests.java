@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
@@ -102,18 +103,20 @@ public class DateUtilsParseTimeTests {
     public Temporal parseTime(String input) {
         Instant inputInstant = Objects.requireNonNull(DateUtils.parseTime(input)).toInstant();
 
-        // No time offset declared. Return a LocalTime
-        if (input.length() == 5)
-            return OffsetDateTime.ofInstant(inputInstant, ZoneId.systemDefault()).toLocalTime();
+        if (input.contains("+") || input.contains("-")) {
+            // The input declares some positive or negative time offset
+            int beginOfOffsetPart = input.contains("+") ? input.indexOf("+") : input.indexOf("-");
+            String offsetPart = input.substring(beginOfOffsetPart);
+            // The input declares some positive or negative time offset
+            String offset = offsetPart.length() == 3 ? offsetPart + ":00" : offsetPart;
+            return OffsetDateTime.ofInstant(inputInstant, ZoneId.of(offset)).toOffsetTime();
+        }
 
-        // The input time is at UTC
-        if (input.charAt(5) == 'Z')
+        if (input.endsWith("Z"))
+            // The input time is at UTC
             return OffsetDateTime.ofInstant(inputInstant, ZoneId.of("Z")).toOffsetTime();
 
-        // The input declares some positive or negative time offset
-        String offsetPart = input.substring(5);
-        // Fix for unparseable short offset notations such as +02
-        String offset = offsetPart.length() == 3 ? offsetPart + ":00" : offsetPart;
-        return OffsetDateTime.ofInstant(inputInstant, ZoneId.of(offset)).toOffsetTime();
+        // No time offset declared. Return a LocalTime
+        return LocalDateTime.ofInstant(inputInstant, ZoneId.systemDefault()).toLocalTime();
     }
 }
