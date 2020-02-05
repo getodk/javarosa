@@ -1,7 +1,7 @@
 package org.javarosa.core.model.instance;
 
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -35,8 +35,8 @@ public class TreeReferenceAnchorHarnessTest {
     @Test
     public void parent_works_as_expected() {
         assertThat(
-            buildRef(tr).anchor(buildRef(base)),
-            is(buildRef(tr).parent(buildRef(base)))
+            getRef(tr).anchor(getRef(base)),
+            is(getRef(tr).parent(getRef(base)))
         );
     }
 

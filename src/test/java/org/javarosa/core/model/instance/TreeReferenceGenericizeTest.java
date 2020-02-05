@@ -18,16 +18,16 @@ package org.javarosa.core.model.instance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import static org.javarosa.core.test.Scenario.getRef;
 
 import org.junit.Test;
 
 public class TreeReferenceGenericizeTest {
     @Test
     public void genericize_sets_all_steps_with_unbound_multiplicity() {
-        assertThat(buildRef("/foo/bar").genericize(), is(buildRef("/foo/bar")));
+        assertThat(getRef("/foo/bar").genericize(), is(getRef("/foo/bar")));
 
-        TreeReference originalRef = buildRef("/foo[2]/bar[3]");
+        TreeReference originalRef = getRef("/foo[2]/bar[3]");
         assertThat(originalRef.getMultiplicity(0), is(2));
         assertThat(originalRef.getMultiplicity(1), is(3));
 

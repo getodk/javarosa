@@ -17,11 +17,12 @@
 package org.javarosa.core.model.instance;
 
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
+import org.javarosa.core.test.Scenario;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -125,7 +126,7 @@ public class TreeReferenceIsAncestorOfTest {
     @Test
     public void isAncestorOf_works_as_expected() {
         assertThat(
-            buildRef(a).isAncestorOf(buildRef(b), properParent),
+            getRef(a).isAncestorOf(getRef(b), properParent),
             is(expectedResult)
         );
     }
