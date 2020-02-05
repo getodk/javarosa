@@ -129,6 +129,8 @@ public class Scenario {
     // region Miscelaneous
 
     public static TreeReference getRef(String xpath) {
+        if (xpath.trim().isEmpty())
+            return new TreeReference();
         try {
             TreeReference reference = ((XPathPathExpr) XPathParseTool.parseXPath(xpath)).getReference();
             for (int i = 0; i < reference.size(); i++) {
