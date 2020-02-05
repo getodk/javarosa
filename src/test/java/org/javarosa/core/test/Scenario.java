@@ -390,7 +390,8 @@ public class Scenario {
         IFormElement child = formDef.getChild(formIndex);
         String labelInnerText = Optional.ofNullable(child.getLabelInnerText()).map(s -> " " + s).orElse("");
         String textId = Optional.ofNullable(child.getTextID()).map(s -> " itext:" + s).orElse("");
-        log.info("Jump to {}{}{}{}", jumpResult, labelInnerText, textId, Optional.ofNullable(formIndex.getReference()).map(ref -> ref.toString(true, true)).orElse(""));
+        String referenceAtIndex = Optional.ofNullable(formIndex.getReference()).map(ref -> ref.toString(true, true)).orElse("");
+        log.info("Jump to {}{}{}{}", jumpResult, labelInnerText, textId, referenceAtIndex);
         return jumpResultCode;
     }
 
