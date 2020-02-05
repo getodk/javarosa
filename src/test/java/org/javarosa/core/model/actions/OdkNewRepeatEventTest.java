@@ -66,7 +66,7 @@ public class OdkNewRepeatEventTest {
         // Adding repeats should trigger odk-new-repeat for those new nodes
         scenario.answer("/data/repeat-count", 6);
 
-        scenario.jumpToFirst("defaults-to-position-again");
+        scenario.jumpToBeginningOfForm();
         while (!scenario.atTheEndOfForm()) {
             scenario.next();
         }

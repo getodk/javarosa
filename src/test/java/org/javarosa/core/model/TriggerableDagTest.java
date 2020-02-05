@@ -75,11 +75,12 @@ public class TriggerableDagTest {
                     bind("/data/house/number").type("int").calculate("position(..)")
                 )
             ),
-            body(group("/data/house", repeat("/data/house")))
+            body(group("/data/house", repeat("/data/house", input("number"))))
         )).onDagEvent(dagEvents::add);
         range(0, 5).forEach(__ -> {
             scenario.next();
             scenario.createNewRepeat();
+            scenario.next();
         });
         assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
         assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
@@ -236,11 +237,12 @@ public class TriggerableDagTest {
                     bind("/data/summary").type("int").calculate("sum(/data/house/number)")
                 )
             ),
-            body(group("/data/house", repeat("/data/house")))
+            body(group("/data/house", repeat("/data/house", input("number"))))
         )).onDagEvent(dagEvents::add);
         range(0, 10).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
+            scenario.next();
         });
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(55)));
 

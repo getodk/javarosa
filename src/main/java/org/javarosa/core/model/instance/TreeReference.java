@@ -676,4 +676,10 @@ public class TreeReference implements Externalizable, Serializable {
         }
         return predicateless;
     }
+
+    public TreeReference removePredicates(int i) {
+        TreeReference predicateless = clone();
+        predicateless.data.set(i, predicateless.data.get(i).setPredicates(null));
+        return predicateless;
+    }
 }
