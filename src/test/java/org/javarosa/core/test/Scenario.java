@@ -119,10 +119,14 @@ public class Scenario {
     public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
     private final FormDef formDef;
     private final FormEntryController formEntryController;
+    private final EvaluationContext ec;
+    private final FormEntryModel model;
 
     private Scenario(FormDef formDef, FormEntryController formEntryController) {
         this.formDef = formDef;
         this.formEntryController = formEntryController;
+        this.ec = formDef.getEvaluationContext();
+        this.model = formEntryController.getModel();
     }
 
     // region Miscelaneous
@@ -183,7 +187,7 @@ public class Scenario {
     }
 
     public EvaluationContext getEvaluationContext() {
-        return formDef.getEvaluationContext();
+        return ec;
     }
 
     /**
@@ -228,14 +232,14 @@ public class Scenario {
      * form indexes otherwise.
      */
     private TreeReference expandSingle(TreeReference reference) {
-        List<TreeReference> expandedRefs = formDef.getEvaluationContext().expandReference(reference);
+        List<TreeReference> expandedRefs = ec.expandReference(reference);
         if (expandedRefs.size() != 1)
             throw new RuntimeException("Provided xPath expands to " + expandedRefs.size() + " references. Expecting exactly one expanded reference.");
         return expandedRefs.get(0);
     }
 
     private boolean refExists(TreeReference reference) {
-        return formDef.getEvaluationContext().expandReference(reference).size() == 1;
+        return ec.expandReference(reference).size() == 1;
     }
 
     /**
@@ -295,7 +299,6 @@ public class Scenario {
 
     private FormIndex getIndexOf(TreeReference ref) {
         TreeReference qualifiedRef = expandSingle(ref);
-        FormEntryModel model = formEntryController.getModel();
         FormIndex backupIndex = model.getFormIndex();
         silentJump(BEGINNING_OF_FORM);
         FormIndex index = model.getFormIndex();
@@ -451,7 +454,7 @@ public class Scenario {
     }
 
     private AnswerResult answer(IAnswerData data) {
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        FormIndex formIndex = model.getFormIndex();
         log.info("Answer {} at {}", data, formIndex.getReference());
         return AnswerResult.from(formEntryController.answerQuestion(formIndex, data, true));
     }
@@ -487,7 +490,7 @@ public class Scenario {
      * at a create new repeat group question
      */
     public Scenario createNewRepeat() {
-        log.info("Create repeat instance {}", formEntryController.getModel().getFormIndex().getReference());
+        log.info("Create repeat instance {}", model.getFormIndex().getReference());
         formEntryController.newRepeat();
         return this;
     }
@@ -503,7 +506,7 @@ public class Scenario {
 
         // Compute the next multiplicity value counting the existing instances
         TreeReference repeatInstanceRef = groupRef.clone();
-        int multiplicity = formDef.getEvaluationContext().expandReference(repeatInstanceRef).size();
+        int multiplicity = ec.expandReference(repeatInstanceRef).size();
         repeatInstanceRef.setMultiplicity(repeatInstanceRef.size() - 1, multiplicity);
 
         return createRepeat(repeatInstanceRef);
@@ -521,7 +524,7 @@ public class Scenario {
         silentJump(BEGINNING_OF_FORM);
         while (!atTheEndOfForm() && !refExists(repeatInstanceRef))
             if (silentNext() == EVENT_PROMPT_NEW_REPEAT) {
-                if (formEntryController.getModel().getFormIndex().getReference().equals(repeatInstanceRef))
+                if (model.getFormIndex().getReference().equals(repeatInstanceRef))
                     // We're in one (probably the first) of the siblings of the
                     // repeat group at the subRef. Create new repeats until the
                     // one want we need is created
@@ -534,7 +537,7 @@ public class Scenario {
     }
 
     private void createMissingRepeats(String xPath) {
-        FormIndex backupIndex = formEntryController.getModel().getFormIndex();
+        FormIndex backupIndex = model.getFormIndex();
         TreeReference reference = getRef(xPath);
         for (int i = 0; i < reference.size(); i++) {
             if (reference.getMultiplicity(i) < 0)
@@ -589,7 +592,7 @@ public class Scenario {
     }
 
     private String humanJumpTrace(int jumpResultCode) {
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        FormIndex formIndex = model.getFormIndex();
         String humanJumpResult = decodeJumpResult(jumpResultCode);
         IFormElement element = formDef.getChild(formIndex);
         String humanLabel = Optional.ofNullable(element.getLabelInnerText()).orElseGet(() -> {
@@ -650,11 +653,11 @@ public class Scenario {
     // region Inspect the form index
 
     public boolean atTheEndOfForm() {
-        return formEntryController.getModel().getFormIndex().isEndOfFormIndex();
+        return model.getFormIndex().isEndOfFormIndex();
     }
 
     public QuestionDef getQuestionAtIndex() {
-        return formEntryController.getModel().getQuestionPrompt().getQuestion();
+        return model.getQuestionPrompt().getQuestion();
     }
 
     // endregion
@@ -676,7 +679,7 @@ public class Scenario {
         if (!reference.isAmbiguous())
             throw new RuntimeException("Provided xPath must be ambiguous");
 
-        return formDef.getEvaluationContext()
+        return ec
             .expandReference(reference)
             .size();
     }
@@ -690,7 +693,7 @@ public class Scenario {
     public List<SelectChoice> choicesOf(String xPath) {
         TreeReference reference = expandSingle(getRef(xPath));
 
-        FormEntryPrompt questionPrompt = formEntryController.getModel().getQuestionPrompt(getIndexOf(reference));
+        FormEntryPrompt questionPrompt = model.getQuestionPrompt(getIndexOf(reference));
         // This call triggers the correct population of dynamic choices.
         questionPrompt.getAnswerValue();
         QuestionDef control = questionPrompt.getQuestion();
