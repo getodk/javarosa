@@ -24,6 +24,7 @@ import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.nio.file.Files.write;
 import static java.nio.file.StandardOpenOption.CREATE;
+import static java.util.stream.Collectors.joining;
 import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
 import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
 import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
@@ -60,6 +61,7 @@ import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -110,6 +112,7 @@ import org.slf4j.LoggerFactory;
 // TODO Extract both APIs to two separate contexts so that they can't be mixed, probably best if it's a Scenario steps runner that would have the common .given(setup).when(action).then(assertion)
 public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
+    public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
     private final FormDef formDef;
     private final FormEntryController formEntryController;
 
@@ -327,7 +330,7 @@ public class Scenario {
 
             // Search for the subreference among the form indexes
             TreeReference subReference = reference.getSubReference(i);
-            silentJump(FormIndex.createBeginningOfFormIndex());
+            silentJump(BEGINNING_OF_FORM);
             while (!atTheEndOfForm() && formDef.getMainInstance().resolveReference(subReference) == null)
                 if (silentNext() == EVENT_PROMPT_NEW_REPEAT) {
                     // Use the string representation to avoid issues with numeric
@@ -385,31 +388,63 @@ public class Scenario {
      */
     public int next() {
         int jumpResultCode = formEntryController.stepToNextEvent();
-        String jumpResult = decodeJumpResult(jumpResultCode);
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
-        IFormElement child = formDef.getChild(formIndex);
-        String labelInnerText = Optional.ofNullable(child.getLabelInnerText()).map(s -> " " + s).orElse("");
-        String textId = Optional.ofNullable(child.getTextID()).map(s -> " itext:" + s).orElse("");
-        String referenceAtIndex = Optional.ofNullable(formIndex.getReference()).map(ref -> ref.toString(true, true)).orElse("");
-        log.info("Jump to {}{}{}{}", jumpResult, labelInnerText, textId, referenceAtIndex);
+        log.info(humanJumpTrace(jumpResultCode));
         return jumpResultCode;
     }
 
     public void jumpToBeginningOfForm() {
-        jump(FormIndex.createBeginningOfFormIndex());
+        jump(BEGINNING_OF_FORM);
     }
 
     private int silentNext() {
         return formEntryController.stepToNextEvent();
     }
 
-    private void jump(FormIndex indexOf) {
-        int jumpResultCode = formEntryController.jumpToIndex(indexOf);
-        log.debug("Jumped to " + decodeJumpResult(jumpResultCode));
+    private int jump(FormIndex index) {
+        int jumpResultCode = formEntryController.jumpToIndex(index);
+        log.info(humanJumpTrace(jumpResultCode));
+        return jumpResultCode;
     }
 
     private void silentJump(FormIndex indexOf) {
         formEntryController.jumpToIndex(indexOf);
+    }
+
+    private String humanJumpTrace(int jumpResultCode) {
+        FormIndex formIndex = formEntryController.getModel().getFormIndex();
+        String humanJumpResult = decodeJumpResult(jumpResultCode);
+        IFormElement element = formDef.getChild(formIndex);
+        String humanLabel = Optional.ofNullable(element.getLabelInnerText()).orElseGet(() -> {
+            Localizer localizer = formDef.getLocalizer();
+            String textId = element.getTextID();
+
+            if (textId == null || localizer == null) {
+                return "";
+            }
+
+            return Optional.ofNullable(localizer.getText(textId))
+                .map(this::trimToOneLine)
+                .orElse("");
+        });
+        String humanReference = Optional.ofNullable(formIndex.getReference())
+            .map(ref -> ref.toString(true, true))
+            .orElse("");
+
+        return String.format(
+            "Jump to %s%s%s",
+            humanJumpResult,
+            prefixIfNotEmpty(" ", humanLabel),
+            prefixIfNotEmpty(" ref:", humanReference));
+    }
+
+    private String prefixIfNotEmpty(String prefix, String text) {
+        return text.isEmpty() ? "" : prefix + text;
+    }
+
+    private String trimToOneLine(String text) {
+        return Stream.of(text.split("\n"))
+            .map(String::trim)
+            .collect(joining(" "));
     }
 
     private String decodeJumpResult(int code) {
@@ -517,17 +552,17 @@ public class Scenario {
             unambiguousRef = refs.get(0);
         FormEntryModel model = formEntryController.getModel();
         FormIndex backupIndex = model.getFormIndex();
-        jump(FormIndex.createBeginningOfFormIndex());
+        silentJump(BEGINNING_OF_FORM);
         FormIndex index = model.getFormIndex();
         do {
             TreeReference reference = index.getReference();
             if (reference != null && reference.equals(unambiguousRef)) {
-                jump(backupIndex);
+                silentJump(backupIndex);
                 return index;
             }
             index = model.incrementIndex(index);
         } while (index.isInForm());
-        jump(backupIndex);
+        silentJump(backupIndex);
         return null;
     }
 
