@@ -25,6 +25,7 @@ import static java.nio.file.Files.newOutputStream;
 import static java.nio.file.Files.write;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.stream.Collectors.joining;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
 import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
 import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
@@ -33,6 +34,8 @@ import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
+import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -71,6 +74,8 @@ import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathNumNegExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -126,19 +131,72 @@ public class Scenario {
     public static TreeReference getRef(String xpath) {
         try {
             TreeReference reference = ((XPathPathExpr) XPathParseTool.parseXPath(xpath)).getReference();
-            for (int i = 0; i < reference.size(); i++)
-                if (reference.getPredicate(i) != null
-                    && !reference.getPredicate(i).isEmpty()
-                    && reference.getPredicate(i).get(0) instanceof XPathNumericLiteral
-                ) {
-                    int multiplicity = Double.valueOf(((XPathNumericLiteral) reference.getPredicate(i).get(0)).d).intValue();
-                    reference.setMultiplicity(i, multiplicity);
+            for (int i = 0; i < reference.size(); i++) {
+                Optional<Integer> multiplicity = extractMultiplicityFromPredicate(reference, i);
+                if (multiplicity.isPresent()) {
+                    reference.setMultiplicity(i, multiplicity.get());
                     reference = reference.removePredicates(i);
                 }
+            }
             return reference;
         } catch (XPathSyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Returns the multiplicity value at the provided step number of the
+     * provided reference if defined.
+     * <p>
+     * Handles special multiplicity textual representations such as <code>[@template]</code>
+     */
+    private static Optional<Integer> extractMultiplicityFromPredicate(TreeReference reference, int stepNumber) {
+        List<XPathExpression> predicates = reference.getPredicate(stepNumber);
+        if (predicates == null || predicates.size() != 1)
+            return Optional.empty();
+
+        if (isPositiveNumberPredicate(predicates))
+            return Optional.ofNullable(predicates.get(0))
+                .map(p -> ((XPathNumericLiteral) p).d)
+                .map(Double::intValue);
+
+        if (isNegativeNumberPredicate(predicates))
+            return Optional.ofNullable(predicates.get(0))
+                .map(p -> ((XPathNumNegExpr) p).a)
+                .map(p -> ((XPathNumericLiteral) p).d)
+                .map(Double::intValue)
+                .map(i -> i * -1);
+
+        if (isAtTemplatePredicate(predicates))
+            return Optional.of(INDEX_TEMPLATE);
+
+        return Optional.empty();
+    }
+
+    /**
+     * Detects [0] (example) textual representation of a node's multiplicity as a predicate
+     */
+    private static boolean isPositiveNumberPredicate(List<XPathExpression> predicates) {
+        return predicates.get(0) instanceof XPathNumericLiteral;
+    }
+
+    /**
+     * Detects [-2] (example) textual representation of a node's multiplicity as a predicate
+     */
+    private static boolean isNegativeNumberPredicate(List<XPathExpression> predicates) {
+        return predicates.get(0) instanceof XPathNumNegExpr && ((XPathNumNegExpr) predicates.get(0)).a instanceof XPathNumericLiteral;
+    }
+
+    /**
+     * Detects the special case of [@template] textual representation of
+     * a node's template multiplicity as a predicate
+     */
+    private static boolean isAtTemplatePredicate(List<XPathExpression> predicates) {
+        return predicates.get(0) instanceof XPathPathExpr
+            && ((XPathPathExpr) predicates.get(0)).steps.length == 1
+            && ((XPathPathExpr) predicates.get(0)).init_context == INIT_CONTEXT_RELATIVE
+            && ((XPathPathExpr) predicates.get(0)).steps[0].axis == AXIS_ATTRIBUTE
+            && ((XPathPathExpr) predicates.get(0)).steps[0].name.name.equals("template");
     }
 
     public void newInstance() {
@@ -351,10 +409,7 @@ public class Scenario {
     }
 
     public Scenario removeRepeat(String xPath) {
-        TreeReference reference = getRef(xPath);
-        List<TreeReference> treeReferences = formDef.getEvaluationContext().expandReference(reference);
-        if (treeReferences.size() > 1)
-            throw new RuntimeException("Provided xPath expands to more than one reference");
+        TreeReference reference = expandSingle(getRef(xPath));
 
         TreeElement group = formDef.getMainInstance().resolveReference(reference);
         FormIndex childIndex = null;
@@ -498,9 +553,8 @@ public class Scenario {
     @SuppressWarnings("unchecked")
     public <T extends IAnswerData> T answerOf(String xPath) {
         TreeReference reference = getRef(xPath);
-        List<TreeReference> treeReferences = formDef.getEvaluationContext().expandReference(reference);
-        if (treeReferences.size() > 1)
-            throw new RuntimeException("Provided xPath expands to more than one reference");
+        if (!refExists(reference))
+            return null;
 
         TreeElement element = formDef.getMainInstance().resolveReference(reference);
         return element != null ? (T) element.getValue() : null;
@@ -524,9 +578,7 @@ public class Scenario {
      */
     public List<SelectChoice> choicesOf(String xPath) {
         TreeReference reference = getRef(xPath);
-        List<TreeReference> treeReferences = formDef.getEvaluationContext().expandReference(reference);
-        if (treeReferences.size() > 1)
-            throw new RuntimeException("Provided xPath expands to more than one reference");
+        expandSingle(reference);
 
         FormEntryPrompt questionPrompt = formEntryController.getModel().getQuestionPrompt(getIndexOf(reference));
         // This call triggers the correct population of dynamic choices.
@@ -539,24 +591,36 @@ public class Scenario {
             : control.getChoices();
     }
 
+    /**
+     * Returns the single expanded reference of the provided reference.
+     * <p>
+     * This method assumes the provided reference will only be expanded
+     * to exactly one reference, which is useful to go from unbound
+     * references to fully qualified references that wouldn't match existing
+     * form indexes otherwise.
+     */
+    private TreeReference expandSingle(TreeReference reference) {
+        List<TreeReference> expandedRefs = formDef.getEvaluationContext().expandReference(reference);
+        if (expandedRefs.size() != 1)
+            throw new RuntimeException("Provided xPath expands to more than one reference");
+        return expandedRefs.get(0);
+    }
+
+    private boolean refExists(TreeReference reference) {
+        return formDef.getEvaluationContext().expandReference(reference).size() == 1;
+    }
+
     // endregion
 
     private FormIndex getIndexOf(TreeReference ref) {
-        // Get an unambiguous ref in case we can expand the provided
-        // ref to exactly one ref. This will adapt incoming /data/some-field
-        // to /data/some-field[0]. Otherwise, unbound refs won't match existing
-        // form indexes.
-        TreeReference unambiguousRef = ref;
-        List<TreeReference> refs = formDef.getEvaluationContext().expandReference(ref);
-        if (refs.size() == 1)
-            unambiguousRef = refs.get(0);
+        TreeReference qualifiedRef = expandSingle(ref);
         FormEntryModel model = formEntryController.getModel();
         FormIndex backupIndex = model.getFormIndex();
         silentJump(BEGINNING_OF_FORM);
         FormIndex index = model.getFormIndex();
         do {
-            TreeReference reference = index.getReference();
-            if (reference != null && reference.equals(unambiguousRef)) {
+            TreeReference refAtIndex = index.getReference();
+            if (refAtIndex != null && refAtIndex.equals(qualifiedRef)) {
                 silentJump(backupIndex);
                 return index;
             }
