@@ -128,6 +128,29 @@ public class Scenario {
 
     // region Miscelaneous
 
+    /**
+     * Returns a TreeReference from the provided xpath string.
+     * <p>
+     * This method parses the provided xpath string using the
+     * XPathParseTool and postprocesses the resulting reference
+     * to account for multiplicity predicates.
+     * <p>
+     * JavaRosa relies on negative multiplicity values to identify special
+     * nodes (such as templates for repeat groups), unbound references
+     * (to refer to a nodeset), and on positive multiplicity values to
+     * specify individual repeat group instances.
+     * <p>
+     * These multiplicities are declared as numeric predicates such as
+     * <code>[2]</code>, which are translated to predicates by the XPath parser.
+     * This is problematic because JavaRosa will eventually try to evaluate
+     * all predicates declared in references when resolving elements of an
+     * instance and nodes won't ever match the predicates used to define
+     * multiplicity.
+     * <p>
+     * For this reason, this method will try to detect these predicates,
+     * turn them into multiplicity values, and remove them from the output
+     * reference.
+     */
     public static TreeReference getRef(String xpath) {
         if (xpath.trim().isEmpty())
             return new TreeReference();
