@@ -808,6 +808,48 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/c"), is(intAnswer(60)));
     }
 
+    @Test
+    public void relative_paths_in_nested_repeats() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("outer jr:template=\"\"",
+                            t("inner jr:template=\"\"",
+                                t("count"),
+                                t("some-field")
+                            ),
+                            t("count"),
+                            t("some-field")
+                        )
+                    )),
+                    bind("/data/outer/inner/count").type("int").calculate("count(../../inner)")
+                )
+            ),
+            body(
+                group("/data/outer", repeat("/data/outer",
+                    input("/data/outer/some-field"),
+                    group("/data/outer/inner", repeat("/data/outer/inner",
+                        input("/data/outer/inner/some-field")
+                    ))
+                ))
+            )));
+        scenario.createNewRepeat("/data/outer");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+
+        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/count"), is(intAnswer(1))); // Should be 3
+        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/count"), is(intAnswer(1))); // Should be 3
+        assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(1))); // Should be 3
+        assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(1))); // Should be 2
+        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(1))); // Should be 2
+    }
+
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
