@@ -1,15 +1,14 @@
 package org.javarosa.core.model.instance;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.Scenario.getRef;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class TreeReferenceEqualsTest {
@@ -47,6 +46,6 @@ public class TreeReferenceEqualsTest {
 
     @Test
     public void treeReferenceEqualsTest() {
-        assertThat(buildRef(pathA).equals(buildRef(pathB)), is(expectToBeEqual));
+        assertThat(getRef(pathA).equals(getRef(pathB)), is(expectToBeEqual));
     }
 }

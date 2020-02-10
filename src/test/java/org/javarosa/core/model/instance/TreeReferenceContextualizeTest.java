@@ -18,7 +18,7 @@ package org.javarosa.core.model.instance;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -45,18 +45,18 @@ public class TreeReferenceContextualizeTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
             // Self references
-            {"Relative context ref", buildRef("bar"), buildRef("foo"), null},
-            {"Non-matching absolute refs", buildRef("/foo"), buildRef("/bar"), buildRef("/foo")},
-            {"Contextualizing a ref with itself and multiplicity #1", buildRef("/foo"), buildRef("/foo[2]"), buildRef("/foo[2]")},
-            {"Contextualizing a ref with itself and multiplicity #2", buildRef("/foo[-1]"), buildRef("/foo[2]"), buildRef("/foo[-1]")},
-            {"Contextualizing a ref with itself and multiplicity #3", buildRef("/foo[0]"), buildRef("/foo[2]"), buildRef("/foo[0]")},
-            {"Contextualizing a ref with itself and multiplicity #4", buildRef("/foo[3]"), buildRef("/foo[2]"), buildRef("/foo[3]")},
-            {"Contextualizing a ref with itself and predicate #1", buildRef("/foo"), buildRef("/foo[position() = 3]"), buildRef("/foo[position() = 3]")},
-            {"Contextualizing a ref with itself and predicate #2", buildRef("/foo[position() = 2]"), buildRef("/foo[position() = 3]"), buildRef("/foo[position() = 2]")},
-            {"Wildcards #1", buildRef("bar"), buildRef("/foo/*"), buildRef("/foo/*/bar")},
-            {"Wildcards #2", buildRef("../baz"), buildRef("/foo/*/bar"), buildRef("/foo/*/baz")},
-            {"Wildcards #3", buildRef("*/baz"), buildRef("/foo/*/bar"), buildRef("/foo/*/bar/*/baz")},
-            {"Wildcards #4", buildRef("*/bar"), buildRef("/foo"), buildRef("/foo/*/bar")},
+            {"Relative context ref", getRef("bar"), getRef("foo"), null},
+            {"Non-matching absolute refs", getRef("/foo"), getRef("/bar"), getRef("/foo")},
+            {"Contextualizing a ref with itself and multiplicity #1", getRef("/foo"), getRef("/foo[2]"), getRef("/foo[2]")},
+            {"Contextualizing a ref with itself and multiplicity #2", getRef("/foo[-1]"), getRef("/foo[2]"), getRef("/foo[2]")},
+            {"Contextualizing a ref with itself and multiplicity #3", getRef("/foo[0]"), getRef("/foo[2]"), getRef("/foo[2]")},
+            {"Contextualizing a ref with itself and multiplicity #4", getRef("/foo[3]"), getRef("/foo[2]"), getRef("/foo[2]")},
+            {"Contextualizing a ref with itself and predicate #1", getRef("/foo"), getRef("/foo[position() = 3]"), getRef("/foo[position() = 3]")},
+            {"Contextualizing a ref with itself and predicate #2", getRef("/foo[position() = 2]"), getRef("/foo[position() = 3]"), getRef("/foo[position() = 2]")},
+            {"Wildcards #1", getRef("bar"), getRef("/foo/*"), getRef("/foo/*/bar")},
+            {"Wildcards #2", getRef("../baz"), getRef("/foo/*/bar"), getRef("/foo/*/baz")},
+            {"Wildcards #3", getRef("*/baz"), getRef("/foo/*/bar"), getRef("/foo/*/bar/*/baz")},
+            {"Wildcards #4", getRef("*/bar"), getRef("/foo"), getRef("/foo/*/bar")},
         });
     }
 

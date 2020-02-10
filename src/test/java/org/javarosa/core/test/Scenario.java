@@ -24,10 +24,8 @@ import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
 import static java.nio.file.Files.write;
 import static java.nio.file.StandardOpenOption.CREATE;
-import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
+import static java.util.stream.Collectors.joining;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
-import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
-import static org.javarosa.core.model.instance.utils.TreeElementNameComparator.elementMatchesName;
 import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
 import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
 import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
@@ -36,15 +34,15 @@ import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
+import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -65,6 +63,7 @@ import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -73,6 +72,12 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathNumNegExpr;
+import org.javarosa.xpath.expr.XPathNumericLiteral;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,14 +116,229 @@ import org.slf4j.LoggerFactory;
 // TODO Extract both APIs to two separate contexts so that they can't be mixed, probably best if it's a Scenario steps runner that would have the common .given(setup).when(action).then(assertion)
 public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
+    public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
     private final FormDef formDef;
     private final FormEntryController formEntryController;
+    private final EvaluationContext ec;
+    private final FormEntryModel model;
 
     private Scenario(FormDef formDef, FormEntryController formEntryController) {
         this.formDef = formDef;
         this.formEntryController = formEntryController;
+        this.ec = formDef.getEvaluationContext();
+        this.model = formEntryController.getModel();
     }
 
+    // region Miscelaneous
+
+    /**
+     * Returns a TreeReference from the provided xpath string.
+     * <p>
+     * This method parses the provided xpath string using the
+     * XPathParseTool and postprocesses the resulting reference
+     * to account for multiplicity predicates.
+     * <p>
+     * JavaRosa relies on negative multiplicity values to identify special
+     * nodes (such as templates for repeat groups), unbound references
+     * (to refer to a nodeset), and on positive multiplicity values to
+     * specify individual repeat group instances.
+     * <p>
+     * These multiplicities are declared as numeric predicates such as
+     * <code>[2]</code>, which are translated to predicates by the XPath parser.
+     * This is problematic because JavaRosa will eventually try to evaluate
+     * all predicates declared in references when resolving elements of an
+     * instance and nodes won't ever match the predicates used to define
+     * multiplicity.
+     * <p>
+     * For this reason, this method will try to detect these predicates,
+     * turn them into multiplicity values, and remove them from the output
+     * reference.
+     */
+    public static TreeReference getRef(String xpath) {
+        if (xpath.trim().isEmpty())
+            return new TreeReference();
+        try {
+            TreeReference reference = ((XPathPathExpr) XPathParseTool.parseXPath(xpath)).getReference();
+            for (int i = 0; i < reference.size(); i++) {
+                Optional<Integer> multiplicity = extractMultiplicityFromPredicate(reference, i);
+                if (multiplicity.isPresent()) {
+                    reference.setMultiplicity(i, multiplicity.get());
+                    reference = reference.removePredicates(i);
+                }
+            }
+            return reference;
+        } catch (XPathSyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Prepares the form to answer a new blank instance
+     */
+    public void newInstance() {
+        formDef.initialize(true, new InstanceInitializationFactory());
+    }
+
+    /**
+     * Sets the language of the form for itext translations
+     */
+    public void setLanguage(String language) {
+        formEntryController.setLanguage(language);
+    }
+
+    public EvaluationContext getEvaluationContext() {
+        return ec;
+    }
+
+    /**
+     * Sets a callback that will be called every time there's a DAG event
+     */
+    public Scenario onDagEvent(Consumer<Event> callback) {
+        formDef.setEventNotifier(callback::accept);
+        return this;
+    }
+
+    /**
+     * Returns a new Scenario instance using a new form obtained by
+     * serializing and deserializing the form being used by this instance.
+     */
+    public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
+        // Initialize serialization
+        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
+        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
+        new XFormsModule().registerModule();
+
+        // Serialize form in a temp file
+        Path tempFile = createTempFile("javarosa", "test");
+        formDef.writeExternal(new DataOutputStream(newOutputStream(tempFile)));
+
+        // Create an empty FormDef and deserialize the form into it
+        FormDef deserializedFormDef = new FormDef();
+        deserializedFormDef.readExternal(
+            new DataInputStream(newInputStream(tempFile)),
+            PrototypeManager.getDefault()
+        );
+
+        delete(tempFile);
+        return new Scenario(deserializedFormDef, new FormEntryController(new FormEntryModel(deserializedFormDef)));
+    }
+
+    /**
+     * Returns the single expanded reference of the provided reference.
+     * <p>
+     * This method assumes the provided reference will only be expanded
+     * to exactly one reference, which is useful to go from unbound
+     * references to fully qualified references that wouldn't match existing
+     * form indexes otherwise.
+     */
+    private TreeReference expandSingle(TreeReference reference) {
+        List<TreeReference> expandedRefs = ec.expandReference(reference);
+        if (expandedRefs.size() != 1)
+            throw new RuntimeException("Provided xPath expands to " + expandedRefs.size() + " references. Expecting exactly one expanded reference.");
+        return expandedRefs.get(0);
+    }
+
+    private boolean refExists(TreeReference reference) {
+        return ec.expandReference(reference).size() == 1;
+    }
+
+    /**
+     * Returns the multiplicity value at the provided step number of the
+     * provided reference if defined.
+     * <p>
+     * Handles special multiplicity textual representations such as <code>[@template]</code>
+     */
+    private static Optional<Integer> extractMultiplicityFromPredicate(TreeReference reference, int stepNumber) {
+        List<XPathExpression> predicates = reference.getPredicate(stepNumber);
+        if (predicates == null || predicates.size() != 1)
+            return Optional.empty();
+
+        if (isPositiveNumberPredicate(predicates))
+            return Optional.ofNullable(predicates.get(0))
+                .map(p -> ((XPathNumericLiteral) p).d)
+                .map(Double::intValue);
+
+        if (isNegativeNumberPredicate(predicates))
+            return Optional.ofNullable(predicates.get(0))
+                .map(p -> ((XPathNumNegExpr) p).a)
+                .map(p -> ((XPathNumericLiteral) p).d)
+                .map(Double::intValue)
+                .map(i -> i * -1);
+
+        if (isAtTemplatePredicate(predicates))
+            return Optional.of(INDEX_TEMPLATE);
+
+        return Optional.empty();
+    }
+
+    /**
+     * Detects [0] (example) textual representation of a node's multiplicity as a predicate
+     */
+    private static boolean isPositiveNumberPredicate(List<XPathExpression> predicates) {
+        return predicates.get(0) instanceof XPathNumericLiteral;
+    }
+
+    /**
+     * Detects [-2] (example) textual representation of a node's multiplicity as a predicate
+     */
+    private static boolean isNegativeNumberPredicate(List<XPathExpression> predicates) {
+        return predicates.get(0) instanceof XPathNumNegExpr && ((XPathNumNegExpr) predicates.get(0)).a instanceof XPathNumericLiteral;
+    }
+
+    /**
+     * Detects the special case of [@template] textual representation of
+     * a node's template multiplicity as a predicate
+     */
+    private static boolean isAtTemplatePredicate(List<XPathExpression> predicates) {
+        return predicates.get(0) instanceof XPathPathExpr
+            && ((XPathPathExpr) predicates.get(0)).steps.length == 1
+            && ((XPathPathExpr) predicates.get(0)).init_context == INIT_CONTEXT_RELATIVE
+            && ((XPathPathExpr) predicates.get(0)).steps[0].axis == AXIS_ATTRIBUTE
+            && ((XPathPathExpr) predicates.get(0)).steps[0].name.name.equals("template");
+    }
+
+    private FormIndex getIndexOf(TreeReference ref) {
+        TreeReference qualifiedRef = expandSingle(ref);
+        FormIndex backupIndex = model.getFormIndex();
+        silentJump(BEGINNING_OF_FORM);
+        FormIndex index = model.getFormIndex();
+        do {
+            TreeReference refAtIndex = index.getReference();
+            if (refAtIndex != null && refAtIndex.equals(qualifiedRef)) {
+                silentJump(backupIndex);
+                return index;
+            }
+            index = model.incrementIndex(index);
+        } while (index.isInForm());
+        silentJump(backupIndex);
+        return null;
+    }
+
+    public enum AnswerResult {
+        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
+
+        private final int jrCode;
+
+        AnswerResult(int jrCode) {
+            this.jrCode = jrCode;
+        }
+
+        public static AnswerResult from(int jrCode) {
+            return Stream.of(values())
+                .filter(v -> v.jrCode == jrCode)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        }
+    }
+
+    // endregion
+
+    // region Initialization of a Scenario
+
+    /**
+     * Initializes the Scenario using a form defined using the DSL in XFormsElement
+     */
+    // TODO Extract the form's name from the provided XFormsElement object to simplify args
     public static Scenario init(String formName, XFormsElement form) throws IOException {
         Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
         String xml = form.asXml();
@@ -128,12 +348,17 @@ public class Scenario {
     }
 
     /**
-     * Creates and prepares the test scenario loading and parsing the given form
+     * Initializes the Scenario with provided form filename.
+     * <p>
+     * A form with the provided filename must exist in the classpath
      */
     public static Scenario init(String formFileName) {
         return init(r(formFileName));
     }
 
+    /**
+     * Initializes the Scenario with the form at the provided path
+     */
     public static Scenario init(Path formFile) {
         // TODO explain why this sequence of calls
         new XFormsModule().registerModule();
@@ -145,411 +370,262 @@ public class Scenario {
         return new Scenario(formDef, formEntryController);
     }
 
+    // endregion
+
+    // region Answer a specific question
+    // TODO Make more overloads of these methods to have one for each data type using the correct IAnswerData subclass
+
     /**
-     * Sets the value of the element located at the given xPath in the main instance.
+     * Answers with a string value the question at the form index
+     * corresponding to the provided reference.
      * <p>
-     * This method ensures that any required downstream change after the given value
-     * is set is triggered.
+     * This method has side-effects:
+     * - It will create all the required middle and end repeat group instances
+     * - It changes the current form index
      */
-    // TODO Make more of these, one for each data type, and use the correct IAnswerData type
-    public void answer(String xPath, String value) {
-        // the xPath could include repeat group indexes, meaning that we expect
-        // some repeat group to exists. We check that and create missing repeats
-        // where they're needed.
+    public AnswerResult answer(String xPath, String value) {
         createMissingRepeats(xPath);
-
-        // The xPath must match a model element. This ensures we can resolve it.
-        TreeElement element = Objects.requireNonNull(resolve(xPath));
-
-        // We wrap the given value and set it through the formDef, which triggers
-        // any downstream change in dependant elements (elements that have a
-        // calculate formula depending on this field, or itemsets rendering this
-        // field's value as a choice)
-        formDef.setValue(new StringData(value), element.getRef(), true);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(value);
     }
 
     /**
-     * Sets the value of the element located at the given xPath in the main instance to a multiple select selection
-     * created from the given values.
+     * Answers with a list of string values the question at the form index
+     * corresponding to the provided reference.
+     * <p>
+     * This method has side-effects:
+     * - It will create all the required middle and end repeat group instances
+     * - It changes the current form index
      */
-    public void answer(String xPath, String... selectionValues) {
+    public AnswerResult answer(String xPath, String... selectionValues) {
         createMissingRepeats(xPath);
-        TreeElement element = Objects.requireNonNull(resolve(xPath));
-
-        List<Selection> selections = Arrays.stream(selectionValues).map(Selection::new).collect(Collectors.toList());
-        formDef.setValue(new MultipleItemsData(selections), element.getRef(), true);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(Arrays.asList(selectionValues));
     }
 
     /**
-     * Sets the value of the element located at the given xPath in the main instance to the given integer value.
-     *
-     * @see #answer(String, String)
+     * Answers with an integer value the question at the form index
+     * corresponding to the provided reference.
+     * <p>
+     * This method has side-effects:
+     * - It will create all the required middle and end repeat group instances
+     * - It changes the current form index
      */
-    public void answer(String xPath, int value) {
+    public AnswerResult answer(String xPath, int value) {
         createMissingRepeats(xPath);
-        TreeElement element = Objects.requireNonNull(resolve(xPath));
-        formDef.setValue(new IntegerData(value), element.getRef(), true);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(value);
     }
 
-    /**
-     * Jumps to the first question with the given name.
-     */
-    public Scenario jumpToFirst(String name) {
-        jumpToFirstQuestionWithName(name);
-        return this;
-    }
+    // endregion
+
+    // region Answer the question at the form index
+    // TODO Make more overloads of these methods to have one for each data type using the correct IAnswerData subclass
 
     /**
-     * Answers the current question.
+     * Answers the question at the form index
      */
     public AnswerResult answer(String value) {
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
-        StringData data = new StringData(value);
-        IFormElement child = formDef.getChild(formIndex);
-        String reference = "";
-        try {
-            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
-        } catch (RuntimeException e) {
-            // Do nothing. Probably "method not implemented" in FormDef.getBind()
-        }
-        log.info("Answer {} at {}", data, reference);
-        int jrCode = formEntryController.answerQuestion(formIndex, data, true);
-        return AnswerResult.from(jrCode);
+        return answer(new StringData(value));
     }
 
+    /**
+     * Answers the question at the form index
+     */
+    public AnswerResult answer(List<String> values) {
+        return answer(new MultipleItemsData(values.stream().map(Selection::new).collect(Collectors.toList())));
+    }
+
+    /**
+     * Answers the question at the form index
+     */
     public AnswerResult answer(int value) {
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
-        IntegerData data = new IntegerData(value);
-        IFormElement child = formDef.getChild(formIndex);
-        String reference = "";
-        try {
-            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
-        } catch (RuntimeException e) {
-            // Do nothing. Probably "method not implemented" in FormDef.getBind()
-        }
-        log.info("Answer {} at {}", data, reference);
-        int jrCode = formEntryController.answerQuestion(formIndex, data, true);
-        return AnswerResult.from(jrCode);
+        return answer(new IntegerData(value));
     }
 
+    /**
+     * Answers the question at the form index
+     */
     public AnswerResult answer(char value) {
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
-        StringData data = new StringData(String.valueOf(value));
-        IFormElement child = formDef.getChild(formIndex);
-        String reference = "";
-        try {
-            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
-        } catch (RuntimeException e) {
-            // Do nothing. Probably "method not implemented" in FormDef.getBind()
-        }
-        log.info("Answer {} at {}", data, reference);
-        int jrCode = formEntryController.answerQuestion(formIndex, data, true);
-        return AnswerResult.from(jrCode);
+        return answer(new StringData(String.valueOf(value)));
     }
 
-    /**
-     * Jumps to next event
-     * </ul>
-     */
-    public void next() {
-        int i = formEntryController.stepToNextEvent();
-        String jumpResult = decodeJumpResult(i);
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
-        IFormElement child = formDef.getChild(formIndex);
-        String labelInnerText = Optional.ofNullable(child.getLabelInnerText()).map(s -> " " + s).orElse("");
-        String textId = Optional.ofNullable(child.getTextID()).map(s -> " itext:" + s).orElse("");
-        String reference = "";
-        try {
-            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> " ref:" + s).orElse("");
-        } catch (RuntimeException e) {
-            // Do nothing. Probably "method not implemented" in FormDef.getBind()
-        }
-        log.info("Jump to {}{}{}{}", jumpResult, labelInnerText, textId, reference);
+    private AnswerResult answer(IAnswerData data) {
+        FormIndex formIndex = model.getFormIndex();
+        log.info("Answer {} at {}", data, formIndex.getReference());
+        return AnswerResult.from(formEntryController.answerQuestion(formIndex, data, true));
     }
 
+    // endregion
+
+    // region Repeat group manipulation
+
     /**
-     * Jumps to next event with the given name
+     * Removes the repeat instance corresponding to the provided reference
      */
-    public Scenario next(String name) {
-        next();
-        TreeReference reference = formEntryController.getModel().getFormIndex().getReference();
-        String xpath = reference.toString(true, true);
-        jump(getIndexOf(xpath + "/" + name));
+    public Scenario removeRepeat(String xPath) {
+        TreeReference reference = expandSingle(getRef(xPath));
+
+        TreeElement group = formDef.getMainInstance().resolveReference(reference);
+        FormIndex childIndex = null;
+        for (int i = 0; i < group.getNumChildren(); i++) {
+            childIndex = getIndexOf(group.getChildAt(i).getRef());
+            if (childIndex != null)
+                break;
+        }
+        if (childIndex == null)
+            throw new RuntimeException("Can't find an index inside the repeat group you want to remove. Please add some field and a form control.");
+
+        // FormDef.deleteRepeat requires a FormIndex belonging to
+        // a descendant of the repeat we want to delete
+        formDef.deleteRepeat(childIndex);
         return this;
     }
 
     /**
-     * Returns true when the index is at the end of the form, false otherwise
+     * Creates a new repeat group instance. The form index must be
+     * at a create new repeat group question
      */
-    public boolean atTheEndOfForm() {
-        return formEntryController.getModel().getFormIndex().isEndOfFormIndex();
+    public Scenario createNewRepeat() {
+        log.info("Create repeat instance {}", model.getFormIndex().getReference());
+        formEntryController.newRepeat();
+        return this;
     }
 
     /**
-     * Returns the value of the element located at the given xPath in the main instance.
-     * Answers live in the main instance of a form. We will traverse the main
-     * instance's tree of elements recursively using the xPath as a guide of
-     * steps.
-     * <p>
-     * The starting point will be the NULL node parent of main instance's root,
-     * which corresponds to the root "/" xPath.
-     * <p>
-     * Note that the formDef.getMainInstance().getRoot() call can be misleading
-     * because it would return an element corresponding to the xPath "/data"
-     * ("data" is commonly used as the main instance's xml tag), not the root
-     * element.
+     * Creates a new repeat group instance in the group corresponding
+     * to the provided xPath reference
      */
-    @SuppressWarnings("unchecked")
-    public <T extends IAnswerData> T answerOf(String xPath) {
-        // Since we start searching from "/", we make the input xPath relative to that
-        String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
+    public Scenario createNewRepeat(String xPath) {
+        TreeReference groupRef = getRef(xPath);
+        if (!groupRef.isAmbiguous())
+            throw new RuntimeException("Provided xPath must be ambiguous");
 
-        // We call the recursive resolve algorithm and get the element
-        TreeElement element = resolve(getRootElement(), relativeXPath);
+        // Compute the next multiplicity value counting the existing instances
+        TreeReference repeatInstanceRef = groupRef.clone();
+        int multiplicity = ec.expandReference(repeatInstanceRef).size();
+        repeatInstanceRef.setMultiplicity(repeatInstanceRef.size() - 1, multiplicity);
 
-        // Return the value if the element exists, otherwise return null
-        return element != null ? (T) element.getValue() : null;
-    }
-
-    public List<TreeElement> repeatInstancesOf(String xPath) {
-        // Since we start searching from "/", we make the input xPath relative to that
-        String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
-
-        String parentXPath = pop(relativeXPath);
-        String repeatName = tailPart(xPath);
-
-        // We call the recursive resolve algorithm and get the element
-        TreeElement parent = resolve(getRootElement(), parentXPath);
-
-        if (parent == null)
-            throw new RuntimeException("The parent element at " + parentXPath + " doesn't exist");
-
-        List<TreeElement> children = new ArrayList<>();
-        for (int i = 0; i < parent.getNumChildren(); i++) {
-            TreeElement child = parent.getChildAt(i);
-            if (child.getMultiplicity() != INDEX_TEMPLATE && child.getName().equals(repeatName))
-                children.add(child);
-        }
-        return children;
+        return createRepeat(repeatInstanceRef);
     }
 
     /**
-     * Returns the list of choices of the &lt;select&gt; or &lt;select1&gt; form controls.
-     * This method ensures that any dynamic choice lists are populated to reflect the status
-     * of the form (already answered questions, etc.).
+     * Creates a repeat group corresponding to the specific repeat
+     * instance reference, creating middle instances if necessary
+     * to reach the specified multiplicity.
      */
-    public List<SelectChoice> choicesOf(String xPath) {
-        FormEntryPrompt questionPrompt = formEntryController.getModel().getQuestionPrompt(getIndexOf(xPath));
-        // This call triggers the correct population of dynamic choices.
-        questionPrompt.getAnswerValue();
-        QuestionDef control = questionPrompt.getQuestion();
-        return control.getChoices() == null
-            // If the (static) choices is null, that means there is an itemset and choices are dynamic
-            // ItemsetBinding.getChoices() will work because we've called questionPrompt.getAnswerValue()
-            ? control.getDynamicChoices().getChoices()
-            : control.getChoices();
-    }
+    private Scenario createRepeat(TreeReference repeatInstanceRef) {
+        if (repeatInstanceRef.isAmbiguous())
+            throw new RuntimeException("The provided reference can't be ambiguous");
 
-    /**
-     * Prepare a new (main) instance in the form, to simulate the user starting to fill a
-     * new form.
-     */
-    public void newInstance() {
-        formDef.initialize(true, new InstanceInitializationFactory());
-    }
-
-    public void setLanguage(String language) {
-        formEntryController.setLanguage(language);
-    }
-
-    public void createMissingRepeats(String xPath) {
-        // We will be looking to the parts in the xPath from left to right.
-        // xPath.substring(1) makes the first "/" char go away, giving us an xPath relative to the root
-        List<String> parts = Arrays.asList(xPath.substring(1).split("/"));
-        String currentXPath = "";
-        do {
-            String nextPart = parts.get(0);
-            // nextName holds the next part's name, excluding the multiplicity suffix if it exists.
-            String nextName = parseName(nextPart);
-            String nextXPath = currentXPath + "/" + nextPart;
-
-            if (isRepeatXPath(nextXPath) && !elementExists(nextXPath)) {
-                // Jumping to the repeat instance for [0] always works because formEntryController.descendIntoNewRepeat() deals with it:
-                // - if the [0] doesn't exists, it creates it
-                // - if the [0] exists, looks for the next sequential repeat and creates it
-                jump(getIndexOf((currentXPath + "/" + nextName) + "[0]"));
-                formEntryController.descendIntoNewRepeat();
+        silentJump(BEGINNING_OF_FORM);
+        while (!atTheEndOfForm() && !refExists(repeatInstanceRef))
+            if (silentNext() == EVENT_PROMPT_NEW_REPEAT) {
+                if (model.getFormIndex().getReference().equals(repeatInstanceRef))
+                    // We're in one (probably the first) of the siblings of the
+                    // repeat group at the subRef. Create new repeats until the
+                    // one want we need is created
+                    while (!refExists(repeatInstanceRef))
+                        formEntryController.descendIntoNewRepeat();
             }
-            // Shift the first part of the list, reset the current xPath and loop
-            parts = parts.subList(1, parts.size());
-            currentXPath = nextXPath;
-        } while (!parts.isEmpty());
+        if (!refExists(repeatInstanceRef))
+            throw new RuntimeException("We couldn't create repeat group instance at " + repeatInstanceRef + ". Check your form and your test");
+        return this;
     }
 
-    private boolean elementExists(String xPath) {
-        return resolve(xPath) != null;
-    }
-
-    private static boolean isRepeatXPath(String xPath) {
-        // Returns true if the last xPath part contains a multiplicity suffix like "[2]"
-        return xPath.substring(xPath.lastIndexOf("/")).contains("[");
-    }
-
-    /**
-     * Returns an absolute reference of the given xPath taking multiplicity of each
-     * xPath part into account.
-     */
-    public static TreeReference absoluteRef(String xPath) {
-        TreeReference tr = new TreeReference();
-        tr.setRefLevel(REF_ABSOLUTE);
-        tr.setContext(CONTEXT_ABSOLUTE);
-        tr.setInstanceName(null);
-        Arrays.stream(xPath.split("/"))
-            .filter(s -> !s.isEmpty())
-            .forEach(s -> tr.add(parseName(s), parseMultiplicity(s)));
-        return tr;
-    }
-
-    private static String parseName(String xPathPart) {
-        return xPathPart.contains("[") ? xPathPart.substring(0, xPathPart.indexOf("[")) : xPathPart;
-    }
-
-    private static int parseMultiplicity(String xPathPart) {
-        return xPathPart.contains("[") ? Integer.parseInt(xPathPart.substring(xPathPart.indexOf("[") + 1, xPathPart.indexOf("]"))) : 0;
-    }
-
-    /**
-     * Returns an index to the given xPath. It uses an absolute reference to
-     * the given xPath and traverses all existing indexes until one of them
-     * matches the reference.
-     * <p>
-     * This is possible because the {@link TreeReference#equals(Object)} can
-     * deal with absolute and relative references.
-     * <p>
-     * Returns null if the reference is not found.
-     */
-    private FormIndex getIndexOf(String xPath) {
-        return getIndexOf(absoluteRef(xPath));
-    }
-
-    private FormIndex getIndexOf(TreeReference ref) {
-        jump(FormIndex.createBeginningOfFormIndex());
-        FormEntryModel model = formEntryController.getModel();
-        FormIndex index = model.getFormIndex();
-        do {
-            if (index.getReference() != null && index.getReference().equals(ref))
-                return index;
-            index = model.incrementIndex(index);
-        } while (index.isInForm());
-        return null;
-    }
-
-
-    /**
-     * Returns the element corresponding to the given xPath.
-     * <p>
-     * The starting point will be the NULL node parent of main instance's root,
-     * which corresponds to the root "/" xPath.
-     * <p>
-     * Note that the formDef.getMainInstance().getRoot() call can be misleading
-     * because it would return an element corresponding to the xPath "/data"
-     * ("data" is commonly used as the main instance's xml tag), not the root
-     * element.
-     */
-    private TreeElement resolve(String xPath) {
-        // Get the real root element
-        TreeElement root = getRootElement();
-        // Since we start searching from "/", we make the input xPath relative to that
-        String relativeXPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
-
-        return resolve(root, relativeXPath);
-    }
-
-    private TreeElement getRootElement() {
-        return (TreeElement) formDef.getMainInstance().getRoot().getParent();
-    }
-
-    /**
-     * Returns the element corresponding to the given xPath.
-     * <p>
-     * It does so by recursively traversing children of the given element and calling
-     * {@link TreeElement#getChild(String, int)} on them.
-     */
-    private TreeElement resolve(TreeElement element, String xPath) {
-        List<String> parts = Arrays.asList(xPath.split("/"));
-        String firstPart = parts.get(0);
-        TreeElement nextElement = element.getChild(parseName(firstPart), parseMultiplicity(firstPart));
-
-        // Return null when a child with the given name and multiplicity doesn't exist.
-        if (nextElement == null)
-            return null;
-
-        // If there are more parts to analyze, call recursively on child
-        if (parts.size() > 1)
-            return resolve(nextElement, shift(xPath));
-
-        // If this is the last part in the xPath, we have the element we're looking for
-        return nextElement;
-    }
-
-    private static String shift(String xPath) {
-        List<String> parts = Arrays.asList(xPath.split("/"));
-        return String.join("/", parts.subList(1, parts.size()));
-    }
-
-    private static String pop(String xPath) {
-        List<String> parts = Arrays.asList(xPath.split("/"));
-        return String.join("/", parts.subList(0, parts.size() - 1));
-    }
-
-    private static String tailPart(String xPath) {
-        List<String> parts = Arrays.asList(xPath.split("/"));
-        return parts.get(parts.size() - 1);
-    }
-
-    private Optional<TreeElement> getFirstDescendantWithName(TreeElement node, String name) {
-        if (isNotRoot(node) && isNotTemplate(node) && elementMatchesName(node, name))
-            return Optional.of(node);
-
-        List<TreeElement> nonTemplateChildren = childrenOf(node).stream()
-            .filter(this::isNotTemplate)
-            .collect(Collectors.toList());
-
-        for (TreeElement child : nonTemplateChildren) {
-            Optional<TreeElement> result = getFirstDescendantWithName(child, name);
-            if (result.isPresent())
-                return result;
+    private void createMissingRepeats(String xPath) {
+        FormIndex backupIndex = model.getFormIndex();
+        TreeReference reference = getRef(xPath);
+        for (int i = 0; i < reference.size(); i++) {
+            if (reference.getMultiplicity(i) < 0)
+                // This part has no multiplicity, so we don't need to do anything.
+                continue;
+            createRepeat(reference.getSubReference(i));
         }
-
-        return Optional.empty();
+        silentJump(backupIndex);
     }
 
-    private List<TreeElement> childrenOf(TreeElement node) {
-        List<TreeElement> children = new ArrayList<>(node.getNumChildren());
-        for (int i = 0, max = node.getNumChildren(); i < max; i++) {
-            children.add(node.getChildAt(i));
-        }
-        return children;
+    // endregion
+
+    // region Traversing the form
+
+    /**
+     * Jump to the next event.
+     * <p>
+     * Side effects:
+     * - This method updates the form index.
+     * - This method leaves log traces
+     */
+    public int next() {
+        int jumpResultCode = formEntryController.stepToNextEvent();
+        log.info(humanJumpTrace(jumpResultCode));
+        return jumpResultCode;
     }
 
-    private boolean isNotRoot(TreeElement node) {
-        return node.getName() != null;
+
+    /**
+     * Jump to the beginning of the form.
+     * <p>
+     * Side effects:
+     * - This method updates the form index.
+     * - This method leaves log traces
+     */
+    public void jumpToBeginningOfForm() {
+        jump(BEGINNING_OF_FORM);
     }
 
-    private boolean isNotTemplate(TreeElement node) {
-        return node.getMultiplicity() != TreeReference.INDEX_TEMPLATE;
+    private int silentNext() {
+        return formEntryController.stepToNextEvent();
     }
 
-    private void jumpToFirstQuestionWithName(String name) {
-        TreeReference ref = getFirstDescendantWithName(getRootElement(), name)
-            .map(TreeElement::getRef)
-            .orElseThrow(() -> new IllegalArgumentException("No question with name " + name + " found"));
-        jump(getIndexOf(ref));
+    private int jump(FormIndex index) {
+        int jumpResultCode = formEntryController.jumpToIndex(index);
+        log.info(humanJumpTrace(jumpResultCode));
+        return jumpResultCode;
     }
 
-    private void jump(FormIndex indexOf) {
-        int result = formEntryController.jumpToIndex(indexOf);
-        log.debug("Jumped to " + decodeJumpResult(result));
+    private void silentJump(FormIndex indexOf) {
+        formEntryController.jumpToIndex(indexOf);
+    }
+
+    private String humanJumpTrace(int jumpResultCode) {
+        FormIndex formIndex = model.getFormIndex();
+        String humanJumpResult = decodeJumpResult(jumpResultCode);
+        IFormElement element = formDef.getChild(formIndex);
+        String humanLabel = Optional.ofNullable(element.getLabelInnerText()).orElseGet(() -> {
+            Localizer localizer = formDef.getLocalizer();
+            String textId = element.getTextID();
+
+            if (textId == null || localizer == null) {
+                return "";
+            }
+
+            return Optional.ofNullable(localizer.getText(textId))
+                .map(this::trimToOneLine)
+                .orElse("");
+        });
+        String humanReference = Optional.ofNullable(formIndex.getReference())
+            .map(ref -> ref.toString(true, true))
+            .orElse("");
+
+        return String.format(
+            "Jump to %s%s%s",
+            humanJumpResult,
+            prefixIfNotEmpty(" ", humanLabel),
+            prefixIfNotEmpty(" ref:", humanReference));
+    }
+
+    private String prefixIfNotEmpty(String prefix, String text) {
+        return text.isEmpty() ? "" : prefix + text;
+    }
+
+    private String trimToOneLine(String text) {
+        return Stream.of(text.split("\n"))
+            .map(String::trim)
+            .collect(joining(" "));
     }
 
     private String decodeJumpResult(int code) {
@@ -572,73 +648,61 @@ public class Scenario {
         return "Unknown";
     }
 
-    public Scenario removeRepeat(String xpath) {
-        formDef.deleteRepeat(getIndexOf(xpath));
-        return this;
-    }
+    // endregion
 
-    public void createNewRepeat() {
-        FormIndex formIndex = formEntryController.getModel().getFormIndex();
-        IFormElement child = formDef.getChild(formIndex);
-        String reference = "";
-        try {
-            reference = Optional.ofNullable(child.getBind()).map(idr -> (TreeReference) idr.getReference()).map(Object::toString).map(s -> "ref:" + s).orElse("");
-        } catch (RuntimeException e) {
-            // Do nothing. Probably "method not implemented" in FormDef.getBind()
-        }
+    // region Inspect the form index
 
-        log.info("Create repeat instance {}", reference);
-        formEntryController.newRepeat();
-    }
-
-    public EvaluationContext getEvaluationContext() {
-        return formDef.getEvaluationContext();
+    public boolean atTheEndOfForm() {
+        return model.getFormIndex().isEndOfFormIndex();
     }
 
     public QuestionDef getQuestionAtIndex() {
-        return formEntryController.getModel().getQuestionPrompt().getQuestion();
+        return model.getQuestionPrompt().getQuestion();
     }
 
-    public enum AnswerResult {
-        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
+    // endregion
 
-        private final int jrCode;
+    // region Inspect the main instance
 
-        AnswerResult(int jrCode) {
-            this.jrCode = jrCode;
-        }
+    @SuppressWarnings("unchecked")
+    public <T extends IAnswerData> T answerOf(String xPath) {
+        TreeReference reference = getRef(xPath);
+        if (!refExists(reference))
+            return null;
 
-        public static AnswerResult from(int jrCode) {
-            return Stream.of(values())
-                .filter(v -> v.jrCode == jrCode)
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
-        }
+        TreeElement element = formDef.getMainInstance().resolveReference(reference);
+        return element != null ? (T) element.getValue() : null;
     }
 
-    public Scenario onDagEvent(Consumer<Event> callback) {
-        formDef.setEventNotifier(callback::accept);
-        return this;
+    public int countRepeatInstancesOf(String xPath) {
+        TreeReference reference = getRef(xPath);
+        if (!reference.isAmbiguous())
+            throw new RuntimeException("Provided xPath must be ambiguous");
+
+        return ec
+            .expandReference(reference)
+            .size();
     }
 
-    public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
-        // Initialize serialization
-        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
-        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
-        new XFormsModule().registerModule();
+    /**
+     * Returns the list of choices of the &lt;select&gt; or &lt;select1&gt; form controls.
+     * <p>
+     * This method ensures that any dynamic choice lists are populated to reflect the status
+     * of the form (already answered questions, etc.).
+     */
+    public List<SelectChoice> choicesOf(String xPath) {
+        TreeReference reference = expandSingle(getRef(xPath));
 
-        // Serialize form in a temp file
-        Path tempFile = createTempFile("javarosa", "test");
-        formDef.writeExternal(new DataOutputStream(newOutputStream(tempFile)));
-
-        // Create an empty FormDef and deserialize the form into it
-        FormDef deserializedFormDef = new FormDef();
-        deserializedFormDef.readExternal(
-            new DataInputStream(newInputStream(tempFile)),
-            PrototypeManager.getDefault()
-        );
-
-        delete(tempFile);
-        return new Scenario(deserializedFormDef, new FormEntryController(new FormEntryModel(deserializedFormDef)));
+        FormEntryPrompt questionPrompt = model.getQuestionPrompt(getIndexOf(reference));
+        // This call triggers the correct population of dynamic choices.
+        questionPrompt.getAnswerValue();
+        QuestionDef control = questionPrompt.getQuestion();
+        return control.getChoices() == null
+            // If the (static) choices is null, that means there is an itemset and choices are dynamic
+            // ItemsetBinding.getChoices() will work because we've called questionPrompt.getAnswerValue()
+            ? control.getDynamicChoices().getChoices()
+            : control.getChoices();
     }
+
+    // endregion
 }

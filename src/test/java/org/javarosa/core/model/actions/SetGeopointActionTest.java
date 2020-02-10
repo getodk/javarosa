@@ -19,7 +19,7 @@ package org.javarosa.core.model.actions;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
-import static org.javarosa.core.test.Scenario.absoluteRef;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
@@ -29,7 +29,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.hamcrest.Matcher;
 import org.javarosa.core.model.actions.setgeopoint.SetGeopointAction;
 import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointAction;
@@ -71,7 +70,7 @@ public class SetGeopointActionTest {
 
     @Test
     public void testSerializationAndDeserialization() throws IOException, DeserializationException {
-        StubSetGeopointAction originalAction = new StubSetGeopointAction(absoluteRef("/data/text"));
+        StubSetGeopointAction originalAction = new StubSetGeopointAction(getRef("/data/text"));
 
         Path ser = Files.createTempFile("serialized-object", null);
         try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(ser))) {

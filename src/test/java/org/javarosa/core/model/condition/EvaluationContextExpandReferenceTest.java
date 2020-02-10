@@ -16,12 +16,12 @@
 
 package org.javarosa.core.model.condition;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.javarosa.core.model.instance.TestHelpers.buildRef;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.group;
@@ -36,7 +36,6 @@ import static org.javarosa.core.util.XFormsElement.title;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import java.util.List;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.junit.BeforeClass;
@@ -73,35 +72,53 @@ public class EvaluationContextExpandReferenceTest {
     public void test_normal_case() {
         // Using the String representation to simplify things, since TreeReference.equals
         // wouldn't work the way we want, and TestHelpers.buildRef() has its limitations
-        assertThat(getRefStringList(ec.expandReference(buildRef("/data/group/number"))), hasItems(
-            "/data/group[0]/number[0]",
-            "/data/group[1]/number[0]",
-            "/data/group[2]/number[0]",
-            "/data/group[3]/number[0]",
-            "/data/group[4]/number[0]"
+        assertThat(ec.expandReference(getRef("/data/group/number")), hasItems(
+            getRef("/data/group[0]/number[0]"),
+            getRef("/data/group[1]/number[0]"),
+            getRef("/data/group[2]/number[0]"),
+            getRef("/data/group[3]/number[0]"),
+            getRef("/data/group[4]/number[0]")
         ));
     }
 
     @Test
     public void test_include_templates_case() {
-        assertThat(getRefStringList(ec.expandReference(buildRef("/data/group/number"), true)), hasItems(
-            "/data/group[@template]/number[0]",
-            "/data/group[0]/number[0]",
-            "/data/group[1]/number[0]",
-            "/data/group[2]/number[0]",
-            "/data/group[3]/number[0]",
-            "/data/group[4]/number[0]"
+        assertThat(ec.expandReference(getRef("/data/group/number"), true), contains(
+            getRef("/data/group[0]/number[0]"),
+            getRef("/data/group[1]/number[0]"),
+            getRef("/data/group[2]/number[0]"),
+            getRef("/data/group[3]/number[0]"),
+            getRef("/data/group[4]/number[0]"),
+            getRef("/data/group[@template]/number[0]")
         ));
     }
 
     @Test
     public void test_relative_ref_case() {
-        assertThat(ec.expandReference(buildRef("group/number")), is(nullValue()));
+        assertThat(ec.expandReference(getRef("group/number")), is(nullValue()));
     }
 
-    private static List<String> getRefStringList(List<TreeReference> treeReferences) {
-        // Using the String representation to simplify things, since TreeReference.equals
-        // wouldn't work the way we want, and TestHelpers.buildRef() has its limitations
-        return treeReferences.stream().map(ref -> ref.toString(true, true)).collect(toList());
+    @Test
+    public void returns_itself_if_fully_qualified() {
+        TreeReference numberRef = getRef("/data/group[3]/number[0]");
+        assertThat(ec.expandReference(numberRef), contains(numberRef));
+
+        TreeReference groupRef = getRef("/data/group[3]");
+        assertThat(ec.expandReference(groupRef), contains(groupRef));
+    }
+
+    @Test
+    public void expands_partially_qualified_refs() {
+        assertThat(
+            ec.expandReference(getRef("/data/group[3]/number")),
+            contains(getRef("/data/group[3]/number[0]"))
+        );
+        assertThat(ec.expandReference(getRef("/data/group")), contains(
+            getRef("/data/group[0]"),
+            getRef("/data/group[1]"),
+            getRef("/data/group[2]"),
+            getRef("/data/group[3]"),
+            getRef("/data/group[4]")
+        ));
     }
 }
