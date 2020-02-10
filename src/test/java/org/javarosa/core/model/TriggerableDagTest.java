@@ -6,9 +6,13 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.test.QuestionDefMatchers.irrelevant;
+import static org.javarosa.core.test.QuestionDefMatchers.relevant;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.group;
@@ -41,6 +45,8 @@ import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
 import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathPathExprEval;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -848,6 +854,161 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(1))); // Should be 3
         assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(1))); // Should be 2
         assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(1))); // Should be 2
+    }
+
+    @Test
+    public void relevance_propagation_simple_initially_irrelevant() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("is-group-relevant"),
+                        t("group", t("field"))
+                    )),
+                    bind("/data/is-group-relevant").type("string"),
+                    bind("/data/group").relevant("/data/is-group-relevant = '1'"),
+                    bind("/data/group/field").type("string")
+                )
+            ),
+            body(
+                input("/data/is-group-relevant"),
+                group("/data/group", input("/data/group/field"))
+            )));
+
+        // Form initialization evaluates all triggerables. This makes the
+        // field irrelevant because its parent group becomes irrelevant.
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
+
+
+        scenario.answer("/data/is-group-relevant", "1");
+        // The group is now relevant. Therefore, the field is also relevant
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
+
+        scenario.answer("/data/is-group-relevant", "0");
+        // The group is back to being irrelevant. Therefore, the field becomes irrelevant again
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
+    }
+
+    @Test
+    public void relevance_propagation_simple_initially_relevant() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("is-group-relevant", "1"),
+                        t("group", t("field"))
+                    )),
+                    bind("/data/is-group-relevant").type("string"),
+                    bind("/data/group").relevant("/data/is-group-relevant = '1'"),
+                    bind("/data/group/field").type("string")
+                )
+            ),
+            body(
+                input("/data/is-group-relevant"),
+                group("/data/group", input("/data/group/field"))
+            )));
+
+        // Form initialization evaluates all triggerables. This makes the
+        // field relevant because its parent group becomes relevant.
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
+
+        scenario.answer("/data/is-group-relevant", "0");
+        // The group is now irrelevant. Therefore, the field becomes irrelevant
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
+
+        scenario.answer("/data/is-group-relevant", "1");
+        // The group is now relevant again. Therefore, the field is also relevant
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
+    }
+
+    @Test
+    public void relevance_propagation_topmost_relevance_wins() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("is-group-relevant"),
+                        t("is-field-relevant"),
+                        t("group", t("field"))
+                    )),
+                    bind("/data/is-group-relevant").type("string"),
+                    bind("/data/is-field-relevant").type("string"),
+                    bind("/data/group").relevant("/data/is-group-relevant = '1'"),
+                    bind("/data/group/field").type("string").relevant("/data/is-field-relevant = '1'")
+                )
+            ),
+            body(
+                input("/data/is-group-relevant"),
+                input("/data/is-field-relevant"),
+                group("/data/group", input("/data/group/field"))
+            )));
+
+        scenario.answer("/data/is-group-relevant", "1");
+
+        assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
+
+        scenario.answer("/data/is-field-relevant", "1");
+
+        assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
+
+        scenario.answer("/data/is-group-relevant", "0");
+
+        assertThat(scenario.getAnswerNode("/data/group"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
+    }
+
+    @Test
+    public void hardcoded_filtering_of_irrelevant_nodes_and_their_values() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        // position() is one-based
+                        t("node", t("value", "1")), // irrelevant
+                        t("node", t("value", "2")), // irrelevant
+                        t("node", t("value", "3")), // relevant
+                        t("node", t("value", "4")), // relevant
+                        t("node", t("value", "5")) // relevant
+                    )),
+                    bind("/data/node").relevant("position() > 2"),
+                    bind("/data/node/value").type("int")
+                )
+            ),
+            body(
+                group("/data/node", input("/data/node/value"))
+            )));
+
+        // The XPathPathExprEval is used when evaluating the nodesets that the
+        // xpath functions declared in triggerable expressions need to operate
+        // upon. This assertion shows that irrelevant nodes are not included
+        // in the resulting nodesets
+        assertThat(
+            new XPathPathExprEval().eval(getRef("/data/node"), scenario.getEvaluationContext()).getReferences(),
+            hasSize(3)
+        );
+
+        // The method XPathPathExpr.getRefValue is what ultimately is used by
+        // triggerable expressions to extract the values they need to operate
+        // upon. The following assertion shows how extrating values from
+        // irrelevant nodes returns `null` values instead of the actual values
+        // they're holding
+        assertThat(
+            XPathPathExpr.getRefValue(
+                scenario.getFormDef().getMainInstance(),
+                scenario.getEvaluationContext(),
+                scenario.expandSingle(getRef(("/data/node[1]/value")))
+            ),
+            is("")
+        );
+        // ... as opposed to the value that we can get by resolving the same
+        // reference with the main instance, which has the expected `2` value
+        assertThat(scenario.answerOf("/data/node[1]/value"), is(intAnswer(2)));
     }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {

@@ -134,6 +134,10 @@ public class Scenario {
 
     // region Miscelaneous
 
+    public FormDef getFormDef() {
+        return formDef;
+    }
+
     /**
      * Returns a TreeReference from the provided xpath string.
      * <p>
@@ -238,7 +242,7 @@ public class Scenario {
      * references to fully qualified references that wouldn't match existing
      * form indexes otherwise.
      */
-    private TreeReference expandSingle(TreeReference reference) {
+    public TreeReference expandSingle(TreeReference reference) {
         List<TreeReference> expandedRefs = ec.expandReference(reference);
         if (expandedRefs.size() != 1)
             throw new RuntimeException("Provided xPath expands to " + expandedRefs.size() + " references. Expecting exactly one expanded reference.");
