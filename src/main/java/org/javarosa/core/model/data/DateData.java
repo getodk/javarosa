@@ -108,4 +108,9 @@ public class DateData implements IAnswerData {
 
         throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Date");
     }
+
+    @Override
+    public String toString() {
+        return "StringData{d='" + DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601) + "'}";
+    }
 }
