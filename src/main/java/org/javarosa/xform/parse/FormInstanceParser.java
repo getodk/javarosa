@@ -166,11 +166,11 @@ class FormInstanceParser {
         List<String> bindErrors = new ArrayList<>();
         verifyControlBindings(formDef, instance, bindErrors);
         if (bindErrors.size() > 0) {
-            String errorMsg = "";
+            StringBuilder errorMsg = new StringBuilder();
             for (String bindError : bindErrors) {
-                errorMsg += bindError + "\n";
+                errorMsg.append(bindError).append("\n");
             }
-            throw new XFormParseException(errorMsg);
+            throw new XFormParseException(errorMsg.toString());
         }
 
         //check that repeat members bind to the proper scope (not above the binding of the parent repeat, and not within any sub-repeat (or outside repeat))
