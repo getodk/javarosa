@@ -6,10 +6,8 @@ import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -20,7 +18,6 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -424,46 +421,6 @@ class FormInstanceParser {
 
         applyControlProperties(instance);
     }
-
-    private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
-        Set<TreeReference> descendantRefs = new HashSet<>();
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                descendantRefs.add(child.getRef().genericize());
-                descendantRefs.addAll(getDescendantRefs(mainInstance, child));
-            }
-        } else {
-            // TODO Eventually remove this branch because a parsed form can't force the program flow throw it
-            List<TreeReference> refSet = evalContext.expandReference(original);
-            for (TreeReference ref : refSet) {
-                descendantRefs.addAll(getDescendantRefs(mainInstance, evalContext.resolveReference(ref)));
-            }
-        }
-        return descendantRefs;
-    }
-
-    // Recursive step of utility method
-    private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, AbstractTreeElement<?> el) {
-        Set<TreeReference> childrenRefs = new HashSet<>();
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getDescendantRefs(mainInstance, child));
-            }
-        } else {
-            for (int i = 0; i < el.getNumChildren(); ++i) {
-                AbstractTreeElement<?> child = el.getChildAt(i);
-                childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getDescendantRefs(mainInstance, child));
-            }
-        }
-        return childrenRefs;
-    }
-
 
     /**
      * Checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not
