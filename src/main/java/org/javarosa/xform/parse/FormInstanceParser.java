@@ -174,7 +174,7 @@ class FormInstanceParser {
         }
 
         //check that repeat members bind to the proper scope (not above the binding of the parent repeat, and not within any sub-repeat (or outside repeat))
-        verifyRepeatMemberBindings(formDef, instance, null);
+        verifyRepeatMemberBindings(formDef, null);
 
         //check that label/copy/value refs are children of nodeset ref, and exist
         verifyItemsetBindings(instance);
@@ -264,7 +264,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyRepeatMemberBindings(IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
+    private void verifyRepeatMemberBindings(IFormElement fe, GroupDef parentRepeat) {
         if (fe.getChildren() == null)
             return;
 
@@ -311,7 +311,7 @@ class FormInstanceParser {
                 }
             }
 
-            verifyRepeatMemberBindings(child, instance, (isRepeat ? (GroupDef) child : parentRepeat));
+            verifyRepeatMemberBindings(child, (isRepeat ? (GroupDef) child : parentRepeat));
         }
     }
 
