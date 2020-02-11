@@ -90,7 +90,7 @@ class FormInstanceParser {
         //print unused attribute warning message for parent element
         if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)) {
             String xmlLocation = getVagueLocation(e);
-            logger.warn("XForm Parse Warning: {}{}", XFormUtils.unusedAttWarning(e, usedAtts), (xmlLocation == null ? "" : xmlLocation));
+            logger.warn("XForm Parse Warning: {}{}", XFormUtils.unusedAttWarning(e, usedAtts), xmlLocation);
         }
 
         return instanceModel;
