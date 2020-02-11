@@ -56,6 +56,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
@@ -431,6 +432,21 @@ public class Scenario {
         return answer(value);
     }
 
+    /**
+     * Answers with a boolean value the question at the form index
+     * corresponding to the provided reference.
+     * <p>
+     * This method has side-effects:
+     * - It will create all the required middle and end repeat group instances
+     * - It changes the current form index
+     */
+    public AnswerResult answer(String xPath, boolean value) {
+        createMissingRepeats(xPath);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(value);
+    }
+
     // endregion
 
     // region Answer the question at the form index
@@ -464,8 +480,18 @@ public class Scenario {
         return answer(new StringData(String.valueOf(value)));
     }
 
+    /**
+     * Answers the question at the form index
+     */
     public AnswerResult answer(LocalDate value) {
         return answer(new DateData(Date.valueOf(value)));
+    }
+
+    /**
+     * Answers the question at the form index
+     */
+    public AnswerResult answer(boolean value) {
+        return answer(new BooleanData(value));
     }
 
     private AnswerResult answer(IAnswerData data) {

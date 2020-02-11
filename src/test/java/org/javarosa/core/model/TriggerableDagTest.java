@@ -8,6 +8,7 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.QuestionDefMatchers.irrelevant;
@@ -20,6 +21,7 @@ import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.item;
+import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
@@ -934,10 +936,10 @@ public class TriggerableDagTest {
                         t("is-field-relevant"),
                         t("group", t("field"))
                     )),
-                    bind("/data/is-group-relevant").type("string"),
-                    bind("/data/is-field-relevant").type("string"),
-                    bind("/data/group").relevant("/data/is-group-relevant = '1'"),
-                    bind("/data/group/field").type("string").relevant("/data/is-field-relevant = '1'")
+                    bind("/data/is-group-relevant").type("boolean"),
+                    bind("/data/is-field-relevant").type("boolean"),
+                    bind("/data/group").relevant("/data/is-group-relevant"),
+                    bind("/data/group/field").type("string").relevant("/data/is-field-relevant")
                 )
             ),
             body(
@@ -946,17 +948,17 @@ public class TriggerableDagTest {
                 group("/data/group", input("/data/group/field"))
             )));
 
-        scenario.answer("/data/is-group-relevant", "1");
+        scenario.answer("/data/is-group-relevant", true);
 
         assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
 
-        scenario.answer("/data/is-field-relevant", "1");
+        scenario.answer("/data/is-field-relevant", true);
 
         assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
 
-        scenario.answer("/data/is-group-relevant", "0");
+        scenario.answer("/data/is-group-relevant", false);
 
         assertThat(scenario.getAnswerNode("/data/group"), is(irrelevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
@@ -1009,6 +1011,62 @@ public class TriggerableDagTest {
         // ... as opposed to the value that we can get by resolving the same
         // reference with the main instance, which has the expected `2` value
         assertThat(scenario.answerOf("/data/node[1]/value"), is(intAnswer(2)));
+    }
+
+    @Test
+    public void issue_119_target_question_should_be_relevant() throws IOException {
+        // This is a translation of the XML form in the issue to our DSL with some adaptations:
+        // - Explicit binds for all fields
+        // - Migrated the condition field to boolean, which should be easier to understand
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("outer_trigger", "D"),
+                        t("inner_trigger"),
+                        t("outer",
+                            t("inner",
+                                t("target_question")
+                            ),
+                            t("inner_condition")
+                        ),
+                        t("end")
+                    )),
+                    bind("/data/outer_trigger").type("string"),
+                    bind("/data/inner_trigger").type("int"),
+                    bind("/data/outer").relevant("/data/outer_trigger = 'D'"),
+                    bind("/data/outer/inner_condition").type("boolean").calculate("/data/inner_trigger > 10"),
+                    bind("/data/outer/inner").relevant("/data/outer/inner_condition"),
+                    bind("/data/outer/inner/target_question").type("string")
+                )
+            ),
+            body(
+                input("inner_trigger", label("inner trigger (enter 5)")),
+                input("outer_trigger", label("outer trigger (enter 'D')")),
+                input("outer/inner/target_question", label("target question: i am incorrectly skipped")),
+                input("end", label("this is the end of the form"))
+            )));
+
+        // Starting conditions (outer trigger is D, inner trigger is empty)
+        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(false)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
+
+        scenario.answer("/data/inner_trigger", 15);
+
+        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
+
+        scenario.answer("/data/outer_trigger", "A");
+
+        assertThat(scenario.getAnswerNode("/data/outer"), is(irrelevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
     }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
