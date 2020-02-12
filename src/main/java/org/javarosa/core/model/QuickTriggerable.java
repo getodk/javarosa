@@ -115,4 +115,9 @@ public final class QuickTriggerable {
     public int hashCode() {
         return hashCode;
     }
+
+    @Override
+    public String toString() {
+        return triggerable.toString();
+    }
 }

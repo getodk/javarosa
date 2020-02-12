@@ -41,6 +41,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +56,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -453,6 +456,10 @@ public class Scenario {
         return answer(new StringData(String.valueOf(value)));
     }
 
+    public AnswerResult answer(LocalDate value) {
+        return answer(new DateData(Date.valueOf(value)));
+    }
+
     private AnswerResult answer(IAnswerData data) {
         FormIndex formIndex = model.getFormIndex();
         log.info("Answer {} at {}", data, formIndex.getReference());
@@ -565,6 +572,10 @@ public class Scenario {
         return jumpResultCode;
     }
 
+    public void next(int amount) {
+        while (amount-- > 0)
+            next();
+    }
 
     /**
      * Jump to the beginning of the form.
@@ -656,6 +667,10 @@ public class Scenario {
         return model.getFormIndex().isEndOfFormIndex();
     }
 
+    public boolean atQuestion() {
+        return formDef.getChild(formEntryController.getModel().getFormIndex()) instanceof QuestionDef;
+    }
+
     public QuestionDef getQuestionAtIndex() {
         return model.getQuestionPrompt().getQuestion();
     }
@@ -702,6 +717,10 @@ public class Scenario {
             // ItemsetBinding.getChoices() will work because we've called questionPrompt.getAnswerValue()
             ? control.getDynamicChoices().getChoices()
             : control.getChoices();
+    }
+
+    public TreeElement getAnswerNode(String xPath) {
+        return formDef.getMainInstance().resolveReference(expandSingle(getRef(xPath)));
     }
 
     // endregion

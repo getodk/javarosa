@@ -35,6 +35,7 @@ import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
+import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -344,8 +345,8 @@ public class TriggerableDag {
      * will create the appropriate ordering and dependencies to ensure the
      * conditions will be evaluated in the appropriate orders.
      */
-    public void finalizeTriggerables(FormInstance mainInstance) throws IllegalStateException {
-        triggerablesDAG = buildDag(allTriggerables, getDagEdges());
+    public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
+        triggerablesDAG = buildDag(allTriggerables, getDagEdges(mainInstance, ec));
         repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
     }
 
@@ -372,18 +373,14 @@ public class TriggerableDag {
      *     the DAG again {@link Triggerable#getImmediateCascades()}</li>
      * </ul>
      */
-    private Set<QuickTriggerable[]> getDagEdges() {
+    private Set<QuickTriggerable[]> getDagEdges(FormInstance mainInstance, EvaluationContext ec) {
         Set<QuickTriggerable[]> edges = new HashSet<>();
         for (QuickTriggerable source : allTriggerables) {
             // Compute the set of edge targets from the source vertex in this
             // loop using the triggerable's target tree reference set.
             // We will create an edge for all the source's target references
             // that, in turn, trigger another triggerable.
-            Set<QuickTriggerable> targets = new HashSet<>();
-            for (TreeReference targetRef : source.getTargets())
-                targets.addAll(triggerablesPerTrigger.containsKey(targetRef)
-                    ? triggerablesPerTrigger.get(targetRef)
-                    : emptySet());
+            Set<QuickTriggerable> targets = getDependantTriggerables(mainInstance, ec, source, triggerablesPerTrigger);
 
             // Account for cycles by self-reference
             if (targets.contains(source))
@@ -398,6 +395,82 @@ public class TriggerableDag {
         return edges;
     }
 
+    private static Set<QuickTriggerable> getDependantTriggerables(FormInstance mainInstance, EvaluationContext ec, QuickTriggerable triggerable, Map<TreeReference, Set<QuickTriggerable>> triggerIndex) {
+        Set<QuickTriggerable> allDependantTriggerables = new LinkedHashSet<>();
+        Set<TreeReference> targets = new HashSet<>();
+        for (TreeReference target : triggerable.getTargets()) {
+
+            targets.add(target);
+
+            // For certain types of triggerables, the update will affect
+            // not only the target, but also the children of the target.
+            // In that case, we want to add all of those nodes
+            // to the list of updated elements as well.
+            if (triggerable.isCascadingToChildren()) {
+                targets.addAll(getChildrenOfReference(mainInstance, ec, target));
+            }
+        }
+
+        // Now go through each of these updated nodes (generally
+        // just 1 for a normal calculation,
+        // multiple nodes if there's a relevance cascade.
+        for (TreeReference target : targets) {
+            // Check our index to see if that target is a Trigger
+            // for other conditions
+            // IE: if they are an element of a different calculation
+            // or relevancy calc
+
+            // We can't make this reference generic before now or
+            // we'll lose the target information,
+            // so we'll be more inclusive than needed and see if any
+            // of our triggers are keyed on the predicate-less path
+            // of this ref
+            Set<QuickTriggerable> dependantTriggerables = triggerIndex.get(target.hasPredicates() ? target.removePredicates() : target);
+            if (dependantTriggerables != null)
+                allDependantTriggerables.addAll(dependantTriggerables);
+        }
+        return allDependantTriggerables;
+    }
+
+    private static Set<TreeReference> getChildrenOfReference(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
+        // original has already been added to the 'toAdd' list.
+
+        Set<TreeReference> descendantRefs = new HashSet<>();
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
+        if (repeatTemplate != null) {
+            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
+                TreeElement child = repeatTemplate.getChildAt(i);
+                descendantRefs.add(child.getRef().genericize());
+                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+            }
+        } else {
+            List<TreeReference> refSet = evalContext.expandReference(original);
+            for (TreeReference ref : refSet) {
+                descendantRefs.addAll(getChildrenRefsOfElement(mainInstance, evalContext.resolveReference(ref)));
+            }
+        }
+        return descendantRefs;
+    }
+
+    // Recursive step of utility method
+    private static Set<TreeReference> getChildrenRefsOfElement(FormInstance mainInstance, AbstractTreeElement<?> el) {
+        Set<TreeReference> childrenRefs = new HashSet<>();
+        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
+        if (repeatTemplate != null) {
+            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
+                TreeElement child = repeatTemplate.getChildAt(i);
+                childrenRefs.add(child.getRef().genericize());
+                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+            }
+        } else {
+            for (int i = 0; i < el.getNumChildren(); ++i) {
+                AbstractTreeElement<?> child = el.getChildAt(i);
+                childrenRefs.add(child.getRef().genericize());
+                childrenRefs.addAll(getChildrenRefsOfElement(mainInstance, child));
+            }
+        }
+        return childrenRefs;
+    }
     /**
      * Returns a set with the DAG that can be build using the provided vertices
      * and edges.

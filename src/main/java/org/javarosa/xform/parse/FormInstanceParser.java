@@ -6,10 +6,8 @@ import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -20,7 +18,6 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -93,7 +90,7 @@ class FormInstanceParser {
         //print unused attribute warning message for parent element
         if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)) {
             String xmlLocation = getVagueLocation(e);
-            logger.warn("XForm Parse Warning: {}{}", XFormUtils.unusedAttWarning(e, usedAtts), (xmlLocation == null ? "" : xmlLocation));
+            logger.warn("XForm Parse Warning: {}{}", XFormUtils.unusedAttWarning(e, usedAtts), xmlLocation);
         }
 
         return instanceModel;
@@ -169,15 +166,15 @@ class FormInstanceParser {
         List<String> bindErrors = new ArrayList<>();
         verifyControlBindings(formDef, instance, bindErrors);
         if (bindErrors.size() > 0) {
-            String errorMsg = "";
+            StringBuilder errorMsg = new StringBuilder();
             for (String bindError : bindErrors) {
-                errorMsg += bindError + "\n";
+                errorMsg.append(bindError).append("\n");
             }
-            throw new XFormParseException(errorMsg);
+            throw new XFormParseException(errorMsg.toString());
         }
 
         //check that repeat members bind to the proper scope (not above the binding of the parent repeat, and not within any sub-repeat (or outside repeat))
-        verifyRepeatMemberBindings(formDef, instance, null);
+        verifyRepeatMemberBindings(formDef, null);
 
         //check that label/copy/value refs are children of nodeset ref, and exist
         verifyItemsetBindings(instance);
@@ -267,7 +264,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyRepeatMemberBindings(IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
+    private void verifyRepeatMemberBindings(IFormElement fe, GroupDef parentRepeat) {
         if (fe.getChildren() == null)
             return;
 
@@ -314,7 +311,7 @@ class FormInstanceParser {
                 }
             }
 
-            verifyRepeatMemberBindings(child, instance, (isRepeat ? (GroupDef) child : parentRepeat));
+            verifyRepeatMemberBindings(child, (isRepeat ? (GroupDef) child : parentRepeat));
         }
     }
 
@@ -393,15 +390,8 @@ class FormInstanceParser {
             List<TreeReference> nodeRefs = ec.expandReference(ref, true);
 
             // Add triggerable targets if needed
-            if (bind.relevancyCondition != null) {
+            if (bind.relevancyCondition != null)
                 bind.relevancyCondition.addTarget(ref);
-                // Since relevancy can affect not only to individual fields, but also to
-                // groups, we need to register all descendant refs as targets for relevancy
-                // conditions to allow for chained reactions in triggerables registered in
-                // any of those descendants
-                for (TreeReference r : getDescendantRefs(instance, ec, ref))
-                    bind.relevancyCondition.addTarget(r);
-            }
             if (bind.requiredCondition != null)
                 bind.requiredCondition.addTarget(ref);
             if (bind.readonlyCondition != null)
@@ -431,46 +421,6 @@ class FormInstanceParser {
 
         applyControlProperties(instance);
     }
-
-    private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, EvaluationContext evalContext, TreeReference original) {
-        Set<TreeReference> descendantRefs = new HashSet<>();
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(original);
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                descendantRefs.add(child.getRef().genericize());
-                descendantRefs.addAll(getDescendantRefs(mainInstance, child));
-            }
-        } else {
-            // TODO Eventually remove this branch because a parsed form can't force the program flow throw it
-            List<TreeReference> refSet = evalContext.expandReference(original);
-            for (TreeReference ref : refSet) {
-                descendantRefs.addAll(getDescendantRefs(mainInstance, evalContext.resolveReference(ref)));
-            }
-        }
-        return descendantRefs;
-    }
-
-    // Recursive step of utility method
-    private Set<TreeReference> getDescendantRefs(FormInstance mainInstance, AbstractTreeElement<?> el) {
-        Set<TreeReference> childrenRefs = new HashSet<>();
-        TreeElement repeatTemplate = mainInstance.getTemplatePath(el.getRef());
-        if (repeatTemplate != null) {
-            for (int i = 0; i < repeatTemplate.getNumChildren(); ++i) {
-                TreeElement child = repeatTemplate.getChildAt(i);
-                childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getDescendantRefs(mainInstance, child));
-            }
-        } else {
-            for (int i = 0; i < el.getNumChildren(); ++i) {
-                AbstractTreeElement<?> child = el.getChildAt(i);
-                childrenRefs.add(child.getRef().genericize());
-                childrenRefs.addAll(getDescendantRefs(mainInstance, child));
-            }
-        }
-        return childrenRefs;
-    }
-
 
     /**
      * Checks which repeat bindings have explicit template nodes; returns a list of the bindings that do not
