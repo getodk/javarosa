@@ -55,6 +55,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.ValidateOutcome;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
@@ -137,6 +138,14 @@ public class Scenario {
 
     public FormDef getFormDef() {
         return formDef;
+    }
+
+    public FormIndex indexOf(String xPath) {
+        return getIndexOf(expandSingle(getRef(xPath)));
+    }
+
+    public ValidateOutcome getValidationOutcome() {
+        return formDef.validate(true);
     }
 
     /**

@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.test.FormDefMatchers.valid;
 import static org.javarosa.core.test.QuestionDefMatchers.irrelevant;
 import static org.javarosa.core.test.QuestionDefMatchers.relevant;
 import static org.javarosa.core.test.Scenario.getRef;
@@ -28,6 +29,8 @@ import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
+import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertThat;
@@ -1067,6 +1070,105 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
+    }
+
+    @Test
+    public void constraints_of_fields_that_are_empty_are_always_satisfied() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string").constraint("/data/b"),
+                    bind("/data/b").type("boolean")
+                )
+            ),
+            body(
+                input("/data/a"),
+                input("/data/b")
+            )));
+
+        // Ensure that the constraint expression in /data/a won't be satisfied
+        scenario.answer("/data/b", false);
+
+        // Verify that regardless of the constraint defined in /data/a, the
+        // form appears to be valid
+        assertThat(scenario.getFormDef(), is(valid()));
+    }
+
+    @Test
+    public void empty_required_fields_make_form_validation_fail() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string").required(),
+                    bind("/data/b").type("boolean")
+                )
+            ),
+            body(
+                input("/data/a"),
+                input("/data/b")
+            )));
+
+        ValidateOutcome validate = scenario.getValidationOutcome();
+        assertThat(validate.failedPrompt, is(scenario.indexOf("/data/a")));
+        assertThat(validate.outcome, is(ANSWER_REQUIRED_BUT_EMPTY));
+    }
+
+
+    @Test
+    public void constraint_violations_and_form_finalization() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string").constraint("/data/b"),
+                    bind("/data/b").type("boolean")
+                )
+            ),
+            body(
+                input("/data/a"),
+                input("/data/b")
+            )));
+
+        // First, ensure we will be able to commit an answer in /data/a by
+        // making it match its constraint. No values can be committed to the
+        // instance if constraints aren't satisfied.
+        scenario.answer("/data/b", true);
+
+        // Then, commit an answer (answers with empty values are always valid)
+        scenario.answer("/data/a", "cocotero");
+
+        // Then, make the constraint defined at /data/a impossible to satisfy
+        scenario.answer("/data/b", false);
+
+        // At this point, the form has /data/a filled with an answer that's
+        // invalid according to its constraint expression, but we can't be
+        // aware of that, unless we validate the whole form.
+        //
+        // Clients like Collect will validate the whole form before marking
+        // a submission as complete and saving it to the filesystem.
+        //
+        // FormDev.validate(boolean) will go through all the relevant fields
+        // re-answering them with their current values in order to detect
+        // any constraint violations. When this happens, a non-null
+        // ValidationOutcome object is returned including information about
+        // the violated constraint.
+        ValidateOutcome validate = scenario.getValidationOutcome();
+        assertThat(validate.failedPrompt, is(scenario.indexOf("/data/a")));
+        assertThat(validate.outcome, is(ANSWER_CONSTRAINT_VIOLATED));
     }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
