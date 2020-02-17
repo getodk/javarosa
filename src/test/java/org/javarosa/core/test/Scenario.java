@@ -69,6 +69,8 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.services.storage.util.DummyIndexedStorageUtility;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -335,6 +337,12 @@ public class Scenario {
         return null;
     }
 
+    public void trace(String msg) {
+        log.info("===============================================================================");
+        log.info("       " + msg);
+        log.info("===============================================================================");
+    }
+
     public enum AnswerResult {
         OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
 
@@ -382,6 +390,7 @@ public class Scenario {
      */
     public static Scenario init(Path formFile) {
         // TODO explain why this sequence of calls
+        StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
@@ -505,7 +514,7 @@ public class Scenario {
 
     private AnswerResult answer(IAnswerData data) {
         FormIndex formIndex = model.getFormIndex();
-        log.info("Answer {} at {}", data, formIndex.getReference());
+        log.info("Answer {} at {}", data, formIndex.getReference().toString(true, true));
         return AnswerResult.from(formEntryController.answerQuestion(formIndex, data, true));
     }
 
@@ -615,6 +624,12 @@ public class Scenario {
         return jumpResultCode;
     }
 
+    public int prev() {
+        int jumpResultCode = formEntryController.stepToPreviousEvent();
+        log.info(humanJumpTrace(jumpResultCode));
+        return jumpResultCode;
+    }
+
     public void next(int amount) {
         while (amount-- > 0)
             next();
@@ -631,8 +646,12 @@ public class Scenario {
         jump(BEGINNING_OF_FORM);
     }
 
-    private int silentNext() {
+    public int silentNext() {
         return formEntryController.stepToNextEvent();
+    }
+
+    public int silentPrev() {
+        return formEntryController.stepToPreviousEvent();
     }
 
     private int jump(FormIndex index) {
@@ -708,6 +727,13 @@ public class Scenario {
 
     public boolean atTheEndOfForm() {
         return model.getFormIndex().isEndOfFormIndex();
+    }
+
+    public TreeReference nextRef() {
+        silentNext();
+        TreeReference ref = refAtIndex();
+        silentPrev();
+        return ref;
     }
 
     public TreeReference refAtIndex() {
