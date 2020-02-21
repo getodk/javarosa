@@ -861,6 +861,7 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(1))); // Should be 2
     }
 
+    // TODO Even though results are the same, this shows how the internal state of the TreeElement corresponding to the field inside the group changes when the group becomes irrelevant, as opposed to what the W3C XForms spec says regarding this particular topic (add a link)
     @Test
     public void relevance_propagation_simple_initially_irrelevant() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
@@ -885,7 +886,6 @@ public class TriggerableDagTest {
         // field irrelevant because its parent group becomes irrelevant.
         assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
 
-
         scenario.answer("/data/is-group-relevant", "1");
         // The group is now relevant. Therefore, the field is also relevant
         assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
@@ -896,40 +896,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void relevance_propagation_simple_initially_relevant() throws IOException {
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("is-group-relevant", "1"),
-                        t("group", t("field"))
-                    )),
-                    bind("/data/is-group-relevant").type("string"),
-                    bind("/data/group").relevant("/data/is-group-relevant = '1'"),
-                    bind("/data/group/field").type("string")
-                )
-            ),
-            body(
-                input("/data/is-group-relevant"),
-                group("/data/group", input("/data/group/field"))
-            )));
-
-        // Form initialization evaluates all triggerables. This makes the
-        // field relevant because its parent group becomes relevant.
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
-
-        scenario.answer("/data/is-group-relevant", "0");
-        // The group is now irrelevant. Therefore, the field becomes irrelevant
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
-
-        scenario.answer("/data/is-group-relevant", "1");
-        // The group is now relevant again. Therefore, the field is also relevant
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
-    }
-
-    @Test
-    public void relevance_propagation_topmost_relevance_wins() throws IOException {
+    public void relevance_propagation_topmost_irrelevance_wins() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
@@ -1053,6 +1020,7 @@ public class TriggerableDagTest {
 
         // Starting conditions (outer trigger is D, inner trigger is empty)
         assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(relevant()));
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(false)));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
@@ -1060,6 +1028,7 @@ public class TriggerableDagTest {
         scenario.answer("/data/inner_trigger", 15);
 
         assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(relevant()));
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(relevant()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
@@ -1067,9 +1036,44 @@ public class TriggerableDagTest {
         scenario.answer("/data/outer_trigger", "A");
 
         assertThat(scenario.getAnswerNode("/data/outer"), is(irrelevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(irrelevant()));
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
+    }
+
+    @Test
+    public void xpath_expressions_dont_see_actual_values_of_irrelevant_fields() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("relevance-trigger", "1"),
+                        t("result"),
+                        t("some-field", "42")
+                    )),
+                    bind("/data/relevance-trigger").type("boolean"),
+                    bind("/data/result").type("int").calculate("if(/data/some-field != '', /data/some-field + 33, 33)"),
+                    bind("/data/some-field").type("int").relevant("/data/relevance-trigger")
+                )
+            ),
+            body(
+                input("/data/relevance-trigger")
+            )));
+
+        assertThat(scenario.answerOf("/data/result"), is(intAnswer(75)));
+        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
+
+        scenario.answer("/data/relevance-trigger", false);
+
+        // This shows how JavaRosa will ignore the actual values of irrelevant fields. The
+        // W3C XForm specs regard relevance a purely UI concern. Changing relevance wouln't
+        // have any consequence on a node's value, which would make /data/result keep having
+        // a 75 after making /data/some-field irrelevant.
+        // TODO Add link to the specs
+        assertThat(scenario.answerOf("/data/result"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
     }
 
     @Test
@@ -1097,6 +1101,8 @@ public class TriggerableDagTest {
         // Verify that regardless of the constraint defined in /data/a, the
         // form appears to be valid
         assertThat(scenario.getFormDef(), is(valid()));
+
+
     }
 
     @Test
