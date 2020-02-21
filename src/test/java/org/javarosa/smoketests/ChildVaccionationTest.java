@@ -54,7 +54,9 @@ public class ChildVaccionationTest {
     public static final TreeReference NOT_ELIG_NOTE_REF = getRef("/data/household/child_repeat/not_elig_note");
     public static final TreeReference NEXT_CHILD_REF = getRef("/data/household/child_repeat/nextChild");
     public static final TreeReference NEXT_CHILD_NO_MOTHER_REF = getRef("/data/household/child_repeat/nextChild_no_mother");
+    public static final TreeReference NEW_HOUSEHOLD_REPEAT_JUNCTION_REF = getRef("/data/household");
     public static final TreeReference FINAL_FLAT_REF = getRef("/data/household/finalflat");
+    public static final TreeReference FINISHED_FORM_REF = getRef("/data/household/finished2");
     public static final LocalDate TODAY = LocalDate.now();
 
     @Test
@@ -86,7 +88,13 @@ public class ChildVaccionationTest {
 
         for (int i = 0; i < households.size(); i++) {
             List<Consumer<Integer>> children = households.get(i);
+            assertThat(scenario.nextRef().genericize(), is(NEW_HOUSEHOLD_REPEAT_JUNCTION_REF));
             answerHousehold(scenario, i, children);
+            // We just want to make sure that we are in a valid position without
+            // going into more detail. Due to the conditional nature of this
+            // form, it would be too complex to describe that in a test with all
+            // the precission in a test like this one that will follow all possible
+            // branches.
             assertThat(scenario.refAtIndex().genericize(), anyOf(
                 // Either we stopped after filling the age with a decomposed date
                 is(DOB_DAY_MONTH_TYPE_1_REF),
@@ -102,12 +110,12 @@ public class ChildVaccionationTest {
                 // Or we answered all questions
                 is(NEXT_CHILD_REF)
             ));
+            scenario.next();
+            assertThat(scenario.refAtIndex().genericize(), is(FINAL_FLAT_REF));
             if (i + 1 < households.size()) {
-                scenario.next();
                 scenario.answer("no");
                 scenario.next();
             } else {
-                scenario.next();
                 scenario.answer("yes");
             }
         }
@@ -119,6 +127,7 @@ public class ChildVaccionationTest {
         // region Go to the end of the form
 
         scenario.next();
+        assertThat(scenario.refAtIndex().genericize(), is(FINISHED_FORM_REF));
         scenario.next();
 
         // endregion

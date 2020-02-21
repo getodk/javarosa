@@ -1101,8 +1101,6 @@ public class TriggerableDagTest {
         // Verify that regardless of the constraint defined in /data/a, the
         // form appears to be valid
         assertThat(scenario.getFormDef(), is(valid()));
-
-
     }
 
     @Test
