@@ -191,10 +191,6 @@ public class Scenario {
         }
     }
 
-    public TreeReference getExpandedRef(String xpath) {
-        return expandSingle(getRef(xpath));
-    }
-
     /**
      * Prepares the form to answer a new blank instance
      */

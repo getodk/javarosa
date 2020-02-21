@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.QuestionDefMatchers.irrelevant;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
@@ -74,6 +75,7 @@ public class WhoVATest {
         assertThat(scenario.getAnswerNode("/data/consented/illhistory/illdur/Id10120_0"), is(irrelevant()));
     }
 
+    // TODO Add a comment pointing out which questions belong to the longest path or, at least, where it's exercised in this script.
     @Test
     public void smoke_test_route_fever_and_lumps() {
         Scenario scenario = Scenario.init(r("whova_form.xml"));
@@ -81,14 +83,14 @@ public class WhoVATest {
         // region Give consent to unblock the rest of the form
         // (Id10013) [Did the respondent give consent?] ref:/data/respondent_backgr/Id10013
         scenario.next(14);
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/respondent_backgr/Id10013")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/respondent_backgr/Id10013")));
         scenario.answer("yes");
         // endregion
 
         // region Info on deceased
         // (Id10019) What was the sex of the deceased? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10019
         scenario.next(6);
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/deceased_CRVS/info_on_deceased/Id10019")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/deceased_CRVS/info_on_deceased/Id10019")));
         scenario.answer("female");
         // (Id10020) Is the date of birth known? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10020
         scenario.next();
@@ -110,7 +112,7 @@ public class WhoVATest {
 
         // Skip a bunch of non yes/no questions
         scenario.next(11);
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/illhistory/illdur/id10120_unit")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/illhistory/illdur/id10120_unit")));
 
         // Answer no to the rest of questions
         IntStream.range(0, 23).forEach(n -> {
@@ -123,7 +125,7 @@ public class WhoVATest {
         // region Signs and symptoms - fever
         // (Id10147) Did (s)he have a fever? ref:/data/consented/illhistory/signs_symptoms_final_illness/Id10147
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10147")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10147")));
         scenario.answer("yes");
         // (Id10148_units) How long did the fever last? ref:/data/consented/illhistory/signs_symptoms_final_illness/Id10148_units
         scenario.next();
@@ -140,7 +142,7 @@ public class WhoVATest {
         // (Id10151) What was the pattern of the fever? ref:/data/consented/illhistory/signs_symptoms_final_illness/Id10151
         scenario.next();
         scenario.answer("nightly");
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10151")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10151")));
         // endregion
 
         // region Answer "no" until we get to the lumps group
@@ -154,7 +156,7 @@ public class WhoVATest {
         // region Signs and symptoms - lumps
         // (Id10253) Did (s)he have any lumps? ref:/data/consented/illhistory/signs_symptoms_final_illness/Id10253
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10253")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10253")));
         scenario.answer("yes");
         // (Id10254) Did (s)he have any lumps or lesions in the mouth? ref:/data/consented/illhistory/signs_symptoms_final_illness/Id10254
         scenario.next();
@@ -168,7 +170,7 @@ public class WhoVATest {
         // (Id10257) Did (s)he have any lumps on the groin? ref:/data/consented/illhistory/signs_symptoms_final_illness/Id10257
         scenario.next();
         scenario.answer("yes");
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10257")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/illhistory/signs_symptoms_final_illness/Id10257")));
         // endregion
 
         // region Answer "no" to almost the end of the form
@@ -181,7 +183,7 @@ public class WhoVATest {
 
         // region Answer the last question with comments
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(scenario.getExpandedRef("/data/consented/comment")));
+        assertThat(scenario.refAtIndex().genericize(), is(getRef("/data/consented/comment")));
         scenario.answer("No comments");
 
         scenario.next();
