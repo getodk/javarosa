@@ -261,6 +261,29 @@ public class Scenario {
         return expandedRefs.get(0);
     }
 
+    public void trace(String msg) {
+        log.info("===============================================================================");
+        log.info("       " + msg);
+        log.info("===============================================================================");
+    }
+
+    public enum AnswerResult {
+        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
+
+        private final int jrCode;
+
+        AnswerResult(int jrCode) {
+            this.jrCode = jrCode;
+        }
+
+        public static AnswerResult from(int jrCode) {
+            return Stream.of(values())
+                .filter(v -> v.jrCode == jrCode)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        }
+    }
+
     private boolean refExists(TreeReference reference) {
         return ec.expandReference(reference).size() == 1;
     }
@@ -335,29 +358,6 @@ public class Scenario {
         } while (index.isInForm());
         silentJump(backupIndex);
         return null;
-    }
-
-    public void trace(String msg) {
-        log.info("===============================================================================");
-        log.info("       " + msg);
-        log.info("===============================================================================");
-    }
-
-    public enum AnswerResult {
-        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
-
-        private final int jrCode;
-
-        AnswerResult(int jrCode) {
-            this.jrCode = jrCode;
-        }
-
-        public static AnswerResult from(int jrCode) {
-            return Stream.of(values())
-                .filter(v -> v.jrCode == jrCode)
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
-        }
     }
 
     // endregion
@@ -630,6 +630,13 @@ public class Scenario {
         return jumpResultCode;
     }
 
+    /**
+     * Jump the provided amount of times to the next event.
+     * <p>
+     * Side effects:
+     * - This method updates the form index.
+     * - This method leaves log traces
+     */
     public void next(int amount) {
         while (amount-- > 0)
             next();
@@ -646,11 +653,11 @@ public class Scenario {
         jump(BEGINNING_OF_FORM);
     }
 
-    public int silentNext() {
+    private int silentNext() {
         return formEntryController.stepToNextEvent();
     }
 
-    public int silentPrev() {
+    private int silentPrev() {
         return formEntryController.stepToPreviousEvent();
     }
 
