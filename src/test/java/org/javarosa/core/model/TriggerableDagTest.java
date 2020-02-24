@@ -12,7 +12,7 @@ import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.FormDefMatchers.valid;
-import static org.javarosa.core.test.QuestionDefMatchers.irrelevant;
+import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
 import static org.javarosa.core.test.QuestionDefMatchers.relevant;
 import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
@@ -340,10 +340,9 @@ public class TriggerableDagTest {
     /**
      * This test was inspired by the issue reported at https://code.google.com/archive/p/opendatakit/issues/888
      * <p>
-     * We want to focus on the relationship between relevancy and other
-     * calculations because relevancy can be
-     * defined for fields **and groups**, which is a special case of expression
-     * evaluation in our DAG.
+     * We want to focus on the relationship between relevance and other calculations
+     * because relevance can be defined for fields **and groups**, which is a special
+     * case of expression evaluation in our DAG.
      */
     @Test
     public void verify_relation_between_calculate_expressions_and_relevancy_conditions() throws IOException {
@@ -383,7 +382,6 @@ public class TriggerableDagTest {
         // and number1_x2_x2 doesn't get evaluated. The difference could be that the second field depends
         // on a field that is inside a non-relevant group.
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
-        // TODO figure out why group/number1_x2_x2 isn't evaluated once number1 gets a value. Should all expressions be evaluated regardless of relevance? In any case, describe and document which expressions are evaluated when
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(nullValue()));
         scenario.next();
         scenario.answer("1"); // Label: "yes"
@@ -861,42 +859,13 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(1))); // Should be 2
     }
 
-    // TODO Even though results are the same, this shows how the internal state of the TreeElement corresponding to the field inside the group changes when the group becomes irrelevant, as opposed to what the W3C XForms spec says regarding this particular topic (add a link)
+    /**
+     * Non-relevance is inherited from ancestor nodes, as per the W3C XForms specs:
+     * - https://www.w3.org/TR/xforms11/#model-prop-relevant
+     * - https://www.w3.org/community/xformsusers/wiki/XForms_2.0#The_relevant_Property
+     */
     @Test
-    public void relevance_propagation_simple_initially_irrelevant() throws IOException {
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("is-group-relevant"),
-                        t("group", t("field"))
-                    )),
-                    bind("/data/is-group-relevant").type("string"),
-                    bind("/data/group").relevant("/data/is-group-relevant = '1'"),
-                    bind("/data/group/field").type("string")
-                )
-            ),
-            body(
-                input("/data/is-group-relevant"),
-                group("/data/group", input("/data/group/field"))
-            )));
-
-        // Form initialization evaluates all triggerables. This makes the
-        // field irrelevant because its parent group becomes irrelevant.
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
-
-        scenario.answer("/data/is-group-relevant", "1");
-        // The group is now relevant. Therefore, the field is also relevant
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
-
-        scenario.answer("/data/is-group-relevant", "0");
-        // The group is back to being irrelevant. Therefore, the field becomes irrelevant again
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
-    }
-
-    @Test
-    public void relevance_propagation_topmost_irrelevance_wins() throws IOException {
+    public void non_relevance_is_inherited_from_ancestors() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
@@ -918,32 +887,35 @@ public class TriggerableDagTest {
                 group("/data/group", input("/data/group/field"))
             )));
 
+        // Form initialization evaluates all triggerables, which makes the group and
+        //field non-relevants because their relevance expressions are not satisfied
+        assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
+
+        // Now we make both relevant
         scenario.answer("/data/is-group-relevant", true);
-
-        assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
-
         scenario.answer("/data/is-field-relevant", true);
-
         assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
 
+        // Now we make the group non-relevant, which makes the field non-relevant
+        // regardless of its local relevance expression, which would be satisfied
+        // in this case
         scenario.answer("/data/is-group-relevant", false);
-
-        assertThat(scenario.getAnswerNode("/data/group"), is(irrelevant()));
-        assertThat(scenario.getAnswerNode("/data/group/field"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
     }
 
     @Test
-    public void hardcoded_filtering_of_irrelevant_nodes_and_their_values() throws IOException {
+    public void non_relevant_nodes_are_excluded_from_nodeset_evaluation() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
                 model(
                     mainInstance(t("data id=\"some-form\"",
                         // position() is one-based
-                        t("node", t("value", "1")), // irrelevant
-                        t("node", t("value", "2")), // irrelevant
+                        t("node", t("value", "1")), // non-relevant
+                        t("node", t("value", "2")), // non-relevant
                         t("node", t("value", "3")), // relevant
                         t("node", t("value", "4")), // relevant
                         t("node", t("value", "5")) // relevant
@@ -958,7 +930,7 @@ public class TriggerableDagTest {
 
         // The XPathPathExprEval is used when evaluating the nodesets that the
         // xpath functions declared in triggerable expressions need to operate
-        // upon. This assertion shows that irrelevant nodes are not included
+        // upon. This assertion shows that non-relevant nodes are not included
         // in the resulting nodesets
         assertThat(
             new XPathPathExprEval().eval(getRef("/data/node"), scenario.getEvaluationContext()).getReferences(),
@@ -968,7 +940,7 @@ public class TriggerableDagTest {
         // The method XPathPathExpr.getRefValue is what ultimately is used by
         // triggerable expressions to extract the values they need to operate
         // upon. The following assertion shows how extrating values from
-        // irrelevant nodes returns `null` values instead of the actual values
+        // non-relevant nodes returns `null` values instead of the actual values
         // they're holding
         assertThat(
             XPathPathExpr.getRefValue(
@@ -981,6 +953,40 @@ public class TriggerableDagTest {
         // ... as opposed to the value that we can get by resolving the same
         // reference with the main instance, which has the expected `2` value
         assertThat(scenario.answerOf("/data/node[1]/value"), is(intAnswer(2)));
+    }
+
+    @Test
+    public void non_relevant_node_values_are_always_null_regardless_of_their_actual_value() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("relevance-trigger", "1"),
+                        t("result"),
+                        t("some-field", "42")
+                    )),
+                    bind("/data/relevance-trigger").type("boolean"),
+                    bind("/data/result").type("int").calculate("if(/data/some-field != '', /data/some-field + 33, 33)"),
+                    bind("/data/some-field").type("int").relevant("/data/relevance-trigger")
+                )
+            ),
+            body(
+                input("/data/relevance-trigger")
+            )));
+
+        assertThat(scenario.answerOf("/data/result"), is(intAnswer(75)));
+        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
+
+        scenario.answer("/data/relevance-trigger", false);
+
+        // This shows how JavaRosa will ignore the actual values of non-relevant fields. The
+        // W3C XForm specs regard relevance a purely UI concern. No side-effects on node values
+        // are described in the specs, which implies that a relevance change wouln't
+        // have any consequence on a node's value. This means that /data/result should keep having
+        // a 75 after making /data/some-field non-relevant.
+        assertThat(scenario.answerOf("/data/result"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
     }
 
     @Test
@@ -1020,60 +1026,26 @@ public class TriggerableDagTest {
 
         // Starting conditions (outer trigger is D, inner trigger is empty)
         assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
-        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(false)));
-        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
 
         scenario.answer("/data/inner_trigger", 15);
 
         assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
-        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(relevant()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
 
         scenario.answer("/data/outer_trigger", "A");
 
-        assertThat(scenario.getAnswerNode("/data/outer"), is(irrelevant()));
-        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(nonRelevant()));
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
-        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(irrelevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(irrelevant()));
-    }
-
-    @Test
-    public void xpath_expressions_dont_see_actual_values_of_irrelevant_fields() throws IOException {
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("relevance-trigger", "1"),
-                        t("result"),
-                        t("some-field", "42")
-                    )),
-                    bind("/data/relevance-trigger").type("boolean"),
-                    bind("/data/result").type("int").calculate("if(/data/some-field != '', /data/some-field + 33, 33)"),
-                    bind("/data/some-field").type("int").relevant("/data/relevance-trigger")
-                )
-            ),
-            body(
-                input("/data/relevance-trigger")
-            )));
-
-        assertThat(scenario.answerOf("/data/result"), is(intAnswer(75)));
-        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
-
-        scenario.answer("/data/relevance-trigger", false);
-
-        // This shows how JavaRosa will ignore the actual values of irrelevant fields. The
-        // W3C XForm specs regard relevance a purely UI concern. Changing relevance wouln't
-        // have any consequence on a node's value, which would make /data/result keep having
-        // a 75 after making /data/some-field irrelevant.
-        // TODO Add link to the specs
-        assertThat(scenario.answerOf("/data/result"), is(intAnswer(33)));
-        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
     }
 
     @Test

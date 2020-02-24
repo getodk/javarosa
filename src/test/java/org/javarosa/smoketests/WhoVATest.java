@@ -20,7 +20,7 @@ package org.javarosa.smoketests;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
-import static org.javarosa.core.test.QuestionDefMatchers.irrelevant;
+import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
 import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
@@ -72,7 +72,7 @@ public class WhoVATest {
          * not equipotent, ensuring that the one declared in the field will be evaluated last, producing the
          * expected relevance state.
          */
-        assertThat(scenario.getAnswerNode("/data/consented/illhistory/illdur/Id10120_0"), is(irrelevant()));
+        assertThat(scenario.getAnswerNode("/data/consented/illhistory/illdur/Id10120_0"), is(nonRelevant()));
     }
 
     // TODO Add a comment pointing out which questions belong to the longest path or, at least, where it's exercised in this script.
