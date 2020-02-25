@@ -6,21 +6,13 @@
             <instance>
                 <internal_empty_select id="internal_empty_select">
                     <first/>
-                    <meta>
-                        <instanceID/>
-                    </meta>
                 </internal_empty_select>
             </instance>
-            <instance id="first">
-                <root>
-                </root>
-            </instance>
             <bind nodeset="/internal_empty_select/first" type="select1"/>
-            <bind calculate="concat('uuid:', uuid())" nodeset="/internal_empty_select/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>
     <h:body>
-        <select1 ref="/internal_select_10/first">
+        <select1 ref="/internal_empty_select/first">
             <label>First</label>
         </select1>
     </h:body>
