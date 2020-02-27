@@ -60,7 +60,8 @@ public class TreeReferenceContextualizeTest {
             {"Predicates #1", getRef("bar"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'bar']/bar")},
             {"Predicates #2", getRef("bar[@foo = 'baz']"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'bar']/bar[@foo = 'baz']")},
             {"Predicates #3", getRef("bar[@foo = 'baz']"), getRef("/foo"), getRef("/foo/bar[@foo = 'baz']")},
-            {"Predicates #4", getRef("/foo[@foo = 'foo']"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'foo']")}
+            {"Predicates #4", getRef("/foo[@foo = 'foo']"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'foo']")},
+            {"Parent refs in nested repeats", getRef("../../inner"), getRef("/data/outer[0]/inner[1]/count[0]"), getRef("/data/outer[0]/inner")}
         });
     }
 
