@@ -770,8 +770,9 @@ public class Scenario {
         if (!reference.isAmbiguous())
             throw new RuntimeException("Provided xPath must be ambiguous");
 
-        return ec
-            .expandReference(reference)
+        List<TreeReference> treeReferences = ec
+            .expandReference(reference);
+        return treeReferences
             .size();
     }
 
