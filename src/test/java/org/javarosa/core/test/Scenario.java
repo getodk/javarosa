@@ -64,6 +64,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -125,15 +126,22 @@ public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
     private final FormDef formDef;
-    private final FormEntryController formEntryController;
-    private final EvaluationContext ec;
-    private final FormEntryModel model;
+    private FormEntryController formEntryController;
+    private EvaluationContext ec;
+    private FormEntryModel model;
+    private final FormInstance blankInstance;
 
-    private Scenario(FormDef formDef, FormEntryController formEntryController) {
+    private Scenario(FormDef formDef, FormEntryController formEntryController, FormEntryModel model, EvaluationContext evaluationContext, FormInstance blankInstance) {
         this.formDef = formDef;
         this.formEntryController = formEntryController;
-        this.ec = formDef.getEvaluationContext();
-        this.model = formEntryController.getModel();
+        this.ec = evaluationContext;
+        this.model = model;
+        this.blankInstance = blankInstance;
+    }
+
+    private static Scenario from(FormDef formDef) {
+        FormEntryModel formEntryModel = new FormEntryModel(formDef);
+        return new Scenario(formDef, new FormEntryController(formEntryModel), formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
     }
 
     // region Miscelaneous
@@ -195,7 +203,11 @@ public class Scenario {
      * Prepares the form to answer a new blank instance
      */
     public void newInstance() {
+        formDef.setInstance(blankInstance.clone());
         formDef.initialize(true, new InstanceInitializationFactory());
+        ec = formDef.getEvaluationContext();
+        model = new FormEntryModel(formDef);
+        formEntryController = new FormEntryController(model);
     }
 
     /**
@@ -239,7 +251,7 @@ public class Scenario {
         );
 
         delete(tempFile);
-        return new Scenario(deserializedFormDef, new FormEntryController(new FormEntryModel(deserializedFormDef)));
+        return Scenario.from(deserializedFormDef);
     }
 
     /**
@@ -391,9 +403,7 @@ public class Scenario {
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());
-        FormEntryModel formEntryModel = new FormEntryModel(formDef);
-        FormEntryController formEntryController = new FormEntryController(formEntryModel);
-        return new Scenario(formDef, formEntryController);
+        return Scenario.from(formDef);
     }
 
     // endregion
