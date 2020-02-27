@@ -912,11 +912,20 @@ public class TriggerableDagTest {
         scenario.createNewRepeat("/data/outer[1]/inner");
         scenario.createNewRepeat("/data/outer[1]/inner");
 
-        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/count"), is(intAnswer(1))); // Should be 3
-        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/count"), is(intAnswer(1))); // Should be 3
-        assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(1))); // Should be 3
-        assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(1))); // Should be 2
-        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(1))); // Should be 2
+        // The following assertions have incrementally greater count values because
+        // we currently evaluate triggerables bound to the new repeat group only. This
+        // means that the actual count value only takes into account the existing repeat
+        // groups when creating the new instance.
+        //
+        // To have the expected count of 3 for outer[0] and 2 for outer[1], we would have
+        // to change the sequence of evaluations when a new repeat group is created to
+        // evaluate the triggerables on all siblings (not just on the instance that has
+        // been created). This is currently driven by TriggerableDag.createRepeatGroup()
+        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/count"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/count"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(2)));
     }
 
     /**
