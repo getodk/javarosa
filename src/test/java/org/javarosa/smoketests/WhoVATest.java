@@ -75,7 +75,6 @@ public class WhoVATest {
         assertThat(scenario.getAnswerNode("/data/consented/illhistory/illdur/Id10120_0"), is(nonRelevant()));
     }
 
-    // TODO Add a comment pointing out which questions belong to the longest path or, at least, where it's exercised in this script.
     @Test
     public void smoke_test_route_fever_and_lumps() {
         Scenario scenario = Scenario.init(r("whova_form.xml"));
@@ -99,6 +98,7 @@ public class WhoVATest {
         scenario.next();
         scenario.answer(LocalDate.parse("1998-01-01"));
         // (Id10022) Is the date of death known? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10022
+        // This question triggers one of the longest evaluation chain of triggerables including 5 calculations
         scenario.next();
         scenario.answer("yes");
         // (Id10021) When was the deceased born? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10021
