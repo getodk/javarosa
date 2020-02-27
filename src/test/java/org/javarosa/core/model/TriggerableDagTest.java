@@ -388,6 +388,67 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
     }
 
+    @Test
+    public void issue_135_verify_that_counts_in_inner_repeats_work_as_expected() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(
+                        t("data id=\"some-form\"",
+                            t("outer-count", "0"),
+                            t("outer jr:template=\"\"",
+                                t("inner-count", "0"),
+                                t("inner jr:template=\"\"",
+                                    t("some-field")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/outer-count").type("int"),
+                    bind("/data/outer/inner-count").type("int"),
+                    bind("/data/outer/inner/some-field").type("string")
+                )
+            ),
+            body(
+                input("/data/outer-count"),
+                group("/data/outer", repeat("/data/outer", "/data/outer-count",
+                    input("/data/outer/inner-count"),
+                    group("/data/outer/inner", repeat("/data/outer/inner", "../inner-count",
+                        input("/data/outer/inner/some-field")
+                    ))
+                ))
+            )
+        ));
+
+        scenario.next();
+        scenario.answer(2);
+        scenario.next();
+        scenario.next();
+        scenario.answer(3);
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 0-0");
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 0-1");
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 0-2");
+        scenario.next();
+        scenario.next();
+        scenario.answer(2);
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 1-0");
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 1-1");
+        scenario.next();
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[0]/inner"), is(3));
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(2));
+    }
+
     /**
      * Ignored because the assertions about non-null next-numbers will fail
      * because our DAG
