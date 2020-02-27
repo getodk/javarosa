@@ -326,8 +326,13 @@ public class TreeReference implements Externalizable, Serializable {
                 //We can't actually merge nodes if the newRef has predicates or filters
                 //on this expression, since those reset any existing resolutions which
                 //may have been done.
-                if(newRef.getPredicate(i) == null) {
-                    newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
+                if (newRef.getPredicate(i) == null) {
+                    List<XPathExpression> predicate = contextRef.getPredicate(i);
+                    newRef.addPredicate(i, predicate);
+                }
+                if (i + refLevel <= newRef.size()) {
+                    int multiplicity = contextRef.getMultiplicity(i);
+                    newRef.setMultiplicity(i, multiplicity);
                 }
             } else {
                 break;
