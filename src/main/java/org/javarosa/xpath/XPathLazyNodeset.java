@@ -118,7 +118,7 @@ public class XPathLazyNodeset extends XPathNodeset {
         return super.toArgList();
     }
 
-    protected List<TreeReference> getReferences() {
+    public List<TreeReference> getReferences() {
         performEvaluation();
         return super.getReferences();
     }

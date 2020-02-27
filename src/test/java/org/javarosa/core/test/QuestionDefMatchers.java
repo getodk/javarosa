@@ -41,7 +41,7 @@ public class QuestionDefMatchers {
         };
     }
 
-    public static TypeSafeMatcher<TreeElement> irrelevant() {
+    public static TypeSafeMatcher<TreeElement> nonRelevant() {
         return new TypeSafeMatcher<TreeElement>() {
             @Override
             protected boolean matchesSafely(TreeElement item) {

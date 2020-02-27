@@ -6,9 +6,15 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.test.FormDefMatchers.valid;
+import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
+import static org.javarosa.core.test.QuestionDefMatchers.relevant;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.group;
@@ -16,12 +22,15 @@ import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.item;
+import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
+import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertThat;
@@ -41,6 +50,8 @@ import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
 import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathPathExprEval;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -329,10 +340,9 @@ public class TriggerableDagTest {
     /**
      * This test was inspired by the issue reported at https://code.google.com/archive/p/opendatakit/issues/888
      * <p>
-     * We want to focus on the relationship between relevancy and other
-     * calculations because relevancy can be
-     * defined for fields **and groups**, which is a special case of expression
-     * evaluation in our DAG.
+     * We want to focus on the relationship between relevance and other calculations
+     * because relevance can be defined for fields **and groups**, which is a special
+     * case of expression evaluation in our DAG.
      */
     @Test
     public void verify_relation_between_calculate_expressions_and_relevancy_conditions() throws IOException {
@@ -368,16 +378,75 @@ public class TriggerableDagTest {
         ));
         scenario.next();
         scenario.answer(2);
-        // Notice how the calculate at number1_x2 gets evaluated even though it's in a non-relevant group
-        // and number1_x2_x2 doesn't get evaluated. The difference could be that the second field depends
-        // on a field that is inside a non-relevant group.
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
-        // TODO figure out why group/number1_x2_x2 isn't evaluated once number1 gets a value. Should all expressions be evaluated regardless of relevance? In any case, describe and document which expressions are evaluated when
+        // The expected value is null because the calculate expression uses a non-relevant field.
+        // Values of non-relevant fields are always null.
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(nullValue()));
         scenario.next();
         scenario.answer("1"); // Label: "yes"
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
+    }
+
+    @Test
+    public void issue_135_verify_that_counts_in_inner_repeats_work_as_expected() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(
+                        t("data id=\"some-form\"",
+                            t("outer-count", "0"),
+                            t("outer jr:template=\"\"",
+                                t("inner-count", "0"),
+                                t("inner jr:template=\"\"",
+                                    t("some-field")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/outer-count").type("int"),
+                    bind("/data/outer/inner-count").type("int"),
+                    bind("/data/outer/inner/some-field").type("string")
+                )
+            ),
+            body(
+                input("/data/outer-count"),
+                group("/data/outer", repeat("/data/outer", "/data/outer-count",
+                    input("/data/outer/inner-count"),
+                    group("/data/outer/inner", repeat("/data/outer/inner", "../inner-count",
+                        input("/data/outer/inner/some-field")
+                    ))
+                ))
+            )
+        ));
+
+        scenario.next();
+        scenario.answer(2);
+        scenario.next();
+        scenario.next();
+        scenario.answer(3);
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 0-0");
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 0-1");
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 0-2");
+        scenario.next();
+        scenario.next();
+        scenario.answer(2);
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 1-0");
+        scenario.next();
+        scenario.next();
+        scenario.answer("Some field 1-1");
+        scenario.next();
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[0]/inner"), is(3));
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(2));
     }
 
     /**
@@ -806,6 +875,336 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/b"), is(intAnswer(9)));
         // Verify that c gets computed using the updated value of b.
         assertThat(scenario.answerOf("/data/c"), is(intAnswer(60)));
+    }
+
+    @Test
+    public void relative_paths_in_nested_repeats() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("outer jr:template=\"\"",
+                            t("inner jr:template=\"\"",
+                                t("count"),
+                                t("some-field")
+                            ),
+                            t("count"),
+                            t("some-field")
+                        )
+                    )),
+                    bind("/data/outer/inner/count").type("int").calculate("count(../../inner)")
+                )
+            ),
+            body(
+                group("/data/outer", repeat("/data/outer",
+                    input("/data/outer/some-field"),
+                    group("/data/outer/inner", repeat("/data/outer/inner",
+                        input("/data/outer/inner/some-field")
+                    ))
+                ))
+            )));
+        scenario.createNewRepeat("/data/outer");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+
+        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/count"), is(intAnswer(1))); // Should be 3
+        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/count"), is(intAnswer(1))); // Should be 3
+        assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(1))); // Should be 3
+        assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(1))); // Should be 2
+        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(1))); // Should be 2
+    }
+
+    /**
+     * Non-relevance is inherited from ancestor nodes, as per the W3C XForms specs:
+     * - https://www.w3.org/TR/xforms11/#model-prop-relevant
+     * - https://www.w3.org/community/xformsusers/wiki/XForms_2.0#The_relevant_Property
+     */
+    @Test
+    public void non_relevance_is_inherited_from_ancestors() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("is-group-relevant"),
+                        t("is-field-relevant"),
+                        t("group", t("field"))
+                    )),
+                    bind("/data/is-group-relevant").type("boolean"),
+                    bind("/data/is-field-relevant").type("boolean"),
+                    bind("/data/group").relevant("/data/is-group-relevant"),
+                    bind("/data/group/field").type("string").relevant("/data/is-field-relevant")
+                )
+            ),
+            body(
+                input("/data/is-group-relevant"),
+                input("/data/is-field-relevant"),
+                group("/data/group", input("/data/group/field"))
+            )));
+
+        // Form initialization evaluates all triggerables, which makes the group and
+        //field non-relevants because their relevance expressions are not satisfied
+        assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
+
+        // Now we make both relevant
+        scenario.answer("/data/is-group-relevant", true);
+        scenario.answer("/data/is-field-relevant", true);
+        assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
+
+        // Now we make the group non-relevant, which makes the field non-relevant
+        // regardless of its local relevance expression, which would be satisfied
+        // in this case
+        scenario.answer("/data/is-group-relevant", false);
+        assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
+    }
+
+    @Test
+    public void non_relevant_nodes_are_excluded_from_nodeset_evaluation() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        // position() is one-based
+                        t("node", t("value", "1")), // non-relevant
+                        t("node", t("value", "2")), // non-relevant
+                        t("node", t("value", "3")), // relevant
+                        t("node", t("value", "4")), // relevant
+                        t("node", t("value", "5")) // relevant
+                    )),
+                    bind("/data/node").relevant("position() > 2"),
+                    bind("/data/node/value").type("int")
+                )
+            ),
+            body(
+                group("/data/node", input("/data/node/value"))
+            )));
+
+        // The XPathPathExprEval is used when evaluating the nodesets that the
+        // xpath functions declared in triggerable expressions need to operate
+        // upon. This assertion shows that non-relevant nodes are not included
+        // in the resulting nodesets
+        assertThat(
+            new XPathPathExprEval().eval(getRef("/data/node"), scenario.getEvaluationContext()).getReferences(),
+            hasSize(3)
+        );
+
+        // The method XPathPathExpr.getRefValue is what ultimately is used by
+        // triggerable expressions to extract the values they need to operate
+        // upon. The following assertion shows how extrating values from
+        // non-relevant nodes returns `null` values instead of the actual values
+        // they're holding
+        assertThat(
+            XPathPathExpr.getRefValue(
+                scenario.getFormDef().getMainInstance(),
+                scenario.getEvaluationContext(),
+                scenario.expandSingle(getRef(("/data/node[1]/value")))
+            ),
+            is("")
+        );
+        // ... as opposed to the value that we can get by resolving the same
+        // reference with the main instance, which has the expected `2` value
+        assertThat(scenario.answerOf("/data/node[1]/value"), is(intAnswer(2)));
+    }
+
+    @Test
+    public void non_relevant_node_values_are_always_null_regardless_of_their_actual_value() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("relevance-trigger", "1"),
+                        t("result"),
+                        t("some-field", "42")
+                    )),
+                    bind("/data/relevance-trigger").type("boolean"),
+                    bind("/data/result").type("int").calculate("if(/data/some-field != '', /data/some-field + 33, 33)"),
+                    bind("/data/some-field").type("int").relevant("/data/relevance-trigger")
+                )
+            ),
+            body(
+                input("/data/relevance-trigger")
+            )));
+
+        assertThat(scenario.answerOf("/data/result"), is(intAnswer(75)));
+        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
+
+        scenario.answer("/data/relevance-trigger", false);
+
+        // This shows how JavaRosa will ignore the actual values of non-relevant fields. The
+        // W3C XForm specs regard relevance a purely UI concern. No side-effects on node values
+        // are described in the specs, which implies that a relevance change wouln't
+        // have any consequence on a node's value. This means that /data/result should keep having
+        // a 75 after making /data/some-field non-relevant.
+        assertThat(scenario.answerOf("/data/result"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
+    }
+
+    @Test
+    public void issue_119_target_question_should_be_relevant() throws IOException {
+        // This is a translation of the XML form in the issue to our DSL with some adaptations:
+        // - Explicit binds for all fields
+        // - Migrated the condition field to boolean, which should be easier to understand
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("outer_trigger", "D"),
+                        t("inner_trigger"),
+                        t("outer",
+                            t("inner",
+                                t("target_question")
+                            ),
+                            t("inner_condition")
+                        ),
+                        t("end")
+                    )),
+                    bind("/data/outer_trigger").type("string"),
+                    bind("/data/inner_trigger").type("int"),
+                    bind("/data/outer").relevant("/data/outer_trigger = 'D'"),
+                    bind("/data/outer/inner_condition").type("boolean").calculate("/data/inner_trigger > 10"),
+                    bind("/data/outer/inner").relevant("/data/outer/inner_condition"),
+                    bind("/data/outer/inner/target_question").type("string")
+                )
+            ),
+            body(
+                input("inner_trigger", label("inner trigger (enter 5)")),
+                input("outer_trigger", label("outer trigger (enter 'D')")),
+                input("outer/inner/target_question", label("target question: i am incorrectly skipped")),
+                input("end", label("this is the end of the form"))
+            )));
+
+        // Starting conditions (outer trigger is D, inner trigger is empty)
+        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(false)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
+
+        scenario.answer("/data/inner_trigger", 15);
+
+        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
+
+        scenario.answer("/data/outer_trigger", "A");
+
+        assertThat(scenario.getAnswerNode("/data/outer"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(nonRelevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
+    }
+
+    @Test
+    public void constraints_of_fields_that_are_empty_are_always_satisfied() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string").constraint("/data/b"),
+                    bind("/data/b").type("boolean")
+                )
+            ),
+            body(
+                input("/data/a"),
+                input("/data/b")
+            )));
+
+        // Ensure that the constraint expression in /data/a won't be satisfied
+        scenario.answer("/data/b", false);
+
+        // Verify that regardless of the constraint defined in /data/a, the
+        // form appears to be valid
+        assertThat(scenario.getFormDef(), is(valid()));
+    }
+
+    @Test
+    public void empty_required_fields_make_form_validation_fail() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string").required(),
+                    bind("/data/b").type("boolean")
+                )
+            ),
+            body(
+                input("/data/a"),
+                input("/data/b")
+            )));
+
+        ValidateOutcome validate = scenario.getValidationOutcome();
+        assertThat(validate.failedPrompt, is(scenario.indexOf("/data/a")));
+        assertThat(validate.outcome, is(ANSWER_REQUIRED_BUT_EMPTY));
+    }
+
+
+    @Test
+    public void constraint_violations_and_form_finalization() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string").constraint("/data/b"),
+                    bind("/data/b").type("boolean")
+                )
+            ),
+            body(
+                input("/data/a"),
+                input("/data/b")
+            )));
+
+        // First, ensure we will be able to commit an answer in /data/a by
+        // making it match its constraint. No values can be committed to the
+        // instance if constraints aren't satisfied.
+        scenario.answer("/data/b", true);
+
+        // Then, commit an answer (answers with empty values are always valid)
+        scenario.answer("/data/a", "cocotero");
+
+        // Then, make the constraint defined at /data/a impossible to satisfy
+        scenario.answer("/data/b", false);
+
+        // At this point, the form has /data/a filled with an answer that's
+        // invalid according to its constraint expression, but we can't be
+        // aware of that, unless we validate the whole form.
+        //
+        // Clients like Collect will validate the whole form before marking
+        // a submission as complete and saving it to the filesystem.
+        //
+        // FormDev.validate(boolean) will go through all the relevant fields
+        // re-answering them with their current values in order to detect
+        // any constraint violations. When this happens, a non-null
+        // ValidationOutcome object is returned including information about
+        // the violated constraint.
+        ValidateOutcome validate = scenario.getValidationOutcome();
+        assertThat(validate.failedPrompt, is(scenario.indexOf("/data/a")));
+        assertThat(validate.outcome, is(ANSWER_CONSTRAINT_VIOLATED));
     }
 
     private void assertDagEvents(List<Event> dagEvents, String... lines) {

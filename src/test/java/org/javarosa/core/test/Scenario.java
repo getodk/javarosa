@@ -55,7 +55,9 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.ValidateOutcome;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
@@ -67,6 +69,8 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.services.storage.util.DummyIndexedStorageUtility;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -133,6 +137,18 @@ public class Scenario {
     }
 
     // region Miscelaneous
+
+    public FormDef getFormDef() {
+        return formDef;
+    }
+
+    public FormIndex indexOf(String xPath) {
+        return getIndexOf(expandSingle(getRef(xPath)));
+    }
+
+    public ValidateOutcome getValidationOutcome() {
+        return formDef.validate(true);
+    }
 
     /**
      * Returns a TreeReference from the provided xpath string.
@@ -234,11 +250,34 @@ public class Scenario {
      * references to fully qualified references that wouldn't match existing
      * form indexes otherwise.
      */
-    private TreeReference expandSingle(TreeReference reference) {
+    public TreeReference expandSingle(TreeReference reference) {
         List<TreeReference> expandedRefs = ec.expandReference(reference);
         if (expandedRefs.size() != 1)
             throw new RuntimeException("Provided xPath expands to " + expandedRefs.size() + " references. Expecting exactly one expanded reference.");
         return expandedRefs.get(0);
+    }
+
+    public void trace(String msg) {
+        log.info("===============================================================================");
+        log.info("       " + msg);
+        log.info("===============================================================================");
+    }
+
+    public enum AnswerResult {
+        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
+
+        private final int jrCode;
+
+        AnswerResult(int jrCode) {
+            this.jrCode = jrCode;
+        }
+
+        public static AnswerResult from(int jrCode) {
+            return Stream.of(values())
+                .filter(v -> v.jrCode == jrCode)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        }
     }
 
     private boolean refExists(TreeReference reference) {
@@ -317,23 +356,6 @@ public class Scenario {
         return null;
     }
 
-    public enum AnswerResult {
-        OK(0), REQUIRED_BUT_EMPTY(1), CONSTRAINT_VIOLATED(2);
-
-        private final int jrCode;
-
-        AnswerResult(int jrCode) {
-            this.jrCode = jrCode;
-        }
-
-        public static AnswerResult from(int jrCode) {
-            return Stream.of(values())
-                .filter(v -> v.jrCode == jrCode)
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
-        }
-    }
-
     // endregion
 
     // region Initialization of a Scenario
@@ -364,6 +386,7 @@ public class Scenario {
      */
     public static Scenario init(Path formFile) {
         // TODO explain why this sequence of calls
+        StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
@@ -423,6 +446,21 @@ public class Scenario {
         return answer(value);
     }
 
+    /**
+     * Answers with a boolean value the question at the form index
+     * corresponding to the provided reference.
+     * <p>
+     * This method has side-effects:
+     * - It will create all the required middle and end repeat group instances
+     * - It changes the current form index
+     */
+    public AnswerResult answer(String xPath, boolean value) {
+        createMissingRepeats(xPath);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(value);
+    }
+
     // endregion
 
     // region Answer the question at the form index
@@ -456,13 +494,23 @@ public class Scenario {
         return answer(new StringData(String.valueOf(value)));
     }
 
+    /**
+     * Answers the question at the form index
+     */
     public AnswerResult answer(LocalDate value) {
         return answer(new DateData(Date.valueOf(value)));
     }
 
+    /**
+     * Answers the question at the form index
+     */
+    public AnswerResult answer(boolean value) {
+        return answer(new BooleanData(value));
+    }
+
     private AnswerResult answer(IAnswerData data) {
         FormIndex formIndex = model.getFormIndex();
-        log.info("Answer {} at {}", data, formIndex.getReference());
+        log.info("Answer {} at {}", data, formIndex.getReference().toString(true, true));
         return AnswerResult.from(formEntryController.answerQuestion(formIndex, data, true));
     }
 
@@ -572,6 +620,19 @@ public class Scenario {
         return jumpResultCode;
     }
 
+    public int prev() {
+        int jumpResultCode = formEntryController.stepToPreviousEvent();
+        log.info(humanJumpTrace(jumpResultCode));
+        return jumpResultCode;
+    }
+
+    /**
+     * Jump the provided amount of times to the next event.
+     * <p>
+     * Side effects:
+     * - This method updates the form index.
+     * - This method leaves log traces
+     */
     public void next(int amount) {
         while (amount-- > 0)
             next();
@@ -590,6 +651,10 @@ public class Scenario {
 
     private int silentNext() {
         return formEntryController.stepToNextEvent();
+    }
+
+    private int silentPrev() {
+        return formEntryController.stepToPreviousEvent();
     }
 
     private int jump(FormIndex index) {
@@ -667,6 +732,17 @@ public class Scenario {
         return model.getFormIndex().isEndOfFormIndex();
     }
 
+    public TreeReference nextRef() {
+        silentNext();
+        TreeReference ref = refAtIndex();
+        silentPrev();
+        return ref;
+    }
+
+    public TreeReference refAtIndex() {
+        return formEntryController.getModel().getFormIndex().getReference();
+    }
+
     public boolean atQuestion() {
         return formDef.getChild(formEntryController.getModel().getFormIndex()) instanceof QuestionDef;
     }
@@ -694,8 +770,9 @@ public class Scenario {
         if (!reference.isAmbiguous())
             throw new RuntimeException("Provided xPath must be ambiguous");
 
-        return ec
-            .expandReference(reference)
+        List<TreeReference> treeReferences = ec
+            .expandReference(reference);
+        return treeReferences
             .size();
     }
 

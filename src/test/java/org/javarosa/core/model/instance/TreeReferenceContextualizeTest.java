@@ -57,6 +57,7 @@ public class TreeReferenceContextualizeTest {
             {"Wildcards #2", getRef("../baz"), getRef("/foo/*/bar"), getRef("/foo/*/baz")},
             {"Wildcards #3", getRef("*/baz"), getRef("/foo/*/bar"), getRef("/foo/*/bar/*/baz")},
             {"Wildcards #4", getRef("*/bar"), getRef("/foo"), getRef("/foo/*/bar")},
+            {"Parent refs in nested repeats", getRef("../../inner"), getRef("/data/outer[0]/inner[1]/count[0]"), getRef("/data/outer[0]/inner[1]")} // Should be /data/outer[0]/inner
         });
     }
 
@@ -70,5 +71,4 @@ public class TreeReferenceContextualizeTest {
                 : is(expectedResult)
         );
     }
-
 }
