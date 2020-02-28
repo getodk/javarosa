@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>internal empty select</h:title>
+        <model>
+            <instance>
+                <internal_empty_select id="internal_empty_select">
+                    <first/>
+                </internal_empty_select>
+            </instance>
+            <bind nodeset="/internal_empty_select/first" type="select1"/>
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/internal_empty_select/first">
+            <label>First</label>
+        </select1>
+    </h:body>
+</h:html>
