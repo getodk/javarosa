@@ -20,14 +20,14 @@ package org.javarosa.benchmarks;
 import static java.util.stream.Collectors.toList;
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Sex.FEMALE;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Sex.MALE;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Vaccines.DIPHTERIA;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Vaccines.DIPHTERIA_AND_MEASLES;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Vaccines.DIPHTERIA_FIRST;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Vaccines.DIPHTERIA_FIRST_AND_MEASLES;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Vaccines.MEASLES;
-import static org.javarosa.benchmarks.ChildVaccionationBenchmark.Vaccines.NONE;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Sex.FEMALE;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Sex.MALE;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.DIPHTERIA;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.DIPHTERIA_AND_MEASLES;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.DIPHTERIA_FIRST;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.DIPHTERIA_FIRST_AND_MEASLES;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.MEASLES;
+import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.NONE;
 import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.test.Scenario.init;
 
@@ -45,14 +45,14 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
-public class ChildVaccionationBenchmark {
+public class ChildVaccinationBenchmark {
 
     public static void main(String[] args) {
-        dryRun(ChildVaccionationBenchmark.class);
+        dryRun(ChildVaccinationBenchmark.class);
     }
 
     @State(Scope.Thread)
-    public static class ChildVaccionationState {
+    public static class ChildVaccinationState {
         public Scenario scenario;
         private LocalDate today;
         private TreeReference finalFlatRef;
@@ -81,28 +81,28 @@ public class ChildVaccionationBenchmark {
     }
 
     @Benchmark
-    public void run_1_times(ChildVaccionationState state, Blackhole bh) {
+    public void run_1_times(ChildVaccinationState state, Blackhole bh) {
         doRuns(state, bh, 1);
     }
 
     @Benchmark
-    public void run_2_times(ChildVaccionationState state, Blackhole bh) {
+    public void run_2_times(ChildVaccinationState state, Blackhole bh) {
         doRuns(state, bh, 2);
     }
 
     @Benchmark
-    public void run_3_times(ChildVaccionationState state, Blackhole bh) {
+    public void run_3_times(ChildVaccinationState state, Blackhole bh) {
         doRuns(state, bh, 3);
     }
 
-    private void doRuns(ChildVaccionationState state, Blackhole bh, int numberOfRuns) {
+    private void doRuns(ChildVaccinationState state, Blackhole bh, int numberOfRuns) {
         for (int i = 0; i < numberOfRuns; i++) {
             state.scenario.newInstance();
             answerAllQuestions(state, bh);
         }
     }
 
-    private void answerAllQuestions(ChildVaccionationState state, Blackhole bh) {
+    private void answerAllQuestions(ChildVaccinationState state, Blackhole bh) {
         // region Answer questions about the building
 
         bh.consume(state.scenario.next());
@@ -165,7 +165,7 @@ public class ChildVaccionationBenchmark {
      * Since the form's limit to the number of children per household is 10, this method will return
      * a list entry per every 6 children (the possible permutations of vaccine sets).
      */
-    private List<List<Consumer<Integer>>> buildHouseholdChildren(ChildVaccionationState state, Blackhole bh, HealthRecord healthRecord) {
+    private List<List<Consumer<Integer>>> buildHouseholdChildren(ChildVaccinationState state, Blackhole bh, HealthRecord healthRecord) {
         return Arrays.asList(
             buildChildrenWithLocalDates(state, bh, 23, healthRecord),
             buildChildrenWithIntegers(state, bh, 23, healthRecord),
@@ -176,7 +176,7 @@ public class ChildVaccionationBenchmark {
         );
     }
 
-    private List<Consumer<Integer>> buildChildrenWithIntegers(ChildVaccionationState state, Blackhole bh, int ageInMonths, HealthRecord healthRecord) {
+    private List<Consumer<Integer>> buildChildrenWithIntegers(ChildVaccinationState state, Blackhole bh, int ageInMonths, HealthRecord healthRecord) {
         return Arrays.asList(
             answerChild(state, bh, healthRecord, ageInMonths, NONE, MALE),
             answerChild(state, bh, healthRecord, ageInMonths, DIPHTERIA_FIRST, FEMALE),
@@ -187,7 +187,7 @@ public class ChildVaccionationBenchmark {
         );
     }
 
-    private List<Consumer<Integer>> buildChildrenWithLocalDates(ChildVaccionationState state, Blackhole bh, int ageInMonths, HealthRecord healthRecord) {
+    private List<Consumer<Integer>> buildChildrenWithLocalDates(ChildVaccinationState state, Blackhole bh, int ageInMonths, HealthRecord healthRecord) {
         LocalDate dob = state.today.minusMonths(ageInMonths);
         return Arrays.asList(
             answerChild(state, bh, healthRecord, dob, NONE, FEMALE),
@@ -199,7 +199,7 @@ public class ChildVaccionationBenchmark {
         );
     }
 
-    private void answerHousehold(ChildVaccionationState state, Blackhole bh, int number, List<Consumer<Integer>> children) {
+    private void answerHousehold(ChildVaccinationState state, Blackhole bh, int number, List<Consumer<Integer>> children) {
         // region Answer info about the household
 
         bh.consume(state.scenario.next());
@@ -254,7 +254,7 @@ public class ChildVaccionationBenchmark {
             this.measles = measles;
         }
 
-        void visit(ChildVaccionationState state, Blackhole bh) {
+        void visit(ChildVaccinationState state, Blackhole bh) {
             // Answer questions until there's no more vaccination related questions
             while (!(state.endOfVisitRefs.contains(state.scenario.nextRef().genericize()))) {
                 bh.consume(state.scenario.next());
@@ -277,7 +277,7 @@ public class ChildVaccionationBenchmark {
             return Arrays.asList(values());
         }
 
-        void visit(ChildVaccionationState state, Blackhole bh) {
+        void visit(ChildVaccinationState state, Blackhole bh) {
             if (this == HEALTH_HANDBOOK) {
                 bh.consume(state.scenario.next());
                 bh.consume(state.scenario.answer("yes"));
@@ -311,7 +311,7 @@ public class ChildVaccionationBenchmark {
         }
     }
 
-    private Consumer<Integer> answerChild(ChildVaccionationState state, Blackhole bh, HealthRecord healthRecord, LocalDate dob, Vaccines vaccines, Sex sex) {
+    private Consumer<Integer> answerChild(ChildVaccinationState state, Blackhole bh, HealthRecord healthRecord, LocalDate dob, Vaccines vaccines, Sex sex) {
         return i -> {
             int ageInMonths = dob.until(state.today).getMonths();
             String name = String.format("CHILD %d - Age %d months - %s", i, ageInMonths, sex.getName());
@@ -334,7 +334,7 @@ public class ChildVaccionationBenchmark {
         };
     }
 
-    private Consumer<Integer> answerChild(ChildVaccionationState state, Blackhole bh, HealthRecord healthRecord, int ageInMonths, Vaccines vaccines, Sex sex) {
+    private Consumer<Integer> answerChild(ChildVaccinationState state, Blackhole bh, HealthRecord healthRecord, int ageInMonths, Vaccines vaccines, Sex sex) {
         return i -> {
             String name = String.format("CHILD %d - Age %d months - %s", i, ageInMonths, sex.getName());
             bh.consume(state.scenario.next());
@@ -354,7 +354,7 @@ public class ChildVaccionationBenchmark {
         };
     }
 
-    private void answerDateOfBirth(ChildVaccionationState state, Blackhole bh, LocalDate dob) {
+    private void answerDateOfBirth(ChildVaccinationState state, Blackhole bh, LocalDate dob) {
         // Is DoB known?
         bh.consume(state.scenario.next());
         bh.consume(state.scenario.answer("yes"));
@@ -369,7 +369,7 @@ public class ChildVaccionationBenchmark {
         bh.consume(state.scenario.answer(dob.getDayOfMonth()));
     }
 
-    private void answerAgeInMonths(ChildVaccionationState state, Blackhole bh, int ageInMonths) {
+    private void answerAgeInMonths(ChildVaccinationState state, Blackhole bh, int ageInMonths) {
         // Is DoB known?
         bh.consume(state.scenario.next());
         bh.consume(state.scenario.answer("no"));
