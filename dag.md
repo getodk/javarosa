@@ -105,7 +105,9 @@ A new repeat instance can be created under two circumstances:
 - When a user is asked to create a new repeat, and they answer yes. This is driven by `FormEntryController.newRepeat(...)`.
 - When the form has to satisfy a certain number of repeat instances determined by a `jr:count` expression e.g., when jumping to the controller jumps to the index of such a group. This is driven by `FormEntryModel.createModelIfNecessary`.
 
-In both cases, `FormDef.createNewRepeat(...)` is eventually called, and a chain of triggerable evaluations is triggered on the new node that's added to the main instance. 
+In both cases, `FormDef.createNewRepeat(...)` is eventually called, and a chain of triggerable evaluations is triggered on the new node that's added to the main instance.
+
+An important consequence of this implementation is that triggerables will only be applied to the repeat instance that is created. This could produce unexpected results when calculate expressions use count() or other functions that work on a nodeset based on the repeat siblings the new repeat instance belongs to. For more information and specific examples of this, check out the TriggerableDatTest class.  
 
 **Set of evaluated triggerables**: 
 - First phase (value change), those triggered by the repeat group's reference
