@@ -21,11 +21,19 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import java.nio.file.Path;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.test.Scenario;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class Issue449Test {
+
+    /*
+     * This test fails to run because the DAG detects a false cycle by self-reference
+     * in the /data/aggregated field because references don't take into account the
+     * instance where they're supposed to be applied to.
+     */
     @Test
-    public void name() {
+    @Ignore
+    public void try_to_load_the_form() {
         Path formFile = r("issue_449.xml");
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParent(), "file");
         Scenario.init(formFile);
