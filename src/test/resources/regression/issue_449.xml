@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>dont-show-options-selected-in-other-instances</h:title>
+        <model>
+            <itext>
+                <translation default="true()" lang="default">
+                    <text id="static_instance-school-0">
+                        <value>School A</value>
+                    </text>
+                    <text id="static_instance-school-1">
+                        <value>School B</value>
+                    </text>
+                    <text id="static_instance-school-2">
+                        <value>School C</value>
+                    </text>
+                    <text id="static_instance-school-3">
+                        <value>School D</value>
+                    </text>
+                    <text id="static_instance-school-4">
+                        <value>School E</value>
+                    </text>
+                    <text id="static_instance-school-5">
+                        <value>School F</value>
+                    </text>
+                </translation>
+            </itext>
+            <instance>
+                <dont-show-options-selected-in-other-instances id="dont-show-options-selected-in-other-instances">
+                    <schools_previous_instances/>
+                    <previous_schools/>
+                    <note/>
+                    <school_remove/>
+                    <school_constraint/>
+                    <school_warning_group>
+                        <school_warning/>
+                        <school_warning_note/>
+                    </school_warning_group>
+                    <note2/>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </dont-show-options-selected-in-other-instances>
+            </instance>
+            <instance id="last-saved" src="jr://file/issue_449_last_saved.xml"/>
+            <instance id="school">
+                <root>
+                    <item>
+                        <itextId>static_instance-school-0</itextId>
+                        <name>a</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-school-1</itextId>
+                        <name>b</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-school-2</itextId>
+                        <name>c</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-school-3</itextId>
+                        <name>d</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-school-4</itextId>
+                        <name>e</name>
+                    </item>
+                    <item>
+                        <itextId>static_instance-school-5</itextId>
+                        <name>f</name>
+                    </item>
+                </root>
+            </instance>
+            <bind calculate="instance('last-saved')/dont-show-options-selected-in-other-instances/previous_schools" nodeset="/dont-show-options-selected-in-other-instances/schools_previous_instances" type="string"/>
+            <bind calculate="concat( /dont-show-options-selected-in-other-instances/schools_previous_instances , ' ',  /dont-show-options-selected-in-other-instances/school_warning_group/school_warning )" nodeset="/dont-show-options-selected-in-other-instances/previous_schools" type="string"/>
+            <bind nodeset="/dont-show-options-selected-in-other-instances/note" readonly="true()" type="string"/>
+            <bind nodeset="/dont-show-options-selected-in-other-instances/school_remove" type="select1"/>
+            <bind constraint="not(selected( /dont-show-options-selected-in-other-instances/schools_previous_instances , .))" jr:constraintMsg="You have previously filled a form about this school." nodeset="/dont-show-options-selected-in-other-instances/school_constraint" type="select1"/>
+            <bind nodeset="/dont-show-options-selected-in-other-instances/school_warning_group/school_warning" type="select1"/>
+            <bind nodeset="/dont-show-options-selected-in-other-instances/school_warning_group/school_warning_note" readonly="true()" relevant=" /dont-show-options-selected-in-other-instances/school_warning_group/school_warning  != '' and selected( /dont-show-options-selected-in-other-instances/schools_previous_instances ,  /dont-show-options-selected-in-other-instances/school_warning_group/school_warning )" type="string"/>
+            <bind nodeset="/dont-show-options-selected-in-other-instances/note2" readonly="true()" type="string"/>
+            <bind calculate="concat('uuid:', uuid())" nodeset="/dont-show-options-selected-in-other-instances/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/dont-show-options-selected-in-other-instances/note">
+            <label>previous:
+                <output value=" /dont-show-options-selected-in-other-instances/schools_previous_instances "/>
+            </label>
+        </input>
+        <select1 ref="/dont-show-options-selected-in-other-instances/school_remove">
+            <label>School</label>
+            <itemset nodeset="instance('school')/root/item[not(selected( /dont-show-options-selected-in-other-instances/schools_previous_instances , name))]">
+                <value ref="name"/>
+                <label ref="jr:itext(itextId)"/>
+            </itemset>
+        </select1>
+        <select1 ref="/dont-show-options-selected-in-other-instances/school_constraint">
+            <label>School</label>
+            <item>
+                <label>School A</label>
+                <value>a</value>
+            </item>
+            <item>
+                <label>School B</label>
+                <value>b</value>
+            </item>
+            <item>
+                <label>School C</label>
+                <value>c</value>
+            </item>
+            <item>
+                <label>School D</label>
+                <value>d</value>
+            </item>
+            <item>
+                <label>School E</label>
+                <value>e</value>
+            </item>
+            <item>
+                <label>School F</label>
+                <value>f</value>
+            </item>
+        </select1>
+        <group appearance="field-list" ref="/dont-show-options-selected-in-other-instances/school_warning_group">
+            <select1 ref="/dont-show-options-selected-in-other-instances/school_warning_group/school_warning">
+                <label>School</label>
+                <item>
+                    <label>School A</label>
+                    <value>a</value>
+                </item>
+                <item>
+                    <label>School B</label>
+                    <value>b</value>
+                </item>
+                <item>
+                    <label>School C</label>
+                    <value>c</value>
+                </item>
+                <item>
+                    <label>School D</label>
+                    <value>d</value>
+                </item>
+                <item>
+                    <label>School E</label>
+                    <value>e</value>
+                </item>
+                <item>
+                    <label>School F</label>
+                    <value>f</value>
+                </item>
+            </select1>
+            <input ref="/dont-show-options-selected-in-other-instances/school_warning_group/school_warning_note">
+                <label>&lt;span color="red"&gt;You have previously filled a form about this school.&lt;/span&gt;</label>
+            </input>
+        </group>
+        <input ref="/dont-show-options-selected-in-other-instances/note2">
+            <label>previous:
+                <output value=" /dont-show-options-selected-in-other-instances/previous_schools "/>
+            </label>
+        </input>
+    </h:body>
+</h:html>
