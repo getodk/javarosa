@@ -120,12 +120,12 @@
                     </item>
                 </root>
             </instance>
-            <bind nodeset="/data/level1" type="select"/>
-            <bind nodeset="/data/level2" type="select"/>
-            <bind nodeset="/data/level3" type="select"/>
-            <bind nodeset="/data/level1_contains" type="select"/>
-            <bind nodeset="/data/level2_contains" type="select"/>
-            <bind nodeset="/data/level3_contains" type="select"/>
+            <bind nodeset="/data/level1" type="string"/>
+            <bind nodeset="/data/level2" type="string"/>
+            <bind nodeset="/data/level3" type="string"/>
+            <bind nodeset="/data/level1_contains" type="string"/>
+            <bind nodeset="/data/level2_contains" type="string"/>
+            <bind nodeset="/data/level3_contains" type="string"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>

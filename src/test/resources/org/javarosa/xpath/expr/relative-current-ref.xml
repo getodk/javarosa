@@ -116,13 +116,13 @@
             <bind nodeset="/data/my_group/name" type="string"/>
             <bind calculate="current()/../name" nodeset="/data/my_group/name_relative" type="string"/>
             <bind nodeset="/data/my_group/name_note" readonly="true()" type="string"/>
-            <bind nodeset="/data/fruit" type="select1"/>
-            <bind nodeset="/data/variety" type="select1"/>
+            <bind nodeset="/data/fruit" type="string"/>
+            <bind nodeset="/data/variety" type="string"/>
             <bind nodeset="/data/my_repeat/repeat_name" type="string"/>
             <bind calculate="current()/../repeat_name" nodeset="/data/my_repeat/repeat_name_relative" type="string"/>
             <bind nodeset="/data/my_repeat/repeat_name_note" readonly="true()" type="string"/>
-            <bind nodeset="/data/my_repeat/repeat_fruit" type="select1"/>
-            <bind nodeset="/data/my_repeat/repeat_variety" type="select1"/>
+            <bind nodeset="/data/my_repeat/repeat_fruit" type="string"/>
+            <bind nodeset="/data/my_repeat/repeat_variety" type="string"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>

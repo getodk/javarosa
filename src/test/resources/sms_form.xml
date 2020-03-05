@@ -102,7 +102,7 @@
       <bind nodeset="/data/address" type="string"/>
       <bind nodeset="/data/country" type="string"/>
       <bind nodeset="/data/dob" type="date"/>
-      <bind nodeset="/data/gender" type="select1"/>
+      <bind nodeset="/data/gender" type="string"/>
       <bind nodeset="/data/maiden_name" type="string" relevant="(selected(data/gender,'female'))"/>
       <bind nodeset="/data/children/child_full_name" type="string"/>
       <bind nodeset="/data/children/child_country" type="string"/>
