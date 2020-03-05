@@ -1,15 +1,4 @@
-<dont-show-options-selected-in-other-instances id="dont-show-options-selected-in-other-instances" instanceID="uuid:39f3dd36-161e-45cb-a1a4-395831d253a7" isComplete="true" markedAsCompleteDate="2018-04-26T08:58:20.525Z" xmlns="http://opendatakit.org/submissions">
-    <schools_previous_instances>a</schools_previous_instances>
-    <previous_schools>b</previous_schools>
-    <note>some note</note>
-    <school_remove>c</school_remove>
-    <school_constraint>d</school_constraint>
-    <school_warning_group>
-        <school_warning>e</school_warning>
-        <school_warning_note>f</school_warning_note>
-    </school_warning_group>
-    <note2>some note 2</note2>
-    <n0:meta xmlns:n0="http://openrosa.org/xforms">
-        <n0:instanceID>uuid:39f3dd36-161e-45cb-a1a4-395831d253a7</n0:instanceID>
-    </n0:meta>
-</dont-show-options-selected-in-other-instances>
+<data id="data">
+    <aggregated>a b</aggregated>
+    <new-part>b</new-part>
+</data>
