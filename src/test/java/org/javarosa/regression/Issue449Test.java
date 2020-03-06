@@ -16,26 +16,34 @@
 
 package org.javarosa.regression;
 
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.test.Scenario;
-import org.junit.Ignore;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.junit.Test;
 
 public class Issue449Test {
 
-    /*
-     * This test fails to run because the DAG detects a false cycle by self-reference
-     * in the /data/aggregated field because references don't take into account the
-     * instance where they're supposed to be applied to.
-     */
     @Test
-    @Ignore
-    public void try_to_load_the_form() {
+    public void support_for_same_references_to_different_instances_without_DAG_cycles() throws IOException, DeserializationException {
         Path formFile = r("issue_449.xml");
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParent(), "file");
-        Scenario.init(formFile);
+        Scenario scenario = Scenario.init(formFile);
+
+        scenario.answer("/data/new-part", "c");
+        assertThat(scenario.answerOf("/data/aggregated"), is(stringAnswer("a b c")));
+
+        Scenario deserialized = scenario.serializeAndDeserializeForm();
+        assertThat(deserialized.answerOf("/data/new-part"), is(stringAnswer("c")));
+        assertThat(deserialized.answerOf("/data/aggregated"), is(stringAnswer("a b c")));
+
+        deserialized.answer("/data/new-part", "c2");
+        assertThat(deserialized.answerOf("/data/aggregated"), is(stringAnswer("a b c2")));
     }
 }
