@@ -143,10 +143,8 @@ public class TriggerableDag {
             List<TreeReference> qualifiedList = evalContext.expandReference(contextRef);
 
             // Go through each one and evaluate the trigger expression
-            for (TreeReference qualified : qualifiedList) {
-                EvaluationContext ec = new EvaluationContext(evalContext, qualified);
-                evaluationResults.addAll(qt.apply(mainInstance, ec, qualified));
-            }
+            for (TreeReference qualified : qualifiedList)
+                evaluationResults.addAll(qt.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
 
             if (evaluationResults.size() > 0)
                 accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
