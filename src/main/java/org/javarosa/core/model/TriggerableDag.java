@@ -134,8 +134,6 @@ public class TriggerableDag {
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
 
         // Contextualize the reference used by the triggerable against the anchor
-        Set<TreeReference> updatedContextRef = new HashSet<>();
-
         TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
 
         try {
@@ -155,7 +153,6 @@ public class TriggerableDag {
                 accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
             }
 
-            updatedContextRef.add(contextRef);
         } catch (Exception e) {
             throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
         }
