@@ -121,7 +121,7 @@ public class TriggerableDag {
         for (QuickTriggerable qt : triggerablesDAG) {
             if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
 
-                List<EvaluationResult> evaluationResults = evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
+                evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
 
                 fired.add(qt);
             }
