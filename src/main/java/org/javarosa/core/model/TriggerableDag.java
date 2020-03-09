@@ -131,8 +131,6 @@ public class TriggerableDag {
      * against the anchor (the value that changed which triggered recomputation)
      */
     private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, TreeReference anchorRef) {
-        List<EvaluationResult> evaluationResults = new ArrayList<>(0);
-
         // Contextualize the reference used by the triggerable against the anchor
         TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
 
@@ -140,6 +138,7 @@ public class TriggerableDag {
         // triggerable updates. (Multiple nodes can be updated by the same trigger)
         List<TreeReference> qualifiedList = evalContext.expandReference(contextRef);
 
+        List<EvaluationResult> evaluationResults = new ArrayList<>(0);
         // Go through each one and evaluate the trigger expression
         for (TreeReference qualified : qualifiedList)
             try {
