@@ -130,22 +130,22 @@ public class TriggerableDag {
      * Step 3 in DAG cascade. evaluate the individual triggerable expressions
      * against the anchor (the value that changed which triggered recomputation)
      */
-    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, TreeReference anchorRef) {
+    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable triggerable, TreeReference anchorRef) {
         // Contextualize the reference used by the triggerable against the anchor
-        TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
+        TreeReference contextRef = triggerable.contextualizeContextRef(anchorRef);
 
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
         // Go through all of the fully qualified nodes which this triggerable
         // updates. (Multiple nodes can be updated by the same trigger)
         for (TreeReference qualified : evalContext.expandReference(contextRef))
             try {
-                evaluationResults.addAll(qt.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
+                evaluationResults.addAll(triggerable.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
                 throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "' (" + qualified + "): " + e.getMessage(), e);
             }
 
         if (evaluationResults.size() > 0)
-            accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
+            accessor.getEventNotifier().publishEvent(new Event(triggerable.isCondition() ? "Condition" : "Recalculate", evaluationResults));
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
