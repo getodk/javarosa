@@ -134,13 +134,10 @@ public class TriggerableDag {
         // Contextualize the reference used by the triggerable against the anchor
         TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
 
-        // Now identify all of the fully qualified nodes which this
-        // triggerable updates. (Multiple nodes can be updated by the same trigger)
-        List<TreeReference> qualifiedList = evalContext.expandReference(contextRef);
-
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
-        // Go through each one and evaluate the trigger expression
-        for (TreeReference qualified : qualifiedList)
+        // Go through all of the fully qualified nodes which this triggerable
+        // updates. (Multiple nodes can be updated by the same trigger)
+        for (TreeReference qualified : evalContext.expandReference(contextRef))
             try {
                 evaluationResults.addAll(qt.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
