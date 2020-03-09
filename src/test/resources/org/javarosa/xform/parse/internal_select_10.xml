@@ -117,8 +117,8 @@
                     </item>
                 </root>
             </instance>
-            <bind nodeset="/internal_select_10/first" type="select1"/>
-            <bind nodeset="/internal_select_10/second" type="select1"/>
+            <bind nodeset="/internal_select_10/first" type="string"/>
+            <bind nodeset="/internal_select_10/second" type="string"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/internal_select_10/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>

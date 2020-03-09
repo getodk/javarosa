@@ -30,7 +30,7 @@
             <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
             <bind nodeset="/data/repeat_group/people/count" type="int" calculate="position(..)"/>
             <bind nodeset="/data/repeat_group/people/person" type="string"/>
-            <bind nodeset="/data/repeat_group/selected_person" type="select1"/>
+            <bind nodeset="/data/repeat_group/selected_person" type="string"/>
         </model>
     </h:head>
     <h:body>

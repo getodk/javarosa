@@ -269,7 +269,7 @@
                 </root>
             </instance>
 
-            <bind nodeset="/jr-choice-name/select_one_outside" type="select1"/>
+            <bind nodeset="/jr-choice-name/select_one_outside" type="string"/>
 
             <!-- the first parameter to jr:choice-name can be a literal string -->
             <bind calculate="jr:choice-name('choice2', ' /jr-choice-name/select_one_outside ')" nodeset="/jr-choice-name/literal_choice_name" type="string"/>
@@ -279,12 +279,12 @@
             <bind calculate="jr:choice-name(concat(/jr-choice-name/cocotero_a, '-', /jr-choice-name/cocotero_b), '/jr-choice-name/cocotero')" nodeset="/jr-choice-name/cocotero_name" type="string"/>
 
             <!-- both parameters to jr:choice-name can be relative XPath paths -->
-            <bind nodeset="/jr-choice-name/my-repeat/select_one" type="select1"/>
+            <bind nodeset="/jr-choice-name/my-repeat/select_one" type="string"/>
             <bind calculate="jr:choice-name( ../select_one , ' ../select_one ')" nodeset="/jr-choice-name/my-repeat/select_one_name" type="string"/>
 
             <!-- jr:choice-name doesn't work with predicates (choice filters) -->
-            <bind nodeset="/jr-choice-name/country" type="select1"/>
-            <bind nodeset="/jr-choice-name/city" type="select1"/>
+            <bind nodeset="/jr-choice-name/country" type="string"/>
+            <bind nodeset="/jr-choice-name/city" type="string"/>
             <bind calculate="jr:choice-name( /jr-choice-name/city , ' /jr-choice-name/city ')" nodeset="/jr-choice-name/city_name" type="string"/>
 
             <bind jr:preload="uid" nodeset="/jr-choice-name/meta/instanceID" readonly="true()" type="string"/>

@@ -8,7 +8,7 @@
                     <first/>
                 </internal_empty_select>
             </instance>
-            <bind nodeset="/internal_empty_select/first" type="select1"/>
+            <bind nodeset="/internal_empty_select/first" type="string"/>
         </model>
     </h:head>
     <h:body>

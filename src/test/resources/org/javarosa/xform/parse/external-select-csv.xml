@@ -16,8 +16,8 @@
 
             <instance id="external-csv" src="jr://file-csv/external-data.csv" />
 
-            <bind nodeset="/data/first" type="select1"/>
-            <bind nodeset="/data/second" type="select1"/>
+            <bind nodeset="/data/first" type="string"/>
+            <bind nodeset="/data/second" type="string"/>
             <bind calculate="concat('uuid:', uuid())" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
         </model>
     </h:head>

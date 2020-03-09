@@ -133,7 +133,7 @@
         </nigeria_wards_external>
       </instance>
       <instance id="lgas" >
-        <root>              
+        <root>
           <item>
             <name>6fa741c46485b9c618f14b79edf50e88</name>
             <label>Aba North</label>
@@ -8032,9 +8032,9 @@
           </item>
         </root>
       </instance>
-      <bind nodeset="/nigeria_wards_external/state" type="select1"/>
-      <bind nodeset="/nigeria_wards_external/lga" required="true()" type="select1"/>
-      <bind nodeset="/nigeria_wards_external/ward" required="true()" type="select1"/>
+      <bind nodeset="/nigeria_wards_external/state" type="string"/>
+      <bind nodeset="/nigeria_wards_external/lga" required="true()" type="string"/>
+      <bind nodeset="/nigeria_wards_external/ward" required="true()" type="string"/>
       <bind nodeset="/nigeria_wards_external/comments" type="string"/>
       <bind nodeset="/nigeria_wards_external/target_pop" type="string"/>
       <bind calculate="instance('wards')/root/item[fake_population =  /nigeria_wards_external/target_pop ]/label" nodeset="/nigeria_wards_external/pop_filter" type="string"/>

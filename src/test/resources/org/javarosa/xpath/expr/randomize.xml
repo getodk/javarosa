@@ -59,15 +59,15 @@
                     <item>6</item>
                 </root>
             </instance>
-            <bind nodeset="/data/no-seed-fruit1" type="select1"/>
-            <bind nodeset="/data/no-seed-fruit2" type="select1"/>
+            <bind nodeset="/data/no-seed-fruit1" type="string"/>
+            <bind nodeset="/data/no-seed-fruit2" type="string"/>
             <bind nodeset="/data/no-seed-random-value" type="int" calculate="max(randomize(instance('numbers')/root/item))"/>
-            <bind nodeset="/data/static-seed-fruit1" type="select1"/>
-            <bind nodeset="/data/static-seed-fruit2" type="select1"/>
+            <bind nodeset="/data/static-seed-fruit1" type="string"/>
+            <bind nodeset="/data/static-seed-fruit2" type="string"/>
             <bind nodeset="/data/static-seed-random-value" type="int" calculate="max(randomize(instance('numbers')/root/item, 42))"/>
             <bind nodeset="/data/nodeset-seed-seed" type="int"/>
-            <bind nodeset="/data/nodeset-seed-fruit1" type="select1"/>
-            <bind nodeset="/data/nodeset-seed-fruit2" type="select1"/>
+            <bind nodeset="/data/nodeset-seed-fruit1" type="string"/>
+            <bind nodeset="/data/nodeset-seed-fruit2" type="string"/>
             <bind nodeset="/data/nodeset-seed-random-value" type="int" calculate="max(randomize(instance('numbers')/root/item, /data/seed))"/>
             <bind nodeset="/data/meta/instanceID" calculate="concat('uuid:', uuid())" readonly="true()" type="string"/>
         </model>
