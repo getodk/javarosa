@@ -112,20 +112,17 @@ public class TriggerableDag {
     }
 
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> triggerables, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
-        // tv should now contain all of the triggerable components which are going
-        // to need to be addressed by this update.
-        // 'triggerables' is topologically-ordered by dependencies, so evaluate
-        // the triggerables in 'tv' in the order they appear in 'triggerables'
         Set<QuickTriggerable> fired = new HashSet<>();
 
-        for (QuickTriggerable qt : triggerablesDAG) {
+        // Evaluate the provided set of triggerables in the order they appear
+        // in the sorted DAG to ensure the correct sequence of evaluations
+        for (QuickTriggerable qt : triggerablesDAG)
             if (triggerables.contains(qt) && !alreadyEvaluated.contains(qt)) {
 
                 evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
 
                 fired.add(qt);
             }
-        }
 
         return fired;
     }
