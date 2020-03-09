@@ -145,7 +145,7 @@ public class TriggerableDag {
             try {
                 evaluationResults.addAll(qt.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
-                throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
+                throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "' (" + qualified + "): " + e.getMessage(), e);
             }
 
         if (evaluationResults.size() > 0)
