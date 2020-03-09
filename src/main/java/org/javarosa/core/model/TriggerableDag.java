@@ -136,23 +136,20 @@ public class TriggerableDag {
         // Contextualize the reference used by the triggerable against the anchor
         TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
 
-        try {
+        // Now identify all of the fully qualified nodes which this
+        // triggerable updates. (Multiple nodes can be updated by the same trigger)
+        List<TreeReference> qualifiedList = evalContext.expandReference(contextRef);
 
-            // Now identify all of the fully qualified nodes which this
-            // triggerable updates. (Multiple nodes can be updated by the same trigger)
-            List<TreeReference> qualifiedList = evalContext.expandReference(contextRef);
-
-            // Go through each one and evaluate the trigger expression
-            for (TreeReference qualified : qualifiedList)
+        // Go through each one and evaluate the trigger expression
+        for (TreeReference qualified : qualifiedList)
+            try {
                 evaluationResults.addAll(qt.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
+            } catch (Exception e) {
+                throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
+            }
 
-            if (evaluationResults.size() > 0)
-                accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
-        }
-
+        if (evaluationResults.size() > 0)
+            accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
