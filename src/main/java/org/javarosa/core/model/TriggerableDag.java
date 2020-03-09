@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -131,7 +130,7 @@ public class TriggerableDag {
      * Step 3 in DAG cascade. evaluate the individual triggerable expressions
      * against the anchor (the value that changed which triggered recomputation)
      */
-    private List<EvaluationResult> evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, TreeReference anchorRef) {
+    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, TreeReference anchorRef) {
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
 
         // Contextualize the reference used by the triggerable against the anchor
@@ -161,7 +160,6 @@ public class TriggerableDag {
             throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
         }
 
-        return evaluationResults;
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
