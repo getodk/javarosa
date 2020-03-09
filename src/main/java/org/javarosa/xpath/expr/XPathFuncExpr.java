@@ -65,7 +65,8 @@ public class XPathFuncExpr extends XPathExpression {
     public XPathQName id;            //name of the function
     public XPathExpression[] args;    //argument list
 
-    public XPathFuncExpr() { } //for deserialization
+    public XPathFuncExpr() {
+    } //for deserialization
 
     public XPathFuncExpr(XPathQName id, XPathExpression[] args) {
         this.id = id;
@@ -504,10 +505,6 @@ public class XPathFuncExpr extends XPathExpression {
      * <p>
      * Note that if the handler supports 'raw args', it will receive the full, unaltered argument
      * list if no prototype matches. (this lets functions support variable-length argument lists)
-     *
-     * @param handler
-     * @param args
-     * @return
      */
     private static Object evalCustomFunction(IFunctionHandler handler, Object[] args, EvaluationContext ec) {
         List<Class[]> prototypes = handler.getPrototypes();
@@ -536,10 +533,6 @@ public class XPathFuncExpr extends XPathExpression {
      * to match that prototype (checking # args, type conversion, etc.). If it is coercible, return
      * the type-converted argument list -- these will be the arguments used to evaluate the function.
      * If not coercible, return null.
-     *
-     * @param args
-     * @param prototype
-     * @return
      */
     private static Object[] matchPrototype(Object[] args, Class[] prototype) {
         Object[] typed = null;
@@ -626,9 +619,6 @@ public class XPathFuncExpr extends XPathExpression {
 
     /**
      * convert a value to a boolean using xpath's type conversion rules
-     *
-     * @param o
-     * @return
      */
     public static Boolean toBoolean(Object o) {
         Boolean val = null;
@@ -668,9 +658,6 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * convert a value to a number using xpath's type conversion rules (note that xpath itself makes
      * no distinction between integer and floating point numbers)
-     *
-     * @param o
-     * @return
      */
     public static Double toNumeric(Object o) {
         Double val = null;
@@ -718,9 +705,6 @@ public class XPathFuncExpr extends XPathExpression {
      * convert a number to an integer by truncating the fractional part. if non-numeric, coerce the
      * value to a number first. note that the resulting return value is still a Double, as required
      * by the xpath engine
-     *
-     * @param o
-     * @return
      */
     public static Double toInt(Object o) {
         Double val = toNumeric(o);
@@ -741,9 +725,6 @@ public class XPathFuncExpr extends XPathExpression {
 
     /**
      * convert a value to a string using xpath's type conversion rules
-     *
-     * @param o
-     * @return
      */
     public static String toString(Object o) {
         String val = null;
@@ -954,12 +935,6 @@ public class XPathFuncExpr extends XPathExpression {
      * args[4] = index number for group (if 5 or 7 parameters passed)
      * args[5] = generic XPath expression for add'l group to index (if 7 parameters passed)
      * args[6] = index number for group (if 7 parameters passed)
-     *
-     * @param model
-     * @param ec
-     * @param args
-     * @param argVals
-     * @return
      */
     public static Object indexedRepeat(DataInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) throws XPathTypeMismatchException {
         // initialize target and context references
@@ -967,7 +942,8 @@ public class XPathFuncExpr extends XPathExpression {
             throw new XPathTypeMismatchException("indexed-repeat(): first parameter must be XPath field reference");
         }
         XPathPathExpr targetPath = (XPathPathExpr) args[0];
-        TreeReference targetRef = targetPath.getReference();
+        // Ensure we can deal with relative target refs by contextualizing with the EC's context ref
+        TreeReference targetRef = targetPath.getReference().contextualize(ec.getContextRef());
         TreeReference contextRef = targetRef.clone();
 
         // process passed index(es)
@@ -977,7 +953,8 @@ public class XPathFuncExpr extends XPathExpression {
                 throw new XPathTypeMismatchException("indexed-repeat(): parameter " + (pathargi + 1) + " must be XPath repeat-group reference");
             }
             // confirm that the passed XPath is a parent of our overall target path
-            TreeReference groupRef = ((XPathPathExpr) args[pathargi]).getReference();
+            // Ensure we can deal with relative group refs by contextualizing with the EC's context ref
+            TreeReference groupRef = ((XPathPathExpr) args[pathargi]).getReference().contextualize(ec.getContextRef());
             if (!groupRef.isAncestorOf(targetRef, true)) {
                 throw new XPathTypeMismatchException("indexed-repeat(): parameter " + (pathargi + 1) + " must be a parent of the field in parameter 1");
             }
@@ -997,7 +974,8 @@ public class XPathFuncExpr extends XPathExpression {
 
         // evaluate and return the XPath expression, in context
         EvaluationContext revisedec = new EvaluationContext(ec, contextRef);
-        return (targetPath.eval(model, revisedec));
+        // The target ref might have changed due to the contextualization. Ensure we evaluate a fresh XPath path expression:
+        return XPathPathExpr.fromRef(targetRef).eval(revisedec);
     }
 
     /**
@@ -1005,7 +983,6 @@ public class XPathFuncExpr extends XPathExpression {
      *
      * @param o1 XML-serialized answer to multi-select question (i.e, space-delimited choice values)
      * @param o2 choice to look for
-     * @return
      */
     public static Boolean multiSelected(Object o1, Object o2, String functionName) {
         Object indexObject = unpack(o2);
@@ -1022,7 +999,6 @@ public class XPathFuncExpr extends XPathExpression {
      * return the number of choices in a multi-select answer
      *
      * @param o XML-serialized answer to multi-select question (i.e, space-delimited choice values)
-     * @return
      */
     public static Double countSelected(Object o) {
         String s = (String) unpack(o);
@@ -1035,7 +1011,6 @@ public class XPathFuncExpr extends XPathExpression {
      *
      * @param o1 XML-serialized answer to multi-select question (i.e, space-delimited choice values)
      * @param o2 the integer index into the list to return
-     * @return
      */
     public static String selectedAt(Object o1, Object o2) {
         String selection = (String) unpack(o1);
@@ -1050,9 +1025,6 @@ public class XPathFuncExpr extends XPathExpression {
 
     /**
      * count the number of nodes in a nodeset
-     *
-     * @param o
-     * @return
      */
     public static Double count(Object o) {
         if (o instanceof XPathNodeset) {
@@ -1136,9 +1108,6 @@ public class XPathFuncExpr extends XPathExpression {
 
     /**
      * Identify the largest value from the list of provided values.
-     *
-     * @param argVals
-     * @return
      */
     private static Object max(Object[] argVals) {
         double max = Double.MIN_VALUE;
@@ -1238,8 +1207,6 @@ public class XPathFuncExpr extends XPathExpression {
      * <p>
      * the weights of all the 'true' factors are summed, and the function returns whether
      * this sum is between the min and max
-     *
-     * @return
      */
     public static Boolean checklistWeighted(Object oMin, Object oMax, Object[] flags, Object[] weights) {
         double min = toNumeric(oMin);
@@ -1262,7 +1229,6 @@ public class XPathFuncExpr extends XPathExpression {
      *
      * @param o1 string being matched
      * @param o2 regular expression
-     * @return
      */
     public static Boolean regex(Object o1, Object o2) {
         String str = toString(o1);
@@ -1278,10 +1244,8 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * return a subset of an argument list as a new arguments list
      *
-     * @param args
      * @param start index to start at
      * @param skip  sub-list will contain every nth argument, where n == skip (default: 1)
-     * @return
      */
     private static Object[] subsetArgList(Object[] args, int start, int skip) {
         if (start > args.length || skip < 1) {
