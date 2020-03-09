@@ -118,33 +118,10 @@ public class TriggerableDag {
         // the triggerables in 'tv' in the order they appear in 'triggerables'
         Set<QuickTriggerable> fired = new HashSet<>();
 
-        Map<TreeReference, List<TreeReference>> firedAnchors = new LinkedHashMap<>();
-
         for (QuickTriggerable qt : triggerablesDAG) {
             if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
 
-                List<TreeReference> affectedTriggers = qt.findAffectedTriggers(firedAnchors);
-                if (affectedTriggers.isEmpty()) {
-                    affectedTriggers.add(anchorRef);
-                }
-
                 List<EvaluationResult> evaluationResults = evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
-
-                if (evaluationResults.size() > 0) {
-                    fired.add(qt);
-
-                    for (EvaluationResult evaluationResult : evaluationResults) {
-                        TreeReference affectedRef = evaluationResult.getAffectedRef();
-
-                        TreeReference key = affectedRef.genericize();
-                        List<TreeReference> values = firedAnchors.get(key);
-                        if (values == null) {
-                            values = new ArrayList<>();
-                            firedAnchors.put(key, values);
-                        }
-                        values.add(affectedRef);
-                    }
-                }
 
                 fired.add(qt);
             }
