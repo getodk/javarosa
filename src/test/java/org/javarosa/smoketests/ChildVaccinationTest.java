@@ -21,14 +21,14 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.Scenario.getRef;
-import static org.javarosa.smoketests.ChildVaccionationTest.Sex.FEMALE;
-import static org.javarosa.smoketests.ChildVaccionationTest.Sex.MALE;
-import static org.javarosa.smoketests.ChildVaccionationTest.Vaccines.DIPHTERIA;
-import static org.javarosa.smoketests.ChildVaccionationTest.Vaccines.DIPHTERIA_AND_MEASLES;
-import static org.javarosa.smoketests.ChildVaccionationTest.Vaccines.DIPHTERIA_FIRST;
-import static org.javarosa.smoketests.ChildVaccionationTest.Vaccines.DIPHTERIA_FIRST_AND_MEASLES;
-import static org.javarosa.smoketests.ChildVaccionationTest.Vaccines.MEASLES;
-import static org.javarosa.smoketests.ChildVaccionationTest.Vaccines.NONE;
+import static org.javarosa.smoketests.ChildVaccinationTest.Sex.FEMALE;
+import static org.javarosa.smoketests.ChildVaccinationTest.Sex.MALE;
+import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA;
+import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA_AND_MEASLES;
+import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA_FIRST;
+import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA_FIRST_AND_MEASLES;
+import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.MEASLES;
+import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.NONE;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -40,7 +40,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.junit.Test;
 
-public class ChildVaccionationTest {
+public class ChildVaccinationTest {
 
     public static final TreeReference DOB_DAY_MONTH_TYPE_1_REF = getRef("/data/household/child_repeat/dob_day_1");
     public static final TreeReference DOB_DAY_MONTH_TYPE_2_REF = getRef("/data/household/child_repeat/dob_day_2");

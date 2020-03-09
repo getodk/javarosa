@@ -1,0 +1,1201 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>child_vaccination_VOL_tool_v12</h:title>
+        <model>
+            <instance>
+                <data id="VOL_CVT_0627" version="1">
+                    <today/>
+                    <start/>
+                    <end/>
+                    <deviceid/>
+                    <phonenumber/>
+                    <building_type/>
+                    <home_type/>
+                    <home_type2/>
+                    <home_type3/>
+                    <not_single>
+                        <gps/>
+                        <accuracy/>
+                        <rounded_accuracy/>
+                        <gps2/>
+                    </not_single>
+                    <building_name/>
+                    <full_address1/>
+                    <flatcount/>
+                    <household_count/>
+                    <household jr:template="">
+                        <houseCount/>
+                        <nextHse/>
+                        <flatNumber/>
+                        <inHome/>
+                        <adultPresence/>
+                        <adultName/>
+                        <childPresent/>
+                        <familyName/>
+                        <motherName/>
+                        <NameA/>
+                        <motherPresent/>
+                        <consent/>
+                        <childNum/>
+                        <child_repeat_count/>
+                        <child_repeat jr:template="">
+                            <childName/>
+                            <NameB/>
+                            <health_card/>
+                            <vacc_record_note/>
+                            <no_card/>
+                            <ever_had_card/>
+                            <ever_been_clinic/>
+                            <sex/>
+                            <gender_ref/>
+                            <dobknown/>
+                            <dob_year/>
+                            <leap/>
+                            <dob_month/>
+                            <dob_day_1/>
+                            <dob_day_2/>
+                            <dob_day_3/>
+                            <dob_day_4/>
+                            <dob_day/>
+                            <dob_month_fix/>
+                            <dob_day_fix/>
+                            <dob/>
+                            <age_days/>
+                            <month_name/>
+                            <not_elig_note/>
+                            <dobnote2/>
+                            <age_months/>
+                            <under2/>
+                            <penta1/>
+                            <pt1/>
+                            <penta3/>
+                            <pt3/>
+                            <mcv1/>
+                            <mr1/>
+                            <count/>
+                            <addchild/>
+                            <nextChild_no_mother/>
+                            <nextChild/>
+                        </child_repeat>
+                        <no_cards/>
+                        <missVaccine/>
+                        <thankyou/>
+                        <single>
+                            <full_address_single/>
+                            <single_consent_not_withheld>
+                                <gps_single1/>
+                                <accuracy_single1/>
+                                <rounded_accuracy_single1/>
+                                <gps_single2/>
+                            </single_consent_not_withheld>
+                            <single_consent_withheld>
+                                <gps_single_no_consent1/>
+                                <accuracy_single_no_consent1/>
+                                <rounded_accuracy_single_no_consent1/>
+                                <gps_single_no_consent2/>
+                            </single_consent_withheld>
+                            <finished1/>
+                        </single>
+                        <finalflat/>
+                        <finishednote/>
+                        <finished2/>
+                    </household>
+                    <household>
+                        <houseCount/>
+                        <nextHse/>
+                        <flatNumber/>
+                        <inHome/>
+                        <adultPresence/>
+                        <adultName/>
+                        <childPresent/>
+                        <familyName/>
+                        <motherName/>
+                        <NameA/>
+                        <motherPresent/>
+                        <consent/>
+                        <childNum/>
+                        <child_repeat_count/>
+                        <child_repeat>
+                            <childName/>
+                            <NameB/>
+                            <health_card/>
+                            <vacc_record_note/>
+                            <no_card/>
+                            <ever_had_card/>
+                            <ever_been_clinic/>
+                            <sex/>
+                            <gender_ref/>
+                            <dobknown/>
+                            <dob_year/>
+                            <leap/>
+                            <dob_month/>
+                            <dob_day_1/>
+                            <dob_day_2/>
+                            <dob_day_3/>
+                            <dob_day_4/>
+                            <dob_day/>
+                            <dob_month_fix/>
+                            <dob_day_fix/>
+                            <dob/>
+                            <age_days/>
+                            <month_name/>
+                            <not_elig_note/>
+                            <dobnote2/>
+                            <age_months/>
+                            <under2/>
+                            <penta1/>
+                            <pt1/>
+                            <penta3/>
+                            <pt3/>
+                            <mcv1/>
+                            <mr1/>
+                            <count/>
+                            <addchild/>
+                            <nextChild_no_mother/>
+                            <nextChild/>
+                        </child_repeat>
+                        <no_cards/>
+                        <missVaccine/>
+                        <thankyou/>
+                        <single>
+                            <full_address_single/>
+                            <single_consent_not_withheld>
+                                <gps_single1/>
+                                <accuracy_single1/>
+                                <rounded_accuracy_single1/>
+                                <gps_single2/>
+                            </single_consent_not_withheld>
+                            <single_consent_withheld>
+                                <gps_single_no_consent1/>
+                                <accuracy_single_no_consent1/>
+                                <rounded_accuracy_single_no_consent1/>
+                                <gps_single_no_consent2/>
+                            </single_consent_withheld>
+                            <finished1/>
+                        </single>
+                        <finalflat/>
+                        <finishednote/>
+                        <finished2/>
+                    </household>
+                    <not_a_dwelling>
+                        <endnote2/>
+                    </not_a_dwelling>
+                    <meta>
+                        <instanceID/>
+                    </meta>
+                </data>
+            </instance>
+            <bind jr:preload="date" jr:preloadParams="today" nodeset="/data/today" type="date"/>
+            <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+            <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+            <bind jr:preload="property" jr:preloadParams="deviceid" nodeset="/data/deviceid" type="string"/>
+            <bind jr:preload="property" jr:preloadParams="phonenumber" nodeset="/data/phonenumber" type="string"/>
+            <bind nodeset="/data/building_type" required="true()" type="string"/>
+            <bind calculate="if( /data/building_type ='single','house',if( /data/building_type ='multi','flat/dwelling',&quot;&quot;))" nodeset="/data/home_type" type="string"/>
+            <bind calculate="if( /data/building_type ='single','home',if( /data/building_type ='multi','flat/dwelling',&quot;&quot;))" nodeset="/data/home_type2" type="string"/>
+            <bind calculate="if( /data/building_type ='single','House',if( /data/building_type ='multi','Flat',&quot;&quot;))" nodeset="/data/home_type3" type="string"/>
+            <bind nodeset="/data/not_single" relevant=" /data/building_type  != 'single'"/>
+            <bind nodeset="/data/not_single/gps" required="true()" type="geopoint"/>
+            <bind calculate="selected-at( /data/not_single/gps ,3)" nodeset="/data/not_single/accuracy" type="string"/>
+            <bind calculate="round( /data/not_single/accuracy ,2)" nodeset="/data/not_single/rounded_accuracy" type="string"/>
+            <bind nodeset="/data/not_single/gps2" relevant=" /data/not_single/rounded_accuracy &gt; 5 or  /data/not_single/rounded_accuracy  = 0" required="true()" type="geopoint"/>
+            <bind nodeset="/data/building_name" relevant=" /data/building_type ='multi'" type="string"/>
+            <bind nodeset="/data/full_address1" relevant=" /data/building_type ='multi'" type="string"/>
+            <bind calculate="count( /data/household )" nodeset="/data/flatcount" relevant=" /data/building_type ='multi'" type="string"/>
+            <bind nodeset="/data/household_count" readonly="true()" type="string"
+                  calculate="
+                    if(
+                        /data/building_type = 'single',
+                        1,
+                        if(
+                            /data/flatcount = 0 or indexed-repeat(/data/household/finalflat, /data/household, /data/flatcount) != 'yes',
+                            /data/flatcount + 1,
+                            /data/flatcount
+                        )
+                    )"
+            />
+            <bind nodeset="/data/household" relevant=" /data/building_type !='not_dwelling'"/>
+            <bind calculate="position(..)" nodeset="/data/household/houseCount" type="string"/>
+            <bind calculate=" ../houseCount +1" nodeset="/data/household/nextHse" type="string"/>
+            <bind nodeset="/data/household/flatNumber" relevant=" /data/building_type ='multi'" type="string"/>
+            <bind nodeset="/data/household/inHome" required="true()" type="string"/>
+            <bind nodeset="/data/household/adultPresence" relevant=" ../inHome ='yes'" required="true()" type="string"/>
+            <bind nodeset="/data/household/adultName" relevant=" ../adultPresence ='no'" type="string"/>
+            <bind nodeset="/data/household/childPresent" relevant=" ../adultPresence ='yes'" required="true()" type="string"/>
+            <bind nodeset="/data/household/familyName" relevant=" ../childPresent ='no'" type="string"/>
+            <bind nodeset="/data/household/motherName" relevant=" ../childPresent ='yes'" type="string"/>
+            <bind calculate="if( ../motherName !='', ../motherName ,'the caregiver')" nodeset="/data/household/NameA" type="string"/>
+            <bind nodeset="/data/household/motherPresent" relevant=" ../childPresent ='yes'" required="true()" type="string"/>
+            <bind nodeset="/data/household/consent" relevant=" ../motherPresent ='yes'" required="true()" type="string"/>
+            <bind constraint=".&gt;=0 and .&lt;= 10" jr:constraintMsg="Please enter number between 0 and 10" nodeset="/data/household/childNum" relevant=" ../consent ='yes'" required="true()" type="int"/>
+            <bind calculate=" ../childNum " nodeset="/data/household/child_repeat_count" readonly="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat" relevant=" ../consent ='yes'"/>
+            <bind nodeset="/data/household/child_repeat/childName" type="string"/>
+            <bind calculate="if( ../childName !='', ../childName ,'the child')" nodeset="/data/household/child_repeat/NameB" type="string"/>
+            <bind nodeset="/data/household/child_repeat/health_card" required="true()" type="string"/>
+            <bind calculate="if( ../health_card ='yes',' or is the date of birth on the vaccination card','')" nodeset="/data/household/child_repeat/vacc_record_note" type="string"/>
+            <bind calculate="if( ../health_card ='no',1,0)" nodeset="/data/household/child_repeat/no_card" type="string"/>
+            <bind nodeset="/data/household/child_repeat/ever_had_card" relevant=" ../health_card ='no'" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/ever_been_clinic" relevant=" ../ever_had_card ='no'" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/sex" required="true()" type="string"/>
+            <bind calculate="if( ../sex ='male','he','she')" nodeset="/data/household/child_repeat/gender_ref" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dobknown" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dob_year" relevant=" ../dobknown ='yes'" required="true()" type="string"/>
+            <bind calculate="if( ../dob_year ='2016' or  ../dob_year ='2020' or  ../dob_year ='2024' or  ../dob_year ='2028' ,1,0)" nodeset="/data/household/child_repeat/leap" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dob_month" relevant=" ../dobknown ='yes'" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dob_day_1" relevant=" ../dobknown ='yes' and ( ../dob_month ='1' or  ../dob_month ='3' or  ../dob_month ='5' or  ../dob_month ='7' or  ../dob_month ='8' or  ../dob_month ='10' or  ../dob_month ='12')" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dob_day_2" relevant=" ../dobknown ='yes' and ( ../dob_month ='4' or  ../dob_month ='6' or  ../dob_month ='9' or  ../dob_month ='11')" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dob_day_3" relevant=" ../dobknown ='yes' and  ../dob_month ='2' and  ../leap =1" required="true()" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dob_day_4" relevant=" ../dobknown ='yes' and  ../dob_month ='2' and  ../leap =0" required="true()" type="string"/>
+            <bind calculate="if( ../dob_day_1 !='', ../dob_day_1 , if( ../dob_day_2 !='', ../dob_day_2 ,if( ../dob_day_3 !='', ../dob_day_3 , ../dob_day_4 )))" nodeset="/data/household/child_repeat/dob_day" relevant=" ../dobknown " type="string"/>
+            <bind calculate="if(number( ../dob_month )&lt;10,concat('0', ../dob_month ), ../dob_month )" nodeset="/data/household/child_repeat/dob_month_fix" relevant=" ../dobknown " type="string"/>
+            <bind calculate="if(number( ../dob_day )&lt;10,concat('0', ../dob_day ), ../dob_day )" nodeset="/data/household/child_repeat/dob_day_fix" relevant=" ../dobknown " type="string"/>
+            <bind calculate="if( ../dob_year !='' and  ../dob_month_fix !='' and  ../dob_day_fix !='',date(concat( ../dob_year ,'-', ../dob_month_fix ,'-', ../dob_day_fix )),'')" nodeset="/data/household/child_repeat/dob" relevant=" ../dobknown " type="string"/>
+            <bind calculate="today() -  ../dob " nodeset="/data/household/child_repeat/age_days" relevant=" ../dobknown " type="string"/>
+            <bind calculate="if( ../dob_month =1,'January',if( ../dob_month =2,'February',if( ../dob_month =3,'March',if( ../dob_month =4,'April',if( ../dob_month =5,'May',if( ../dob_month =6,'June',if( ../dob_month =7,'July',if( ../dob_month =8,'August',if( ../dob_month =9,'September',if( ../dob_month =10,'October',if( ../dob_month =11,'November','December')))))))))))" nodeset="/data/household/child_repeat/month_name" type="string"/>
+            <bind nodeset="/data/household/child_repeat/not_elig_note" readonly="true()" relevant=" ../dobknown ='yes' and  ../age_days  &gt; 730" type="string"/>
+            <bind nodeset="/data/household/child_repeat/dobnote2" readonly="true()" relevant=" ../dobknown ='yes' and  ../age_days  &lt; 0" type="string"/>
+            <bind constraint=".&gt;= 0 and .&lt;= 23" jr:constraintMsg="Age in months must be between 0 - 23 months" nodeset="/data/household/child_repeat/age_months" relevant=" ../dobknown ='no'" required="true()" type="int"/>
+            <bind calculate="if( ../age_days &gt;0 and  ../age_days  &lt;=730,1,0)" nodeset="/data/household/child_repeat/under2" type="string"/>
+            <bind nodeset="/data/household/child_repeat/penta1" relevant="( ../age_months  &gt; 1 or ((today() -  ../dob  ) &gt;= 42 and  ../under2 =1)) and  ../health_card ='yes'" required="true()" type="string"/>
+            <bind calculate="if( ../penta1 ='no',1,0)" nodeset="/data/household/child_repeat/pt1" type="string"/>
+            <bind nodeset="/data/household/child_repeat/penta3" relevant="( ../age_months  &gt;= 4 or (( today() -  ../dob  ) &gt;= 98 and  ../under2 =1)) and  ../penta1 ='yes'" required="true()" type="string"/>
+            <bind calculate="if( ../penta3 ='no',1,0)" nodeset="/data/household/child_repeat/pt3" type="string"/>
+            <bind nodeset="/data/household/child_repeat/mcv1" relevant="( ../age_months  &gt;= 9 or ((today() -  ../dob  ) &gt;= 273 and  ../under2 =1)) and  ../health_card ='yes'" required="true()" type="string"/>
+            <bind calculate="if( ../mcv1 ='no',1,0)" nodeset="/data/household/child_repeat/mr1" type="string"/>
+            <bind calculate="position(..)" nodeset="/data/household/child_repeat/count" type="string"/>
+            <bind calculate=" ../count  + 1" nodeset="/data/household/child_repeat/addchild" type="string"/>
+            <bind nodeset="/data/household/child_repeat/nextChild_no_mother" readonly="true()" relevant=" ../health_card ='no' and  ../count  &lt;  ../../childNum " type="string"/>
+            <bind nodeset="/data/household/child_repeat/nextChild" readonly="true()" relevant=" ../health_card ='yes' and  ../count  &lt;  ../../childNum " type="string"/>
+            <bind calculate="sum( /data/household/child_repeat/no_card )" nodeset="/data/household/no_cards" type="string"/>
+            <bind calculate="sum( /data/household/child_repeat/pt1 ) + sum( /data/household/child_repeat/pt3 )+sum( /data/household/child_repeat/mr1 )" nodeset="/data/household/missVaccine" type="string"/>
+            <bind calculate="if( ../inHome ='no','',if( ../childPresent ='no' and  /data/building_type ='multi','Thank the person for their time and explain we are only looking for flats/dwellings where children under 2 years of age permanently live.',if( ../childPresent ='no' and  /data/building_type ='single','Thank the person for their time and explain we are only looking for houses where children under 2 years of age permanently live.','Thank the person for their time.')))" nodeset="/data/household/thankyou" type="string"/>
+            <bind nodeset="/data/household/single" relevant=" /data/building_type  = 'single'"/>
+            <bind nodeset="/data/household/single/full_address_single" type="string"/>
+            <bind nodeset="/data/household/single/single_consent_not_withheld" relevant=" ../../inHome ='no' or ( ../../inHome ='yes' and  ../../adultPresence ='no') or ( ../../inHome ='yes' and  ../../adultPresence ='yes' and  ../../childPresent ='no') or ( ../../inHome ='yes' and  ../../adultPresence ='yes' and  ../../childPresent ='yes' and  ../../motherPresent ='no') or ( ../../inHome ='yes' and  ../../adultPresence ='yes' and  ../../childPresent ='yes' and  ../../motherPresent ='yes' and  ../../consent ='yes')"/>
+            <bind nodeset="/data/household/single/single_consent_not_withheld/gps_single1" required="true()" type="geopoint"/>
+            <bind calculate="selected-at( ../gps_single1 ,3)" nodeset="/data/household/single/single_consent_not_withheld/accuracy_single1" type="string"/>
+            <bind calculate="round( ../accuracy_single1 ,2)" nodeset="/data/household/single/single_consent_not_withheld/rounded_accuracy_single1" type="string"/>
+            <bind nodeset="/data/household/single/single_consent_not_withheld/gps_single2" relevant=" ../rounded_accuracy_single1 &gt; 5 or  ../rounded_accuracy_single1  = 0" required="true()" type="geopoint"/>
+            <bind nodeset="/data/household/single/single_consent_withheld" relevant=" ../../inHome ='yes' and  ../../adultPresence ='yes' and  ../../childPresent ='yes' and  ../../motherPresent ='yes' and  ../../consent ='no'"/>
+            <bind nodeset="/data/household/single/single_consent_withheld/gps_single_no_consent1" type="geopoint"/>
+            <bind calculate="selected-at( ../gps_single_no_consent1 ,3)" nodeset="/data/household/single/single_consent_withheld/accuracy_single_no_consent1" type="string"/>
+            <bind calculate="round( ../accuracy_single_no_consent1 ,2)" nodeset="/data/household/single/single_consent_withheld/rounded_accuracy_single_no_consent1" type="string"/>
+            <bind nodeset="/data/household/single/single_consent_withheld/gps_single_no_consent2" relevant=" ../rounded_accuracy_single_no_consent1 &gt; 5 or  ../rounded_accuracy_single_no_consent1  = 0" type="geopoint"/>
+            <bind nodeset="/data/household/single/finished1" readonly="true()" type="string"/>
+            <bind nodeset="/data/household/finalflat" relevant=" /data/building_type  = 'multi'" required="true()" type="string"/>
+            <bind calculate="if( ../finalflat ='no','You have finished the questionnaire for this flat/dwelling. Go on to the next flat/dwelling.','You have finished the questionnaire for this multi-family dwelling. Go to the next building.')" nodeset="/data/household/finishednote" type="string"/>
+            <bind nodeset="/data/household/finished2" readonly="true()" relevant=" /data/building_type  = 'multi'" type="string"/>
+            <bind nodeset="/data/not_a_dwelling" relevant=" /data/building_type ='not_dwelling'"/>
+            <bind nodeset="/data/not_a_dwelling/endnote2" readonly="true()" type="string"/>
+            <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/data/building_type">
+            <label>What type of building is this?</label>
+            <item>
+                <label>Not a dwelling (examples: store, abandoned building, factory, etc.)</label>
+                <value>not_dwelling</value>
+            </item>
+            <item>
+                <label>Single family dwelling (house)</label>
+                <value>single</value>
+            </item>
+            <item>
+                <label>Multi-family dwelling (flat, apartment)</label>
+                <value>multi</value>
+            </item>
+        </select1>
+        <group ref="/data/not_single">
+            <input appearance="placement-map" ref="/data/not_single/gps">
+                <label>Record GPS coordinates of this building</label>
+                <hint>Ensure clear sky for better accuracies</hint>
+            </input>
+            <input appearance="placement-map" ref="/data/not_single/gps2">
+                <label>GPS recording is<output value=" /data/not_single/rounded_accuracy "/>m. Accuracy should be greater than 0m and less than 5m - Please recapture the GPS coordinates.
+                </label>
+                <hint>Ensure clear sky for better accuracies</hint>
+            </input>
+        </group>
+        <input ref="/data/building_name">
+            <label>Record the building name</label>
+            <hint>All interviewers entering the same building should record the SAME building name.</hint>
+        </input>
+        <input ref="/data/full_address1">
+            <label>Record the full address of the building</label>
+            <hint>All interviewers entering the same building should record the same address. Record Road, Street, Estate, and/or Court, Block Number</hint>
+        </input>
+        <group ref="/data/household">
+            <label>
+                <output value=" /data/home_type3 "/>
+            </label>
+            <repeat jr:count=" /data/household_count " nodeset="/data/household">
+                <input ref="/data/household/flatNumber">
+                    <label>House, apartment or dwelling number</label>
+                </input>
+                <select1 ref="/data/household/inHome">
+                    <label>Knock on the door. Is there a response?</label>
+                    <item>
+                        <label>Yes</label>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label>No</label>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <select1 ref="/data/household/adultPresence">
+                    <label>Is there an adult in the<output value=" /data/home_type2 "/>?
+                    </label>
+                    <hint>Greetings. I am [Name] from Red Cross. We are working to improve health services in this area.
+                        (If a child answers the door, ask to speak to an adult. If there is no adult in the<output value=" /data/home_type "/>, it will need to be revisited.)
+                    </hint>
+                    <item>
+                        <label>Yes</label>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label>No</label>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <input ref="/data/household/adultName">
+                    <label>Record the name of the adult for revisit purposes.</label>
+                    <hint>We may come back later to talk with an adult. What is the name of the head of household.</hint>
+                </input>
+                <select1 ref="/data/household/childPresent">
+                    <label>We are helping to improve health care in this area, and vaccinations of children in particular. Are there any children under the age of 2 years who permanently live in this<output value=" /data/home_type "/>?
+                    </label>
+                    <item>
+                        <label>Yes</label>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label>No</label>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <input ref="/data/household/familyName">
+                    <label>Can you please tell me what is the name of the family who lives at this<output value=" /data/home_type "/>?
+                    </label>
+                    <hint>There are no children under the age of 2 years who permanently live in this<output value=" /data/home_type "/>.
+                    </hint>
+                </input>
+                <input ref="/data/household/motherName">
+                    <label>What is the name of the mother or caregiver of the child(ren) under 2 years of age?</label>
+                </input>
+                <select1 ref="/data/household/motherPresent">
+                    <label>Is
+                        <output value=" ../NameA "/>
+                        available?
+                    </label>
+                    <hint>If yes, request to speak to the mother or caregiver.</hint>
+                    <item>
+                        <label>Yes</label>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label>No</label>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <select1 ref="/data/household/consent">
+                    <label>I'd like to ask you a few questions about each of the children under the age of 2 years who permanently live in the<output value=" /data/home_type "/>. Is that OK?
+                    </label>
+                    <hint>Introduce yourself to the mother or caregiver, giving your name and stating you are a Red Cross Volunteer and explaining why you are there</hint>
+                    <item>
+                        <label>Yes</label>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label>No</label>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <input ref="/data/household/childNum">
+                    <label>How many children under the age of 2 years live permanently in this<output value=" /data/home_type "/>?
+                    </label>
+                </input>
+                <group ref="/data/household/child_repeat">
+                    <label>Child</label>
+                    <repeat jr:count=" ../child_repeat_count " nodeset="/data/household/child_repeat">
+                        <input ref="/data/household/child_repeat/childName">
+                            <label>What is the name of your child?</label>
+                        </input>
+                        <select1 ref="/data/household/child_repeat/health_card">
+                            <label>Does
+                                <output value=" ../NameB "/>
+                                have a mother and child health handbook or any vaccination record available?
+                            </label>
+                            <hint>If yes, ask the caregiver to get the health record book for the child</hint>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/ever_had_card">
+                            <label>Has
+                                <output value=" ../NameB "/>
+                                ever had a health or vaccination card?
+                            </label>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                            <item>
+                                <label>Not sure, can't remember</label>
+                                <value>dont_know</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/ever_been_clinic">
+                            <label>Has
+                                <output value=" ../NameB "/>
+                                ever been to a health clinic for any reason?
+                            </label>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                            <item>
+                                <label>Not sure, can't remember</label>
+                                <value>dont_know</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/sex">
+                            <label>Is
+                                <output value=" ../NameB "/>
+                                a boy or a girl?
+                            </label>
+                            <item>
+                                <label>Boy</label>
+                                <value>male</value>
+                            </item>
+                            <item>
+                                <label>Girl</label>
+                                <value>female</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dobknown">
+                            <label>Do you know<output value=" ../NameB "/>'s date of birth<output value=" ../vacc_record_note "/>?
+                            </label>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dob_year">
+                            <label>Record<output value=" ../NameB "/>'s year of birth
+                            </label>
+                            <item>
+                                <label>2017</label>
+                                <value>2017</value>
+                            </item>
+                            <item>
+                                <label>2018</label>
+                                <value>2018</value>
+                            </item>
+                            <item>
+                                <label>2019</label>
+                                <value>2019</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dob_month">
+                            <label>Record<output value=" ../NameB "/>'s month of birth
+                            </label>
+                            <item>
+                                <label>01 - January</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>02 - February</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>03 - March</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>04 - April</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>05 - May</label>
+                                <value>5</value>
+                            </item>
+                            <item>
+                                <label>06 - June</label>
+                                <value>6</value>
+                            </item>
+                            <item>
+                                <label>07 - July</label>
+                                <value>7</value>
+                            </item>
+                            <item>
+                                <label>08 - August</label>
+                                <value>8</value>
+                            </item>
+                            <item>
+                                <label>09 - September</label>
+                                <value>9</value>
+                            </item>
+                            <item>
+                                <label>10 - October</label>
+                                <value>10</value>
+                            </item>
+                            <item>
+                                <label>11 - November</label>
+                                <value>11</value>
+                            </item>
+                            <item>
+                                <label>12 - December</label>
+                                <value>12</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dob_day_1">
+                            <label>Record<output value=" ../NameB "/>'s day of birth
+                            </label>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                            <item>
+                                <label>6</label>
+                                <value>6</value>
+                            </item>
+                            <item>
+                                <label>7</label>
+                                <value>7</value>
+                            </item>
+                            <item>
+                                <label>8</label>
+                                <value>8</value>
+                            </item>
+                            <item>
+                                <label>9</label>
+                                <value>9</value>
+                            </item>
+                            <item>
+                                <label>10</label>
+                                <value>10</value>
+                            </item>
+                            <item>
+                                <label>11</label>
+                                <value>11</value>
+                            </item>
+                            <item>
+                                <label>12</label>
+                                <value>12</value>
+                            </item>
+                            <item>
+                                <label>13</label>
+                                <value>13</value>
+                            </item>
+                            <item>
+                                <label>14</label>
+                                <value>14</value>
+                            </item>
+                            <item>
+                                <label>15</label>
+                                <value>15</value>
+                            </item>
+                            <item>
+                                <label>16</label>
+                                <value>16</value>
+                            </item>
+                            <item>
+                                <label>17</label>
+                                <value>17</value>
+                            </item>
+                            <item>
+                                <label>18</label>
+                                <value>18</value>
+                            </item>
+                            <item>
+                                <label>19</label>
+                                <value>19</value>
+                            </item>
+                            <item>
+                                <label>20</label>
+                                <value>20</value>
+                            </item>
+                            <item>
+                                <label>21</label>
+                                <value>21</value>
+                            </item>
+                            <item>
+                                <label>22</label>
+                                <value>22</value>
+                            </item>
+                            <item>
+                                <label>23</label>
+                                <value>23</value>
+                            </item>
+                            <item>
+                                <label>24</label>
+                                <value>24</value>
+                            </item>
+                            <item>
+                                <label>25</label>
+                                <value>25</value>
+                            </item>
+                            <item>
+                                <label>26</label>
+                                <value>26</value>
+                            </item>
+                            <item>
+                                <label>27</label>
+                                <value>27</value>
+                            </item>
+                            <item>
+                                <label>28</label>
+                                <value>28</value>
+                            </item>
+                            <item>
+                                <label>29</label>
+                                <value>29</value>
+                            </item>
+                            <item>
+                                <label>30</label>
+                                <value>30</value>
+                            </item>
+                            <item>
+                                <label>31</label>
+                                <value>31</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dob_day_2">
+                            <label>Record<output value=" ../NameB "/>'s day of birth
+                            </label>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                            <item>
+                                <label>6</label>
+                                <value>6</value>
+                            </item>
+                            <item>
+                                <label>7</label>
+                                <value>7</value>
+                            </item>
+                            <item>
+                                <label>8</label>
+                                <value>8</value>
+                            </item>
+                            <item>
+                                <label>9</label>
+                                <value>9</value>
+                            </item>
+                            <item>
+                                <label>10</label>
+                                <value>10</value>
+                            </item>
+                            <item>
+                                <label>11</label>
+                                <value>11</value>
+                            </item>
+                            <item>
+                                <label>12</label>
+                                <value>12</value>
+                            </item>
+                            <item>
+                                <label>13</label>
+                                <value>13</value>
+                            </item>
+                            <item>
+                                <label>14</label>
+                                <value>14</value>
+                            </item>
+                            <item>
+                                <label>15</label>
+                                <value>15</value>
+                            </item>
+                            <item>
+                                <label>16</label>
+                                <value>16</value>
+                            </item>
+                            <item>
+                                <label>17</label>
+                                <value>17</value>
+                            </item>
+                            <item>
+                                <label>18</label>
+                                <value>18</value>
+                            </item>
+                            <item>
+                                <label>19</label>
+                                <value>19</value>
+                            </item>
+                            <item>
+                                <label>20</label>
+                                <value>20</value>
+                            </item>
+                            <item>
+                                <label>21</label>
+                                <value>21</value>
+                            </item>
+                            <item>
+                                <label>22</label>
+                                <value>22</value>
+                            </item>
+                            <item>
+                                <label>23</label>
+                                <value>23</value>
+                            </item>
+                            <item>
+                                <label>24</label>
+                                <value>24</value>
+                            </item>
+                            <item>
+                                <label>25</label>
+                                <value>25</value>
+                            </item>
+                            <item>
+                                <label>26</label>
+                                <value>26</value>
+                            </item>
+                            <item>
+                                <label>27</label>
+                                <value>27</value>
+                            </item>
+                            <item>
+                                <label>28</label>
+                                <value>28</value>
+                            </item>
+                            <item>
+                                <label>29</label>
+                                <value>29</value>
+                            </item>
+                            <item>
+                                <label>30</label>
+                                <value>30</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dob_day_3">
+                            <label>Record<output value=" ../NameB "/>'s day of birth
+                            </label>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                            <item>
+                                <label>6</label>
+                                <value>6</value>
+                            </item>
+                            <item>
+                                <label>7</label>
+                                <value>7</value>
+                            </item>
+                            <item>
+                                <label>8</label>
+                                <value>8</value>
+                            </item>
+                            <item>
+                                <label>9</label>
+                                <value>9</value>
+                            </item>
+                            <item>
+                                <label>10</label>
+                                <value>10</value>
+                            </item>
+                            <item>
+                                <label>11</label>
+                                <value>11</value>
+                            </item>
+                            <item>
+                                <label>12</label>
+                                <value>12</value>
+                            </item>
+                            <item>
+                                <label>13</label>
+                                <value>13</value>
+                            </item>
+                            <item>
+                                <label>14</label>
+                                <value>14</value>
+                            </item>
+                            <item>
+                                <label>15</label>
+                                <value>15</value>
+                            </item>
+                            <item>
+                                <label>16</label>
+                                <value>16</value>
+                            </item>
+                            <item>
+                                <label>17</label>
+                                <value>17</value>
+                            </item>
+                            <item>
+                                <label>18</label>
+                                <value>18</value>
+                            </item>
+                            <item>
+                                <label>19</label>
+                                <value>19</value>
+                            </item>
+                            <item>
+                                <label>20</label>
+                                <value>20</value>
+                            </item>
+                            <item>
+                                <label>21</label>
+                                <value>21</value>
+                            </item>
+                            <item>
+                                <label>22</label>
+                                <value>22</value>
+                            </item>
+                            <item>
+                                <label>23</label>
+                                <value>23</value>
+                            </item>
+                            <item>
+                                <label>24</label>
+                                <value>24</value>
+                            </item>
+                            <item>
+                                <label>25</label>
+                                <value>25</value>
+                            </item>
+                            <item>
+                                <label>26</label>
+                                <value>26</value>
+                            </item>
+                            <item>
+                                <label>27</label>
+                                <value>27</value>
+                            </item>
+                            <item>
+                                <label>28</label>
+                                <value>28</value>
+                            </item>
+                            <item>
+                                <label>29</label>
+                                <value>29</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/dob_day_4">
+                            <label>Record<output value=" ../NameB "/>'s day of birth
+                            </label>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                            <item>
+                                <label>6</label>
+                                <value>6</value>
+                            </item>
+                            <item>
+                                <label>7</label>
+                                <value>7</value>
+                            </item>
+                            <item>
+                                <label>8</label>
+                                <value>8</value>
+                            </item>
+                            <item>
+                                <label>9</label>
+                                <value>9</value>
+                            </item>
+                            <item>
+                                <label>10</label>
+                                <value>10</value>
+                            </item>
+                            <item>
+                                <label>11</label>
+                                <value>11</value>
+                            </item>
+                            <item>
+                                <label>12</label>
+                                <value>12</value>
+                            </item>
+                            <item>
+                                <label>13</label>
+                                <value>13</value>
+                            </item>
+                            <item>
+                                <label>14</label>
+                                <value>14</value>
+                            </item>
+                            <item>
+                                <label>15</label>
+                                <value>15</value>
+                            </item>
+                            <item>
+                                <label>16</label>
+                                <value>16</value>
+                            </item>
+                            <item>
+                                <label>17</label>
+                                <value>17</value>
+                            </item>
+                            <item>
+                                <label>18</label>
+                                <value>18</value>
+                            </item>
+                            <item>
+                                <label>19</label>
+                                <value>19</value>
+                            </item>
+                            <item>
+                                <label>20</label>
+                                <value>20</value>
+                            </item>
+                            <item>
+                                <label>21</label>
+                                <value>21</value>
+                            </item>
+                            <item>
+                                <label>22</label>
+                                <value>22</value>
+                            </item>
+                            <item>
+                                <label>23</label>
+                                <value>23</value>
+                            </item>
+                            <item>
+                                <label>24</label>
+                                <value>24</value>
+                            </item>
+                            <item>
+                                <label>25</label>
+                                <value>25</value>
+                            </item>
+                            <item>
+                                <label>26</label>
+                                <value>26</value>
+                            </item>
+                            <item>
+                                <label>27</label>
+                                <value>27</value>
+                            </item>
+                            <item>
+                                <label>28</label>
+                                <value>28</value>
+                            </item>
+                        </select1>
+                        <input ref="/data/household/child_repeat/not_elig_note">
+                            <label>We are only looking for children under 2 years of age (730 days).
+                                Date of birth for
+                                <output value=" ../NameB "/>
+                                is
+                                <output value=" ../dob_day_fix "/>
+                                <output value=" ../month_name "/>
+                                <output value=" ../dob_year "/>
+                                and
+                                <output value=" ../gender_ref "/>
+                                is
+                                <output value=" ../age_days "/>
+                                days old.
+
+                                If this is not correct, swipe back and fix the date of birth.
+                            </label>
+                        </input>
+                        <input ref="/data/household/child_repeat/dobnote2">
+                            <label>Date of birth for
+                                <output value=" ../NameB "/>
+                                is
+                                <output value=" ../dob_day_fix "/>
+                                <output value=" ../month_name "/>
+                                <output value=" ../dob_year "/>
+                                and is a date in the future.
+
+                                Please swipe back and correct.
+                            </label>
+                        </input>
+                        <input ref="/data/household/child_repeat/age_months">
+                            <label>Record the age of
+                                <output value=" ../NameB "/>
+                                in months.
+                            </label>
+                            <hint>If the age is only known in weeks, round up to the nearest month</hint>
+                        </input>
+                        <select1 ref="/data/household/child_repeat/penta1">
+                            <label>Record if the 1st dose of the vaccine beginning with 'Diphtheria' or 'Penta' was received</label>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/penta3">
+                            <label>Record if the 3rd dose of the vaccine beginning with 'Diphtheria' or 'Penta' was received</label>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                        </select1>
+                        <select1 ref="/data/household/child_repeat/mcv1">
+                            <label>Record if measles rubella (MR) vaccine was received</label>
+                            <item>
+                                <label>Yes</label>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <value>no</value>
+                            </item>
+                        </select1>
+                        <input ref="/data/household/child_repeat/nextChild_no_mother">
+                            <label>Move on to child number
+                                <output value=" ../addchild "/>
+                            </label>
+                        </input>
+                        <input ref="/data/household/child_repeat/nextChild">
+                            <label>Move on to child number
+                                <output value=" ../addchild "/>
+                            </label>
+                        </input>
+                    </repeat>
+                </group>
+                <group ref="/data/household/single">
+                    <input ref="/data/household/single/full_address_single">
+                        <label>Record the full address of the house</label>
+                    </input>
+                    <group ref="/data/household/single/single_consent_not_withheld">
+                        <input appearance="placement-map" ref="/data/household/single/single_consent_not_withheld/gps_single1">
+                            <label>Record GPS coordinates of this building</label>
+                            <hint>Ensure clear sky for better accuracies</hint>
+                        </input>
+                        <input appearance="placement-map" ref="/data/household/single/single_consent_not_withheld/gps_single2">
+                            <label>GPS recording is<output value=" ../rounded_accuracy_single1 "/>m. Accuracy should be greater than 0m and less than 5m - Please recapture the GPS coordinates.
+                            </label>
+                            <hint>Ensure clear sky for better accuracies</hint>
+                        </input>
+                    </group>
+                    <group ref="/data/household/single/single_consent_withheld">
+                        <input appearance="placement-map" ref="/data/household/single/single_consent_withheld/gps_single_no_consent1">
+                            <label>Record GPS coordinates of this building</label>
+                            <hint>Ensure clear sky for better accuracies</hint>
+                        </input>
+                        <input appearance="placement-map" ref="/data/household/single/single_consent_withheld/gps_single_no_consent2">
+                            <label>GPS recording is<output value=" ../rounded_accuracy_single_no_consent1 "/>m. Accuracy should be greater than 0m and less than 5m - Please recapture the GPS coordinates.
+                            </label>
+                            <hint>Ensure clear sky for better accuracies</hint>
+                        </input>
+                    </group>
+                    <input ref="/data/household/single/finished1">
+                        <label>You have finished the questionnaire for this single family dwelling. Go to the next building.</label>
+                        <hint>
+                            <output value=" ../../thankyou "/>
+                        </hint>
+                    </input>
+                </group>
+                <select1 ref="/data/household/finalflat">
+                    <label>Is this the final flat/dwelling?</label>
+                    <item>
+                        <label>Yes</label>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label>No</label>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <input ref="/data/household/finished2">
+                    <label>
+                        <output value=" ../finishednote "/>
+                    </label>
+                    <hint>
+                        <output value=" ../thankyou "/>
+                    </hint>
+                </input>
+            </repeat>
+        </group>
+        <group ref="/data/not_a_dwelling">
+            <input ref="/data/not_a_dwelling/endnote2">
+                <label>You have finished the questionnaire for this non dwelling. Go to the next building.</label>
+            </input>
+        </group>
+    </h:body>
+</h:html>

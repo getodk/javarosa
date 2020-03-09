@@ -64,6 +64,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -125,15 +126,22 @@ public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
     private final FormDef formDef;
-    private final FormEntryController formEntryController;
-    private final EvaluationContext ec;
-    private final FormEntryModel model;
+    private FormEntryController controller;
+    private EvaluationContext evaluationContext;
+    private FormEntryModel model;
+    private final FormInstance blankInstance;
 
-    private Scenario(FormDef formDef, FormEntryController formEntryController) {
+    private Scenario(FormDef formDef, FormEntryController controller, FormEntryModel model, EvaluationContext evaluationContext, FormInstance blankInstance) {
         this.formDef = formDef;
-        this.formEntryController = formEntryController;
-        this.ec = formDef.getEvaluationContext();
-        this.model = formEntryController.getModel();
+        this.controller = controller;
+        this.evaluationContext = evaluationContext;
+        this.model = model;
+        this.blankInstance = blankInstance;
+    }
+
+    private static Scenario from(FormDef formDef) {
+        FormEntryModel formEntryModel = new FormEntryModel(formDef);
+        return new Scenario(formDef, new FormEntryController(formEntryModel), formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
     }
 
     // region Miscelaneous
@@ -195,18 +203,22 @@ public class Scenario {
      * Prepares the form to answer a new blank instance
      */
     public void newInstance() {
+        formDef.setInstance(blankInstance.clone());
         formDef.initialize(true, new InstanceInitializationFactory());
+        evaluationContext = formDef.getEvaluationContext();
+        model = new FormEntryModel(formDef);
+        controller = new FormEntryController(model);
     }
 
     /**
      * Sets the language of the form for itext translations
      */
     public void setLanguage(String language) {
-        formEntryController.setLanguage(language);
+        controller.setLanguage(language);
     }
 
     public EvaluationContext getEvaluationContext() {
-        return ec;
+        return evaluationContext;
     }
 
     /**
@@ -239,7 +251,7 @@ public class Scenario {
         );
 
         delete(tempFile);
-        return new Scenario(deserializedFormDef, new FormEntryController(new FormEntryModel(deserializedFormDef)));
+        return Scenario.from(deserializedFormDef);
     }
 
     /**
@@ -251,7 +263,7 @@ public class Scenario {
      * form indexes otherwise.
      */
     public TreeReference expandSingle(TreeReference reference) {
-        List<TreeReference> expandedRefs = ec.expandReference(reference);
+        List<TreeReference> expandedRefs = evaluationContext.expandReference(reference);
         if (expandedRefs.size() != 1)
             throw new RuntimeException("Provided xPath expands to " + expandedRefs.size() + " references. Expecting exactly one expanded reference.");
         return expandedRefs.get(0);
@@ -281,7 +293,7 @@ public class Scenario {
     }
 
     private boolean refExists(TreeReference reference) {
-        return ec.expandReference(reference).size() == 1;
+        return evaluationContext.expandReference(reference).size() == 1;
     }
 
     /**
@@ -391,9 +403,7 @@ public class Scenario {
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());
-        FormEntryModel formEntryModel = new FormEntryModel(formDef);
-        FormEntryController formEntryController = new FormEntryController(formEntryModel);
-        return new Scenario(formDef, formEntryController);
+        return Scenario.from(formDef);
     }
 
     // endregion
@@ -511,7 +521,7 @@ public class Scenario {
     private AnswerResult answer(IAnswerData data) {
         FormIndex formIndex = model.getFormIndex();
         log.info("Answer {} at {}", data, formIndex.getReference().toString(true, true));
-        return AnswerResult.from(formEntryController.answerQuestion(formIndex, data, true));
+        return AnswerResult.from(controller.answerQuestion(formIndex, data, true));
     }
 
     // endregion
@@ -546,7 +556,7 @@ public class Scenario {
      */
     public Scenario createNewRepeat() {
         log.info("Create repeat instance {}", model.getFormIndex().getReference());
-        formEntryController.newRepeat();
+        controller.newRepeat();
         return this;
     }
 
@@ -561,7 +571,7 @@ public class Scenario {
 
         // Compute the next multiplicity value counting the existing instances
         TreeReference repeatInstanceRef = groupRef.clone();
-        int multiplicity = ec.expandReference(repeatInstanceRef).size();
+        int multiplicity = evaluationContext.expandReference(repeatInstanceRef).size();
         repeatInstanceRef.setMultiplicity(repeatInstanceRef.size() - 1, multiplicity);
 
         return createRepeat(repeatInstanceRef);
@@ -584,7 +594,7 @@ public class Scenario {
                     // repeat group at the subRef. Create new repeats until the
                     // one want we need is created
                     while (!refExists(repeatInstanceRef))
-                        formEntryController.descendIntoNewRepeat();
+                        controller.descendIntoNewRepeat();
             }
         if (!refExists(repeatInstanceRef))
             throw new RuntimeException("We couldn't create repeat group instance at " + repeatInstanceRef + ". Check your form and your test");
@@ -615,13 +625,13 @@ public class Scenario {
      * - This method leaves log traces
      */
     public int next() {
-        int jumpResultCode = formEntryController.stepToNextEvent();
+        int jumpResultCode = controller.stepToNextEvent();
         log.info(humanJumpTrace(jumpResultCode));
         return jumpResultCode;
     }
 
     public int prev() {
-        int jumpResultCode = formEntryController.stepToPreviousEvent();
+        int jumpResultCode = controller.stepToPreviousEvent();
         log.info(humanJumpTrace(jumpResultCode));
         return jumpResultCode;
     }
@@ -650,21 +660,21 @@ public class Scenario {
     }
 
     private int silentNext() {
-        return formEntryController.stepToNextEvent();
+        return controller.stepToNextEvent();
     }
 
     private int silentPrev() {
-        return formEntryController.stepToPreviousEvent();
+        return controller.stepToPreviousEvent();
     }
 
     private int jump(FormIndex index) {
-        int jumpResultCode = formEntryController.jumpToIndex(index);
+        int jumpResultCode = controller.jumpToIndex(index);
         log.info(humanJumpTrace(jumpResultCode));
         return jumpResultCode;
     }
 
     private void silentJump(FormIndex indexOf) {
-        formEntryController.jumpToIndex(indexOf);
+        controller.jumpToIndex(indexOf);
     }
 
     private String humanJumpTrace(int jumpResultCode) {
@@ -740,11 +750,11 @@ public class Scenario {
     }
 
     public TreeReference refAtIndex() {
-        return formEntryController.getModel().getFormIndex().getReference();
+        return controller.getModel().getFormIndex().getReference();
     }
 
     public boolean atQuestion() {
-        return formDef.getChild(formEntryController.getModel().getFormIndex()) instanceof QuestionDef;
+        return formDef.getChild(controller.getModel().getFormIndex()) instanceof QuestionDef;
     }
 
     public QuestionDef getQuestionAtIndex() {
@@ -770,7 +780,7 @@ public class Scenario {
         if (!reference.isAmbiguous())
             throw new RuntimeException("Provided xPath must be ambiguous");
 
-        List<TreeReference> treeReferences = ec
+        List<TreeReference> treeReferences = evaluationContext
             .expandReference(reference);
         return treeReferences
             .size();
