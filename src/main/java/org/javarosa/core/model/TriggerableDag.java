@@ -148,10 +148,8 @@ public class TriggerableDag {
                 evaluationResults.addAll(qt.apply(mainInstance, ec, qualified));
             }
 
-            boolean fired = evaluationResults.size() > 0;
-            if (fired) {
+            if (evaluationResults.size() > 0)
                 accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
-            }
 
         } catch (Exception e) {
             throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
