@@ -323,12 +323,10 @@ public class TreeReference implements Externalizable, Serializable {
 
             if (contextRef.getName(i).equals(newRef.getName(i))) {
                 if (newRef.getPredicate(i) == null) {
-                    List<XPathExpression> predicate = contextRef.getPredicate(i);
-                    newRef.addPredicate(i, predicate);
+                    newRef.addPredicate(i, contextRef.getPredicate(i));
                 }
                 if (i + refLevel <= newRef.size()) {
-                    int multiplicity = contextRef.getMultiplicity(i);
-                    newRef.setMultiplicity(i, multiplicity);
+                    newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
                 }
             } else {
                 break;
