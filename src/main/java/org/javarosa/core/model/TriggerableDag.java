@@ -305,7 +305,7 @@ public class TriggerableDag {
     /**
      * Adds the provided triggerable to the DAG.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * <ul>
      *     <li>If a similar triggerable has been already added, its context gets
      *     intersected with the provided triggerable to cover both using only
@@ -364,7 +364,7 @@ public class TriggerableDag {
      * Returns the list of edges in the DAG that can be built from all the
      * triggerables added to the DAG while parsing the form.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * <ul>
      *     <li>Throws IllegalStateException when cycles are detected involving
      *     self-references</li>
@@ -475,7 +475,7 @@ public class TriggerableDag {
      * Returns a set with the DAG that can be build using the provided vertices
      * and edges.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * <ul>
      *     <li>Throws IllegalStateException when cycles are detected involving
      *     more than one node</li>
