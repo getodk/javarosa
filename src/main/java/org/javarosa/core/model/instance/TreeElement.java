@@ -62,7 +62,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
  *
  * <p>TODO: Split out the bind-able session data from this class and leave only the mandatory values to speed up
  * new DOM-like models</p>
- 
+
  * @author Clayton Sims
  */
 
@@ -893,7 +893,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
             step.setInstanceName(elem.getInstanceName());
             if(elem.getInstanceName() != null) {
                 // it is a named instance; it should not inherit runtime context...
-                step.setContext(TreeReference.CONTEXT_INSTANCE);
+                step.setContextType(TreeReference.CONTEXT_INSTANCE);
             }
 
             ref = ref.parent(step);

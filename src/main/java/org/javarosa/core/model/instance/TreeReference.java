@@ -199,7 +199,7 @@ public class TreeReference implements Externalizable, Serializable {
 
         //copy instances
         newRef.setInstanceName(instanceName);
-        newRef.setContext(this.contextType);
+        newRef.setContextType(this.contextType);
         return newRef;
     }
 
@@ -312,7 +312,7 @@ public class TreeReference implements Externalizable, Serializable {
 
         TreeReference newRef = anchor(contextRef);
         // unclear...
-        newRef.setContext(contextRef.getContext());
+        newRef.setContextType(contextRef.getContextType());
 
         //apply multiplicities and fill in wildcards as necessary based on the context ref
         for (int i = 0; i < contextRef.size() && i < newRef.size(); i++) {
@@ -642,12 +642,29 @@ public class TreeReference implements Externalizable, Serializable {
     }
 
     //TODO: This should be in construction
-    public void setContext(int context) {
-        this.contextType = context;
+
+    /**
+     * @deprecated use #setContextType(int) instead
+     */
+    @Deprecated
+    public void setContext(int contextType) {
+        setContextType(contextType);
     }
 
+    public void setContextType(int contextType) {
+        this.contextType = contextType;
+    }
+
+    /**
+     * @deprecated use #getContextType() instead
+     */
+    @Deprecated
     public int getContext() {
-        return this.contextType;
+        return this.getContextType();
+    }
+
+    public int getContextType() {
+        return contextType;
     }
 
     /**

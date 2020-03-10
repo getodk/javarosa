@@ -216,7 +216,7 @@ public class XPathFuncExprRandomizeTest {
     private static TreeReference absoluteRef(String path) {
         TreeReference tr = new TreeReference();
         tr.setRefLevel(REF_ABSOLUTE);
-        tr.setContext(CONTEXT_ABSOLUTE);
+        tr.setContextType(CONTEXT_ABSOLUTE);
         tr.setInstanceName(null);
         Arrays.stream(path.split("/"))
             .filter(s -> !s.isEmpty())

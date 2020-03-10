@@ -82,7 +82,7 @@ public class XPathPathExprEval {
 
     private TreeReference getContextualizedTreeReference(TreeReference genericRef, EvaluationContext ec) {
         // We don't necessarily know the model we want to be working with until we've contextualized the node
-        TreeReference contextRef = genericRef.getContext() == TreeReference.CONTEXT_ORIGINAL ?
+        TreeReference contextRef = genericRef.getContextType() == TreeReference.CONTEXT_ORIGINAL ?
             ec.getOriginalContext() : ec.getContextRef();
         return genericRef.contextualize(contextRef);
     }
