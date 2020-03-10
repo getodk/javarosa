@@ -311,8 +311,6 @@ public class TreeReference implements Externalizable, Serializable {
         }
 
         TreeReference newRef = anchor(contextRef);
-        // unclear...
-        newRef.setContextType(contextRef.getContextType());
 
         //apply multiplicities and fill in wildcards as necessary based on the context ref
         for (int i = 0; i < contextRef.size() && i < newRef.size(); i++) {
