@@ -199,7 +199,7 @@ public class TreeReference implements Externalizable, Serializable {
 
         //copy instances
         newRef.setInstanceName(instanceName);
-        newRef.setContext(this.contextType);
+        newRef.setContextType(this.contextType);
         return newRef;
     }
 
@@ -306,38 +306,25 @@ public class TreeReference implements Externalizable, Serializable {
     }
 
     public TreeReference contextualize(TreeReference contextRef) {
-        //TODO: Technically we should possibly be modifying context stuff here
-        //instead of in the xpath stuff;
         if (!contextRef.isAbsolute()) {
             return null;
         }
 
-        // I think contextualizing of absolute nodes still needs to be done.
-        // They may contain predicates that need to be contextualized.
-
         TreeReference newRef = anchor(contextRef);
-        // unclear...
-        newRef.setContext(contextRef.getContext());
 
         //apply multiplicities and fill in wildcards as necessary based on the context ref
         for (int i = 0; i < contextRef.size() && i < newRef.size(); i++) {
-
-            //If the the contextRef can provide a definition for a wildcard, do so
+            //If the the contextRef can provide a definition for a wildcard (not currently supported by JR), do so
             if (TreeReference.NAME_WILDCARD.equals(newRef.getName(i)) && !TreeReference.NAME_WILDCARD.equals(contextRef.getName(i))) {
                 newRef.data.set(i, newRef.data.get(i).setName(contextRef.getName(i)));
             }
 
             if (contextRef.getName(i).equals(newRef.getName(i))) {
-                //We can't actually merge nodes if the newRef has predicates or filters
-                //on this expression, since those reset any existing resolutions which
-                //may have been done.
                 if (newRef.getPredicate(i) == null) {
-                    List<XPathExpression> predicate = contextRef.getPredicate(i);
-                    newRef.addPredicate(i, predicate);
+                    newRef.addPredicate(i, contextRef.getPredicate(i));
                 }
                 if (i + refLevel <= newRef.size()) {
-                    int multiplicity = contextRef.getMultiplicity(i);
-                    newRef.setMultiplicity(i, multiplicity);
+                    newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
                 }
             } else {
                 break;
@@ -653,12 +640,29 @@ public class TreeReference implements Externalizable, Serializable {
     }
 
     //TODO: This should be in construction
-    public void setContext(int context) {
-        this.contextType = context;
+
+    /**
+     * @deprecated use #setContextType(int) instead
+     */
+    @Deprecated
+    public void setContext(int contextType) {
+        setContextType(contextType);
     }
 
+    public void setContextType(int contextType) {
+        this.contextType = contextType;
+    }
+
+    /**
+     * @deprecated use #getContextType() instead
+     */
+    @Deprecated
     public int getContext() {
-        return this.contextType;
+        return this.getContextType();
+    }
+
+    public int getContextType() {
+        return contextType;
     }
 
     /**

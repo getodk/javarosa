@@ -119,10 +119,10 @@ public class XPathPathExpr extends XPathExpression {
                             //we've got a non-standard instance in play, watch out
                             if (strLit.s == null) {
                                 // absolute reference to the main instance
-                                ref.setContext(TreeReference.CONTEXT_ABSOLUTE);
+                                ref.setContextType(TreeReference.CONTEXT_ABSOLUTE);
                                 ref.setInstanceName(null);
                             } else {
-                                ref.setContext(TreeReference.CONTEXT_INSTANCE);
+                                ref.setContextType(TreeReference.CONTEXT_INSTANCE);
                                 ref.setInstanceName(strLit.s);
                             }
                             break;
@@ -142,7 +142,7 @@ public class XPathPathExpr extends XPathExpression {
                              * in the XPathPathExprCurrentTest test class
                              */
                             parentsAllowed = true;
-                            ref.setContext(TreeReference.CONTEXT_ORIGINAL);
+                            ref.setContextType(TreeReference.CONTEXT_ORIGINAL);
                             break;
                         default:
                             //We only support expression root contexts for instance refs, everything else is an illegal filter
