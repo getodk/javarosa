@@ -353,7 +353,7 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
         return getMaskVar(MASK_ENABLED_INH) && getMaskVar(MASK_ENABLED);
     }
 
-    /* ==== SPECIAL SETTERS (SETTERS WITH SIDE-EFFECTS) ==== */
+    /* ==== SPECIAL SETTERS (SETTERS WITH SIDE EFFECTS) ==== */
 
     public boolean setAnswer(IAnswerData answer) {
         if (value != null || answer != null) {

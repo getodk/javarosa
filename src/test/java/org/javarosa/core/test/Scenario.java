@@ -104,7 +104,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class helps writing JavaRosa tests. It provides two separate APIs:
  * <ul>
- * <li>A static, declarative API that lets the test author to define the state
+ * <li>A static, declarative API that lets the test author define the state
  * of a form in a given time.</li>
  * <li>A dynamic, imperative API that lets the test author fill the form as the
  * user would do, by controlling the flow while filling questions. These methods
@@ -144,7 +144,7 @@ public class Scenario {
         return new Scenario(formDef, new FormEntryController(formEntryModel), formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
     }
 
-    // region Miscelaneous
+    // region Miscellaneous
 
     public FormDef getFormDef() {
         return formDef;
@@ -415,7 +415,7 @@ public class Scenario {
      * Answers with a string value the question at the form index
      * corresponding to the provided reference.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * - It will create all the required middle and end repeat group instances
      * - It changes the current form index
      */
@@ -430,7 +430,7 @@ public class Scenario {
      * Answers with a list of string values the question at the form index
      * corresponding to the provided reference.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * - It will create all the required middle and end repeat group instances
      * - It changes the current form index
      */
@@ -445,7 +445,7 @@ public class Scenario {
      * Answers with an integer value the question at the form index
      * corresponding to the provided reference.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * - It will create all the required middle and end repeat group instances
      * - It changes the current form index
      */
@@ -460,7 +460,7 @@ public class Scenario {
      * Answers with a boolean value the question at the form index
      * corresponding to the provided reference.
      * <p>
-     * This method has side-effects:
+     * This method has side effects:
      * - It will create all the required middle and end repeat group instances
      * - It changes the current form index
      */
@@ -621,7 +621,7 @@ public class Scenario {
      * Jump to the next event.
      * <p>
      * Side effects:
-     * - This method updates the form index.
+     * - This method updates the form index
      * - This method leaves log traces
      */
     public int next() {
@@ -640,7 +640,7 @@ public class Scenario {
      * Jump the provided amount of times to the next event.
      * <p>
      * Side effects:
-     * - This method updates the form index.
+     * - This method updates the form index
      * - This method leaves log traces
      */
     public void next(int amount) {
@@ -652,7 +652,7 @@ public class Scenario {
      * Jump to the beginning of the form.
      * <p>
      * Side effects:
-     * - This method updates the form index.
+     * - This method updates the form index
      * - This method leaves log traces
      */
     public void jumpToBeginningOfForm() {

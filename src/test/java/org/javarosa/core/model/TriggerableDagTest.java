@@ -1050,7 +1050,7 @@ public class TriggerableDagTest {
         scenario.answer("/data/relevance-trigger", false);
 
         // This shows how JavaRosa will ignore the actual values of non-relevant fields. The
-        // W3C XForm specs regard relevance a purely UI concern. No side-effects on node values
+        // W3C XForm specs regard relevance a purely UI concern. No side effects on node values
         // are described in the specs, which implies that a relevance change wouln't
         // have any consequence on a node's value. This means that /data/result should keep having
         // a 75 after making /data/some-field non-relevant.
