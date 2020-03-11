@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
@@ -110,29 +109,6 @@ public abstract class Triggerable implements Externalizable {
             absTriggers.add(r.anchor(originalContextRef));
         }
         return absTriggers;
-    }
-
-    /**
-     * Searches in the triggers of this Triggerable, trying to find the ones that are
-     * contained in the given list of contextualized refs.
-     *
-     * @param firedAnchorsMap a map of absolute refs
-     * @return a list of affected nodes.
-     */
-    public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchorsMap) {
-        List<TreeReference> affectedTriggers = new ArrayList<>(0);
-
-        Set<TreeReference> triggers = this.getTriggers();
-        for (TreeReference trigger : triggers) {
-            List<TreeReference> firedAnchors = firedAnchorsMap.get(trigger.genericize());
-            if (firedAnchors == null) {
-                continue;
-            }
-
-            affectedTriggers.addAll(firedAnchors);
-        }
-
-        return affectedTriggers;
     }
 
     public TreeReference contextualizeContextRef(TreeReference anchorRef) {
