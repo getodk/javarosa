@@ -73,7 +73,9 @@ public class DigestTest {
             {"SHA-1", SHA1, "some text", BASE64, "N6pjx3OY2VRHMmLhoAV8HmMu2nc="},
             {"SHA-256", SHA256, "some text", BASE64, "uU9vElx546X/qoJvWEwQ1SraZp5nYgUbgmtVd20FrtI="},
             {"SHA-384", SHA384, "some text", BASE64, "zJTsPphzwLmnJIZEKVj2cQZ833e5QnQW0DFEDMYgQeLuE0RJhEfsDO2fcENGG9Hz"},
-            {"SHA-512", SHA512, "some text", BASE64, "4nMrrtyj6sFAeChjfeHbynAsP8ns4Wz1Nt241hOc2F3+dGS4I1spgm9gjM9KxkPimxnGN4WKPYcQpZER30LdtQ=="}
+            {"SHA-512", SHA512, "some text", BASE64, "4nMrrtyj6sFAeChjfeHbynAsP8ns4Wz1Nt241hOc2F3+dGS4I1spgm9gjM9KxkPimxnGN4WKPYcQpZER30LdtQ=="},
+
+            {"MD5 HEX of empty string (baseline from forum feedback)", MD5, "", HEX, "d41d8cd98f00b204e9800998ecf8427e"}
         });
     }
 
@@ -89,15 +91,15 @@ public class DigestTest {
                 title("Digest form"),
                 model(
                     mainInstance(t("data id=\"digest\"",
-                        t("my-text"),
-                        t("my-algorithm"),
-                        t("my-encoding"),
+                        t("my-text", input),
+                        t("my-algorithm", algorithm.toString()),
+                        t("my-encoding", encoding.toString()),
                         t("my-digest")
                     )),
                     bind("/data/my-text").type("string"),
                     bind("/data/my-algorithm").type("string"),
                     bind("/data/my-encoding").type("string"),
-                    bind("/data/my-digest").type("string").calculate("if(/data/my-algorithm != '' and /data/my-encoding != '', digest(/data/my-text, /data/my-algorithm, /data/my-encoding), '')")
+                    bind("/data/my-digest").type("string").calculate("digest(/data/my-text, /data/my-algorithm, /data/my-encoding)")
                 )
             ),
             body(
@@ -107,9 +109,6 @@ public class DigestTest {
             ))
         );
 
-        scenario.answer("/data/my-text", "some text");
-        scenario.answer("/data/my-algorithm", algorithm.toString());
-        scenario.answer("/data/my-encoding", encoding.toString());
         assertThat(scenario.answerOf("/data/my-digest"), is(stringAnswer(expectedOutput)));
     }
 }
