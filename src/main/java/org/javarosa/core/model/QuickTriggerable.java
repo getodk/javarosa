@@ -1,7 +1,6 @@
 package org.javarosa.core.model;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -36,10 +35,6 @@ public final class QuickTriggerable {
 
     public boolean isRecalculate() {
         return triggerable instanceof Recalculate;
-    }
-
-    public List<TreeReference> findAffectedTriggers(Map<TreeReference, List<TreeReference>> firedAnchors) {
-        return triggerable.findAffectedTriggers(firedAnchors);
     }
 
     public TreeReference contextualizeContextRef(TreeReference anchorRef) {

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,44 +110,18 @@ public class TriggerableDag {
         this.accessor = accessor;
     }
 
-    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> tv, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
-        // tv should now contain all of the triggerable components which are going
-        // to need to be addressed by this update.
-        // 'triggerables' is topologically-ordered by dependencies, so evaluate
-        // the triggerables in 'tv' in the order they appear in 'triggerables'
+    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> triggerables, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> fired = new HashSet<>();
 
-        Map<TreeReference, List<TreeReference>> firedAnchors = new LinkedHashMap<>();
+        // Evaluate the provided set of triggerables in the order they appear
+        // in the sorted DAG to ensure the correct sequence of evaluations
+        for (QuickTriggerable qt : triggerablesDAG)
+            if (triggerables.contains(qt) && !alreadyEvaluated.contains(qt)) {
 
-        for (QuickTriggerable qt : triggerablesDAG) {
-            if (tv.contains(qt) && !alreadyEvaluated.contains(qt)) {
-
-                List<TreeReference> affectedTriggers = qt.findAffectedTriggers(firedAnchors);
-                if (affectedTriggers.isEmpty()) {
-                    affectedTriggers.add(anchorRef);
-                }
-
-                List<EvaluationResult> evaluationResults = evaluateTriggerable(mainInstance, evalContext, qt, affectedTriggers);
-
-                if (evaluationResults.size() > 0) {
-                    fired.add(qt);
-
-                    for (EvaluationResult evaluationResult : evaluationResults) {
-                        TreeReference affectedRef = evaluationResult.getAffectedRef();
-
-                        TreeReference key = affectedRef.genericize();
-                        List<TreeReference> values = firedAnchors.get(key);
-                        if (values == null) {
-                            values = new ArrayList<>();
-                            firedAnchors.put(key, values);
-                        }
-                        values.add(affectedRef);
-                    }
-                }
+                evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
 
                 fired.add(qt);
             }
-        }
 
         return fired;
     }
@@ -157,42 +130,22 @@ public class TriggerableDag {
      * Step 3 in DAG cascade. evaluate the individual triggerable expressions
      * against the anchor (the value that changed which triggered recomputation)
      */
-    private List<EvaluationResult> evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable qt, List<TreeReference> anchorRefs) {
-        List<EvaluationResult> evaluationResults = new ArrayList<>(0);
-
+    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable triggerable, TreeReference anchorRef) {
         // Contextualize the reference used by the triggerable against the anchor
-        Set<TreeReference> updatedContextRef = new HashSet<>();
+        TreeReference contextRef = triggerable.contextualizeContextRef(anchorRef);
 
-        for (TreeReference anchorRef : anchorRefs) {
-            TreeReference contextRef = qt.contextualizeContextRef(anchorRef);
-            if (updatedContextRef.contains(contextRef)) {
-                continue;
-            }
-
+        List<EvaluationResult> evaluationResults = new ArrayList<>(0);
+        // Go through all of the fully qualified nodes which this triggerable
+        // updates. (Multiple nodes can be updated by the same trigger)
+        for (TreeReference qualified : evalContext.expandReference(contextRef))
             try {
-
-                // Now identify all of the fully qualified nodes which this
-                // triggerable updates. (Multiple nodes can be updated by the same trigger)
-                List<TreeReference> qualifiedList = evalContext.expandReference(contextRef);
-
-                // Go through each one and evaluate the trigger expression
-                for (TreeReference qualified : qualifiedList) {
-                    EvaluationContext ec = new EvaluationContext(evalContext, qualified);
-                    evaluationResults.addAll(qt.apply(mainInstance, ec, qualified));
-                }
-
-                boolean fired = evaluationResults.size() > 0;
-                if (fired) {
-                    accessor.getEventNotifier().publishEvent(new Event(qt.isCondition() ? "Condition" : "Recalculate", evaluationResults));
-                }
-
-                updatedContextRef.add(contextRef);
+                evaluationResults.addAll(triggerable.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
-                throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "': " + e.getMessage(), e);
+                throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "' (" + qualified + "): " + e.getMessage(), e);
             }
-        }
 
-        return evaluationResults;
+        if (evaluationResults.size() > 0)
+            accessor.getEventNotifier().publishEvent(new Event(triggerable.isCondition() ? "Condition" : "Recalculate", evaluationResults));
     }
 
     public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
@@ -471,6 +424,7 @@ public class TriggerableDag {
         }
         return childrenRefs;
     }
+
     /**
      * Returns a set with the DAG that can be build using the provided vertices
      * and edges.
