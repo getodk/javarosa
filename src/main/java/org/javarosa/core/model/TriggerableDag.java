@@ -211,7 +211,7 @@ public class TriggerableDag {
         publishSummary("Created (phase 1)", createRef, qtSet1);
 
         // initialize conditions for the node (and sub-nodes)
-        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0));
+        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createRef, qtSet1);
         publishSummary("Created (phase 2)", createRef, qtSet2);
 
         Set<QuickTriggerable> alreadyEvaluated = new HashSet<>(qtSet1);
@@ -240,7 +240,7 @@ public class TriggerableDag {
         publishSummary("Copied itemset answer (phase 1)", targetRef, qtSet1);
 
         // initialize conditions for the node (and sub-nodes)
-        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, copyRef, new HashSet<>(0));
+        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, copyRef, qtSet1);
         publishSummary("Copied itemset answer (phase 2)", targetRef, qtSet2);
         // not 100% sure this will work since destRef is ambiguous as the last
         // step, but i think it's supposed to work
