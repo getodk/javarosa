@@ -110,14 +110,13 @@ public class TriggerableDag {
         this.accessor = accessor;
     }
 
-    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> triggerables, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
+    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> fired = new HashSet<>();
 
         // Evaluate the provided set of triggerables in the order they appear
         // in the sorted DAG to ensure the correct sequence of evaluations
         for (QuickTriggerable qt : triggerablesDAG)
-            if (triggerables.contains(qt) && !alreadyEvaluated.contains(qt)) {
-
+            if (toTrigger.contains(qt) && !alreadyEvaluated.contains(qt)) {
                 evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
 
                 fired.add(qt);
@@ -492,23 +491,16 @@ public class TriggerableDag {
      * further be triggered due to their update, and then dispatching all of the
      * evaluations.
      */
-    private Set<QuickTriggerable> evaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> tv, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
-        // add all cascaded triggerables to queue
-
-        // Iterate through all of the currently known triggerables to be
-        // triggered
-        Set<QuickTriggerable> refSet = new HashSet<>(tv);
-        for (; !refSet.isEmpty(); ) {
+    private Set<QuickTriggerable> evaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
+        Set<QuickTriggerable> refSet = new HashSet<>(toTrigger);
+        while (!refSet.isEmpty()) {
             Set<QuickTriggerable> newSet = new HashSet<>();
             for (QuickTriggerable qt : refSet) {
-                // leverage the saved DAG edges.
-                // This may over-fill the set of triggerables.
-                // but should be faster than recomputing the edges.
-                // with value-change optimizations, this should be
-                // much faster.
+                // Leverage the saved DAG edges. This may over-fill the set of triggerables but should be faster than
+                // recomputing the edges. With value-change optimizations, this should be much faster.
                 for (QuickTriggerable qu : qt.getImmediateCascades()) {
-                    if (!tv.contains(qu)) {
-                        tv.add(qu);
+                    if (!toTrigger.contains(qu)) {
+                        toTrigger.add(qu);
                         newSet.add(qu);
                     }
                 }
@@ -516,7 +508,7 @@ public class TriggerableDag {
             refSet = newSet;
         }
 
-        return doEvaluateTriggerables(mainInstance, evalContext, tv, anchorRef, alreadyEvaluated);
+        return doEvaluateTriggerables(mainInstance, evalContext, toTrigger, anchorRef, alreadyEvaluated);
     }
 
     /**
@@ -558,10 +550,7 @@ public class TriggerableDag {
     }
 
     private Set<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref, Set<QuickTriggerable> alreadyEvaluated) {
-
-        // turn unambiguous ref into a generic ref
-        // to identify what nodes should be triggered by this
-        // reference changing
+        // Turn unambiguous ref into a generic ref to identify what nodes should be triggered by this reference changing
         TreeReference genericRef = ref.genericize();
 
         // get triggerables which are activated by the generic reference
