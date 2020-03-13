@@ -929,6 +929,84 @@ public class TriggerableDagTest {
     }
 
     /**
+     * Excercises the triggerTriggerables call in createRepeatGroup.
+     */
+    @Test
+    public void adding_repeat_instance_triggers_triggerables_outside_repeat_that_reference_repeat_nodeset() throws IOException {
+        Scenario scenario = Scenario.init("Form", html(
+            head(
+                title("Form"),
+                model(
+                    mainInstance(t("data",
+                        t("count"),
+                        t("repeat jr:template=\"\"",
+                            t("string")
+                        )
+                    )),
+                    bind("/data/count").type("int").calculate("count(/data/repeat)"),
+                    bind("/data/repeat/string").type("string")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/string")
+                )
+            )
+        ));
+
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+
+        assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
+    }
+
+    /**
+     * Excercises the initializeTriggerables call in createRepeatGroup.
+     */
+    @Test
+    public void adding_repeat_instance_triggers_descendant_node_triggerables() throws IOException {
+        Scenario scenario = Scenario.init("Form", html(
+            head(
+                title("Form"),
+                model(
+                    mainInstance(t("data",
+                        t("repeat jr:template=\"\"",
+                            t("string"),
+                            t("group",
+                                t("int")
+                            )
+                        )
+                    )),
+                    bind("/data/repeat/string").type("string"),
+                    bind("/data/repeat/group").relevant("0")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/string"),
+                    input("/data/repeat/group/int")
+                )
+            )
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/int"), is(nonRelevant()));
+
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.getAnswerNode("/data/repeat[1]/group/int"), is(nonRelevant()));
+
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.getAnswerNode("/data/repeat[2]/group/int"), is(nonRelevant()));
+    }
+
+    /**
      * This test documents some bugs:
      *  * calling the count function with an absolute reference to a repeat should return the count of repeat instances
      *  but instead it always returns 1
