@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
 import org.joda.time.LocalDateTime;
@@ -61,6 +62,7 @@ public class DateUtils {
             second = 0;
             secTicks = 0;
             dow = 0;
+            week = 1;
 
 //            tzStr = "Z";
 //            tzOffset = 0;
@@ -73,6 +75,7 @@ public class DateUtils {
         public int minute; //0-59
         public int second; //0-59
         public int secTicks; //0-999 (ms)
+        public int week; // 1-52
 
         /** NOTE: CANNOT BE USED TO SPECIFY A DATE **/
         public int dow; //1-7;
@@ -80,7 +83,7 @@ public class DateUtils {
 //        public String tzStr;
 //        public int tzOffset; //s ahead of UTC
 
-        DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow) {
+        DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow, int week) {
             this.year = year;
             this.month = month;
             this.day = day;
@@ -89,20 +92,25 @@ public class DateUtils {
             this.second = second;
             this.secTicks = secTicks;
             this.dow = dow;
+            this.week = week;
         }
 
         public static DateFields of(int year, int month, int day, int hour, int minute, int second, int secTicks) {
             // The official API returns an ISO 8601 day of week
             // with a range of values from 1 for Monday to 7 for Sunday].
-            // TODO migrate dow field to a DayOfWeek type to avoid any possible interpretation errors
-            int iso8601Dow = new LocalDateTime(year, month, day, hour, minute, second, secTicks).getDayOfWeek();
+            // TODO migrate dow field to a DayOfWeek type to avoid any possible
+            // interpretation errors
+            LocalDateTime ldt = new LocalDateTime(year, month, day, hour, minute, second, secTicks);
+            int iso8601Dow = ldt.getDayOfWeek();
             int dow = iso8601Dow == 7 ? 0 : iso8601Dow;
-            return new DateFields(year, month, day, hour, minute, second, secTicks, dow);
+            int week = ldt.getWeekOfWeekyear();
+            return new DateFields(year, month, day, hour, minute, second, secTicks, dow, week);
         }
 
-        public boolean check () {
-            return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year)) &&
-                    inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999));
+        public boolean check() {
+            return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year))
+                    && inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59)
+                    && inRange(secTicks, 0, 999) && inRange(week, 1, 52));
         }
     }
 
@@ -126,6 +134,7 @@ public class DateUtils {
         fields.second = cd.get(Calendar.SECOND);
         fields.secTicks = cd.get(Calendar.MILLISECOND);
         fields.dow = cd.get(Calendar.DAY_OF_WEEK);
+        fields.week = cd.get(Calendar.WEEK_OF_YEAR);
 
         return fields;
     }
@@ -310,6 +319,8 @@ public class DateUtils {
                     sb.append(intPad(f.secTicks, 3));
                 } else if (c == 'a') {    //Three letter short text day
                     sb.append(getLocalDateTime(f).toString(DateTimeFormat.forPattern("EEE")));
+                } else if (c == 'W') { // week of the year
+                    sb.append(intPad(f.week, 2));
                 } else if (c == 'Z' || c == 'A' || c == 'B') {
                     throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
                 } else {
