@@ -16,31 +16,29 @@
 
 package org.javarosa.core.model.data.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Before;
+import org.junit.Test;
 
-public class SelectOneDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(SelectOneDataTests.class);
+public class SelectOneDataTests {
     QuestionDef question;
 
     Selection one;
     Selection two;
 
-    private static int NUM_TESTS = 3;
-
     /* (non-Javadoc)
      * @see j2meunit.framework.TestCase#setUp()
      */
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
+
 
         question = new QuestionDef();
         question.setID(57);
@@ -55,36 +53,14 @@ public class SelectOneDataTests extends TestCase {
         two.attachChoice(question);
     }
 
-    public SelectOneDataTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
 
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new SelectOneDataTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testGetData";
-        case 2: return "testSetData";
-        case 3: return "testNullData";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testGetData() {
         SelectOneData data = new SelectOneData(one);
         assertEquals("SelectOneData's getValue returned an incorrect SelectOne", data.getValue(), one);
 
     }
+    @Test
     public void testSetData() {
         SelectOneData data = new SelectOneData(one);
         data.setValue(two);
@@ -97,6 +73,7 @@ public class SelectOneDataTests extends TestCase {
         assertEquals("SelectOneData did not properly reset value ", data.getValue(), one);
 
     }
+    @Test
     public void testNullData() {
         boolean exceptionThrown = false;
         SelectOneData data = new SelectOneData();

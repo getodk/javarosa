@@ -19,101 +19,109 @@ package org.javarosa.core.model.condition;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-
+import java.util.Set;
+import org.javarosa.core.model.QuickTriggerable;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.XPathException;
 
 public class Condition extends Triggerable {
-    public static final int ACTION_NULL = 0;
-    public static final int ACTION_SHOW = 1;
-    public static final int ACTION_HIDE = 2;
-    public static final int ACTION_ENABLE = 3;
-    public static final int ACTION_DISABLE = 4;
-    public static final int ACTION_LOCK = 5;
-    public static final int ACTION_UNLOCK = 6;
-    public static final int ACTION_REQUIRE = 7;
-    public static final int ACTION_DONT_REQUIRE = 8;
+    public ConditionAction trueAction;
+    public ConditionAction falseAction;
 
-    public int trueAction;
-    public int falseAction;
-
-    public Condition () {
-
+    /**
+     * Constructor required for deserialization
+     */
+    @SuppressWarnings("unused")
+    public Condition() {
     }
 
-    public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
-        this(expr, trueAction, falseAction, contextRef, new ArrayList<TreeReference>(0));
-    }
-
-    public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, ArrayList<TreeReference> targets) {
-        super(expr, contextRef, targets);
+    protected Condition(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
+        super(expr, contextRef, originalContextRef, targets, immediateCascades);
         this.trueAction = trueAction;
         this.falseAction = falseAction;
     }
 
-    public Object eval (FormInstance model, EvaluationContext evalContext) {
-        return evalPredicate(model, evalContext);
+    @Override
+    public Object eval(FormInstance model, EvaluationContext evalContext) {
+        try {
+            return expr.eval(model, evalContext);
+        } catch (XPathException e) {
+            e.setSource("Condition expression for " + contextRef.toString(true));
+            throw e;
+        }
     }
 
-    public boolean evalBool (FormInstance model, EvaluationContext evalContext) {
-        return ((Boolean)eval(model, evalContext)).booleanValue();
+    @Override
+    public void apply(TreeReference ref, Object result, FormInstance mainInstance) {
+        TreeElement element = mainInstance.resolveReference(ref);
+        switch ((boolean) result ? trueAction : falseAction) {
+            case RELEVANT:
+                element.setRelevant(true);
+                break;
+            case NOT_RELEVANT:
+                element.setRelevant(false);
+                break;
+            case ENABLE:
+                element.setEnabled(true);
+                break;
+            case READ_ONLY:
+                element.setEnabled(false);
+                break;
+            case REQUIRE:
+                element.setRequired(true);
+                break;
+            case DONT_REQUIRE:
+                element.setRequired(false);
+                break;
+        }
     }
 
-    public void apply (TreeReference ref, Object rawResult, FormInstance mainInstance) {
-        boolean result = ((Boolean)rawResult).booleanValue();
-        performAction(mainInstance.resolveReference(ref), result ? trueAction : falseAction);
+    @Override
+    public boolean canCascade() {
+        // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
+        return trueAction.isCascading();
     }
 
-    public boolean canCascade () {
-        return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
-    }
-
+    @Override
     public boolean isCascadingToChildren() {
-        return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
+        // TODO Study why we consider just the true action to decide this. Maybe we assume that if the true action is cascading, then the false action is cascading too?
+        return trueAction.isCascading();
     }
 
-
-    private void performAction (TreeElement node, int action) {
-        switch (action) {
-        case ACTION_NULL: break;
-        case ACTION_SHOW:         node.setRelevant(true); break;
-        case ACTION_HIDE:         node.setRelevant(false); break;
-        case ACTION_ENABLE:       node.setEnabled(true); break;
-        case ACTION_DISABLE:      node.setEnabled(false); break;
-        case ACTION_LOCK:         /* not supported */; break;
-        case ACTION_UNLOCK:       /* not supported */; break;
-        case ACTION_REQUIRE:      node.setRequired(true); break;
-        case ACTION_DONT_REQUIRE: node.setRequired(false); break;
-        }
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Condition
+            && super.equals(o)
+            && trueAction == ((Condition) o).trueAction
+            && falseAction == ((Condition) o).falseAction;
     }
 
-    //conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
-    public boolean equals (Object o) {
-        if (o instanceof Condition) {
-            Condition c = (Condition)o;
-            if (this == c)
-                return true;
-
-            return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && super.equals(c));
-        } else {
-            return false;
-        }
+    @Override
+    public String toString() {
+        return String.format("%s %s if (%s)", trueAction.getVerb(), buildHumanReadableTargetList(), expr.xpath);
     }
 
+    // region External Serialization
+
+    @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         super.readExternal(in, pf);
-        trueAction = ExtUtil.readInt(in);
-        falseAction = ExtUtil.readInt(in);
+        trueAction = ConditionAction.from(ExtUtil.readInt(in));
+        falseAction = ConditionAction.from(ExtUtil.readInt(in));
     }
 
+    @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         super.writeExternal(out);
-        ExtUtil.writeNumeric(out, trueAction);
-        ExtUtil.writeNumeric(out, falseAction);
+        ExtUtil.writeNumeric(out, trueAction.getCode());
+        ExtUtil.writeNumeric(out, falseAction.getCode());
     }
+
+    // endregion
 }

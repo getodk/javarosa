@@ -16,22 +16,19 @@
 
 package org.javarosa.core.io.test;
 
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.javarosa.core.io.BufferedInputStream;
 import org.javarosa.core.util.ArrayUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Before;
+import org.junit.Test;
 
-public class BufferedInputStreamTests extends TestCase{
-    private static final Logger logger = LoggerFactory.getLogger(BufferedInputStreamTests.class);
+public class BufferedInputStreamTests {
 
     byte[] bytes;
 
@@ -39,10 +36,10 @@ public class BufferedInputStreamTests extends TestCase{
 
     byte[][] arraysToTest;
 
-    private static int NUM_TESTS = 2;
 
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
+
 
         Random r = new Random();
 
@@ -53,30 +50,7 @@ public class BufferedInputStreamTests extends TestCase{
         }
     }
 
-    public BufferedInputStreamTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
-
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new BufferedInputStreamTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testBuffered";
-        case 2: return "testIndividual";
-        }
-        throw new IllegalStateException("unexpected index");
-    }
-
+    @Test
     public void testBuffered() {
         //TODO: Test on this axis too?
         byte[] testBuffer = new byte[256];
@@ -117,6 +91,7 @@ public class BufferedInputStreamTests extends TestCase{
         }
     }
 
+    @Test
     public void testIndividual() {
         //TODO: Almost identical to above
         for(byte[] bytes : arraysToTest) {

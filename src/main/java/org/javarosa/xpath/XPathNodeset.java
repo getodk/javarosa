@@ -109,7 +109,7 @@ public class XPathNodeset {
         this.nodes = nodes;
     }
 
-    protected List<TreeReference> getReferences() {
+    public List<TreeReference> getReferences() {
         return this.nodes;
     }
 

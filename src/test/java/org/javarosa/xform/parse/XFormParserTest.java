@@ -46,7 +46,9 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,6 +191,17 @@ public class XFormParserTest {
     @Test(expected = XFormParseException.class)
     public void throwsParseExceptionOnBadRangeForm() throws IOException {
         parse(r("bad-range-form.xml"));
+    }
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
+
+    @Test
+    public void throwsExceptionOnEmptySelect() throws IOException {
+        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expectMessage("Select question 'First' has no choices");
+
+        Path formName = r("internal_empty_select.xml");
+        FormDef formDef = parse(formName);
     }
 
     @Test

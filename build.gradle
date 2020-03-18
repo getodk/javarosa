@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id "me.champeau.gradle.jmh" version "0.4.8"
+    id "me.champeau.gradle.jmh" version "0.5.0"
 }
 
 repositories {
@@ -75,8 +75,12 @@ javadoc {
     failOnError = false
 }
 
+jmhJar.doFirst {
+    new File("build/resources/test").mkdirs()
+}
+
 jmh {
-    exclude = "(BenchmarkTemplate)"
+    exclude = ["(BenchmarkTemplate)"]
     threads = 1
     fork = 1
     timeout = '10s'
@@ -91,6 +95,8 @@ jmh {
     includeTests = true
     resultFormat = 'CSV'
     forceGC = true
+
+    duplicateClassesStrategy = 'warn'
 }
 
 /**

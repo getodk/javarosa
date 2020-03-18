@@ -38,6 +38,16 @@ To build the project, go to the `View` menu, then `Tool Windows > Gradle`. `buil
 
 To package a jar, use the `jar` Gradle task.
 
+## Running benchmarks
+
+JavaRosa can be used to parse and fill very large forms on inexpensive devices and so it's important to keep an eye on performance. Benchmarks using [JMH](http://openjdk.java.net/projects/code-tools/jmh/) and the [JMH Gradle plugin](https://github.com/melix/jmh-gradle-plugin) have been introduced to compare relative performance as code changes are made. We have found that running these benchmarks with the `jmh` Gradle task or through IntelliJ can produce inconsistent results. The most reliable way we have found to run them is to first build a `jar` with the `jmhJar` Gradle task and then to run the jar:
+
+        java -jar build/libs/javarosa-jmh.jar ChildVaccination
+
+This also makes it easy to selectively run a subset of benchmarks by including a regular expression as an argument. In the example above, only benchmarks that include the text "ChildVaccination" will be executed. Run `java -jar build/libs/javarosa-jmh.jar -h` to see other JMH configuration options.
+
+While benchmarks can help identify relative performance improvements or regressions, they are not always a reliable proxy for how code will perform in a realistic context. Profiling is helpful for identifying parts of the code that are worth analyzing and optimizing as well as to validate that any performance changes have the intended effects.
+
 ## Contributing code
 
 Any and all contributions to the project are welcome. ODK JavaRosa is used across the world primarily by organizations with a social purpose so you can have real impact!

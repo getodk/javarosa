@@ -1101,7 +1101,7 @@ public class XFormParser implements IXFormParserFunctions {
             if (question.getNumChoices() > 0 && question.getDynamicChoices() != null) {
                 throw new XFormParseException("Select question contains both literal choices and <itemset>");
             } else if (question.getNumChoices() == 0 && question.getDynamicChoices() == null) {
-                throw new XFormParseException("Select question has no choices");
+                throw new XFormParseException("Select question '" + question.getLabelInnerText() + "' has no choices");
             }
         }
 
@@ -1931,7 +1931,6 @@ public class XFormParser implements IXFormParserFunctions {
     private void addMainInstanceToFormDef(Element e, FormInstance instanceModel) {
         loadInstanceData(e, instanceModel.getRoot(), _f);
 
-        checkDependencyCycles();
         _f.setInstance(instanceModel);
         _f.setLocalizer(localizer);
 

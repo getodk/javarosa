@@ -6,7 +6,7 @@
         xmlns:jr="http://openrosa.org/javarosa">
   <h:head>
 
-    <h:title>Simpler Cascading Select Form</h:title> 
+    <h:title>Simpler Cascading Select Form</h:title>
     <model>
       <itext>
         <translation lang="english">
@@ -33,7 +33,7 @@
             </county>
         </counties>
       </instance>
-      <bind nodeset="/form/county" type="select1" />
+      <bind nodeset="/form/county" type="string" />
     </model>
   </h:head>
   <h:body>

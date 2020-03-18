@@ -16,34 +16,19 @@
 
 package org.javarosa.core.util.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
 import org.javarosa.core.util.externalizable.ExtWrapIntEncoding;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingSmall;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingUniform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
 
-public class NumericEncodingTest extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(NumericEncodingTest.class);
+public class NumericEncodingTest {
 
-    public NumericEncodingTest(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
+    private void testNumericEncoding (long val, ExtWrapIntEncoding encoding) {
+        ExternalizableTest.testExternalizable(encoding.clone(new Long(val)), encoding, null, null);
     }
 
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-        aSuite.addTest(new NumericEncodingTest("testIntEncodingUniform"));
-        aSuite.addTest(new NumericEncodingTest("testIntEncodingSmall"));
-        return aSuite;
-    }
-
-    public void testNumericEncoding (long val, ExtWrapIntEncoding encoding) {
-        ExternalizableTest.testExternalizable(encoding.clone(new Long(val)), encoding, null, this, null);
-    }
-
+    @Test
     public void testIntEncodingUniform () {
         ExtWrapIntEncoding enc = new ExtWrapIntEncodingUniform();
 
@@ -67,6 +52,7 @@ public class NumericEncodingTest extends TestCase {
         }
     }
 
+    @Test
     public void testIntEncodingSmall () {
         int[] biases = {0, 1, 30, 128, 254};
         int[] smallTests = {0, 1, 126, 127, 128, 129, 253, 254, 255, 256, -1, -2, -127, -128, -129};

@@ -16,57 +16,32 @@
 
 package org.javarosa.core.model.data.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.utils.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Before;
+import org.junit.Test;
 
-public class DateDataTests extends TestCase {
-    private static final Logger logger = LoggerFactory.getLogger(DateDataTests.class);
+public class DateDataTests {
+
     Date today;
     Date notToday;
 
-    private static int NUM_TESTS = 4;
 
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
 
         today = DateUtils.roundDate(new Date());
         notToday = DateUtils.roundDate(new Date(today.getTime() - today.getTime()/2));
     }
 
-    public DateDataTests(String name) {
-        super(name);
-        logger.info("Running {} test: {}...", this.getClass().getName(), name);
-    }
 
-    public static Test suite() {
-        TestSuite aSuite = new TestSuite();
-
-        for (int i = 1; i <= NUM_TESTS; i++) {
-            final int testID = i;
-
-            aSuite.addTest(new DateDataTests(testMaster(testID)));
-        }
-
-        return aSuite;
-    }
-    public static String testMaster (int testID) {
-        switch (testID) {
-        case 1: return "testGetData";
-        case 2: return "testSetData";
-        case 3: return "testDisplay";
-        case 4: return "testNullData";
-        }
-        throw new IllegalStateException("Unexpected index");
-    }
-
+    @Test
     public void testGetData() {
         DateData data = new DateData(today);
         assertEquals("DateData's getValue returned an incorrect date", data.getValue(), today);
@@ -79,6 +54,7 @@ public class DateDataTests extends TestCase {
 
         assertEquals("DateData's getValue was mutated incorrectly", data.getValue(), temp);
     }
+    @Test
     public void testSetData() {
         DateData data = new DateData(notToday);
         data.setValue(today);
@@ -96,10 +72,12 @@ public class DateDataTests extends TestCase {
         assertEquals("DateData's value was mutated incorrectly", data.getValue(), temp);
     }
 
+    @Test
     public void testDisplay() {
         // We don't actually want this, because the Date's getDisplayText code should be moved to a library
     }
 
+    @Test
     public void testNullData() {
         boolean exceptionThrown = false;
         DateData data = new DateData();
