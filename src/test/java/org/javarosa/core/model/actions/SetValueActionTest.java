@@ -1,33 +1,19 @@
 package org.javarosa.core.model.actions;
 
-import org.javarosa.core.model.CoreModelModule;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.model.xform.XFormsModule;
 import org.joda.time.DateTimeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.javarosa.core.test.AnswerDataMatchers.dateTimeAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
@@ -36,13 +22,9 @@ import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
-import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class SetValueActionTest {
     private static final long DATE_NOW = 1_500_000_000_000L;
@@ -60,104 +42,135 @@ public class SetValueActionTest {
 
     @Test
     public void when_triggerNodeIsUpdated_targetNodeCalculation_isEvaluated() throws IOException {
-        // Given
-        final FormDef formDef = parse(r("nested-setvalue-action.xml"));
-        FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
-        TreeReference targetRef = createTargetRef(null);
+        Scenario scenario = Scenario.init("Nested setvalue action", html(
+            head(
+                title("Nested setvalue action"),
+                model(
+                    mainInstance(t("data id=\"nested-setvalue\"",
+                        t("source"),
+                        t("destination")
+                    )),
+                    bind("/data/source").type("int"),
+                    bind("/data/destination").type("dateTime")
+                )
+            ),
+            body(
+                input("/data/source",
+                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination\" value=\"now()\""))
+            )));
 
-        assertNullAt(formDef, targetRef);
+        assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
 
-        // When
-        formEntryController.stepToNextEvent();
-        formEntryController.answerQuestion(new DecimalData(22.0), true);
+        scenario.next();
+        scenario.answer(22);
 
-        // Then
-        assertEquals(getDateValue(DATE_NOW), getValueAt(formDef, targetRef));
-    }
-
-    @Test
-    public void when_triggerNodeIsUpdatedWithinRepeat_targetNodeCalculation_isEvaluated() throws IOException {
-        // Given
-        final FormDef formDef = parse(r("nested-setvalue-action-with-repeats.xml"));
-        FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
-
-        TreeReference[] targetRefs = new TreeReference[3];
-
-        for (int i = 0; i < targetRefs.length; i++) {
-            targetRefs[i] = createTargetRef(i);;
-            assertNullAt(formDef, targetRefs[i]);
-        }
-
-        // When
-        for (int i = 0; i < targetRefs.length; i++) {
-            int eventType = -1;
-            while (eventType != FormEntryController.EVENT_QUESTION) {
-                eventType = formEntryController.stepToNextEvent();
-            }
-
-            DateTimeUtils.setCurrentMillisFixed(todayPlusDays(i));
-            formEntryController.answerQuestion(new DecimalData(i + 1), true);
-        }
-
-        // Then
-        for (int i = 0; i < targetRefs.length; i++) {
-            assertEquals(getDateValue(todayPlusDays(i)), getValueAt(formDef, targetRefs[i]));
-        }
+        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
     }
 
     @Test
     public void when_triggerNodeIsUpdatedWithTheSameValue_targetNodeCalculation_isNotEvaluated() throws IOException {
-        // Given
-        final FormDef formDef = parse(r("nested-setvalue-action.xml"));
-        FormEntryController formEntryController = new FormEntryController(new FormEntryModel(formDef));
-        TreeReference targetRef = createTargetRef(null);
+        Scenario scenario = Scenario.init("Nested setvalue action", html(
+            head(
+                title("Nested setvalue action"),
+                model(
+                    mainInstance(t("data id=\"nested-setvalue\"",
+                        t("source"),
+                        t("destination")
+                    )),
+                    bind("/data/source").type("int"),
+                    bind("/data/destination").type("dateTime")
+                )
+            ),
+            body(
+                input("/data/source",
+                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination\" value=\"now()\""))
+            )));
 
-        formEntryController.stepToNextEvent();
-        formEntryController.answerQuestion(new DecimalData(22.0), true);
+        assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
 
-        assertEquals(getDateValue(DATE_NOW), getValueAt(formDef, targetRef));
+        scenario.next();
+        scenario.answer(22);
 
-        // When
+        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+
         DateTimeUtils.setCurrentMillisFixed(DATE_NOW + DAY_OFFSET); // shift the current time so we can test whether the setvalue action was re-fired
-        formEntryController.answerQuestion(new DecimalData(22.0), true);
+        scenario.answer(22);
 
-        // Then
-        assertEquals(getDateValue(DATE_NOW), getValueAt(formDef, targetRef));
+        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+
+        scenario.answer(23);
+
+        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW + DAY_OFFSET)));
     }
 
     @Test
-    public void testSerializationAndDeserialization() throws IOException, DeserializationException {
-        PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
-        PrototypeManager.registerPrototypes(CoreModelModule.classNames);
-        new XFormsModule().registerModule();
+    public void setvalue_isSerializedAndDeserialized() throws IOException, DeserializationException {
+        Scenario scenario = Scenario.init("Nested setvalue action", html(
+            head(
+                title("Nested setvalue action"),
+                model(
+                    mainInstance(t("data id=\"nested-setvalue\"",
+                        t("source"),
+                        t("destination")
+                    )),
+                    bind("/data/source").type("int"),
+                    bind("/data/destination").type("dateTime")
+                )
+            ),
+            body(
+                input("/data/source",
+                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination\" value=\"now()\""))
+            )));
 
-        FormDef formDef = parse(r("nested-setvalue-action.xml"));
-        Path p = Files.createTempFile("serialized-form", null);
+        scenario.serializeAndDeserializeForm();
 
-        final DataOutputStream dos = new DataOutputStream(Files.newOutputStream(p));
-        formDef.writeExternal(dos);
-        dos.close();
+        assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
 
-        final DataInputStream dis = new DataInputStream(Files.newInputStream(p));
-        formDef.readExternal(dis, defaultPrototypes());
-        dis.close();
+        scenario.next();
+        scenario.answer(22);
 
-        Files.delete(p);
+        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+    }
 
-        TreeReference triggerRef = new TreeReference();
-        triggerRef.setRefLevel(TreeReference.REF_ABSOLUTE);
-        triggerRef.add("data", 0);
-        triggerRef.add("cost", 0);
+    @Test
+    public void when_triggerNodeIsUpdatedWithinRepeat_targetNodeCalculation_isEvaluated() throws IOException {
+        Scenario scenario = Scenario.init("Nested setvalue action with repeats", html(
+            head(
+                title("Nested setvalue action with repeats"),
+                model(
+                    mainInstance(t("data id=\"nested-setvalue-repeats\"",
+                        repeat("repeat",
+                            t("source"),
+                            t("destination")
+                        )
+                    )),
+                    bind("/data/repeat/source").type("int"),
+                    bind("/data/repeat/destination").type("dateTime")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/source",
+                        t("setvalue event=\"xforms-value-changed\" ref=\"/data/repeat/destination\" value=\"now()\""))
+                )
+            )));
 
-        TreeReference targetRef = createTargetRef(null);
+        final int REPEAT_COUNT = 5;
 
-        assertNullAt(formDef, targetRef);
+        for (int i = 0; i < REPEAT_COUNT; i++) {
+            scenario.createNewRepeat("/data/repeat");
+            assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(nullValue()));
+        }
 
-        // When
-        formDef.setValue(new DecimalData(22.0), triggerRef, true);
+        for (int i = 0; i < REPEAT_COUNT; i++) {
+            DateTimeUtils.setCurrentMillisFixed(todayPlusDays(i));
 
-        // Then
-        assertEquals(getDateValue(DATE_NOW), getValueAt(formDef, targetRef));
+            scenario.answer("/data/repeat[" + i + "]/source", 7);
+        }
+
+        for (int i = 0; i < REPEAT_COUNT; i++) {
+            assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(dateTimeAnswer(todayPlusDays(i))));
+        }
     }
 
     /**
@@ -234,33 +247,7 @@ public class SetValueActionTest {
         assertThat(scenario.answerOf("/data/readonly-calculate"), is(intAnswer(14)));
     }
 
-    private TreeReference createTargetRef(Integer optionalRepeatIndex) {
-        TreeReference targetRef = new TreeReference();
-        targetRef.setRefLevel(TreeReference.REF_ABSOLUTE);
-        targetRef.add("data", 0);
-        if (optionalRepeatIndex != null)
-            targetRef.add("repeat", optionalRepeatIndex);
-        targetRef.add("cost_timestamp", 0);
-        return targetRef;
-    }
-
     private long todayPlusDays(int i) {
         return DATE_NOW + i * DAY_OFFSET;
-    }
-
-    private void assertNullAt(FormDef formDef, TreeReference targetRef) {
-        assertNull(getAnswerDataAt(formDef, targetRef));
-    }
-
-    private Object getDateValue(long date) {
-        return new DateTimeData(new Date(date)).getValue();
-    }
-
-    private Object getValueAt(FormDef formDef, TreeReference targetRef) {
-        return getAnswerDataAt(formDef, targetRef).getValue();
-    }
-
-    private IAnswerData getAnswerDataAt(FormDef formDef, TreeReference targetRef) {
-        return formDef.getMainInstance().resolveReference(targetRef).getValue();
     }
 }
