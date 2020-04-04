@@ -200,8 +200,8 @@ public class XPathPathExpr extends XPathExpression {
             if (step.predicates.length > 0) {
                 List<XPathExpression> v = new ArrayList<XPathExpression>(step.predicates.length);
                 Collections.addAll(v, step.predicates);
-                //int level = ref.getRefLevel() > 0 ? i - ref.getRefLevel() : i; // refLevel represents parenting steps
-                ref.addPredicate(i, v);
+                int level = ref.getRefLevel() > 0 ? i - ref.getRefLevel() : i; // refLevel represents parenting steps
+                ref.addPredicate(level, v);
             }
         }
         return ref;
