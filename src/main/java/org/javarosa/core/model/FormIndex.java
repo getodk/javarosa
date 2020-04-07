@@ -547,4 +547,12 @@ public class FormIndex implements Serializable {
             i++;
         }
     }
+
+    public FormIndex getPreviousLevel() {
+        if (isTerminal()) {
+            return null;
+        } else {
+            return new FormIndex(nextLevel.getPreviousLevel(), this);
+        }
+    }
 }
