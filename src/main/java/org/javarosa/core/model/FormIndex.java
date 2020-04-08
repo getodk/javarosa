@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model;
 
-import jdk.internal.jline.internal.Nullable;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.Objects;
 
