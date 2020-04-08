@@ -149,4 +149,34 @@ public class FormEntryControllerTest {
         controller.jumpToNewRepeatPrompt();
         assertThat(controller.getModel().getFormIndex().toString(), is("0_1, "));
     }
+
+    @Test
+    public void jumpToNewRepeatPrompt_whenNotInRepeat_doesNothing() throws Exception {
+        Scenario scenario = Scenario.init("questionsOnly", html(
+            head(
+                title("form"),
+                model(
+                    mainInstance(
+                        t("data",
+                            t("question1"),
+                            t("question2")
+                        )
+                    ),
+                    bind("/data/question1").type("int"),
+                    bind("/data/question1").type("int")
+                )
+            ),
+            body(
+                input("/data/question1"),
+                input("/data/question2")
+            )
+        ));
+
+        FormEntryController controller = new FormEntryController(new FormEntryModel(scenario.getFormDef()));
+        assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
+        assertThat(controller.getModel().getFormIndex().toString(), is("0, "));
+
+        controller.jumpToNewRepeatPrompt();
+        assertThat(controller.getModel().getFormIndex().toString(), is("0, "));
+    }
 }

@@ -303,6 +303,10 @@ public class FormEntryController {
 
     public void jumpToNewRepeatPrompt() {
         FormIndex repeatIndex = getRepeatGroupIndex(getModel().getFormIndex(), getModel().getForm());
+        if (repeatIndex == null) {
+            return;
+        }
+
         int repeatDepth = repeatIndex.getDepth();
 
         do {
@@ -316,8 +320,11 @@ public class FormEntryController {
         if (element instanceof GroupDef && ((GroupDef) element).getRepeat()) {
             return index;
         } else {
-            FormIndex previousLevel = index.getPreviousLevel();
-            return getRepeatGroupIndex(previousLevel, formDef);
+            if (index.getPreviousLevel() != null) {
+                return getRepeatGroupIndex(index.getPreviousLevel(), formDef);
+            } else {
+                return null;
+            }
         }
     }
 }
