@@ -197,7 +197,7 @@ public abstract class Triggerable implements Externalizable {
     }
 
     public Set<TreeReference> getTriggers () {
-        Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
+        Set<TreeReference> relTriggers = expr.getTriggers(originalContextRef);
         Set<TreeReference> absTriggers = new HashSet<TreeReference>();
         for (TreeReference r : relTriggers ) {
             absTriggers.add(r.anchor(originalContextRef));
