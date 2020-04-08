@@ -61,7 +61,7 @@ public class FormEntryControllerTest {
     }
 
     @Test
-    public void jumpToNewRepeatPrompt_whenInOuterOfNestedRepeat_jumpsToOutRepeatPrompt() throws Exception {
+    public void jumpToNewRepeatPrompt_whenInOuterOfNestedRepeat_jumpsToOuterRepeatPrompt() throws Exception {
         Scenario scenario = Scenario.init("nestedRepeat", html(
             head(
                 title("form"),
@@ -105,6 +105,56 @@ public class FormEntryControllerTest {
 
         controller.jumpToNewRepeatPrompt();
         assertThat(controller.getModel().getFormIndex().toString(), is("0_1, "));
+    }
+
+    @Test
+    public void jumpToNewRepeatPrompt_whenInInnerOfNestedRepeat_jumpsToInnerRepeatPrompt() throws Exception {
+        Scenario scenario = Scenario.init("nestedRepeat", html(
+            head(
+                title("form"),
+                model(
+                    mainInstance(
+                        t("data",
+                            t("repeat1",
+                                t("question1"),
+                                t("question2"),
+                                t("repeat2",
+                                    t("question3")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/repeat1/question1").type("int"),
+                    bind("/data/repeat1/question2").type("int"),
+                    bind("/data/repeat1/repeat2/question3").type("int")
+                )
+            ),
+            body(
+                group("/data/repeat1",
+                    repeat("/data/repeat1",
+                        input("/data/repeat1/question1"),
+                        input("/data/repeat1/question2"),
+                        group("/data/repeat1/repeat2",
+                            repeat("/data/repeat1/repeat2",
+                                input("/data/repeat1/repeat2/question3")
+                            )
+                        )
+                    )
+                )
+            )
+        ));
+
+        FormEntryController controller = new FormEntryController(new FormEntryModel(scenario.getFormDef()));
+
+        assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
+        assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
+        assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
+        assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
+        assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
+        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 2_0, 0, "));
+
+        controller.jumpToNewRepeatPrompt();
+        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 2_1, "));
     }
 
     @Test
