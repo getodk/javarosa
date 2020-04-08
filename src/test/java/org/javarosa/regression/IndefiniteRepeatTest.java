@@ -106,4 +106,55 @@ public class IndefiniteRepeatTest {
         scenario.next();
         assertThat(scenario.atTheEndOfForm(), is(true));
     }
+
+    @Test
+    public void indefiniteRepeatJrCountExpression_inNestedRepeat_withRelativePaths_addsRepeatsUntilConditionMet() throws IOException {
+        Scenario scenario = Scenario.init("nested indefinite repeat", html(
+            head(
+                title("Indefinite repeat in nested repeat"),
+                model(
+                    mainInstance(t("data id=\"indefinite-nested-repeat\"",
+                        t("outer_repeat",
+                            t("inner_count"),
+                            t("target_count"),
+                            t("inner_repeat",
+                                t("add_more")
+                            )
+                        ))
+                    ),
+                    bind("/data/outer_repeat/inner_count").type("int").calculate("count(../inner_repeat)"),
+                    bind("/data/outer_repeat/target_count").type("int").calculate("if(../inner_count = 0" +
+                        "or ../inner_repeat[position() = ../inner_count]/add_more = 'yes', " +
+                        "../inner_count + 1, ../inner_count)")
+                )),
+            body(
+                repeat("/data/outer_repeat",
+                    repeat("/data/outer_repeat/inner_repeat", "target_count",
+                        input("/data/outer_repeat/inner_repeat/add_more")
+                    )
+                )
+            )));
+
+        scenario.next();
+        scenario.next();
+        scenario.next();
+        scenario.answer("yes");
+        scenario.next();
+        scenario.next();
+        scenario.answer("yes");
+        scenario.next();
+        scenario.next();
+        scenario.answer("no");
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.next();
+        scenario.answer("yes");
+        scenario.next();
+        scenario.next();
+        scenario.answer("no");
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.atTheEndOfForm(), is(true));
+    }
 }
