@@ -16,7 +16,10 @@
 
 package org.javarosa.form.api;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InvalidReferenceException;
@@ -70,27 +73,27 @@ public class FormEntryController {
         return answerQuestion(model.getFormIndex(), data, midSurvey);
     }
 
-   /**
-    * Attempts to save the answer at the given {@link FormIndex} into the instance
-    * and returns one of three possible {@code int} attempt result codes:
-    * <ul>
-    * <li>{@link #ANSWER_OK}
-    * <li>{@link #ANSWER_REQUIRED_BUT_EMPTY}
-    * <li>{@link #ANSWER_CONSTRAINT_VIOLATED}
-    * </ul>
-    * <p>
-    * Side effects: When it returns {@link #ANSWER_OK}, it mutates
-    * the {@link TreeElement} corresponding to the given {@link FormIndex} by
-    * setting its value to the given {@link IAnswerData} or by copying an
-    * itemset answer if the question is complex.
-    *
-    * @param index The index of the question/prompt that is being currently evaluated
-    * @param data  The data to attempt to answer the question with.
-    * @return the attempt's {@code int} result code
-    * @throws RuntimeException when the question is complex and it has constraints.
-    *                          See inline comments.
-    * @see QuestionDef#isComplex()
-    */
+    /**
+     * Attempts to save the answer at the given {@link FormIndex} into the instance
+     * and returns one of three possible {@code int} attempt result codes:
+     * <ul>
+     * <li>{@link #ANSWER_OK}
+     * <li>{@link #ANSWER_REQUIRED_BUT_EMPTY}
+     * <li>{@link #ANSWER_CONSTRAINT_VIOLATED}
+     * </ul>
+     * <p>
+     * Side effects: When it returns {@link #ANSWER_OK}, it mutates
+     * the {@link TreeElement} corresponding to the given {@link FormIndex} by
+     * setting its value to the given {@link IAnswerData} or by copying an
+     * itemset answer if the question is complex.
+     *
+     * @param index The index of the question/prompt that is being currently evaluated
+     * @param data  The data to attempt to answer the question with.
+     * @return the attempt's {@code int} result code
+     * @throws RuntimeException when the question is complex and it has constraints.
+     *                          See inline comments.
+     * @see QuestionDef#isComplex()
+     */
     public int answerQuestion(FormIndex index, IAnswerData data, boolean midSurvey) {
         QuestionDef q = model.getQuestionPrompt(index).getQuestion();
         if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
@@ -228,12 +231,12 @@ public class FormEntryController {
         return model.getEvent(index);
     }
 
-    public FormIndex descendIntoRepeat (int n) {
+    public FormIndex descendIntoRepeat(int n) {
         jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), n));
         return model.getFormIndex();
     }
 
-    public FormIndex descendIntoNewRepeat () {
+    public FormIndex descendIntoNewRepeat() {
         jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), -1));
         newRepeat(model.getFormIndex());
         return model.getFormIndex();
@@ -246,9 +249,9 @@ public class FormEntryController {
      * @param questionIndex
      */
     public void newRepeat(FormIndex questionIndex) {
-        try{
+        try {
             model.getForm().createNewRepeat(questionIndex);
-        } catch(InvalidReferenceException ire) {
+        } catch (InvalidReferenceException ire) {
             throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
         }
     }
@@ -257,7 +260,6 @@ public class FormEntryController {
     /**
      * Creates a new repeated instance of the group referenced by the current
      * FormIndex.
-     *
      */
     public void newRepeat() {
         newRepeat(model.getFormIndex());
@@ -286,15 +288,36 @@ public class FormEntryController {
         return deleteRepeat(model.getFormIndex());
     }
 
-    public void deleteRepeat (int n) {
+    public void deleteRepeat(int n) {
         deleteRepeat(model.getForm().descendIntoRepeat(model.getFormIndex(), n));
     }
 
     /**
      * Sets the current language.
+     *
      * @param language
      */
     public void setLanguage(String language) {
         model.setLanguage(language);
+    }
+
+    public void jumpToNewRepeatPrompt() {
+        FormIndex repeatIndex = getRepeatGroupIndex(getModel().getFormIndex(), getModel().getForm());
+        int repeatDepth = repeatIndex.getDepth();
+
+        do {
+            stepToNextEvent();
+        } while (getModel().getEvent() != EVENT_PROMPT_NEW_REPEAT
+            || getModel().getFormIndex().getDepth() != repeatDepth);
+    }
+
+    private static FormIndex getRepeatGroupIndex(FormIndex index, FormDef formDef) {
+        IFormElement element = formDef.getChild(index);
+        if (element instanceof GroupDef && ((GroupDef) element).getRepeat()) {
+            return index;
+        } else {
+            FormIndex previousLevel = index.getPreviousLevel();
+            return getRepeatGroupIndex(previousLevel, formDef);
+        }
     }
 }
