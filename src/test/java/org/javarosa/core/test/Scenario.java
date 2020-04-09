@@ -180,6 +180,17 @@ public class Scenario {
      * For this reason, this method will try to detect these predicates,
      * turn them into multiplicity values, and remove them from the output
      * reference.
+     *
+     * When using the result of this method for test assertions against {@link FormIndex#getReference()} we need to
+     * specify multiplicity on all steps. For example the following would pass for a form index pointing at a
+     * question at the top level of the form:
+     *
+     * <code>
+     * assertThat(formIndex.getReference(), is(getRef("/data/question[0]")));
+     * </code>
+     *
+     * If we used just used <code>getRef("/data/question")</code> the test would fail as the multiplicity defaults
+     * to <code>0</code>.
      */
     public static TreeReference getRef(String xpath) {
         if (xpath.trim().isEmpty())

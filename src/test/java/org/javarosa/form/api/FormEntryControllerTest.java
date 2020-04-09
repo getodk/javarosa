@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.group;
@@ -54,10 +55,10 @@ public class FormEntryControllerTest {
 
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 0, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[0]/question1[0]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_1, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[1]")));
     }
 
     @Test
@@ -101,10 +102,10 @@ public class FormEntryControllerTest {
 
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 0, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[0]/question1[0]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_1, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[1]")));
     }
 
     @Test
@@ -151,10 +152,10 @@ public class FormEntryControllerTest {
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 2_0, 0, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[0]/repeat2[0]/question3[0]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 2_1, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[0]/repeat2[1]")));
     }
 
     @Test
@@ -194,10 +195,10 @@ public class FormEntryControllerTest {
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_GROUP));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_0, 0, 0, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[0]/group[0]/question1[0]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().toString(), is("0_1, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[1]")));
     }
 
     @Test
@@ -224,9 +225,9 @@ public class FormEntryControllerTest {
 
         FormEntryController controller = new FormEntryController(new FormEntryModel(scenario.getFormDef()));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().toString(), is("0, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/question1[0]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().toString(), is("0, "));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/question1[0]")));
     }
 }
