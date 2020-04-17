@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -18,7 +19,7 @@ import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
-public class IndefiniteRepeatTest {
+public class TriggersForRelativeRefsTest {
     @Test
     public void indefiniteRepeatJrCountExpression_inSingleRepeat_addsRepeatsUntilConditionMet() throws IOException {
         Scenario scenario = Scenario.init("indefinite repeat", html(
@@ -156,5 +157,58 @@ public class IndefiniteRepeatTest {
         scenario.next();
         scenario.next();
         assertThat(scenario.atTheEndOfForm(), is(true));
+    }
+
+    @Test
+    public void predicateWithRelativePathExpression_reevaluated_whenTriggerChanges() throws IOException {
+        Scenario scenario = Scenario.init("Predicate trigger", html(
+            head(
+                title("Predicate trigger"),
+                model(
+                    mainInstance(t("data id=\"predicate-trigger\"",
+                        t("outer_repeat",
+                            t("cutoff_number"),
+                            t("inner_repeat",
+                                t("number", "1")
+                            ),
+                            t("inner_repeat",
+                                t("number", "2")
+                            ),
+                            t("inner_repeat",
+                                t("number", "3")
+                            ),
+                            t("inner_repeat",
+                                t("number", "4")
+                            ),
+                            t("inner_repeat",
+                                t("number", "5")
+                            ),
+                            t("inner_repeat",
+                                t("number", "6")
+                            ),
+                            t("sum")
+                        ))
+                    ),
+                    bind("/data/outer_repeat/cutoff_number").type("int"),
+                    bind("/data/outer_repeat/inner_repeat/number").type("int"),
+                    bind("/data/outer_repeat/sum").type("int").calculate("sum(../inner_repeat[number > ../cutoff_number]/number)")
+                )),
+            body(
+                repeat("/data/outer_repeat",
+                    input("/data/outer_repeat/cutoff_number"),
+                    repeat("/data/outer_repeat/inner_repeat",
+                        input("/data/outer_repeat/inner_repeat/number")
+                    )
+                )
+            )));
+
+        scenario.answer("/data/outer_repeat/cutoff_number", 3);
+        assertThat(scenario.answerOf("/data/outer_repeat/sum"), is(intAnswer(15)));
+
+        scenario.answer("/data/outer_repeat/cutoff_number", 7);
+        assertThat(scenario.answerOf("/data/outer_repeat/sum"), is(intAnswer(0)));
+
+        scenario.answer("/data/outer_repeat/cutoff_number", -11);
+        assertThat(scenario.answerOf("/data/outer_repeat/sum"), is(intAnswer(21)));
     }
 }
