@@ -5,19 +5,34 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
 
-import java.util.Set;
-
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class XPathConditionalTriggersTest {
     @Test
-    public void predicateTriggers_areAddedToDag() throws XPathSyntaxException {
+    public void getTriggers_onExpressionWithRelativePathInPredicate_returnsPredicateTriggers() throws XPathSyntaxException {
         XPathConditional expression = new XPathConditional("../inner[position() = ../node2]/node3");
         TreeReference context = Scenario.getRef("/data/outer[7]/node1");
 
         TreeReference predicateTrigger = Scenario.getRef("/data/outer[7]/node2");
 
         assertThat(expression.getTriggers(context), hasItem(predicateTrigger));
+    }
+
+    @Test
+    public void getTriggers_onExpressionWithComplexRelativePathInPredicate_returnsPredicateTriggers() throws XPathSyntaxException {
+        XPathConditional expression = new XPathConditional("../inner[position() = ../node2 and /data/foo = ../x/y/z]/node3");
+        TreeReference context = Scenario.getRef("/data/outer[7]/node1");
+
+        assertThat(expression.getTriggers(context), hasItems(Scenario.getRef("/data/outer[7]/node2"),
+            Scenario.getRef("/data/foo"), Scenario.getRef("/data/outer[7]/x/y/z")));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getTriggers_onExpressionWithRelativePredicateAndNoContext_throwsError() throws XPathSyntaxException {
+        XPathConditional expression = new XPathConditional("../inner[position() = ../node2]/node3");
+
+        expression.getTriggers(null);
     }
 }
