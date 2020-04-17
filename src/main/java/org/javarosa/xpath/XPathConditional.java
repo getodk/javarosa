@@ -97,49 +97,50 @@ public class XPathConditional implements IConditionExpr {
     }
 
     public Set<TreeReference> getTriggers (TreeReference contextRef) {
-        Set<TreeReference> triggers = new HashSet<TreeReference>();
-        getTriggers(expr, triggers, contextRef);
+        Set<TreeReference> triggers = new HashSet<>();
+        getTriggers(expr, contextRef, triggers);
         return triggers;
     }
 
-    private static void getTriggers (XPathExpression x, Set<TreeReference> v, TreeReference contextRef) {
+    private static void getTriggers(XPathExpression x, TreeReference contextRef, Set<TreeReference> triggersSoFar) {
         if (x instanceof XPathPathExpr) {
             TreeReference ref = ((XPathPathExpr)x).getReference();
             TreeReference contextualized = ref;
-            if(contextRef != null) {
+            if (contextRef != null) {
                 contextualized = ref.contextualize(contextRef);
             }
 
-            //TODO: It's possible we should just handle this the same way as "genericize". Not entirely clear.
-            if(contextualized.hasPredicates()) {
+            // TODO: It's possible we should just handle this the same way as "genericize". Not entirely clear.
+            if (contextualized.hasPredicates()) {
                 contextualized = contextualized.removePredicates();
             }
 
-            v.add(contextualized);
+            triggersSoFar.add(contextualized);
 
-            for(int i = 0; i < ref.size() ; i++) {
-            List<XPathExpression> predicates = ref.getPredicate(i);
-                if(predicates == null) {
+            for (int i = 0; i < ref.size() ; i++) {
+                List<XPathExpression> predicates = ref.getPredicate(i);
+                if (predicates == null) {
                     continue;
                 }
 
-                //we can't generate this properly without an absolute reference
-                if (!contextualized.isAbsolute()) {throw new IllegalArgumentException("can't get triggers for relative references");}
+                if (!contextualized.isAbsolute()) {
+                    throw new IllegalArgumentException("can't get triggers for relative references");
+                }
                 TreeReference predicateContext = contextualized.getSubReference(i);
 
-                for(XPathExpression predicate : predicates) {
-                    getTriggers(predicate, v, predicateContext);
+                for (XPathExpression predicate : predicates) {
+                    getTriggers(predicate, predicateContext, triggersSoFar);
                 }
             }
         } else if (x instanceof XPathBinaryOpExpr) {
-            getTriggers(((XPathBinaryOpExpr)x).a, v, contextRef);
-            getTriggers(((XPathBinaryOpExpr)x).b, v, contextRef);
+            getTriggers(((XPathBinaryOpExpr)x).a, contextRef, triggersSoFar);
+            getTriggers(((XPathBinaryOpExpr)x).b, contextRef, triggersSoFar);
         } else if (x instanceof XPathUnaryOpExpr) {
-            getTriggers(((XPathUnaryOpExpr)x).a, v, contextRef);
+            getTriggers(((XPathUnaryOpExpr)x).a, contextRef, triggersSoFar);
         } else if (x instanceof XPathFuncExpr) {
             XPathFuncExpr fx = (XPathFuncExpr)x;
             for (int i = 0; i < fx.args.length; i++)
-                getTriggers(fx.args[i], v, contextRef);
+                getTriggers(fx.args[i], contextRef, triggersSoFar);
         }
     }
 
