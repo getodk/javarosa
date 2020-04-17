@@ -5,9 +5,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -210,5 +212,60 @@ public class TriggersForRelativeRefsTest {
 
         scenario.answer("/data/outer_repeat/cutoff_number", -11);
         assertThat(scenario.answerOf("/data/outer_repeat/sum"), is(intAnswer(21)));
+    }
+
+    @Test
+    public void predicateWithCurrentPathExpression_reevaluated_whenTriggerChanges() throws IOException {
+        Scenario scenario = Scenario.init("Predicate trigger", html(
+            head(
+                title("Predicate trigger"),
+                model(
+                    mainInstance(t("data id=\"predicate-trigger\"",
+                        t("outer_repeat",
+                            t("cutoff_number"),
+
+                            t("inner_repeat",
+                                t("foo"),
+                                t("join")
+                            )
+                        ))
+                    ),
+                    t("instance id=\"dataset\"", t("root",
+                        t("item",
+                            t("name", "Item1"),
+                            t("value", "1")),
+                        t("item",
+                            t("name", "Item2"),
+                            t("value", "2")),
+                        t("item",
+                            t("name", "Item3"),
+                            t("value", "3")),
+                        t("item",
+                            t("name", "Item4"),
+                            t("value", "4")),
+                        t("item",
+                            t("name", "Item5"),
+                            t("value", "5"))
+                    )),
+                    bind("/data/outer_repeat/cutoff_number").type("int"),
+                    bind("/data/outer_repeat/inner_repeat/join").type("string").calculate("join(', ', instance('dataset')/root/item[value > current()/../../cutoff_number]/name)")
+                )),
+            body(
+                repeat("/data/outer_repeat",
+                    input("/data/outer_repeat/cutoff_number"),
+                    repeat("/data/outer_repeat/inner_repeat",
+                        input("/data/outer_repeat/inner_repeat/foo")
+                    )
+                )
+            )));
+
+        scenario.answer("/data/outer_repeat/cutoff_number", 3);
+        assertThat(scenario.answerOf("/data/outer_repeat/inner_repeat/join"), is(stringAnswer("Item4, Item5")));
+
+        scenario.answer("/data/outer_repeat/cutoff_number", 7);
+        assertThat(scenario.answerOf("/data/outer_repeat/inner_repeat/join"), is(nullValue()));
+
+        scenario.answer("/data/outer_repeat/cutoff_number", 4);
+        assertThat(scenario.answerOf("/data/outer_repeat/inner_repeat/join"), is(stringAnswer("Item5")));
     }
 }

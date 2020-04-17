@@ -35,4 +35,14 @@ public class XPathConditionalTriggersTest {
 
         expression.getTriggers(null);
     }
+
+    @Test
+    public void getTriggers_onExpressionWithRelativePredicateWithCurrent_returnsTriggersContextualizedWithOriginalContext() throws XPathSyntaxException {
+        XPathConditional expression = new XPathConditional("instance('dataset')/root/item[value > current()/../../node1]/name");
+        TreeReference context = Scenario.getRef("/data/outer[7]/inner[3]/node2");
+
+        TreeReference predicateTrigger = Scenario.getRef("/data/outer[7]/node1");
+
+        assertThat(expression.getTriggers(context), hasItem(predicateTrigger));
+    }
 }
