@@ -98,16 +98,17 @@ public class XPathConditional implements IConditionExpr {
 
     public Set<TreeReference> getTriggers (TreeReference contextRef) {
         Set<TreeReference> triggers = new HashSet<>();
-        getTriggers(expr, contextRef, triggers);
+        getTriggers(expr, contextRef, contextRef, triggers);
         return triggers;
     }
 
-    private static void getTriggers(XPathExpression x, TreeReference contextRef, Set<TreeReference> triggersSoFar) {
+    private static void getTriggers(XPathExpression x, TreeReference contextRef, TreeReference originalContext, Set<TreeReference> triggersSoFar) {
         if (x instanceof XPathPathExpr) {
             TreeReference ref = ((XPathPathExpr)x).getReference();
             TreeReference contextualized = ref;
-            if (contextRef != null) {
-                contextualized = ref.contextualize(contextRef);
+            if (contextRef != null
+                || (ref.getContextType() == TreeReference.CONTEXT_ORIGINAL && originalContext != null)) {
+                contextualized = ref.contextualize(ref.getContextType() == TreeReference.CONTEXT_ORIGINAL ? originalContext : contextRef);
             }
 
             // TODO: It's possible we should just handle this the same way as "genericize". Not entirely clear.
@@ -125,18 +126,18 @@ public class XPathConditional implements IConditionExpr {
                 TreeReference predicateContext = contextualized.getSubReference(i).removePredicates();
 
                 for (XPathExpression predicate : predicates) {
-                    getTriggers(predicate, predicateContext, triggersSoFar);
+                    getTriggers(predicate, predicateContext, originalContext, triggersSoFar);
                 }
             }
         } else if (x instanceof XPathBinaryOpExpr) {
-            getTriggers(((XPathBinaryOpExpr)x).a, contextRef, triggersSoFar);
-            getTriggers(((XPathBinaryOpExpr)x).b, contextRef, triggersSoFar);
+            getTriggers(((XPathBinaryOpExpr)x).a, contextRef, originalContext, triggersSoFar);
+            getTriggers(((XPathBinaryOpExpr)x).b, contextRef, originalContext, triggersSoFar);
         } else if (x instanceof XPathUnaryOpExpr) {
-            getTriggers(((XPathUnaryOpExpr)x).a, contextRef, triggersSoFar);
+            getTriggers(((XPathUnaryOpExpr)x).a, contextRef, originalContext, triggersSoFar);
         } else if (x instanceof XPathFuncExpr) {
             XPathFuncExpr fx = (XPathFuncExpr)x;
             for (int i = 0; i < fx.args.length; i++)
-                getTriggers(fx.args[i], contextRef, triggersSoFar);
+                getTriggers(fx.args[i], contextRef, originalContext, triggersSoFar);
         }
     }
 
