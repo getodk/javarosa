@@ -547,7 +547,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             TreeReference parentPath = templNode.getParent().getRef().genericize();
             TreeElement parentNode = mainInstance
                 .resolveReference(parentPath.contextualize(repeatRef));
-            relev = parentNode.isRelevant();
+            relev = parentNode.isRelevant() && templNode.isRelevant() && templNode.hasChildren();
         }
 
         return relev;
