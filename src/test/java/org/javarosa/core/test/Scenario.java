@@ -189,8 +189,10 @@ public class Scenario {
      * assertThat(formIndex.getReference(), is(getRef("/data/question[0]")));
      * </code>
      *
-     * If we used just used <code>getRef("/data/question")</code> the test would fail as the multiplicity defaults
-     * to <code>0</code>.
+     * This is because <code>getRef</code> has no way of knowing if a node without multiplicity (<code>[x]</code>) is
+     * a question/group or an unbounded repeat (which would have a multiplicity of <code>-1</code>). Adding the
+     * explicit <code>[0]</code> lets <code>getRef</code> know that the node is not an unbounded repeat and that it,
+     * like a real question or group, should have the default multiplicity of <code>0</code>.
      */
     public static TreeReference getRef(String xpath) {
         if (xpath.trim().isEmpty())
