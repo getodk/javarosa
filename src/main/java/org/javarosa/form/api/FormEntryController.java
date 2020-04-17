@@ -303,7 +303,7 @@ public class FormEntryController {
 
     /**
      * Jump to the prompt to add a new repeat for the repeat the controller is currently in. If the current
-     * position in the form is no in a repeat nothing will happen.
+     * position in the form is not in a repeat nothing will happen.
      */
     public void jumpToNewRepeatPrompt() {
         FormIndex repeatIndex = getRepeatGroupIndex(getModel().getFormIndex(), getModel().getForm());
