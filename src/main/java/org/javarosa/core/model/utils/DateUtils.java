@@ -74,7 +74,7 @@ public class DateUtils {
         public int minute; //0-59
         public int second; //0-59
         public int secTicks; //0-999 (ms)
-        public int week; // 1-52
+        public int week; // 1-53
 
         /** NOTE: CANNOT BE USED TO SPECIFY A DATE **/
         public int dow; //1-7;
@@ -109,7 +109,7 @@ public class DateUtils {
         public boolean check() {
             return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year))
                     && inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59)
-                    && inRange(secTicks, 0, 999) && inRange(week, 1, 52));
+                    && inRange(secTicks, 0, 999) && inRange(week, 1, 53));
         }
     }
 

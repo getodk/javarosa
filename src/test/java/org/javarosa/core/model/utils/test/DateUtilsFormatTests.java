@@ -39,6 +39,9 @@ public class DateUtilsFormatTests {
         week = DateUtils.format(DateFields.of(2017, 1, 1, 10, 20, 30, 400), "%W");
         assertEquals("52", week);
        
+        // 12/29/2020 is the 53rd week of the year 
+        week = DateUtils.format(DateFields.of(2020, 12, 29, 10, 20, 30, 400), "%W");
+        assertEquals("53", week);
     }
     
 }
