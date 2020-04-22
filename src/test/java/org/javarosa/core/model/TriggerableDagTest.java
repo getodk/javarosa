@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
@@ -1437,5 +1438,32 @@ public class TriggerableDagTest {
         logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
     }
 
+    @Test
+    public void deleteLastRepeat_evaluatesTriggerables() throws IOException {
+        Scenario scenario = Scenario.init("Delete last repeat instance", html(
+            head(
+                title("Delete last repeat instance"),
+                model(
+                    mainInstance(t("data id=\"delete-last-repeat-instance\"",
+                        t("repeat-count"),
 
+                        t("repeat",
+                            t("question")),
+                        t("repeat",
+                            t("question")),
+                        t("repeat",
+                            t("question"))
+                    )),
+                    bind("/data/repeat-count").type("int").calculate("count(/data/repeat)")
+                ),
+                body(
+                    repeat("/data/repeat",
+                        input("question"))
+                ))));
+
+        assertThat(scenario.answerOf("/data/repeat-count"), is(intAnswer(3)));
+
+        scenario.removeRepeat("/data/repeat[2]");
+        assertThat(scenario.answerOf("/data/repeat-count"), is(intAnswer(2)));
+    }
 }
