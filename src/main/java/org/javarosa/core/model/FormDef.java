@@ -533,6 +533,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
     }
 
+    // TODO: Consider alternate implementation:
+    //    TreeElement node = mainInstance.resolveReference(repeatRef);
+    //    return node == null || mainInstance.resolveReference(repeatRef).isRelevant()
+    //  Verifying parent node relevance is likely not necessary since it would have been inherited by
+    //  children. Currently no test fails when removing that check. Note also that ancestors are verified yet
+    //  again at the FormEntryModel.isIndexRelevant call site. That is also almost certainly unnecessary.
+    //  Checking the template node is currently only necessary because static relevance expressions (false()) aren't
+    //  included in the DAG (where getTriggerableForRepeatGroup gets the expression from).
     public boolean isRepeatRelevant(TreeReference repeatRef) {
         boolean relev = true;
 
@@ -541,7 +549,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             relev = (boolean) qc.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
         }
 
-        // check the relevancy of the immediate parent
         if (relev) {
             TreeElement templNode = mainInstance.getTemplate(repeatRef);
             TreeReference parentPath = templNode.getParent().getRef().genericize();
