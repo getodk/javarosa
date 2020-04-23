@@ -22,11 +22,11 @@ public class XPathConditionalTriggersTest {
 
     @Test
     public void getTriggers_onExpressionWithComplexRelativePathInPredicate_returnsPredicateTriggers() throws XPathSyntaxException {
-        XPathConditional expression = new XPathConditional("../inner[position() = ../node2 and /data/foo = ../x/y/z]/node3");
-        TreeReference context = Scenario.getRef("/data/outer[7]/node1");
+        XPathConditional expression = new XPathConditional("../inner[position() = anode and /data/foo = x/y/z]/anothernode");
+        TreeReference context = Scenario.getRef("/data/outer[7]/bar/baz");
 
-        assertThat(expression.getTriggers(context), hasItems(Scenario.getRef("/data/outer[7]/node2"),
-            Scenario.getRef("/data/foo"), Scenario.getRef("/data/outer[7]/x/y/z")));
+        assertThat(expression.getTriggers(context), hasItems(Scenario.getRef("/data/outer[7]/bar/inner/anode"),
+            Scenario.getRef("/data/foo"), Scenario.getRef("/data/outer[7]/bar/inner/x/y/z")));
     }
 
     @Test(expected = IllegalArgumentException.class)
