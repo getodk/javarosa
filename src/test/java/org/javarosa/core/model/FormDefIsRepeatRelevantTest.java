@@ -1,4 +1,4 @@
-package org.javarosa.xform.parse;
+package org.javarosa.core.model;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.Scenario;
@@ -22,7 +22,7 @@ import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
-public class RepeatGroupsRelevanceTest {
+public class FormDefIsRepeatRelevantTest {
     @Test
     public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException {
         Scenario scenario = Scenario.init("Repeat relevance - dynamic expression", html(
