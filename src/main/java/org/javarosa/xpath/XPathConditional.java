@@ -121,7 +121,7 @@ public class XPathConditional implements IConditionExpr {
 
                 //we can't generate this properly without an absolute reference
                 if (!contextualized.isAbsolute()) { throw new IllegalArgumentException("can't get triggers for relative references");}
-                TreeReference predicateContext = contextualized.getSubReference(i);
+                TreeReference predicateContext = contextualized.getSubReference(i).removePredicates();
 
                 for(XPathExpression predicate : predicates) {
                     getTriggers(predicate, v, predicateContext);
