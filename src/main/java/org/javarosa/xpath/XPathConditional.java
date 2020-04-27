@@ -111,14 +111,10 @@ public class XPathConditional implements IConditionExpr {
             }
 
             //TODO: It's possible we should just handle this the same way as "genericize". Not entirely clear.
-            if(contextualized.hasPredicates()) {
-                contextualized = contextualized.removePredicates();
-            }
+            v.add(contextualized.removePredicates());
 
-            v.add(contextualized);
-
-            for(int i = 0; i < ref.size() ; i++) {
-            List<XPathExpression> predicates = ref.getPredicate(i);
+            for(int i = 0; i < contextualized.size() ; i++) {
+            List<XPathExpression> predicates = contextualized.getPredicate(i);
                 if(predicates == null) {
                     continue;
                 }
