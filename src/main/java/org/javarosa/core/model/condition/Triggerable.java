@@ -103,12 +103,7 @@ public abstract class Triggerable implements Externalizable {
     public abstract boolean isCascadingToChildren();
 
     public Set<TreeReference> getTriggers() {
-        Set<TreeReference> relTriggers = expr.getTriggers(null);  /// should this be originalContextRef???
-        Set<TreeReference> absTriggers = new HashSet<>();
-        for (TreeReference r : relTriggers) {
-            absTriggers.add(r.anchor(originalContextRef));
-        }
-        return absTriggers;
+        return expr.getTriggers(originalContextRef);
     }
 
     public TreeReference contextualizeContextRef(TreeReference anchorRef) {
