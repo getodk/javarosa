@@ -57,6 +57,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -272,7 +273,19 @@ public class XPathEvalTest {
         testEval("normalize-space('\na\nb\n')", "a b");
         testEval("normalize-space('\nab')", "ab");
         testEval("normalize-space(' \ta\n\t  b \n\t c   \n')", "a b c");
+        testEval("normalize-space()", new XPathException());
         testEval("string-length('cocotero')", 8.0);
+        testEval("string-length()", new XPathException());
+    }
+
+    @Test
+    public void other_string_functions_with_context() {
+        FormInstance instance1 = buildInstance();
+        testEval("/data/path[normalize-space()='some value']", instance1, null,
+            createExpectedNodesetFromInstance(instance1, "path", 2));
+
+        testEval("/data/path[string-length()=17]", instance1, null,
+            createExpectedNodesetFromInstance(instance1, "path", 2));
     }
 
     @Test
@@ -699,6 +712,15 @@ public class XPathEvalTest {
         }
     }
 
+    private XPathNodeset createExpectedNodesetFromInstance(FormInstance testInstance, String nodeName, int index) {
+        TreeReference referencedNode = testInstance.getRoot().getChildrenWithName(nodeName).get(index).getRef();
+        return new XPathNodeset(
+            Collections.singletonList(referencedNode),
+            testInstance,
+            new EvaluationContext(new EvaluationContext(testInstance), referencedNode)
+        );
+    }
+
     private XPathNodeset createExpectedNodesetFromIndexedRepeatFunction(FormInstance testInstance, int repeatIndex, String nodeName) {
         TreeReference referencedNode = testInstance.getRoot().getChildAt(repeatIndex).getChildrenWithName(nodeName).get(0).getRef();
         return new XPathNodeset(
@@ -746,7 +768,7 @@ public class XPathEvalTest {
         data.addChild(new TreeElement("path", 1));
 
         path = new TreeElement("path", 2);
-        path.setValue(new StringData("some value"));
+        path.setValue(new StringData("    some    value"));
         data.addChild(path);
 
         path = new TreeElement("path", 3);
