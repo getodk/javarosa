@@ -32,7 +32,7 @@ public class DateUtilsFormatTests {
         assertEquals("13", week);
         
         week = DateUtils.format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%W");
-        assertEquals("01", week);
+        assertEquals("1", week);
 
         // Week of year is based on what year the first thursday is. 1/1/2017 was a Sunday so 
         // it's actually the 52nd week of the previous year.

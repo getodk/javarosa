@@ -319,7 +319,7 @@ public class DateUtils {
                 } else if (c == 'a') {    //Three letter short text day
                     sb.append(getLocalDateTime(f).toString(DateTimeFormat.forPattern("EEE")));
                 } else if (c == 'W') { // week of the year
-                    sb.append(intPad(f.week, 2));
+                    sb.append(f.week);
                 } else if (c == 'Z' || c == 'A' || c == 'B') {
                     throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
                 } else {
