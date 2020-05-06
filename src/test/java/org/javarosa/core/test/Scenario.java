@@ -180,6 +180,19 @@ public class Scenario {
      * For this reason, this method will try to detect these predicates,
      * turn them into multiplicity values, and remove them from the output
      * reference.
+     *
+     * When using the result of this method for test assertions against {@link FormIndex#getReference()} we need to
+     * specify multiplicity on all steps. For example the following would pass for a form index pointing at a
+     * question at the top level of the form:
+     *
+     * <code>
+     * assertThat(formIndex.getReference(), is(getRef("/data/question[0]")));
+     * </code>
+     *
+     * This is because <code>getRef</code> has no way of knowing if a node without multiplicity (<code>[x]</code>) is
+     * a question/group or an unbounded repeat (which would have a multiplicity of <code>-1</code>). Adding the
+     * explicit <code>[0]</code> lets <code>getRef</code> know that the node is not an unbounded repeat and that it,
+     * like a real question or group, should have the default multiplicity of <code>0</code>.
      */
     public static TreeReference getRef(String xpath) {
         if (xpath.trim().isEmpty())
