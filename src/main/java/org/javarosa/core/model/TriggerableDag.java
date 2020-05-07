@@ -206,6 +206,7 @@ public class TriggerableDag {
             }
         } else {
             triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>(0));
+            evaluateChildrenTriggerables(mainInstance, evalContext, deletedElement, false, new HashSet<>(0));
         }
     }
 
