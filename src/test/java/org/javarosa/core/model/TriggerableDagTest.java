@@ -1466,4 +1466,33 @@ public class TriggerableDagTest {
         scenario.removeRepeat("/data/repeat[2]");
         assertThat(scenario.answerOf("/data/repeat-count"), is(intAnswer(2)));
     }
+
+    @Test
+    public void deleteLastRepeat_evaluatesTriggerables_indirectlyDependentOnTheDeletedRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Delete last repeat instance", html(
+            head(
+                title("Delete last repeat instance"),
+                model(
+                    mainInstance(t("data id=\"delete-last-repeat-instance\"",
+                        t("summary"),
+
+                        t("repeat",
+                            t("question", "a")),
+                        t("repeat",
+                            t("question", "b")),
+                        t("repeat",
+                            t("question", "c"))
+                    )),
+                    bind("/data/summary").type("string").calculate("concat(/data/repeat/question)")
+                ),
+                body(
+                    repeat("/data/repeat",
+                        input("question"))
+                ))));
+
+        assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("abc")));
+
+        scenario.removeRepeat("/data/repeat[2]");
+        assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ab")));
+    }
 }
