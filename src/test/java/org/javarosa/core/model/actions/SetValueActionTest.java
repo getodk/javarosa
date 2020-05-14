@@ -17,11 +17,10 @@
 package org.javarosa.core.model.actions;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.javarosa.core.test.AnswerDataMatchers.dateTimeAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -38,25 +37,9 @@ import static org.javarosa.core.util.XFormsElement.title;
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.joda.time.DateTimeUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class SetValueActionTest {
-    private static final long DATE_NOW = 1_500_000_000_000L;
-    private static final long DAY_OFFSET = 86_400_000L;
-
-    @Before
-    public void before() {
-        DateTimeUtils.setCurrentMillisFixed(DATE_NOW);
-    }
-
-    @After
-    public void after() {
-        DateTimeUtils.setCurrentMillisSystem();
-    }
-
     @Test
     public void when_triggerNodeIsUpdated_targetNodeCalculation_isEvaluated() throws IOException {
         Scenario scenario = Scenario.init("Nested setvalue action", html(
@@ -68,12 +51,12 @@ public class SetValueActionTest {
                         t("destination")
                     )),
                     bind("/data/source").type("int"),
-                    bind("/data/destination").type("dateTime")
+                    bind("/data/destination").type("int")
                 )
             ),
             body(
                 input("/data/source",
-                    setvalue("xforms-value-changed", "/data/destination", "now()"))
+                    setvalue("xforms-value-changed", "/data/destination", "4*4"))
             )));
 
         assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
@@ -81,7 +64,7 @@ public class SetValueActionTest {
         scenario.next();
         scenario.answer(22);
 
-        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+        assertThat(scenario.answerOf("/data/destination"), is(intAnswer(16)));
     }
 
     @Test
@@ -92,32 +75,32 @@ public class SetValueActionTest {
                 model(
                     mainInstance(t("data id=\"nested-setvalue\"",
                         t("source"),
-                        t("destination")
+                        t("destination"),
+                        t("some-field")
                     )),
-                    bind("/data/source").type("int"),
-                    bind("/data/destination").type("dateTime")
-                )
-            ),
+                    bind("/data/destination").type("string")
+            )),
             body(
                 input("/data/source",
-                    setvalue("xforms-value-changed", "/data/destination", "now()"))
+                    setvalue("xforms-value-changed", "/data/destination", "concat('foo',/data/some-field)")),
+                input("/data/some-field")
             )));
 
         assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
 
         scenario.next();
         scenario.answer(22);
+        assertThat(scenario.answerOf("/data/destination"), is(stringAnswer("foo")));
 
-        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+        scenario.next();
+        scenario.answer("bar");
 
-        DateTimeUtils.setCurrentMillisFixed(DATE_NOW + DAY_OFFSET); // shift the current time so we can test whether the setvalue action was re-fired
+        scenario.prev();
         scenario.answer(22);
-
-        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+        assertThat(scenario.answerOf("/data/destination"), is(stringAnswer("foo")));
 
         scenario.answer(23);
-
-        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW + DAY_OFFSET)));
+        assertThat(scenario.answerOf("/data/destination"), is(stringAnswer("foobar")));
     }
 
     @Test
@@ -130,13 +113,12 @@ public class SetValueActionTest {
                         t("source"),
                         t("destination")
                     )),
-                    bind("/data/source").type("int"),
-                    bind("/data/destination").type("dateTime")
+                    bind("/data/destination").type("int")
                 )
             ),
             body(
                 input("/data/source",
-                    setvalue("xforms-value-changed", "/data/destination", "now()"))
+                    setvalue("xforms-value-changed", "/data/destination", "4*4"))
             )));
 
         scenario.serializeAndDeserializeForm();
@@ -146,7 +128,7 @@ public class SetValueActionTest {
         scenario.next();
         scenario.answer(22);
 
-        assertThat(scenario.answerOf("/data/destination"), is(dateTimeAnswer(DATE_NOW)));
+        assertThat(scenario.answerOf("/data/destination"), is(intAnswer(16)));
     }
 
     @Test
@@ -161,14 +143,13 @@ public class SetValueActionTest {
                             t("destination")
                         )
                     )),
-                    bind("/data/repeat/source").type("int"),
-                    bind("/data/repeat/destination").type("dateTime")
+                    bind("/data/repeat/destination").type("int")
                 )
             ),
             body(
                 repeat("/data/repeat",
                     input("/data/repeat/source",
-                        setvalue("xforms-value-changed", "/data/repeat/destination", "now()"))
+                        setvalue("xforms-value-changed", "/data/repeat/destination", "4*position(..)"))
                 )
             )));
 
@@ -180,13 +161,11 @@ public class SetValueActionTest {
         }
 
         for (int i = 0; i < REPEAT_COUNT; i++) {
-            DateTimeUtils.setCurrentMillisFixed(todayPlusDays(i));
-
             scenario.answer("/data/repeat[" + i + "]/source", 7);
         }
 
         for (int i = 0; i < REPEAT_COUNT; i++) {
-            assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(dateTimeAnswer(todayPlusDays(i))));
+            assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(intAnswer(4 * (i + 1))));
         }
     }
 
@@ -203,15 +182,15 @@ public class SetValueActionTest {
                     mainInstance(t("data id=\"setvalue-readonly\"",
                         t("readonly-field")
                     )),
-                    bind("/data/readonly-field").readonly("1"),
-                    setvalue("odk-instance-first-load", "/data/readonly-field", "now()")
+                    bind("/data/readonly-field").readonly("1").type("int"),
+                    setvalue("odk-instance-first-load", "/data/readonly-field", "4*4")
                 )
             ),
             body(
                 input("/data/readonly-field")
             )));
 
-        assertThat(scenario.answerOf("/data/readonly-field"), is(notNullValue()));
+        assertThat(scenario.answerOf("/data/readonly-field"), is(intAnswer(16)));
     }
 
     @Test
@@ -278,9 +257,5 @@ public class SetValueActionTest {
         scenario.answer("/data/source", "foo");
         assertThat(scenario.answerOf("/data/destination1"), is(intAnswer(7)));
         assertThat(scenario.answerOf("/data/destination2"), is(intAnswer(11)));
-    }
-
-    private long todayPlusDays(int i) {
-        return DATE_NOW + i * DAY_OFFSET;
     }
 }

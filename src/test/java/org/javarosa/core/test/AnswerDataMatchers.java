@@ -4,12 +4,9 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.javarosa.core.model.data.BooleanData;
-import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
-
-import java.util.Date;
 
 public class AnswerDataMatchers {
     public static Matcher<StringData> stringAnswer(String expectedAnswer) {
@@ -122,25 +119,6 @@ public class AnswerDataMatchers {
             @Override
             protected boolean matchesSafely(BooleanData item) {
                 return item.getValue().equals(expectedAnswer);
-            }
-        };
-    }
-
-    public static Matcher<DateTimeData> dateTimeAnswer(long expectedDateTime) {
-        return new TypeSafeMatcher<DateTimeData>() {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("answer with value " + expectedDateTime);
-            }
-
-            @Override
-            protected void describeMismatchSafely(DateTimeData item, Description mismatchDescription) {
-                mismatchDescription.appendText("was answer " + item.getDisplayText() + "(").appendValue(item.getValue()).appendText(")");
-            }
-
-            @Override
-            protected boolean matchesSafely(DateTimeData item) {
-                return item.getValue().equals(new Date(expectedDateTime));
             }
         };
     }
