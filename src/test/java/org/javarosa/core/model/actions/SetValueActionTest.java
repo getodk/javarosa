@@ -16,15 +16,6 @@
 
 package org.javarosa.core.model.actions;
 
-import org.javarosa.core.test.Scenario;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.joda.time.DateTimeUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -39,8 +30,18 @@ import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
+import static org.javarosa.core.util.XFormsElement.setvalue;
+import static org.javarosa.core.util.XFormsElement.setvalueLiteral;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+
+import java.io.IOException;
+import org.javarosa.core.test.Scenario;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.joda.time.DateTimeUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SetValueActionTest {
     private static final long DATE_NOW = 1_500_000_000_000L;
@@ -72,7 +73,7 @@ public class SetValueActionTest {
             ),
             body(
                 input("/data/source",
-                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination\" value=\"now()\""))
+                    setvalue("xforms-value-changed", "/data/destination", "now()"))
             )));
 
         assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
@@ -99,7 +100,7 @@ public class SetValueActionTest {
             ),
             body(
                 input("/data/source",
-                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination\" value=\"now()\""))
+                    setvalue("xforms-value-changed", "/data/destination", "now()"))
             )));
 
         assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
@@ -135,7 +136,7 @@ public class SetValueActionTest {
             ),
             body(
                 input("/data/source",
-                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination\" value=\"now()\""))
+                    setvalue("xforms-value-changed", "/data/destination", "now()"))
             )));
 
         scenario.serializeAndDeserializeForm();
@@ -167,7 +168,7 @@ public class SetValueActionTest {
             body(
                 repeat("/data/repeat",
                     input("/data/repeat/source",
-                        t("setvalue event=\"xforms-value-changed\" ref=\"/data/repeat/destination\" value=\"now()\""))
+                        setvalue("xforms-value-changed", "/data/repeat/destination", "now()"))
                 )
             )));
 
@@ -203,7 +204,7 @@ public class SetValueActionTest {
                         t("readonly-field")
                     )),
                     bind("/data/readonly-field").readonly("1"),
-                    t("setvalue event=\"odk-instance-first-load\" ref=\"/data/readonly-field\" value=\"now()\"")
+                    setvalue("odk-instance-first-load", "/data/readonly-field", "now()")
                 )
             ),
             body(
@@ -223,7 +224,7 @@ public class SetValueActionTest {
                         t("a-field", "12")
                     )),
                     bind("/data/a-field").type("int"),
-                    t("setvalue event=\"odk-instance-first-load\" ref=\"/data/a-field\"", "")
+                    setvalueLiteral("odk-instance-first-load", "/data/a-field", "")
                 )
             ),
             body(
@@ -243,7 +244,7 @@ public class SetValueActionTest {
                         t("a-field", "12")
                     )),
                     bind("/data/a-field").type("int"),
-                    t("setvalue event=\"odk-instance-first-load\" ref=\"/data/a-field\" value=\"\"")
+                    setvalue("odk-instance-first-load", "/data/a-field", "")
                 )
             ),
             body(
@@ -270,8 +271,8 @@ public class SetValueActionTest {
             ),
             body(
                 input("/data/source",
-                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination1\" value=\"7\""),
-                    t("setvalue event=\"xforms-value-changed\" ref=\"/data/destination2\" value=\"11\""))
+                    setvalueLiteral("xforms-value-changed", "/data/destination1", "7"),
+                    setvalueLiteral("xforms-value-changed", "/data/destination2", "11"))
             )));
 
         scenario.answer("/data/source", "foo");

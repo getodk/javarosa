@@ -127,4 +127,11 @@ public interface XFormsElement {
         );
     }
 
+    static XFormsElement setvalue(String event, String ref, String value) {
+        return t("setvalue event=\"" + event + "\" ref=\"" + ref + "\" value=\"" + value + "\"");
+    }
+
+    static XFormsElement setvalueLiteral(String event, String ref, String innerHtml) {
+        return t("setvalue event=\"" + event + "\" ref=\"" + ref + "\"", innerHtml);
+    }
 }
