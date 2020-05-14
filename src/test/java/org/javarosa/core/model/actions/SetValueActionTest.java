@@ -280,30 +280,6 @@ public class SetValueActionTest {
         assertThat(scenario.answerOf("/data/destination2"), is(intAnswer(11)));
     }
 
-    /**
-     * This test demonstrates that read-only is just a UI concern and that calculates are still run on read-only fields.
-     * Questions around this behavior came up while discussing setvalue. It's here for documentation purposes pending a
-     * better place to put it.
-     */
-    @Test
-    public void calculate_evaluatedOnReadonlyFieldWithUI() throws IOException {
-        Scenario scenario = Scenario.init("Calculate readonly", html(
-            head(
-                title("Calculate readonly"),
-                model(
-                    mainInstance(t("data id=\"calculate-readonly\"",
-                        t("readonly-calculate")
-                    )),
-                    bind("/data/readonly-calculate").readonly("1").calculate("7 * 2")
-                )
-            ),
-            body(
-                input("/data/readonly-calculate")
-            )));
-
-        assertThat(scenario.answerOf("/data/readonly-calculate"), is(intAnswer(14)));
-    }
-
     private long todayPlusDays(int i) {
         return DATE_NOW + i * DAY_OFFSET;
     }
