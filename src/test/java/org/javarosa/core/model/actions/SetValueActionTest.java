@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Nafundi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.javarosa.core.model.actions;
 
 import org.javarosa.core.test.Scenario;
@@ -195,6 +211,46 @@ public class SetValueActionTest {
             )));
 
         assertThat(scenario.answerOf("/data/readonly-field"), is(notNullValue()));
+    }
+
+    @Test
+    public void setvalue_withInnerEmptyString_clearsTarget() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue empty string", html(
+            head(
+                title("Setvalue empty string"),
+                model(
+                    mainInstance(t("data id=\"setvalue-empty-string\"",
+                        t("a-field", "12")
+                    )),
+                    bind("/data/a-field").type("int"),
+                    t("setvalue event=\"odk-instance-first-load\" ref=\"/data/a-field\"", "")
+                )
+            ),
+            body(
+                input("/data/a-field")
+            )));
+
+        assertThat(scenario.answerOf("/data/a-field"), is(nullValue()));
+    }
+
+    @Test
+    public void setvalue_withEmptyStringValue_clearsTarget() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue empty string", html(
+            head(
+                title("Setvalue empty string"),
+                model(
+                    mainInstance(t("data id=\"setvalue-empty-string\"",
+                        t("a-field", "12")
+                    )),
+                    bind("/data/a-field").type("int"),
+                    t("setvalue event=\"odk-instance-first-load\" ref=\"/data/a-field\" value=\"\"")
+                )
+            ),
+            body(
+                input("/data/a-field")
+            )));
+
+        assertThat(scenario.answerOf("/data/a-field"), is(nullValue()));
     }
 
     @Test
