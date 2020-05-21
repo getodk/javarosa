@@ -29,7 +29,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.junit.Test;
 
 public class Issue449Test {
-
     @Test
     public void support_for_same_references_to_different_instances_without_DAG_cycles() throws IOException, DeserializationException {
         Path formFile = r("issue_449.xml");
