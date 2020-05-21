@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- from https://opendatakit.github.io/xforms-spec/#primary-instance: "The primary instance is the first instance
+<!-- from https://getodk.github.io/xforms-spec/#primary-instance: "The primary instance is the first instance
 defined by the form." In particular, there is no guarantee about whether or not the primary instance has an id. -->
 
 <h:html xmlns="http://www.w3.org/2002/xforms"

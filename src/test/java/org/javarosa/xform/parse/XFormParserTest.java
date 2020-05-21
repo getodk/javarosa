@@ -157,7 +157,7 @@ public class XFormParserTest {
 
     /**
      * ensure serializing and deserializing a range form is done without errors
-     * see https://github.com/opendatakit/javarosa/issues/245 why this is needed
+     * see https://github.com/getodk/javarosa/issues/245 why this is needed
      */
     @Test
     public void rangeFormSavesAndRestores() throws IOException, DeserializationException {

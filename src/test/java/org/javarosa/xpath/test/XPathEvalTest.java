@@ -425,7 +425,7 @@ public class XPathEvalTest {
         // non US format
         testEval("round('14,6')", 15.0);
         // Java 8 tests deprecated by XPath 3.0 specification
-        // See discussion at https://github.com/opendatakit/javarosa/pull/42#issuecomment-299527754
+        // See discussion at https://github.com/getodk/javarosa/pull/42#issuecomment-299527754
         testEval("round('12345.15', 1)", 12345.2);
         testEval("round('-12345.15', 1)", -12345.1);
         testEval("pow(2, 2)", 4.0);

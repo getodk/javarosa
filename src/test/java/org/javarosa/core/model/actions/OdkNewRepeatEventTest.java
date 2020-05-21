@@ -10,7 +10,7 @@ import org.javarosa.xform.parse.XFormParseException;
 import org.junit.Test;
 
 /**
- * Specification: https://opendatakit.github.io/xforms-spec/#the-odk-new-repeat-event.
+ * Specification: https://getodk.github.io/xforms-spec/#the-odk-new-repeat-event.
  */
 public class OdkNewRepeatEventTest {
     @Test
