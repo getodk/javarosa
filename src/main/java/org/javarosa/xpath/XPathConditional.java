@@ -81,7 +81,7 @@ public class XPathConditional implements IConditionExpr {
     }
 
     public boolean eval (DataInstance model, EvaluationContext evalContext) {
-        return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
+        return XPathFuncExpr.toBoolean(evalRaw(model, evalContext));
     }
 
     public String evalReadable (DataInstance model, EvaluationContext evalContext) {

@@ -23,13 +23,15 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public abstract class DataInstance<T extends AbstractTreeElement<T>> implements Persistable {
-
-
     /** The integer Id of the model */
     private int recordid = -1;
 
-    /** The name for this data model */
+    /**
+     * A unique name for this instance. The value of the id attribute in the case of a secondary instance or the title
+     * of the form for the primary instance.
+     **/
     private String name;
+
     /** The ID of the form that this is a model for */
     private int formId;
 

@@ -51,8 +51,11 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
 
     private HashMap<String, Object> namespaces = new HashMap<String, Object>();
 
-    /** The root of this tree */
-    protected TreeElement root = new TreeElement();
+    /**
+     * The root node of this instance. This is the "instance" node that contains the instance's document root.
+     * See https://getodk.github.io/xforms-spec/#instance.
+     **/
+    private TreeElement root = new TreeElement();
 
     public FormInstance() {
 
@@ -63,10 +66,7 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
     }
 
     /**
-     * Creates a new data model using the root given.
-     *
-     * @param root
-     *            The root of the tree for this data model.
+     * Creates a new instance using the provided document root.
      */
     public FormInstance(TreeElement root, String id) {
         super(id);
@@ -79,21 +79,18 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
         return root;
     }
 
+    /**
+     * Get this instance's document root which is the root's first child.
+     */
     public TreeElement getRoot() {
-
         if (root.getNumChildren() == 0)
             throw new RuntimeException("root node has no children");
 
         return root.getChildAt(0);
     }
 
-
-
     /**
-     * Sets the root element of this Model's tree
-     *
-     * @param topLevel
-     *            The root of the tree for this data model.
+     * Sets the root element of this instance's tree. Builds the root node and attaches the root element to it.
      */
     public void setRoot(TreeElement topLevel) {
         root = new TreeElement();

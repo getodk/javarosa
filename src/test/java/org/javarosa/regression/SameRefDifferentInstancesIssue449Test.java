@@ -28,9 +28,9 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.junit.Test;
 
-public class Issue449Test {
+public class SameRefDifferentInstancesIssue449Test {
     @Test
-    public void support_for_same_references_to_different_instances_without_DAG_cycles() throws IOException, DeserializationException {
+    public void formWithSameRefInDifferentInstances_isSuccessfullyDeserialized() throws IOException, DeserializationException {
         Path formFile = r("issue_449.xml");
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParent(), "file");
         Scenario scenario = Scenario.init(formFile);
@@ -39,10 +39,10 @@ public class Issue449Test {
         assertThat(scenario.answerOf("/data/aggregated"), is(stringAnswer("a b c")));
 
         Scenario deserialized = scenario.serializeAndDeserializeForm();
-        assertThat(deserialized.answerOf("/data/new-part"), is(stringAnswer("c")));
-        assertThat(deserialized.answerOf("/data/aggregated"), is(stringAnswer("a b c")));
+        assertThat(deserialized.answerOf("/data/new-part[0]"), is(stringAnswer("c")));
+        assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c")));
 
         deserialized.answer("/data/new-part", "c2");
-        assertThat(deserialized.answerOf("/data/aggregated"), is(stringAnswer("a b c2")));
+        assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c2")));
     }
 }
