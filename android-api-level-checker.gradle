@@ -12,8 +12,8 @@ task androidSetMinSdkVersion(dependsOn: [androidUnpackBlankProject]) {
         def buildFile = new File("$buildDir/android-api-level-checker/app/build.gradle")
         def oldBuildContents = buildFile.getText("UTF-8")
         def newBuildContents = oldBuildContents.replace(
-            "minSdkVersion 16",
-            "minSdkVersion ${getValue("androidMinSdkVersion", "16")}"
+            "minSdkVersion 16", // The minSdkVersion set in javarosa-android-api-level-checker.zip
+            "minSdkVersion ${getValue("androidMinSdkVersion", "21")}"
         )
         buildFile.write(newBuildContents)
     }
