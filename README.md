@@ -70,7 +70,7 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and g
     <servers>
         <server>
             <id>ossrh</id>
-            <username>opendatakit</username>
+            <username>getodk</username>
             <password>very-secure-password</password>
         </server>
     </servers>
@@ -91,7 +91,7 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and g
 </settings>
 ```
 
-Official releases are typically done by @yanokwa or @ggalmazor. Both use AdoptOpenJDK v1.8.x.
+Official releases are typically done by @yanokwa. Both use AdoptOpenJDK v1.8.x.
 
 To generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 
@@ -99,7 +99,7 @@ To generate official signed releases, you'll need the GPG folder, GPG passwords,
     * Use `x.x.x-SNAPSHOT` for snapshots releases and `x.x.x` for production releases.
 1. Run `mvn -v` to confirm the Java version and vendor used to build the release.
 1. In the repo folder, run `mvn -s secrets.xml clean deploy` to publish.
-    * If successful, both snapshots and production releases will appear in OSSRH [here](https://oss.sonatype.org/content/groups/public/org/opendatakit/opendatakit-javarosa/). 
-    * Production releases are automatically synced to Central [here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22opendatakit-javarosa%22) a few hours later.
+    * If successful, both snapshots and production releases will appear in OSSRH [here](https://oss.sonatype.org/content/groups/public/org/getodk/odk-javarosa/).
+    * Production releases are automatically synced to Central [here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22odk-javarosa%22) a few hours later.
 
 Don't forget to update the `build.gradle` files in any downstream tools (e.g., ODK Collect, ODK Briefcase) to the newest version!
