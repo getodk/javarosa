@@ -2,10 +2,20 @@ package org.javarosa.core.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.item;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.select1;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
+import java.io.IOException;
 import org.javarosa.core.test.Scenario;
 import org.junit.Test;
 
@@ -50,6 +60,8 @@ public class ChoiceNameTest {
         assertThat(scenario.answerOf("/jr-choice-name/my-repeat[1]/select_one_name"), is(stringAnswer("Choice 4")));
     }
 
+    // The choice list for question cocotero with dynamic itemset is populated on DAG initialization time triggered by the jr:choice-name
+    // expression in the calculate.
     @Test public void choiceNameCallWithDynamicChoicesAndNoPredicate_selectsName() {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         scenario.answer("/jr-choice-name/cocotero_a", "a");
@@ -57,14 +69,51 @@ public class ChoiceNameTest {
         assertThat(scenario.answerOf("/jr-choice-name/cocotero_name"), is(stringAnswer("Cocotero a-b")));
     }
 
-    // The handler for choice-name calls populateDynamicChoices and determines there are no matches. This is because
-    // when it tries to get the value for /jr-choice-name/country, the model that XPathEqExpr evaluates against is
-    // the cities secondary instance. That means that when evaluating the country = /jr-choice-name/country predicate,
-    // the right side is always null.
-    @Test public void choiceNameCallWithDynamicChoicesAndPredicate_doesntWork() {
-        Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
-        scenario.answer("/jr-choice-name/country", "france");
-        scenario.answer("/jr-choice-name/city", "grenoble");
-        assertThat(scenario.answerOf("/jr-choice-name/city_name"), is(nullValue()));
+    // The choice list for question city with dynamic itemset is populated at DAG initialization time. Since country hasn't been
+    // set yet, the choice list is empty. Setting the country does not automatically trigger re-computation of the choice list for the
+    // city question. Instead, clients trigger a recomputation of the list when the list is displayed.
+    @Test public void choiceNameCallWithDynamicChoicesAndPredicate_requiresExplicitDynamicChoicesRecomputation() throws IOException {
+        Scenario scenario = Scenario.init("Dynamic Choices and Predicates", html(
+            head(
+                title("Dynamic Choices and Predicates"),
+                model(
+                    mainInstance(t("data id=\"dynamic-choices-predicates\"",
+                        t("country"),
+                        t("city"),
+                        t("city_name")
+                    )),
+
+                    t("itext",
+                        t("translation lang=\"default\"",
+                            t("text id=\"static_instance-countries-0\"", t("value", "Canada")),
+                            t("text id=\"static_instance-countries-1\"", t("value", "France")),
+                            t("text id=\"static_instance-cities-0\"", t("value", "Montréal")),
+                            t("text id=\"static_instance-cities-1\"", t("value", "Grenoble")))
+                    ),
+
+                    t("instance id=\"cities\"",
+                        t("root",
+                            t("item", t("itextId", "static_instance-cities-0"), t("name", "montreal"), t("country", "canada")),
+                            t("item", t("itextId", "static_instance-cities-1"), t("name", "grenoble"), t("country", "france")))
+                    ),
+                    bind("/data/country").type("string"),
+                    bind("/data/city").type("string"),
+                    bind("/data/city_name").type("string").calculate("jr:choice-name(/data/city,'/data/city')")
+                )
+            ),
+            body(
+                select1("/data/country", item("canada", "Canada"), item("france", "France")),
+
+                t("select1 ref=\"/data/city\"", t("itemset nodeset=\"instance('cities')/root/item[selected(country,/data/country)]\"",
+                    t("value ref=\"name\""), t("label ref=\"jr:itext(itextId)\"")))
+            )));
+
+        scenario.answer("/data/country", "france");
+
+        // Trigger recomputation of the city choice list
+        assertThat(scenario.choicesOf("/data/city").get(0).getValue(), is("grenoble"));
+
+        scenario.answer("/data/city", "grenoble");
+        assertThat(scenario.answerOf("/data/city_name"), is(stringAnswer("Grenoble")));
     }
 }

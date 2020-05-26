@@ -42,24 +42,6 @@
                     <text id="/jr-choice-name/my-repeat/select_one/choice5:label">
                         <value>Choix 5</value>
                     </text>
-                    <text id="/jr-choice-name/country:label">
-                        <value>Pays</value>
-                    </text>
-                    <text id="/jr-choice-name/country/canada:label">
-                        <value>Canada</value>
-                    </text>
-                    <text id="/jr-choice-name/country/france:label">
-                        <value>France</value>
-                    </text>
-                    <text id="/jr-choice-name/city:label">
-                        <value>Ville</value>
-                    </text>
-                    <text id="/jr-choice-name/city/montreal:label">
-                        <value>Montréal</value>
-                    </text>
-                    <text id="/jr-choice-name/city/grenoble:label">
-                        <value>Grenoble</value>
-                    </text>
                     <text id="static_instance-choices-0">
                         <value>Choix 1</value>
                     </text>
@@ -74,18 +56,6 @@
                     </text>
                     <text id="static_instance-choices-4">
                         <value>Choix 5</value>
-                    </text>
-                    <text id="static_instance-countries-0">
-                        <value>Canada</value>
-                    </text>
-                    <text id="static_instance-countries-1">
-                        <value>France</value>
-                    </text>
-                    <text id="static_instance-cities-0">
-                        <value>Montréal</value>
-                    </text>
-                    <text id="static_instance-cities-1">
-                        <value>Grenoble</value>
                     </text>
                 </translation>
                 <translation lang="English (en)" default="">
@@ -125,24 +95,6 @@
                     <text id="/jr-choice-name/my-repeat/select_one/choice5:label">
                         <value>Choice 5</value>
                     </text>
-                    <text id="/jr-choice-name/country:label">
-                        <value>Country</value>
-                    </text>
-                    <text id="/jr-choice-name/country/canada:label">
-                        <value>Canada</value>
-                    </text>
-                    <text id="/jr-choice-name/country/france:label">
-                        <value>France</value>
-                    </text>
-                    <text id="/jr-choice-name/city:label">
-                        <value>City</value>
-                    </text>
-                    <text id="/jr-choice-name/city/montreal:label">
-                        <value>Montreal</value>
-                    </text>
-                    <text id="/jr-choice-name/city/grenoble:label">
-                        <value>Grenoble</value>
-                    </text>
                     <text id="static_instance-choices-0">
                         <value>Choice 1</value>
                     </text>
@@ -157,18 +109,6 @@
                     </text>
                     <text id="static_instance-choices-4">
                         <value>Choice 5</value>
-                    </text>
-                    <text id="static_instance-countries-0">
-                        <value>Canada</value>
-                    </text>
-                    <text id="static_instance-countries-1">
-                        <value>France</value>
-                    </text>
-                    <text id="static_instance-cities-0">
-                        <value>Montreal</value>
-                    </text>
-                    <text id="static_instance-cities-1">
-                        <value>Grenoble</value>
                     </text>
                 </translation>
             </itext>
@@ -188,9 +128,6 @@
                         <select_one_name/>
                     </my-repeat>
 
-                    <country/>
-                    <city/>
-                    <city_name/>
                     <meta>
                         <instanceID/>
                     </meta>
@@ -242,33 +179,6 @@
                 </root>
             </instance>
 
-            <instance id="countries">
-                <root>
-                    <item>
-                        <itextId>static_instance-countries-0</itextId>
-                        <name>canada</name>
-                    </item>
-                    <item>
-                        <itextId>static_instance-countries-1</itextId>
-                        <name>france</name>
-                    </item>
-                </root>
-            </instance>
-            <instance id="cities">
-                <root>
-                    <item>
-                        <itextId>static_instance-cities-0</itextId>
-                        <country>canada</country>
-                        <name>montreal</name>
-                    </item>
-                    <item>
-                        <itextId>static_instance-cities-1</itextId>
-                        <country>france</country>
-                        <name>grenoble</name>
-                    </item>
-                </root>
-            </instance>
-
             <bind nodeset="/jr-choice-name/select_one_outside" type="string"/>
 
             <!-- the first parameter to jr:choice-name can be a literal string -->
@@ -281,11 +191,6 @@
             <!-- both parameters to jr:choice-name can be relative XPath paths -->
             <bind nodeset="/jr-choice-name/my-repeat/select_one" type="string"/>
             <bind calculate="jr:choice-name( ../select_one , ' ../select_one ')" nodeset="/jr-choice-name/my-repeat/select_one_name" type="string"/>
-
-            <!-- jr:choice-name doesn't work with predicates (choice filters) -->
-            <bind nodeset="/jr-choice-name/country" type="string"/>
-            <bind nodeset="/jr-choice-name/city" type="string"/>
-            <bind calculate="jr:choice-name( /jr-choice-name/city , ' /jr-choice-name/city ')" nodeset="/jr-choice-name/city_name" type="string"/>
 
             <bind jr:preload="uid" nodeset="/jr-choice-name/meta/instanceID" readonly="true()" type="string"/>
         </model>
@@ -357,23 +262,5 @@
                 </select1>
             </repeat>
         </group>
-        <select1 ref="/jr-choice-name/country">
-            <label ref="jr:itext('/jr-choice-name/country:label')"/>
-            <item>
-                <label ref="jr:itext('/jr-choice-name/country/canada:label')"/>
-                <value>canada</value>
-            </item>
-            <item>
-                <label ref="jr:itext('/jr-choice-name/country/france:label')"/>
-                <value>france</value>
-            </item>
-        </select1>
-        <select1 ref="/jr-choice-name/city">
-            <label ref="jr:itext('/jr-choice-name/city:label')"/>
-            <itemset nodeset="instance('cities')/root/item[country =  /jr-choice-name/country ]">
-                <value ref="name"/>
-                <label ref="jr:itext(itextId)"/>
-            </itemset>
-        </select1>
     </h:body>
 </h:html>
