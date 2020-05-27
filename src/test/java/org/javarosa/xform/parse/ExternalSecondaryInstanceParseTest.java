@@ -115,7 +115,7 @@ public class ExternalSecondaryInstanceParseTest {
         assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
     }
 
-    // See https://github.com/opendatakit/javarosa/issues/451
+    // See https://github.com/getodk/javarosa/issues/451
     @Test
     public void dummyNodesInExternalInstanceDeclaration_ShouldBeIgnored() throws IOException, XPathSyntaxException {
         Path formPath = r("external-select-xml-dummy-nodes.xml");

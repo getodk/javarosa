@@ -22,7 +22,7 @@ public class ExternalDataInstance extends DataInstance {
     private String path;
     private TreeElement root;
 
-    // todo Make @mdudzinski’s recommended changes from https://github.com/opendatakit/javarosa/pull/154#pullrequestreview-51806826
+    // todo Make @mdudzinski’s recommended changes from https://github.com/getodk/javarosa/pull/154#pullrequestreview-51806826
 
     /**
      * No-args constructor for deserialization

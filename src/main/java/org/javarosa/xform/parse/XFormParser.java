@@ -863,7 +863,7 @@ public class XFormParser implements IXFormParserFunctions {
         String instanceSrc = instance.getAttributeValue("", "src");
 
         // Only consider child nodes if the instance declaration does not include a source.
-        // TODO: revisit this to allow for a mix of static and dynamic data but beware of https://github.com/opendatakit/javarosa/issues/451
+        // TODO: revisit this to allow for a mix of static and dynamic data but beware of https://github.com/getodk/javarosa/issues/451
         if (instanceSrc == null) {
             for (int i = 0; i < instance.getChildCount(); i++) {
                 if (instance.getType(i) == Node.ELEMENT) {

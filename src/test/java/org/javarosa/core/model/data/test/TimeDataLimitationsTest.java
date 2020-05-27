@@ -24,8 +24,8 @@ import org.junit.Test;
  * (in Kiev or London for example).
  * <p>
  * Related issues:
- * https://github.com/opendatakit/javarosa/pull/478
- * https://github.com/opendatakit/collect/issues/170
+ * https://github.com/getodk/javarosa/pull/478
+ * https://github.com/getodk/collect/issues/170
  */
 public class TimeDataLimitationsTest {
     public static final TimeZone WARSAW = TimeZone.getTimeZone("Europe/Warsaw");

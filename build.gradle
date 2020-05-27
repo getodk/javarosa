@@ -52,7 +52,7 @@ checkstyle {
 }
 
 jar {
-    baseName = 'opendatakit-javarosa'
+    baseName = 'odk-javarosa'
     // Be sure to update version in pom.xml to match
     // snapshot release = x.x.x-SNAPSHOT
     // production release = x.x.x

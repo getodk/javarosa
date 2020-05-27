@@ -95,9 +95,9 @@ import org.slf4j.LoggerFactory;
  * aren't met by this class, please, ask around and let's try to make this tool
  * awesome together.
  * <ul>
- * <li><a href="https://opendatakit.slack.com">OpenDataKit Slack</a></li>
- * <li><a href="https://github.com/opendatakit/javarosa/issues">GitHub issues</a></li>
- * <li><a href="https://forum.opendatakit.org/c/development">Development forum</a></li>
+ * <li><a href="https://slack.getodk.org">Developer Slack</a></li>
+ * <li><a href="https://github.com/getodk/javarosa/issues">GitHub issues</a></li>
+ * <li><a href="https://forum.getodk.org/c/development">Developer forum</a></li>
  * </ul>
  * <hr/>
  * </div>

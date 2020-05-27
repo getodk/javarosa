@@ -195,7 +195,7 @@ public class ReferenceManager {
      * Returns the first deriving factory in the three ReferenceFactory collections.
      */
     private ReferenceFactory derivingRoot(String uri) throws InvalidReferenceException {
-        // See https://github.com/opendatakit/javarosa/pull/394#discussion_r245902058 for why `? extends` is needed
+        // See https://github.com/getodk/javarosa/pull/394#discussion_r245902058 for why `? extends` is needed
         for (List<? extends ReferenceFactory> rfs : Arrays.asList(sessionTranslators, translators, factories))
             for (ReferenceFactory rf : rfs)
                 if (rf.derives(uri))
