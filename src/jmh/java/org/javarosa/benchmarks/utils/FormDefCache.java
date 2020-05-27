@@ -119,38 +119,28 @@ public class FormDefCache {
     }
 
     private static FormDef deserializeFormDef(File serializedFormDef) {
-        FileInputStream fis;
-        FormDef fd;
-        try {
-            // create new form def
-            fd = new FormDef();
-            fis = new FileInputStream(serializedFormDef);
-            DataInputStream dis = new DataInputStream(fis);
-
-            // read serialized formdef into new formdef
+        try (FileInputStream fis = new FileInputStream(serializedFormDef);
+             DataInputStream dis = new DataInputStream(fis)) {
+            FormDef fd = new FormDef();
             fd.readExternal(dis, ExtUtil.defaultPrototypes());
-            dis.close();
+            return fd;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            fd = null;
+            return null;
         }
-
-        return fd;
     }
 
 
     public static String getMd5Hash(File file) {
-        final InputStream is;
-        try {
-            is = new FileInputStream(file);
-
+        try (InputStream is = new FileInputStream(file)){
+            return getMd5Hash(is);
         } catch (FileNotFoundException e) {
             logger.debug(String.format("Cache file %s not found", file.getAbsolutePath()), e);
             return null;
-
+        } catch (IOException e) {
+            logger.debug(String.format("Error creating cache file %s", file.getAbsolutePath()), e);
+            return null;
         }
-
-        return getMd5Hash(is);
     }
 
 

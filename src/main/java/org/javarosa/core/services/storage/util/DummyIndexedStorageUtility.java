@@ -169,9 +169,9 @@ public class DummyIndexedStorageUtility<T extends Persistable> implements IStora
      * @see org.javarosa.core.services.storage.IStorageUtility#readBytes(int)
      */
     public byte[] readBytes(int id) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
-            data.get(DataUtil.integer(id)).writeExternal(new DataOutputStream(stream));
+        try (ByteArrayOutputStream stream = new ByteArrayOutputStream();
+             DataOutputStream dataOutputStream = new DataOutputStream(stream)) {
+            data.get(DataUtil.integer(id)).writeExternal(dataOutputStream);
             return stream.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("Couldn't serialize data to return to readBytes");
