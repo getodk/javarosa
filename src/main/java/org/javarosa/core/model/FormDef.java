@@ -533,31 +533,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
     }
 
-    // TODO: Consider alternate implementation:
-    //    TreeElement node = mainInstance.resolveReference(repeatRef);
-    //    return node == null || mainInstance.resolveReference(repeatRef).isRelevant()
-    //  Verifying parent node relevance is likely not necessary since it would have been inherited by
-    //  children. Currently no test fails when removing that check. Note also that ancestors are verified yet
-    //  again at the FormEntryModel.isIndexRelevant call site. That is also almost certainly unnecessary.
-    //  Checking the template node is currently only necessary because static relevance expressions (false()) aren't
-    //  included in the DAG (where getTriggerableForRepeatGroup gets the expression from).
     public boolean isRepeatRelevant(TreeReference repeatRef) {
-        boolean relev = true;
-
-        QuickTriggerable qc = dagImpl.getTriggerableForRepeatGroup(repeatRef.genericize());
-        if (qc != null) {
-            relev = (boolean) qc.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
-        }
-
-        if (relev) {
-            TreeElement templNode = mainInstance.getTemplate(repeatRef);
-            TreeReference parentPath = templNode.getParent().getRef().genericize();
-            TreeElement parentNode = mainInstance
-                .resolveReference(parentPath.contextualize(repeatRef));
-            relev = parentNode.isRelevant() && templNode.isRelevant() && templNode.hasChildren();
-        }
-
-        return relev;
+        TreeElement repeatNode = mainInstance.resolveReference(repeatRef);
+        return repeatNode == null || repeatNode.isRelevant();
     }
 
     public boolean canCreateRepeat(TreeReference repeatRef, FormIndex repeatIndex) {

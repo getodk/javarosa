@@ -1,11 +1,5 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.test.Scenario;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.Scenario.getRef;
@@ -21,6 +15,10 @@ import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+
+import java.io.IOException;
+import org.javarosa.core.test.Scenario;
+import org.junit.Test;
 
 public class FormDefIsRepeatRelevantTest {
     @Test
@@ -72,24 +70,6 @@ public class FormDefIsRepeatRelevantTest {
         FormDef formDef = scenario.getFormDef();
 
         assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
-    }
-
-    @Test
-    public void emptyRepeat_isIrrelevant() throws IOException {
-        Scenario scenario = Scenario.init("Repeat relevance - empty repeat", html(
-            head(
-                title("Repeat relevance - empty repeat"),
-                model(
-                    mainInstance(t("data id=\"repeat_relevance_empty\"",
-                        t("emptyRepeat")
-                    ))
-                ),
-                body(
-                    repeat("/data/emptyRepeat")
-                ))));
-        FormDef formDef = scenario.getFormDef();
-
-        assertThat(formDef.isRepeatRelevant(getRef("/data/emptyRepeat[0]")), is(false));
     }
 
     @Test
