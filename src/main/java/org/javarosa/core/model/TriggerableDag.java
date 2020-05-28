@@ -185,22 +185,28 @@ public class TriggerableDag {
         //After a repeat group has been deleted, the following repeat groups position has changed.
         //Evaluate triggerables which depend on the repeat group reference. Directly or indirectly.
         String repeatGroupName = deletedElement.getName();
-        for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
-            TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
+        boolean lastRepeatGroup = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatGroupName);
+        if (!lastRepeatGroup) {
+            for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
+                TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
 
-            Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), new HashSet<>(0));
-            publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
+                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), new HashSet<>(0));
+                publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
 
-            if (repeatGroup.getRef().equals(deleteRef)) {
-                // Evaluate the children triggerables only once, for the deleted repeat group.
-                //  Only children of the deleted repeat group have actually changed (they're gone) and thus calculations depend
-                //  on the must be re-evaluated, the following repeat groups have been shifted along with their children.
-                //  If there are calculations - regardless if inside the repeat or outside - that depend on the following
-                //  repeat group positions, they will fired cascade by the above code anyway.
-                //  Unit test for this scenario:
-                //  Safe2014DagImplTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
-                evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
+                if (repeatGroup.getRef().equals(deleteRef)) {
+                    // Evaluate the children triggerables only once, for the deleted repeat group.
+                    //  Only children of the deleted repeat group have actually changed (they're gone) and thus calculations depend
+                    //  on the must be re-evaluated, the following repeat groups have been shifted along with their children.
+                    //  If there are calculations - regardless if inside the repeat or outside - that depend on the following
+                    //  repeat group positions, they will fired cascade by the above code anyway.
+                    //  Unit test for this scenario:
+                    //  Safe2014DagImplTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
+                    evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
+                }
             }
+        } else {
+            triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>(0));
+            evaluateChildrenTriggerables(mainInstance, evalContext, deletedElement, false, new HashSet<>(0));
         }
     }
 
