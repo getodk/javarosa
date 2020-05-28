@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opendatakit</groupId>
-  <artifactId>opendatakit-javarosa</artifactId>
+  <groupId>org.getodk</groupId>
+  <artifactId>javarosa</artifactId>
   <!-- Be sure to update version in build.gradle to match -->
   <!-- snapshot release = x.x.x-SNAPSHOT -->
   <!-- production release = x.x.x -->
   <version>2.17.2</version>
   <packaging>jar</packaging>
-  <name>opendatakit-javarosa</name>
+  <name>javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
-  <url>https://github.com/opendatakit/javarosa</url>
+  <url>https://github.com/getodk/javarosa</url>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -18,26 +18,22 @@
   </licenses>
   <developers>
     <developer>
-      <name>opendatakit</name>
-      <email>opendatakit.org@gmail.com</email>
-      <organization>Open Data Kit</organization>
-      <organizationUrl>https://opendatakit.org</organizationUrl>
+      <name>getodk</name>
+      <email>team@getodk.org</email>
+      <organization>Get ODK</organization>
+      <organizationUrl>https://getodk.org</organizationUrl>
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git://github.com/opendatakit/javarosa.git</connection>
-    <developerConnection>scm:git:ssh://github.com:opendatakit/javarosa.git</developerConnection>
-    <url>https://github.com/opendatakit/javarosa/tree/master</url>
+    <connection>scm:git:git://github.com/getodk/javarosa.git</connection>
+    <developerConnection>scm:git:ssh://github.com:getodk/javarosa.git</developerConnection>
+    <url>https://github.com/getodk/javarosa/tree/master</url>
   </scm>
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
-    <relocation>
-      <groupId>org.getodk</groupId>
-      <artifactId>javarosa</artifactId>
-    </relocation>
     <repository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
