@@ -392,25 +392,7 @@ public class FormEntryModel {
             relevant = form.isRepeatRelevant(ref);
         } else {
             TreeElement node = form.getMainInstance().resolveReference(ref);
-            relevant = node != null && node.isRelevant(); // check instance flag first
-        }
-
-        if (relevant) { // if instance flag/condition says relevant, we still
-            // have to check the <group>/<repeat> hierarchy
-
-            FormIndex ancestorIndex = index;
-            while (!ancestorIndex.isTerminal()) {
-                // This should be safe now that the TreeReference is contained
-                // in the ancestor index itself
-                TreeElement ancestorNode =
-                        form.getMainInstance().resolveReference(ancestorIndex.getLocalReference());
-
-                if (!ancestorNode.isRelevant()) {
-                    relevant = false;
-                    break;
-                }
-                ancestorIndex = ancestorIndex.getNextLevel();
-            }
+            relevant = node != null && node.isRelevant();
         }
 
         return relevant;
