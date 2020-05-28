@@ -36,7 +36,6 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.Scenario;
@@ -82,10 +81,10 @@ public class FormDefTest {
                 ))));
         FormDef formDef = scenario.getFormDef();
 
-        MatcherAssert.assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
 
         scenario.answer("/data/selectYesNo", "yes");
-        MatcherAssert.assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(true));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(true));
     }
 
     @Test
@@ -107,7 +106,7 @@ public class FormDefTest {
                 ))));
         FormDef formDef = scenario.getFormDef();
 
-        MatcherAssert.assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
     }
 
     @Test
@@ -137,10 +136,10 @@ public class FormDefTest {
                 ))));
         FormDef formDef = scenario.getFormDef();
 
-        MatcherAssert.assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
 
         scenario.answer("/data/selectYesNo", "yes");
-        MatcherAssert.assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(true));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(true));
     }
 
     @Test
@@ -167,7 +166,48 @@ public class FormDefTest {
                 ))));
         FormDef formDef = scenario.getFormDef();
 
-        MatcherAssert.assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
+    }
+
+    @Test
+    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException {
+        Scenario scenario = Scenario.init("Nested repeat relevance", html(
+            head(
+                title("Nested repeat relevance"),
+                model(
+                    mainInstance(t("data id=\"nested-repeat-relevance\"",
+                        t("outer",
+                            t("inner",
+                                t("q1")
+                            )
+                        ),
+                        t("relevance-condition", "0")
+                    )),
+                    bind("/data/relevance-condition").type("string"),
+                    bind("/data/outer/inner").relevant("position(..) mod 2 = /data/relevance-condition")
+                ),
+                body(
+                    repeat("/data/outer",
+                        repeat("/data/outer/inner",
+                            input("/data/outer/inner/q1")
+                        )
+                    ),
+                    input("/data/relevance-condition")
+                ))));
+
+        FormDef formDef = scenario.getFormDef();
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer[0]/inner[0]")), is(false));
+
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]/inner[1]")));
+
+        scenario.answer("/data/relevance-condition", "1");
+        scenario.jumpToBeginningOfForm();
+
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]/inner[0]")));
     }
     //endregion
 }
