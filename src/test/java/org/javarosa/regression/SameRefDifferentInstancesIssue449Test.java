@@ -18,11 +18,22 @@ package org.javarosa.regression;
 
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -44,5 +55,40 @@ public class SameRefDifferentInstancesIssue449Test {
 
         deserialized.answer("/data/new-part", "c2");
         assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c2")));
+    }
+
+    @Test
+    public void constraintsAreCorrectlyApplied_afterDeserialization() throws IOException, DeserializationException {
+        Scenario scenario = Scenario.init("Tree reference deserialization", html(
+            head(
+                title("Tree reference deserialization"),
+                model(
+                    mainInstance(t("data id=\"treeref-deserialization\"",
+                        t("a", "not ok"),
+                        t("b")
+                    )),
+                    bind("/data/a").type("string"),
+                    bind("/data/b").type("string").constraint(". != /data/a")
+                )
+            ),
+            body(
+                input("/data/b")
+            )));
+
+        scenario.next();
+        scenario.answer("ok");
+        MatcherAssert.assertThat(scenario.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+
+        scenario.answer("not ok");
+        MatcherAssert.assertThat(scenario.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+
+        Scenario deserialized = scenario.serializeAndDeserializeForm();
+
+        deserialized.next();
+        deserialized.answer("ok");
+        MatcherAssert.assertThat(deserialized.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+
+        deserialized.answer("not ok");
+        MatcherAssert.assertThat(deserialized.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
     }
 }
