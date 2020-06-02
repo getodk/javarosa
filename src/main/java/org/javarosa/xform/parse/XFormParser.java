@@ -103,6 +103,7 @@ import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathStringLiteral;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
@@ -782,12 +783,12 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        String valueRef = e.getAttributeValue(null, "value");
+        String valueExpression = e.getAttributeValue(null, "value");
         Action action;
         TreeReference treeref = FormInstance.unpackReference(dataRef);
 
         registerActionTarget(treeref);
-        if (valueRef == null) {
+        if (valueExpression == null) {
             if (e.getChildCount() == 0 || !e.isText(0)) {
                 throw new XFormParseException("No 'value' attribute and no inner value set in <setvalue> associated with: " + treeref, e);
             }
@@ -795,10 +796,11 @@ public class XFormParser implements IXFormParserFunctions {
             action = new SetValueAction(treeref, e.getText(0));
         } else {
             try {
-                action = new SetValueAction(treeref, XPathParseTool.parseXPath(valueRef));
+                action = new SetValueAction(treeref, valueExpression.equals("") ? new XPathStringLiteral("")
+                    : XPathParseTool.parseXPath(valueExpression));
             } catch (XPathSyntaxException e1) {
                 logger.error("Error", e1);
-                throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueRef + "'", e);
+                throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueExpression + "'", e);
             }
         }
 
