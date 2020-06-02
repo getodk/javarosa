@@ -3,8 +3,11 @@ package org.javarosa.core.test;
 import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
-
+import java.util.List;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -14,11 +17,6 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.xform.util.XFormUtils;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,16 +48,15 @@ public class FormParseInit {
 
     private void init() {
         String xf_name = FORM_NAME;
-        FileInputStream is;
-        try {
-            is = new FileInputStream(xf_name);
+        try (FileInputStream is = new FileInputStream(xf_name)) {
+            xform = XFormUtils.getFormFromInputStream(is);
         } catch (FileNotFoundException e) {
             logger.error("Error: the file '{}' could not be found!", xf_name);
             throw new RuntimeException("Error: the file '" + xf_name + "' could not be found!");
+        } catch (IOException e) {
+            logger.debug(String.format("Error reading form with name %s", xf_name), e);
+            throw new RuntimeException("Error reading form with name '" + xf_name);
         }
-
-        // Parse the form
-        xform = XFormUtils.getFormFromInputStream(is);
 
         femodel = new FormEntryModel(xform);
         fec = new FormEntryController(femodel);

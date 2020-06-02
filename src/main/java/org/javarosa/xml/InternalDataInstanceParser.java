@@ -26,8 +26,7 @@ public class InternalDataInstanceParser {
      */
     public static HashMap<String, DataInstance> buildInstances(String xFormSrc) {
             HashMap<String, DataInstance> internalDataInstances = new HashMap<>();
-            try {
-                InputStream inputStream  = new FileInputStream(xFormSrc);
+            try (InputStream inputStream  = new FileInputStream(xFormSrc)) {
                 KXmlParser parser = ElementParser.instantiateParser(inputStream);
                 TreeElementParser treeElementParser =
                     new TreeElementParser(parser,0, "");

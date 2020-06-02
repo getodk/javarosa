@@ -64,8 +64,7 @@ public class ReferenceDataSource implements LocaleDataSource {
 
     @Override
     public OrderedMap<String, String> getLocalizedText() {
-        try {
-            InputStream is = ReferenceManager.instance().deriveReference(referenceURI).getStream();
+        try (InputStream is = ReferenceManager.instance().deriveReference(referenceURI).getStream()) {
             return LocalizationUtils.parseLocaleInput(is);
         } catch (IOException e) {
             logger.error("Error", e);
