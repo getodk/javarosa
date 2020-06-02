@@ -1344,7 +1344,7 @@ public class TriggerableDagTest {
         // Clients like Collect will validate the whole form before marking
         // a submission as complete and saving it to the filesystem.
         //
-        // FormDev.validate(boolean) will go through all the relevant fields
+        // FormDef.validate(boolean) will go through all the relevant fields
         // re-answering them with their current values in order to detect
         // any constraint violations. When this happens, a non-null
         // ValidationOutcome object is returned including information about

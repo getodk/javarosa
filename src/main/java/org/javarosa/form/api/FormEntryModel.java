@@ -465,7 +465,7 @@ public class FormEntryModel {
                                 getForm().createNewRepeat(index);
                               } catch (InvalidReferenceException ire) {
                                   logger.error("Error", ire);
-                                  throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
+                                  throw new RuntimeException("Invalid Reference while creating new repeat!" + ire.getMessage());
                               }
                             }
                         }

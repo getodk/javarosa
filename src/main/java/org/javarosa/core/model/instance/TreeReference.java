@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -404,6 +405,8 @@ public class TreeReference implements Externalizable, Serializable {
             return true;
         } else if (o instanceof TreeReference) {
             TreeReference ref = (TreeReference) o;
+            if (!Objects.equals(getInstanceName(), ref.getInstanceName()))
+                return false;
 
             if (this.refLevel == ref.refLevel && this.size() == ref.size()) {
                 for (int i = 0; i < this.size(); i++) {
@@ -447,6 +450,7 @@ public class TreeReference implements Externalizable, Serializable {
 
     public int hashCode() {
         int hash = (Integer.valueOf(refLevel)).hashCode();
+        hash ^= instanceName != null ? instanceName.hashCode() : "".hashCode();
         for (int i = 0; i < size(); i++) {
             //NOTE(ctsims): It looks like this is only using Integer to
             //get the hashcode method, but that method

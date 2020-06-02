@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Form title</h:title>
+        <model>
+            <instance>
+                <data id="form_id">
+                    <aggregated/>
+                    <new-part/>
+                </data>
+            </instance>
+            <instance id="last-saved" src="jr://file/issue_449_last_saved.xml"/>
+            <bind nodeset="/data/aggregated" type="string" calculate="concat(instance('last-saved')/data/aggregated , ' ',  /data/new-part)"/>
+            <bind nodeset="/data/new-part" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <input ref="/data/new-part"/>
+    </h:body>
+</h:html>

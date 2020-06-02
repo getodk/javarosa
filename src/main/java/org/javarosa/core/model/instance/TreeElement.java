@@ -100,6 +100,10 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     private String namespace;
     private String namespacePrefix;
 
+    /**
+     * The name of the instance that this node is in. The value of the id attribute in the case of a secondary
+     * instance or null for the primary instance.
+     */
     private String instanceName = null;
 
     /**

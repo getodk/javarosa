@@ -1,2 +1,2 @@
 # Android minimum SDK version that this codebase should work on
-androidMinSdkVersion=16
+androidMinSdkVersion=21
