@@ -179,30 +179,62 @@ public class TriggerableDag {
 
     void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference deleteRef, TreeElement parentElement, TreeElement deletedElement) {
         //After a repeat group has been deleted, the following repeat groups position has changed.
-        //Evaluate triggerables which depend on the repeat group reference. Directly or indirectly.
+        //Evaluate triggerables which depend on the repeat group reference directly or indirectly.
         String repeatGroupName = deletedElement.getName();
+
         boolean lastRepeatGroup = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatGroupName);
         if (!lastRepeatGroup) {
+            // triggerables outside the repeat only need to be recomputed once, not for every repeat instance
+            Set<QuickTriggerable> excluded = getTriggerablesOutsideRepeat(deleteRef.genericize());
+
             for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
                 TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
 
-                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), new HashSet<>(0));
+                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), excluded);
                 publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
 
                 if (repeatGroup.getRef().equals(deleteRef)) {
-                    // Evaluate the children triggerables only once, for the deleted repeat group.
-                    //  Only children of the deleted repeat group have actually changed (they're gone) and thus calculations depend
-                    //  on the must be re-evaluated, the following repeat groups have been shifted along with their children.
+                    // Evaluate the children triggerables only for the deleted repeat instance.
+                    //  Children of the deleted repeat instance have changed (they're gone) and thus calculations that depend
+                    //  on them must be re-evaluated. The following repeat instances have been shifted along with their children.
                     //  If there are calculations - regardless if inside the repeat or outside - that depend on the following
-                    //  repeat group positions, they will fired cascade by the above code anyway.
+                    //  repeat group positions, they will be fired by the above code anyway.
                     //  Unit test for this scenario:
                     //  Safe2014DagImplTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
+                    alreadyEvaluated.addAll(excluded);
                     evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
                 }
+            }
+
+            if (!excluded.isEmpty()) {
+                triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>());
             }
         } else {
             triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>(0));
             evaluateChildrenTriggerables(mainInstance, evalContext, deletedElement, false, new HashSet<>(0));
+        }
+    }
+
+    private Set<QuickTriggerable> getTriggerablesOutsideRepeat(TreeReference genericRepeatRef) {
+        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRepeatRef);
+        Set<QuickTriggerable> triggeredOutsideRepeat = new HashSet<>();
+
+        if (triggered != null) {
+            for (QuickTriggerable triggerable : triggered) {
+                getTriggerablesOutsideRepeat(genericRepeatRef, triggerable, triggeredOutsideRepeat);
+            }
+        }
+
+        return triggeredOutsideRepeat;
+    }
+
+    private void getTriggerablesOutsideRepeat(TreeReference genericRepeatRef, QuickTriggerable triggered, Set<QuickTriggerable> result) {
+        if (!genericRepeatRef.isAncestorOf(triggered.getTriggerable().getContext(), true)) {
+            result.add(triggered);
+        }
+
+        for (QuickTriggerable nextCascade : triggered.getTriggerable().getImmediateCascades()) {
+            getTriggerablesOutsideRepeat(genericRepeatRef, nextCascade, result);
         }
     }
 

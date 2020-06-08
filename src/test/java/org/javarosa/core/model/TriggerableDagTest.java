@@ -266,28 +266,23 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(45)));
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Recalculate' for summary [1] (51.0)",
-            "Processing 'Deleted: house [3]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: house [3]: 1 triggerables were fired.' for ",
             "Processing 'Deleted: number [3_1]: 0 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [4_1] (4.0)",
-            "Processing 'Recalculate' for summary [1] (50.0)",
-            "Processing 'Deleted: house [4]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: house [4]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [5_1] (5.0)",
-            "Processing 'Recalculate' for summary [1] (49.0)",
-            "Processing 'Deleted: house [5]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: house [5]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [6_1] (6.0)",
-            "Processing 'Recalculate' for summary [1] (48.0)",
-            "Processing 'Deleted: house [6]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: house [6]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [7_1] (7.0)",
-            "Processing 'Recalculate' for summary [1] (47.0)",
-            "Processing 'Deleted: house [7]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: house [7]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [8_1] (8.0)",
-            "Processing 'Recalculate' for summary [1] (46.0)",
-            "Processing 'Deleted: house [8]: 2 triggerables were fired.' for ",
+            "Processing 'Deleted: house [8]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [9_1] (9.0)",
-            "Processing 'Recalculate' for summary [1] (45.0)",
-            "Processing 'Deleted: house [9]: 2 triggerables were fired.' for "
-        );
+            "Processing 'Deleted: house [9]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [3_1] (3.0)",
+            "Processing 'Recalculate' for summary [1] (45.0)"
+            );
     }
 
     /**
@@ -1398,7 +1393,7 @@ public class TriggerableDagTest {
         ), body(inputs.toArray(new XFormsElement[]{})));
     }
 
-    // TODO Replace this test with a benchmark
+    @Ignore("Replace by benchmark")
     @Test
     public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
         // Given
