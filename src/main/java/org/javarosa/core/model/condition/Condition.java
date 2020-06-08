@@ -31,8 +31,8 @@ import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
 
 public class Condition extends Triggerable {
-    public ConditionAction trueAction;
-    public ConditionAction falseAction;
+    private ConditionAction trueAction;
+    private ConditionAction falseAction;
 
     /**
      * Constructor required for deserialization
@@ -41,7 +41,7 @@ public class Condition extends Triggerable {
     public Condition() {
     }
 
-    protected Condition(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
+    Condition(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades, ConditionAction trueAction, ConditionAction falseAction) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
         this.trueAction = trueAction;
         this.falseAction = falseAction;
@@ -52,7 +52,7 @@ public class Condition extends Triggerable {
         try {
             return expr.eval(model, evalContext);
         } catch (XPathException e) {
-            e.setSource("Condition expression for " + contextRef.toString(true));
+            e.setSource("Condition expression for " + getContext().toString(true));
             throw e;
         }
     }
