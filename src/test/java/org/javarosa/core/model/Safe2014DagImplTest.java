@@ -102,7 +102,7 @@ public class Safe2014DagImplTest {
     }
 
     @Test
-    public void foo() throws IOException {
+    public void referenceToCalculatedRepeatCount_insideRepeat_updatesWhenCountChanges() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
             head(
                 title("Count outside repeat used inside"),
@@ -131,6 +131,10 @@ public class Safe2014DagImplTest {
         });
 
         range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), is(intAnswer(5))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), is(intAnswer(4))));
     }
 
     @Test
