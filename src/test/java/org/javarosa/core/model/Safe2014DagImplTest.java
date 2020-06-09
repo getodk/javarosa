@@ -1,25 +1,38 @@
 package org.javarosa.core.model;
 
+import static java.util.stream.IntStream.range;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.title;
+
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.junit.Assert.assertThat;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.test.Scenario;
 import org.javarosa.debug.Event;
 import org.javarosa.debug.EventNotifier;
 import org.joda.time.LocalTime;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.junit.Assert.assertThat;
 
 public class Safe2014DagImplTest {
     private static final Logger logger = LoggerFactory.getLogger(Safe2014DagImplTest.class);
@@ -84,6 +97,38 @@ public class Safe2014DagImplTest {
         for (String expectedMessage : expectedMessages) {
             assertThat(dagEvents.get(messageIndex++).getDisplayMessage(), equalTo(expectedMessage));
         }
+    }
+
+    @Test
+    public void foo() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("count"),
+
+                        t("repeat jr:template=\"\"",
+                            t("question"),
+                            t("inner-count"))
+                    )),
+                    bind("/data/count").type("int").calculate("count(/data/repeat)"),
+                    bind("/data/repeat/inner-count").type("int").calculate("/data/count")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/count"), is(intAnswer(n + 1)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), is(intAnswer(5))));
     }
 
     @Test
