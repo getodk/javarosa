@@ -4,6 +4,8 @@ import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
