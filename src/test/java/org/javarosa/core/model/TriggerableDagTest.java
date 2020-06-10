@@ -892,13 +892,42 @@ public class TriggerableDagTest {
                 )
             ),
             body(group("/data/house", repeat("/data/house", input("number"))))
-        )).onDagEvent(dagEvents::add);
+        ));
         range(0, 10).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
         });
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(55)));
+
+        scenario.removeRepeat("/data/house[2]");
+
+        assertThat(scenario.answerOf("/data/summary"), is(intAnswer(45)));
+    }
+
+    // Verifies that the list of recalculations triggered by the repeat instance deletion is minimal. In particular,
+    // calculations outside the repeat should only be re-computed once.
+    @Test
+    public void repeatInstanceDeletion_triggersCalculationsOutsideTheRepeat_exactlyOnce() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("house jr:template=\"\"", t("number")),
+                        t("summary")
+                    )),
+                    bind("/data/house/number").type("int").calculate("position(..)"),
+                    bind("/data/summary").type("int").calculate("sum(/data/house/number)")
+                )
+            ),
+            body(group("/data/house", repeat("/data/house", input("number"))))
+        )).onDagEvent(dagEvents::add);
+        range(0, 10).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            scenario.next();
+        });
 
         // Start recording DAG events now
         dagEvents.clear();
@@ -923,8 +952,8 @@ public class TriggerableDagTest {
             "Processing 'Recalculate' for number [9_1] (9.0)",
             "Processing 'Deleted: house [9]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Recalculate' for summary [1] (45.0)"
-            );
+            "Processing 'Recalculate' for summary [1] (45.0)" // this calculation is outside the repeat and is only computed once
+        );
     }
 
     /**
