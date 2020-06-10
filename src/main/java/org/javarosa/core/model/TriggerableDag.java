@@ -200,7 +200,7 @@ public class TriggerableDag {
                     //  If there are calculations - regardless if inside the repeat or outside - that depend on the following
                     //  repeat group positions, they will be fired by the above code anyway.
                     //  Unit test for this scenario:
-                    //  Safe2014DagImplTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
+                    //  TriggerableDagTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
                     alreadyEvaluated.addAll(excluded);
                     evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
                 }
