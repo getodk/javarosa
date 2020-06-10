@@ -185,12 +185,12 @@ public class TriggerableDag {
         boolean lastRepeatGroup = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatGroupName);
         if (!lastRepeatGroup) {
             // triggerables outside the repeat only need to be recomputed once, not for every repeat instance
-            Set<QuickTriggerable> excluded = getTriggerablesOutsideRepeat(deleteRef.genericize());
+            Set<QuickTriggerable> triggerablesOutside = getTriggerablesOutsideRepeat(deleteRef.genericize());
 
             for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
                 TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
 
-                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), excluded);
+                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), triggerablesOutside);
                 publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
 
                 if (repeatGroup.getRef().equals(deleteRef)) {
@@ -201,12 +201,12 @@ public class TriggerableDag {
                     //  repeat group positions, they will be fired by the above code anyway.
                     //  Unit test for this scenario:
                     //  TriggerableDagTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
-                    alreadyEvaluated.addAll(excluded);
+                    alreadyEvaluated.addAll(triggerablesOutside);
                     evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
                 }
             }
 
-            if (!excluded.isEmpty()) {
+            if (!triggerablesOutside.isEmpty()) {
                 triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>());
             }
         } else {
