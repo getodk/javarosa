@@ -185,12 +185,12 @@ public class TriggerableDag {
         boolean lastRepeat = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatName);
         if (!lastRepeat) {
             // triggerables outside the repeat only need to be recomputed once, not for every repeat instance
-            Set<QuickTriggerable> triggerablesOutside = getTriggerablesOutsideRepeat(deleteRef.genericize());
+            Set<QuickTriggerable> triggeredOutsideRepeat = getTriggeredOutsideRepeat(deleteRef.genericize());
 
             for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatName); i++) {
                 TreeElement repeatInstance = parentElement.getChild(repeatName, i);
 
-                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatInstance.getRef(), triggerablesOutside);
+                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatInstance.getRef(), triggeredOutsideRepeat);
                 publishSummary("Deleted", repeatInstance.getRef(), alreadyEvaluated);
 
                 if (repeatInstance.getRef().equals(deleteRef)) {
@@ -201,12 +201,12 @@ public class TriggerableDag {
                     //  repeat group positions, they will be fired by the above code anyway.
                     //  Unit test for this scenario:
                     //  TriggerableDagTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
-                    alreadyEvaluated.addAll(triggerablesOutside);
+                    alreadyEvaluated.addAll(triggeredOutsideRepeat);
                     evaluateChildrenTriggerables(mainInstance, evalContext, repeatInstance, false, alreadyEvaluated);
                 }
             }
 
-            if (!triggerablesOutside.isEmpty()) {
+            if (!triggeredOutsideRepeat.isEmpty()) {
                 triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>());
             }
         } else {
@@ -215,27 +215,26 @@ public class TriggerableDag {
         }
     }
 
-    private Set<QuickTriggerable> getTriggerablesOutsideRepeat(TreeReference genericRepeatRef) {
+    private Set<QuickTriggerable> getTriggeredOutsideRepeat(TreeReference genericRepeatRef) {
         Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRepeatRef);
         Set<QuickTriggerable> triggeredOutsideRepeat = new HashSet<>();
 
         if (triggered != null) {
-            for (QuickTriggerable triggerable : triggered) {
-                getTriggerablesOutsideRepeat(genericRepeatRef, triggerable, triggeredOutsideRepeat);
+            Set<QuickTriggerable> toConsider = new HashSet<>(triggered);
+
+            while (!toConsider.isEmpty()) {
+                QuickTriggerable triggerable = toConsider.iterator().next();
+                toConsider.remove(triggerable);
+
+                if (!genericRepeatRef.isAncestorOf(triggerable.getContext(), true)) {
+                    triggeredOutsideRepeat.add(triggerable);
+                }
+
+                toConsider.addAll(triggerable.getImmediateCascades());
             }
         }
 
         return triggeredOutsideRepeat;
-    }
-
-    private void getTriggerablesOutsideRepeat(TreeReference genericRepeatRef, QuickTriggerable triggered, Set<QuickTriggerable> result) {
-        if (!genericRepeatRef.isAncestorOf(triggered.getTriggerable().getContext(), true)) {
-            result.add(triggered);
-        }
-
-        for (QuickTriggerable nextCascade : triggered.getTriggerable().getImmediateCascades()) {
-            getTriggerablesOutsideRepeat(genericRepeatRef, nextCascade, result);
-        }
     }
 
     void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement createdElement) {
