@@ -180,20 +180,20 @@ public class TriggerableDag {
     void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference deleteRef, TreeElement parentElement, TreeElement deletedElement) {
         //After a repeat group has been deleted, the following repeat groups position has changed.
         //Evaluate triggerables which depend on the repeat group reference directly or indirectly.
-        String repeatGroupName = deletedElement.getName();
+        String repeatName = deletedElement.getName();
 
-        boolean lastRepeatGroup = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatGroupName);
-        if (!lastRepeatGroup) {
+        boolean lastRepeat = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatName);
+        if (!lastRepeat) {
             // triggerables outside the repeat only need to be recomputed once, not for every repeat instance
             Set<QuickTriggerable> triggerablesOutside = getTriggerablesOutsideRepeat(deleteRef.genericize());
 
-            for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
-                TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
+            for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatName); i++) {
+                TreeElement repeatInstance = parentElement.getChild(repeatName, i);
 
-                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), triggerablesOutside);
-                publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
+                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatInstance.getRef(), triggerablesOutside);
+                publishSummary("Deleted", repeatInstance.getRef(), alreadyEvaluated);
 
-                if (repeatGroup.getRef().equals(deleteRef)) {
+                if (repeatInstance.getRef().equals(deleteRef)) {
                     // Evaluate the children triggerables only for the deleted repeat instance.
                     //  Children of the deleted repeat instance have changed (they're gone) and thus calculations that depend
                     //  on them must be re-evaluated. The following repeat instances have been shifted along with their children.
@@ -202,7 +202,7 @@ public class TriggerableDag {
                     //  Unit test for this scenario:
                     //  TriggerableDagTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
                     alreadyEvaluated.addAll(triggerablesOutside);
-                    evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
+                    evaluateChildrenTriggerables(mainInstance, evalContext, repeatInstance, false, alreadyEvaluated);
                 }
             }
 
