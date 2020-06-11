@@ -57,28 +57,28 @@ public abstract class Triggerable implements Externalizable {
      * References to all of the (non-contextualized) nodes which should be
      * updated by the result of this triggerable
      */
-    protected Set<TreeReference> targets;
+    private Set<TreeReference> targets;
 
     /**
      * Current reference which is the "Basis" of the trigerrables being evaluated. This is the highest
      * common root of all of the targets being evaluated.
      */
-    protected TreeReference contextRef;  //generic ref used to turn triggers into absolute references
+    private TreeReference contextRef;  //generic ref used to turn triggers into absolute references
 
     // TODO Study why we really need this property. Looking at mutators, it should always equal the contextRef.
     /**
      * The first context provided to this triggerable before reducing to the common root.
      */
-    protected TreeReference originalContextRef;
+    private TreeReference originalContextRef;
 
     // TODO Move this into the DAG. This shouldn't be here.
-    protected Set<QuickTriggerable> immediateCascades = null;
+    private Set<QuickTriggerable> immediateCascades = null;
 
-    protected Triggerable() {
+    Triggerable() {
 
     }
 
-    protected Triggerable(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    Triggerable(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         this.expr = expr;
         this.targets = targets;
         this.contextRef = contextRef;
@@ -193,7 +193,7 @@ public abstract class Triggerable implements Externalizable {
         return true;
     }
 
-    protected String buildHumanReadableTargetList() {
+    String buildHumanReadableTargetList() {
         StringBuilder targetsBuilder = new StringBuilder();
         for (TreeReference t : getTargets())
             targetsBuilder.append(t.toString(true, true)).append(", ");

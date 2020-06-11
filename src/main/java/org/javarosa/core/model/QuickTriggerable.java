@@ -33,11 +33,11 @@ public final class QuickTriggerable {
         return triggerable instanceof Condition;
     }
 
-    public boolean isRecalculate() {
+    boolean isRecalculate() {
         return triggerable instanceof Recalculate;
     }
 
-    public TreeReference contextualizeContextRef(TreeReference anchorRef) {
+    TreeReference contextualizeContextRef(TreeReference anchorRef) {
         return triggerable.contextualizeContextRef(anchorRef);
     }
 
@@ -45,7 +45,7 @@ public final class QuickTriggerable {
         return triggerable.apply(mainInstance, ec, qualified);
     }
 
-    public Set<TreeReference> getTargets() {
+    Set<TreeReference> getTargets() {
         return triggerable.getTargets();
     }
 
@@ -53,11 +53,11 @@ public final class QuickTriggerable {
         return this.triggerable.equals(triggerable);
     }
 
-    public void intersectContextWith(Triggerable other) {
+    void intersectContextWith(Triggerable other) {
         triggerable.intersectContextWith(other);
     }
 
-    public void setImmediateCascades(Set<QuickTriggerable> deps) {
+    void setImmediateCascades(Set<QuickTriggerable> deps) {
         triggerable.setImmediateCascades(deps);
     }
 
@@ -65,11 +65,11 @@ public final class QuickTriggerable {
         return triggerable.canCascade();
     }
 
-    public boolean isCascadingToChildren() {
+    boolean isCascadingToChildren() {
         return triggerable.isCascadingToChildren();
     }
 
-    public Set<QuickTriggerable> getImmediateCascades() {
+    Set<QuickTriggerable> getImmediateCascades() {
         return triggerable.getImmediateCascades();
     }
 

@@ -40,7 +40,7 @@ public class Recalculate extends Triggerable {
 
     }
 
-    protected Recalculate(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
+    Recalculate(XPathConditional expr, TreeReference contextRef, TreeReference originalContextRef, Set<TreeReference> targets, Set<QuickTriggerable> immediateCascades) {
         super(expr, contextRef, originalContextRef, targets, immediateCascades);
     }
 
@@ -49,7 +49,7 @@ public class Recalculate extends Triggerable {
         try {
             return expr.evalRaw(model, ec);
         } catch (XPathException e) {
-            e.setSource("Calculate expression for " + contextRef.toString(true));
+            e.setSource("Calculate expression for " + getContext().toString(true));
             throw e;
         }
     }

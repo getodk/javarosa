@@ -106,7 +106,7 @@ public class TriggerableDag {
      */
     private final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
-    public TriggerableDag(EventNotifierAccessor accessor) {
+    TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
     }
 
@@ -147,10 +147,6 @@ public class TriggerableDag {
             accessor.getEventNotifier().publishEvent(new Event(triggerable.isCondition() ? "Condition" : "Recalculate", evaluationResults));
     }
 
-    public QuickTriggerable getTriggerableForRepeatGroup(TreeReference repeatRef) {
-        return repeatConditionsPerTargets.get(repeatRef.genericize());
-    }
-
     private Set<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef, Set<QuickTriggerable> alreadyEvaluated) {
         TreeReference genericRoot = rootRef.genericize();
 
@@ -177,32 +173,41 @@ public class TriggerableDag {
      * @param ref The full contextualized unambiguous reference of the value
      *            that was changed.
      */
-    public Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref) {
+    Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref) {
         return this.triggerTriggerables(mainInstance, evalContext, ref, new HashSet<>(1));
     }
 
-    public void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference deleteRef, TreeElement parentElement, TreeElement deletedElement) {
+    void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference deleteRef, TreeElement parentElement, TreeElement deletedElement) {
         //After a repeat group has been deleted, the following repeat groups position has changed.
-        //Evaluate triggerables which depend on the repeat group reference. Directly or indirectly.
-        String repeatGroupName = deletedElement.getName();
-        boolean lastRepeatGroup = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatGroupName);
-        if (!lastRepeatGroup) {
-            for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatGroupName); i++) {
-                TreeElement repeatGroup = parentElement.getChild(repeatGroupName, i);
+        //Evaluate triggerables which depend on the repeat group reference directly or indirectly.
+        String repeatName = deletedElement.getName();
 
-                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), new HashSet<>(0));
-                publishSummary("Deleted", repeatGroup.getRef(), alreadyEvaluated);
+        boolean lastRepeat = deletedElement.getMultiplicity() == parentElement.getChildMultiplicity(repeatName);
+        if (!lastRepeat) {
+            // triggerables outside the repeat only need to be recomputed once, not for every repeat instance
+            Set<QuickTriggerable> triggeredOutsideRepeat = getTriggeredOutsideRepeat(deleteRef.genericize());
 
-                if (repeatGroup.getRef().equals(deleteRef)) {
-                    // Evaluate the children triggerables only once, for the deleted repeat group.
-                    //  Only children of the deleted repeat group have actually changed (they're gone) and thus calculations depend
-                    //  on the must be re-evaluated, the following repeat groups have been shifted along with their children.
+            for (int i = deletedElement.getMultiplicity(); i < parentElement.getChildMultiplicity(repeatName); i++) {
+                TreeElement repeatInstance = parentElement.getChild(repeatName, i);
+
+                Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatInstance.getRef(), triggeredOutsideRepeat);
+                publishSummary("Deleted", repeatInstance.getRef(), alreadyEvaluated);
+
+                if (repeatInstance.getRef().equals(deleteRef)) {
+                    // Evaluate the children triggerables only for the deleted repeat instance.
+                    //  Children of the deleted repeat instance have changed (they're gone) and thus calculations that depend
+                    //  on them must be re-evaluated. The following repeat instances have been shifted along with their children.
                     //  If there are calculations - regardless if inside the repeat or outside - that depend on the following
-                    //  repeat group positions, they will fired cascade by the above code anyway.
+                    //  repeat group positions, they will be fired by the above code anyway.
                     //  Unit test for this scenario:
-                    //  Safe2014DagImplTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
-                    evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated);
+                    //  TriggerableDagTest#deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber
+                    alreadyEvaluated.addAll(triggeredOutsideRepeat);
+                    evaluateChildrenTriggerables(mainInstance, evalContext, repeatInstance, false, alreadyEvaluated);
                 }
+            }
+
+            if (!triggeredOutsideRepeat.isEmpty()) {
+                triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>());
             }
         } else {
             triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>(0));
@@ -210,7 +215,29 @@ public class TriggerableDag {
         }
     }
 
-    public void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement createdElement) {
+    private Set<QuickTriggerable> getTriggeredOutsideRepeat(TreeReference genericRepeatRef) {
+        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRepeatRef);
+        Set<QuickTriggerable> triggeredOutsideRepeat = new HashSet<>();
+
+        if (triggered != null) {
+            Set<QuickTriggerable> toConsider = new HashSet<>(triggered);
+
+            while (!toConsider.isEmpty()) {
+                QuickTriggerable triggerable = toConsider.iterator().next();
+                toConsider.remove(triggerable);
+
+                if (!genericRepeatRef.isAncestorOf(triggerable.getContext(), true)) {
+                    triggeredOutsideRepeat.add(triggerable);
+                }
+
+                toConsider.addAll(triggerable.getImmediateCascades());
+            }
+        }
+
+        return triggeredOutsideRepeat;
+    }
+
+    void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement createdElement) {
         // trigger conditions that depend on the creation of this new node
         Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0));
         publishSummary("Created (phase 1)", createRef, qtSet1);
@@ -236,7 +263,7 @@ public class TriggerableDag {
         }
     }
 
-    public void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference copyRef, TreeElement copyToElement) {
+    void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference copyRef, TreeElement copyToElement) {
         TreeReference targetRef = copyToElement.getRef();
 
         // trigger conditions that depend on the creation of these new nodes
@@ -303,7 +330,7 @@ public class TriggerableDag {
      * will create the appropriate ordering and dependencies to ensure the
      * conditions will be evaluated in the appropriate orders.
      */
-    public void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
+    void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
         triggerablesDAG = buildDag(allTriggerables, getDagEdges(mainInstance, ec));
         repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
     }
@@ -521,7 +548,7 @@ public class TriggerableDag {
      * Walks the current set of conditions, and evaluates each of them with the
      * current context.
      */
-    public Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef) {
+    Collection<QuickTriggerable> initializeTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference rootRef) {
         return initializeTriggerables(mainInstance, evalContext, rootRef, new HashSet<>(1));
     }
 
@@ -571,7 +598,7 @@ public class TriggerableDag {
         return evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref, alreadyEvaluated);
     }
 
-    public boolean shouldTrustPreviouslyCommittedAnswer() {
+    boolean shouldTrustPreviouslyCommittedAnswer() {
         return false;
     }
 
@@ -579,7 +606,7 @@ public class TriggerableDag {
         accessor.getEventNotifier().publishEvent(new Event(lead + ": " + (ref != null ? ref.toShortString() + ": " : "") + quickTriggerables.size() + " triggerables were fired."));
     }
 
-    public void reportDependencyCycles() {
+    void reportDependencyCycles() {
         Set<TreeReference> vertices = new HashSet<>();
         List<TreeReference[]> edges = new ArrayList<>();
 
@@ -646,14 +673,14 @@ public class TriggerableDag {
 
     // region External Serialization
 
-    public void writeExternalTriggerables(DataOutputStream dos) throws IOException {
+    void writeExternalTriggerables(DataOutputStream dos) throws IOException {
         // Order of writes must match order of reads in readExternalTriggerables
         ExtUtil.write(dos, new ExtWrapList(getConditions()));
         ExtUtil.write(dos, new ExtWrapList(getRecalculates()));
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Triggerable> readExternalTriggerables(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+    static List<Triggerable> readExternalTriggerables(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
         // Order of reads must match order of writes in writeExternalTriggerables
         List<Triggerable> triggerables = new LinkedList<>();
         triggerables.addAll((List<Triggerable>) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf));
