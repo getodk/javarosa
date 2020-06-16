@@ -154,6 +154,10 @@ public class Scenario {
         return getIndexOf(expandSingle(getRef(xPath)));
     }
 
+    public FormIndex getCurrentIndex() {
+        return model.getFormIndex();
+    }
+
     public ValidateOutcome getValidationOutcome() {
         return formDef.validate(true);
     }

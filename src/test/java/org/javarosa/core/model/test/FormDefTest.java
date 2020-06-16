@@ -26,6 +26,7 @@ import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.item;
+import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
@@ -36,9 +37,11 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.form.api.FormEntryCaption;
 import org.junit.Test;
 /**
  * See testAnswerConstraint() for an example of how to write the
@@ -210,4 +213,40 @@ public class FormDefTest {
         assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]/inner[0]")));
     }
     //endregion
+
+    @Test
+    public void fillTemplateString_resolvesRelativeReferences() throws IOException {
+        Scenario scenario = Scenario.init("<output> with relative ref", html(
+            head(
+                title("output with relative ref"),
+                model(
+                    mainInstance(t("data id=\"relative-output\"",
+                        t("repeat jr:template=\"\"",
+                            t("position"),
+                            t("position_in_label")
+                        )
+                    )),
+                    bind("/data/repeat/position").type("int").calculate("position(..)"),
+                    bind("/data/repeat/position_in_label").type("int")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/position_in_label", label("Position: <output value=\" ../position \"/>"))))
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+
+        FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
+        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 1"));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+
+        caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
+        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 2"));
+    }
 }
