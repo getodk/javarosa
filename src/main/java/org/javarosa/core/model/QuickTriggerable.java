@@ -37,10 +37,6 @@ public final class QuickTriggerable {
         return triggerable instanceof Recalculate;
     }
 
-    TreeReference contextualizeContextRef(TreeReference anchorRef) {
-        return triggerable.contextualizeContextRef(anchorRef);
-    }
-
     public List<EvaluationResult> apply(FormInstance mainInstance, EvaluationContext ec, TreeReference qualified) {
         return triggerable.apply(mainInstance, ec, qualified);
     }

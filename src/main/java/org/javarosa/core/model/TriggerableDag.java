@@ -453,11 +453,11 @@ public class TriggerableDag {
      * The entry point for the DAG cascade after a value is changed in the
      * model.
      *
-     * @param ref The full contextualized unambiguous reference of the value
+     * @param changedRef The full contextualized unambiguous reference of the value
      *            that was changed.
      */
-    Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref) {
-        return triggerTriggerables(mainInstance, evalContext, ref, new HashSet<>());
+    Collection<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference changedRef) {
+        return triggerTriggerables(mainInstance, evalContext, changedRef, new HashSet<>());
     }
 
     /**
@@ -504,41 +504,39 @@ public class TriggerableDag {
         return toTrigger;
     }
 
-    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
-        Set<QuickTriggerable> fired = new HashSet<>();
+    private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger, TreeReference changedRef, Set<QuickTriggerable> alreadyEvaluated) {
+        Set<QuickTriggerable> evaluated = new HashSet<>();
 
         // Evaluate the provided set of triggerables in the order they appear
         // in the sorted DAG to ensure the correct sequence of evaluations
         for (QuickTriggerable qt : triggerablesDAG)
             if (toTrigger.contains(qt) && !alreadyEvaluated.contains(qt)) {
-                evaluateTriggerable(mainInstance, evalContext, qt, anchorRef);
+                evaluateTriggerable(mainInstance, evalContext, qt, changedRef);
 
-                fired.add(qt);
+                evaluated.add(qt);
             }
 
-        return fired;
+        return evaluated;
     }
 
     /**
-     * Step 3 in DAG cascade. evaluate the individual triggerable expressions
-     * against the anchor (the value that changed which triggered recomputation)
+     * Step 3 in DAG cascade. Evaluate the individual triggerable expressions.
      */
-    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable triggerable, TreeReference anchorRef) {
-        // Contextualize the reference used by the triggerable against the anchor
-        TreeReference contextRef = triggerable.contextualizeContextRef(anchorRef);
+    private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable toTrigger, TreeReference changedRef) {
+        TreeReference contextRef = toTrigger.getContext().contextualize(changedRef);
 
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
         // Go through all of the fully qualified nodes which this triggerable
         // updates. (Multiple nodes can be updated by the same trigger)
         for (TreeReference qualified : evalContext.expandReference(contextRef))
             try {
-                evaluationResults.addAll(triggerable.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
+                evaluationResults.addAll(toTrigger.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
                 throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "' (" + qualified + "): " + e.getMessage(), e);
             }
 
         if (evaluationResults.size() > 0)
-            accessor.getEventNotifier().publishEvent(new Event(triggerable.isCondition() ? "Condition" : "Recalculate", evaluationResults));
+            accessor.getEventNotifier().publishEvent(new Event(toTrigger.isCondition() ? "Condition" : "Recalculate", evaluationResults));
     }
 
     private void evaluateChildrenTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeElement newNode, boolean createdOrDeleted, Set<QuickTriggerable> alreadyEvaluated) {
