@@ -81,22 +81,6 @@ public class TriggerableDag {
      */
     private Set<QuickTriggerable> triggerablesDAG = emptySet();
 
-    // TODO Make this member fit the expected behavior on calling sites by containing only relevance conditions
-    /**
-     * Stores an index for conditions (triggerables declared in
-     * <code>readonly</code>, <code>required</code>, or <code>relevant</code>
-     * attributes) belonging to repeat groups.
-     * <p>
-     * This index is used to determine whether a repeat group instance is
-     * relevant or not.
-     * <p>
-     * <b>Warning</b>: Calling site assumes that a repeat group would only have
-     * one object stored for its reference in this map. This is because, so
-     * far, <code>relevant</code> is the only attribute that makes sense adding
-     * to a repeat group, but a form could declare other conditions as well,
-     * leading to an unexpected scenario.
-     */
-    private Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
     /**
      * Stores an index to resolve triggerables by their corresponding trigger's
      * reference.
@@ -165,7 +149,6 @@ public class TriggerableDag {
      */
     void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
         triggerablesDAG = buildDag(allTriggerables, getDagEdges(mainInstance, ec));
-        repeatConditionsPerTargets = getRepeatConditionsPerTargets(mainInstance, triggerablesDAG);
     }
 
     /**
@@ -660,16 +643,6 @@ public class TriggerableDag {
         publishSummary("Copied itemset answer (phase 2)", targetRef, qtSet2);
         // not 100% sure this will work since destRef is ambiguous as the last
         // step, but i think it's supposed to work
-    }
-
-    private static Map<TreeReference, QuickTriggerable> getRepeatConditionsPerTargets(FormInstance mainInstance, Set<QuickTriggerable> triggerables) {
-        Map<TreeReference, QuickTriggerable> repeatConditionsPerTargets = new HashMap<>();
-        for (QuickTriggerable triggerable : triggerables)
-            if (triggerable.isCondition())
-                for (TreeReference target : triggerable.getTargets())
-                    if (mainInstance.getTemplate(target) != null)
-                        repeatConditionsPerTargets.put(target, triggerable);
-        return repeatConditionsPerTargets;
     }
 
     boolean shouldTrustPreviouslyCommittedAnswer() {
