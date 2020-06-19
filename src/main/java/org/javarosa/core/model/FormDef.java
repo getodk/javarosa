@@ -393,9 +393,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         boolean valueChanged = !objectEquals(answerDataSerializer.serializeAnswerData(oldValue),
             answerDataSerializer.serializeAnswerData(data));
 
-        if (midSurvey && dagImpl.shouldTrustPreviouslyCommittedAnswer() && !valueChanged) {
-            return;
-        }
         setAnswer(data, node);
 
         QuestionDef currentQuestion = findQuestionByRef(ref, this);
