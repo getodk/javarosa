@@ -110,6 +110,7 @@ public class TriggerableDag {
         this.accessor = accessor;
     }
 
+
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> fired = new HashSet<>();
 
@@ -160,10 +161,8 @@ public class TriggerableDag {
             }
         }
 
-        // TODO Call doEvaluateTriggerables directly instead to avoid a redundant extra indirection level
-        // return doEvaluateTriggerables(mainInstance, evalContext, applicable, rootRef, alreadyEvaluated);
-
-        return evaluateTriggerables(mainInstance, evalContext, applicable, rootRef, alreadyEvaluated);
+        Set<QuickTriggerable> toTrigger = getAllToTrigger(applicable);
+        return doEvaluateTriggerables(mainInstance, evalContext, toTrigger, rootRef, alreadyEvaluated);
     }
 
     /**
@@ -518,14 +517,14 @@ public class TriggerableDag {
     }
 
     /**
-     * Step 2 in evaluating DAG computation updates from a value being changed
-     * in the instance. This step is responsible for taking the root set of
-     * directly triggered conditions, identifying which conditions should
-     * further be triggered due to their update, and then dispatching all of the
-     * evaluations.
+     * Given a set of cascade roots, return a set of all triggerables across those cascades.
+     *
+     *  @param cascadeRoots  The roots of the triggerable cascades that must be triggered. Guaranteed not to be modified.
      */
-    private Set<QuickTriggerable> evaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger, TreeReference anchorRef, Set<QuickTriggerable> alreadyEvaluated) {
-        Set<QuickTriggerable> refSet = new HashSet<>(toTrigger);
+    private Set<QuickTriggerable> getAllToTrigger(Set<QuickTriggerable> cascadeRoots) {
+        Set<QuickTriggerable> refSet = new HashSet<>(cascadeRoots);
+        Set<QuickTriggerable> toTrigger = new HashSet<>(cascadeRoots);
+
         while (!refSet.isEmpty()) {
             Set<QuickTriggerable> newSet = new HashSet<>();
             for (QuickTriggerable qt : refSet) {
@@ -541,7 +540,7 @@ public class TriggerableDag {
             refSet = newSet;
         }
 
-        return doEvaluateTriggerables(mainInstance, evalContext, toTrigger, anchorRef, alreadyEvaluated);
+        return toTrigger;
     }
 
     /**
@@ -582,20 +581,21 @@ public class TriggerableDag {
         return null;
     }
 
-    private Set<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference ref, Set<QuickTriggerable> alreadyEvaluated) {
-        // Turn unambiguous ref into a generic ref to identify what nodes should be triggered by this reference changing
-        TreeReference genericRef = ref.genericize();
+    /**
+     * Step 2 in evaluating DAG computation updates from a value being changed in the instance. Identifies all triggerables to be evaluated and
+     * evaluates them.
+     */
+    private Set<QuickTriggerable> triggerTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeReference changedRef, Set<QuickTriggerable> alreadyEvaluated) {
+        // The DAG uses generic references as keys
+        TreeReference genericRef = changedRef.genericize();
 
-        // get triggerables which are activated by the generic reference
-        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRef);
-        if (triggered == null) {
+        Set<QuickTriggerable> cascadeRoots = triggerablesPerTrigger.get(genericRef);
+        if (cascadeRoots == null) {
             return alreadyEvaluated;
         }
 
-        Set<QuickTriggerable> triggeredCopy = new HashSet<>(triggered);
-
-        // Evaluate all of the triggerables in our new set
-        return evaluateTriggerables(mainInstance, evalContext, triggeredCopy, ref, alreadyEvaluated);
+        Set<QuickTriggerable> toTrigger = getAllToTrigger(cascadeRoots);
+        return doEvaluateTriggerables(mainInstance, evalContext, toTrigger, changedRef, alreadyEvaluated);
     }
 
     boolean shouldTrustPreviouslyCommittedAnswer() {
