@@ -523,6 +523,8 @@ public class TriggerableDag {
      * Step 3 in DAG cascade. Evaluate the individual triggerable expressions.
      */
     private void evaluateTriggerable(FormInstance mainInstance, EvaluationContext evalContext, QuickTriggerable toTrigger, TreeReference changedRef) {
+        // For addition or removal of repeat instances, contextualizing against the changed ref ensures that triggerables with triggers and targets inside
+        // the repeat are only triggered for the changed instance. This is important for performance.
         TreeReference contextRef = toTrigger.getContext().contextualize(changedRef);
 
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
