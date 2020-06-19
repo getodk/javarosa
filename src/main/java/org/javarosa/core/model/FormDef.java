@@ -502,7 +502,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             }
         }
 
-        dagImpl.deleteRepeatGroup(getMainInstance(), getEvaluationContext(), deleteRef, parentElement, deleteElement);
+        dagImpl.deleteRepeatInstance(getMainInstance(), getEvaluationContext(), deleteRef, parentElement, deleteElement);
 
         return newIndex;
     }
@@ -523,7 +523,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // Trigger actions nested in the new repeat
         getChild(index).getActionController().triggerActionsFromEvent(Action.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
 
-        dagImpl.createRepeatGroup(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
+        dagImpl.createRepeatInstance(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
     }
 
     @Override

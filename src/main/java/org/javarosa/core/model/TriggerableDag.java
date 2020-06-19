@@ -176,7 +176,44 @@ public class TriggerableDag {
         return this.triggerTriggerables(mainInstance, evalContext, ref, new HashSet<>(1));
     }
 
-    void deleteRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference deleteRef, TreeElement parentElement, TreeElement deletedElement) {
+    private Set<QuickTriggerable> getTriggeredOutsideRepeat(TreeReference genericRepeatRef) {
+        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRepeatRef);
+        Set<QuickTriggerable> triggeredOutsideRepeat = new HashSet<>();
+
+        if (triggered != null) {
+            Set<QuickTriggerable> toConsider = new HashSet<>(triggered);
+
+            while (!toConsider.isEmpty()) {
+                QuickTriggerable triggerable = toConsider.iterator().next();
+                toConsider.remove(triggerable);
+
+                if (!genericRepeatRef.isAncestorOf(triggerable.getContext(), true)) {
+                    triggeredOutsideRepeat.add(triggerable);
+                }
+
+                toConsider.addAll(triggerable.getImmediateCascades());
+            }
+        }
+
+        return triggeredOutsideRepeat;
+    }
+
+    void createRepeatInstance(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement createdElement) {
+        // trigger conditions that depend on the creation of this new node
+        Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0));
+        publishSummary("Created (phase 1)", createRef, qtSet1);
+
+        // initialize conditions for the node (and sub-nodes)
+        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createRef, qtSet1);
+        publishSummary("Created (phase 2)", createRef, qtSet2);
+
+        Set<QuickTriggerable> alreadyEvaluated = new HashSet<>(qtSet1);
+        alreadyEvaluated.addAll(qtSet2);
+
+        evaluateChildrenTriggerables(mainInstance, evalContext, createdElement, true, alreadyEvaluated);
+    }
+
+    void deleteRepeatInstance(FormInstance mainInstance, EvaluationContext evalContext, TreeReference deleteRef, TreeElement parentElement, TreeElement deletedElement) {
         //After a repeat group has been deleted, the following repeat groups position has changed.
         //Evaluate triggerables which depend on the repeat group reference directly or indirectly.
         String repeatName = deletedElement.getName();
@@ -212,43 +249,6 @@ public class TriggerableDag {
             triggerTriggerables(mainInstance, evalContext, deleteRef, new HashSet<>(0));
             evaluateChildrenTriggerables(mainInstance, evalContext, deletedElement, false, new HashSet<>(0));
         }
-    }
-
-    private Set<QuickTriggerable> getTriggeredOutsideRepeat(TreeReference genericRepeatRef) {
-        Set<QuickTriggerable> triggered = triggerablesPerTrigger.get(genericRepeatRef);
-        Set<QuickTriggerable> triggeredOutsideRepeat = new HashSet<>();
-
-        if (triggered != null) {
-            Set<QuickTriggerable> toConsider = new HashSet<>(triggered);
-
-            while (!toConsider.isEmpty()) {
-                QuickTriggerable triggerable = toConsider.iterator().next();
-                toConsider.remove(triggerable);
-
-                if (!genericRepeatRef.isAncestorOf(triggerable.getContext(), true)) {
-                    triggeredOutsideRepeat.add(triggerable);
-                }
-
-                toConsider.addAll(triggerable.getImmediateCascades());
-            }
-        }
-
-        return triggeredOutsideRepeat;
-    }
-
-    void createRepeatGroup(FormInstance mainInstance, EvaluationContext evalContext, TreeReference createRef, TreeElement createdElement) {
-        // trigger conditions that depend on the creation of this new node
-        Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0));
-        publishSummary("Created (phase 1)", createRef, qtSet1);
-
-        // initialize conditions for the node (and sub-nodes)
-        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createRef, qtSet1);
-        publishSummary("Created (phase 2)", createRef, qtSet2);
-
-        Set<QuickTriggerable> alreadyEvaluated = new HashSet<>(qtSet1);
-        alreadyEvaluated.addAll(qtSet2);
-
-        evaluateChildrenTriggerables(mainInstance, evalContext, createdElement, true, alreadyEvaluated);
     }
 
     private void evaluateChildrenTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeElement newNode, boolean createdOrDeleted, Set<QuickTriggerable> alreadyEvaluated) {

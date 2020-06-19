@@ -1246,7 +1246,7 @@ public class TriggerableDagTest {
 
     //region Adding repeats
     /**
-     * Excercises the triggerTriggerables call in createRepeatGroup.
+     * Excercises the triggerTriggerables call in createRepeatInstance.
      */
     @Test
     public void adding_repeat_instance_triggers_triggerables_outside_repeat_that_reference_repeat_nodeset() throws IOException {
@@ -1278,7 +1278,7 @@ public class TriggerableDagTest {
     }
 
     /**
-     * Excercises the initializeTriggerables call in createRepeatGroup.
+     * Excercises the initializeTriggerables call in createRepeatInstance.
      */
     @Test
     public void adding_repeat_instance_triggers_descendant_node_triggerables() throws IOException {
@@ -1511,7 +1511,7 @@ public class TriggerableDagTest {
         // To have the expected count of 3 for outer[0] and 2 for outer[1], we would have
         // to change the sequence of evaluations when a new repeat group is created to
         // evaluate the triggerables on all siblings (not just on the instance that has
-        // been created). This is currently driven by TriggerableDag.createRepeatGroup()
+        // been created). This is currently driven by TriggerableDag.createRepeatInstance()
         assertThat(scenario.answerOf("/data/outer[0]/inner[0]/count"), is(intAnswer(1)));
         assertThat(scenario.answerOf("/data/outer[0]/inner[1]/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(3)));
