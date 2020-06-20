@@ -1490,55 +1490,6 @@ public class TriggerableDagTest {
         assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(2));
     }
 
-    @Ignore("Failed on v2.17.0 and prior")
-    @Test
-    public void addingRepeatInstance_withReferenceToNextInstance_updatesPreviousInstance() throws IOException {
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("group jr:template=\"\"",
-                            t("number"),
-                            t("next-number")
-                        )
-                    )),
-                    bind("/data/group/number").type("int").required(),
-                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number")
-                )
-            ),
-            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
-        ));
-
-        scenario.next();
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.answer(11);
-
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-
-        scenario.next();
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.answer(22);
-
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
-
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
-
-        scenario.next();
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.answer(33);
-
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
-        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
-    }
-
     @Test
     public void addingNestedRepeatInstance_updatesExpressionTriggeredByGenericRef_forAllRepeatInstances() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
@@ -1618,6 +1569,61 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
         // The following assertion fails because /data/group gets contextualized such that the count is always 1.
         // assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
+    }
+
+    // In this test, it's not the repeat addition that needs to trigger recomputation across repeat instances, it's
+    // the setting of the number value in a specific instance. There's currently no mechanism to do that. When a repeat
+    // is added, it will trigger recomputation for previous instances.
+    @Ignore("Failed on v2.17.0 and prior.")
+    @Test
+    public void changingValueInRepeat_withReferenceToNextInstance_updatesPreviousInstance() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group jr:template=\"\"",
+                            t("number"),
+                            t("next-number")
+                        )
+                    )),
+                    bind("/data/group/number").type("int").required(),
+                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number")
+                )
+            ),
+            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(11);
+
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(22);
+
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+
+        // This assertion is false because setting the answer to 22 didn't trigger recomputation across repeat instances
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(33);
+
+        // This assertion is true because adding a new repeat triggered recomputation across repeat instances
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        // This assertion is false because setting the answer to 33 didn't trigger recomputation across repeat instances
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
     }
     //endregion
 
