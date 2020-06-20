@@ -935,13 +935,8 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
         assertDagEvents(dagEvents,
-            "Processing 'Recalculate' for number [2_1] (2.0)",
-            "Processing 'Deleted: house [2]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Deleted: house [3]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [4_1] (4.0)",
-            "Processing 'Deleted: house [4]: 1 triggerables were fired.' for "
+            "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0)",
+            "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for "
         );
     }
 
@@ -988,18 +983,11 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("E4")));
         assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
         assertDagEvents(dagEvents,
-            "Processing 'Recalculate' for number [2_1] (2.0)",
-            "Processing 'Recalculate' for name_and_number [2_1] (C2)",
-            "Processing 'Deleted: house [2]: 2 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0)",
+            "Processing 'Recalculate' for name_and_number [1_1] (A1), name_and_number [2_1] (C2), name_and_number [3_1] (D3), name_and_number [4_1] (E4)",
             "Processing 'Deleted: number [2_1]: 0 triggerables were fired.' for ",
             "Processing 'Deleted: name [2_1]: 0 triggerables were fired.' for ",
-            "Processing 'Deleted: name_and_number [2_1]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Recalculate' for name_and_number [3_1] (D3)",
-            "Processing 'Deleted: house [3]: 2 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [4_1] (4.0)",
-            "Processing 'Recalculate' for name_and_number [4_1] (E4)",
-            "Processing 'Deleted: house [4]: 2 triggerables were fired.' for "
+            "Processing 'Deleted: name_and_number [2_1]: 2 triggerables were fired.' for "
         );
     }
 
@@ -1046,16 +1034,11 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("EX")));
         assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
         assertDagEvents(dagEvents,
-            "Processing 'Recalculate' for number [2_1] (2.0)",
-            "Processing 'Deleted: house [2]: 1 triggerables were fired.' for ",
+            "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0)",
             "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for ",
             "Processing 'Recalculate' for name_and_number [2_1] (CX)",
             "Processing 'Deleted: name [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: name_and_number [2_1]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Deleted: house [3]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [4_1] (4.0)",
-            "Processing 'Deleted: house [4]: 1 triggerables were fired.' for "
+            "Processing 'Deleted: name_and_number [2_1]: 1 triggerables were fired.' for "
         );
     }
 
@@ -1118,23 +1101,9 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(45)));
         assertDagEvents(dagEvents,
-            "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Deleted: house [3]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: number [3_1]: 0 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [4_1] (4.0)",
-            "Processing 'Deleted: house [4]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [5_1] (5.0)",
-            "Processing 'Deleted: house [5]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [6_1] (6.0)",
-            "Processing 'Deleted: house [6]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [7_1] (7.0)",
-            "Processing 'Deleted: house [7]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [8_1] (8.0)",
-            "Processing 'Deleted: house [8]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [9_1] (9.0)",
-            "Processing 'Deleted: house [9]: 1 triggerables were fired.' for ",
-            "Processing 'Recalculate' for number [3_1] (3.0)",
-            "Processing 'Recalculate' for summary [1] (45.0)" // this calculation is outside the repeat and is only computed once
+            "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0), number [5_1] (5.0), number [6_1] (6.0), number [7_1] (7.0), number [8_1] (8.0), number [9_1] (9.0)",
+            "Processing 'Recalculate' for summary [1] (45.0)",
+            "Processing 'Deleted: number [3_1]: 0 triggerables were fired.' for "
         );
     }
 
@@ -1178,10 +1147,8 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABDE")));
         assertDagEvents(dagEvents,
-            "Processing 'Deleted: house [3]: 0 triggerables were fired.' for ",
             "Processing 'Recalculate' for summary [1] (ABDE)",
-            "Processing 'Deleted: name [3_1]: 1 triggerables were fired.' for ",
-            "Processing 'Deleted: house [4]: 0 triggerables were fired.' for "
+                "Processing 'Deleted: name [3_1]: 1 triggerables were fired.' for "
         );
     }
 
