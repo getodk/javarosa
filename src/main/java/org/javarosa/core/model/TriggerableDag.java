@@ -583,7 +583,7 @@ public class TriggerableDag {
      * Returns triggerables with expressions that will need to be updated for every instance of the
      * repeat at the given reference. There are two cases considered:
      * <ul>
-     *   <li>triggerables in the context of the given repeat and are triggered directly by that repeat or are in a cascade
+     *   <li>triggerables in the context of the given repeat that are triggered directly by that repeat or are in a cascade
      *       triggered directly by the repeat. For example, if the repeat reference is /data/repeat, a triggerable representing
      *       a calculate at /data/repeat/calc with an expression such as position(..) would be included.
      *   </li>
