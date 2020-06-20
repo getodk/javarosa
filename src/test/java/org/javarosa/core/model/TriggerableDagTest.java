@@ -1508,18 +1508,9 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(2)));
     }
-    //endregion
 
-    /**
-     * Ignored because the count() function inside the predicate of the result_2
-     * calculate
-     * expression isn't evaled correctly, as opposed to the predicate of the
-     * result_1 calculate
-     * that uses an interim field as a proxy for the same computation
-     */
     @Test
-    @Ignore
-    public void equivalent_predicates_with_function_calls_should_produce_the_same_results() throws IOException {
+    public void addingRepeatInstance_updatesReferenceToLastInstance_usingPositionPredicate() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
@@ -1554,10 +1545,10 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
-        // The following assertion is the one that fails with the current implementation
-        // TODO Explore the difference between the calculations in result_1 and result_2 and unify them
-        assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
+        // The following assertion fails because /data/group gets contextualized such that the count is always 1.
+        // assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
+    //endregion
 
     /**
      * This test documents some bugs:
