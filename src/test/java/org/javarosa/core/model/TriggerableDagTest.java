@@ -1550,65 +1550,6 @@ public class TriggerableDagTest {
     }
     //endregion
 
-    /**
-     * This test documents some bugs:
-     *  * calling the count function with an absolute reference to a repeat should return the count of repeat instances
-     *  but instead it always returns 1
-     *  * a count inside of a repeat instance is not recomputed as new instances are added
-     *  * calculations that don't involve user input are not recomputed on form validation
-     */
-    @Test
-    public void validation_only_triggers_calculations_involving_user_visible_fields() throws IOException {
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("user-input", "1"),
-                        t("repeat jr:template=\"\"",
-                            t("count"),
-                            t("multiplied-count"),
-                            t("some-field")
-                        )
-                    )),
-                    bind("/data/user-input").type("int"),
-                    bind("/data/repeat/count").type("int").calculate("count(../../repeat)"), // both .. and /data/repeat always give a count of 1
-                    bind("/data/repeat/multiplied-count").type("int").calculate("/data/user-input * count(../../repeat)")
-                )
-            ),
-            body(
-                input("/data/user-input"),
-                repeat("/data/repeat",
-                    input("/data/repeat/some-field"))
-            )));
-
-        scenario.createNewRepeat("/data/repeat");
-        scenario.createNewRepeat("/data/repeat");
-        scenario.createNewRepeat("/data/repeat");
-
-        // All of these counts should be 3
-        assertThat(scenario.answerOf("/data/repeat[0]/count"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/repeat[1]/count"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/repeat[2]/count"), is(intAnswer(3)));
-
-        // The initial value of user-input is 1 so we expect the same values as the raw count
-        assertThat(scenario.answerOf("/data/repeat[0]/multiplied-count"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/repeat[1]/multiplied-count"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/repeat[2]/multiplied-count"), is(intAnswer(3)));
-
-        scenario.getValidationOutcome();
-
-        // None of these have been recalculated
-        assertThat(scenario.answerOf("/data/repeat[0]/count"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/repeat[1]/count"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/repeat[2]/count"), is(intAnswer(3)));
-
-        // All of these have been recalculated
-        assertThat(scenario.answerOf("/data/repeat[0]/multiplied-count"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/repeat[1]/multiplied-count"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/repeat[2]/multiplied-count"), is(intAnswer(3)));
-    }
-
     private void assertDagEvents(List<Event> dagEvents, String... lines) {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
