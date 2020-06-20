@@ -1329,6 +1329,43 @@ public class TriggerableDagTest {
         scenario.next();
         assertThat(scenario.getAnswerNode("/data/repeat[2]/group/int"), is(nonRelevant()));
     }
+
+    @Ignore("Fails on v2.17.0. Need to trigger all cascades that end inside repeat.")
+    @Test
+    public void addingRepeatInstance_withInnerCalculateDependentOnOuterSum_updatesInnerSumForAllInstances() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("sum"),
+
+                        t("repeat jr:template=\"\"",
+                            t("question", "5"),
+                            t("inner-sum"))
+                    )),
+                    bind("/data/sum").type("int").calculate("sum(/data/repeat/question)"),
+                    bind("/data/repeat/inner-sum").type("int").calculate("/data/sum")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer((n + 1) * 5)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
+    }
     //endregion
 
     //region Repeat misc
