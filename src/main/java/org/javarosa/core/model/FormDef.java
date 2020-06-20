@@ -499,7 +499,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             }
         }
 
-        dagImpl.deleteRepeatInstance(getMainInstance(), getEvaluationContext(), deleteRef, parentElement, deleteElement);
+        dagImpl.deleteRepeatInstance(getMainInstance(), getEvaluationContext(), deleteRef, deleteElement);
 
         return newIndex;
     }
