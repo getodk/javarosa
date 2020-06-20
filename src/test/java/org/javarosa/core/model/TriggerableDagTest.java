@@ -75,8 +75,9 @@ public class TriggerableDagTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
+    // Illustrates the second case in TriggerableDAG.getTriggerablesAffectingAllInstances
     @Test
-    public void referenceToCalculatedRepeatCount_insideRepeat_updatesWhenCountChanges() throws IOException {
+    public void addingOrRemovingRepeatInstance_withCalculatedCountOutsideRepeat_updatesReferenceToCountInside() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
             head(
                 title("Count outside repeat used inside"),
@@ -114,7 +115,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void repeatCount_insideAndOutsideRepeat_updatesWhenCountChanges() throws IOException {
+    public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideAndOutsideRepeat() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
             head(
                 title("Count outside repeat used inside"),
@@ -151,7 +152,7 @@ public class TriggerableDagTest {
 
     @Ignore("Highlights issue with de-duplicating refs and different contexts")
     @Test
-    public void repeatCount_insideRepeat_updatesWhenCountChanges() throws IOException {
+    public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideRepeat() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
             head(
                 title("Count outside repeat used inside"),
@@ -184,7 +185,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void repeatCount_insideRepeatWithRelativeRef_updatesWhenCountChanges() throws IOException {
+    public void addingOrRemovingRepeatInstance_updatesRelativeRepeatCount_insideRepeat() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
             head(
                 title("Count outside repeat used inside"),
@@ -217,7 +218,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void cascadeStartingInRepeat_withOuterComponent() throws IOException {
+    public void addingOrRemovingRepeatInstance_withReferenceToRepeatInRepeat_andOuterSum_updates() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
             head(
                 title("Count outside repeat used inside"),
@@ -238,9 +239,7 @@ public class TriggerableDagTest {
                     repeat("/data/repeat",
                         input("/data/repeat/position1")
                     )
-                )))).onDagEvent(dagEvents::add);
-
-        dagEvents.clear();
+                ))));
 
         range(0, 5).forEach(n -> {
             scenario.next();
