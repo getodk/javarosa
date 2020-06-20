@@ -1386,24 +1386,8 @@ public class TriggerableDagTest {
         assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(2));
     }
 
-    /**
-     * Ignored because the assertions about non-null next-numbers will fail
-     * because our DAG
-     * doesn't evaluate calculations in repeat instances that are previous
-     * siblings to the
-     * one that has changed.
-     * <p>
-     * The expeculation is that, originally, only forward references might have
-     * been considered
-     * to speed up repeat group intance deletion because it was assumed that
-     * back references
-     * were a marginal use case.
-     * <p>
-     * This test explores how the issue affects to value changes too.
-     */
     @Test
-    @Ignore
-    public void calculate_expressions_should_be_evaluated_on_previous_repeat_siblings() throws IOException {
+    public void addingRepeatInstance_withReferenceToPreviousInstance_updatesThatReference() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
@@ -1411,11 +1395,58 @@ public class TriggerableDagTest {
                     mainInstance(t("data id=\"some-form\"",
                         t("group jr:template=\"\"",
                             t("prev-number"),
+                            t("number")
+                        )
+                    )),
+                    bind("/data/group/prev-number").type("int").calculate("/data/group[position() = (position(current()/..) - 1)]/number"),
+                    bind("/data/group/number").type("int").required()
+                )
+            ),
+            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(11);
+
+        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(22);
+
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+
+        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(33);
+
+        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(22)));
+    }
+
+    @Ignore("Failed on v2.17.0 and prior")
+    @Test
+    public void addingRepeatInstance_withReferenceToNextInstance_updatesPreviousInstance() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group jr:template=\"\"",
                             t("number"),
                             t("next-number")
                         )
                     )),
-                    bind("/data/group/prev-number").type("int").calculate("/data/group[position() = (position(current()/..) - 1)]/number"),
                     bind("/data/group/number").type("int").required(),
                     bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number")
                 )
@@ -1428,25 +1459,18 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.answer(11);
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-
         assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
         scenario.answer(22);
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
-
         assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
         assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
 
-        // This assertion is the one that fails with the current implementation
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(11)));
         assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
 
         scenario.next();
@@ -1454,17 +1478,8 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.answer(33);
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(22)));
-
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
-        assertThat(scenario.answerOf("/data/group[2]/number"), is(intAnswer(33)));
-
-        // The following couple of assertions are the ones that fail with the current implementation
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(22)));
         assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
     }
 
