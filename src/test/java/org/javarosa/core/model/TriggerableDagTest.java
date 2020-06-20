@@ -757,6 +757,9 @@ public class TriggerableDagTest {
         range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
     }
 
+    // In this case, the count(/data/repeat) expression is represented by a single triggerable. The expression gets
+    // evaluated once and it's the expandReference call in Triggerable.apply which ensures the result is updated for
+    // every repeat instance.
     @Test
     public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideAndOutsideRepeat() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
@@ -793,6 +796,8 @@ public class TriggerableDagTest {
         range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
     }
 
+    // In this case, /data/repeat in the count(/data/repeat) expression is given the context of the current repeat so the
+    // count always evaluates to 1. See contrast with addingOrRemovingRepeatInstance_updatesRepeatCount_insideAndOutsideRepeat.
     @Ignore("Highlights issue with de-duplicating refs and different contexts")
     @Test
     public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideRepeat() throws IOException {
