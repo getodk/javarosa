@@ -44,23 +44,30 @@ public class TreeReferenceContextualizeTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            // Self references
             {"Relative context ref", getRef("bar"), getRef("foo"), null},
             {"Non-matching absolute refs", getRef("/foo"), getRef("/bar"), getRef("/foo")},
+
             {"Contextualizing a ref with itself and multiplicity #1", getRef("/foo"), getRef("/foo[2]"), getRef("/foo[2]")},
             {"Contextualizing a ref with itself and multiplicity #2", getRef("/foo[-1]"), getRef("/foo[2]"), getRef("/foo[2]")},
             {"Contextualizing a ref with itself and multiplicity #3", getRef("/foo[0]"), getRef("/foo[2]"), getRef("/foo[2]")},
             {"Contextualizing a ref with itself and multiplicity #4", getRef("/foo[3]"), getRef("/foo[2]"), getRef("/foo[2]")},
+
             {"Contextualizing a ref with itself and predicate #1", getRef("/foo"), getRef("/foo[position() = 3]"), getRef("/foo[position() = 3]")},
             {"Contextualizing a ref with itself and predicate #2", getRef("/foo[position() = 2]"), getRef("/foo[position() = 3]"), getRef("/foo[position() = 2]")},
+
+            {"Contextualizing a ref with predicate with itself and multiplicity", getRef("/foo[position() = 2]"), getRef("/foo[1]"), getRef("/foo[position() = 2]")},
+            {"Contextualizing a ref with multiplicity with itself and predicate", getRef("/foo[1]"), getRef("/foo[position() = 2]"), getRef("/foo[position() = 2]")},
+
             {"Wildcards #1", getRef("bar"), getRef("/foo/*"), getRef("/foo/*/bar")},
             {"Wildcards #2", getRef("../baz"), getRef("/foo/*/bar"), getRef("/foo/*/baz")},
             {"Wildcards #3", getRef("*/baz"), getRef("/foo/*/bar"), getRef("/foo/*/bar/*/baz")},
             {"Wildcards #4", getRef("*/bar"), getRef("/foo"), getRef("/foo/*/bar")},
+
             {"Predicates #1", getRef("bar"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'bar']/bar")},
             {"Predicates #2", getRef("bar[@foo = 'baz']"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'bar']/bar[@foo = 'baz']")},
             {"Predicates #3", getRef("bar[@foo = 'baz']"), getRef("/foo"), getRef("/foo/bar[@foo = 'baz']")},
             {"Predicates #4", getRef("/foo[@foo = 'foo']"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'foo']")},
+            
             {"Parent refs in nested repeats", getRef("../../inner"), getRef("/data/outer[0]/inner[1]/count[0]"), getRef("/data/outer[0]/inner")}
         });
     }
