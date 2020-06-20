@@ -1567,7 +1567,8 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
-        // The following assertion fails because /data/group gets contextualized such that the count is always 1.
+        // The following assertion fails because /data/group gets contextualized such that the count is always 1. There's
+        // probably a use of originalContext missing somewhere.
         // assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
 
