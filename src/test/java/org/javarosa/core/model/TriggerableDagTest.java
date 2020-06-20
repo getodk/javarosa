@@ -75,186 +75,6 @@ public class TriggerableDagTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-    // Illustrates the second case in TriggerableDAG.getTriggerablesAffectingAllInstances
-    @Test
-    public void addingOrRemovingRepeatInstance_withCalculatedCountOutsideRepeat_updatesReferenceToCountInside() throws IOException {
-        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
-            head(
-                title("Count outside repeat used inside"),
-                model(
-                    mainInstance(t("data id=\"outside-used-inside\"",
-                        t("count"),
-
-                        t("repeat jr:template=\"\"",
-                            t("question"),
-                            t("inner-count"))
-                    )),
-                    bind("/data/count").type("int").calculate("count(/data/repeat)"),
-                    bind("/data/repeat/inner-count").type("int").calculate("/data/count")),
-
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                )))).onDagEvent(dagEvents::add);
-
-        dagEvents.clear();
-
-        range(0, 5).forEach(n -> {
-            scenario.next();
-            scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/count"), CoreMatchers.is(intAnswer(n + 1)));
-            scenario.next();
-        });
-
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
-
-        scenario.removeRepeat("/data/repeat[3]");
-
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
-    }
-
-    @Test
-    public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideAndOutsideRepeat() throws IOException {
-        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
-            head(
-                title("Count outside repeat used inside"),
-                model(
-                    mainInstance(t("data id=\"outside-used-inside\"",
-                        t("count"),
-
-                        t("repeat jr:template=\"\"",
-                            t("question"),
-                            t("inner-count"))
-                    )),
-                    bind("/data/count").type("int").calculate("count(/data/repeat)"),
-                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)")),
-
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
-
-        range(0, 5).forEach(n -> {
-            scenario.next();
-            scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
-            scenario.next();
-        });
-
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
-
-        scenario.removeRepeat("/data/repeat[3]");
-
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
-    }
-
-    @Ignore("Highlights issue with de-duplicating refs and different contexts")
-    @Test
-    public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideRepeat() throws IOException {
-        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
-            head(
-                title("Count outside repeat used inside"),
-                model(
-                    mainInstance(t("data id=\"outside-used-inside\"",
-                        t("repeat jr:template=\"\"",
-                            t("question"),
-                            t("inner-count"))
-                    )),
-                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)")),
-
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
-
-        range(0, 5).forEach(n -> {
-            scenario.next();
-            scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
-            scenario.next();
-        });
-
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
-
-        scenario.removeRepeat("/data/repeat[3]");
-
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
-    }
-
-    @Test
-    public void addingOrRemovingRepeatInstance_updatesRelativeRepeatCount_insideRepeat() throws IOException {
-        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
-            head(
-                title("Count outside repeat used inside"),
-                model(
-                    mainInstance(t("data id=\"outside-used-inside\"",
-                        t("repeat jr:template=\"\"",
-                            t("question"),
-                            t("inner-count"))
-                    )),
-                    bind("/data/repeat/inner-count").type("int").calculate("count(../../repeat)")),
-
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
-
-        range(0, 5).forEach(n -> {
-            scenario.next();
-            scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
-            scenario.next();
-        });
-
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
-
-        scenario.removeRepeat("/data/repeat[3]");
-
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
-    }
-
-    @Test
-    public void addingOrRemovingRepeatInstance_withReferenceToRepeatInRepeat_andOuterSum_updates() throws IOException {
-        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
-            head(
-                title("Count outside repeat used inside"),
-                model(
-                    mainInstance(t("data id=\"outside-used-inside\"",
-                        t("sum"),
-
-                        t("repeat jr:template=\"\"",
-                            t("question"),
-                            t("position1"),
-                            t("position2"))
-                    )),
-                    bind("/data/sum").type("int").calculate("sum(/data/repeat/position1)"),
-                    bind("/data/repeat/position1").type("int").calculate("position(..)"),
-                    bind("/data/repeat/position2").type("int").calculate("/data/repeat/position1")),
-
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/position1")
-                    )
-                ))));
-
-        range(0, 5).forEach(n -> {
-            scenario.next();
-            scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer((n + 1) * (n + 2) / 2)));
-            scenario.next();
-        });
-
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position1"), CoreMatchers.is(intAnswer(n + 1))));
-
-        scenario.removeRepeat("/data/repeat[3]");
-
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position2"), CoreMatchers.is(intAnswer(n + 1))));
-    }
-
     @Test
     public void order_of_the_DAG_is_ensured() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
@@ -894,6 +714,188 @@ public class TriggerableDagTest {
         ValidateOutcome validate = scenario.getValidationOutcome();
         assertThat(validate.failedPrompt, is(scenario.indexOf("/data/a")));
         assertThat(validate.outcome, is(ANSWER_CONSTRAINT_VIOLATED));
+    }
+    //endregion
+
+    //region Adding or deleting repeats
+    // Illustrates the second case in TriggerableDAG.getTriggerablesAffectingAllInstances
+    @Test
+    public void addingOrRemovingRepeatInstance_withCalculatedCountOutsideRepeat_updatesReferenceToCountInside() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("count"),
+
+                        t("repeat jr:template=\"\"",
+                            t("question"),
+                            t("inner-count"))
+                    )),
+                    bind("/data/count").type("int").calculate("count(/data/repeat)"),
+                    bind("/data/repeat/inner-count").type("int").calculate("/data/count")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                )))).onDagEvent(dagEvents::add);
+
+        dagEvents.clear();
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/count"), CoreMatchers.is(intAnswer(n + 1)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+    }
+
+    @Test
+    public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideAndOutsideRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("count"),
+
+                        t("repeat jr:template=\"\"",
+                            t("question"),
+                            t("inner-count"))
+                    )),
+                    bind("/data/count").type("int").calculate("count(/data/repeat)"),
+                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+    }
+
+    @Ignore("Highlights issue with de-duplicating refs and different contexts")
+    @Test
+    public void addingOrRemovingRepeatInstance_updatesRepeatCount_insideRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("repeat jr:template=\"\"",
+                            t("question"),
+                            t("inner-count"))
+                    )),
+                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+    }
+
+    @Test
+    public void addingOrRemovingRepeatInstance_updatesRelativeRepeatCount_insideRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("repeat jr:template=\"\"",
+                            t("question"),
+                            t("inner-count"))
+                    )),
+                    bind("/data/repeat/inner-count").type("int").calculate("count(../../repeat)")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+    }
+
+    @Test
+    public void addingOrRemovingRepeatInstance_withReferenceToRepeatInRepeat_andOuterSum_updates() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("sum"),
+
+                        t("repeat jr:template=\"\"",
+                            t("question"),
+                            t("position1"),
+                            t("position2"))
+                    )),
+                    bind("/data/sum").type("int").calculate("sum(/data/repeat/position1)"),
+                    bind("/data/repeat/position1").type("int").calculate("position(..)"),
+                    bind("/data/repeat/position2").type("int").calculate("/data/repeat/position1")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/position1")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer((n + 1) * (n + 2) / 2)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position1"), CoreMatchers.is(intAnswer(n + 1))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position2"), CoreMatchers.is(intAnswer(n + 1))));
     }
     //endregion
 
