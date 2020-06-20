@@ -1108,6 +1108,45 @@ public class TriggerableDagTest {
         );
     }
 
+    @Test
+    public void repeatInstanceDeletion_withoutReferencesToRepeat_evaluatesNoTriggersInInstances() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("repeat jr:template=\"\"",
+                            t("number"),
+                            t("numberx2"),
+                            t("calc")
+                        )
+                    )),
+                    bind("/data/repeat/number").type("int"),
+                    bind("/data/repeat/numberx2").type("int").calculate("../number * 2"),
+                    bind("/data/repeat/calc").type("int").calculate("2 * random()")
+                )
+            ),
+            body(group("/data/repeat", repeat("/data/repeat", input("number"))))
+        )).onDagEvent(dagEvents::add);
+        range(0, 10).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            scenario.next();
+        });
+
+        // Start recording DAG events now
+        dagEvents.clear();
+
+        scenario.removeRepeat("/data/repeat[2]");
+
+        assertDagEvents(dagEvents,
+            "Processing 'Recalculate' for numberx2 [3_1] (NaN)",
+            "Processing 'Deleted: number [3_1]: 1 triggerables were fired.' for ",
+            "Processing 'Deleted: numberx2 [3_1]: 0 triggerables were fired.' for ",
+            "Processing 'Deleted: calc [3_1]: 0 triggerables were fired.' for "
+        );
+    }
+
     /**
      * Indirectly means that the calculation - `concat(/data/house/name)` - does
      * not take the
