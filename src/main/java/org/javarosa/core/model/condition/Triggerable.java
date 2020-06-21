@@ -106,12 +106,6 @@ public abstract class Triggerable implements Externalizable {
         return expr.getTriggers(originalContextRef);
     }
 
-    public TreeReference contextualizeContextRef(TreeReference anchorRef) {
-        // Contextualize the reference used by the triggerable against
-        // the anchor
-        return contextRef.contextualize(anchorRef);
-    }
-
     /**
      * Dispatches all of the evaluation
      */

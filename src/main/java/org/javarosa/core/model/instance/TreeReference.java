@@ -321,10 +321,14 @@ public class TreeReference implements Externalizable, Serializable {
             }
 
             if (contextRef.getName(i).equals(newRef.getName(i))) {
-                if (newRef.getPredicate(i) == null) {
+                if (newRef.getPredicate(i) == null && contextRef.getPredicate(i) != null) {
+                    // Positive integer multiplicity is equivalent to a predicate with a position expression so a
+                    // reference level shouldn't have both. If there's an explicit predicate on either reference, always
+                    // favor that and clear out multiplicity on the contextualized node.
                     newRef.addPredicate(i, contextRef.getPredicate(i));
+                    newRef.setMultiplicity(i, INDEX_UNBOUND);
                 }
-                if (i + refLevel <= newRef.size()) {
+                if (newRef.getPredicate(i) == null && i + refLevel <= newRef.size()) {
                     newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
                 }
             } else {
