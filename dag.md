@@ -79,12 +79,12 @@ The `Triggerable` abstraction represents an expression, references updated by it
 
 ### 3 - Something changes while answering a form
 
-#### A note on repeats
+#### Note about repeats
 To ensure correctness, JavaRosa could evaluate every triggerable with a target inside the repeat for every repeat instance. In fact, this has been tried before but it slows repeat addition, deletion, and value updates too much to be practical. It's most common to have expressions in repeats only refer to other nodes in the repeat in which case there's no need to update every instance.
 
 In general, expressions inside a repeat are only evaluated when a new instance of that repeat is added and only for that new instance. However, if an expression in the repeat references the generic repeat (e.g. `count(../../repeat)` or `position(..)`) or a node outside the repeat which itself references the generic repeat, then that expression is evaluated for all repeat instances. See `TriggerableDag.getTriggerablesAffectingAllInstances`.
 
-`TriggerableDagTest` has several ignored tests that highlight cases that aren't correctly updated. A more correct but still performant solution would likely require static analysis on expressions to identify things like predicates or `sum` function calls.
+`TriggerableDagTest` has several ignored tests that highlight cases that aren't correctly updated. A more correct but still performant solution would likely require static analysis on expressions to identify things like predicates or `sum` function calls. `CreateRepeatDagBenchmark` and `DeleteRepeatDagBenchmark` measure different cases with different performance characteristics.
  
 #### a - A value changes
 
