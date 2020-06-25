@@ -898,6 +898,48 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(33)));
         assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
     }
+
+    @Test
+    public void addingOrDeletingRepeatInstance_withRelevanceInsideRepeatDependingOnCount_updatesRelevanceForAllInstances() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("repeat jr:template=\"\"",
+                            t("number"),
+                            t("group",
+                                t("in_group")
+                            )
+                        )
+                    )),
+                    bind("/data/repeat/number").type("int").required(),
+                    bind("/data/repeat/group").relevant("count(../../repeat) mod 2 = 1")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/number"),
+                    group("/data/repeat/group",
+                        input("/data/repeat/group/in_group")
+                    ))
+                )
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(true));
+
+        scenario.createNewRepeat("/data/repeat");
+
+        assertThat(scenario.getAnswerNode("/data/repeat[1]/group/in_group").isRelevant(), is(false));
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(false));
+
+        scenario.removeRepeat("/data/repeat[1]");
+
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(true));
+    }
     //endregion
 
     //region Deleting repeats
