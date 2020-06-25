@@ -1,12 +1,12 @@
 # DAG
 
-Forms used by JavaRosa can use expressions to compute dynamic values as users answer questions in forms. These values can be used in a range of applications, including, among others, setting values for other fields, validation, or conditionally hiding non-relevant fields.
+Forms used by JavaRosa can use expressions to compute dynamic values as users answer questions. These values can be used in a range of applications, including, among others, setting values for other fields, validation, or conditionally hiding non-relevant fields.
 
 `calculate`, `relevant`, `readonly`, and `required` expressions used in `<bind>` attributes are stored in a directed acyclic graph (DAG from now on) of `Triggerable` objects.
 
-The `Triggerable` abstraction represents an expression, references updated by it, and references that trigger its evaluation when their values change.
+The `Triggerable` abstraction represents an expression, references updated by it, and references that trigger the expression's evaluation when their values change.
 
-## Deviations from specs
+## Relationships to formal specs
 
 ### Recalculation Sequence Algorithm from XForms 1.1
 
@@ -14,15 +14,13 @@ The `Triggerable` abstraction represents an expression, references updated by it
 
   > "The XForms recalculation algorithm considers model items and model item properties to be vertices in a directed graph. Edges between the vertices represent computational dependencies between vertices."
 
-  JavaRosa's underlying DAG tracks `Triggerable` instances (vertices) and cascading evaluations of triggerables when one of their trigger refs is changed by another (edges).
+  In JavaRosa, the vertices are `Triggerable` instances. The DAG is represented as a map from trigger references to the `Triggerable`s they each directly trigger.
   
-  Nevertheless, further reading of the specs reveals that the DAG should have computations as vertices and their computational dependencies as edges, which is similar to what JavaRosa does.
-
 - https://www.w3.org/TR/xforms11/#model-prop-calculate
 
   > "An XForms Model may include model items whose string values are computed from other values. For example, the sum over line items for quantity times unit price, or the amount of tax to be paid on an order. The formula for such a computed value can be expressed with a calculate property, whose XPath expression is evaluated, converted to a string with the XPath string() function, and stored as the value content of the calculated data node. Chapter 4 Processing Model contains details of when and how the calculation is performed."
 
-  JavaRosa casts expression output values to types other than strings before committing them to the instance.
+  JavaRosa's internal representation of expression results is typed. The conversion to string values happens on serialization to XML.
 
 - https://www.w3.org/TR/xforms11/#rpm-event-seq-vc
 
@@ -34,15 +32,15 @@ The `Triggerable` abstraction represents an expression, references updated by it
 
   > "Specifically, the depList for a vertex v is assigned to be the vertices other than v whose computational expressions reference v (described below). Vertex v is excluded from its own depList to allow self-references to occur without causing a circular reference exception."
 
-  JavaRosa only allows for self-references in `constraint` conditions implicitly due to not storing them in the DAG.
+  JavaRosa only allows for self-references in `constraint` conditions implicitly due to not storing them in the DAG. `TriggerableDag.getDagEdges` prevents self-references between other expressions. This is presumably because self-references are generally a form design error. However, this deviation precludes possibly useful expressions like `coalesce(., "default")`. `TriggerableDagTest` has several ignored tests that illustrate this deviation.
 
 - https://www.w3.org/TR/xforms11/#rpm-processing-recalc-compute
 
   > "2.b. relevant, readonly, required, constraint: If any or all of these computed properties change, the new settings are placed into effect for associated form controls."
 
-  JavaRosa doesn't include `constraint` condition expressions in the DAG, nor it keeps track of its result in the node's internal state. 
+  JavaRosa doesn't include `constraint` condition expressions in the DAG or keep track of its result in the node's internal state.
   
-  JavaRosa doesn't update the internal state of form controls associated with nodes when evaluating these expressions. 
+  JavaRosa keeps a series of flags representing `relevant`, `readonly`, `required` status in `TreeElement`.
 
 - https://www.w3.org/TR/xforms11/#rpm-processing-recalc-example
 
@@ -50,7 +48,7 @@ The `Triggerable` abstraction represents an expression, references updated by it
 
   The specs describe an evaluation sequence that would evaluate constraints on fields changed during the cascade of evaluations and flagging them as invalid as a result, which JavaRosa doesn't do.
   
-  JavaRosa only evaluates constraints to prevent committing to the instance values that don't match their constraint expressions.
+  JavaRosa evaluates constraints on a particular instance node before committing a new value to that node. It does not evaluate constraints on dependant values. `TriggerableDag.validate` must be run to verify all constraints.
    
 ## DAG lifecycle
 
@@ -59,17 +57,14 @@ The `Triggerable` abstraction represents an expression, references updated by it
 `XFormsParser.parseDoc` parses the blank form's XML contents and returns a `FormDef`
 
 - `parseElement(_xmldoc.getRootElement(), _f, topLevelHandlers)` triggers a recursive parsing process
-- Eventually, `StandardBindAttributesProcessor` objects parse the `<bind>` elements. Here condition and computation triggerables are parsed and:
-  - They are added to the DAG by calling to `TriggerableDag.addTriggerable(...)`.
-  
-    This also builds an index of triggerables per trigger reference.
-    
-  - They're assigned as members of the output `DataBinding` objects.
-- `FormInstance fi = instanceParser.parseInstance(...)` triggers calling `FormInstanceParser.applyInstanceProperties(...)`, which iterates the parsed bindings and sets a two-way relationship between the `DataBinding` objects and the `TreeElement` object corresponding to their `nodeset` references.
+- `StandardBindAttributesProcessor` objects parse the `<bind>` elements. Here `Triggerable` objects are built for each expression and:
+  - They are added to the DAG by calling to `TriggerableDag.addTriggerable(...)` which builds an index of triggerables per trigger reference.
+  - They're assigned as members of the returned `DataBinding` objects.
+- In `XFormParser`, `FormInstance fi = instanceParser.parseInstance(...)` results in calling `FormInstanceParser.applyInstanceProperties(...)`, which iterates the parsed bindings and sets a two-way relationship between the `DataBinding` objects and the `TreeElement` object corresponding to their `nodeset` references.
   - Here's when references are actually declared as targets of triggerable objects. So far, any triggerable object would only know about its trigger references only (which is parsed from the xpath expressions)
   - All triggerables get one target corresponding to `nodeset` reference of the binding where they are defined.
   - Additionally, relevance conditions declared in group fields get a target reference per each (recursive) descendant element found in them.
-- `addMainInstanceToFormDef(mainInstanceNode, fi)` triggers calling `TriggerableDag.finalizeTriggerables`, which effectively finished the DAG building process and leaves everything ready for evaluation at runtime while filling forms.
+- `addMainInstanceToFormDef(mainInstanceNode, fi)` results in calling `TriggerableDag.finalizeTriggerables`, which effectively finishes the DAG building process and leaves everything ready for evaluation at runtime while filling forms.
 
 ### 2 - A new form instance is initialized
 
@@ -83,6 +78,13 @@ The `Triggerable` abstraction represents an expression, references updated by it
 - `TriggerableDag.initializeTriggerables(...)` receives the form's root reference, which resolves to all triggerables declared in the form because the root reference is always an ancestor of any target reference in the form.
 
 ### 3 - Something changes while answering a form
+
+#### A note on repeats
+To ensure correctness, JavaRosa could evaluate every triggerable with a target inside the repeat for every repeat instance. In fact, this has been tried before but it slows repeat addition, deletion, and value updates too much to be practical. It's most common to have expressions in repeats only refer to other nodes in the repeat in which case there's no need to update every instance.
+
+In general, expressions inside a repeat are only evaluated when a new instance of that repeat is added and only for that new instance. However, if an expression in the repeat references the generic repeat (e.g. `count(../../repeat)` or `position(..)`) or a node outside the repeat which itself references the generic repeat, then that expression is evaluated for all repeat instances. See `TriggerableDag.getTriggerablesAffectingAllInstances`.
+
+`TriggerableDagTest` has several ignored tests that highlight cases that aren't correctly updated. A more correct but still performant solution would likely require static analysis on expressions to identify things like predicates or `sum` function calls.
  
 #### a - A value changes
 
@@ -107,8 +109,6 @@ A new repeat instance can be created under two circumstances:
 
 In both cases, `FormDef.createNewRepeat(...)` is eventually called, and a chain of triggerable evaluations is triggered on the new node that's added to the main instance.
 
-An important consequence of this implementation is that triggerables will only be applied to the repeat instance that is created. This could produce unexpected results when calculate expressions use count() or other functions that work on a nodeset based on the repeat siblings the new repeat instance belongs to. For more information and specific examples of this, check out the TriggerableDatTest class.  
-
 **Set of evaluated triggerables**: 
 - First phase (value change), those triggered by the repeat group's reference
 - Second phase (initialization), those triggerables that target a descendant of the repeat group's reference
@@ -121,13 +121,13 @@ For this reason, triggerables related to repeat groups are evaluated in three ph
 
 **Phase one (value change)**
 
-`Set<QuickTriggerable> qtSet1 = triggerTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0))` starts the evaluation of the first set of triggerables as if a simple value would have changed (see 3a). 
+`Set<QuickTriggerable> qtSet1 = triggerTriggerables(...)` starts the evaluation of the first set of triggerables as if a simple value would have changed (see 3a).
 
-This is done to let any other part of the form react to the creation of a new repeat group instance e.g., to compute the count of instances in the repeat group.
+This is done to let any other part of the form react to the creation of a new repeat group instance e.g., to compute the count of instances in the repeat group. This is where some expressions may be evaluated for all repeat instances (see above and `TriggerableDag.getTriggerablesAffectingAllInstances`).
 
 **Phase two (initialization)**
 
-Adding new elements to the main instance requires their initialization the same way we prepare the main instance to receive new answers the first time. `Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createRef, new HashSet<>(0));` starts the evaluation of all triggerables targetting a descendant of the repeat group's reference. 
+Adding new elements to the main instance requires their initialization the same way we prepare the main instance to receive new answers the first time. `Set<QuickTriggerable> qtSet2 = initializeTriggerables(...);` starts the evaluation of all triggerables targetting a descendant of the repeat group's reference. 
 
 This is done to prepare the new elements in case they have computed values. 
 
@@ -137,18 +137,16 @@ Now the children elements in the new repeat group instance have been created and
 
 #### c - A repeat instance is deleted
 
-`FormEntryController.deleteRepeat(...)` is called when a user deletes a repeat group. After removing the corresponding elements from the main instance, `TriggerableDag.deleteRepeatGroup(...)` gets called. When this happens, we iterate the all the repeat group instances starting from the position that the one that has been deleted had before deleting it.
+`FormEntryController.deleteRepeat(...)` is called when a user deletes a repeat group. After removing the corresponding elements from the main instance, `TriggerableDag.deleteRepeatGroup(...)` gets called.
 
 **Set of evaluated triggerables**: 
-- those triggered by the repeat group's reference, once per repeat group sibling starting from the position that belonged to the deleted group.
+- those triggered by the generic repeat reference
 - those triggered by the references of the children of the deleted repeat group. 
 (see Evaluation of a set of triggerables)
 
-Deleting a repeat group instance will update the group's instance count and the position of all the instances that follow the deleted one. This means that we need to evaluate all triggerables triggered by the repeat group's reference. 
+Deletion uses the same strategy as addition. First, the call on `triggerTriggerables` evaluates cascades with a reference to the generic repeat reference. `getTriggerablesAffectingAllInstances` ensures that references to such calculations inside the repeat are evaluated for all repeat instances.
 
-We need to remember that we need to follow an alternative strategy to evaluate the triggerables belonging to repeat groups because the DAG uses genericized trigger references to index sets of triggerables. In this case, calling `Set<QuickTriggerable> alreadyEvaluated = triggerTriggerables(mainInstance, evalContext, repeatGroup.getRef(), new HashSet<>(0))` once per sibling (starting from the deleted group's position) deals with that.
-
-We also have to evaluate any triggerable triggered by children references of the repeat group, which is done by `evaluateChildrenTriggerables(mainInstance, evalContext, repeatGroup, false, alreadyEvaluated)`. Even though this is done inside the loop, the `if` check ensures this is only done once, coinciding with the first iteration (corresponding to the sibling that takes the place of the deleted one). Presumably, this is to have a nice ordering of published events in the `EventNotifier`, although there's no apparent functional requirement for this, and the call could be done outside the loop in `TriggerableDag.deleteRepeatGroup(...)`.
+We then have to evaluate any triggerables triggered by references to children of the repeat group, which is done by `evaluateChildrenTriggerables`.
 
 #### d - A complex itemset value is copied to the main instance
 
@@ -176,8 +174,6 @@ This is done to prepare the new elements in case they have computed values.
 
 Once the DAG has configured a set of triggerables affected by the user's action, their evaluation starts in `TriggerableDag.doEvaluateTriggerables(...)`
 
-To ensure the ordered evaluation of triggerables, the whole DAG is iterated, and only the triggerables inside the selected set are evaluated (if they haven't been already evaluated).
+To ensure the ordered evaluation of triggerables, triggerables are triggered in the order they appear in the ordered collection of DAG nodes.
 
-It's uncertain how and why the `firedAnchors` map is used, so I'll completely ignore it for this explanation (see my analysis below).
-
-Each time we iterate over a triggerable, a list of expanded affected references is computed by an `EvaluationContext` using the triggerable to contextualize the provided `anchorRef`. Then the triggerable is applied to each one of these expanded affected references.
+Generally when evaluating a specific triggerable, the context saved in that triggerable can be used to contextualize references in the expressions and targets where the expression result needs to be saved. However, in some cases in repeats (see a note about repeats above), the generic repeat reference is expanded so that the triggerable is evaluated for every repeat instance.

@@ -1390,7 +1390,12 @@ public class TriggerableDagTest {
         assertThat(scenario.getAnswerNode("/data/repeat[2]/group/int"), is(nonRelevant()));
     }
 
-    @Ignore("Fails on v2.17.0. Need to trigger all cascades that end inside repeat.")
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
+    // This case is where a particular field in a repeat is referred to in a calculation outside the repeat and that
+    // calculation is then referenced in the repeat. The reference outside the repeat could be from an aggregating
+    // function such as sum or with a predicate/indexed-repeat. Then, if that calculation is referred to inside the repeat,
+    // every repeat instance should be updated. We could handle this by using a strategy simliar to
+    // getTriggerablesAffectingAllInstances but for initializeTriggerables.
     @Test
     public void addingRepeatInstance_withInnerCalculateDependentOnOuterSum_updatesInnerSumForAllInstances() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
@@ -1572,10 +1577,10 @@ public class TriggerableDagTest {
         // assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
 
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
     // In this test, it's not the repeat addition that needs to trigger recomputation across repeat instances, it's
     // the setting of the number value in a specific instance. There's currently no mechanism to do that. When a repeat
     // is added, it will trigger recomputation for previous instances.
-    @Ignore("Failed on v2.17.0 and prior.")
     @Test
     public void changingValueInRepeat_withReferenceToNextInstance_updatesPreviousInstance() throws IOException {
         Scenario scenario = Scenario.init("Some form", html(
