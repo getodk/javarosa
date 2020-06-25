@@ -1,6 +1,5 @@
 package org.javarosa.core.model;
 
-import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -31,8 +30,6 @@ import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
 import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -42,10 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.hamcrest.CoreMatchers;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
@@ -53,7 +46,6 @@ import org.javarosa.debug.Event;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathPathExprEval;
-import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -1719,11 +1711,11 @@ public class TriggerableDagTest {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
 
-    public XFormsElement buildFormForDagCyclesCheck(BindBuilderXFormsElement... binds) {
+    private XFormsElement buildFormForDagCyclesCheck(BindBuilderXFormsElement... binds) {
         return buildFormForDagCyclesCheck(null, binds);
     }
 
-    public XFormsElement buildFormForDagCyclesCheck(String initialValue, BindBuilderXFormsElement... binds) {
+    private XFormsElement buildFormForDagCyclesCheck(String initialValue, BindBuilderXFormsElement... binds) {
         // Map the last part of each bind's nodeset to model fields
         // They will get an initial value if provided
         List<XFormsElement> modelFields = Stream.of(binds)
@@ -1757,45 +1749,5 @@ public class TriggerableDagTest {
             title("Some form"),
             model(modelChildren.toArray(new XFormsElement[]{}))
         ), body(inputs.toArray(new XFormsElement[]{})));
-    }
-
-    @Ignore("Replace by benchmark")
-    @Test
-    public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
-        // Given
-        FormDef formDef = parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
-
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-
-        FormInstance mainInstance = formDef.getMainInstance();
-
-        // Construct the required amount of repeats
-        TreeElement templateRepeat = mainInstance.getRoot().getChildAt(0);
-        int numberOfRepeats = 10; // Raise this value to really measure
-        for (int i = 0; i < numberOfRepeats; i++) {
-            TreeReference refToNewRepeat = templateRepeat.getRef();
-            refToNewRepeat.setMultiplicity(1, i); // set the correct multiplicity
-
-            FormIndex indexOfNewRepeat = new FormIndex(0, i, refToNewRepeat);
-            formDef.createNewRepeat(indexOfNewRepeat);
-        }
-
-        TreeElement firstRepeat = mainInstance.getRoot().getChildAt(1);
-        TreeReference firstRepeatRef = firstRepeat.getRef();
-        FormIndex firstRepeatIndex = new FormIndex(0, 0, firstRepeatRef);
-
-        // When
-        long start = System.nanoTime();
-
-        for (int i = 0; i < numberOfRepeats; i++) {
-            long currentIterationStart = System.nanoTime();
-            formDef.deleteRepeat(firstRepeatIndex);
-            double tookMs = (System.nanoTime() - currentIterationStart) / 1000000D;
-            logger.info(format("%d\t%.3f\n", i, tookMs));
-        }
-
-        // Then
-        LocalTime duration = LocalTime.fromMillisOfDay((System.nanoTime() - start) / 1_000_000);
-        logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
     }
 }
