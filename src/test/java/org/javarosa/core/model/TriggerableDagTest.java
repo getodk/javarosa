@@ -1334,10 +1334,47 @@ public class TriggerableDagTest {
 
     //region DAG limitations (cases that aren't correctly updated)
     @Ignore("Fails on v2.17.0 (before DAG simplification)")
+    // This case is where a particular field in a repeat makes an aggregate computation over another field in the repeat.
+    // This should cause every repeat instance to be updated. We could handle this by using a strategy similar to
+    // getTriggerablesAffectingAllInstances but for initializeTriggerables.
+    @Test
+    public void addingRepeatInstance_withInnerSumOfQuestionInRepeat_updatesInnerSumForAllInstances() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("repeat jr:template=\"\"",
+                            t("question", "5"),
+                            t("inner-sum"))
+                    )),
+                    bind("/data/repeat/inner-sum").type("int").calculate("sum(../../repeat/question)")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer((n + 1) * 5)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
+    }
+
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
     // This case is where a particular field in a repeat is referred to in a calculation outside the repeat and that
     // calculation is then referenced in the repeat. The reference outside the repeat could be from an aggregating
     // function such as sum or with a predicate/indexed-repeat. Then, if that calculation is referred to inside the repeat,
-    // every repeat instance should be updated. We could handle this by using a strategy simliar to
+    // every repeat instance should be updated. We could handle this by using a strategy similar to
     // getTriggerablesAffectingAllInstances but for initializeTriggerables.
     @Test
     public void addingRepeatInstance_withInnerCalculateDependentOnOuterSum_updatesInnerSumForAllInstances() throws IOException {
