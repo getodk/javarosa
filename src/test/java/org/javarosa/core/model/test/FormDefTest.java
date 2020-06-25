@@ -249,4 +249,44 @@ public class FormDefTest {
         caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
         MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 2"));
     }
+
+    @Test
+    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException {
+        Scenario scenario = Scenario.init("<output> with relative ref in translation", html(
+            head(
+                title("output with relative ref in translation"),
+                model(
+                    t("itext", t("translation lang=\"Français\"",
+                        t("text id=\"/data/repeat/position_in_label:label",
+                            t("value", "Position: <output value=\"../position\"/>"))
+                    )),
+                    mainInstance(t("data id=\"relative-output\"",
+                        t("repeat jr:template=\"\"",
+                            t("position"),
+                            t("position_in_label")
+                        )
+                    )),
+                    bind("/data/repeat/position").type("int").calculate("position(..)"),
+                    bind("/data/repeat/position_in_label").type("int")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/position_in_label", label("Position: <output value=\" ../position \"/>"))))
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+
+        FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
+        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 1"));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+
+        caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
+        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 2"));
+    }
 }
