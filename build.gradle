@@ -92,3 +92,15 @@ jmh {
     resultFormat = 'CSV'
     forceGC = true
 }
+
+// https://github.com/melix/jmh-gradle-plugin/issues/133#issuecomment-432445376
+task benchmarkJar(type: Jar, dependsOn: jmhJar) {
+    manifest {
+        attributes 'Main-Class': 'org.openjdk.jmh.Main'
+    }
+    classifier = 'benchmark'
+    from {
+        (jmhJar.outputs.files + configurations.jmh + configurations.jmhRuntime)
+                .collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
