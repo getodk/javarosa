@@ -95,7 +95,7 @@ public class CreateRepeatDagBenchmark {
         });
     }
 
-    private static Scenario getExpressionInsideScenario() throws IOException {
+    static Scenario getExpressionInsideScenario() throws IOException {
         return Scenario.init("Repeat with expression inside", html(
             head(
                 title("Repeat with expression inside"),
@@ -117,7 +117,7 @@ public class CreateRepeatDagBenchmark {
             )));
     }
 
-    private static Scenario getExpressionInsideWithRefOutsideScenario() throws IOException {
+    static Scenario getExpressionInsideWithRefOutsideScenario() throws IOException {
         return Scenario.init("Repeat with expression inside referencing outside", html(
             head(
                 title("Repeat with expression inside referencing outside"),
@@ -139,7 +139,7 @@ public class CreateRepeatDagBenchmark {
             )));
     }
 
-    private static Scenario getSumExpressionOutsideScenario() throws IOException {
+    static Scenario getSumExpressionOutsideScenario() throws IOException {
         return Scenario.init("Repeat with sum expression outside", html(
             head(
                 title("Repeat with sum expression outside"),
@@ -161,7 +161,7 @@ public class CreateRepeatDagBenchmark {
             )));
     }
 
-    private static Scenario getExpressionInsideWithPositionCallScenario() throws IOException {
+    static Scenario getExpressionInsideWithPositionCallScenario() throws IOException {
         return Scenario.init("Repeat with expression inside referencing outside", html(
             head(
                 title("Repeat with expression inside referencing outside"),
