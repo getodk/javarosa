@@ -1680,7 +1680,7 @@ public class TriggerableDagTest {
                     bind("/data/group/number").type("int").required(),
                     bind("/data/count").type("int").calculate("count(/data/group)"),
                     bind("/data/result_1").type("int").calculate("10 + /data/group[position() = /data/count]/number"),
-                    bind("/data/result_2").type("int").calculate("10 + /data/group[position() = count(/data/group)]/number")
+                    bind("/data/result_2").type("int").calculate("10 + /data/group[position() = count(../group)]/number")
                 )
             ),
             body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
@@ -1701,9 +1701,8 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
-        // The following assertion fails because /data/group gets contextualized such that the count is always 1. There's
-        // probably a use of originalContext missing somewhere.
-        // assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
+        // This would fail with count(/data/group) because the absolute ref would get a multiplicity
+        assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
     //endregion
 
