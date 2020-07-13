@@ -1,6 +1,5 @@
 package org.javarosa.core.model;
 
-import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -31,8 +30,6 @@ import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
 import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -42,10 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.hamcrest.CoreMatchers;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
@@ -53,7 +46,6 @@ import org.javarosa.debug.Event;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathPathExprEval;
-import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -555,65 +547,6 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
     }
-
-    @Test
-    public void issue_119_target_question_should_be_relevant() throws IOException {
-        // This is a translation of the XML form in the issue to our DSL with some adaptations:
-        // - Explicit binds for all fields
-        // - Migrated the condition field to boolean, which should be easier to understand
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("outer_trigger", "D"),
-                        t("inner_trigger"),
-                        t("outer",
-                            t("inner",
-                                t("target_question")
-                            ),
-                            t("inner_condition")
-                        ),
-                        t("end")
-                    )),
-                    bind("/data/outer_trigger").type("string"),
-                    bind("/data/inner_trigger").type("int"),
-                    bind("/data/outer").relevant("/data/outer_trigger = 'D'"),
-                    bind("/data/outer/inner_condition").type("boolean").calculate("/data/inner_trigger > 10"),
-                    bind("/data/outer/inner").relevant("/data/outer/inner_condition"),
-                    bind("/data/outer/inner/target_question").type("string")
-                )
-            ),
-            body(
-                input("inner_trigger", label("inner trigger (enter 5)")),
-                input("outer_trigger", label("outer trigger (enter 'D')")),
-                input("outer/inner/target_question", label("target question: i am incorrectly skipped")),
-                input("end", label("this is the end of the form"))
-            )));
-
-        // Starting conditions (outer trigger is D, inner trigger is empty)
-        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
-        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(false)));
-        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
-
-        scenario.answer("/data/inner_trigger", 15);
-
-        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
-        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
-        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(relevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
-
-        scenario.answer("/data/outer_trigger", "A");
-
-        assertThat(scenario.getAnswerNode("/data/outer"), is(nonRelevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(nonRelevant()));
-        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
-        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
-        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
-    }
     //endregion
 
     //region Required and constraint
@@ -956,6 +889,48 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
         assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(33)));
         assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+    }
+
+    @Test
+    public void addingOrDeletingRepeatInstance_withRelevanceInsideRepeatDependingOnCount_updatesRelevanceForAllInstances() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("repeat jr:template=\"\"",
+                            t("number"),
+                            t("group",
+                                t("in_group")
+                            )
+                        )
+                    )),
+                    bind("/data/repeat/number").type("int").required(),
+                    bind("/data/repeat/group").relevant("count(../../repeat) mod 2 = 1")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/number"),
+                    group("/data/repeat/group",
+                        input("/data/repeat/group/in_group")
+                    ))
+                )
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(true));
+
+        scenario.createNewRepeat("/data/repeat");
+
+        assertThat(scenario.getAnswerNode("/data/repeat[1]/group/in_group").isRelevant(), is(false));
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(false));
+
+        scenario.removeRepeat("/data/repeat[1]");
+
+        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(true));
     }
     //endregion
 
@@ -1389,8 +1364,52 @@ public class TriggerableDagTest {
         scenario.next();
         assertThat(scenario.getAnswerNode("/data/repeat[2]/group/int"), is(nonRelevant()));
     }
+    //endregion
 
-    @Ignore("Fails on v2.17.0. Need to trigger all cascades that end inside repeat.")
+    //region DAG limitations (cases that aren't correctly updated)
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
+    // This case is where a particular field in a repeat makes an aggregate computation over another field in the repeat.
+    // This should cause every repeat instance to be updated. We could handle this by using a strategy similar to
+    // getTriggerablesAffectingAllInstances but for initializeTriggerables.
+    @Test
+    public void addingRepeatInstance_withInnerSumOfQuestionInRepeat_updatesInnerSumForAllInstances() throws IOException {
+        Scenario scenario = Scenario.init("Count outside repeat used inside", html(
+            head(
+                title("Count outside repeat used inside"),
+                model(
+                    mainInstance(t("data id=\"outside-used-inside\"",
+                        t("repeat jr:template=\"\"",
+                            t("question", "5"),
+                            t("inner-sum"))
+                    )),
+                    bind("/data/repeat/inner-sum").type("int").calculate("sum(../../repeat/question)")),
+
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")
+                    )
+                ))));
+
+        range(0, 5).forEach(n -> {
+            scenario.next();
+            scenario.createNewRepeat();
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer((n + 1) * 5)));
+            scenario.next();
+        });
+
+        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
+
+        scenario.removeRepeat("/data/repeat[3]");
+
+        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
+    }
+
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
+    // This case is where a particular field in a repeat is referred to in a calculation outside the repeat and that
+    // calculation is then referenced in the repeat. The reference outside the repeat could be from an aggregating
+    // function such as sum or with a predicate/indexed-repeat. Then, if that calculation is referred to inside the repeat,
+    // every repeat instance should be updated. We could handle this by using a strategy similar to
+    // getTriggerablesAffectingAllInstances but for initializeTriggerables.
     @Test
     public void addingRepeatInstance_withInnerCalculateDependentOnOuterSum_updatesInnerSumForAllInstances() throws IOException {
         Scenario scenario = Scenario.init("Count outside repeat used inside", html(
@@ -1425,6 +1444,121 @@ public class TriggerableDagTest {
         scenario.removeRepeat("/data/repeat[3]");
 
         range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
+    }
+
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
+    // In this test, it's not the repeat addition that needs to trigger recomputation across repeat instances, it's
+    // the setting of the number value in a specific instance. There's currently no mechanism to do that. When a repeat
+    // is added, it will trigger recomputation for previous instances.
+    @Test
+    public void changingValueInRepeat_withReferenceToNextInstance_updatesPreviousInstance() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("group jr:template=\"\"",
+                            t("number"),
+                            t("next-number")
+                        )
+                    )),
+                    bind("/data/group/number").type("int").required(),
+                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number")
+                )
+            ),
+            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
+        ));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(11);
+
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(22);
+
+        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+
+        // This assertion is false because setting the answer to 22 didn't trigger recomputation across repeat instances
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.answer(33);
+
+        // This assertion is true because adding a new repeat triggered recomputation across repeat instances
+        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        // This assertion is false because setting the answer to 33 didn't trigger recomputation across repeat instances
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
+    }
+
+    @Ignore("Fails on v2.17.0 (before DAG simplification)")
+    @Test
+    public void issue_119_target_question_should_be_relevant() throws IOException {
+        // This is a translation of the XML form in the issue to our DSL with some adaptations:
+        // - Explicit binds for all fields
+        // - Migrated the condition field to boolean, which should be easier to understand
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("outer_trigger", "D"),
+                        t("inner_trigger"),
+                        t("outer",
+                            t("inner",
+                                t("target_question")
+                            ),
+                            t("inner_condition")
+                        ),
+                        t("end")
+                    )),
+                    bind("/data/outer_trigger").type("string"),
+                    bind("/data/inner_trigger").type("int"),
+                    bind("/data/outer").relevant("/data/outer_trigger = 'D'"),
+                    bind("/data/outer/inner_condition").type("boolean").calculate("/data/inner_trigger > 10"),
+                    bind("/data/outer/inner").relevant("/data/outer/inner_condition"),
+                    bind("/data/outer/inner/target_question").type("string")
+                )
+            ),
+            body(
+                input("inner_trigger", label("inner trigger (enter 5)")),
+                input("outer_trigger", label("outer trigger (enter 'D')")),
+                input("outer/inner/target_question", label("target question: i am incorrectly skipped")),
+                input("end", label("this is the end of the form"))
+            )));
+
+        // Starting conditions (outer trigger is D, inner trigger is empty)
+        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(false)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(nonRelevant()));
+
+        scenario.answer("/data/inner_trigger", 15);
+
+        assertThat(scenario.getAnswerNode("/data/outer"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(relevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
+
+        scenario.answer("/data/outer_trigger", "A");
+
+        assertThat(scenario.getAnswerNode("/data/outer"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner_condition"), is(nonRelevant()));
+        assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
     }
     //endregion
 
@@ -1546,7 +1680,7 @@ public class TriggerableDagTest {
                     bind("/data/group/number").type("int").required(),
                     bind("/data/count").type("int").calculate("count(/data/group)"),
                     bind("/data/result_1").type("int").calculate("10 + /data/group[position() = /data/count]/number"),
-                    bind("/data/result_2").type("int").calculate("10 + /data/group[position() = count(/data/group)]/number")
+                    bind("/data/result_2").type("int").calculate("10 + /data/group[position() = count(../group)]/number")
                 )
             ),
             body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
@@ -1567,64 +1701,8 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/count"), is(intAnswer(2)));
         assertThat(scenario.answerOf("/data/result_1"), is(intAnswer(30)));
-        // The following assertion fails because /data/group gets contextualized such that the count is always 1. There's
-        // probably a use of originalContext missing somewhere.
-        // assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
-    }
-
-    // In this test, it's not the repeat addition that needs to trigger recomputation across repeat instances, it's
-    // the setting of the number value in a specific instance. There's currently no mechanism to do that. When a repeat
-    // is added, it will trigger recomputation for previous instances.
-    @Ignore("Failed on v2.17.0 and prior.")
-    @Test
-    public void changingValueInRepeat_withReferenceToNextInstance_updatesPreviousInstance() throws IOException {
-        Scenario scenario = Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("group jr:template=\"\"",
-                            t("number"),
-                            t("next-number")
-                        )
-                    )),
-                    bind("/data/group/number").type("int").required(),
-                    bind("/data/group/next-number").type("int").calculate("/data/group[position() = (position(current()/..) + 1)]/number")
-                )
-            ),
-            body(group("/data/group", repeat("/data/group", input("/data/group/number"))))
-        ));
-
-        scenario.next();
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.answer(11);
-
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-
-        scenario.next();
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.answer(22);
-
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
-
-        // This assertion is false because setting the answer to 22 didn't trigger recomputation across repeat instances
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
-
-        scenario.next();
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.answer(33);
-
-        // This assertion is true because adding a new repeat triggered recomputation across repeat instances
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
-        // This assertion is false because setting the answer to 33 didn't trigger recomputation across repeat instances
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
-        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
+        // This would fail with count(/data/group) because the absolute ref would get a multiplicity
+        assertThat(scenario.answerOf("/data/result_2"), is(intAnswer(30)));
     }
     //endregion
 
@@ -1632,11 +1710,11 @@ public class TriggerableDagTest {
         assertThat(dagEvents.stream().map(Event::getDisplayMessage).collect(joining("\n")), is(join("\n", lines)));
     }
 
-    public XFormsElement buildFormForDagCyclesCheck(BindBuilderXFormsElement... binds) {
+    private XFormsElement buildFormForDagCyclesCheck(BindBuilderXFormsElement... binds) {
         return buildFormForDagCyclesCheck(null, binds);
     }
 
-    public XFormsElement buildFormForDagCyclesCheck(String initialValue, BindBuilderXFormsElement... binds) {
+    private XFormsElement buildFormForDagCyclesCheck(String initialValue, BindBuilderXFormsElement... binds) {
         // Map the last part of each bind's nodeset to model fields
         // They will get an initial value if provided
         List<XFormsElement> modelFields = Stream.of(binds)
@@ -1670,45 +1748,5 @@ public class TriggerableDagTest {
             title("Some form"),
             model(modelChildren.toArray(new XFormsElement[]{}))
         ), body(inputs.toArray(new XFormsElement[]{})));
-    }
-
-    @Ignore("Replace by benchmark")
-    @Test
-    public void deleteRepeatGroupWithCalculationsTimingTest() throws Exception {
-        // Given
-        FormDef formDef = parse(r("delete-repeat-group-with-calculations-timing-test.xml"));
-
-        formDef.initialize(false, new InstanceInitializationFactory()); // trigger all calculations
-
-        FormInstance mainInstance = formDef.getMainInstance();
-
-        // Construct the required amount of repeats
-        TreeElement templateRepeat = mainInstance.getRoot().getChildAt(0);
-        int numberOfRepeats = 10; // Raise this value to really measure
-        for (int i = 0; i < numberOfRepeats; i++) {
-            TreeReference refToNewRepeat = templateRepeat.getRef();
-            refToNewRepeat.setMultiplicity(1, i); // set the correct multiplicity
-
-            FormIndex indexOfNewRepeat = new FormIndex(0, i, refToNewRepeat);
-            formDef.createNewRepeat(indexOfNewRepeat);
-        }
-
-        TreeElement firstRepeat = mainInstance.getRoot().getChildAt(1);
-        TreeReference firstRepeatRef = firstRepeat.getRef();
-        FormIndex firstRepeatIndex = new FormIndex(0, 0, firstRepeatRef);
-
-        // When
-        long start = System.nanoTime();
-
-        for (int i = 0; i < numberOfRepeats; i++) {
-            long currentIterationStart = System.nanoTime();
-            formDef.deleteRepeat(firstRepeatIndex);
-            double tookMs = (System.nanoTime() - currentIterationStart) / 1000000D;
-            logger.info(format("%d\t%.3f\n", i, tookMs));
-        }
-
-        // Then
-        LocalTime duration = LocalTime.fromMillisOfDay((System.nanoTime() - start) / 1_000_000);
-        logger.info("Deletion of {} repeats took {}", numberOfRepeats, duration.toString());
     }
 }

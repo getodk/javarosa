@@ -529,10 +529,11 @@ public class TriggerableDag {
         TreeReference contextRef = affectsAllRepeatInstances ? toTrigger.getContext() : toTrigger.getContext().contextualize(changedRef);
 
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
-        // Go through all of the fully qualified nodes which this triggerable
-        // updates. (Multiple nodes can be updated by the same trigger)
+        // In general, expansion will have no effect. It only makes a difference if affectsAllRepeatInstances is true in
+        // which case the triggerable will be applied for every repeat instance.
         for (TreeReference qualified : evalContext.expandReference(contextRef))
             try {
+                // apply evaluates the expression in the given context and saves the result in the contextualized target(s).
                 evaluationResults.addAll(toTrigger.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
                 throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "' (" + qualified + "): " + e.getMessage(), e);
