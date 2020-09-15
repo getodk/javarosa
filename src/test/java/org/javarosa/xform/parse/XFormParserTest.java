@@ -13,6 +13,15 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -101,7 +110,32 @@ public class XFormParserTest {
         assertEquals(3, formDef.getChildren().size());
         assertEquals("What is your first name?", formDef.getChild(0).getLabelInnerText());
     }
+    
+    @Test
+    public void spacesBetweenOutputs_areRespected() throws IOException {
+        Scenario scenario = Scenario.init("spaces-outputs", html(
+            head(
+                model(
+                    mainInstance(t("data id=\"spaces-outputs\"",
+                        t("first_name"),
+                        t("last_name"),
+                        t("question")
+                    )),
+                    bind("/data/question").type("string")
+                )),
+            body(
+                input("/data/question",
+                        t("label", "Full name: <output value=\" ../first_name \"/>\u00A0<output value=\" ../last_name \"/>"))
+            )
+        ));
 
+        scenario.next();
+        String innerText = scenario.getQuestionAtIndex().getLabelInnerText();
+        char nbsp = 0x00A0;
+        String expected = "Full name: ${0}" + nbsp + "${1}";
+        assertEquals(expected, innerText);
+    }
+    
     @Test
     public void parsesSecondaryInstanceForm() throws IOException {
         FormDef formDef = parse(SECONDARY_INSTANCE_XML);
