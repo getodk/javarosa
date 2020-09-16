@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms"
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:jr="http://openrosa.org/javarosa"
+	xmlns:odk="http://www.opendatakit.org/xforms"
+	xmlns:orx="http://openrosa.org/xforms"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<h:head>
+		<h:title>Sum_test</h:title>
+		<model odk:xforms-version="1.0.0">
+			<instance>
+				<data id="Sum_test">
+					<sup />
+					<valid />
+					<farmer_fields />
+					<field_repeat_count />
+					<field_repeat jr:template="">
+						<field_size />
+						<total_field_calc />
+					</field_repeat>
+					<field_repeat>
+						<field_size />
+						<total_field_calc />
+					</field_repeat>
+					<total_parcel_calc />
+					<start_time />
+					<end_time />
+					<survey_day />
+					<deviceid />
+					<subscriberid />
+					<imei />
+					<sim_serial_number />
+					<phonenumber />
+					<meta>
+						<instanceID />
+						<instanceName />
+					</meta>
+				</data>
+			</instance>
+			<bind nodeset="/data/sup" type="decimal" />
+			<bind constraint=". &gt;=1"
+				jr:constraintMsg="Number must be greater than zero."
+				nodeset="/data/farmer_fields" required="true()" type="int" />
+			<bind calculate=" /data/farmer_fields "
+				nodeset="/data/field_repeat_count" readonly="true()" type="string" />
+			<bind nodeset="/data/field_repeat/field_size" required="true()"
+				type="decimal" />
+			<bind calculate=" ../field_size "
+				nodeset="/data/field_repeat/total_field_calc" type="string" />
+			<bind calculate="sum( /data/field_repeat/total_field_calc )"
+				nodeset="/data/total_parcel_calc" type="string" />
+			<bind jr:preload="timestamp" jr:preloadParams="start"
+				nodeset="/data/start_time" type="dateTime" />
+			<bind jr:preload="timestamp" jr:preloadParams="end"
+				nodeset="/data/end_time" type="dateTime" />
+			<bind jr:preload="date" jr:preloadParams="today"
+				nodeset="/data/survey_day" type="date" />
+			<bind jr:preload="property" jr:preloadParams="deviceid"
+				nodeset="/data/deviceid" type="string" />
+			<bind jr:preload="property" jr:preloadParams="subscriberid"
+				nodeset="/data/subscriberid" type="string" />
+			<bind jr:preload="property" jr:preloadParams="deviceid"
+				nodeset="/data/imei" type="string" />
+			<bind jr:preload="property" jr:preloadParams="simserial"
+				nodeset="/data/sim_serial_number" type="string" />
+			<bind jr:preload="property" jr:preloadParams="phonenumber"
+				nodeset="/data/phonenumber" type="string" />
+			<bind jr:preload="uid" nodeset="/data/meta/instanceID"
+				readonly="true()" type="string" />
+            <bind calculate="Sum_test" nodeset="/data/meta/instanceName"
+                type="string" />
+            <bind calculate="/data/total_parcel_calc = /data/sup" nodeset="/data/valid"
+                type="boolean" />
+			
+		</model>
+	</h:head>
+	<h:body>
+		<input ref="/data/sup">
+			<label>Total Area</label>
+		</input>
+		<input ref="/data/farmer_fields">
+			<label>Total number of fields</label>
+		</input>
+		<group ref="/data/field_repeat">
+			<label>Field</label>
+			<repeat jr:count=" /data/field_repeat_count "
+				nodeset="/data/field_repeat">
+				<input ref="/data/field_repeat/field_size">
+					<label>Field area</label>
+				</input>
+			</repeat>
+		</group>
+	</h:body>
+</h:html>
