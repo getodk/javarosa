@@ -46,6 +46,8 @@ import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
 import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -73,6 +75,9 @@ import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.SetValueAction;
 import org.javarosa.core.model.actions.setgeopoint.SetGeopointActionHandler;
 import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointActionHandler;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -89,6 +94,7 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
 import org.javarosa.core.util.StopWatch;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.InterningKXmlParser;
@@ -1629,6 +1635,56 @@ public class XFormParser implements IXFormParserFunctions {
         //print unused attribute warning message for parent element
         if (XFormUtils.showUnusedAttributeWarning(e, usedAtts)) {
             triggerWarning(XFormUtils.unusedAttWarning(e, usedAtts), getVagueLocation(e));
+        }
+
+        if (!bindings.isEmpty()) {
+            DataBinding dataBinding = bindings.get(0);
+
+            if (dataBinding.relevancyCondition != null) {
+                group.relevanceExpr = dataBinding.relevancyCondition.getExpr();
+            } else if (!dataBinding.relevantAbsolute) {
+                group.relevanceExpr = new IConditionExpr() {
+                    @Override
+                    public boolean eval(DataInstance model, EvaluationContext evalContext) {
+                        return false;
+                    }
+
+                    @Override
+                    public Object evalRaw(DataInstance model, EvaluationContext evalContext) {
+                        return null;
+                    }
+
+                    @Override
+                    public String evalReadable(DataInstance model, EvaluationContext evalContext) {
+                        return null;
+                    }
+
+                    @Override
+                    public List<TreeReference> evalNodeset(DataInstance model, EvaluationContext evalContext) {
+                        return null;
+                    }
+
+                    @Override
+                    public Set<TreeReference> getTriggers(TreeReference contextRef) {
+                        return null;
+                    }
+
+                    @Override
+                    public List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+                        return null;
+                    }
+
+                    @Override
+                    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+
+                    }
+
+                    @Override
+                    public void writeExternal(DataOutputStream out) throws IOException {
+
+                    }
+                };
+            }
         }
 
         parent.addChild(group);

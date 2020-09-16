@@ -380,7 +380,8 @@ public class FormEntryModel {
                 return false;
             }
 
-            return form.isRepeatRelevant(ref);
+            GroupDef group = (GroupDef) form.getChild(index);
+            return group.isNewRepeatRelevant(form.getMainInstance(), form.getEvaluationContext());
         } else if (isRepeatJuncture) {
             //repeat junctures are still relevant if no new repeat can be created; that option
             //is simply missing from the menu
