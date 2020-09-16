@@ -6,13 +6,21 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.*;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.title;
 import static org.junit.Assert.assertThat;
 
 public class RepeatTest {
 
     @Test
-    public void whenRepeatIsNotRelevant_isSkipped() throws Exception {
+    public void whenRepeatIsNotRelevant_repeatPromptIsSkipped() throws Exception {
         Scenario scenario = Scenario.init("Non relevant repeat", html(
             head(
                 title("Non relevant repeat"),
