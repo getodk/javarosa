@@ -91,7 +91,7 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and g
 </settings>
 ```
 
-Official releases are typically done by @yanokwa. Both use AdoptOpenJDK v1.8.x.
+Official releases are built by [@yanokwa](https://github.com/yanokwa) using AdoptOpenJDK v1.8.x.
 
 To generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 
