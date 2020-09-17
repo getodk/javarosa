@@ -17,9 +17,6 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.actions.ActionController;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -48,8 +45,6 @@ import java.util.List;
  */
 public class GroupDef implements IFormElement, Localizable {
     private static final Logger logger = LoggerFactory.getLogger(GroupDef.class);
-
-    public IConditionExpr relevanceExpr;
 
     private List<IFormElement> children;    /** A list of questions on a group. */
     private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
@@ -290,13 +285,5 @@ public class GroupDef implements IFormElement, Localizable {
             textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }
         this.textID = textID;
-    }
-
-    public boolean isNewRepeatRelevant(DataInstance instance, EvaluationContext evaluationContext) {
-        if (relevanceExpr != null) {
-            return relevanceExpr.eval(instance, evaluationContext);
-        } else {
-            return true;
-        }
     }
 }

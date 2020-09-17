@@ -532,7 +532,7 @@ public class TriggerableDag {
         // which case the triggerable will be applied for every repeat instance.
         List<TreeReference> qualifiedReferences = evalContext.expandReference(contextRef);
 
-        // We want to up a repeat's template as well
+        // We want to update the repeat's template as well
         TreeElement template = mainInstance.getTemplate(contextRef);
         if (template != null) {
             TreeReference templateRef = template.getRef();
