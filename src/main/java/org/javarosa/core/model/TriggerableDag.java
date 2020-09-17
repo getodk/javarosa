@@ -528,19 +528,30 @@ public class TriggerableDag {
         // the repeat are only triggered for the changed instance. This is important for performance.
         TreeReference contextRef = affectsAllRepeatInstances ? toTrigger.getContext() : toTrigger.getContext().contextualize(changedRef);
 
-        List<EvaluationResult> evaluationResults = new ArrayList<>(0);
         // In general, expansion will have no effect. It only makes a difference if affectsAllRepeatInstances is true in
         // which case the triggerable will be applied for every repeat instance.
-        for (TreeReference qualified : evalContext.expandReference(contextRef))
+        List<TreeReference> qualifiedReferences = evalContext.expandReference(contextRef);
+
+        // We want to update the repeat's template as well
+        TreeElement template = mainInstance.getTemplate(contextRef);
+        if (template != null) {
+            TreeReference templateRef = template.getRef();
+            qualifiedReferences.add(templateRef);
+        }
+
+        List<EvaluationResult> evaluationResults = new ArrayList<>(0);
+        for (TreeReference qualified : qualifiedReferences) {
             try {
                 // apply evaluates the expression in the given context and saves the result in the contextualized target(s).
                 evaluationResults.addAll(toTrigger.apply(mainInstance, new EvaluationContext(evalContext, qualified), qualified));
             } catch (Exception e) {
                 throw new RuntimeException("Error evaluating field '" + contextRef.getNameLast() + "' (" + qualified + "): " + e.getMessage(), e);
             }
+        }
 
-        if (evaluationResults.size() > 0)
+        if (evaluationResults.size() > 0) {
             accessor.getEventNotifier().publishEvent(new Event(toTrigger.isCondition() ? "Condition" : "Recalculate", evaluationResults));
+        }
     }
 
     private void evaluateChildrenTriggerables(FormInstance mainInstance, EvaluationContext evalContext, TreeElement newNode, boolean createdOrDeleted, Set<QuickTriggerable> alreadyEvaluated) {

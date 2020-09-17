@@ -532,7 +532,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public boolean isRepeatRelevant(TreeReference repeatRef) {
         TreeElement repeatNode = mainInstance.resolveReference(repeatRef);
-        return repeatNode == null || repeatNode.isRelevant();
+
+        if (repeatNode != null) {
+            return repeatNode.isRelevant();
+        } else {
+            // We are dealing with a repeat that doesn't exist yet so get
+            // relevance from the template
+            TreeElement template = mainInstance.getTemplate(repeatRef);
+            return template.isRelevant();
+        }
     }
 
     public boolean canCreateRepeat(TreeReference repeatRef, FormIndex repeatIndex) {
