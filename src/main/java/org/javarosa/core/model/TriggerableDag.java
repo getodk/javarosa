@@ -90,6 +90,11 @@ public class TriggerableDag {
      */
     private final Map<TreeReference, Set<QuickTriggerable>> triggerablesPerTrigger = new HashMap<>();
 
+    /**
+     * An index to look up relevance conditions for each repeat. See buildRelevancePerRepeat.
+     */
+    private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
+
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
     }
@@ -149,6 +154,7 @@ public class TriggerableDag {
      */
     void finalizeTriggerables(FormInstance mainInstance, EvaluationContext ec) throws IllegalStateException {
         triggerablesDAG = buildDag(allTriggerables, getDagEdges(mainInstance, ec));
+        relevancePerRepeat = buildRelevancePerRepeat(mainInstance, triggerablesDAG);
     }
 
     /**
@@ -532,13 +538,6 @@ public class TriggerableDag {
         // which case the triggerable will be applied for every repeat instance.
         List<TreeReference> qualifiedReferences = evalContext.expandReference(contextRef);
 
-        // We want to update the repeat's template as well
-        TreeElement template = mainInstance.getTemplate(contextRef);
-        if (template != null) {
-            TreeReference templateRef = template.getRef();
-            qualifiedReferences.add(templateRef);
-        }
-
         List<EvaluationResult> evaluationResults = new ArrayList<>(0);
         for (TreeReference qualified : qualifiedReferences) {
             try {
@@ -643,6 +642,28 @@ public class TriggerableDag {
         }
 
         return result;
+    }
+
+    /**
+     * Builds an index to look up relevance for repeats. Assumes that there can only be a single Triggerable associated
+     * with a repeat and that it must represent relevance. This Triggerable is evaluated directly to determine relevance
+     * at a new repeat prompt. This is used instead of the relevance stored in the corresponding TreeElement and updated
+     * by the DAG because repeat templates aren't updated by DAG recomputations. Additionally, the context intersection
+     * made in Triggerable.intersectContextWith means we may not evaluate against the correct context when the triggerable is
+     * applied.
+     */
+    private static Map<TreeReference, QuickTriggerable> buildRelevancePerRepeat(FormInstance mainInstance, Set<QuickTriggerable> triggerables) {
+        Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
+        for (QuickTriggerable triggerable : triggerables)
+            if (triggerable.isCondition())
+                for (TreeReference target : triggerable.getTargets())
+                    if (mainInstance.getTemplate(target) != null)
+                        relevancePerRepeat.put(target, triggerable);
+        return relevancePerRepeat;
+    }
+
+    public QuickTriggerable getRelevanceForRepeat(TreeReference genericRepeatRef) {
+        return relevancePerRepeat.get(genericRepeatRef);
     }
 
     void copyItemsetAnswer(FormInstance mainInstance, EvaluationContext evalContext, TreeReference copyRef, TreeElement copyToElement) {
