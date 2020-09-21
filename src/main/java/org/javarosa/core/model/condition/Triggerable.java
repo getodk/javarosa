@@ -65,9 +65,10 @@ public abstract class Triggerable implements Externalizable {
      */
     private TreeReference contextRef;  //generic ref used to turn triggers into absolute references
 
-    // TODO Study why we really need this property. Looking at mutators, it should always equal the contextRef.
     /**
-     * The first context provided to this triggerable before reducing to the common root.
+     * The first context provided to this triggerable before reducing to the common root (see Triggerable.intersectContextWith).
+     * This is just the first bind encountered with the expression represented by this Triggerable so it's not clear how
+     * it's useful (and bind order for the same form definition affects its value).
      */
     private TreeReference originalContextRef;
 

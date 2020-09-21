@@ -1,9 +1,5 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.test.Scenario;
-import org.javarosa.form.api.FormEntryController;
-import org.junit.Test;
-
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
@@ -18,6 +14,10 @@ import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.junit.Assert.assertThat;
+
+import org.javarosa.core.test.Scenario;
+import org.javarosa.form.api.FormEntryController;
+import org.junit.Test;
 
 public class RepeatTest {
 
@@ -71,6 +71,37 @@ public class RepeatTest {
         scenario.answer("/data/selectYesNo", "no");
 
         int event = scenario.next();
+        assertThat(event, is(FormEntryController.EVENT_END_OF_FORM));
+    }
+
+    @Test
+    public void whenRepeatAndTopLevelNodeHaveSameRelevanceExpression_andExpressionEvaluatesToFalse_repeatPromptIsSkipped() throws Exception {
+        Scenario scenario = Scenario.init("Repeat relevance same as other", html(
+            head(
+                title("Repeat relevance same as other"),
+                model(
+                    mainInstance(t("data id=\"repeat_relevance_same_as_other\"",
+                        t("selectYesNo", "no"),
+                        t("repeat1",
+                            t("q1")),
+                        t("q0")
+                    )),
+                    bind("/data/q0").relevant("/data/selectYesNo = 'yes'"),
+                    bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
+                ),
+                body(
+                    select1("/data/selectYesNo",
+                        item("yes", "Yes"),
+                        item("no", "No")),
+                    repeat("/data/repeat1",
+                        input("/data/repeat1/q1")
+                    )
+                ))));
+
+        scenario.jumpToBeginningOfForm();
+        scenario.next();
+        int event = scenario.next();
+
         assertThat(event, is(FormEntryController.EVENT_END_OF_FORM));
     }
 }

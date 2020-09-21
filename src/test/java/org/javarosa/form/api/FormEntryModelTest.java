@@ -74,4 +74,51 @@ public class FormEntryModelTest {
         scenario.answer("/data/outerYesNo", "yes");
         assertThat(formEntryModel.isIndexRelevant(q1Index), is(true));
     }
+
+    /**
+     * Identical expressions in a form get collapsed to a single Triggerable and the Triggerable's context becomes
+     * its targets' highest common parent (see Triggerable.intersectContextWith). This makes evaluation in the context
+     * of repeats hard to reason about. This test shows that relevance is propagated as expected when a relevance expression
+     * is shared between a repeat and non-repeat.
+     */
+    @Test
+    public void whenRepeatAndNonRepeatShareRelevanceExpr_repeatContentRelevanceRespectsHierarchy() throws IOException {
+        Scenario scenario = Scenario.init("Nested relevance with common expression", html(
+            head(
+                title("Nested relevance with common expression"),
+                model(
+                    mainInstance(t("data id=\"nested_relevance\"",
+                        t("unrelated"),
+                        t("outer",
+                            t("inner",
+                                t("q1"))),
+
+                        t("innerYesNo", "no"),
+                        t("outerYesNo", "no")
+                    )),
+                    bind("/data/unrelated").relevant("/data/innerYesNo = 'yes'"),
+                    bind("/data/outer").relevant("/data/outerYesNo = 'yes'"),
+                    bind("/data/outer/inner/q1").relevant("/data/innerYesNo = 'yes'")
+                ),
+                body(
+                    group("/data/outer",
+                        group("/data/outer/inner",
+                            input("/data/outer/inner/q1")
+                        )
+                    ),
+                    input("/data/outerYesNo"),
+                    input("/data/innerYesNo")
+                ))));
+        FormDef formDef = scenario.getFormDef();
+        FormEntryModel formEntryModel = new FormEntryModel(formDef);
+
+        FormIndex q1Index = scenario.indexOf("/data/outer/inner/q1");
+        assertThat(formEntryModel.isIndexRelevant(q1Index), is(false));
+
+        scenario.answer("/data/innerYesNo", "yes");
+        assertThat(formEntryModel.isIndexRelevant(q1Index), is(false));
+
+        scenario.answer("/data/outerYesNo", "yes");
+        assertThat(formEntryModel.isIndexRelevant(q1Index), is(true));
+    }
 }
