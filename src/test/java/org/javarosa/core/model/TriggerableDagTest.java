@@ -45,6 +45,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
+import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathPathExprEval;
@@ -548,6 +549,43 @@ public class TriggerableDagTest {
         scenario.answer("1"); // Label: "yes"
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
+    }
+
+    /**
+     * Identical expressions in a form get collapsed to a single Triggerable and the Triggerable's context becomes
+     * its targets' highest common parent (see Triggerable.intersectContextWith). This makes evaluation in the context
+     * of repeats hard to reason about. This test shows that relevance is propagated as expected when a relevance expression
+     * is shared between a repeat and non-repeat. See https://github.com/getodk/javarosa/issues/603.
+     */
+    @Test
+    public void whenRepeatAndTopLevelNodeHaveSameRelevanceExpression_andExpressionEvaluatesToFalse_repeatPromptIsSkipped() throws Exception {
+        Scenario scenario = Scenario.init("Repeat relevance same as other", html(
+            head(
+                title("Repeat relevance same as other"),
+                model(
+                    mainInstance(t("data id=\"repeat_relevance_same_as_other\"",
+                        t("selectYesNo", "no"),
+                        t("repeat1",
+                            t("q1")),
+                        t("q0")
+                    )),
+                    bind("/data/q0").relevant("/data/selectYesNo = 'yes'"),
+                    bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
+                ),
+                body(
+                    select1("/data/selectYesNo",
+                        item("yes", "Yes"),
+                        item("no", "No")),
+                    repeat("/data/repeat1",
+                        input("/data/repeat1/q1")
+                    )
+                ))));
+
+        scenario.jumpToBeginningOfForm();
+        scenario.next();
+        int event = scenario.next();
+
+        assertThat(event, is(FormEntryController.EVENT_END_OF_FORM));
     }
     //endregion
 
