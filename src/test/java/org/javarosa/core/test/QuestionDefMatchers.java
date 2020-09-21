@@ -59,4 +59,42 @@ public class QuestionDefMatchers {
             }
         };
     }
+
+    public static TypeSafeMatcher<TreeElement> enabled() {
+        return new TypeSafeMatcher<TreeElement>() {
+            @Override
+            protected boolean matchesSafely(TreeElement item) {
+                return item.isEnabled();
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("enabled");
+            }
+
+            @Override
+            protected void describeMismatchSafely(TreeElement item, Description mismatchDescription) {
+                mismatchDescription.appendValue(item).appendText(" is read-only");
+            }
+        };
+    }
+
+    public static TypeSafeMatcher<TreeElement> readOnly() {
+        return new TypeSafeMatcher<TreeElement>() {
+            @Override
+            protected boolean matchesSafely(TreeElement item) {
+                return !item.isEnabled();
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("read-only");
+            }
+
+            @Override
+            protected void describeMismatchSafely(TreeElement item, Description mismatchDescription) {
+                mismatchDescription.appendValue(item).appendText(" is enabled");
+            }
+        };
+    }
 }

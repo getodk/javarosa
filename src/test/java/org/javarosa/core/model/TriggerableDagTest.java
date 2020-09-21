@@ -11,7 +11,9 @@ import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.FormDefMatchers.valid;
+import static org.javarosa.core.test.QuestionDefMatchers.enabled;
 import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
+import static org.javarosa.core.test.QuestionDefMatchers.readOnly;
 import static org.javarosa.core.test.QuestionDefMatchers.relevant;
 import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
@@ -548,6 +550,67 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
     }
     //endregion
+
+    //region Read-only
+    /**
+     * Read-only is inherited from ancestor nodes, as per the W3C XForms specs:
+     * - https://www.w3.org/TR/xforms11/#model-prop-relevant
+     */
+    @Test
+    public void readonly_is_inherited_from_ancestors() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("is-outer-readonly"),
+                        t("is-inner-readonly"),
+                        t("is-field-readonly"),
+                        t("outer",
+                            t("inner",
+                                t("field")))
+                    )),
+                    bind("/data/is-outer-readonly").type("boolean"),
+                    bind("/data/is-inner-readonly").type("boolean"),
+                    bind("/data/is-field-readonly").type("boolean"),
+                    bind("/data/outer").readonly("/data/is-outer-readonly"),
+                    bind("/data/outer/inner").readonly("/data/is-inner-readonly"),
+                    bind("/data/outer/inner/field").type("string").readonly("/data/is-field-readonly")
+                )
+            ),
+            body(
+                input("/data/is-outer-readonly"),
+                input("/data/is-inner-readonly"),
+                input("/data/is-field-readonly"),
+                group("/data/outer", group("/data/outer/inner", input("/data/outer/inner/field")))
+            )));
+
+        // Form initialization evaluates all triggerables, which makes the field editable (not read-only)
+        assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(enabled()));
+
+        // Make the outer group read-only
+        scenario.answer("/data/is-outer-readonly", true);
+        assertThat(scenario.getAnswerNode("/data/outer"), is(readOnly()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(readOnly()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
+
+        // Make the inner group read-only
+        scenario.answer("/data/is-outer-readonly", false);
+        scenario.answer("/data/is-inner-readonly", true);
+        assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(readOnly()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
+
+        // Make the field read-only
+        scenario.answer("/data/is-inner-readonly", false);
+        scenario.answer("/data/is-field-readonly", true);
+        assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
+    }
+    //endregion Read-only
 
     //region Required and constraint
     @Test
