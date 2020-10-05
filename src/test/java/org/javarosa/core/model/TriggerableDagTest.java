@@ -11,7 +11,9 @@ import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.FormDefMatchers.valid;
+import static org.javarosa.core.test.QuestionDefMatchers.enabled;
 import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
+import static org.javarosa.core.test.QuestionDefMatchers.readOnly;
 import static org.javarosa.core.test.QuestionDefMatchers.relevant;
 import static org.javarosa.core.test.Scenario.getRef;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
@@ -43,6 +45,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.BindBuilderXFormsElement;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
+import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathPathExprEval;
@@ -547,7 +550,105 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/group/number1_x2"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/data/group/number1_x2_x2"), is(intAnswer(8)));
     }
+
+    /**
+     * Identical expressions in a form get collapsed to a single Triggerable and the Triggerable's context becomes
+     * its targets' highest common parent (see Triggerable.intersectContextWith). This makes evaluation in the context
+     * of repeats hard to reason about. This test shows that relevance is propagated as expected when a relevance expression
+     * is shared between a repeat and non-repeat. See https://github.com/getodk/javarosa/issues/603.
+     */
+    @Test
+    public void whenRepeatAndTopLevelNodeHaveSameRelevanceExpression_andExpressionEvaluatesToFalse_repeatPromptIsSkipped() throws Exception {
+        Scenario scenario = Scenario.init("Repeat relevance same as other", html(
+            head(
+                title("Repeat relevance same as other"),
+                model(
+                    mainInstance(t("data id=\"repeat_relevance_same_as_other\"",
+                        t("selectYesNo", "no"),
+                        t("repeat1",
+                            t("q1")),
+                        t("q0")
+                    )),
+                    bind("/data/q0").relevant("/data/selectYesNo = 'yes'"),
+                    bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
+                ),
+                body(
+                    select1("/data/selectYesNo",
+                        item("yes", "Yes"),
+                        item("no", "No")),
+                    repeat("/data/repeat1",
+                        input("/data/repeat1/q1")
+                    )
+                ))));
+
+        scenario.jumpToBeginningOfForm();
+        scenario.next();
+        int event = scenario.next();
+
+        assertThat(event, is(FormEntryController.EVENT_END_OF_FORM));
+    }
     //endregion
+
+    //region Read-only
+    /**
+     * Read-only is inherited from ancestor nodes, as per the W3C XForms specs:
+     * - https://www.w3.org/TR/xforms11/#model-prop-relevant
+     */
+    @Test
+    public void readonly_is_inherited_from_ancestors() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("is-outer-readonly"),
+                        t("is-inner-readonly"),
+                        t("is-field-readonly"),
+                        t("outer",
+                            t("inner",
+                                t("field")))
+                    )),
+                    bind("/data/is-outer-readonly").type("boolean"),
+                    bind("/data/is-inner-readonly").type("boolean"),
+                    bind("/data/is-field-readonly").type("boolean"),
+                    bind("/data/outer").readonly("/data/is-outer-readonly"),
+                    bind("/data/outer/inner").readonly("/data/is-inner-readonly"),
+                    bind("/data/outer/inner/field").type("string").readonly("/data/is-field-readonly")
+                )
+            ),
+            body(
+                input("/data/is-outer-readonly"),
+                input("/data/is-inner-readonly"),
+                input("/data/is-field-readonly"),
+                group("/data/outer", group("/data/outer/inner", input("/data/outer/inner/field")))
+            )));
+
+        // Form initialization evaluates all triggerables, which makes the field editable (not read-only)
+        assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(enabled()));
+
+        // Make the outer group read-only
+        scenario.answer("/data/is-outer-readonly", true);
+        assertThat(scenario.getAnswerNode("/data/outer"), is(readOnly()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(readOnly()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
+
+        // Make the inner group read-only
+        scenario.answer("/data/is-outer-readonly", false);
+        scenario.answer("/data/is-inner-readonly", true);
+        assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(readOnly()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
+
+        // Make the field read-only
+        scenario.answer("/data/is-inner-readonly", false);
+        scenario.answer("/data/is-field-readonly", true);
+        assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner"), is(enabled()));
+        assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
+    }
+    //endregion Read-only
 
     //region Required and constraint
     @Test
