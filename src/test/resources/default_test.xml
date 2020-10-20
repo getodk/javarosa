@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms"
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:jr="http://openrosa.org/javarosa"
+	xmlns:odk="http://www.opendatakit.org/xforms"
+	xmlns:orx="http://openrosa.org/xforms"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<h:head>
+		<h:title>Sum_test</h:title>
+		<model odk:xforms-version="1.0.0">
+			<instance>
+				<data id="Default_test">
+					<string_val />
+					<inline_val />
+					<meta>
+						<instanceID />
+						<instanceName />
+					</meta>
+				</data>
+			</instance>
+			<bind constraint="." nodeset="/data/string_val" type="string" />
+            <setvalue event="odk-instance-first-load"
+                ref="/data/string_val" value="&quot;string-value&quot;"/>
+            <bind constraint="." nodeset="/data/string_val" type="string" />
+            <setvalue event="odk-instance-first-load"
+                ref="/data/inline_val">inline-value</setvalue>
+		</model>
+	</h:head>
+	<h:body>
+		<input ref="/data/string_val">
+			<label>StringVal</label>
+		</input>
+	</h:body>
+</h:html>
