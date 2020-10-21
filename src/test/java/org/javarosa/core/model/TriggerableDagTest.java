@@ -752,6 +752,78 @@ public class TriggerableDagTest {
     //endregion
 
     //region Adding or deleting repeats
+    @Test
+    public void addingRepeatInstance_updatesCalculationCascade() throws IOException {
+        Scenario scenario = Scenario.init("Add repeat instance", html(
+            head(
+                title("Add repeat instance"),
+                model(
+                    mainInstance(t("data id=\"repeat-calcs\"",
+                        t("repeat",
+                            t("inner1"),
+                            t("inner2"),
+                            t("inner3")
+                        ))),
+                    bind("/data/repeat/inner2").calculate("2 * ../inner1"),
+                    bind("/data/repeat/inner3").calculate("2 * ../inner2"))),
+
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/inner1"))
+            )));
+
+        scenario.next();
+        scenario.next();
+        scenario.answer(0);
+
+        assertThat(scenario.answerOf("/data/repeat[" + 0 + "]/inner2"), CoreMatchers.is(intAnswer(0)));
+        assertThat(scenario.answerOf("/data/repeat[" + 0 + "]/inner3"), CoreMatchers.is(intAnswer(0)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+
+        scenario.answer(1);
+
+        assertThat(scenario.answerOf("/data/repeat[" + 1 + "]/inner2"), CoreMatchers.is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/repeat[" + 1 + "]/inner3"), CoreMatchers.is(intAnswer(4)));
+    }
+
+    @Test
+    public void addingRepeat_updatesInnerCalculations_withMultipleDependencies() throws IOException {
+        Scenario scenario = Scenario.init("Repeat cascading calc", html(
+            head(
+                title("Repeat cascading calc"),
+                model(
+                    mainInstance(t("data id=\"repeat-calcs\"",
+                        t("repeat",
+                            t("position"),
+                            t("position_2"),
+                            t("other"),
+                            t("concatenated")
+                        ))),
+                    // position(..) means the full cascade is evaulated as part of triggerTriggerables
+                    bind("/data/repeat/position").calculate("position(..)"),
+                    bind("/data/repeat/position_2").calculate("/data/repeat/position * 2"),
+                    bind("/data/repeat/other").calculate("2 * 2"),
+                    // concat needs to be evaluated after /data/repeat/other has a value
+                    bind("/data/repeat/concatenated").calculate("concat(../position_2, '-', ../other)")),
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/concatenated"))
+                ))));
+
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.answerOf("/data/repeat[" + 0 + "]/concatenated"), CoreMatchers.is(stringAnswer("2-4")));
+
+        scenario.next();
+        scenario.createNewRepeat();
+
+        scenario.next();
+        assertThat(scenario.answerOf("/data/repeat[" + 1 + "]/concatenated"), CoreMatchers.is(stringAnswer("4-4")));
+    }
+
     // Illustrates the second case in TriggerableDAG.getTriggerablesAffectingAllInstances
     @Test
     public void addingOrRemovingRepeatInstance_withCalculatedCountOutsideRepeat_updatesReferenceToCountInside() throws IOException {

@@ -574,12 +574,13 @@ public class TriggerableDag {
         publishSummary("Created (phase 1)", createdRef, qtSet1);
 
         // initialize conditions for the node (and sub-nodes)
-        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createdRef, qtSet1);
+        Set<QuickTriggerable> qtSet2 = initializeTriggerables(mainInstance, evalContext, createdRef, new HashSet<>());
         publishSummary("Created (phase 2)", createdRef, qtSet2);
 
         Set<QuickTriggerable> alreadyEvaluated = new HashSet<>(qtSet1);
         alreadyEvaluated.addAll(qtSet2);
 
+        // TODO: add a test that fails without this or remove (all tests on v2.17 pre-DAG simplification pass)
         evaluateChildrenTriggerables(mainInstance, evalContext, createdElement, true, alreadyEvaluated);
     }
 
