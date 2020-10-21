@@ -458,6 +458,14 @@ public class XFormParserTest {
         assertThat(g3Element.getBind(), is(g3AbsRef));
     }
 
+    @Test
+    public void testSetValueWithStrings() throws IOException {
+        
+        Scenario scenario = Scenario.init("default_test.xml");
+        assertEquals("string-value", scenario.getAnswerNode("/data/string_val").getValue().getValue().toString());
+        assertEquals("inline-value", scenario.getAnswerNode("/data/inline_val").getValue().getValue().toString());
+    }
+    
     private TreeElement findDepthFirst(TreeElement parent, String name) {
         int len = parent.getNumChildren();
         for (int i = 0; i < len; ++i) {
