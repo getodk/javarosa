@@ -16,16 +16,8 @@
 
 package org.javarosa.core.model.test;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.test.Scenario;
-import org.javarosa.form.api.FormEntryCaption;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.Scenario.AnswerResult.CONSTRAINT_VIOLATED;
 import static org.javarosa.core.test.Scenario.AnswerResult.OK;
 import static org.javarosa.core.test.Scenario.getRef;
@@ -44,6 +36,15 @@ import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
+
+import java.io.IOException;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.test.Scenario;
+import org.javarosa.core.util.XFormsElement;
+import org.javarosa.form.api.FormEntryCaption;
+import org.junit.Test;
 /**
  * See testAnswerConstraint() for an example of how to write the
  * constraint unit type tests.
@@ -59,6 +60,38 @@ public class FormDefTest {
         scenario.next();
         assertThat(scenario.answer("10"), Matchers.is(CONSTRAINT_VIOLATED));
         assertThat(scenario.answer("13"), Matchers.is(OK));
+    }
+
+    @Test
+    public void enforcesConstraints_whenInstanceIsDeserialized() throws IOException {
+        XFormsElement formDef = html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("a")
+                    )),
+                    bind("/data/a").type("string").constraint("regex(.,'[0-9]{10}')")
+                )
+            ),
+            body(input("/data/a"))
+        );
+
+        Scenario scenario = Scenario.init("Some form", formDef);
+
+        scenario.next();
+        Scenario.AnswerResult result = scenario.answer("00000");
+        assertThat(result, Matchers.is(CONSTRAINT_VIOLATED));
+
+        scenario.answer("0000000000");
+        scenario.next();
+        assertThat(scenario.getCurrentIndex().isEndOfFormIndex(), is(true));
+
+        Scenario restored = scenario.serializeAndDeserializeInstance(formDef);
+        restored.next();
+        assertThat(restored.answerOf("/data/a"), is(stringAnswer("0000000000")));
+        result = restored.answer("00000");
+        assertThat(result, Matchers.is(CONSTRAINT_VIOLATED));
     }
 
     //region Repeat relevance
