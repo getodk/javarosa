@@ -2178,6 +2178,11 @@ public class XFormParser implements IXFormParserFunctions {
         tr.add(templateRoot.getName(), TreeReference.INDEX_UNBOUND);
         templateRoot.populate(savedRoot, f);
 
+        // FormInstanceParser.parseInstance is responsible for initial creation of instances. It explicitly sets the
+        // main instance name to null so we force this again on deserialization because some code paths rely on the main
+        // instance not having a name.
+        f.getMainInstance().setName(null);
+
         // populated model to current form
         f.getMainInstance().setRoot(templateRoot);
 

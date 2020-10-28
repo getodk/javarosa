@@ -37,9 +37,11 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
 import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -79,7 +81,9 @@ import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathNumNegExpr;
@@ -125,6 +129,7 @@ import org.slf4j.LoggerFactory;
 public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
+    private Path formFile;
     private final FormDef formDef;
     private FormEntryController controller;
     private EvaluationContext evaluationContext;
@@ -269,6 +274,26 @@ public class Scenario {
 
         delete(tempFile);
         return Scenario.from(deserializedFormDef);
+    }
+
+    // The fact that we need to pass in the same raw form definition that the current scenario is built around suggests
+    // that XFormParser.loadXmlInstance(FormDef f, Reader xmlReader) should probably be public. This is also the method that Collect
+    // copies because the FormDef may be built from cache meaning there won't be a Reader/Document available and because it makes
+    // some extra calls for search(). We pass in an XFormsElement for now until we decide on an interface that Collect can use.
+    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException {
+        FormInstance originalInstance = getFormDef().getMainInstance();
+        XFormSerializingVisitor serializer = new XFormSerializingVisitor();
+        byte[] formInstanceBytes = serializer.serializeInstance(originalInstance);
+
+        InputStreamReader instanceReader = new InputStreamReader(new ByteArrayInputStream(formInstanceBytes));
+        InputStreamReader formReader = new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes()));
+
+        XFormParser parser = new XFormParser(formReader, instanceReader);
+        FormDef restoredFormDef = parser.parse();
+
+        Scenario restored = Scenario.from(restoredFormDef);
+
+        return restored;
     }
 
     /**
