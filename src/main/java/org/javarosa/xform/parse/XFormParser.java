@@ -786,11 +786,12 @@ public class XFormParser implements IXFormParserFunctions {
 
         registerActionTarget(treeref);
         if (valueExpression == null) {
-            if (e.getChildCount() == 0 || !e.isText(0)) {
-                throw new XFormParseException("No 'value' attribute and no inner value set in <setvalue> associated with: " + treeref, e);
+            String value = "";
+            if (e.getChildCount() > 0 && e.isText(0)) {
+                value = e.getText(0);
             }
-            //Set expression
-            action = new SetValueAction(treeref, e.getText(0));
+
+            action = new SetValueAction(treeref, value);
         } else {
             try {
                 action = new SetValueAction(treeref, valueExpression.equals("") ? new XPathStringLiteral("")
