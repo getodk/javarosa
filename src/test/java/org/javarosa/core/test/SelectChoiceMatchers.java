@@ -26,18 +26,19 @@ public class SelectChoiceMatchers {
         };
     }
 
-    public static Matcher<SelectChoice> choice(String expectedValue, String expectedDisplayText) {
+    public static Matcher<SelectChoice> choice(String expectedValue, String expectedLabelOrId) {
         return new TypeSafeMatcher<SelectChoice>() {
 
             @Override
             public void describeTo(Description description) {
-                description.appendText("choice " + expectedDisplayText + "(\"" + expectedValue + "\")");
+                description.appendText("choice " + expectedLabelOrId + "(\"" + expectedValue + "\")");
             }
 
             @Override
             protected boolean matchesSafely(SelectChoice item) {
                 return item.getValue().equals(expectedValue) &&
-                    item.getLabelInnerText().equals(expectedDisplayText);
+                    (item.isLocalizable() ? item.getTextID().equals(expectedLabelOrId)
+                        : item.getLabelInnerText().equals(expectedLabelOrId));
             }
 
             @Override
