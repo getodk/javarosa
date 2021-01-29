@@ -52,7 +52,6 @@ public class FormEntryPrompt extends FormEntryCaption {
     private static final Logger logger = LoggerFactory.getLogger(FormEntryPrompt.class);
 
     TreeElement mTreeElement;
-    boolean dynamicChoicesPopulated = false;
 
     /**
      * This empty constructor exists for convenience of any supertypes of this prompt
@@ -231,25 +230,12 @@ public class FormEntryPrompt extends FormEntryCaption {
 
         ItemsetBinding itemset = q.getDynamicChoices();
         if (itemset != null) {
-            if (!dynamicChoicesPopulated) {
-                itemset.populateDynamicChoices(form, mTreeElement.getRef());
-                dynamicChoicesPopulated = true;
-            }
+            itemset.populateDynamicChoices(form, mTreeElement.getRef());
             return itemset.getChoices();
         } else { //static choices
             return q.getChoices();
         }
     }
-
-    public void expireDynamicChoices () {
-        dynamicChoicesPopulated = false;
-        ItemsetBinding itemset = getQuestion().getDynamicChoices();
-        if (itemset != null) {
-            itemset.clearChoices();
-        }
-    }
-
-
 
     public boolean isRequired() {
         return mTreeElement.isRequired();
