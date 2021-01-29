@@ -41,7 +41,6 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -73,7 +72,6 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xml.InternalDataInstanceParser;
-import org.javarosa.xpath.XPathException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -867,7 +865,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                                     ref = ref.contextualize(ec.getContextRef());
                                 }
 
-                                f.populateDynamicChoices(itemset, ref);
+                                itemset.populateDynamicChoices(f, ref);
                             }
                             choices = itemset.getChoices();
                         } else { // static choices
@@ -963,127 +961,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
 
         return template;
-    }
-
-    /**
-     * Identifies the <code>itemset</code> in the backend model, and creates a set of
-     * <code>SelectChoice</code> objects at the current question reference based on the data
-     * in the model.
-     * <p/>
-     * Modifies the <code>itemset</code> object passed by clearing any choices currently on it, and populating with
-     * choices based on the question reference <code>curQRef</code> that was passed.
-     *
-     * @param itemset the binding for an itemset, where the choices will be populated
-     * @param curQRef a reference to the current question's element, which will be
-     *                used to determine the values to be chosen from
-     */
-    public void populateDynamicChoices(ItemsetBinding itemset, TreeReference curQRef) {
-        getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
-
-        List<SelectChoice> choices = new ArrayList<>();
-
-        List<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getMainInstance(),
-            new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
-
-        DataInstance formInstance;
-        if (itemset.nodesetRef.getInstanceName() != null) { // a secondary instance is specified
-            formInstance = getNonMainInstance(itemset.nodesetRef.getInstanceName());
-            if (formInstance == null) {
-                throw new XPathException("Instance " + itemset.nodesetRef.getInstanceName() + " not found");
-            }
-        } else {
-            formInstance = getMainInstance();
-        }
-
-        if (matches == null) {
-            throw new XPathException("Could not find references depended on by" + itemset.nodesetRef.getInstanceName());
-        }
-
-        // Get the answer to the current question to remove selection(s) that are no longer in the choice list.
-        Map<String, Boolean> currentAnswersInNewChoices = null;
-        IAnswerData rawValue = getMainInstance().resolveReference(curQRef).getValue();
-        if (rawValue != null) {
-            currentAnswersInNewChoices = new HashMap<>();
-
-            if (rawValue instanceof MultipleItemsData) {
-                for (Selection selection : (List<Selection>) rawValue.getValue()) {
-                    currentAnswersInNewChoices.put(selection.choice != null ? selection.choice.getValue() : selection.xmlValue, false);
-                }
-            } else {
-                currentAnswersInNewChoices.put(rawValue.getDisplayText(), false);
-            }
-        }
-
-        for (int i = 0; i < matches.size(); i++) {
-            TreeReference item = matches.get(i);
-
-            String label = itemset.labelExpr.evalReadable(formInstance, new EvaluationContext(exprEvalContext,
-                item));
-            String value = null;
-            TreeElement copyNode = null;
-            if (itemset.copyMode) {
-                copyNode = this.getMainInstance().resolveReference(itemset.copyRef.contextualize(item));
-            }
-            if (itemset.valueRef != null) {
-                value = itemset.valueExpr
-                    .evalReadable(formInstance, new EvaluationContext(exprEvalContext, item));
-            }
-
-            // Provide a default value if none is specified
-            value = value != null ? value : "dynamic:" + i;
-
-            if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.keySet().contains(value)) {
-                currentAnswersInNewChoices.put(value, true);
-            }
-
-            SelectChoice choice = new SelectChoice(label, value, itemset.labelIsItext);
-            choice.setIndex(i);
-            if (itemset.copyMode)
-                choice.copyNode = copyNode;
-
-            choices.add(choice);
-        }
-
-        if (choices.size() == 0) {
-            logger.info("Dynamic select question has no choices! [{}]. If this occurs while " +
-                    "filling out a form (and not while saving an incomplete form), the filter " +
-                    "condition may have eliminated all the choices. Is that what you intended?"
-                , itemset.nodesetRef);
-
-        }
-
-        // Remove values that are no longer in choices.
-        if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.containsValue(false)) {
-            IAnswerData filteredAnswer;
-            if (rawValue instanceof MultipleItemsData) {
-                filteredAnswer = getFilteredSelections((MultipleItemsData) rawValue, currentAnswersInNewChoices);
-            } else {
-                filteredAnswer = new StringData("");
-            }
-
-            getMainInstance().resolveReference(curQRef).setAnswer(filteredAnswer);
-        }
-
-        itemset.clearChoices();
-        itemset.setChoices(choices, getMainInstance(), exprEvalContext, this.getLocalizer());
-    }
-
-    /**
-     * @param selections          an answer to a multiple selection question
-     * @param shouldKeepSelection maps each value that could be in @{code selections} to a boolean representing whether
-     *                            or not it should be kept
-     * @return a copy of {@code selections} without the values that were mapped to false in {@code shouldKeepSelection}
-     */
-    private static MultipleItemsData getFilteredSelections(MultipleItemsData selections, Map<String, Boolean> shouldKeepSelection) {
-        List<Selection> newSelections = new ArrayList<>();
-        for (Selection oldSelection : (List<Selection>) selections.getValue()) {
-            String key = oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue;
-            if (shouldKeepSelection.get(key)) {
-                newSelections.add(oldSelection);
-            }
-        }
-
-        return new MultipleItemsData(newSelections);
     }
 
     public QuestionPreloader getPreloader() {
