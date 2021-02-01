@@ -80,8 +80,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         Map<TreeReference, IAnswerData> currentTriggerValues = getCurrentTriggerValues(formDef, curQRef);
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
 
-        if (latestFilteredChoiceList != null && Objects.equals(curQRef, latestQuestionRef) && Objects.equals(currentTriggerValues, latestTriggerValues)
-            && Objects.equals(currentRandomizeSeed, latestRandomizeSeed)) {
+        if (latestFilteredChoiceList != null && Objects.equals(curQRef, latestQuestionRef) && currentTriggerValues != null &&
+            Objects.equals(currentTriggerValues, latestTriggerValues) && Objects.equals(currentRandomizeSeed, latestRandomizeSeed)) {
             return randomize && latestRandomizeSeed == null ? shuffle(latestFilteredChoiceList) : latestFilteredChoiceList;
         }
 
@@ -142,6 +142,14 @@ public class ItemsetBinding implements Externalizable, Localizable {
         return latestFilteredChoiceList;
     }
 
+    /**
+     * Returns a map:
+     *  - keys: the references that are triggers for the nodeset expression
+     *  - values: current values at those references
+     *
+     * Returns null if the nodeset expression has any triggers that are unbounded references because there's no single
+     * value we could track in that case.
+     */
     private Map<TreeReference, IAnswerData> getCurrentTriggerValues(FormDef formDef, TreeReference curQRef) {
         Map<TreeReference, IAnswerData> currentTriggerValues = new HashMap<>();
 
@@ -152,8 +160,10 @@ public class ItemsetBinding implements Externalizable, Localizable {
                 TreeElement element = formDef.getMainInstance().resolveReference(trigger);
 
                 // Unbounded references (e.g. ref to a repeat nodeset rather than a repeat instance) don't have a value we can keep track of.
-                if (element != null) {
+                if (element != null && !element.isRepeatable()) {
                     currentTriggerValues.put(trigger, element.getValue());
+                } else {
+                    return null;
                 }
             }
         }
