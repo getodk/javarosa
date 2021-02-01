@@ -853,21 +853,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                             // choices. however, it's hard, because we don't really have any context to work with, and all
                             // the situations where that context would be used don't make sense for trying to reverse a
                             // select value back to a label in an unrelated expression
-                            if (itemset.getChoices() == null) {
-                                // NOTE: this will return incorrect results if the list is filtered. fortunately, they
-                                // are ignored by FormEntryPrompt.
-                                // 2019-HM: can't reproduce a case where filtered list would be anything other than empty
-
-                                if (ref.isAmbiguous()) {
-                                    // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
-                                    // like we do when we populate those at FormEntryPrompt (line 251).
-                                    // The "ref" here is ambiguous, so we need to make it concrete first.
-                                    ref = ref.contextualize(ec.getContextRef());
-                                }
-
-                                itemset.populateDynamicChoices(f, ref);
+                            if (ref.isAmbiguous()) {
+                                // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
+                                // like we do when we populate those at FormEntryPrompt (line 251).
+                                // The "ref" here is ambiguous, so we need to make it concrete first.
+                                ref = ref.contextualize(ec.getContextRef());
                             }
-                            choices = itemset.getChoices();
+                            choices = itemset.getChoices(f, ref);
                         } else { // static choices
                             choices = q.getChoices();
                         }

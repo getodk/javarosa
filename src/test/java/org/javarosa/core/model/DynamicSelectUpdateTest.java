@@ -36,6 +36,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -68,6 +69,7 @@ public class DynamicSelectUpdateTest {
     }
 
     @Test
+    @Ignore("TODO")
     public void selectFromRepeat_whenRepeatChanged_updatesChoices() throws Exception {
         Scenario scenario = Scenario.init("Select from repeat", getSelectFromRepeatForm());
 

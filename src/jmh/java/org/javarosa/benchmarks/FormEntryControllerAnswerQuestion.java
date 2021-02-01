@@ -46,7 +46,7 @@ public class FormEntryControllerAnswerQuestion {
                 //Resolve DynamicChoices
                 ItemsetBinding itemsetBinding = question.getDynamicChoices();
                 if (itemsetBinding != null) {
-                    formDef.populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+                    itemsetBinding.getChoices(formDef, (TreeReference) question.getBind().getReference());
                 }
                 formEntryController.stepToNextEvent();
             }
@@ -87,8 +87,7 @@ public class FormEntryControllerAnswerQuestion {
             QuestionDef question = formEntryPrompt.getQuestion();
             ItemsetBinding itemsetBinding = question.getDynamicChoices();
             if (itemsetBinding != null) {
-                state.formEntryController.getModel().getForm()
-                    .populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+                itemsetBinding.getChoices (state.formEntryController.getModel().getForm(), (TreeReference) question.getBind().getReference());
             }
             IAnswerData answer = getStubAnswer(formEntryPrompt.getQuestion());
             int saveStatus = state.formEntryController.answerQuestion(questionIndex, answer, true);
@@ -138,11 +137,9 @@ public class FormEntryControllerAnswerQuestion {
             FormEntryPrompt formEntryPrompt = state.formEntryModel.getQuestionPrompt(questionIndex);
             QuestionDef question = formEntryPrompt.getQuestion();
             ItemsetBinding itemsetBinding = question.getDynamicChoices();
-            if (itemsetBinding != null)
-                state.formEntryController.getModel().getForm().populateDynamicChoices(
-                    itemsetBinding,
-                    (TreeReference) question.getBind().getReference()
-                );
+            if (itemsetBinding != null) {
+                itemsetBinding.getChoices(state.formEntryController.getModel().getForm(), (TreeReference) question.getBind().getReference());
+            }
             answer = getStubAnswer(formEntryPrompt.getQuestion());
             state.formEntryController.answerQuestion(questionIndex, answer, true);
             return this;

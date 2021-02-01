@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
@@ -41,6 +43,11 @@ public class ItemsetBinding implements Externalizable, Localizable {
     // Temporarily cached filtered list (not serialized)
     private List<SelectChoice> latestFilteredChoiceList;
 
+    // Values needed to determine whether the cached list should be expired
+    private TreeReference latestQuestionRef;
+    private Map<TreeReference, IAnswerData> latestTriggerValues;
+    private Long latestRandomizeSeed;
+
     /**
      * note that storing both the ref and expr for everything is kind of redundant, but we're forced
      * to since it's nearly impossible to convert between the two w/o having access to the underlying
@@ -69,21 +76,19 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public XPathNumericLiteral randomSeedNumericExpr = null;
     public XPathPathExpr randomSeedPathExpr = null;
 
-    public List<SelectChoice> getChoices () {
-        return latestFilteredChoiceList;
-    }
+    public List<SelectChoice> getChoices(FormDef formDef, TreeReference curQRef) {
+        Map<TreeReference, IAnswerData> currentTriggerValues = getCurrentTriggerValues(formDef, curQRef);
+        Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
 
-    /**
-     * Creates a set of <code>SelectChoice</code> objects at the current question reference based on the data
-     * in the model.
-     * <p/>
-     * Always clears existing choices and repopulates when called.
-     */
-    public void populateDynamicChoices(FormDef formDef, TreeReference curQRef) {
+        if (latestFilteredChoiceList != null && Objects.equals(curQRef, latestQuestionRef) && Objects.equals(currentTriggerValues, latestTriggerValues)
+            && Objects.equals(currentRandomizeSeed, latestRandomizeSeed)) {
+            return randomize && latestRandomizeSeed == null ? shuffle(latestFilteredChoiceList) : latestFilteredChoiceList;
+        }
+
         formDef.getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
 
         DataInstance formInstance;
-        if (nodesetRef.getInstanceName() != null) { // a secondary instance is specified
+        if (nodesetRef.getInstanceName() != null) { // the itemset is defined in a secondary instance
             formInstance = formDef.getNonMainInstance(nodesetRef.getInstanceName());
             if (formInstance == null) {
                 throw new XPathException("Instance " + nodesetRef.getInstanceName() + " not found");
@@ -112,7 +117,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         updateQuestionAnswerInModel(formDef, curQRef, currentAnswersInNewChoices);
 
-        latestFilteredChoiceList = randomize ? shuffle(choices, resolveRandomSeed(formInstance, formDef.getEvaluationContext())) : choices;
+        latestFilteredChoiceList = randomize ? shuffle(choices, currentRandomizeSeed) : choices;
 
         // TODO: write a test that fails if this is removed. It looks like a no-op because it's not accessing the shuffled collection.
         if (randomize) {
@@ -129,6 +134,30 @@ public class ItemsetBinding implements Externalizable, Localizable {
                 localeChanged(curLocale, formDef.getLocalizer());
             }
         }
+
+        latestQuestionRef = curQRef;
+        latestTriggerValues = currentTriggerValues;
+        latestRandomizeSeed = currentRandomizeSeed;
+
+        return latestFilteredChoiceList;
+    }
+
+    private Map<TreeReference, IAnswerData> getCurrentTriggerValues(FormDef formDef, TreeReference curQRef) {
+        Map<TreeReference, IAnswerData> currentTriggerValues = new HashMap<>();
+
+        Set<TreeReference> triggers = nodesetExpr.getTriggers(curQRef);
+        for (TreeReference trigger : triggers) {
+            // Only store values for expressions in the primary instance. Secondary instances can never change so no need to store their values.
+            if (trigger.getInstanceName() == null) {
+                TreeElement element = formDef.getMainInstance().resolveReference(trigger);
+
+                // Unbounded references (e.g. ref to a repeat nodeset rather than a repeat instance) don't have a value we can keep track of.
+                if (element != null) {
+                    currentTriggerValues.put(trigger, element.getValue());
+                }
+            }
+        }
+        return currentTriggerValues;
     }
 
     private SelectChoice getChoiceForTreeReference(FormDef formDef, DataInstance formInstance, int i, TreeReference item) {
