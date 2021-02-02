@@ -43,8 +43,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
     // Temporarily cached filtered list (not serialized)
     private List<SelectChoice> latestFilteredChoiceList;
 
-    // Values needed to determine whether the cached list should be expired
-    private TreeReference latestQuestionRef;
+    // Values needed to determine whether the cached list should be expired (not serialized)
     private Map<TreeReference, IAnswerData> latestTriggerValues;
     private Long latestRandomizeSeed;
 
@@ -80,8 +79,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         Map<TreeReference, IAnswerData> currentTriggerValues = getCurrentTriggerValues(formDef, curQRef);
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
 
-        if (latestFilteredChoiceList != null && Objects.equals(curQRef, latestQuestionRef) && currentTriggerValues != null &&
-            Objects.equals(currentTriggerValues, latestTriggerValues) && Objects.equals(currentRandomizeSeed, latestRandomizeSeed)) {
+        if (latestFilteredChoiceList != null && currentTriggerValues != null && Objects.equals(currentTriggerValues, latestTriggerValues)
+            && Objects.equals(currentRandomizeSeed, latestRandomizeSeed)) {
             return randomize && latestRandomizeSeed == null ? shuffle(latestFilteredChoiceList) : latestFilteredChoiceList;
         }
 
@@ -135,7 +134,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
             }
         }
 
-        latestQuestionRef = curQRef;
         latestTriggerValues = currentTriggerValues;
         latestRandomizeSeed = currentRandomizeSeed;
 
