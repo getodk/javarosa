@@ -20,6 +20,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -34,6 +36,7 @@ import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
+import java.util.List;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.junit.Test;
@@ -216,6 +219,105 @@ public class DynamicSelectUpdateTest {
             choice("a", "choices-0"),
             choice("b", "choices-1"),
             choice("c", "choices-2")));
+    }
+    //endregion
+
+    //region Caching
+    @Test
+    public void selectWithUnchangedTriggers_providesCachedChoiceList() throws Exception {
+        Scenario scenario = Scenario.init("Select", html(
+            head(
+                title("Select"),
+                model(
+                    mainInstance(
+                        t("data id=\"select\"",
+                            t("filter"),
+                            t("select"))),
+
+                    instance("choices",
+                        item("aa", "A"),
+                        item("aaa", "AA"),
+                        item("bb", "B"),
+                        item("bbb", "BB"))),
+                body(
+                    input("/data/filter"),
+                    select1Dynamic("/data/select", "instance('choices')/root/item[starts-with(value,/data/filter)]")
+                )
+            )));
+
+        scenario.answer("/data/filter", "a");
+        List<SelectChoice> choices = scenario.choicesOf("/data/select");
+        assertThat(scenario.choicesOf("/data/select"), sameInstance(choices));
+    }
+
+    @Test
+    public void selectWithChangedTriggers_recomputesChoiceList() throws Exception {
+        Scenario scenario = Scenario.init("Select", html(
+            head(
+                title("Select"),
+                model(
+                    mainInstance(
+                        t("data id=\"select\"",
+                            t("filter"),
+                            t("select"))),
+
+                    instance("choices",
+                        item("aa", "A"),
+                        item("aaa", "AA"),
+                        item("bb", "B"),
+                        item("bbb", "BB"))),
+                body(
+                    input("/data/filter"),
+                    select1Dynamic("/data/select", "instance('choices')/root/item[starts-with(value,/data/filter)]")
+                )
+            )));
+
+        scenario.answer("/data/filter", "a");
+        List<SelectChoice> choices = scenario.choicesOf("/data/select");
+        assertThat(choices, containsInAnyOrder(
+            choice("aa", "A"),
+            choice("aaa", "AA")));
+
+        scenario.answer("/data/filter", "aa");
+        assertThat(choices, containsInAnyOrder(
+            choice("aa", "A"),
+            choice("aaa", "AA")));
+        // Even though the list happens to be unchanged, it should have been recomputed because the trigger value changed
+        assertThat(scenario.choicesOf("/data/select"), not(sameInstance(choices)));
+    }
+
+    @Test
+    public void selectWithRepeatAsTrigger_recomputesChoiceListAtEveryRequest() throws Exception {
+        Scenario scenario = Scenario.init("Select with repeat trigger", html(
+            head(
+                title("Repeat trigger"),
+                model(
+                    mainInstance(
+                        t("data id=\"repeat-trigger\"",
+                            t("repeat",
+                                t("question")),
+                            t("select"))),
+
+                    instance("choices",
+                        item("1", "A"),
+                        item("2", "AA"),
+                        item("3", "B"),
+                        item("4", "BB"))),
+                body(
+                    repeat("/data/repeat",
+                        input("/data/repeat/question")),
+                    select1Dynamic("/data/select", "instance('choices')/root/item[value>count(/data/repeat)]")
+                )
+            )));
+
+        scenario.answer("/data/repeat[0]/question", "a");
+        assertThat(scenario.choicesOf("/data/select").size(), is(3));
+
+        scenario.answer("/data/repeat[1]/question", "b");
+        List<SelectChoice> choices = scenario.choicesOf("/data/select");
+        assertThat(choices.size(), is(2));
+        // Because of the repeat trigger in the count expression, choices should be recomputed every time they're requested
+        assertThat(scenario.choicesOf("/data/select"), not(sameInstance(choices)));
     }
     //endregion
 }
