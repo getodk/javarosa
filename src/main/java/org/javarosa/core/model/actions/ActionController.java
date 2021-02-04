@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -76,6 +78,14 @@ public class ActionController implements Externalizable {
 
     public void triggerActionsFromEvent(String event, FormDef model) {
         triggerActionsFromEvent(event, model, null, null);
+    }
+
+    public void triggerActionsFromEvent(String event, Set<IFormElement> nestedElements, FormDef model) {
+        triggerActionsFromEvent(event, model, null, null);
+
+        for (IFormElement element : nestedElements) {
+            element.getActionController().triggerActionsFromEvent(Action.EVENT_ODK_INSTANCE_FIRST_LOAD, model, ((TreeReference) element.getBind().getReference()).getParentRef(), null);
+        }
     }
 
     public void triggerActionsFromEvent(String event, FormDef model, TreeReference contextForAction,
