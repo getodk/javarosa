@@ -273,6 +273,7 @@ public class Scenario {
         );
 
         delete(tempFile);
+        deserializedFormDef.initialize(false, new InstanceInitializationFactory());
         return Scenario.from(deserializedFormDef);
     }
 

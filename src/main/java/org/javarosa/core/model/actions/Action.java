@@ -26,6 +26,11 @@ public abstract class Action implements Externalizable {
     public static final String EVENT_ODK_INSTANCE_FIRST_LOAD = "odk-instance-first-load";
 
     /**
+     * Dispatched any time a form instance is loaded.
+     */
+    public static final String EVENT_ODK_INSTANCE_LOAD = "odk-instance-load";
+
+    /**
      * @deprecated because as W3C XForms defines it, it should be dispatched any time the XForms engine is ready. In
      * JavaRosa, it was dispatched only on first load of a form instance. Use
      * {@link #EVENT_ODK_INSTANCE_FIRST_LOAD} instead.
@@ -43,10 +48,11 @@ public abstract class Action implements Externalizable {
 
     public static final String EVENT_QUESTION_VALUE_CHANGED = "xforms-value-changed";
 
-    private static final String[] ALL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_XFORMS_READY,
+    private static final String[] ALL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_ODK_INSTANCE_LOAD, EVENT_XFORMS_READY,
                         EVENT_ODK_NEW_REPEAT, EVENT_JR_INSERT, EVENT_QUESTION_VALUE_CHANGED, EVENT_XFORMS_REVALIDATE};
 
-    private static final String[] TOP_LEVEL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_XFORMS_READY, EVENT_XFORMS_REVALIDATE};
+    private static final String[] TOP_LEVEL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_ODK_INSTANCE_LOAD, EVENT_XFORMS_READY,
+        EVENT_XFORMS_REVALIDATE};
 
     private String name;
 

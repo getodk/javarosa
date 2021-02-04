@@ -1305,6 +1305,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             actionController.triggerActionsFromEvent(Action.EVENT_XFORMS_READY, elementsWithActionTriggeredByToplevelEvent, this);
         }
 
+        actionController.triggerActionsFromEvent(Action.EVENT_ODK_INSTANCE_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
+
         Collection<QuickTriggerable> qts = initializeTriggerables(TreeReference.rootRef());
         dagImpl.publishSummary("Form initialized", null, qts);
     }
