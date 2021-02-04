@@ -75,6 +75,14 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public XPathNumericLiteral randomSeedNumericExpr = null;
     public XPathPathExpr randomSeedPathExpr = null;
 
+    /**
+     * Returns a list of <code>SelectChoice</code> objects based on the data in the model. If any of the itemset expression
+     * triggers or the random seed have changed since the last request, a new list will be computed which may be time consuming.
+     * Otherwise, a cached list is returned.
+     *
+     * SIDE EFFECT: any item currently selected as part of the current question's answer that is no longer
+     * part of the new filtered list is removed and the new answer is saved back to the model.
+     */
     public List<SelectChoice> getChoices(FormDef formDef, TreeReference curQRef) {
         Map<TreeReference, IAnswerData> currentTriggerValues = getCurrentTriggerValues(formDef, curQRef);
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
