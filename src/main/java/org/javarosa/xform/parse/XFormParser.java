@@ -730,7 +730,7 @@ public class XFormParser implements IXFormParserFunctions {
                     "Must be either a child of a control element, or a child of the <model>");
             }
 
-            if (!parent.equals(_f) && event.equals(Action.EVENT_ODK_INSTANCE_FIRST_LOAD)) {
+            if (!parent.equals(_f) && Action.isTopLevelEvent(event)) {
                 _f.registerElementWithActionTriggeredByToplevelEvent((IFormElement) parent);
             }
         }

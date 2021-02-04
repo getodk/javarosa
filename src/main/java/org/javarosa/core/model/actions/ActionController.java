@@ -76,10 +76,6 @@ public class ActionController implements Externalizable {
         }
     }
 
-    public void triggerActionsFromEvent(String event, FormDef model) {
-        triggerActionsFromEvent(event, model, null, null);
-    }
-
     public void triggerActionsFromEvent(String event, Set<IFormElement> nestedElements, FormDef model) {
         triggerActionsFromEvent(event, model, null, null);
 

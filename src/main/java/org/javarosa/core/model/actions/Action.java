@@ -3,16 +3,15 @@
  */
 package org.javarosa.core.model.actions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 /**
  * @author ctsims
@@ -44,8 +43,10 @@ public abstract class Action implements Externalizable {
 
     public static final String EVENT_QUESTION_VALUE_CHANGED = "xforms-value-changed";
 
-    private static final String[] allEvents = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_XFORMS_READY,
+    private static final String[] ALL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_XFORMS_READY,
                         EVENT_ODK_NEW_REPEAT, EVENT_JR_INSERT, EVENT_QUESTION_VALUE_CHANGED, EVENT_XFORMS_REVALIDATE};
+
+    private static final String[] TOP_LEVEL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_XFORMS_READY, EVENT_XFORMS_REVALIDATE};
 
     private String name;
 
@@ -81,8 +82,17 @@ public abstract class Action implements Externalizable {
         ExtUtil.writeString(out,  name);
     }
 
-    public static boolean isValidEvent(String actionEventAttribute)  {
-        for (String event : allEvents) {
+    public static boolean isValidEvent(String actionEventAttribute) {
+        for (String event : ALL_EVENTS) {
+            if (event.equals(actionEventAttribute)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTopLevelEvent(String actionEventAttribute) {
+        for (String event : TOP_LEVEL_EVENTS) {
             if (event.equals(actionEventAttribute)) {
                 return true;
             }
