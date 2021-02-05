@@ -15,6 +15,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 import java.io.IOException;
 import org.javarosa.core.model.actions.recordaudio.RecordAudioActionHandler;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.junit.Test;
 
 public class RecordAudioActionTest {
@@ -60,7 +61,31 @@ public class RecordAudioActionTest {
 
         assertThat(listener.getActionName(), is(RecordAudioActionHandler.ELEMENT_NAME));
         assertThat(listener.getAbsoluteTargetRef(), is(getRef("/data/recording")));
+    }
 
-        Actions.unregisterActionListener(RecordAudioActionHandler.ELEMENT_NAME);
+    @Test
+    public void serializationAndDeserialization_maintainsFields() throws IOException, DeserializationException {
+        Scenario scenario = Scenario.init("Record audio form", html(
+            head(
+                title("Record audio form"),
+                model(
+                    mainInstance(
+                        t("data id=\"record-audio-form\"",
+                            t("recording"),
+                            t("q1")
+                        )),
+                    t("odk:recordaudio event=\"odk-instance-load\" ref=\"/data/recording\""))),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        CapturingXFormsActionListener listener = new CapturingXFormsActionListener();
+        Actions.registerActionListener(RecordAudioActionHandler.ELEMENT_NAME, listener);
+
+        scenario.serializeAndDeserializeForm();
+
+        assertThat(listener.getActionName(), is(RecordAudioActionHandler.ELEMENT_NAME));
+        assertThat(listener.getAbsoluteTargetRef(), is(getRef("/data/recording")));
     }
 }
