@@ -9,19 +9,18 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -38,7 +37,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.RangeQuestion;
 import org.javarosa.core.model.SubmissionProfile;
-import org.javarosa.core.model.actions.Action;
+import org.javarosa.core.model.actions.Actions;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
@@ -385,13 +384,13 @@ public class XFormParserTest {
         // Given & When
         FormDef formDef = parse(r("form-with-setvalue-action.xml"));
 
-        // dispatch 'odk-instance-first-load' event (Action.EVENT_ODK_INSTANCE_FIRST_LOAD)
+        // dispatch 'odk-instance-first-load' event (Actions.EVENT_ODK_INSTANCE_FIRST_LOAD)
         formDef.initialize(true, new InstanceInitializationFactory());
 
         // Then
         assertEquals(formDef.getTitle(), "SetValue action");
         assertNoParseErrors(formDef);
-        assertEquals(1, formDef.getActionController().getListenersForEvent(Action.EVENT_ODK_INSTANCE_FIRST_LOAD).size());
+        assertEquals(1, formDef.getActionController().getListenersForEvent(Actions.EVENT_ODK_INSTANCE_FIRST_LOAD).size());
 
         TreeElement textNode =
             formDef.getMainInstance().getRoot().getChildrenWithName("text").get(0);
