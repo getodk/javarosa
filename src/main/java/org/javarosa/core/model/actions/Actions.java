@@ -1,6 +1,10 @@
 package org.javarosa.core.model.actions;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import org.javarosa.core.model.actions.recordaudio.RecordAudioActionHandler;
+import org.javarosa.core.model.actions.recordaudio.XFormsActionListener;
 
 public class Actions {
     private Actions() { }
@@ -41,6 +45,12 @@ public class Actions {
     private static final String[] TOP_LEVEL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_ODK_INSTANCE_LOAD, EVENT_XFORMS_READY,
         EVENT_XFORMS_REVALIDATE};
 
+    /**
+     * Global registry of client classes that want to get updates about triggered actions. Addresses the need for some
+     * actions to be handled entirely client-side.
+     */
+    private static Map<String, XFormsActionListener> actionListeners = new HashMap<>();
+
     public static boolean isValidEvent(String actionEventAttribute) {
         return Arrays.asList(ALL_EVENTS).contains(actionEventAttribute);
     }
@@ -48,4 +58,22 @@ public class Actions {
     public static boolean isTopLevelEvent(String actionEventAttribute) {
         return Arrays.asList(TOP_LEVEL_EVENTS).contains(actionEventAttribute);
     }
+
+
+    public static void registerActionListener(String actionName, XFormsActionListener listener) {
+        if (!actionName.equals(RecordAudioActionHandler.ELEMENT_NAME)){
+            throw new IllegalArgumentException("Currently, only the recordaudio action notifies listeners");
+        }
+
+        actionListeners.put(actionName, listener);
+    }
+
+    public static void unregisterActionListener(String actionName) {
+        actionListeners.remove(actionName);
+    }
+
+    public static XFormsActionListener getActionListener(String actionName) {
+        return actionListeners.get(actionName);
+    }
+
 }
