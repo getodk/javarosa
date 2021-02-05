@@ -38,8 +38,8 @@ public class RecordAudioActionHandler implements IElementHandler {
 
         List<String> validEventNames = getValidEventNames(e.getAttributeValue(null, EVENT_ATTR));
         for (String eventName : validEventNames) {
-            if (!Actions.isTopLevelEvent(eventName)) {
-                throw new XFormParseException("odk:recordaudio action may only be triggered by top-level events (e.g. odk-instance-load)");
+            if (!Actions.isInstanceLoadEvent(eventName)) {
+                throw new XFormParseException("odk:recordaudio action may only be triggered by instance load events (e.g. odk-instance-load)");
             }
         }
 

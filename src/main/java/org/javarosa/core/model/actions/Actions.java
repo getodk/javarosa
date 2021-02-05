@@ -38,6 +38,8 @@ public class Actions {
     private static final String[] ALL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_ODK_INSTANCE_LOAD, EVENT_XFORMS_READY,
         EVENT_ODK_NEW_REPEAT, EVENT_JR_INSERT, EVENT_QUESTION_VALUE_CHANGED, EVENT_XFORMS_REVALIDATE};
 
+    private static final String[] INSTANCE_LOAD_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_ODK_INSTANCE_LOAD, EVENT_XFORMS_READY};
+
     private static final String[] TOP_LEVEL_EVENTS = new String[]{EVENT_ODK_INSTANCE_FIRST_LOAD, EVENT_ODK_INSTANCE_LOAD, EVENT_XFORMS_READY,
         EVENT_XFORMS_REVALIDATE};
 
@@ -47,5 +49,9 @@ public class Actions {
 
     public static boolean isTopLevelEvent(String actionEventAttribute) {
         return Arrays.asList(TOP_LEVEL_EVENTS).contains(actionEventAttribute);
+    }
+
+    public static boolean isInstanceLoadEvent(String actionEventAttribute) {
+        return Arrays.asList(INSTANCE_LOAD_EVENTS).contains(actionEventAttribute);
     }
 }
