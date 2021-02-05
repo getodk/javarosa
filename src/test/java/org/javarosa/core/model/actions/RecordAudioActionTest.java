@@ -9,6 +9,7 @@ import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
@@ -61,6 +62,32 @@ public class RecordAudioActionTest {
 
         assertThat(listener.getActionName(), is(RecordAudioActionHandler.ELEMENT_NAME));
         assertThat(listener.getAbsoluteTargetRef(), is(getRef("/data/recording")));
+    }
+
+    @Test
+    public void targetReferenceInRepeat_isContextualized() throws IOException {
+        CapturingXFormsActionListener listener = new CapturingXFormsActionListener();
+        Actions.registerActionListener(RecordAudioActionHandler.ELEMENT_NAME, listener);
+
+        Scenario.init("Record audio form", html(
+            head(
+                title("Record audio form"),
+                model(
+                    mainInstance(
+                        t("data id=\"record-audio-form\"",
+                            t("repeat",
+                                t("recording"),
+                                t("q1"))
+                        )))),
+            body(
+                repeat("/data/repeat",
+                    t("odk:recordaudio event=\"odk-instance-load\" ref=\"/data/repeat/recording\""),
+                    input("/data/repeat/q1"))
+            )
+        ));
+
+        assertThat(listener.getActionName(), is(RecordAudioActionHandler.ELEMENT_NAME));
+        assertThat(listener.getAbsoluteTargetRef(), is(getRef("/data/repeat[0]/recording")));
     }
 
     @Test

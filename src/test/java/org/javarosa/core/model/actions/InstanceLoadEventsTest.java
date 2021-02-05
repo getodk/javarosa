@@ -115,4 +115,32 @@ public class InstanceLoadEventsTest {
         scenario.createNewRepeat("/data/repeat");
         assertThat(scenario.answerOf("/data/repeat[1]/q1"), CoreMatchers.is(nullValue()));
     }
+
+    @Test
+    public void instanceLoadEvent_triggeredForAllPreExistingRepeatInstances() throws IOException {
+        Scenario scenario = Scenario.init("Nested instance load", html(
+            head(
+                title("Nested instance load"),
+                model(
+                    mainInstance(
+                        t("data id=\"nested-instance-load\"",
+                            t("repeat",
+                                t("q1")),
+                            t("repeat",
+                                t("q1"))
+                        )),
+                    bind("/data/repeat/q1").type("string"))),
+            body(
+                repeat("/data/repeat",
+                    setvalue("odk-instance-load", "/data/repeat/q1", "4*4"),
+                    input("/data/repeat/q1"))
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/repeat[0]/q1"), CoreMatchers.is(stringAnswer("16")));
+        assertThat(scenario.answerOf("/data/repeat[1]/q1"), CoreMatchers.is(stringAnswer("16")));
+
+        scenario.createNewRepeat("/data/repeat");
+        assertThat(scenario.answerOf("/data/repeat[2]/q1"), CoreMatchers.is(nullValue()));
+    }
 }
