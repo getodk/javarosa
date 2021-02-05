@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.actions.Action;
-import org.javarosa.core.model.actions.Actions;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -14,10 +13,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class RecordAudioAction extends Action {
     private TreeReference targetReference;
+    private String quality;
 
-    public RecordAudioAction(TreeReference targetReference) {
+    public RecordAudioAction(TreeReference targetReference, String quality) {
         super(RecordAudioActionHandler.ELEMENT_NAME);
         this.targetReference = targetReference;
+        this.quality = quality;
     }
 
     public RecordAudioAction() {
@@ -29,8 +30,8 @@ public class RecordAudioAction extends Action {
         TreeReference contextualizedTargetReference = contextRef == null ? this.targetReference
             : this.targetReference.contextualize(contextRef);
 
-        if (Actions.getActionListener(getName()) != null) {
-            Actions.getActionListener(getName()).actionTriggered(getName(), contextualizedTargetReference);
+        if (RecordAudioActions.getRecordAudioListener() != null) {
+            RecordAudioActions.getRecordAudioListener().recordAudioTriggered(contextualizedTargetReference, quality);
         }
 
         return contextualizedTargetReference;
@@ -42,6 +43,7 @@ public class RecordAudioAction extends Action {
         super.readExternal(in, pf);
 
         targetReference = (TreeReference) ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
+        quality = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
     }
 
     @Override
@@ -49,6 +51,7 @@ public class RecordAudioAction extends Action {
         super.writeExternal(out);
 
         ExtUtil.write(out, new ExtWrapNullable(targetReference));
+        ExtUtil.write(out, new ExtWrapNullable(quality));
     }
     //endregion
 }

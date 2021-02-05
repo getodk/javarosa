@@ -25,6 +25,7 @@ public class RecordAudioActionHandler implements IElementHandler {
             throw new XFormParseException("recordaudio action must be in http://www.opendatakit.org/xforms namespace");
         }
 
+        String quality = e.getAttributeValue("http://www.opendatakit.org/xforms", "quality");
         String ref = e.getAttributeValue(null, "ref");
 
         if (ref == null) {
@@ -42,7 +43,7 @@ public class RecordAudioActionHandler implements IElementHandler {
             }
         }
 
-        RecordAudioAction action = new RecordAudioAction(target);
+        RecordAudioAction action = new RecordAudioAction(target, quality);
 
         // XFormParser.parseAction already ensures parent is an IFormElement so we can safely cast
         ((IFormElement) parent).getActionController().registerEventListener(validEventNames, action);
