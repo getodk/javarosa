@@ -80,7 +80,7 @@ public class ActionController implements Externalizable {
         triggerActionsFromEvent(event, model, null, null);
 
         for (IFormElement element : nestedElements) {
-            element.getActionController().triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_FIRST_LOAD, model, ((TreeReference) element.getBind().getReference()).getParentRef(), null);
+            element.getActionController().triggerActionsFromEvent(event, model, ((TreeReference) element.getBind().getReference()).getParentRef(), null);
         }
     }
 
