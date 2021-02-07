@@ -66,7 +66,8 @@ public interface XFormsElement {
         return t("h:html " +
                         "xmlns=\"http://www.w3.org/2002/xforms\" " +
                         "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
-                        "xmlns:jr=\"http://openrosa.org/javarosa\"",
+                        "xmlns:jr=\"http://openrosa.org/javarosa\" " +
+                        "xmlns:odk=\"http://www.opendatakit.org/xforms\"",
                 children
         );
     }

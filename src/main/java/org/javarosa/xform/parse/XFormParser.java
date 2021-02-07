@@ -70,7 +70,9 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.actions.Action;
 import org.javarosa.core.model.actions.ActionController;
+import org.javarosa.core.model.actions.Actions;
 import org.javarosa.core.model.actions.SetValueAction;
+import org.javarosa.core.model.actions.recordaudio.RecordAudioActionHandler;
 import org.javarosa.core.model.actions.setgeopoint.SetGeopointActionHandler;
 import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointActionHandler;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -319,6 +321,9 @@ public class XFormParser implements IXFormParserFunctions {
         // Register a stub odk:setgeopoint action handler. Clients that want to actually collect location need to
         // register their own subclass handler which will replace this one.
         registerActionHandler(SetGeopointActionHandler.ELEMENT_NAME, new StubSetGeopointActionHandler());
+
+        // Clients that want to record audio must register an action listener with Actions.registerActionListener
+        registerActionHandler(RecordAudioActionHandler.ELEMENT_NAME, new RecordAudioActionHandler());
     }
 
     private void initState() {
@@ -704,8 +709,8 @@ public class XFormParser implements IXFormParserFunctions {
                 parseSubmission(child);
             } else {
                 // For now, anything that isn't a submission is an action
-                if (actionHandlers.containsKey(name) && child.getAttributeValue(null, EVENT_ATTR).equals(Action.EVENT_ODK_NEW_REPEAT)) {
-                    throw new XFormParseException("Actions triggered by " + Action.EVENT_ODK_NEW_REPEAT + " must be nested in the repeat form control.", child);
+                if (actionHandlers.containsKey(name) && child.getAttributeValue(null, EVENT_ATTR).equals(Actions.EVENT_ODK_NEW_REPEAT)) {
+                    throw new XFormParseException("Actions triggered by " + Actions.EVENT_ODK_NEW_REPEAT + " must be nested in the repeat form control.", child);
                 } else {
                     actionHandlers.get(name).handle(this, child, _f);
                 }
@@ -730,7 +735,7 @@ public class XFormParser implements IXFormParserFunctions {
                     "Must be either a child of a control element, or a child of the <model>");
             }
 
-            if (!parent.equals(_f) && event.equals(Action.EVENT_ODK_INSTANCE_FIRST_LOAD)) {
+            if (!parent.equals(_f) && Actions.isTopLevelEvent(event)) {
                 _f.registerElementWithActionTriggeredByToplevelEvent((IFormElement) parent);
             }
         }
@@ -744,7 +749,7 @@ public class XFormParser implements IXFormParserFunctions {
         List<String> validEvents = new ArrayList<>();
         List<String> invalidEventList = new ArrayList<>();
         for (String event : eventsString.split(" "))
-            if (Action.isValidEvent(event))
+            if (Actions.isValidEvent(event))
                 validEvents.add(event);
             else
                 invalidEventList.add(event);
