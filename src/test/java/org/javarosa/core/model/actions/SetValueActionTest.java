@@ -203,7 +203,7 @@ public class SetValueActionTest {
                         t("a-field", "12")
                     )),
                     bind("/data/a-field").type("int"),
-                    setvalueLiteral("odk-instance-first-load", "/data/a-field", "")
+                    setvalue("odk-instance-first-load", "/data/a-field")
                 )
             ),
             body(
