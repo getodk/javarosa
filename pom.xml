@@ -5,7 +5,7 @@
   <!-- Be sure to update version in build.gradle to match -->
   <!-- snapshot release = x.x.x-SNAPSHOT -->
   <!-- production release = x.x.x -->
-  <version>3.1.0-SNAPSHOT</version>
+  <version>3.1.0</version>
   <packaging>jar</packaging>
   <name>javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
