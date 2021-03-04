@@ -260,8 +260,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
     public void localeChanged(String locale, Localizer localizer) {
         if (latestFilteredChoiceList != null) {
-            for (int i = 0; i < latestFilteredChoiceList.size(); i++) {
-                latestFilteredChoiceList.get(i).localeChanged(locale, localizer);
+            for (SelectChoice selectChoice : latestFilteredChoiceList) {
+                selectChoice.localeChanged(locale, localizer);
             }
         }
     }

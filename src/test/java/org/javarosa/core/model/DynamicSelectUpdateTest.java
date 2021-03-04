@@ -123,7 +123,7 @@ public class DynamicSelectUpdateTest {
                 title("Select from repeat"),
                 model(
                     mainInstance(
-                        t("data id=\"repeat-select\"",
+                        t("data id='repeat-select'",
                             t("repeat",
                                 t("value"),
                                 t("label")),
@@ -144,12 +144,12 @@ public class DynamicSelectUpdateTest {
     // When a dynamic select is in a repeat, the itemsets for all repeat instances are represented by the same ItemsetBinding.
     @Test
     public void selectInRepeat_withPredicate_evaluatesChoiceListForEachRepeatInstance() throws Exception {
-        Scenario scenario = Scenario.init("Select from repeat", html(
+        Scenario scenario = Scenario.init("Select in repeat", html(
             head(
                 title("Select in repeat"),
                 model(
                     mainInstance(
-                        t("data id=\"repeat-select\"",
+                        t("data id='repeat-select'",
                             t("repeat",
                                 t("select"),
                                 t("filter")))),
@@ -158,12 +158,11 @@ public class DynamicSelectUpdateTest {
                         item("a", "A"),
                         item("aa", "AA"),
                         item("b", "B"),
-                        item("bb", "BB"))),
-                body(
-                    repeat("/data/repeat",
-                        select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"),
-                        input("filter"))
-                )
+                        item("bb", "BB")))),
+            body(
+                repeat("/data/repeat",
+                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"),
+                    input("filter"))
             )));
 
         scenario.answer("/data/repeat[0]/filter", "a");
@@ -180,29 +179,29 @@ public class DynamicSelectUpdateTest {
     //region Multi-language
     @Test
     public void multilanguage() throws Exception {
-        Scenario scenario = Scenario.init("Select from repeat", html(
+        Scenario scenario = Scenario.init("Multilingual dynamic select", html(
             head(
                 title("Multilingual dynamic select"),
                 model(
                     t("itext",
-                        t("translation lang=\"fr\"",
-                            t("text id=\"choices-0\"",
+                        t("translation lang='fr'",
+                            t("text id='choices-0'",
                                 t("value", "A (fr)")),
-                            t("text id=\"choices-1\"",
+                            t("text id='choices-1'",
                                 t("value", "B (fr)")),
-                            t("text id=\"choices-2\"",
+                            t("text id='choices-2'",
                                 t("value", "C (fr)"))
                         ),
-                        t("translation lang=\"en\"",
-                            t("text id=\"choices-0\"",
+                        t("translation lang='en'",
+                            t("text id='choices-0'",
                                 t("value", "A (en)")),
-                            t("text id=\"choices-1\"",
+                            t("text id='choices-1'",
                                 t("value", "B (en)")),
-                            t("text id=\"choices-2\"",
+                            t("text id='choices-2'",
                                 t("value", "C (en)"))
                         )),
                     mainInstance(
-                        t("data id=\"multilingual-select\"",
+                        t("data id='multilingual-select'",
                             t("select"))),
 
                     instance("choices",
@@ -230,7 +229,7 @@ public class DynamicSelectUpdateTest {
                 title("Select"),
                 model(
                     mainInstance(
-                        t("data id=\"select\"",
+                        t("data id='select'",
                             t("filter"),
                             t("select"))),
 
@@ -238,11 +237,10 @@ public class DynamicSelectUpdateTest {
                         item("aa", "A"),
                         item("aaa", "AA"),
                         item("bb", "B"),
-                        item("bbb", "BB"))),
-                body(
-                    input("/data/filter"),
-                    select1Dynamic("/data/select", "instance('choices')/root/item[starts-with(value,/data/filter)]")
-                )
+                        item("bbb", "BB")))),
+            body(
+                input("/data/filter"),
+                select1Dynamic("/data/select", "instance('choices')/root/item[starts-with(value,/data/filter)]")
             )));
 
         scenario.answer("/data/filter", "a");
@@ -257,7 +255,7 @@ public class DynamicSelectUpdateTest {
                 title("Select"),
                 model(
                     mainInstance(
-                        t("data id=\"select\"",
+                        t("data id='select'",
                             t("filter"),
                             t("select"))),
 
@@ -265,11 +263,10 @@ public class DynamicSelectUpdateTest {
                         item("aa", "A"),
                         item("aaa", "AA"),
                         item("bb", "B"),
-                        item("bbb", "BB"))),
-                body(
-                    input("/data/filter"),
-                    select1Dynamic("/data/select", "instance('choices')/root/item[starts-with(value,/data/filter)]")
-                )
+                        item("bbb", "BB")))),
+            body(
+                input("/data/filter"),
+                select1Dynamic("/data/select", "instance('choices')/root/item[starts-with(value,/data/filter)]")
             )));
 
         scenario.answer("/data/filter", "a");
@@ -293,7 +290,7 @@ public class DynamicSelectUpdateTest {
                 title("Repeat trigger"),
                 model(
                     mainInstance(
-                        t("data id=\"repeat-trigger\"",
+                        t("data id='repeat-trigger'",
                             t("repeat",
                                 t("question")),
                             t("select"))),
@@ -302,13 +299,13 @@ public class DynamicSelectUpdateTest {
                         item("1", "A"),
                         item("2", "AA"),
                         item("3", "B"),
-                        item("4", "BB"))),
+                        item("4", "BB")))),
                 body(
                     repeat("/data/repeat",
                         input("/data/repeat/question")),
                     select1Dynamic("/data/select", "instance('choices')/root/item[value>count(/data/repeat)]")
                 )
-            )));
+            ));
 
         scenario.answer("/data/repeat[0]/question", "a");
         assertThat(scenario.choicesOf("/data/select").size(), is(3));
