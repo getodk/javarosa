@@ -571,15 +571,15 @@ public class TriggerableDagTest {
                     )),
                     bind("/data/q0").relevant("/data/selectYesNo = 'yes'"),
                     bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
-                ),
-                body(
-                    select1("/data/selectYesNo",
-                        item("yes", "Yes"),
-                        item("no", "No")),
-                    repeat("/data/repeat1",
-                        input("/data/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                select1("/data/selectYesNo",
+                    item("yes", "Yes"),
+                    item("no", "No")),
+                repeat("/data/repeat1",
+                    input("/data/repeat1/q1")
+                )
+            )));
 
         scenario.jumpToBeginningOfForm();
         scenario.next();
@@ -807,11 +807,11 @@ public class TriggerableDagTest {
                     bind("/data/repeat/position_2").calculate("/data/repeat/position * 2"),
                     bind("/data/repeat/other").calculate("2 * 2"),
                     // concat needs to be evaluated after /data/repeat/other has a value
-                    bind("/data/repeat/concatenated").calculate("concat(../position_2, '-', ../other)")),
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/concatenated"))
-                ))));
+                    bind("/data/repeat/concatenated").calculate("concat(../position_2, '-', ../other)"))),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/concatenated"))
+            )));
 
         scenario.next();
         scenario.next();
@@ -839,13 +839,13 @@ public class TriggerableDagTest {
                             t("inner-count"))
                     )),
                     bind("/data/count").type("int").calculate("count(/data/repeat)"),
-                    bind("/data/repeat/inner-count").type("int").calculate("/data/count")),
+                    bind("/data/repeat/inner-count").type("int").calculate("/data/count"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                )))).onDagEvent(dagEvents::add);
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/question")
+                )
+            ))).onDagEvent(dagEvents::add);
 
         dagEvents.clear();
 
@@ -880,13 +880,13 @@ public class TriggerableDagTest {
                             t("inner-count"))
                     )),
                     bind("/data/count").type("int").calculate("count(/data/repeat)"),
-                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)")),
+                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/question")
+                )
+            )));
 
         range(0, 5).forEach(n -> {
             scenario.next();
@@ -916,13 +916,13 @@ public class TriggerableDagTest {
                             t("question"),
                             t("inner-count"))
                     )),
-                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)")),
+                    bind("/data/repeat/inner-count").type("int").calculate("count(/data/repeat)"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/question")
+                )
+            )));
 
         range(0, 5).forEach(n -> {
             scenario.next();
@@ -949,13 +949,13 @@ public class TriggerableDagTest {
                             t("question"),
                             t("inner-count"))
                     )),
-                    bind("/data/repeat/inner-count").type("int").calculate("count(../../repeat)")),
+                    bind("/data/repeat/inner-count").type("int").calculate("count(../../repeat)"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/question")
+                )
+            )));
 
         range(0, 5).forEach(n -> {
             scenario.next();
@@ -987,13 +987,13 @@ public class TriggerableDagTest {
                     )),
                     bind("/data/sum").type("int").calculate("sum(/data/repeat/position1)"),
                     bind("/data/repeat/position1").type("int").calculate("position(..)"),
-                    bind("/data/repeat/position2").type("int").calculate("/data/repeat/position1")),
+                    bind("/data/repeat/position2").type("int").calculate("/data/repeat/position1"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/position1")
-                    )
-                ))));
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/position1")
+                )
+            )));
 
         range(0, 5).forEach(n -> {
             scenario.next();
@@ -1417,11 +1417,11 @@ public class TriggerableDagTest {
                             t("question"))
                     )),
                     bind("/data/repeat-count").type("int").calculate("count(/data/repeat)")
-                ),
-                body(
-                    repeat("/data/repeat",
-                        input("question"))
-                ))));
+                )),
+            body(
+                repeat("/data/repeat",
+                    input("question"))
+            )));
 
         assertThat(scenario.answerOf("/data/repeat-count"), is(intAnswer(3)));
 
@@ -1446,11 +1446,11 @@ public class TriggerableDagTest {
                             t("question", "c"))
                     )),
                     bind("/data/summary").type("string").calculate("concat(/data/repeat/question)")
-                ),
-                body(
-                    repeat("/data/repeat",
-                        input("question"))
-                ))));
+                )),
+            body(
+                repeat("/data/repeat",
+                    input("question"))
+            )));
 
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("abc")));
 
@@ -1555,13 +1555,13 @@ public class TriggerableDagTest {
                             t("question", "5"),
                             t("inner-sum"))
                     )),
-                    bind("/data/repeat/inner-sum").type("int").calculate("sum(../../repeat/question)")),
+                    bind("/data/repeat/inner-sum").type("int").calculate("sum(../../repeat/question)"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/question")
+                )
+            )));
 
         range(0, 5).forEach(n -> {
             scenario.next();
@@ -1597,13 +1597,13 @@ public class TriggerableDagTest {
                             t("inner-sum"))
                     )),
                     bind("/data/sum").type("int").calculate("sum(/data/repeat/question)"),
-                    bind("/data/repeat/inner-sum").type("int").calculate("/data/sum")),
+                    bind("/data/repeat/inner-sum").type("int").calculate("/data/sum"))),
 
-                body(
-                    repeat("/data/repeat",
-                        input("/data/repeat/question")
-                    )
-                ))));
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/question")
+                )
+            )));
 
         range(0, 5).forEach(n -> {
             scenario.next();

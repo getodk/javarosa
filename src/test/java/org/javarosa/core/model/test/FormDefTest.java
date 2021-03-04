@@ -107,15 +107,15 @@ public class FormDefTest {
                             t("q1"))
                     )),
                     bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
-                ),
-                body(
-                    select1("/data/selectYesNo",
-                        item("yes", "Yes"),
-                        item("no", "No")),
-                    repeat("/data/repeat1",
-                        input("/data/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                select1("/data/selectYesNo",
+                    item("yes", "Yes"),
+                    item("no", "No")),
+                repeat("/data/repeat1",
+                    input("/data/repeat1/q1")
+                )
+            )));
         FormDef formDef = scenario.getFormDef();
 
         assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
@@ -135,12 +135,12 @@ public class FormDefTest {
                             t("q1"))
                     )),
                     bind("/data/repeat1").relevant("false()")
-                ),
-                body(
-                    repeat("/data/repeat1",
-                        input("/data/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                repeat("/data/repeat1",
+                    input("/data/repeat1/q1")
+                )
+            )));
         FormDef formDef = scenario.getFormDef();
 
         assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
@@ -162,15 +162,15 @@ public class FormDefTest {
                         )
                     )),
                     bind("/data/outer").relevant("/data/selectYesNo = 'yes'")
-                ),
-                body(
-                    select1("/data/selectYesNo",
-                        item("yes", "Yes"),
-                        item("no", "No")),
-                    repeat("/data/outer/inner/repeat1",
-                        input("/data/outer/inner/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                select1("/data/selectYesNo",
+                    item("yes", "Yes"),
+                    item("no", "No")),
+                repeat("/data/outer/inner/repeat1",
+                    input("/data/outer/inner/repeat1/q1")
+                )
+            )));
         FormDef formDef = scenario.getFormDef();
 
         assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
@@ -195,12 +195,12 @@ public class FormDefTest {
                         )
                     )),
                     bind("/data/outer").relevant("false()")
-                ),
-                body(
-                    repeat("/data/outer/inner/repeat1",
-                        input("/data/outer/inner/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                repeat("/data/outer/inner/repeat1",
+                    input("/data/outer/inner/repeat1/q1")
+                )
+            )));
         FormDef formDef = scenario.getFormDef();
 
         assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
@@ -230,15 +230,15 @@ public class FormDefTest {
                     )),
                     bind("/data/relevance-condition").type("string"),
                     bind("/data/outer/inner").relevant("position(..) mod 2 = /data/relevance-condition")
+                )),
+            body(
+                repeat("/data/outer",
+                    repeat("/data/outer/inner",
+                        input("/data/outer/inner/q1")
+                    )
                 ),
-                body(
-                    repeat("/data/outer",
-                        repeat("/data/outer/inner",
-                            input("/data/outer/inner/q1")
-                        )
-                    ),
-                    input("/data/relevance-condition")
-                ))));
+                input("/data/relevance-condition")
+            )));
 
 
         scenario.next();

@@ -52,16 +52,16 @@ public class FormEntryModelTest {
                         )),
                     bind("/data/outer").relevant("/data/outerYesNo = 'yes'"),
                     bind("/data/outer/inner").relevant("/data/innerYesNo = 'yes'")
+                )),
+            body(
+                group("/data/outer",
+                    group("/data/outer/inner",
+                        input("/data/outer/inner/q1")
+                    )
                 ),
-                body(
-                    group("/data/outer",
-                        group("/data/outer/inner",
-                            input("/data/outer/inner/q1")
-                        )
-                    ),
-                    input("/data/outerYesNo"),
-                    input("/data/innerYesNo")
-                ))));
+                input("/data/outerYesNo"),
+                input("/data/innerYesNo")
+            )));
         FormDef formDef = scenario.getFormDef();
         FormEntryModel formEntryModel = new FormEntryModel(formDef);
 
