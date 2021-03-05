@@ -140,42 +140,6 @@ public class DynamicSelectUpdateTest {
     }
     //endregion
 
-    //region Select in repeat
-    // When a dynamic select is in a repeat, the itemsets for all repeat instances are represented by the same ItemsetBinding.
-    @Test
-    public void selectInRepeat_withPredicate_evaluatesChoiceListForEachRepeatInstance() throws Exception {
-        Scenario scenario = Scenario.init("Select in repeat", html(
-            head(
-                title("Select in repeat"),
-                model(
-                    mainInstance(
-                        t("data id='repeat-select'",
-                            t("repeat",
-                                t("select"),
-                                t("filter")))),
-
-                    instance("choices",
-                        item("a", "A"),
-                        item("aa", "AA"),
-                        item("b", "B"),
-                        item("bb", "BB")))),
-            body(
-                repeat("/data/repeat",
-                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"),
-                    input("filter"))
-            )));
-
-        scenario.answer("/data/repeat[0]/filter", "a");
-        scenario.answer("/data/repeat[1]/filter", "a");
-        assertThat(scenario.choicesOf("/data/repeat[0]/select").size(), is(2));
-        assertThat(scenario.choicesOf("/data/repeat[1]/select").size(), is(2));
-
-        scenario.answer("/data/repeat[1]/filter", "bb");
-        assertThat(scenario.choicesOf("/data/repeat[0]/select").size(), is(2));
-        assertThat(scenario.choicesOf("/data/repeat[1]/select").size(), is(1));
-    }
-    //endregion
-
     //region Multi-language
     @Test
     public void multilanguage() throws Exception {
@@ -316,5 +280,119 @@ public class DynamicSelectUpdateTest {
         // Because of the repeat trigger in the count expression, choices should be recomputed every time they're requested
         assertThat(scenario.choicesOf("/data/select"), not(sameInstance(choices)));
     }
+
+    //region Caching for selects in repeat
+    // When a dynamic select is in a repeat, the itemsets for all repeat instances are represented by the same ItemsetBinding.
+    @Test
+    public void selectInRepeat_withRefToRepeatChildInPredicate_evaluatesChoiceListForEachRepeatInstance() throws Exception {
+        Scenario scenario = Scenario.init("Select in repeat", html(
+            head(
+                title("Select in repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("repeat",
+                                t("select"),
+                                t("filter")))),
+
+                    instance("choices",
+                        item("a", "A"),
+                        item("aa", "AA"),
+                        item("b", "B"),
+                        item("bb", "BB")))),
+            body(
+                repeat("/data/repeat",
+                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"),
+                    input("filter"))
+            )));
+
+        scenario.answer("/data/repeat[0]/filter", "a");
+        scenario.answer("/data/repeat[1]/filter", "a");
+        List<SelectChoice> repeat0Choices = scenario.choicesOf("/data/repeat[0]/select");
+        List<SelectChoice> repeat1Choices = scenario.choicesOf("/data/repeat[1]/select");
+
+        // The trigger keys are /data/repeat[0]/filter and /data/repeat[1]/filter which means no caching between them
+        assertThat(repeat0Choices, not(sameInstance(repeat1Choices)));
+
+        scenario.answer("/data/repeat[1]/filter", "bb");
+        assertThat(scenario.choicesOf("/data/repeat[0]/select").size(), is(2));
+        assertThat(scenario.choicesOf("/data/repeat[1]/select").size(), is(1));
+    }
+
+    @Test
+    public void selectInRepeat_withRootRefInPredicate_returnsCachedChoiceListUnlessRootValueChanges() throws Exception {
+        Scenario scenario = Scenario.init("Select in repeat", html(
+            head(
+                title("Select in repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("filter"),
+                            t("repeat",
+                                t("select")))),
+
+                    instance("choices",
+                        item("a", "A"),
+                        item("aa", "AA"),
+                        item("b", "B"),
+                        item("bb", "BB")))),
+            body(
+                input("filter"),
+                repeat("/data/repeat",
+                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,/data/filter)]"))
+            )));
+
+        scenario.answer("/data/filter", "a");
+        scenario.createNewRepeat("/data/repeat");
+
+        List<SelectChoice> repeat0Choices = scenario.choicesOf("/data/repeat[0]/select");
+        List<SelectChoice> repeat1Choices = scenario.choicesOf("/data/repeat[1]/select");
+        assertThat(repeat0Choices, sameInstance(repeat1Choices));
+
+        scenario.answer("/data/filter", "bb");
+        assertThat(scenario.choicesOf("/data/repeat[0]/select").size(), is(1));
+    }
+
+    @Test
+    public void selectInNestedRepeat_withPredicateWithOuterRef_returnsCachedChoiceListForSameOuterRepeatInstance() throws Exception {
+        Scenario scenario = Scenario.init("Select in repeat", html(
+            head(
+                title("Select in repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("outer",
+                                t("filter"),
+                                t("inner",
+                                    t("select"))))),
+
+                    instance("choices",
+                        item("a", "A"),
+                        item("aa", "AA"),
+                        item("b", "B"),
+                        item("bb", "BB")))),
+            body(
+                repeat("/data/outer",
+                    input("filter"),
+                    repeat("/data/outer/inner",
+                        select1Dynamic("/data/outer/inner/select", "instance('choices')/root/item[starts-with(value,current()/../../filter)]"))
+            ))));
+
+        scenario.answer("/data/outer[0]/filter", "a");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.answer("/data/outer[1]/filter", "a");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+
+        List<SelectChoice> outer0Inner0Choices = scenario.choicesOf("/data/outer[0]/inner[0]/select");
+        List<SelectChoice> outer0Inner1Choices = scenario.choicesOf("/data/outer[0]/inner[1]/select");
+        assertThat(outer0Inner0Choices, sameInstance(outer0Inner1Choices));
+
+        List<SelectChoice> outer1Inner0Choices = scenario.choicesOf("/data/outer[1]/inner[0]/select");
+        List<SelectChoice> outer1Inner1Choices = scenario.choicesOf("/data/outer[1]/inner[1]/select");
+        assertThat(outer1Inner0Choices, sameInstance(outer1Inner1Choices));
+        assertThat(outer1Inner0Choices, not(sameInstance(outer0Inner0Choices)));
+    }
+    //endregion
     //endregion
 }
