@@ -1361,7 +1361,7 @@ public class XFormParser implements IXFormParserFunctions {
                             String questionType = !isMultipleItems ? SELECTONE :
                                 (q.getControlType() == CONTROL_SELECT_MULTI ? SELECT : RANK);
                             triggerWarning(questionType + " question <value>s [" + value + "] " +
-                                    (isMultipleItems ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks",
+                                    (isMultipleItems ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostrophes/quotation marks",
                                 getVagueLocation(child));
                             break;
                         }
