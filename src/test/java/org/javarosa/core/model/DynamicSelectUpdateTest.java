@@ -127,16 +127,15 @@ public class DynamicSelectUpdateTest {
                             t("repeat",
                                 t("value"),
                                 t("label")),
-                            t("select"),
-                            t("filter"))))),
+                            t("filter"),
+                            t("select"))))),
             body(
                 repeat("/data/repeat",
                     input("value"),
                     input("label")),
-                select1Dynamic("/data/select", "../repeat" + (!predicate.isEmpty() ? "[" + predicate + "]" : "")),
-                input("filter")
-            )
-        );
+                input("filter"),
+                select1Dynamic("/data/select", "../repeat" + (!predicate.isEmpty() ? "[" + predicate + "]" : ""))
+            ));
     }
     //endregion
 
@@ -292,8 +291,8 @@ public class DynamicSelectUpdateTest {
                     mainInstance(
                         t("data id='repeat-select'",
                             t("repeat",
-                                t("select"),
-                                t("filter")))),
+                                t("filter"),
+                                t("select")))),
 
                     instance("choices",
                         item("a", "A"),
@@ -302,8 +301,8 @@ public class DynamicSelectUpdateTest {
                         item("bb", "BB")))),
             body(
                 repeat("/data/repeat",
-                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"),
-                    input("filter"))
+                    input("filter"),
+                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"))
             )));
 
         scenario.answer("/data/repeat[0]/filter", "a");
