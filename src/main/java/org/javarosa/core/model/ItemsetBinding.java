@@ -41,11 +41,11 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 
 public class ItemsetBinding implements Externalizable, Localizable {
     // Temporarily cached filtered list (not serialized)
-    private List<SelectChoice> latestFilteredChoiceList;
+    private List<SelectChoice> cachedFilteredChoiceList;
 
     // Values needed to determine whether the cached list should be expired (not serialized)
-    private Map<TreeReference, IAnswerData> latestTriggerValues;
-    private Long latestRandomizeSeed;
+    private Map<TreeReference, IAnswerData> cachedTriggerValues;
+    private Long cachedRandomizeSeed;
 
     /**
      * note that storing both the ref and expr for everything is kind of redundant, but we're forced
@@ -90,9 +90,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
 
         // Return cached list if possible
-        if (latestFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, latestTriggerValues)
-            && Objects.equals(currentRandomizeSeed, latestRandomizeSeed)) {
-            return randomize && latestRandomizeSeed == null ? shuffle(latestFilteredChoiceList) : latestFilteredChoiceList;
+        if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
+            && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)) {
+            return randomize && cachedRandomizeSeed == null ? shuffle(cachedFilteredChoiceList) : cachedFilteredChoiceList;
         }
 
         formDef.getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
@@ -127,7 +127,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         updateQuestionAnswerInModel(formDef, curQRef, currentAnswersInNewChoices);
 
-        latestFilteredChoiceList = randomize ? shuffle(choices, currentRandomizeSeed) : choices;
+        cachedFilteredChoiceList = randomize ? shuffle(choices, currentRandomizeSeed) : choices;
 
         // TODO: write a test that fails if this is removed. It looks like a no-op because it's not accessing the shuffled collection.
         if (randomize) {
@@ -145,10 +145,10 @@ public class ItemsetBinding implements Externalizable, Localizable {
             }
         }
 
-        latestTriggerValues = currentTriggerValues;
-        latestRandomizeSeed = currentRandomizeSeed;
+        cachedTriggerValues = currentTriggerValues;
+        cachedRandomizeSeed = currentRandomizeSeed;
 
-        return latestFilteredChoiceList;
+        return cachedFilteredChoiceList;
     }
 
     /**
@@ -262,8 +262,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     public void localeChanged(String locale, Localizer localizer) {
-        if (latestFilteredChoiceList != null) {
-            for (SelectChoice selectChoice : latestFilteredChoiceList) {
+        if (cachedFilteredChoiceList != null) {
+            for (SelectChoice selectChoice : cachedFilteredChoiceList) {
                 selectChoice.localeChanged(locale, localizer);
             }
         }
