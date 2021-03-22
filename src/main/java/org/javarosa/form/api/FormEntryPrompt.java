@@ -52,7 +52,6 @@ public class FormEntryPrompt extends FormEntryCaption {
     private static final Logger logger = LoggerFactory.getLogger(FormEntryPrompt.class);
 
     TreeElement mTreeElement;
-    boolean dynamicChoicesPopulated = false;
 
     /**
      * This empty constructor exists for convenience of any supertypes of this prompt
@@ -95,63 +94,52 @@ public class FormEntryPrompt extends FormEntryCaption {
         ItemsetBinding itemset = q.getDynamicChoices();
         if (itemset != null) {
             if (itemset.valueRef != null) {
-            List<SelectChoice> choices = getSelectChoices();
-            List<String> preselectedValues = new ArrayList<String>();
+                List<SelectChoice> choices = getSelectChoices();
 
-                //determine which selections are already present in the answer
-                if (itemset.copyMode) {
+                if (!itemset.copyMode) {
+                    // The call to get a list of choices filters out answer options that don't exist anymore.
+                    return mTreeElement.getValue();
+                } else {
+                    // TODO: add tests for copy mode
+                    List<String> preselectedValues = new ArrayList<String>();
+
                     TreeReference destRef = itemset.getDestRef().contextualize(mTreeElement.getRef());
-               List<TreeReference> subNodes = form.getEvaluationContext().expandReference(destRef);
+                    List<TreeReference> subNodes = form.getEvaluationContext().expandReference(destRef);
                     for (int i = 0; i < subNodes.size(); i++) {
                         TreeElement node = form.getMainInstance().resolveReference(subNodes.get(i));
                         String value = itemset.getRelativeValue().evalReadable(form.getMainInstance(), new EvaluationContext(form.getEvaluationContext(), node.getRef()));
                         preselectedValues.add(value);
                     }
-                } else {
-               List<Selection> sels;
-                    IAnswerData data = mTreeElement.getValue();
-                    if (data instanceof MultipleItemsData) {
-                        sels = (List<Selection>)data.getValue();
-                    } else if (data instanceof SelectOneData) {
-                        sels = new ArrayList<Selection>(1);
-                        sels.add((Selection)data.getValue());
-                    } else {
-                        sels = new ArrayList<Selection>(0);
-                    }
-                    for (int i = 0; i < sels.size(); i++) {
-                        preselectedValues.add(sels.get(i).xmlValue);
-                    }
-                }
 
-                //populate 'selection' with the corresponding choices (matching 'value') from the dynamic choiceset
-            List<Selection> selection = new ArrayList<Selection>();
-                for (int i = 0; i < preselectedValues.size(); i++) {
-                    String value = preselectedValues.get(i);
-                    SelectChoice choice = null;
-                    for (int j = 0; j < choices.size(); j++) {
-                        SelectChoice ch = choices.get(j);
-                        if (value.equals(ch.getValue())) {
-                            choice = ch;
-                            break;
+                    //populate 'selection' with the corresponding choices (matching 'value') from the dynamic choiceset
+                    List<Selection> selection = new ArrayList<Selection>();
+                    for (int i = 0; i < preselectedValues.size(); i++) {
+                        String value = preselectedValues.get(i);
+                        SelectChoice choice = null;
+                        for (int j = 0; j < choices.size(); j++) {
+                            SelectChoice ch = choices.get(j);
+                            if (value.equals(ch.getValue())) {
+                                choice = ch;
+                                break;
+                            }
+                        }
+                        //if it's a dynamic question, then there's a good choice what they selected last time
+                        //will no longer be an option this go around
+                        if (choice != null) {
+                            selection.add(choice.selection());
                         }
                     }
-                    //if it's a dynamic question, then there's a good choice what they selected last time
-                    //will no longer be an option this go around
-                    if(choice != null)
-                    {
-                        selection.add(choice.selection());
-                    }
-                }
 
-                //convert to IAnswerData
-                if (selection.size() == 0) {
-                    return null;
-                } else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI || q.getControlType() == Constants.CONTROL_RANK) {
-                    return new MultipleItemsData(selection);
-                } else if (q.getControlType() == Constants.CONTROL_SELECT_ONE) {
-                    return new SelectOneData(selection.get(0)); //do something if more than one selected?
-                } else {
-                    throw new RuntimeException("can't happen");
+                    //convert to IAnswerData
+                    if (selection.size() == 0) {
+                        return null;
+                    } else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI || q.getControlType() == Constants.CONTROL_RANK) {
+                        return new MultipleItemsData(selection);
+                    } else if (q.getControlType() == Constants.CONTROL_SELECT_ONE) {
+                        return new SelectOneData(selection.get(0)); //do something if more than one selected?
+                    } else {
+                        throw new RuntimeException("can't happen");
+                    }
                 }
             } else {
                 return null; //cannot map up selections without <value>
@@ -173,12 +161,12 @@ public class FormEntryPrompt extends FormEntryCaption {
             //csims@dimagi.com - Aug 11, 2010 - Added special logic to
             //capture and display the appropriate value for selections
             //and multi-selects.
-            if(data instanceof SelectOneData) {
-                text = this.getSelectItemText((Selection)data.getValue());
-            } else if(data  instanceof MultipleItemsData) {
+            if (data instanceof SelectOneData) {
+                text = this.getSelectItemText((Selection) data.getValue());
+            } else if (data instanceof MultipleItemsData) {
                 StringBuilder b = new StringBuilder();
-            List<Selection> values = (List<Selection>)data.getValue();
-                for(Selection value : values) {
+                List<Selection> values = (List<Selection>) data.getValue();
+                for (Selection value : values) {
                     b.append(this.getSelectItemText(value)).append(" ");
                 }
                 text = b.toString();
@@ -186,9 +174,9 @@ public class FormEntryPrompt extends FormEntryCaption {
                 text = data.getDisplayText();
             }
 
-            if(getControlType() == Constants.CONTROL_SECRET) {
+            if (getControlType() == Constants.CONTROL_SECRET) {
                 StringBuilder b = new StringBuilder();
-                for(int i =0 ; i < text.length() ; ++i ) {
+                for (int i = 0; i < text.length(); ++i) {
                     b.append("*");
                 }
                 text = b.toString();
@@ -231,25 +219,11 @@ public class FormEntryPrompt extends FormEntryCaption {
 
         ItemsetBinding itemset = q.getDynamicChoices();
         if (itemset != null) {
-            if (!dynamicChoicesPopulated) {
-                form.populateDynamicChoices(itemset, mTreeElement.getRef());
-                dynamicChoicesPopulated = true;
-            }
-            return itemset.getChoices();
+            return itemset.getChoices(form, mTreeElement.getRef());
         } else { //static choices
             return q.getChoices();
         }
     }
-
-    public void expireDynamicChoices () {
-        dynamicChoicesPopulated = false;
-        ItemsetBinding itemset = getQuestion().getDynamicChoices();
-        if (itemset != null) {
-            itemset.clearChoices();
-        }
-    }
-
-
 
     public boolean isRequired() {
         return mTreeElement.isRequired();
@@ -318,7 +292,8 @@ public class FormEntryPrompt extends FormEntryCaption {
 
 
     /**
-     * Attempts to return the specified Item (from a select or 1select) text.
+     * Attempts to return the specified item text from a STATIC select or select1. Does NOT
+     * support dynamic selects ({@see ItemsetBinding}).
      * Will check for text in the following order:<br/>
      * Localized Text (long form) -> Localized Text (no special form) <br />
      * If no textID is available, method will return this item's labelInnerText.
@@ -329,20 +304,22 @@ public class FormEntryPrompt extends FormEntryCaption {
      */
     public String getSelectItemText(Selection sel){
         //throw tantrum if this method is called when it shouldn't be or sel==null
-        if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
-        if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
+        if (!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
+        if (sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
 
         //Just in case the selection hasn't had a chance to be initialized yet.
-        if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+        if (sel.index == -1) {
+            sel.attachChoice(this.getQuestion());
+        }
 
         //check for the null id case and return labelInnerText if it is so.
         String tid = sel.choice.getTextID();
-        if(tid == null || tid.length() == 0) return substituteStringArgs(sel.choice.getLabelInnerText());
+        if (tid == null || tid.length() == 0) return substituteStringArgs(sel.choice.getLabelInnerText());
 
         //otherwise check for 'long' form of the textID, then for the default form and return
         String returnText;
         returnText = getIText(tid, "long");
-        if(returnText == null) returnText = getIText(tid,null);
+        if (returnText == null) returnText = getIText(tid, null);
 
         return substituteStringArgs(returnText);
     }

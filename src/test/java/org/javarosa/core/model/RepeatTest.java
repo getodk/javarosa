@@ -32,12 +32,12 @@ public class RepeatTest {
                             t("q1"))
                     )),
                     bind("/data/repeat1").relevant("false()")
-                ),
-                body(
-                    repeat("/data/repeat1",
-                        input("/data/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                repeat("/data/repeat1",
+                    input("/data/repeat1/q1")
+                )
+            )));
 
         scenario.jumpToBeginningOfForm();
 
@@ -57,15 +57,15 @@ public class RepeatTest {
                             t("q1"))
                     )),
                     bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
-                ),
-                body(
-                    select1("/data/selectYesNo",
-                        item("yes", "Yes"),
-                        item("no", "No")),
-                    repeat("/data/repeat1",
-                        input("/data/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                select1("/data/selectYesNo",
+                    item("yes", "Yes"),
+                    item("no", "No")),
+                repeat("/data/repeat1",
+                    input("/data/repeat1/q1")
+                )
+            )));
 
         scenario.jumpToBeginningOfForm();
         scenario.answer("/data/selectYesNo", "no");
@@ -88,15 +88,15 @@ public class RepeatTest {
                     )),
                     bind("/data/q0").relevant("/data/selectYesNo = 'yes'"),
                     bind("/data/repeat1").relevant("/data/selectYesNo = 'yes'")
-                ),
-                body(
-                    select1("/data/selectYesNo",
-                        item("yes", "Yes"),
-                        item("no", "No")),
-                    repeat("/data/repeat1",
-                        input("/data/repeat1/q1")
-                    )
-                ))));
+                )),
+            body(
+                select1("/data/selectYesNo",
+                    item("yes", "Yes"),
+                    item("no", "No")),
+                repeat("/data/repeat1",
+                    input("/data/repeat1/q1")
+                )
+            )));
 
         scenario.jumpToBeginningOfForm();
         scenario.next();

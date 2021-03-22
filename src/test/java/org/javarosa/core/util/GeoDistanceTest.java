@@ -137,7 +137,9 @@ public class GeoDistanceTest {
                     bind("/data/point5").type("geopoint"),
                     bind("/data/concat").type("string").calculate("concat(/data/point1, ';', /data/point2, ';', /data/point3, ';', /data/point4, ';', /data/point5)"),
                     bind("/data/distance").type("decimal").calculate("distance(/data/concat)")
-                )
+                )),
+            body(
+                input("/data/point1")
             )
         ));
 

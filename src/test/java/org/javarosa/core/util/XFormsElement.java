@@ -62,22 +62,22 @@ public interface XFormsElement {
         return new StringLiteralXFormsElement(parseName(name), parseAttributes(name), innerHtml);
     }
 
-    static XFormsElement html(XFormsElement... children) {
+    static XFormsElement html(HeadXFormsElement head, BodyXFormsElement body) {
         return t("h:html " +
                         "xmlns=\"http://www.w3.org/2002/xforms\" " +
                         "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
                         "xmlns:jr=\"http://openrosa.org/javarosa\" " +
                         "xmlns:odk=\"http://www.opendatakit.org/xforms\"",
-                children
+                head, body
         );
     }
 
-    static XFormsElement head(XFormsElement... children) {
-        return t("h:head", children);
+    static HeadXFormsElement head(XFormsElement... children) {
+        return new HeadXFormsElement(children);
     }
 
-    static XFormsElement body(XFormsElement... children) {
-        return t("h:body", children);
+    static BodyXFormsElement body(XFormsElement... children) {
+        return new BodyXFormsElement(children);
     }
 
     static XFormsElement title(String innerHTML) {
@@ -92,6 +92,9 @@ public interface XFormsElement {
         return t("instance", children);
     }
 
+    static XFormsElement instance(String name, XFormsElement... children) {
+        return t("instance id=\"" + name + "\"", t("root", children));
+    }
 
     static XFormsElement input(String ref, XFormsElement... children) {
         return t("input ref=\"" + ref + "\"", children);
@@ -99,6 +102,17 @@ public interface XFormsElement {
 
     static XFormsElement select1(String ref, XFormsElement... children) {
         return t("select1 ref=\"" + ref + "\"", children);
+    }
+
+    static XFormsElement select1Dynamic(String ref, String nodesetRef) {
+        return select1Dynamic(ref, nodesetRef, "value", "label");
+    }
+
+    static XFormsElement select1Dynamic(String ref, String nodesetRef, String valueRef, String labelRef) {
+        return t("select1 ref=\"" + ref + "\"",
+            t("itemset nodeset=\"" + nodesetRef + "\"",
+                t("value ref=\"" + valueRef + "\""),
+                t("label ref=\"" + labelRef + "\"")));
     }
 
     static XFormsElement group(String ref, XFormsElement... children) {
@@ -138,5 +152,17 @@ public interface XFormsElement {
 
     static XFormsElement setvalueLiteral(String event, String ref, String innerHtml) {
         return t("setvalue event=\"" + event + "\" ref=\"" + ref + "\"", innerHtml);
+    }
+
+    class HeadXFormsElement extends TagXFormsElement {
+        public HeadXFormsElement(XFormsElement[] children) {
+            super("h:head", emptyMap(), Arrays.asList(children));
+        }
+    }
+
+    class BodyXFormsElement extends TagXFormsElement {
+        public BodyXFormsElement(XFormsElement[] children) {
+            super("h:body", emptyMap(), Arrays.asList(children));
+        }
     }
 }

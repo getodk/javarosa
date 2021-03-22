@@ -45,7 +45,7 @@ public class FormDefValidateBenchmark {
                 //Resolve Dynamic Choices
                 ItemsetBinding itemsetBinding = question.getDynamicChoices();
                 if (itemsetBinding != null) {
-                    formDef.populateDynamicChoices(itemsetBinding, (TreeReference) question.getBind().getReference());
+                    itemsetBinding.getChoices(formDef, (TreeReference) question.getBind().getReference());
                 }
                 IAnswerData answer = BenchmarkUtils.getStubAnswer(formEntryPrompt.getQuestion());
                 formEntryController.answerQuestion(questionIndex, answer, true);

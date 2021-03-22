@@ -122,6 +122,9 @@ public class GeoAreaTest {
                     bind("/data/concat").type("string").calculate("concat(/data/point1, ';', /data/point2, ';', /data/point3, ';', /data/point4, ';', /data/point5)"),
                     bind("/data/area").type("decimal").calculate("area(/data/concat)")
                 )
+            ),
+            body(
+                input("/data/point1")
             )
         ));
 
