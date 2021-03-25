@@ -1,5 +1,6 @@
 # java
 *.class
+.java-version
 
 # gradle
 .gradle
