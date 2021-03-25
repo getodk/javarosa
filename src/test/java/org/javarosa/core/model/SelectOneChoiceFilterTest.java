@@ -142,12 +142,12 @@ public class SelectOneChoiceFilterTest {
             choice("baa")));
         scenario.answer("/data/level3_contains", "aab");
         scenario.answer("/data/level2_contains", "ab");
-        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("aab")));
+        assertThat(scenario.answerOf("/data/level3_contains").getDisplayText(), is("aab"));
 
-        // Since populateDynamicChoices can change answers, verify it doesn't in this case
+        // Since recomputing the choice list can change answers, verify it doesn't in this case
         assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
             choice("aab"),
             choice("bab")));
-        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("aab")));
+        assertThat(scenario.answerOf("/data/level3_contains").getDisplayText(), is("aab"));
     }
 }

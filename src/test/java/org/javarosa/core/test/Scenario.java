@@ -804,6 +804,10 @@ public class Scenario {
         return model.getQuestionPrompt().getQuestion();
     }
 
+    public FormEntryPrompt getFormEntryPromptAtIndex() {
+        return model.getQuestionPrompt();
+    }
+
     // endregion
 
     // region Inspect the main instance

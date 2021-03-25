@@ -40,8 +40,6 @@ import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
 
-
-
 /**
  * This class gives you all the information you need to display a question when
  * your current FormIndex references a QuestionEvent.
@@ -289,27 +287,25 @@ public class FormEntryPrompt extends FormEntryCaption {
 
     }
 
-
-
     /**
-     * Attempts to return the specified item text from a STATIC select or select1. Does NOT
-     * support dynamic selects ({@see ItemsetBinding}).
+     * Attempts to return the specified item text from a select or select1.
+     *
      * Will check for text in the following order:<br/>
      * Localized Text (long form) -> Localized Text (no special form) <br />
      * If no textID is available, method will return this item's labelInnerText.
+     *
      * @param sel the selection (item), if <code>null</code> will throw a IllegalArgumentException
      * @return Question Text.  <code>null</code> if no text for this element exists (after all fallbacks).
-     * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+     * @throws RuntimeException if this method is called on an element that is NOT a QuestionDef
      * @throws IllegalArgumentException if Selection is <code>null</code>
      */
-    public String getSelectItemText(Selection sel){
-        //throw tantrum if this method is called when it shouldn't be or sel==null
+    public String getSelectItemText(Selection sel) {
         if (!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
         if (sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
 
-        //Just in case the selection hasn't had a chance to be initialized yet.
+        // Just in case the selection hasn't had a chance to be initialized yet.
         if (sel.index == -1) {
-            sel.attachChoice(this.getQuestion());
+            sel.attachChoice(getQuestion());
         }
 
         //check for the null id case and return labelInnerText if it is so.
@@ -325,7 +321,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     /**
-     * @see getSelectItemText(Selection sel)
+     * @see #getSelectItemText(Selection sel)
      */
     public String getSelectChoiceText(SelectChoice selection){
         return getSelectItemText(selection.selection());
@@ -338,7 +334,7 @@ public class FormEntryPrompt extends FormEntryCaption {
      * @param sel - The Item whose text you're trying to retrieve.
      * @param form - Special text form of Item you're trying to retrieve.
      * @return Special Form Text. <code>null</code> if no text for this element exists (with the specified special form).
-     * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+     * @throws RuntimeException if this method is called on an element that is NOT a QuestionDef
      * @throws IllegalArgumentException if <code>sel == null</code>
      */
     public String getSpecialFormSelectItemText(Selection sel,String form){
