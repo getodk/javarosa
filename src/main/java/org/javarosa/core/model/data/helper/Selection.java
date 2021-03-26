@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.util.Objects;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -133,5 +134,20 @@ public class Selection implements Externalizable {
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeString(out, getValue());
         ExtUtil.writeNumeric(out, index);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Selection selection = (Selection) o;
+        return index == selection.index &&
+            Objects.equals(xmlValue, selection.xmlValue) &&
+            Objects.equals(choice, selection.choice);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(xmlValue, index, choice);
     }
 }

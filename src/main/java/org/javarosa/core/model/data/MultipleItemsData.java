@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Objects;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -130,5 +131,18 @@ public class MultipleItemsData implements IAnswerData {
             v.add(new Selection(s));
         }
         return new MultipleItemsData(v);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MultipleItemsData that = (MultipleItemsData) o;
+        return Objects.equals(vs, that.vs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vs);
     }
 }
