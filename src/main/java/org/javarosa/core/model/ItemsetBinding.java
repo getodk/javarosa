@@ -115,18 +115,19 @@ public class ItemsetBinding implements Externalizable, Localizable {
             throw new XPathException("Could not find references depended on by" + nodesetRef.getInstanceName());
         }
 
-        Map<String, SelectChoice> currentAnswersInNewChoices = initializeCurrentAnswerMap(formDef, curQRef);
+        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
 
         List<SelectChoice> choices = new ArrayList<>();
         for (int i = 0; i < filteredItemReferences.size(); i++) {
             SelectChoice choice = getChoiceForTreeReference(formDef, formInstance, i, filteredItemReferences.get(i));
             choices.add(choice);
-            if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.containsKey(choice.getValue())) {
-                currentAnswersInNewChoices.put(choice.getValue(), choice);
+            if (selectChoicesForAnswer != null && selectChoicesForAnswer.containsKey(choice.getValue())) {
+                // Keys with values that don't get set here will have null values and must be filtered out of the answer.
+                selectChoicesForAnswer.put(choice.getValue(), choice);
             }
         }
 
-        updateQuestionAnswerInModel(formDef, curQRef, currentAnswersInNewChoices);
+        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
         cachedFilteredChoiceList = randomize ? shuffle(choices, currentRandomizeSeed) : choices;
 
@@ -202,39 +203,41 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     /**
-     * Build a map with keys for each value in the current answer. This will allow us to remove answers that are no
-     * longer available for selection because of an updated filter and to bind selection(s) in the IAnswerData to Selection
-     * objects. The latter is necessary to get label text for the answers.
+     * Build a map with keys for each value in the current answer, each mapped to null.
+     *
+     * When we iterate over the new filtered choice list, we will update the values in this map. Keys with null values
+     * after this process will be removed from the answer. We will also use this map to bind selection(s) in the IAnswerData
+     * to Selection objects. The latter is necessary to get label text for the answers.
      */
-    private Map<String, SelectChoice> initializeCurrentAnswerMap(FormDef formDef, TreeReference curQRef) {
-        Map<String, SelectChoice> currentAnswersInNewChoices = null;
+    private Map<String, SelectChoice> initializeAnswerMap(FormDef formDef, TreeReference curQRef) {
+        Map<String, SelectChoice> selectChoicesForAnswer = null;
         IAnswerData rawValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
         if (rawValue != null) {
-            currentAnswersInNewChoices = new HashMap<>();
+            selectChoicesForAnswer = new HashMap<>();
 
             if (rawValue instanceof MultipleItemsData) {
                 for (Selection selection : (List<Selection>) rawValue.getValue()) {
-                    currentAnswersInNewChoices.put(selection.choice != null ? selection.choice.getValue() : selection.xmlValue, null);
+                    selectChoicesForAnswer.put(selection.choice != null ? selection.choice.getValue() : selection.xmlValue, null);
                 }
             } else {
-                currentAnswersInNewChoices.put(rawValue.getDisplayText(), null);
+                selectChoicesForAnswer.put(rawValue.getDisplayText(), null);
             }
         }
 
-        return currentAnswersInNewChoices;
+        return selectChoicesForAnswer;
     }
 
-    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, SelectChoice> currentAnswersInNewChoices) {
+    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, SelectChoice> selectChoicesForAnswer) {
         IAnswerData originalValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
 
-        if (currentAnswersInNewChoices != null) {
+        if (selectChoicesForAnswer != null) {
             IAnswerData boundAndFilteredValue;
             if (originalValue instanceof MultipleItemsData) {
-                boundAndFilteredValue = getFilteredAndBoundSelections((MultipleItemsData) originalValue, currentAnswersInNewChoices);
-            } else if (currentAnswersInNewChoices.containsValue(null)) {
+                boundAndFilteredValue = getFilteredAndBoundSelections((MultipleItemsData) originalValue, selectChoicesForAnswer);
+            } else if (selectChoicesForAnswer.containsValue(null)) {
                 boundAndFilteredValue = new StringData("");
             } else {
-                SelectChoice selectChoice = currentAnswersInNewChoices.get(originalValue.getDisplayText());
+                SelectChoice selectChoice = selectChoicesForAnswer.get(originalValue.getDisplayText());
                 boundAndFilteredValue = new SelectOneData(selectChoice.selection());
             }
 
@@ -244,17 +247,18 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
     /**
      * @param selections          an answer to a multiple selection question
-     * @param selectChoicesToKeep maps each value that could be in @{code selections} to a SelectChoice if it should be bound
+     * @param selectChoicesForAnswer maps each value that could be in @{code selections} to a SelectChoice if it should be bound
      *                            or null if it should be removed.
-     * @return a copy of {@code selections} without the values that were mapped to false in {@code selectChoicesToKeep} and
+     * @return a copy of {@code selections} without the values that were mapped to null in {@code selectChoicesForAnswer} and
      * with all selections bound.
      */
-    private static MultipleItemsData getFilteredAndBoundSelections(MultipleItemsData selections, Map<String, SelectChoice> selectChoicesToKeep) {
+    private static MultipleItemsData getFilteredAndBoundSelections(MultipleItemsData selections, Map<String, SelectChoice> selectChoicesForAnswer) {
         List<Selection> newSelections = new ArrayList<>();
         for (Selection oldSelection : (List<Selection>) selections.getValue()) {
             String key = oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue;
-            if (selectChoicesToKeep.get(key) != null) {
-                newSelections.add(selectChoicesToKeep.get(key).selection());
+            SelectChoice selectChoice = selectChoicesForAnswer.get(key);
+            if (selectChoice != null) {
+                newSelections.add(selectChoice.selection());
             }
         }
 
