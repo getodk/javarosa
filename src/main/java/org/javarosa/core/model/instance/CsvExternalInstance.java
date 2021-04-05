@@ -1,35 +1,36 @@
 package org.javarosa.core.model.instance;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.javarosa.core.model.data.UncastData;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 public class CsvExternalInstance {
     public static TreeElement parse(String instanceId, String path) throws IOException {
-        TreeElement root = new TreeElement("root", 0);
+        final TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        String csvLine = br.readLine();
+        final CSVParser csvParser = CSVParser.parse(Paths.get(path),
+            StandardCharsets.UTF_8, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        final String[] fieldNames = csvParser.getHeaderMap().keySet().toArray(new String[0]);
+        int multiplicity = 0;
 
-        if (csvLine != null) {
-            String[] fieldNames = csvLine.split(",");
-            int multiplicity = 0;
+        for (CSVRecord csvRecord : csvParser.getRecords()) {
+            TreeElement item = new TreeElement("item", multiplicity);
 
-            while ((csvLine = br.readLine()) != null) {
-                TreeElement item = new TreeElement("item", multiplicity);
-                String[] data = csvLine.split(",");
-                for (int i = 0; i < fieldNames.length; ++i) {
-                    TreeElement field = new TreeElement(fieldNames[i], 0);
-                    field.setValue(new UncastData(i < data.length ? data[i] : ""));
-
-                    item.addChild(field);
-                }
-
-                root.addChild(item);
-                multiplicity++;
+            for (int i = 0; i < fieldNames.length; ++i) {
+                TreeElement field = new TreeElement(fieldNames[i], 0);
+                field.setValue(new UncastData(i < csvRecord.size() ? csvRecord.get(i) : ""));
+                item.addChild(field);
             }
+
+            root.addChild(item);
+            multiplicity++;
         }
+
         return root;
     }
 }
