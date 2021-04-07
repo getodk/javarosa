@@ -18,7 +18,6 @@ import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -235,7 +234,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
             if (originalValue instanceof MultipleItemsData) {
                 boundAndFilteredValue = getFilteredAndBoundSelections((MultipleItemsData) originalValue, selectChoicesForAnswer);
             } else if (selectChoicesForAnswer.containsValue(null)) {
-                boundAndFilteredValue = new StringData("");
+                boundAndFilteredValue = null;
             } else {
                 SelectChoice selectChoice = selectChoicesForAnswer.get(originalValue.getDisplayText());
                 boundAndFilteredValue = new SelectOneData(selectChoice.selection());
