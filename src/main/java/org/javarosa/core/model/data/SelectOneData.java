@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.util.Objects;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -88,5 +89,18 @@ public class SelectOneData implements IAnswerData {
     @Override
     public SelectOneData cast(UncastData data) throws IllegalArgumentException {
         return new SelectOneData(new Selection(data.value));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SelectOneData that = (SelectOneData) o;
+        return Objects.equals(s, that.s);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(s);
     }
 }

@@ -17,7 +17,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
-import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -114,18 +114,19 @@ public class ItemsetBinding implements Externalizable, Localizable {
             throw new XPathException("Could not find references depended on by" + nodesetRef.getInstanceName());
         }
 
-        Map<String, Boolean> currentAnswersInNewChoices = initializeCurrentAnswerMap(formDef, curQRef);
+        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
 
         List<SelectChoice> choices = new ArrayList<>();
         for (int i = 0; i < filteredItemReferences.size(); i++) {
             SelectChoice choice = getChoiceForTreeReference(formDef, formInstance, i, filteredItemReferences.get(i));
             choices.add(choice);
-            if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.containsKey(choice.getValue())) {
-                currentAnswersInNewChoices.put(choice.getValue(), true);
+            if (selectChoicesForAnswer != null && selectChoicesForAnswer.containsKey(choice.getValue())) {
+                // Keys with values that don't get set here will have null values and must be filtered out of the answer.
+                selectChoicesForAnswer.put(choice.getValue(), choice);
             }
         }
 
-        updateQuestionAnswerInModel(formDef, curQRef, currentAnswersInNewChoices);
+        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
         cachedFilteredChoiceList = randomize ? shuffle(choices, currentRandomizeSeed) : choices;
 
@@ -200,53 +201,63 @@ public class ItemsetBinding implements Externalizable, Localizable {
         return choice;
     }
 
-    // Build a map with keys for each value in the current answer. This will allow us to remove answers that are no
-    // longer available for selection because of an updated filter.
-    private Map<String, Boolean> initializeCurrentAnswerMap(FormDef formDef, TreeReference curQRef) {
-        Map<String, Boolean> currentAnswersInNewChoices = null;
+    /**
+     * Build a map with keys for each value in the current answer, each mapped to null.
+     *
+     * When we iterate over the new filtered choice list, we will update the values in this map. Keys with null values
+     * after this process will be removed from the answer. We will also use this map to bind selection(s) in the IAnswerData
+     * to Selection objects. The latter is necessary to get label text for the answers.
+     */
+    private Map<String, SelectChoice> initializeAnswerMap(FormDef formDef, TreeReference curQRef) {
+        Map<String, SelectChoice> selectChoicesForAnswer = null;
         IAnswerData rawValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
         if (rawValue != null) {
-            currentAnswersInNewChoices = new HashMap<>();
+            selectChoicesForAnswer = new HashMap<>();
 
             if (rawValue instanceof MultipleItemsData) {
                 for (Selection selection : (List<Selection>) rawValue.getValue()) {
-                    currentAnswersInNewChoices.put(selection.choice != null ? selection.choice.getValue() : selection.xmlValue, false);
+                    selectChoicesForAnswer.put(selection.choice != null ? selection.choice.getValue() : selection.xmlValue, null);
                 }
             } else {
-                currentAnswersInNewChoices.put(rawValue.getDisplayText(), false);
+                selectChoicesForAnswer.put(rawValue.getDisplayText(), null);
             }
         }
 
-        return currentAnswersInNewChoices;
+        return selectChoicesForAnswer;
     }
 
-    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, Boolean> currentAnswersInNewChoices) {
-        IAnswerData rawValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
+    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, SelectChoice> selectChoicesForAnswer) {
+        IAnswerData originalValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
 
-        if (currentAnswersInNewChoices != null && currentAnswersInNewChoices.containsValue(false)) {
-            IAnswerData filteredAnswer;
-            if (rawValue instanceof MultipleItemsData) {
-                filteredAnswer = getFilteredSelections((MultipleItemsData) rawValue, currentAnswersInNewChoices);
+        if (selectChoicesForAnswer != null) {
+            IAnswerData boundAndFilteredValue;
+            if (originalValue instanceof MultipleItemsData) {
+                boundAndFilteredValue = getFilteredAndBoundSelections((MultipleItemsData) originalValue, selectChoicesForAnswer);
+            } else if (selectChoicesForAnswer.containsValue(null)) {
+                boundAndFilteredValue = null;
             } else {
-                filteredAnswer = new StringData("");
+                SelectChoice selectChoice = selectChoicesForAnswer.get(originalValue.getDisplayText());
+                boundAndFilteredValue = new SelectOneData(selectChoice.selection());
             }
 
-            formDef.getMainInstance().resolveReference(curQRef).setAnswer(filteredAnswer);
+            formDef.getMainInstance().resolveReference(curQRef).setAnswer(boundAndFilteredValue);
         }
     }
 
     /**
      * @param selections          an answer to a multiple selection question
-     * @param shouldKeepSelection maps each value that could be in @{code selections} to a boolean representing whether
-     *                            or not it should be kept
-     * @return a copy of {@code selections} without the values that were mapped to false in {@code shouldKeepSelection}
+     * @param selectChoicesForAnswer maps each value that could be in @{code selections} to a SelectChoice if it should be bound
+     *                            or null if it should be removed.
+     * @return a copy of {@code selections} without the values that were mapped to null in {@code selectChoicesForAnswer} and
+     * with all selections bound.
      */
-    private static MultipleItemsData getFilteredSelections(MultipleItemsData selections, Map<String, Boolean> shouldKeepSelection) {
+    private static MultipleItemsData getFilteredAndBoundSelections(MultipleItemsData selections, Map<String, SelectChoice> selectChoicesForAnswer) {
         List<Selection> newSelections = new ArrayList<>();
         for (Selection oldSelection : (List<Selection>) selections.getValue()) {
             String key = oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue;
-            if (shouldKeepSelection.get(key)) {
-                newSelections.add(oldSelection);
+            SelectChoice selectChoice = selectChoicesForAnswer.get(key);
+            if (selectChoice != null) {
+                newSelections.add(selectChoice.selection());
             }
         }
 

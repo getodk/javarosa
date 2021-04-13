@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.util.Objects;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -92,5 +93,18 @@ public class DecimalData implements IAnswerData {
         } catch(NumberFormatException nfe) {
             throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Decimal");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DecimalData that = (DecimalData) o;
+        return Double.compare(that.d, d) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(d);
     }
 }

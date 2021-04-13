@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import java.util.Objects;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -99,5 +100,18 @@ public class IntegerData implements IAnswerData {
         return "IntegerData{" +
             "n=" + n +
             '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntegerData that = (IntegerData) o;
+        return n == that.n;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(n);
     }
 }

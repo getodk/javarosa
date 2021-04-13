@@ -20,10 +20,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
+import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 
 import org.javarosa.core.test.Scenario;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -106,8 +108,34 @@ public class SelectOneChoiceFilterTest {
         assertThat(scenario.choicesOf("/data/level2"), empty());
         // this next assertion is only true because the one before called populateDynamic choices
         // TODO: make clearing out answers that are no longer available choices part of the form re-evaluation
-        assertThat(scenario.answerOf("/data/level2"), is(stringAnswer("")));
+        assertThat(scenario.answerOf("/data/level2"), nullValue());
         assertThat(scenario.choicesOf("/data/level3"), empty());
+    }
+
+    @Test
+    public void clearingValueAtLevel1_ShouldClearValuesAtLevels2And3() {
+        scenario.newInstance();
+        assertThat(scenario.answerOf("/data/level2"), nullValue());
+        assertThat(scenario.answerOf("/data/level3"), nullValue());
+
+        scenario.answer("/data/level1", "a");
+        scenario.answer("/data/level2", "aa");
+        scenario.answer("/data/level3", "aab");
+
+        scenario.answer("/data/level1", "");
+
+        ValidateOutcome validate = scenario.getValidationOutcome();
+        Assert.assertThat(validate.failedPrompt, is(scenario.indexOf("/data/level2")));
+        Assert.assertThat(validate.outcome, is(ANSWER_REQUIRED_BUT_EMPTY));
+
+        // If we set level2 to "aa", form validation passes. Currently, clearing a choice only updates filter expressions
+        // that directly depend on it. With this form, we could force clearing the third level when the first level is cleared
+        // by making the level3 filter expression in the form definition reference level1 AND level2.
+        scenario.answer("/data/level2", "bb");
+
+        validate = scenario.getValidationOutcome();
+        Assert.assertThat(validate.failedPrompt, is(scenario.indexOf("/data/level3")));
+        Assert.assertThat(validate.outcome, is(ANSWER_REQUIRED_BUT_EMPTY));
     }
 
     @Test
@@ -127,7 +155,7 @@ public class SelectOneChoiceFilterTest {
             choice("bab")));
         // this next assertion is only true because the one before called populateDynamicChoices
         // TODO: make clearing out answers that are no longer available choices part of the form re-evaluation
-        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("")));
+        assertThat(scenario.answerOf("/data/level3_contains"), nullValue());
     }
 
     @Test
@@ -142,12 +170,12 @@ public class SelectOneChoiceFilterTest {
             choice("baa")));
         scenario.answer("/data/level3_contains", "aab");
         scenario.answer("/data/level2_contains", "ab");
-        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("aab")));
+        assertThat(scenario.answerOf("/data/level3_contains").getDisplayText(), is("aab"));
 
-        // Since populateDynamicChoices can change answers, verify it doesn't in this case
+        // Since recomputing the choice list can change answers, verify it doesn't in this case
         assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
             choice("aab"),
             choice("bab")));
-        assertThat(scenario.answerOf("/data/level3_contains"), is(stringAnswer("aab")));
+        assertThat(scenario.answerOf("/data/level3_contains").getDisplayText(), is("aab"));
     }
 }
