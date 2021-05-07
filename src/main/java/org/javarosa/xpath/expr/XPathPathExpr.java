@@ -150,7 +150,8 @@ public class XPathPathExpr extends XPathExpression {
                     }
                 } else {
                     //We only support expression root contexts for instance refs, everything else is an illegal filter
-                    throw new XPathUnsupportedException("filter expression");
+                    // We can end up here for a variety of reasons including missing a boolean operator.
+                    throw new XPathUnsupportedException("filter expression: " + this.toString());
                 }
 
                 break;
