@@ -120,7 +120,7 @@ public class Selection implements Externalizable {
         if (xmlValue != null && xmlValue.length() > 0) {
             return xmlValue;
         } else {
-            throw new RuntimeException("don't know xml value! perhaps selection was stored as index only and has not yet been linked up to a formdef?");
+            throw new RuntimeException("This choice is not valid. If you are using an external file, please make sure it has the expected columns (usually name and label).");
         }
     }
 

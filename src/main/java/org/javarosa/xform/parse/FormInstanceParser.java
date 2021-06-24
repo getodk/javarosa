@@ -19,6 +19,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -344,13 +345,16 @@ class FormInstanceParser {
                 fi = instance;
             }
 
-
-            if (fi.getTemplatePath(itemset.labelRef) == null) {
-                throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
-            }
-            //check value nodes exist
-            else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
-                throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
+            // Don't try to validate references if the external instance could not be resolved. We allow parsing a form
+            // with placeholder external secondary instances for cases where a ReferenceManager can't be configured.
+            if (fi instanceof ExternalDataInstance && !((ExternalDataInstance) fi).isUsingPlaceholder()) {
+                if (fi.getTemplatePath(itemset.labelRef) == null) {
+                    throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
+                }
+                //check value nodes exist
+                else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
+                    throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
+                }
             }
         }
     }

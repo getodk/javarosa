@@ -2,12 +2,14 @@ package org.javarosa.core.model.instance;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
@@ -18,7 +20,9 @@ import org.xmlpull.v1.XmlPullParserException;
 // This is still a work in progress.
 
 public class ExternalDataInstance extends DataInstance {
-    private static final Logger logger = LoggerFactory.getLogger(ExternalDataInstance.class.getSimpleName());
+    public static final TreeElement PLACEHOLDER_ROOT = new TreeElement("missing file", 0);
+    private static final Logger logger = LoggerFactory.getLogger(XFormParser.class.getSimpleName());
+
     private String path;
     private TreeElement root;
 
@@ -38,20 +42,29 @@ public class ExternalDataInstance extends DataInstance {
     }
 
     /**
-     * Builds an ExternalDataInstance
+     * Builds an ExternalDataInstance by parsing the file at the given location or fills in a placeholder if the file
+     * can't be found or derived.
+     *
+     * The placeholder makes it possible to successfully parse a form without an external
+     * instance in cases where a client isn't providing a form-filling interface (e.g. form validation or discovery).
      *
      * @param instanceSrc the value of the instance’s src attribute, e.g., jr://file/…
      * @param instanceId  the ID of the new instance
      * @return a new ExternalDataInstance
-     * @throws IOException                       if FileInputStream can’t find the file, or ElementParser can’t read the stream
-     * @throws InvalidReferenceException         if the ReferenceManager in getPath(String srcLocation) can’t derive a reference
+     * @throws IOException                       if ElementParser can’t read the stream
      * @throws UnfullfilledRequirementsException thrown by {@link TreeElementParser#parse()}
      * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
      * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
      */
     public static ExternalDataInstance build(String instanceSrc, String instanceId)
-        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException, InvalidReferenceException {
-        TreeElement root = parseExternalInstance(instanceSrc, instanceId);
+        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+        TreeElement root;
+        try {
+            root = parseExternalInstance(instanceSrc, instanceId);
+        } catch (FileNotFoundException | InvalidReferenceException e) {
+            logger.info("External instance not found, falling back to placeholder");
+            root = PLACEHOLDER_ROOT;
+        }
         return new ExternalDataInstance(root, instanceId, instanceSrc);
     }
 
@@ -72,6 +85,10 @@ public class ExternalDataInstance extends DataInstance {
             throw new RuntimeException("root node has no children");
 
         return root.getChildAt(0);
+    }
+
+    public boolean isUsingPlaceholder() {
+        return getRoot().equals(PLACEHOLDER_ROOT);
     }
 
     private void setRoot(TreeElement topLevel) {
