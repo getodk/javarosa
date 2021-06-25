@@ -64,6 +64,7 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
+import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
@@ -531,6 +532,10 @@ public class Scenario {
      */
     public AnswerResult answer(List<String> values) {
         return answer(new MultipleItemsData(values.stream().map(Selection::new).collect(Collectors.toList())));
+    }
+
+    public AnswerResult answer(SelectChoice choice) {
+        return answer(new SelectOneData(choice.selection()));
     }
 
     /**

@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id "me.champeau.gradle.jmh" version "0.5.0"
+    id "me.champeau.jmh" version "0.6.5"
 }
 
 repositories {
@@ -31,13 +31,13 @@ sourceCompatibility = '1.8'
 
 dependencies {
     // Be sure to update dependencies in pom.xml to match
-    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
-    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+    implementation 'joda-time:joda-time:2.10.10'
+    implementation 'org.slf4j:slf4j-api:1.7.31'
+    compileOnly 'net.sf.kxml:kxml2:2.3.0'
+    testImplementation 'ch.qos.logback:logback-classic:1.2.3'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'net.sf.kxml:kxml2:2.3.0'
+    testImplementation 'org.hamcrest:hamcrest-all:1.3'
 }
 
 jacocoTestReport {
@@ -80,10 +80,9 @@ jmhJar.doFirst {
 }
 
 jmh {
-    exclude = ["(BenchmarkTemplate)"]
+    excludes = ["(BenchmarkTemplate)"]
     threads = 1
     fork = 1
-    timeout = '10s'
     warmup = '2s'
     warmupIterations = 10
     warmupBatchSize = 1
@@ -96,12 +95,12 @@ jmh {
     resultFormat = 'CSV'
     forceGC = true
 
-    duplicateClassesStrategy = 'warn'
+    duplicateClassesStrategy = DuplicatesStrategy.WARN
 }
 
 /**
  * Returns the value of a property of this build if it exists. Otherwise,
- * returns the provided devault value.
+ * returns the provided default value.
  *
  * This method is used as a safe way to get properties that might or might not
  * be defined in the gradle.properties file.

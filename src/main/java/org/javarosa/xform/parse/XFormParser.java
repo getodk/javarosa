@@ -86,7 +86,6 @@ import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.model.osm.OSMTagItem;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.CacheTable;
@@ -501,11 +500,10 @@ public class XFormParser implements IXFormParserFunctions {
                 // instance() call
                 if (referencedInstanceIds.contains(instanceId)) {
                     if (instanceSrc != null) {
-                        final ExternalDataInstance externalDataInstance;
+                        ExternalDataInstance externalDataInstance;
                         try {
                             externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
-                        } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException |
-                            XmlPullParserException | InvalidReferenceException e) {
+                        } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
                             String msg = "Unable to parse external secondary instance";
                             logger.error(msg, e);
                             throw new XFormParseException(msg + ": " + e.toString(), instance);
