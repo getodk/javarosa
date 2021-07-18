@@ -33,6 +33,7 @@ dependencies {
     // Be sure to update dependencies in pom.xml to match
     implementation 'joda-time:joda-time:2.10.10'
     implementation 'org.slf4j:slf4j-api:1.7.31'
+    implementation 'org.apache.commons:commons-csv:1.6'
     compileOnly 'net.sf.kxml:kxml2:2.3.0'
     testImplementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'junit:junit:4.13.2'
