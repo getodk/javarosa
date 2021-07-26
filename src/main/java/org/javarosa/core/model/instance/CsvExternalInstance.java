@@ -9,27 +9,30 @@ public class CsvExternalInstance {
     public static TreeElement parse(String instanceId, String path) throws IOException {
         TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        String csvLine = br.readLine();
 
-        if (csvLine != null) {
-            String[] fieldNames = csvLine.split(",");
-            int multiplicity = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String csvLine = br.readLine();
 
-            while ((csvLine = br.readLine()) != null) {
-                TreeElement item = new TreeElement("item", multiplicity);
-                String[] data = csvLine.split(",");
-                for (int i = 0; i < fieldNames.length; ++i) {
-                    TreeElement field = new TreeElement(fieldNames[i], 0);
-                    field.setValue(new UncastData(i < data.length ? data[i] : ""));
+            if (csvLine != null) {
+                String[] fieldNames = csvLine.split(",");
+                int multiplicity = 0;
 
-                    item.addChild(field);
+                while ((csvLine = br.readLine()) != null) {
+                    TreeElement item = new TreeElement("item", multiplicity);
+                    String[] data = csvLine.split(",");
+                    for (int i = 0; i < fieldNames.length; ++i) {
+                        TreeElement field = new TreeElement(fieldNames[i], 0);
+                        field.setValue(new UncastData(i < data.length ? data[i] : ""));
+
+                        item.addChild(field);
+                    }
+
+                    root.addChild(item);
+                    multiplicity++;
                 }
-
-                root.addChild(item);
-                multiplicity++;
             }
         }
+
         return root;
     }
 }
