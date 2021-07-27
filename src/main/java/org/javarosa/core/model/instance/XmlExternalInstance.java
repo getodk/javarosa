@@ -12,9 +12,10 @@ import org.xmlpull.v1.XmlPullParserException;
 
 public class XmlExternalInstance {
     public static TreeElement parse(String instanceId, String path) throws IOException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
-        InputStream inputStream = new FileInputStream(path);
-        KXmlParser xmlParser = ElementParser.instantiateParser(inputStream);
-        TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
-        return treeElementParser.parse();
+        try (InputStream inputStream = new FileInputStream(path)) {
+            KXmlParser xmlParser = ElementParser.instantiateParser(inputStream);
+            TreeElementParser treeElementParser = new TreeElementParser(xmlParser, 0, instanceId);
+            return treeElementParser.parse();
+        }
     }
 }
