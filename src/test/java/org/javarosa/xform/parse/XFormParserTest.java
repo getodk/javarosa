@@ -22,8 +22,10 @@ import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSer
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -133,6 +135,31 @@ public class XFormParserTest {
         char nbsp = 0x00A0;
         String expected = "Full name: ${0}" + nbsp + "${1}";
         assertEquals(expected, innerText);
+    }
+ 
+    @Test
+    public void sumWorksWithStrings() throws IOException {
+        
+        Scenario scenario = Scenario.init("sum_test.xml");
+
+        scenario.next();
+        scenario.getQuestionAtIndex().getLabelInnerText();
+        scenario.answer("35.1189");
+        scenario.next();
+        scenario.answer(3);
+        scenario.next();
+        scenario.next();
+        scenario.answer("20.877");
+        scenario.next();
+        scenario.next();
+        scenario.answer("2.7859");
+        assertFalse((Boolean)scenario.getAnswerNode("/data/valid").getValue().getValue());
+        scenario.next();
+        scenario.next();
+        scenario.answer("11.456");
+        assertTrue((Boolean)scenario.getAnswerNode("/data/valid").getValue().getValue());
+
+
     }
     
     @Test
