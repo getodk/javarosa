@@ -46,6 +46,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
     // Values needed to determine whether the cached list should be expired (not serialized)
     private Map<TreeReference, IAnswerData> cachedTriggerValues;
     private Long cachedRandomizeSeed;
+    private TreeReference cachedRef;
 
     /**
      * note that storing both the ref and expr for everything is kind of redundant, but we're forced
@@ -91,7 +92,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         // Return cached list if possible
         if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
-            && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)) {
+            && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)
+            && Objects.equals(curQRef, cachedRef)) {
             return randomize && cachedRandomizeSeed == null ? shuffle(cachedFilteredChoiceList) : cachedFilteredChoiceList;
         }
 
@@ -148,6 +150,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         cachedTriggerValues = currentTriggerValues;
         cachedRandomizeSeed = currentRandomizeSeed;
+        cachedRef = curQRef;
 
         return cachedFilteredChoiceList;
     }
