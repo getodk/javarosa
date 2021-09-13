@@ -1,6 +1,8 @@
 package org.javarosa.core.model.instance;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.csv.CSVFormat;
@@ -13,7 +15,10 @@ public class CsvExternalInstance {
         final TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
 
-        final CSVParser csvParser = CSVParser.parse(new File(path), StandardCharsets.UTF_8, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        final CSVFormat csvFormat = CSVFormat.DEFAULT
+            .withDelimiter(getDelimiter(path))
+            .withFirstRecordAsHeader();
+        final CSVParser csvParser = CSVParser.parse(new File(path), StandardCharsets.UTF_8, csvFormat);
         final String[] fieldNames = csvParser.getHeaderMap().keySet().toArray(new String[0]);
         int multiplicity = 0;
 
@@ -31,5 +36,17 @@ public class CsvExternalInstance {
         }
 
         return root;
+    }
+
+    private static char getDelimiter(String path) throws IOException {
+        char delimiter = ',';
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            String header = reader.readLine();
+
+            if (header.contains(";")) {
+                delimiter = ';';
+            }
+        }
+        return delimiter;
     }
 }
