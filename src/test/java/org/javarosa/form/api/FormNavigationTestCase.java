@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class FormNavigationTestCase {
 
-    private String formName;
-    private String[] expectedIndices;
+    private final String formName;
+    private final String[] expectedIndices;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
@@ -36,7 +36,9 @@ public class FormNavigationTestCase {
 
                 ei("twoNestedRepeatGroups.xml",
                         "-1, ", "0_0, ", "0_0, 0_0, ", "0_0, 0_0, 0, ", "0_0, 0_0, 1, ", "0_0, 0_1, ",
-                        "0_0, 0_1, 0, ", "0_0, 0_1, 1, ", "0_0, 0_2, ", "0_1, ", "-1, "),
+                        "0_0, 0_1, 0, ", "0_0, 0_1, 1, ", "0_0, 0_2, ",
+                        //For #4059 fix
+                        "0_0, 0_2, 0, ", "0_0, 0_2, 1, ", "0_0, 0_3, ", "0_1, ", "-1, "),
 
                 ei("simpleFormWithThreeQuestions.xml",
                         "-1, ", "0, ", "1, ", "2, ", "-1, ")
