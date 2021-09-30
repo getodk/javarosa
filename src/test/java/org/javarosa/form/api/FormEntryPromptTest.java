@@ -26,6 +26,7 @@ import static org.javarosa.core.util.XFormsElement.instance;
 import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
@@ -35,6 +36,7 @@ import org.javarosa.core.test.Scenario;
 import org.junit.Test;
 
 public class FormEntryPromptTest {
+    //region Binding of select choice values to labels
     @Test
     public void getSelectItemText_onSelectionFromDynamicSelect_withoutTranslations_returnsLabelInnerText() throws IOException {
         Scenario scenario = Scenario.init("Select", html(
@@ -108,4 +110,41 @@ public class FormEntryPromptTest {
         scenario.setLanguage("fr");
         assertThat(questionPrompt.getAnswerText(), is("B (fr)"));
     }
+
+    @Test
+    public void getSelectItemText_onSelectionsInRepeatInstances_returnsLabelInnerText() throws IOException {
+        Scenario scenario = Scenario.init("Select", html(
+            head(
+                title("Select"),
+                model(
+                    mainInstance(
+                        t("data id='select-repeat'",
+                            t("repeat",
+                                t("select", "a")),
+                            t("repeat",
+                                t("select", "a")))),
+
+                    instance("choices",
+                        item("a", "A"),
+                        item("aa", "AA"),
+                        item("b", "B"),
+                        item("bb", "BB")))),
+            body(
+                repeat("/data/repeat",
+                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item")
+            ))));
+
+        scenario.next();
+        scenario.next();
+        FormEntryPrompt questionPrompt = scenario.getFormEntryPromptAtIndex();
+        assertThat(questionPrompt.getAnswerText(), is("A"));
+
+        // Prior to https://github.com/getodk/javarosa/issues/642 being addressed, the selected choice for a select in a
+        // repeat instance with the same choice list as the prior repeat instance's select would not be bound to its label
+        scenario.next();
+        scenario.next();
+        questionPrompt = scenario.getFormEntryPromptAtIndex();
+        assertThat(questionPrompt.getAnswerText(), is("A"));
+    }
+    //endregion
 }
