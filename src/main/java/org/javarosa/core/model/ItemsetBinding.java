@@ -92,6 +92,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
         // Return cached list if possible
         if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
             && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)) {
+            updateQuestionAnswerInModel(formDef, curQRef);
+
             return randomize && cachedRandomizeSeed == null ? shuffle(cachedFilteredChoiceList) : cachedFilteredChoiceList;
         }
 
@@ -116,10 +118,10 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
 
-        List<SelectChoice> choices = new ArrayList<>();
+        List<SelectChoice> filteredChoiceList = new ArrayList<>();
         for (int i = 0; i < filteredItemReferences.size(); i++) {
             SelectChoice choice = getChoiceForTreeReference(formDef, formInstance, i, filteredItemReferences.get(i));
-            choices.add(choice);
+            filteredChoiceList.add(choice);
             if (selectChoicesForAnswer != null && selectChoicesForAnswer.containsKey(choice.getValue())) {
                 // Keys with values that don't get set here will have null values and must be filtered out of the answer.
                 selectChoicesForAnswer.put(choice.getValue(), choice);
@@ -128,13 +130,13 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
-        cachedFilteredChoiceList = randomize ? shuffle(choices, currentRandomizeSeed) : choices;
+        cachedFilteredChoiceList = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
 
         // TODO: write a test that fails if this is removed. It looks like a no-op because it's not accessing the shuffled collection.
         if (randomize) {
             // Match indices to new positions
-            for (int i = 0; i < choices.size(); i++)
-                choices.get(i).setIndex(i);
+            for (int i = 0; i < filteredChoiceList.size(); i++)
+                filteredChoiceList.get(i).setIndex(i);
         }
 
         //init localization
@@ -202,7 +204,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     /**
-     * Build a map with keys for each value in the current answer, each mapped to null.
+     * Builds a map with keys for each value in the current answer, each mapped to null.
      *
      * When we iterate over the new filtered choice list, we will update the values in this map. Keys with null values
      * after this process will be removed from the answer. We will also use this map to bind selection(s) in the IAnswerData
@@ -226,6 +228,12 @@ public class ItemsetBinding implements Externalizable, Localizable {
         return selectChoicesForAnswer;
     }
 
+    /**
+     * Removes any answers that aren't in the filtered choice list. Binds the answer to its choice(s) so that the answer
+     * label can be retrieved.
+     *
+     * SIDE EFFECTS: mutates the instance node's value (TreeElement.value, type {@link SelectOneData} or {@link MultipleItemsData})
+     */
     private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, SelectChoice> selectChoicesForAnswer) {
         IAnswerData originalValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
 
@@ -242,6 +250,23 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
             formDef.getMainInstance().resolveReference(curQRef).setAnswer(boundAndFilteredValue);
         }
+    }
+
+    /**
+     * Updates the model using the previously-cached choice list.
+     *
+     * @see #updateQuestionAnswerInModel(FormDef, TreeReference, Map) for details and side-effects
+     */
+    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef) {
+        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
+        if (selectChoicesForAnswer != null) {
+            for (SelectChoice choice : cachedFilteredChoiceList) {
+                if (selectChoicesForAnswer.containsKey(choice.getValue())) {
+                    selectChoicesForAnswer.put(choice.getValue(), choice);
+                }
+            }
+        }
+        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
     }
 
     /**

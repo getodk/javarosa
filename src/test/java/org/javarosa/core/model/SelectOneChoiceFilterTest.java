@@ -131,6 +131,7 @@ public class SelectOneChoiceFilterTest {
         // If we set level2 to "aa", form validation passes. Currently, clearing a choice only updates filter expressions
         // that directly depend on it. With this form, we could force clearing the third level when the first level is cleared
         // by making the level3 filter expression in the form definition reference level1 AND level2.
+        scenario.answer("/data/level1", "b");
         scenario.answer("/data/level2", "bb");
 
         validate = scenario.getValidationOutcome();
