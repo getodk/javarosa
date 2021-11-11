@@ -699,7 +699,8 @@ public class XPathFuncExpr extends XPathExpression {
                 val = NaN;
             }
         } else if (o instanceof Date) {
-            val = (double) DateUtils.daysSinceEpoch((Date) o);
+            val = (double) DateUtils.fractionalDaysSinceEpoch((Date) o);
+            q
         } else if (o instanceof IExprDataType) {
             val = ((IExprDataType) o).toNumeric();
         }
