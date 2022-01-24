@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import org.javarosa.core.model.instance.geojson.GeoJsonExternalInstance;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -68,10 +69,12 @@ public class ExternalDataInstance extends DataInstance {
         return new ExternalDataInstance(root, instanceId, instanceSrc);
     }
 
-    private static TreeElement parseExternalInstance(String instanceSrc, String instanceId) throws IOException, InvalidReferenceException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
+    private static TreeElement parseExternalInstance(String instanceSrc, String instanceId)
+        throws IOException, InvalidReferenceException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
         String path = getPath(instanceSrc);
-        return instanceSrc.contains("file-csv") ?
-            CsvExternalInstance.parse(instanceId, path) : XmlExternalInstance.parse(instanceId, path);
+        return instanceSrc.contains("file-csv") ? CsvExternalInstance.parse(instanceId, path)
+            : instanceSrc.endsWith("geojson") ? GeoJsonExternalInstance.parse(instanceId, path)
+            : XmlExternalInstance.parse(instanceId, path);
     }
 
     @Override
