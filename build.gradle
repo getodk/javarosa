@@ -66,13 +66,6 @@ jar {
     }
 }
 
-// Useful for testing
-task explodedJar(type: Copy) {
-    into "$buildDir/libs/$jar.baseName $jar.version"
-    with jar
-}
-
-
 tasks.register('installLocal') {
     def lines = []
     new File('pom.xml').withReader { reader ->
