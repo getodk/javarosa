@@ -66,11 +66,32 @@ jar {
     }
 }
 
-// Useful for testing
-task explodedJar(type: Copy) {
-    into "$buildDir/libs/$jar.baseName $jar.version"
-    with jar
+tasks.register('installLocal') {
+    def lines = []
+    new File('pom.xml').withReader { reader ->
+        reader.eachLine {
+            lines.add(it)
+        }
+    }
+
+    def changedVersion = false
+    new File('pom-local.xml').withWriter { writer ->
+        lines.forEach {
+            if (it.trim().startsWith('<version>') && !changedVersion) {
+                writer.write('<version>local</version>')
+                changedVersion = true
+            } else {
+                writer.write(it)
+            }
+        }
+    }
+
+    exec {
+        executable 'mvn'
+        args '-f', 'pom-local.xml', '-Dgpg.skip', 'install'
+    }
 }
+
 
 // TODO: does not build UML diagrams
 javadoc {
