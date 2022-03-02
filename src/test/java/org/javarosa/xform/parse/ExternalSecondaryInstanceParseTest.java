@@ -39,6 +39,8 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
 
 public class ExternalSecondaryInstanceParseTest {
+
+    //region Parsing of different file types into external secondary instances
     @Test
     public void itemsFromExternalSecondaryXMLInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
         configureReferenceManagerCorrectly();
@@ -54,6 +56,39 @@ public class ExternalSecondaryInstanceParseTest {
         AbstractTreeElement fifthItem = formDef.getNonMainInstance("external-xml").resolveReference(treeReferences.get(4));
         assertThat(fifthItem.getChild("label", 0).getValue().getDisplayText(), is("AB"));
     }
+
+    @Test
+    public void itemsFromExternalSecondaryGeoJsonInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
+        configureReferenceManagerCorrectly();
+
+        FormDef formDef = parse(r("external-select-geojson.xml"));
+        assertEquals("GeoJSON External Secondary Instance", formDef.getTitle());
+
+        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-geojson')/root/item")).getReference();
+        EvaluationContext evaluationContext = formDef.getEvaluationContext();
+        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
+        assertThat(treeReferences.size(), is(2));
+
+        AbstractTreeElement secondItem = formDef.getNonMainInstance("external-geojson").resolveReference(treeReferences.get(1));
+        assertThat(secondItem.getChild("name", 0).getValue().getDisplayText(), is("Your cool point"));
+    }
+
+    @Test
+    public void itemsFromExternalSecondaryCSVInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
+        configureReferenceManagerCorrectly();
+
+        FormDef formDef = parse(r("external-select-csv.xml"));
+        assertEquals("CSV External Secondary Instance", formDef.getTitle());
+
+        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-csv')/root/item")).getReference();
+        EvaluationContext evaluationContext = formDef.getEvaluationContext();
+        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
+        assertThat(treeReferences.size(), is(12));
+
+        AbstractTreeElement fifthItem = formDef.getNonMainInstance("external-csv").resolveReference(treeReferences.get(4));
+        assertThat(fifthItem.getChild("label", 0).getValue().getDisplayText(), is("AB"));
+    }
+    //endregion
 
     @Test
     public void xformParseException_whenItemsetConfiguresValueOrLabelNotInExternalInstance() throws IOException {
@@ -108,22 +143,7 @@ public class ExternalSecondaryInstanceParseTest {
         assertTrue(deserializedFormDef.getFormInstances().containsKey("external-xml"));
     }
 
-    @Test
-    public void itemsFromExternalSecondaryCSVInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
-        configureReferenceManagerCorrectly();
-
-        FormDef formDef = parse(r("external-select-csv.xml"));
-        assertEquals("CSV External Secondary Instance", formDef.getTitle());
-        
-        TreeReference treeReference = ((XPathPathExpr) parseXPath("instance('external-csv')/root/item")).getReference();
-        EvaluationContext evaluationContext = formDef.getEvaluationContext();
-        List<TreeReference> treeReferences = evaluationContext.expandReference(treeReference);
-        assertThat(treeReferences.size(), is(12));
-
-        AbstractTreeElement fifthItem = formDef.getNonMainInstance("external-csv").resolveReference(treeReferences.get(4));
-        assertThat(fifthItem.getChild("label", 0).getValue().getDisplayText(), is("AB"));
-    }
-
+    //region ODK Collect database-driven external file features
     // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
     // secondary instance is declared but not referenced in an instance() call, it is ignored by JavaRosa.
     @Test
@@ -148,6 +168,7 @@ public class ExternalSecondaryInstanceParseTest {
         formDef = fpi.getFormDef();
         assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
     }
+    //endregion
 
     // See https://github.com/getodk/javarosa/issues/451
     @Test
@@ -161,6 +182,7 @@ public class ExternalSecondaryInstanceParseTest {
         assertThat(dataSet.size(), is(12));
     }
 
+    //region Missing external file
     @Test
     public void emptyPlaceholderInstanceIsUsed_whenExternalInstanceNotFound() {
         configureReferenceManagerIncorrectly();
@@ -232,6 +254,7 @@ public class ExternalSecondaryInstanceParseTest {
             // pass
         }
     }
+    //endregion
 
     // All external secondary instances and forms are in the same folder. Configure the ReferenceManager to resolve
     // URIs to that folder.

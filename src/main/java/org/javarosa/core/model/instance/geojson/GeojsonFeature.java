@@ -17,6 +17,7 @@
 package org.javarosa.core.model.instance.geojson;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import java.io.IOException;
 import java.util.Map;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -27,7 +28,7 @@ public class GeojsonFeature {
     private GeojsonGeometry geometry;
     private Map<String, String> properties;
 
-    public TreeElement toTreeElement(int multiplicity) {
+    public TreeElement toTreeElement(int multiplicity) throws IOException {
         TreeElement item = new TreeElement("item", multiplicity);
 
         TreeElement geoField = new TreeElement("geometry", 0);

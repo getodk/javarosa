@@ -17,6 +17,7 @@
 package org.javarosa.core.model.instance.geojson;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import java.io.IOException;
 import java.util.ArrayList;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -28,9 +29,9 @@ public class GeojsonGeometry {
         return type;
     }
 
-    public String getOdkCoordinates() {
-        if (!(type.equals("Point") && coordinates.size() == 2)) {
-            throw new UnsupportedOperationException("Only Points are currently supported");
+    public String getOdkCoordinates() throws IOException {
+        if (!(getType().equals("Point") && coordinates.size() == 2)) {
+            throw new IOException("Only Points are currently supported");
         }
 
         return coordinates.get(0) + " " + coordinates.get(1) + " 0 0";

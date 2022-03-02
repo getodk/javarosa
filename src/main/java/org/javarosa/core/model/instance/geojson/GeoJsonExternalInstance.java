@@ -21,20 +21,15 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import org.javarosa.core.model.instance.TreeElement;
 
 public class GeoJsonExternalInstance {
     public static TreeElement parse(String instanceId, String path) throws IOException {
-        return parse(instanceId, new FileInputStream(path));
-    }
-
-    protected static TreeElement parse(String instanceId, InputStream geojsonStream) throws IOException {
         final TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        try (JsonParser jsonParser = objectMapper.getFactory().createParser(geojsonStream)) {
+        try (JsonParser jsonParser = objectMapper.getFactory().createParser(new FileInputStream(path))) {
             validatePreamble(jsonParser);
 
             int multiplicity = 0;

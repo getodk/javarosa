@@ -18,20 +18,18 @@ package org.javarosa.core.model.instance.geojson;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.fail;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.javarosa.core.model.instance.TreeElement;
 import org.junit.Test;
 
 public class GeoJsonExternalInstanceTest {
     @Test
-    public void parse_throwsException_ifTopLevelElementNotFeatureCollection() {
+    public void parse_throwsException_ifNoTopLevelObject() {
         try {
-            GeoJsonExternalInstance.parse("id", new ByteArrayInputStream(GEOMETRY_COLLECTION_GEOJSON.getBytes(StandardCharsets.UTF_8)));
+            GeoJsonExternalInstance.parse("id", r("not-object.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -39,21 +37,46 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
-    public void parse_parsesMultipleFeatures() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", new ByteArrayInputStream(FEATURE_COLLECTION_GEOJSON.getBytes(StandardCharsets.UTF_8)));
-        assertThat(featureCollection.getNumChildren(), is(2));
+    public void parse_throwsException_ifTopLevelObjectTypeNotFeatureCollection() {
+        try {
+            GeoJsonExternalInstance.parse("id", r("invalid-type.geojson").toString());
+            fail("Exception expected");
+        } catch (IOException e) {
+            // expected
+        }
     }
 
     @Test
-    public void parse_addsGeometryAsChild() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", new ByteArrayInputStream(FEATURE_COLLECTION_GEOJSON.getBytes(StandardCharsets.UTF_8)));
+    public void parse_throwsException_ifNoFeaturesArray() {
+        try {
+            GeoJsonExternalInstance.parse("id", r("bad-futures-collection.geojson").toString());
+            fail("Exception expected");
+        } catch (IOException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void parse_throwsException_ifFeaturesNotArray() {
+        try {
+            GeoJsonExternalInstance.parse("id", r("bad-features-not-array.geojson").toString());
+            fail("Exception expected");
+        } catch (IOException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void parse_addsGeometriesAsChildren_forMultipleFeatures() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
+        assertThat(featureCollection.getNumChildren(), is(2));
         assertThat(featureCollection.getChildAt(0).getChild("geometry", 0).getValue().getValue(), is("102 0.5 0 0"));
         assertThat(featureCollection.getChildAt(1).getChild("geometry", 0).getValue().getValue(), is("104 0.5 0 0"));
     }
 
     @Test
     public void parse_addsAllOtherPropertiesAsChildren() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", new ByteArrayInputStream(FEATURE_COLLECTION_GEOJSON.getBytes(StandardCharsets.UTF_8)));
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("name", 0).getValue().getValue(), is("My cool point"));
 
@@ -62,90 +85,12 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
-    public void getOdkCoordinates_convertsPointGeoJsonGeometry() throws IOException {
-        String point = "{ \"type\": \"Point\", \"coordinates\": [ 102, 0.5 ] }";
-        ObjectMapper objectMapper = new ObjectMapper();
-        GeojsonGeometry geometry = objectMapper.readValue(point, GeojsonGeometry.class);
-        assertThat(geometry.getOdkCoordinates(), is("102 0.5 0 0"));
-    }
-
-    @Test
-    public void getOdkCoordinates_throwsException_ifGeometryNotPoint() throws IOException {
-        String notPoint = "{\n" +
-            "               \"type\": \"LineString\",\n" +
-            "               \"coordinates\": [102.0, 0.0]\n" +
-            "           }";
-        ObjectMapper objectMapper = new ObjectMapper();
-        GeojsonGeometry geometry = objectMapper.readValue(notPoint, GeojsonGeometry.class);
-
+    public void parse_throwsException_whenGeometryNotPoint() {
         try {
-            geometry.getOdkCoordinates();
+            GeoJsonExternalInstance.parse("id", r("feature-collection-with-line.geojson").toString());
             fail("Exception expected");
-        } catch (UnsupportedOperationException e) {
+        } catch (IOException e) {
             // expected
         }
     }
-
-    private static final String GEOMETRY_COLLECTION_GEOJSON = "{\n" +
-        "    \"geometries\": [\n" +
-        "        {\n" +
-        "            \"coordinates\": [\n" +
-        "                [\n" +
-        "                    10.0,\n" +
-        "                    11.2\n" +
-        "                ],\n" +
-        "                [\n" +
-        "                    10.5,\n" +
-        "                    11.9\n" +
-        "                ]\n" +
-        "            ],\n" +
-        "            \"type\": \"Linestring\"\n" +
-        "        },\n" +
-        "        {\n" +
-        "            \"coordinates\": [\n" +
-        "                10.0,\n" +
-        "                20.0\n" +
-        "            ],\n" +
-        "            \"type\": \"Point\"\n" +
-        "        }\n" +
-        "    ],\n" +
-        "    \"type\": \"GeometryCollection\"\n" +
-        "}";
-
-    private static final String FEATURE_COLLECTION_GEOJSON = "{\n" +
-        "    \"type\": \"FeatureCollection\",\n" +
-        "    \"features\": [\n" +
-        "        {\n" +
-        "            \"type\": \"Feature\",\n" +
-        "            \"geometry\": {\n" +
-        "                \"type\": \"Point\",\n" +
-        "                \"coordinates\": [\n" +
-        "                    102,\n" +
-        "                    0.5\n" +
-        "                ]\n" +
-        "            },\n" +
-        "            \"properties\": {\n" +
-        "                \"id\": \"fs87b\",\n" +
-        "                \"name\": \"My cool point\",\n" +
-        "                \"foo\": \"bar\"\n" +
-        "            }\n" +
-        "        },\n" +
-        "        {\n" +
-        "            \"type\": \"Feature\",\n" +
-        "            \"geometry\": {\n" +
-        "                \"type\": \"Point\",\n" +
-        "                \"coordinates\": [\n" +
-        "                    104,\n" +
-        "                    0.5\n" +
-        "                ]\n" +
-        "            },\n" +
-        "            \"properties\": {\n" +
-        "                \"id\": \"67abie\",\n" +
-        "                \"name\": \"Your cool point\",\n" +
-        "                \"foo\": \"quux\",\n" +
-        "                \"special-property\": \"special value\"\n" +
-        "            }\n" +
-        "        }\n" +
-        "    ]\n" +
-        "}";
 }
