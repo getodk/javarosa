@@ -29,18 +29,22 @@ public class GeojsonFeature {
     private Map<String, String> properties;
 
     public TreeElement toTreeElement(int multiplicity) throws IOException {
+        if (!type.equals("Feature")) {
+            throw new IOException("Item of type " + type + " found but expected item of type Feature");
+        }
+
         TreeElement item = new TreeElement("item", multiplicity);
 
         TreeElement geoField = new TreeElement("geometry", 0);
         geoField.setValue(new UncastData(geometry.getOdkCoordinates()));
         item.addChild(geoField);
 
-       for (String property : properties.keySet()) {
-           TreeElement field = new TreeElement(property, 0);
-           field.setValue(new UncastData(properties.get(property)));
-           item.addChild(field);
-       }
+        for (String property : properties.keySet()) {
+            TreeElement field = new TreeElement(property, 0);
+            field.setValue(new UncastData(properties.get(property)));
+            item.addChild(field);
+        }
 
-       return item;
+        return item;
     }
 }

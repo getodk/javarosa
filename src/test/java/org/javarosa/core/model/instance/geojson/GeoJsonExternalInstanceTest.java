@@ -67,6 +67,16 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
+    public void parse_throwsException_ifSingleFeatureNotOfFeatureType() {
+        try {
+            GeoJsonExternalInstance.parse("id", r("bad-feature-not-feature.geojson").toString());
+            fail("Exception expected");
+        } catch (IOException e) {
+            // expected
+        }
+    }
+
+    @Test
     public void parse_addsGeometriesAsChildren_forMultipleFeatures() throws IOException {
         TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
         assertThat(featureCollection.getNumChildren(), is(2));
