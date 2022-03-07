@@ -17,6 +17,7 @@
 package org.javarosa.core.model.instance.geojson;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.fail;
@@ -107,6 +108,13 @@ public class GeoJsonExternalInstanceTest {
         TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-id-twice.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("fs87b"));
+    }
+
+    @Test
+    public void parse_ignoresUnknownToplevelProperties() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-toplevel.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
+        assertThat(featureCollection.getChildAt(0).getChild("ignored", 0), nullValue());
     }
 
     @Test
