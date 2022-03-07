@@ -39,10 +39,12 @@ public class GeojsonFeature {
         geoField.setValue(new UncastData(geometry.getOdkCoordinates()));
         item.addChild(geoField);
 
-        for (String property : properties.keySet()) {
-            TreeElement field = new TreeElement(property, 0);
-            field.setValue(new UncastData(properties.get(property)));
-            item.addChild(field);
+        if (properties != null) {
+            for (String property : properties.keySet()) {
+                TreeElement field = new TreeElement(property, 0);
+                field.setValue(new UncastData(properties.get(property)));
+                item.addChild(field);
+            }
         }
 
         return item;

@@ -95,6 +95,12 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
+    public void parse_addsFeaturesWithNoProperties() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-no-properties.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(1));
+    }
+
+    @Test
     public void parse_throwsException_whenGeometryNotPoint() {
         try {
             GeoJsonExternalInstance.parse("id", r("feature-collection-with-line.geojson").toString());
