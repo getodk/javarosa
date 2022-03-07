@@ -28,6 +28,8 @@ public class GeojsonFeature {
     private GeojsonGeometry geometry;
     private Map<String, String> properties;
 
+    private String id;
+
     public TreeElement toTreeElement(int multiplicity) throws IOException {
         if (!type.equals("Feature")) {
             throw new IOException("Item of type " + type + " found but expected item of type Feature");
@@ -43,6 +45,16 @@ public class GeojsonFeature {
             for (String property : properties.keySet()) {
                 TreeElement field = new TreeElement(property, 0);
                 field.setValue(new UncastData(properties.get(property)));
+                item.addChild(field);
+            }
+        }
+
+        if (id != null) {
+            if (!item.getChildrenWithName("id").isEmpty()) {
+                item.getChildrenWithName("id").get(0).setValue(new UncastData(id));
+            } else {
+                TreeElement field = new TreeElement("id", 0);
+                field.setValue(new UncastData(id));
                 item.addChild(field);
             }
         }

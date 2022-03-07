@@ -95,6 +95,21 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
+    public void parse_usesTopLevelId() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-id-toplevel.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
+        assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("fs87b"));
+
+    }
+
+    @Test
+    public void parse_prioritizesTopLevelId() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-id-twice.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
+        assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("fs87b"));
+    }
+
+    @Test
     public void parse_addsFeaturesWithNoProperties() throws IOException {
         TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-no-properties.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(1));
