@@ -32,7 +32,7 @@ import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
 import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -415,6 +415,35 @@ public class TriggerableDagTest {
         scenario.answer("/data/is-group-relevant", false);
         assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
+    }
+
+    /**
+     * Nodes can be nested differently in the model and body. The model structure is used
+     * to determine relevance inheritance.
+     */
+    @Test
+    public void relevanceIsDeterminedByModelNesting() throws IOException {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("outernode"),
+                        t("group",
+                            t("innernode"))
+                    )),
+                    bind("/data/group").relevant("false()")
+                    )
+            ),
+            body(
+                group("/data/group",
+                    input("/data/outernode"),
+                    input("/data/group/innernode"))
+            )));
+
+        assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
+        assertThat(scenario.getAnswerNode("/data/outernode"), is(relevant()));
+        assertThat(scenario.getAnswerNode("/data/group/innernode"), is(nonRelevant()));
     }
 
     @Test
