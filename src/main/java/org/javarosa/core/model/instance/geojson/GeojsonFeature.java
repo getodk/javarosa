@@ -17,30 +17,50 @@
 package org.javarosa.core.model.instance.geojson;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.IOException;
 import java.util.Map;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GeojsonFeature {
     private String type;
     private GeojsonGeometry geometry;
     private Map<String, String> properties;
 
+    private String id;
+
     public TreeElement toTreeElement(int multiplicity) throws IOException {
+        if (!type.equals("Feature")) {
+            throw new IOException("Item of type " + type + " found but expected item of type Feature");
+        }
+
         TreeElement item = new TreeElement("item", multiplicity);
 
         TreeElement geoField = new TreeElement("geometry", 0);
         geoField.setValue(new UncastData(geometry.getOdkCoordinates()));
         item.addChild(geoField);
 
-       for (String property : properties.keySet()) {
-           TreeElement field = new TreeElement(property, 0);
-           field.setValue(new UncastData(properties.get(property)));
-           item.addChild(field);
-       }
+        if (properties != null) {
+            for (String property : properties.keySet()) {
+                TreeElement field = new TreeElement(property, 0);
+                field.setValue(new UncastData(properties.get(property)));
+                item.addChild(field);
+            }
+        }
 
-       return item;
+        if (id != null) {
+            if (!item.getChildrenWithName("id").isEmpty()) {
+                item.getChildrenWithName("id").get(0).setValue(new UncastData(id));
+            } else {
+                TreeElement field = new TreeElement("id", 0);
+                field.setValue(new UncastData(id));
+                item.addChild(field);
+            }
+        }
+
+        return item;
     }
 }
