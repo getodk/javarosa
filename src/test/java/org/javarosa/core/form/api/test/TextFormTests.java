@@ -130,7 +130,7 @@ public class TextFormTests {
         QuestionDef q = fpi.getFirstQuestionDef();
 
         q.addSelectChoice(new SelectChoice("choice1 id", "val1"));
-        q.addSelectChoice(new SelectChoice("loc: choice2", "val2", false, null));
+        q.addSelectChoice(new SelectChoice("loc: choice2", "val2", false));
 
         if (!fep.getSelectChoices().toString().equals("[{choice1 id} => val1, loc: choice2 => val2]")) {
             fail("Could not add individual select choice ID"+fep.getSelectChoices().toString());
@@ -153,9 +153,9 @@ public class TextFormTests {
 
         String onetext = "choice";
         String twotext = "stacey's";
-        SelectChoice one = new SelectChoice(null,onetext, "val", false, null);
+        SelectChoice one = new SelectChoice(null,onetext, "val", false);
         q.addSelectChoice(one);
-        SelectChoice two = new SelectChoice(null,twotext, "mom", false, null);
+        SelectChoice two = new SelectChoice(null,twotext, "mom", false);
         q.addSelectChoice(two);
 
 
