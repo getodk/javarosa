@@ -1,8 +1,5 @@
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -12,6 +9,10 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.XFormParseException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class SelectChoice implements Externalizable, Localizable {
 
@@ -45,6 +46,20 @@ public class SelectChoice implements Externalizable, Localizable {
         this(labelID, null, value, true, null);
     }
 
+    public SelectChoice(String labelID, String labelInnerText, boolean isLocalizable) {
+        this(labelID, labelInnerText, isLocalizable, null);
+    }
+
+    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
+        this(labelID, labelInnerText, value, isLocalizable, null);
+    }
+
+    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item) {
+        this(isLocalizable ? labelOrID : null,
+            isLocalizable ? null : labelOrID,
+            Value, isLocalizable, item);
+    }
+
     /**
      * @param labelID        can be null
      * @param labelInnerText can be null
@@ -61,12 +76,6 @@ public class SelectChoice implements Externalizable, Localizable {
         } else {
             throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
         }
-    }
-
-    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item) {
-        this(isLocalizable ? labelOrID : null,
-            isLocalizable ? null : labelOrID,
-            Value, isLocalizable, item);
     }
 
     public void setIndex(int index) {
@@ -88,7 +97,7 @@ public class SelectChoice implements Externalizable, Localizable {
                 return child.getValue().getDisplayText();
             }
         }
-       return null;
+        return null;
     }
 
     public int getIndex() {
