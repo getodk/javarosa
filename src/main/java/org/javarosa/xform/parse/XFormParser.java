@@ -1378,7 +1378,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (textRef != null) {
             q.addSelectChoice(new SelectChoice(textRef, value));
         } else {
-            q.addSelectChoice(new SelectChoice(null, labelInnerText, value, false));
+            q.addSelectChoice(new SelectChoice(null, labelInnerText, value, false, null));
         }
 
         //print unused attribute warning message for parent element

@@ -18,19 +18,26 @@ package org.javarosa.core.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1;
+import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 import java.io.IOException;
+import org.hamcrest.CoreMatchers;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.junit.Test;
@@ -61,5 +68,55 @@ public class SelectChoiceTest {
         deserializedScenario.newInstance();
         deserializedScenario.next();
         assertThat(deserializedScenario.getQuestionAtIndex().getChoice(0).getValue(), is(""));
+    }
+
+    @Test
+    public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() {
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+
+        Scenario scenario = Scenario.init("external-select-geojson.xml");
+        assertThat(scenario.choicesOf("/data/q").get(1).getChild("geometry"), CoreMatchers.is("104 0.5 0 0"));
+        assertThat(scenario.choicesOf("/data/q").get(1).getChild("special-property"), CoreMatchers.is("special value"));
+    }
+
+    @Test
+    public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() {
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+
+        Scenario scenario = Scenario.init("external-select-geojson.xml");
+        assertThat(scenario.choicesOf("/data/q").get(1).getChild("non-existent"), CoreMatchers.is(nullValue()));
+    }
+
+    @Test
+    public void getChild_updates_whenChoicesAreFromRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Select from repeat", html(
+            head(
+                title("Select from repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("repeat",
+                                t("value"),
+                                t("label"),
+                                t("special-property")),
+                            t("filter"),
+                            t("select"))))),
+            body(
+                repeat("/data/repeat",
+                    input("value"),
+                    input("label"),
+                    input("special-property")),
+                input("filter"),
+                select1Dynamic("/data/select", "../repeat")
+            )));
+        scenario.answer("/data/repeat[0]/value", "a");
+        scenario.answer("/data/repeat[0]/label", "A");
+        scenario.answer("/data/repeat[0]/special-property", "AA");
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
+        assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("AA"));
+
+        scenario.answer("/data/repeat[0]/special-property", "changed");
+        assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("changed"));
     }
 }

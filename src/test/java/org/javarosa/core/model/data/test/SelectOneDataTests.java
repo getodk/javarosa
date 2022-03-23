@@ -44,7 +44,7 @@ public class SelectOneDataTests {
         question.setID(57);
 
         for (int i = 0; i < 3; i++) {
-            question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false));
+            question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false, null));
         }
 
         one = new Selection("Selection1");

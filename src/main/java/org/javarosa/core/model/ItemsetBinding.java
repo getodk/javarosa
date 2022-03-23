@@ -191,15 +191,20 @@ public class ItemsetBinding implements Externalizable, Localizable {
         // Provide a default value if none is specified
         value = value != null ? value : "dynamic:" + i;
 
-        TreeElement copyNode = null;
+        SelectChoice choice = new SelectChoice(
+            label,
+            value,
+            labelIsItext,
+            item.getInstanceName() != null
+                ? (TreeElement) formDef.getNonMainInstance(item.getInstanceName()).resolveReference(item)
+                : formDef.getMainInstance().resolveReference(item));
+
+        choice.setIndex(i);
+
         if (copyMode) {
-            copyNode = formDef.getMainInstance().resolveReference(copyRef.contextualize(item));
+            choice.copyNode = formDef.getMainInstance().resolveReference(copyRef.contextualize(item));
         }
 
-        SelectChoice choice = new SelectChoice(label, value, labelIsItext);
-        choice.setIndex(i);
-        if (copyMode)
-            choice.copyNode = copyNode;
         return choice;
     }
 

@@ -30,6 +30,11 @@ public class SelectChoice implements Externalizable, Localizable {
     public TreeElement copyNode;
 
     /**
+     * The node that this choice represents. Not serialized.
+     */
+    private TreeElement item;
+
+    /**
      * for deserialization only
      */
     public SelectChoice() {
@@ -37,7 +42,7 @@ public class SelectChoice implements Externalizable, Localizable {
     }
 
     public SelectChoice(String labelID, String value) {
-        this(labelID, null, value, true);
+        this(labelID, null, value, true, null);
     }
 
     /**
@@ -46,10 +51,11 @@ public class SelectChoice implements Externalizable, Localizable {
      * @param value          should not be null
      * @throws XFormParseException if value is null
      */
-    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
+    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item) {
         this.isLocalizable = isLocalizable;
         this.textID = labelID;
         this.labelInnerText = labelInnerText;
+        this.item = item;
         if (value != null) {
             this.value = value;
         } else {
@@ -57,10 +63,10 @@ public class SelectChoice implements Externalizable, Localizable {
         }
     }
 
-    public SelectChoice(String labelOrID, String Value, boolean isLocalizable) {
+    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item) {
         this(isLocalizable ? labelOrID : null,
             isLocalizable ? null : labelOrID,
-            Value, isLocalizable);
+            Value, isLocalizable, item);
     }
 
     public void setIndex(int index) {
@@ -73,6 +79,16 @@ public class SelectChoice implements Externalizable, Localizable {
 
     public String getValue() {
         return value;
+    }
+
+    public String getChild(String childName) {
+        if (item != null) {
+            TreeElement child = item.getChild(childName, 0);
+            if (child != null) {
+                return child.getValue().getDisplayText();
+            }
+        }
+       return null;
     }
 
     public int getIndex() {
