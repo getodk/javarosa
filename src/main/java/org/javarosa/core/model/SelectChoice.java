@@ -1,8 +1,5 @@
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -12,6 +9,10 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.XFormParseException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class SelectChoice implements Externalizable, Localizable {
 
@@ -30,6 +31,11 @@ public class SelectChoice implements Externalizable, Localizable {
     public TreeElement copyNode;
 
     /**
+     * The node that this choice represents. Not serialized.
+     */
+    private TreeElement item;
+
+    /**
      * for deserialization only
      */
     public SelectChoice() {
@@ -37,7 +43,21 @@ public class SelectChoice implements Externalizable, Localizable {
     }
 
     public SelectChoice(String labelID, String value) {
-        this(labelID, null, value, true);
+        this(labelID, null, value, true, null);
+    }
+
+    public SelectChoice(String labelID, String labelInnerText, boolean isLocalizable) {
+        this(labelID, labelInnerText, isLocalizable, null);
+    }
+
+    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
+        this(labelID, labelInnerText, value, isLocalizable, null);
+    }
+
+    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item) {
+        this(isLocalizable ? labelOrID : null,
+            isLocalizable ? null : labelOrID,
+            Value, isLocalizable, item);
     }
 
     /**
@@ -46,21 +66,16 @@ public class SelectChoice implements Externalizable, Localizable {
      * @param value          should not be null
      * @throws XFormParseException if value is null
      */
-    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
+    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item) {
         this.isLocalizable = isLocalizable;
         this.textID = labelID;
         this.labelInnerText = labelInnerText;
+        this.item = item;
         if (value != null) {
             this.value = value;
         } else {
             throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
         }
-    }
-
-    public SelectChoice(String labelOrID, String Value, boolean isLocalizable) {
-        this(isLocalizable ? labelOrID : null,
-            isLocalizable ? null : labelOrID,
-            Value, isLocalizable);
     }
 
     public void setIndex(int index) {
@@ -73,6 +88,16 @@ public class SelectChoice implements Externalizable, Localizable {
 
     public String getValue() {
         return value;
+    }
+
+    public String getChild(String childName) {
+        if (item != null) {
+            TreeElement child = item.getChild(childName, 0);
+            if (child != null) {
+                return child.getValue().getDisplayText();
+            }
+        }
+        return null;
     }
 
     public int getIndex() {
