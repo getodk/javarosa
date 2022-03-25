@@ -34,6 +34,6 @@ public class GeojsonGeometry {
             throw new IOException("Only Points are currently supported");
         }
 
-        return coordinates.get(0) + " " + coordinates.get(1) + " 0 0";
+        return coordinates.get(1) + " " + coordinates.get(0) + " 0 0";
     }
 }

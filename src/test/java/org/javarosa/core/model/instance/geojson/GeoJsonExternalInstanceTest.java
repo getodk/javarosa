@@ -81,8 +81,8 @@ public class GeoJsonExternalInstanceTest {
     public void parse_addsGeometriesAsChildren_forMultipleFeatures() throws IOException {
         TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
         assertThat(featureCollection.getNumChildren(), is(2));
-        assertThat(featureCollection.getChildAt(0).getChild("geometry", 0).getValue().getValue(), is("102 0.5 0 0"));
-        assertThat(featureCollection.getChildAt(1).getChild("geometry", 0).getValue().getValue(), is("104 0.5 0 0"));
+        assertThat(featureCollection.getChildAt(0).getChild("geometry", 0).getValue().getValue(), is("0.5 102 0 0"));
+        assertThat(featureCollection.getChildAt(1).getChild("geometry", 0).getValue().getValue(), is("0.5 104 0 0"));
     }
 
     @Test

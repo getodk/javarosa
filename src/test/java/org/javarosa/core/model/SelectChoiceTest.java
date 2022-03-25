@@ -75,7 +75,7 @@ public class SelectChoiceTest {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
-        assertThat(scenario.choicesOf("/data/q").get(1).getChild("geometry"), CoreMatchers.is("104 0.5 0 0"));
+        assertThat(scenario.choicesOf("/data/q").get(1).getChild("geometry"), CoreMatchers.is("0.5 104 0 0"));
         assertThat(scenario.choicesOf("/data/q").get(1).getChild("special-property"), CoreMatchers.is("special value"));
     }
 
