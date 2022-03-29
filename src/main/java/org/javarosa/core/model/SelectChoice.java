@@ -42,7 +42,10 @@ public class SelectChoice implements Externalizable, Localizable {
      * 'copy' answer mode, this points to the node to be copied if this
      * selection is chosen this field only has meaning for dynamic choices, thus
      * is unserialized
+     *
+     * @deprecated No tests and no evidence it's used.
      */
+    @Deprecated
     public TreeElement copyNode;
 
     /**
@@ -122,7 +125,6 @@ public class SelectChoice implements Externalizable, Localizable {
 
         return index;
     }
-
 
     public void localeChanged(String locale, Localizer localizer) {
         // TODO Review this commented block

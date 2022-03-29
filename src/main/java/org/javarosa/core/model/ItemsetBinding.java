@@ -55,16 +55,13 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public TreeReference nodesetRef;   //absolute ref of itemset source nodes
     public IConditionExpr nodesetExpr; //path expression for source nodes; may be relative, may contain predicates
     public TreeReference contextRef;   //context ref for nodesetExpr; ref of the control parent (group/formdef) of itemset question
-       //note: this is only here because its currently impossible to both (a) get a form control's parent, and (b)
+       //note: this is only here because it's currently impossible to both (a) get a form control's parent, and (b)
        //convert expressions into refs while preserving predicates. once these are fixed, this field can go away
 
     public TreeReference labelRef;     //absolute ref of label
     public IConditionExpr labelExpr;   //path expression for label; may be relative, no predicates
     public boolean labelIsItext;       //if true, content of 'label' is an itext id
 
-    public boolean copyMode;           //true = copy subtree; false = copy string value
-    public IConditionExpr copyExpr;    // path expression for copy; may be relative, no predicates
-    public TreeReference copyRef;      //absolute ref to copy
     public TreeReference valueRef;     //absolute ref to value
     public IConditionExpr valueExpr;   //path expression for value; may be relative, no predicates (must be relative if copy mode)
 
@@ -74,6 +71,22 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public boolean randomize = false;
     public XPathNumericLiteral randomSeedNumericExpr = null;
     public XPathPathExpr randomSeedPathExpr = null;
+
+    /**
+     * @deprecated No tests and no evidence it's used.
+     */
+    @Deprecated
+    public boolean copyMode;           //true = copy subtree; false = copy string value
+    /**
+     * @deprecated No tests and no evidence it's used.
+     */
+    @Deprecated
+    public IConditionExpr copyExpr;    // path expression for copy; may be relative, no predicates
+    /**
+     * @deprecated No tests and no evidence it's used.
+     */
+    @Deprecated
+    public TreeReference copyRef;      //absolute ref to copy
 
     /**
      * Returns a list of <code>SelectChoice</code> objects based on the data in the model. If any of the itemset expression

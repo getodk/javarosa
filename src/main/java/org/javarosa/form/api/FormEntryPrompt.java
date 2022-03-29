@@ -98,7 +98,6 @@ public class FormEntryPrompt extends FormEntryCaption {
                     // The call to get a list of choices filters out answer options that don't exist anymore.
                     return mTreeElement.getValue();
                 } else {
-                    // TODO: add tests for copy mode
                     List<String> preselectedValues = new ArrayList<String>();
 
                     TreeReference destRef = itemset.getDestRef().contextualize(mTreeElement.getRef());
