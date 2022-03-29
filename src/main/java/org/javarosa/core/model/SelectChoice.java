@@ -1,5 +1,8 @@
 package org.javarosa.core.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -10,16 +13,28 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.XFormParseException;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class SelectChoice implements Externalizable, Localizable {
-
-    private String labelInnerText;
-    private String textID;
-    private boolean isLocalizable;
+    /** The literal value from the child that is used as a value. For inline selects ("static"), this child always has
+     * the name "value". For selects from itemsets ("dynamic"), the child node to use is specified in the form definition
+     * (e.g. country_code)
+     */
     private String value;
+
+    /**
+     * If this choice is from a non-localizable item, the literal value from the child that is used as a label.
+     * For inline selects ("static"), this child always has the name "label". For selects from itemsets ("dynamic"), the
+     * child node to use is specified in the form definition (e.g. the_human_friendly_name)
+     */
+    private String labelInnerText;
+
+    /**
+     * If this choice is from a localizable item, the literal text from the child that is used as a label. This will be
+     * used to look up the localized label based on the current language.
+     */
+    private String textID;
+
+    private boolean isLocalizable;
+
     private int index = -1;
 
     /**
@@ -31,7 +46,7 @@ public class SelectChoice implements Externalizable, Localizable {
     public TreeElement copyNode;
 
     /**
-     * The node that this choice represents. Not serialized.
+     * For selects from itemsets ("dynamic"), the node that this choice represents. Not serialized.
      */
     private TreeElement item;
 
