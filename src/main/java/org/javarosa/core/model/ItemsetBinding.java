@@ -210,7 +210,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
             labelIsItext,
             item.getInstanceName() != null
                 ? (TreeElement) formDef.getNonMainInstance(item.getInstanceName()).resolveReference(item)
-                : formDef.getMainInstance().resolveReference(item));
+                : formDef.getMainInstance().resolveReference(item),
+            labelRef.getNameLast());
 
         choice.setIndex(i);
 

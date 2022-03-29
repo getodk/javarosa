@@ -3,6 +3,8 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -54,6 +56,11 @@ public class SelectChoice implements Externalizable, Localizable {
     private TreeElement item;
 
     /**
+     * For selects from itemsets ("dynamic"), the terminal node of the reference that determines the label.
+     */
+    private String labelRefName;
+
+    /**
      * for deserialization only
      */
     public SelectChoice() {
@@ -61,39 +68,34 @@ public class SelectChoice implements Externalizable, Localizable {
     }
 
     public SelectChoice(String labelID, String value) {
-        this(labelID, null, value, true, null);
+        this(labelID, null, value, true, null, null);
     }
 
     public SelectChoice(String labelID, String labelInnerText, boolean isLocalizable) {
-        this(labelID, labelInnerText, isLocalizable, null);
+        this(labelID, labelInnerText, isLocalizable, null, null);
     }
 
     public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
-        this(labelID, labelInnerText, value, isLocalizable, null);
+        this(labelID, labelInnerText, value, isLocalizable, null, null);
     }
 
-    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item) {
+    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item, String labelRefName) {
         this(isLocalizable ? labelOrID : null,
             isLocalizable ? null : labelOrID,
-            Value, isLocalizable, item);
+            Value, isLocalizable, item, labelRefName);
     }
 
-    /**
-     * @param labelID        can be null
-     * @param labelInnerText can be null
-     * @param value          should not be null
-     * @throws XFormParseException if value is null
-     */
-    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item) {
+    private SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item, String labelRefName) {
+        if (value == null) {
+            throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
+        }
+
+        this.value = value;
         this.isLocalizable = isLocalizable;
         this.textID = labelID;
         this.labelInnerText = labelInnerText;
         this.item = item;
-        if (value != null) {
-            this.value = value;
-        } else {
-            throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
-        }
+        this.labelRefName = labelRefName;
     }
 
     public void setIndex(int index) {
@@ -109,13 +111,31 @@ public class SelectChoice implements Externalizable, Localizable {
     }
 
     public String getChild(String childName) {
-        if (item != null) {
-            TreeElement child = item.getChild(childName, 0);
-            if (child != null) {
-                return child.getValue().getDisplayText();
+        if (item == null) {
+            throw new IllegalStateException("Can only get the child of a choice from a select from itemset");
+        }
+
+        TreeElement child = item.getChild(childName, 0);
+        if (child != null) {
+            return child.getValue().getDisplayText();
+        }
+
+        return null;
+    }
+
+    public Map<String, String> getAdditionalChildren() {
+        if (item == null) {
+            throw new IllegalStateException("Can only get the child of a choice from a select from itemset");
+        }
+
+        Map<String, String> children = new LinkedHashMap<>();
+        for (int i = 0; i < item.getNumChildren(); i++) {
+            TreeElement child = item.getChildAt(i);
+            if (!child.getRef().getNameLast().equals(labelRefName)) {
+                children.put(child.getName(), child.getValue().getDisplayText());
             }
         }
-        return null;
+        return children;
     }
 
     public int getIndex() {

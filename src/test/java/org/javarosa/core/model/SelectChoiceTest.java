@@ -17,6 +17,8 @@
 package org.javarosa.core.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
@@ -35,8 +37,10 @@ import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.Map;
 import org.hamcrest.CoreMatchers;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -118,5 +122,104 @@ public class SelectChoiceTest {
 
         scenario.answer("/data/repeat[0]/special-property", "changed");
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("changed"));
+    }
+
+    @Test
+    public void getChild_throwsException_whenCalledOnAChoiceFromStaticSelect() throws IOException {
+        Scenario scenario = Scenario.init("Static select", html(
+            head(
+                title("Static select"),
+                model(
+                    mainInstance(
+                        t("data id='static-select'",
+                            t("select"))))),
+            body(
+                select1("/data/select", item("one", "One"), item("two", "Two"))
+            )));
+
+        try {
+            scenario.choicesOf("/data/select").get(0).getChild("invalid-property");
+            fail();
+        } catch (IllegalStateException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void getAdditionalChildren_returnsChildren_whenChoicesAreFromSecondaryInstance() {
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+
+        Scenario scenario = Scenario.init("external-select-geojson.xml");
+
+        Map<String, String> firstNodeChildren = scenario.choicesOf("/data/q").get(0).getAdditionalChildren();
+        assertThat(firstNodeChildren.keySet(), hasSize(3));
+        assertThat(firstNodeChildren, hasEntry("geometry", "0.5 102 0 0"));
+        assertThat(firstNodeChildren, hasEntry("id", "fs87b"));
+        assertThat(firstNodeChildren, hasEntry("foo", "bar"));
+
+        Map<String, String> secondNodeChildren = scenario.choicesOf("/data/q").get(1).getAdditionalChildren();
+        assertThat(secondNodeChildren.keySet(), hasSize(4));
+        assertThat(secondNodeChildren, hasEntry("geometry", "0.5 104 0 0"));
+        assertThat(secondNodeChildren, hasEntry("id", "67abie"));
+        assertThat(secondNodeChildren, hasEntry("foo", "quux"));
+        assertThat(secondNodeChildren, hasEntry("special-property", "special value"));
+    }
+
+    @Test
+    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Select from repeat", html(
+            head(
+                title("Select from repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("repeat",
+                                t("value"),
+                                t("label"),
+                                t("special-property")),
+                            t("filter"),
+                            t("select"))))),
+            body(
+                repeat("/data/repeat",
+                    input("value"),
+                    input("label"),
+                    input("special-property")),
+                input("filter"),
+                select1Dynamic("/data/select", "../repeat")
+            )));
+        scenario.answer("/data/repeat[0]/value", "a");
+        scenario.answer("/data/repeat[0]/label", "A");
+        scenario.answer("/data/repeat[0]/special-property", "AA");
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
+        Map<String, String> children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
+        assertThat(children.keySet(), hasSize(2));
+        assertThat(children, hasEntry("value", "a"));
+        assertThat(children, hasEntry("special-property", "AA"));
+
+        scenario.answer("/data/repeat[0]/special-property", "changed");
+        children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
+        assertThat(children, hasEntry("special-property", "changed"));
+    }
+
+    @Test
+    public void getAdditionalChildren_throwsException_whenCalledOnAChoiceFromStaticSelect() throws IOException {
+        Scenario scenario = Scenario.init("Static select", html(
+            head(
+                title("Static select"),
+                model(
+                    mainInstance(
+                        t("data id='static-select'",
+                            t("select"))))),
+            body(
+                select1("/data/select", item("one", "One"), item("two", "Two"))
+            )));
+
+        try {
+            scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
+            fail();
+        } catch (IllegalStateException e) {
+            // expected
+        }
     }
 }
