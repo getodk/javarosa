@@ -17,6 +17,7 @@
 package org.javarosa.core.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -37,7 +38,6 @@ import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Map;
@@ -125,7 +125,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_throwsException_whenCalledOnAChoiceFromStaticSelect() throws IOException {
+    public void getChild_returnsNull_whenCalledOnAChoiceFromInlineSelect() throws IOException {
         Scenario scenario = Scenario.init("Static select", html(
             head(
                 title("Static select"),
@@ -137,12 +137,7 @@ public class SelectChoiceTest {
                 select1("/data/select", item("one", "One"), item("two", "Two"))
             )));
 
-        try {
-            scenario.choicesOf("/data/select").get(0).getChild("invalid-property");
-            fail();
-        } catch (IllegalStateException e) {
-            // expected
-        }
+        assertThat(scenario.choicesOf("/data/select").get(0).getChild("invalid-property"), nullValue());
     }
 
     @Test
@@ -203,7 +198,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_throwsException_whenCalledOnAChoiceFromStaticSelect() throws IOException {
+    public void getAdditionalChildren_returnsEmpty_whenCalledOnAChoiceFromInlineSelect() throws IOException {
         Scenario scenario = Scenario.init("Static select", html(
             head(
                 title("Static select"),
@@ -215,11 +210,6 @@ public class SelectChoiceTest {
                 select1("/data/select", item("one", "One"), item("two", "Two"))
             )));
 
-        try {
-            scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
-            fail();
-        } catch (IllegalStateException e) {
-            // expected
-        }
+        assertThat(scenario.choicesOf("/data/select").get(0).getAdditionalChildren().keySet(), is(empty()));
     }
 }

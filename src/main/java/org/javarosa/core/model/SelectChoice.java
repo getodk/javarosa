@@ -112,7 +112,7 @@ public class SelectChoice implements Externalizable, Localizable {
 
     public String getChild(String childName) {
         if (item == null) {
-            throw new IllegalStateException("Can only get the child of a choice from a select from itemset");
+            return null;
         }
 
         TreeElement child = item.getChild(childName, 0);
@@ -125,7 +125,7 @@ public class SelectChoice implements Externalizable, Localizable {
 
     public Map<String, String> getAdditionalChildren() {
         if (item == null) {
-            throw new IllegalStateException("Can only get the child of a choice from a select from itemset");
+            return new LinkedHashMap<>();
         }
 
         Map<String, String> children = new LinkedHashMap<>();
