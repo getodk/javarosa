@@ -3,8 +3,9 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import kotlin.Pair;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -123,16 +124,16 @@ public class SelectChoice implements Externalizable, Localizable {
         return null;
     }
 
-    public Map<String, String> getAdditionalChildren() {
+    public List<Pair<String, String>> getAdditionalChildren() {
         if (item == null) {
-            return new LinkedHashMap<>();
+            return new ArrayList<>();
         }
 
-        Map<String, String> children = new LinkedHashMap<>();
+        List<Pair<String, String>> children = new ArrayList<>();
         for (int i = 0; i < item.getNumChildren(); i++) {
             TreeElement child = item.getChildAt(i);
             if (!child.getRef().getNameLast().equals(labelRefName)) {
-                children.put(child.getName(), child.getValue().getDisplayText());
+                children.add(new Pair<>(child.getName(), child.getValue().getDisplayText()));
             }
         }
         return children;

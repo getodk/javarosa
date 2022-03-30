@@ -16,9 +16,9 @@
 
 package org.javarosa.core.model;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -40,7 +40,8 @@ import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import kotlin.Pair;
 import org.hamcrest.CoreMatchers;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -141,23 +142,23 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_returnsChildren_whenChoicesAreFromSecondaryInstance() {
+    public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
 
-        Map<String, String> firstNodeChildren = scenario.choicesOf("/data/q").get(0).getAdditionalChildren();
-        assertThat(firstNodeChildren.keySet(), hasSize(3));
-        assertThat(firstNodeChildren, hasEntry("geometry", "0.5 102 0 0"));
-        assertThat(firstNodeChildren, hasEntry("id", "fs87b"));
-        assertThat(firstNodeChildren, hasEntry("foo", "bar"));
+        List<Pair<String, String>> firstNodeChildren = scenario.choicesOf("/data/q").get(0).getAdditionalChildren();
+        assertThat(firstNodeChildren, hasSize(3));
+        assertThat(firstNodeChildren.get(0), equalTo(new Pair<>("geometry", "0.5 102 0 0")));
+        assertThat(firstNodeChildren.get(1), equalTo(new Pair<>("id", "fs87b")));
+        assertThat(firstNodeChildren.get(2), equalTo(new Pair<>("foo", "bar")));
 
-        Map<String, String> secondNodeChildren = scenario.choicesOf("/data/q").get(1).getAdditionalChildren();
-        assertThat(secondNodeChildren.keySet(), hasSize(4));
-        assertThat(secondNodeChildren, hasEntry("geometry", "0.5 104 0 0"));
-        assertThat(secondNodeChildren, hasEntry("id", "67abie"));
-        assertThat(secondNodeChildren, hasEntry("foo", "quux"));
-        assertThat(secondNodeChildren, hasEntry("special-property", "special value"));
+        List<Pair<String, String>> secondNodeChildren = scenario.choicesOf("/data/q").get(1).getAdditionalChildren();
+        assertThat(secondNodeChildren, hasSize(4));
+        assertThat(secondNodeChildren.get(0), equalTo(new Pair<>("geometry", "0.5 104 0 0")));
+        assertThat(secondNodeChildren.get(1), equalTo(new Pair<>("id", "67abie")));
+        assertThat(secondNodeChildren.get(2), equalTo(new Pair<>("foo", "quux")));
+        assertThat(secondNodeChildren.get(3), equalTo(new Pair<>("special-property", "special value")));
     }
 
     @Test
@@ -187,14 +188,14 @@ public class SelectChoiceTest {
         scenario.answer("/data/repeat[0]/special-property", "AA");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
-        Map<String, String> children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
-        assertThat(children.keySet(), hasSize(2));
-        assertThat(children, hasEntry("value", "a"));
-        assertThat(children, hasEntry("special-property", "AA"));
+        List<Pair<String, String>> children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
+        assertThat(children, hasSize(2));
+        assertThat(children.get(0), equalTo(new Pair<>("value", "a")));
+        assertThat(children.get(1), equalTo(new Pair<>("special-property", "AA")));
 
         scenario.answer("/data/repeat[0]/special-property", "changed");
         children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
-        assertThat(children, hasEntry("special-property", "changed"));
+        assertThat(children.get(1), equalTo(new Pair<>("special-property", "changed")));
     }
 
     @Test
@@ -210,6 +211,6 @@ public class SelectChoiceTest {
                 select1("/data/select", item("one", "One"), item("two", "Two"))
             )));
 
-        assertThat(scenario.choicesOf("/data/select").get(0).getAdditionalChildren().keySet(), is(empty()));
+        assertThat(scenario.choicesOf("/data/select").get(0).getAdditionalChildren(), is(empty()));
     }
 }
