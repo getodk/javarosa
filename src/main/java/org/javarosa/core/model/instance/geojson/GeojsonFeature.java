@@ -26,6 +26,7 @@ import org.javarosa.core.model.instance.TreeElement;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GeojsonFeature {
+    public static final String GEOMETRY_CHILD_NAME = "geometry";
     private String type;
     private GeojsonGeometry geometry;
     private Map<String, String> properties;
@@ -39,7 +40,7 @@ public class GeojsonFeature {
 
         TreeElement item = new TreeElement("item", multiplicity);
 
-        TreeElement geoField = new TreeElement("geometry", 0);
+        TreeElement geoField = new TreeElement(GEOMETRY_CHILD_NAME, 0);
         geoField.setValue(new UncastData(geometry.getOdkCoordinates()));
         item.addChild(geoField);
 

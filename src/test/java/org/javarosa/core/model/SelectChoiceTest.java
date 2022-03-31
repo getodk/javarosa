@@ -16,7 +16,10 @@
 
 package org.javarosa.core.model;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
@@ -37,6 +40,8 @@ import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 import java.io.IOException;
+import java.util.List;
+import kotlin.Pair;
 import org.hamcrest.CoreMatchers;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -118,5 +123,94 @@ public class SelectChoiceTest {
 
         scenario.answer("/data/repeat[0]/special-property", "changed");
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("changed"));
+    }
+
+    @Test
+    public void getChild_returnsNull_whenCalledOnAChoiceFromInlineSelect() throws IOException {
+        Scenario scenario = Scenario.init("Static select", html(
+            head(
+                title("Static select"),
+                model(
+                    mainInstance(
+                        t("data id='static-select'",
+                            t("select"))))),
+            body(
+                select1("/data/select", item("one", "One"), item("two", "Two"))
+            )));
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getChild("invalid-property"), nullValue());
+    }
+
+    @Test
+    public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() {
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+
+        Scenario scenario = Scenario.init("external-select-geojson.xml");
+
+        List<Pair<String, String>> firstNodeChildren = scenario.choicesOf("/data/q").get(0).getAdditionalChildren();
+        assertThat(firstNodeChildren, hasSize(3));
+        assertThat(firstNodeChildren.get(0), equalTo(new Pair<>("geometry", "0.5 102 0 0")));
+        assertThat(firstNodeChildren.get(1), equalTo(new Pair<>("id", "fs87b")));
+        assertThat(firstNodeChildren.get(2), equalTo(new Pair<>("foo", "bar")));
+
+        List<Pair<String, String>> secondNodeChildren = scenario.choicesOf("/data/q").get(1).getAdditionalChildren();
+        assertThat(secondNodeChildren, hasSize(4));
+        assertThat(secondNodeChildren.get(0), equalTo(new Pair<>("geometry", "0.5 104 0 0")));
+        assertThat(secondNodeChildren.get(1), equalTo(new Pair<>("id", "67abie")));
+        assertThat(secondNodeChildren.get(2), equalTo(new Pair<>("foo", "quux")));
+        assertThat(secondNodeChildren.get(3), equalTo(new Pair<>("special-property", "special value")));
+    }
+
+    @Test
+    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Select from repeat", html(
+            head(
+                title("Select from repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("repeat",
+                                t("value"),
+                                t("label"),
+                                t("special-property")),
+                            t("filter"),
+                            t("select"))))),
+            body(
+                repeat("/data/repeat",
+                    input("value"),
+                    input("label"),
+                    input("special-property")),
+                input("filter"),
+                select1Dynamic("/data/select", "../repeat")
+            )));
+        scenario.answer("/data/repeat[0]/value", "a");
+        scenario.answer("/data/repeat[0]/label", "A");
+        scenario.answer("/data/repeat[0]/special-property", "AA");
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
+        List<Pair<String, String>> children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
+        assertThat(children, hasSize(2));
+        assertThat(children.get(0), equalTo(new Pair<>("value", "a")));
+        assertThat(children.get(1), equalTo(new Pair<>("special-property", "AA")));
+
+        scenario.answer("/data/repeat[0]/special-property", "changed");
+        children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
+        assertThat(children.get(1), equalTo(new Pair<>("special-property", "changed")));
+    }
+
+    @Test
+    public void getAdditionalChildren_returnsEmpty_whenCalledOnAChoiceFromInlineSelect() throws IOException {
+        Scenario scenario = Scenario.init("Static select", html(
+            head(
+                title("Static select"),
+                model(
+                    mainInstance(
+                        t("data id='static-select'",
+                            t("select"))))),
+            body(
+                select1("/data/select", item("one", "One"), item("two", "Two"))
+            )));
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getAdditionalChildren(), is(empty()));
     }
 }

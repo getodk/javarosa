@@ -1,5 +1,11 @@
 package org.javarosa.core.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import kotlin.Pair;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -10,16 +16,28 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.XFormParseException;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class SelectChoice implements Externalizable, Localizable {
-
-    private String labelInnerText;
-    private String textID;
-    private boolean isLocalizable;
+    /** The literal value from the child that is used as a value. For inline selects ("static"), this child always has
+     * the name "value". For selects from itemsets ("dynamic"), the child node to use is specified in the form definition
+     * (e.g. country_code)
+     */
     private String value;
+
+    /**
+     * If this choice is from a non-localizable item, the literal value from the child that is used as a label.
+     * For inline selects ("static"), this child always has the name "label". For selects from itemsets ("dynamic"), the
+     * child node to use is specified in the form definition (e.g. the_human_friendly_name)
+     */
+    private String labelInnerText;
+
+    /**
+     * If this choice is from a localizable item, the literal text from the child that is used as a label. This will be
+     * used to look up the localized label based on the current language.
+     */
+    private String textID;
+
+    private boolean isLocalizable;
+
     private int index = -1;
 
     /**
@@ -27,13 +45,21 @@ public class SelectChoice implements Externalizable, Localizable {
      * 'copy' answer mode, this points to the node to be copied if this
      * selection is chosen this field only has meaning for dynamic choices, thus
      * is unserialized
+     *
+     * @deprecated No tests and no evidence it's used.
      */
+    @Deprecated
     public TreeElement copyNode;
 
     /**
-     * The node that this choice represents. Not serialized.
+     * For selects from itemsets ("dynamic"), the node that this choice represents. Not serialized.
      */
     private TreeElement item;
+
+    /**
+     * For selects from itemsets ("dynamic"), the terminal node of the reference that determines the label.
+     */
+    private String labelRefName;
 
     /**
      * for deserialization only
@@ -43,39 +69,34 @@ public class SelectChoice implements Externalizable, Localizable {
     }
 
     public SelectChoice(String labelID, String value) {
-        this(labelID, null, value, true, null);
+        this(labelID, null, value, true, null, null);
     }
 
     public SelectChoice(String labelID, String labelInnerText, boolean isLocalizable) {
-        this(labelID, labelInnerText, isLocalizable, null);
+        this(labelID, labelInnerText, isLocalizable, null, null);
     }
 
     public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable) {
-        this(labelID, labelInnerText, value, isLocalizable, null);
+        this(labelID, labelInnerText, value, isLocalizable, null, null);
     }
 
-    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item) {
+    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item, String labelRefName) {
         this(isLocalizable ? labelOrID : null,
             isLocalizable ? null : labelOrID,
-            Value, isLocalizable, item);
+            Value, isLocalizable, item, labelRefName);
     }
 
-    /**
-     * @param labelID        can be null
-     * @param labelInnerText can be null
-     * @param value          should not be null
-     * @throws XFormParseException if value is null
-     */
-    public SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item) {
+    private SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item, String labelRefName) {
+        if (value == null) {
+            throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
+        }
+
+        this.value = value;
         this.isLocalizable = isLocalizable;
         this.textID = labelID;
         this.labelInnerText = labelInnerText;
         this.item = item;
-        if (value != null) {
-            this.value = value;
-        } else {
-            throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
-        }
+        this.labelRefName = labelRefName;
     }
 
     public void setIndex(int index) {
@@ -91,13 +112,31 @@ public class SelectChoice implements Externalizable, Localizable {
     }
 
     public String getChild(String childName) {
-        if (item != null) {
-            TreeElement child = item.getChild(childName, 0);
-            if (child != null) {
-                return child.getValue().getDisplayText();
+        if (item == null) {
+            return null;
+        }
+
+        TreeElement child = item.getChild(childName, 0);
+        if (child != null) {
+            return child.getValue().getDisplayText();
+        }
+
+        return null;
+    }
+
+    public List<Pair<String, String>> getAdditionalChildren() {
+        if (item == null) {
+            return new ArrayList<>();
+        }
+
+        List<Pair<String, String>> children = new ArrayList<>();
+        for (int i = 0; i < item.getNumChildren(); i++) {
+            TreeElement child = item.getChildAt(i);
+            if (!child.getRef().getNameLast().equals(labelRefName)) {
+                children.add(new Pair<>(child.getName(), child.getValue().getDisplayText()));
             }
         }
-        return null;
+        return children;
     }
 
     public int getIndex() {
@@ -107,7 +146,6 @@ public class SelectChoice implements Externalizable, Localizable {
 
         return index;
     }
-
 
     public void localeChanged(String locale, Localizer localizer) {
         // TODO Review this commented block
