@@ -16,14 +16,15 @@
 
 package org.javarosa.core.model.data;
 
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.IExprDataType;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xpath.IExprDataType;
 
 /**
  * A response to a question requesting an GeoTrace Value.
@@ -109,7 +110,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
 
 
     @Override
-    public Object getValue() {
+    public @NotNull Object getValue() {
         ArrayList<double[]> pts = new ArrayList<>();
         for ( GeoPointData p : points ) {
             pts.add((double[])p.getValue());

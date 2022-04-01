@@ -16,15 +16,16 @@
 
 package org.javarosa.core.model.data;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -106,7 +107,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
 
 
     @Override
-    public Object getValue() {
+    public @NotNull Object getValue() {
         // clone()'ing to prevent some potential bad direct accesses
         // when these values are returned by GeoLine or GeoShape objects.
         return gp.clone();

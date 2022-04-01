@@ -16,15 +16,16 @@
 
 package org.javarosa.core.model.data;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import java.util.Objects;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * A response to a question requesting a selection
@@ -62,7 +63,7 @@ public class SelectOneData implements IAnswerData {
     }
 
     @Override
-    public Object getValue () {
+    public @NotNull Object getValue () {
         return s;
     }
 

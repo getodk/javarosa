@@ -16,6 +16,12 @@
 
 package org.javarosa.core.model.data;
 
+import org.javarosa.core.model.DataType;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Date;
+
 import static org.javarosa.core.model.DataType.BOOLEAN;
 import static org.javarosa.core.model.DataType.CHOICE;
 import static org.javarosa.core.model.DataType.DATE;
@@ -26,10 +32,6 @@ import static org.javarosa.core.model.DataType.INTEGER;
 import static org.javarosa.core.model.DataType.LONG;
 import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
 import static org.javarosa.core.model.DataType.TIME;
-
-import java.util.Date;
-import org.javarosa.core.model.DataType;
-import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * An IAnswerData object represents an answer to a question
@@ -128,6 +130,7 @@ public interface IAnswerData extends Externalizable {
      * @return The value of this answer, will never
      * be null
      */
+    @NotNull
     Object getValue ();       //will never be null
     /**
      * @return Gets a string representation of this
