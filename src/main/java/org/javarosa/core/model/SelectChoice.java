@@ -1,10 +1,5 @@
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import kotlin.Pair;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
@@ -15,9 +10,17 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.XFormParseException;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SelectChoice implements Externalizable, Localizable {
-    /** The literal value from the child that is used as a value. For inline selects ("static"), this child always has
+    /**
+     * The literal value from the child that is used as a value. For inline selects ("static"), this child always has
      * the name "value". For selects from itemsets ("dynamic"), the child node to use is specified in the form definition
      * (e.g. country_code)
      */
@@ -111,6 +114,7 @@ public class SelectChoice implements Externalizable, Localizable {
         return value;
     }
 
+    @Nullable
     public String getChild(String childName) {
         if (item == null) {
             return null;

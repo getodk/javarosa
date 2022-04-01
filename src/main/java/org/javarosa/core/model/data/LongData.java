@@ -16,12 +16,13 @@
 
 package org.javarosa.core.model.data;
 
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 /**
@@ -58,7 +59,7 @@ public class LongData implements IAnswerData {
     }
 
     @Override
-    public Object getValue() {
+    public @NotNull Object getValue() {
         return n;
     }
 

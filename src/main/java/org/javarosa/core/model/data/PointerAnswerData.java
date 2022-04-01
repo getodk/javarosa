@@ -16,15 +16,16 @@
 
 package org.javarosa.core.model.data;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * Answer data representing a pointer object.  The pointer is a reference to some
@@ -60,7 +61,7 @@ public class PointerAnswerData implements IAnswerData {
     }
 
     @Override
-    public Object getValue() {
+    public @NotNull Object getValue() {
         return data;
     }
 
