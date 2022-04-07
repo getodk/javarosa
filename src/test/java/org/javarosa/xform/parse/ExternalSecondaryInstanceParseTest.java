@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -71,6 +72,17 @@ public class ExternalSecondaryInstanceParseTest {
 
         AbstractTreeElement secondItem = formDef.getNonMainInstance("external-geojson").resolveReference(treeReferences.get(1));
         assertThat(secondItem.getChild("name", 0).getValue().getDisplayText(), is("Your cool point"));
+    }
+
+    @Test
+    public void itemsFromExternalSecondaryGeoJsonInstance_withIntegerIds_canBeSelected() throws XFormParser.ParseException {
+        configureReferenceManagerCorrectly();
+
+        Scenario scenario = Scenario.init(r("external-select-geojson.xml"));
+        SelectChoice choiceWithIntId = scenario.choicesOf("/data/q").get(1);
+        scenario.next();
+        scenario.answer(choiceWithIntId);
+        assertThat(scenario.answerOf("/data/q").getDisplayText(), is("67"));
     }
 
     @Test

@@ -123,6 +123,14 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
+    public void parse_allowsIntegerId() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-integer-id.geojson").toString());
+
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
+        assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("77"));
+    }
+
+    @Test
     public void parse_ignoresUnknownToplevelProperties() throws IOException {
         TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-feature-toplevel.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
