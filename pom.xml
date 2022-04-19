@@ -5,7 +5,7 @@
   <!-- Be sure to update version in build.gradle to match -->
   <!-- snapshot release = x.x.x-SNAPSHOT -->
   <!-- production release = x.x.x -->
-  <version>3.4.0</version>
+  <version>3.5.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
@@ -59,7 +59,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.1</version>
+      <version>2.13.2.1</version>
     </dependency>
     <dependency>
        <groupId>org.apache.commons</groupId>
