@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 import org.javarosa.core.model.instance.TreeElement;
 
 public class GeoJsonExternalInstance {
@@ -30,37 +31,41 @@ public class GeoJsonExternalInstance {
 
         ObjectMapper objectMapper = new ObjectMapper();
         try (JsonParser jsonParser = objectMapper.getFactory().createParser(new FileInputStream(path))) {
-            validatePreamble(jsonParser);
+            if (jsonParser.nextToken() != JsonToken.START_OBJECT) {
+                throw new IOException("GeoJSON file must contain a top-level Object");
+            }
 
-            int multiplicity = 0;
-            while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-                GeojsonFeature feature = objectMapper.readValue(jsonParser, GeojsonFeature.class);
+            boolean typeValidated = false;
+            boolean featuresIdentified = false;
 
-                root.addChild(feature.toTreeElement(multiplicity));
-                multiplicity++;
+            while (jsonParser.hasCurrentToken() && !(typeValidated && featuresIdentified)) {
+                String propertyName = jsonParser.nextFieldName();
+                JsonToken propertyType = jsonParser.nextValue();
+
+                if (Objects.equals(propertyName, "type") && propertyType == JsonToken.VALUE_STRING && Objects.equals(jsonParser.getValueAsString(), "FeatureCollection")) {
+                    typeValidated = true;
+                } else if (Objects.equals(propertyName, "features") && propertyType.equals(JsonToken.START_ARRAY)) {
+                    int multiplicity = 0;
+                    while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+                        GeojsonFeature feature = objectMapper.readValue(jsonParser, GeojsonFeature.class);
+                        root.addChild(feature.toTreeElement(multiplicity));
+                        multiplicity++;
+                    }
+                    featuresIdentified = true;
+                } else {
+                    jsonParser.skipChildren();
+                }
+            }
+
+            if (!typeValidated) {
+                throw new IOException("GeoJSON file must contain a top-level FeatureCollection");
+            }
+
+            if (!featuresIdentified) {
+                throw new IOException("GeoJSON FeatureCollection must contain an array of features");
             }
         }
 
         return root;
-    }
-
-    private static void validatePreamble(JsonParser jsonParser) throws IOException {
-        if (jsonParser.nextToken() != JsonToken.START_OBJECT) {
-            throw new IOException("GeoJSON file must contain a top-level Object");
-        }
-
-        jsonParser.nextToken();
-        String propertyName = jsonParser.getCurrentName();
-        jsonParser.nextToken();
-        if (!(propertyName.equals("type") && jsonParser.getValueAsString().equals("FeatureCollection"))) {
-            throw new IOException("GeoJSON file must contain a top-level FeatureCollection");
-        }
-
-        jsonParser.nextToken();
-        propertyName = jsonParser.getCurrentName();
-
-        if (!(propertyName.equals("features") && jsonParser.nextToken() == JsonToken.START_ARRAY)) {
-            throw new IOException("GeoJSON FeatureCollection must contain an array of features");
-        }
     }
 }
