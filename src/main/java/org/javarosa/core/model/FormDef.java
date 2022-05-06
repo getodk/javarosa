@@ -394,12 +394,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         setAnswer(data, node);
 
         QuestionDef currentQuestion = findQuestionByRef(ref, this);
+
+        Collection<QuickTriggerable> qts = triggerTriggerables(ref);
+
         if (valueChanged && currentQuestion != null) {
             currentQuestion.getActionController().triggerActionsFromEvent(Actions.EVENT_QUESTION_VALUE_CHANGED, this,
                 ref.getParentRef(), null);
         }
-
-        Collection<QuickTriggerable> qts = triggerTriggerables(ref);
         dagImpl.publishSummary("New value", ref, qts);
         // TODO: pre-populate fix-count repeats here?
     }

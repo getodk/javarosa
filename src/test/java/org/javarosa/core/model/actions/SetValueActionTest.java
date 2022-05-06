@@ -258,4 +258,28 @@ public class SetValueActionTest {
         assertThat(scenario.answerOf("/data/destination1"), is(intAnswer(7)));
         assertThat(scenario.answerOf("/data/destination2"), is(intAnswer(11)));
     }
+
+    @Test
+    public void xformsValueChanged_triggeredAfterRecomputation() throws IOException {
+        Scenario scenario = Scenario.init("xforms-value-changed-event", html(
+            head(
+                title("Value changed event"),
+                model(
+                    mainInstance(t("data id=\"xforms-value-changed-event\"",
+                        t("source"),
+                        t("calculate"),
+                        t("destination")
+                    )),
+                    bind("/data/calculate").type("int").calculate("/data/source * 2"),
+                    bind("/data/destination").type("int")
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalue("xforms-value-changed", "/data/destination", "/data/calculate")
+            ))));
+
+        scenario.answer("/data/source", 12);
+        assertThat(scenario.answerOf("/data/destination"), is(intAnswer(24)));
+    }
 }
