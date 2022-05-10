@@ -1,7 +1,0 @@
-{
-    "type": "FeatureCollection",
-    "extra": null,
-    "features": [
-        { "type": "Feature", "properties": { "gid": 1, "visited": "yes", "extra": null }, "geometry": { "type": "Point", "coordinates": [ 130.559803472160752, 31.580360584438704 ] } }
-    ]
-}

@@ -1,10 +1,12 @@
 {
+    "type": "FeatureCollection",
     "features": [
         {
             "type": "Feature",
             "properties": {
                 "gid": 1,
-                "visited": "yes"
+                "visited": "yes",
+                "extra": null
             },
             "geometry": {
                 "type": "Point",
@@ -14,13 +16,5 @@
                 ]
             }
         }
-    ],
-    "name": "things_with_layer_attributes",
-    "ignored": {
-        "type": "name",
-        "properties": {
-            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
-        }
-    },
-    "type": "FeatureCollection"
+    ]
 }

@@ -146,8 +146,8 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
-    public void parse_allowsNulls() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-with-nulls.geojson").toString());
+    public void parse_allowsNullFeaturePropertyValues() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-with-null.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("extra", 0).getValue().getDisplayText(), is(""));
     }
