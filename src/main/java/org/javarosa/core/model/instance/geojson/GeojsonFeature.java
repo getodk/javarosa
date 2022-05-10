@@ -47,7 +47,11 @@ public class GeojsonFeature {
         if (properties != null) {
             for (String property : properties.keySet()) {
                 TreeElement field = new TreeElement(property, 0);
-                field.setValue(new UncastData(properties.get(property)));
+                if (properties.get(property) != null) {
+                    field.setValue(new UncastData(properties.get(property)));
+                } else {
+                    field.setValue(new UncastData(""));
+                }
                 item.addChild(field);
             }
         }

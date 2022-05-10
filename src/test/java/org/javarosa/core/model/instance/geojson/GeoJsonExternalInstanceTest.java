@@ -48,6 +48,18 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
+    public void parse_ignoresExtraTopLevelProperties() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-toplevel.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
+    }
+
+    @Test
+    public void parse_acceptsAnyToplevelPropertyOrder() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-toplevel-order.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
+    }
+
+    @Test
     public void parse_throwsException_ifNoFeaturesArray() {
         try {
             GeoJsonExternalInstance.parse("id", r("bad-futures-collection.geojson").toString());
@@ -112,7 +124,7 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_ignoresUnknownToplevelProperties() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-toplevel.geojson").toString());
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-feature-toplevel.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
         assertThat(featureCollection.getChildAt(0).getChild("ignored", 0), nullValue());
     }
@@ -131,5 +143,12 @@ public class GeoJsonExternalInstanceTest {
         } catch (IOException e) {
             // expected
         }
+    }
+
+    @Test
+    public void parse_allowsNullFeaturePropertyValues() throws IOException {
+        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-with-null.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
+        assertThat(featureCollection.getChildAt(0).getChild("extra", 0).getValue().getDisplayText(), is(""));
     }
 }
