@@ -19,14 +19,13 @@ package org.javarosa.xform.util;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.nio.charset.StandardCharsets;
 
 /* this is just a big dump of serialization-related code */
 
@@ -88,8 +87,7 @@ public class XFormSerializer {
         KXmlSerializer serializer = new KXmlSerializer();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            Writer osw = new OutputStreamWriter(bos, "UTF-8");
-            serializer.setOutput(osw);
+            serializer.setOutput(bos, StandardCharsets.UTF_8.name());
             doc.write(serializer);
             serializer.flush();
             return bos.toByteArray();
