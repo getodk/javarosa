@@ -1,9 +1,13 @@
 package org.javarosa.core.model.instance;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import org.apache.commons.io.input.BOMInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,5 +51,20 @@ public class CsvExternalInstanceTest {
             assertEquals("", commaSeparated.getChildAt(5).getChildAt(fieldIndex).getValue().getValue());
             assertEquals("", semiColonSeparated.getChildAt(5).getChildAt(fieldIndex).getValue().getValue());
         }
+    }
+
+    @Test
+    public void ignores_utf8_bom() throws IOException {
+        BOMInputStream bomIs = new BOMInputStream(new FileInputStream(r("external-secondary-csv-bom.csv").toFile()));
+        assertThat(bomIs.hasBOM(), is(true));
+
+        TreeElement bomCsv = CsvExternalInstance.parse("id", r("external-secondary-csv-bom.csv").toString());
+        assertThat(bomCsv.getChildAt(0).getChildAt(0).getName(), is("name"));
+    }
+
+    @Test
+    public void parses_utf8_characters() throws IOException {
+        TreeElement bomCsv = CsvExternalInstance.parse("id", r("external-secondary-csv-bom.csv").toString());
+        assertThat(bomCsv.getChildAt(0).getChild("elevation", 0).getValue().getValue(), is("testé"));
     }
 }
