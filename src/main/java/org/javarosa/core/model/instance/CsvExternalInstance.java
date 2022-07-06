@@ -1,13 +1,15 @@
 package org.javarosa.core.model.instance;
 
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
 import org.javarosa.core.model.data.UncastData;
 
 public class CsvExternalInstance {
@@ -18,7 +20,8 @@ public class CsvExternalInstance {
         final CSVFormat csvFormat = CSVFormat.DEFAULT
             .withDelimiter(getDelimiter(path))
             .withFirstRecordAsHeader();
-        final CSVParser csvParser = CSVParser.parse(new File(path), StandardCharsets.UTF_8, csvFormat);
+        Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(path)));
+        final CSVParser csvParser = new CSVParser(reader, csvFormat);
         final String[] fieldNames = csvParser.getHeaderMap().keySet().toArray(new String[0]);
         int multiplicity = 0;
 
