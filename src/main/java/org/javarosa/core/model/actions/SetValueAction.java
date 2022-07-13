@@ -68,23 +68,8 @@ public class SetValueAction extends Action {
     }
 
     public TreeReference processAction(FormDef model, TreeReference contextRef) {
-
-        //Qualify the reference if necessary
+        // If the target is in a repeat, it's stored as an unbound ref. Use the context that the action is defined in to qualify it
         TreeReference targetReference = contextRef == null ? target : target.contextualize(contextRef);
-
-        //For now we only process setValue actions which are within the
-        //context if a context is provided. This happens for repeats where
-        //insert events should only trigger on the right nodes
-        if (contextRef != null){
-            //Note: right now we're qualifying then testing parentage to see whether
-            //there was a conflict, but it's not super clear whether this is a perfect
-            //strategy
-            if (!contextRef.isAncestorOf(targetReference, false)) {
-                return null;
-            }
-        }
-
-        //TODO: either the target or the value's node might not exist here, catch and throw reasonably
         EvaluationContext context = new EvaluationContext(model.getEvaluationContext(), targetReference);
 
         String failMessage = "Target of TreeReference " + target.toString(true) + " could not be resolved!";

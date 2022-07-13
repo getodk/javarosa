@@ -131,8 +131,59 @@ public class SetValueActionTest {
         assertThat(scenario.answerOf("/data/destination"), is(intAnswer(16)));
     }
 
+    //region groups
     @Test
-    public void when_triggerNodeIsUpdatedWithinRepeat_targetNodeCalculation_isEvaluated() throws IOException {
+    public void setvalueInGroup_setsValueOutsideOfGroup() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue", html(
+            head(
+                title("Setvalue"),
+                model(
+                    mainInstance(t("data id=\"setvalue\"",
+                        t("g",
+                            t("source")),
+                        t("destination")
+                    )),
+                    bind("/data/g/source").type("int"),
+                    bind("/data/destination").type("int")
+                )
+            ),
+            body(
+                group("/data/g",
+                    input("/data/g/source",
+                        setvalueLiteral("xforms-value-changed", "/data/destination", "7")
+                    ))
+            )));
+
+        scenario.answer("/data/g/source", "foo");
+        assertThat(scenario.answerOf("/data/destination"), is(intAnswer(7)));
+    }
+
+    @Test
+    public void setvalueOutsideGroup_setsValueInGroup() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue", html(
+            head(
+                title("Setvalue"),
+                model(
+                    mainInstance(t("data id=\"setvalue\"",
+                        t("source"),
+                        t("g",
+                            t("destination"))
+                    )),
+                    bind("/data/source").type("int"),
+                    bind("/data/g/destination").type("int")
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalueLiteral("xforms-value-changed", "/data/g/destination", "7")
+                ))
+        ));
+
+        scenario.answer("/data/source", "foo");
+        assertThat(scenario.answerOf("/data/g/destination"), is(intAnswer(7)));
+    }
+    //endregion
+
         Scenario scenario = Scenario.init("Nested setvalue action with repeats", html(
             head(
                 title("Nested setvalue action with repeats"),
