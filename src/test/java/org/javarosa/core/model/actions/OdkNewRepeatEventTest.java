@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
@@ -135,6 +136,43 @@ public class OdkNewRepeatEventTest {
 
         assertThat(scenario.answerOf("/data/repeat2[1]/q1").getDisplayText(), is("barbaz"));
         assertThat(scenario.answerOf("/data/repeat2[2]/q1").getDisplayText(), is("barbaz"));
+    }
+
+    @Test
+    public void newRepeatInstance_canUsePreviousInstanceAsDefault() throws IOException {
+        Scenario scenario = Scenario.init("Default from prior instance", html(
+            head(
+                title("Default from prior instance"),
+                model(
+                    mainInstance(t("data id=\"default-from-prior-instance\"",
+                        t("repeat",
+                            t("q"))
+                    )),
+                    bind("/data/repeat/q").type("integer")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    setvalue("odk-new-repeat", "/data/repeat/q", "/data/repeat[position()=position(current()/..)-1]/q"),
+                    input("/data/repeat/q")
+                ))));
+        scenario.next();
+        scenario.next();
+        scenario.answer(7);
+        assertThat(scenario.answerOf("/data/repeat[0]/q"), is(intAnswer(7)));
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        assertThat(scenario.answerOf("/data/repeat[1]/q"), is(intAnswer(7)));
+        scenario.answer(8); // override the default
+
+        scenario.next();
+        scenario.createNewRepeat();
+        scenario.next();
+        assertThat(scenario.answerOf("/data/repeat[0]/q"), is(intAnswer(7)));
+        assertThat(scenario.answerOf("/data/repeat[1]/q"), is(intAnswer(8)));
+        assertThat(scenario.answerOf("/data/repeat[2]/q"), is(intAnswer(8)));
     }
 
     // Not part of ODK XForms so throws parse exception.

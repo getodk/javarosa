@@ -23,6 +23,7 @@ import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.group;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
@@ -184,6 +185,8 @@ public class SetValueActionTest {
     }
     //endregion
 
+    @Test
+    public void sourceInRepeat_updatesDestInSameRepeatInstance() throws IOException {
         Scenario scenario = Scenario.init("Nested setvalue action with repeats", html(
             head(
                 title("Nested setvalue action with repeats"),
