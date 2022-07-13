@@ -40,7 +40,7 @@ public interface XFormsElement {
         Map<String, String> attributes = new HashMap<>();
         String[] words = name.split(" ");
         for (String word : Arrays.asList(words).subList(1, words.length)) {
-            String[] parts = word.split("=");
+            String[] parts = word.split("(?<!\\))=");
             attributes.put(parts[0], parts[1].substring(1, parts[1].length() - 1));
         }
         return attributes;
