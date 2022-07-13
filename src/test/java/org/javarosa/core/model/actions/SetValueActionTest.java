@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.actions;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,10 +35,13 @@ import static org.javarosa.core.util.XFormsElement.setvalue;
 import static org.javarosa.core.util.XFormsElement.setvalueLiteral;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.xpath.XPathTypeMismatchException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SetValueActionTest {
@@ -185,6 +189,7 @@ public class SetValueActionTest {
     }
     //endregion
 
+    //region repeats
     @Test
     public void sourceInRepeat_updatesDestInSameRepeatInstance() throws IOException {
         Scenario scenario = Scenario.init("Nested setvalue action with repeats", html(
@@ -192,7 +197,7 @@ public class SetValueActionTest {
                 title("Nested setvalue action with repeats"),
                 model(
                     mainInstance(t("data id=\"nested-setvalue-repeats\"",
-                        repeat("repeat",
+                        t("repeat",
                             t("source"),
                             t("destination")
                         )
@@ -222,6 +227,161 @@ public class SetValueActionTest {
             assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(intAnswer(4 * (i + 1))));
         }
     }
+
+    @Test
+    public void setvalueAtRoot_setsValueOfNodeInFirstRepeatInstance() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue into repeat", html(
+            head(
+                title("Setvalue into repeat"),
+                model(
+                    mainInstance(t("data id=\"setvalue-into-repeat\"",
+                        t("source"),
+                        t("repeat",
+                            t("destination")
+                        )
+                    ))
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalue("xforms-value-changed", "/data/repeat[position()=1]/destination", "/data/source")),
+                repeat("/data/repeat",
+                    input("/data/repeat/destination")
+                ))));
+
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+
+        scenario.answer("/data/source", "foo");
+        assertThat(scenario.answerOf("/data/repeat[0]/destination").getDisplayText(), is("foo"));
+    }
+
+    @Ignore("TODO: verifyActions seems like it may be overzealous")
+    @Test
+    public void setvalueAtRoot_setsValueOfNodeInRepeatInstanceAddedAfterFormLoad() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue into repeat", html(
+            head(
+                title("Setvalue into repeat"),
+                model(
+                    mainInstance(t("data id=\"setvalue-into-repeat\"",
+                        t("source"),
+                        t("repeat",
+                            t("destination")
+                        )
+                    ))
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalue("xforms-value-changed", "/data/repeat[position()=2]/destination", "/data/source")),
+                repeat("/data/repeat",
+                    input("/data/repeat/destination")
+                ))));
+
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+
+        scenario.answer("/data/source", "foo");
+        assertThat(scenario.answerOf("/data/repeat[1]/destination").getDisplayText(), is("foo"));
+    }
+
+    @Test
+    public void setValueAtRoot_throwsExpression_whenTargetIsUnboundReference() throws IOException {
+        Scenario scenario = Scenario.init("Setvalue into repeat", html(
+            head(
+                title("Setvalue into repeat"),
+                model(
+                    mainInstance(t("data id=\"setvalue-into-repeat\"",
+                        t("source"),
+                        t("repeat",
+                            t("destination")
+                        )
+                    ))
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalue("xforms-value-changed", "/data/repeat/destination", "/data/source")),
+                repeat("/data/repeat",
+                    input("/data/repeat/destination")
+            ))));
+
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+        scenario.createNewRepeat("/data/repeat");
+
+        try {
+            scenario.answer("/data/source", "foo");
+            fail("Expected multiple node target to fail");
+        } catch (XPathTypeMismatchException e) {
+            assertThat(e.getMessage(), containsString("has more than one node"));
+        }
+    }
+
+    @Test
+    public void setValueInRepeat_setsValueOutsideOfRepeat() throws IOException {
+        Scenario scenario = Scenario.init("Nested setvalue action with repeats", html(
+            head(
+                title("Nested setvalue action with repeats"),
+                model(
+                    mainInstance(t("data id=\"nested-setvalue-repeats\"",
+                        t("destination", "0"),
+                        t("repeat",
+                            t("source")
+                        )
+                    )),
+                    bind("/data/destination").type("int")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/source",
+                        setvalue("xforms-value-changed", "/data/destination", ".+1"))
+                )
+            )));
+
+        final int REPEAT_COUNT = 5;
+
+        for (int i = 0; i < REPEAT_COUNT; i++) {
+            scenario.createNewRepeat("/data/repeat");
+            assertThat(scenario.answerOf("/data/destination"), is(intAnswer(0)));
+        }
+
+        for (int i = 0; i < REPEAT_COUNT; i++) {
+            scenario.answer("/data/repeat[" + i + "]/source", 7);
+            assertThat(scenario.answerOf("/data/destination"), is(intAnswer(i + 1)));
+        }
+    }
+
+    @Test
+    public void setvalueInOuterRepeat_setsInnerRepeatValue() throws IOException {
+        Scenario scenario = Scenario.init("Nested repeats", html(
+            head(
+                title("Nested repeats"),
+                model(
+                    mainInstance(t("data id=\"nested-repeats\"",
+                        t("repeat1",
+                            t("source"),
+                            t("repeat2",
+                                t("destination")
+                            ))
+                    ))
+                )
+            ),
+            body(
+                repeat("/data/repeat1",
+                    input("/data/repeat1/source",
+                        setvalue("xforms-value-changed", "/data/repeat1/repeat2/destination", "/data/repeat1/source")),
+                    repeat("/data/repeat1/repeat2",
+                        input("/data/repeat1/repeat2/destination")
+            )))));
+
+            scenario.answer("/data/repeat1[0]/source", "foo");
+            assertThat(scenario.answerOf("/data/repeat1[0]/repeat2[0]/destination").getDisplayText(), is("foo"));
+    }
+    //endregion
 
     /**
      * Read-only is a display-only concern so it should be possible to use an action to modify the value of a read-only

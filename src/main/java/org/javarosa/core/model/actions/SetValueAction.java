@@ -74,22 +74,18 @@ public class SetValueAction extends Action {
 
         String failMessage = "Target of TreeReference " + target.toString(true) + " could not be resolved!";
 
-        if (targetReference.hasPredicates()) {
-            //CTS: in theory these predicates could contain logic which breaks if the qualified ref
-            //contains unbound repeats (IE: nested repeats).
-            List<TreeReference> references = context.expandReference(targetReference);
-            if (references.size() == 0) {
-                //If after finding our concrete reference it is a template, this action is outside of the
-                //scope of the current target, so we can leave.
-                if (model.getMainInstance().hasTemplatePath(target)) {
-                    return null;
-                }
-                throw new NullPointerException(failMessage);
-            } else if (references.size() > 1) {
-                throw new XPathTypeMismatchException("XPath nodeset has more than one node [" + references + "]; Actions can only target a single node reference. Refine path expression to match only one node.");
-            } else {
-                targetReference = references.get(0);
+        List<TreeReference> references = context.expandReference(targetReference);
+        if (references.size() == 0) {
+            // If after finding our concrete reference it is a template, this action is outside of the
+            // scope of the current target, so we can leave.
+            if (model.getMainInstance().hasTemplatePath(target)) {
+                return null;
             }
+            throw new NullPointerException(failMessage);
+        } else if (references.size() > 1) {
+            throw new XPathTypeMismatchException("You are trying to target a repeated field. Currently you may only target a field in a specific repeat instance.\n\nXPath nodeset has more than one node [\" + references + \"].");
+        } else {
+            targetReference = references.get(0);
         }
 
         AbstractTreeElement node = context.resolveReference(targetReference);
@@ -98,7 +94,7 @@ public class SetValueAction extends Action {
             //an unbound template, so see if such a reference could exist. Unfortunately this
             //won't be included in the above walk if the template is nested, since only the
             //top level template retains its subelement templates
-            if(model.getMainInstance().hasTemplatePath(target)) {
+            if (model.getMainInstance().hasTemplatePath(target)) {
                 return null;
             } else {
                 throw new NullPointerException(failMessage);
@@ -106,10 +102,6 @@ public class SetValueAction extends Action {
         }
 
         Object result;
-
-        //CTS: Is not clear whether we should be creating _another_ EC below with this newly qualified
-        //ref or not. This logic used to come after the result was calculated.
-
         if (explicitValue != null) {
             result = explicitValue;
         } else {
