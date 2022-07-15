@@ -68,43 +68,24 @@ public class SetValueAction extends Action {
     }
 
     public TreeReference processAction(FormDef model, TreeReference contextRef) {
-
-        //Qualify the reference if necessary
+        // If the target is in a repeat, it's stored as an unbound ref. Use the context that the action is defined in to qualify it
         TreeReference targetReference = contextRef == null ? target : target.contextualize(contextRef);
-
-        //For now we only process setValue actions which are within the
-        //context if a context is provided. This happens for repeats where
-        //insert events should only trigger on the right nodes
-        if (contextRef != null){
-            //Note: right now we're qualifying then testing parentage to see whether
-            //there was a conflict, but it's not super clear whether this is a perfect
-            //strategy
-            if (!contextRef.isAncestorOf(targetReference, false)) {
-                return null;
-            }
-        }
-
-        //TODO: either the target or the value's node might not exist here, catch and throw reasonably
         EvaluationContext context = new EvaluationContext(model.getEvaluationContext(), targetReference);
 
         String failMessage = "Target of TreeReference " + target.toString(true) + " could not be resolved!";
 
-        if (targetReference.hasPredicates()) {
-            //CTS: in theory these predicates could contain logic which breaks if the qualified ref
-            //contains unbound repeats (IE: nested repeats).
-            List<TreeReference> references = context.expandReference(targetReference);
-            if (references.size() == 0) {
-                //If after finding our concrete reference it is a template, this action is outside of the
-                //scope of the current target, so we can leave.
-                if (model.getMainInstance().hasTemplatePath(target)) {
-                    return null;
-                }
-                throw new NullPointerException(failMessage);
-            } else if (references.size() > 1) {
-                throw new XPathTypeMismatchException("XPath nodeset has more than one node [" + references + "]; Actions can only target a single node reference. Refine path expression to match only one node.");
-            } else {
-                targetReference = references.get(0);
+        List<TreeReference> references = context.expandReference(targetReference);
+        if (references.size() == 0) {
+            // If after finding our concrete reference it is a template, this action is outside of the
+            // scope of the current target, so we can leave.
+            if (model.getMainInstance().hasTemplatePath(target)) {
+                return null;
             }
+            throw new NullPointerException(failMessage);
+        } else if (references.size() > 1) {
+            throw new XPathTypeMismatchException("You are trying to target a repeated field. Currently you may only target a field in a specific repeat instance.\n\nXPath nodeset has more than one node [\" + references + \"].");
+        } else {
+            targetReference = references.get(0);
         }
 
         AbstractTreeElement node = context.resolveReference(targetReference);
@@ -113,7 +94,7 @@ public class SetValueAction extends Action {
             //an unbound template, so see if such a reference could exist. Unfortunately this
             //won't be included in the above walk if the template is nested, since only the
             //top level template retains its subelement templates
-            if(model.getMainInstance().hasTemplatePath(target)) {
+            if (model.getMainInstance().hasTemplatePath(target)) {
                 return null;
             } else {
                 throw new NullPointerException(failMessage);
@@ -121,10 +102,6 @@ public class SetValueAction extends Action {
         }
 
         Object result;
-
-        //CTS: Is not clear whether we should be creating _another_ EC below with this newly qualified
-        //ref or not. This logic used to come after the result was calculated.
-
         if (explicitValue != null) {
             result = explicitValue;
         } else {
