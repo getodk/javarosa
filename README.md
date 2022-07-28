@@ -90,12 +90,12 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and g
 </settings>
 ```
 
-Official releases are built by [@yanokwa](https://github.com/yanokwa) using AdoptOpenJDK v1.8.x.
-
-To generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
+Official releases are built by a Github action when a commit is tagged. Before tagging a release:
 
 1. Update the version in `build.gradle` and `pom.xml` and merge the changes to master.
     * Use `x.x.x-SNAPSHOT` for snapshots releases and `x.x.x` for production releases.
+
+To manually generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 1. Run `mvn -v` to confirm the Java version and vendor used to build the release.
 1. In the repo folder, run `mvn -s secrets.xml clean deploy` to publish.
     * If successful, both snapshots and production releases will appear in OSSRH [here](https://oss.sonatype.org/content/groups/public/org/getodk/javarosa/).
