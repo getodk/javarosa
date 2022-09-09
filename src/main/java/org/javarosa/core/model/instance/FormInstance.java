@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.instance;
 
+import kotlin.Pair;
 import org.javarosa.core.model.Entity;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -51,6 +52,8 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
     public String schema;
     public String formVersion;
     public String uiVersion;
+    private String dataset;
+    private final List<Entity> entities = new ArrayList<>();
 
     private HashMap<String, Object> namespaces = new HashMap<String, Object>();
 
@@ -425,6 +428,14 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
     }
 
     public List<Entity> getEntities() {
-        return new ArrayList<>();
+        return entities;
+    }
+
+    public void setDataset(String dataset) {
+        this.dataset = dataset;
+    }
+
+    public void addEntity(List<Pair<String, String>> fields) {
+        this.entities.add(new Entity(dataset, fields));
     }
 }

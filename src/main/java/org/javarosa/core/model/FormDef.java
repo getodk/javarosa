@@ -16,19 +16,7 @@
 
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import kotlin.Pair;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.ActionController;
@@ -75,6 +63,21 @@ import org.javarosa.xml.InternalDataInstanceParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Definition of a form. This has some meta data about the form definition and a
  * collection of groups together with question branching or skipping rules.
@@ -89,6 +92,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
+    private List<Pair<IDataReference, String>> saveTos = new ArrayList<>();
 
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
@@ -1004,7 +1008,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public boolean postProcessInstance() {
         actionController.triggerActionsFromEvent(Actions.EVENT_XFORMS_REVALIDATE, elementsWithActionTriggeredByToplevelEvent, this);
-        return postProcessInstance(mainInstance.getRoot());
+        boolean instanceChanged = postProcessInstance(mainInstance.getRoot());
+
+        List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
+            IDataReference reference = saveTo.getFirst();
+            String answer = mainInstance.resolveReference(reference).getValue().getDisplayText();
+            return new Pair<>(saveTo.getSecond(), answer);
+        }).collect(Collectors.toList());
+        mainInstance.addEntity(fields);
+
+        return instanceChanged;
     }
 
     /**
@@ -1689,5 +1702,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public HashMap<String, DataInstance> getFormInstances() {
         return formInstances;
+    }
+
+    public void setSaveTos(List<Pair<IDataReference, String>> saveTos) {
+        this.saveTos = saveTos;
     }
 }

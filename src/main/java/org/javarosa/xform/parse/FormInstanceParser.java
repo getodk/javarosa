@@ -1,13 +1,5 @@
 package org.javarosa.xform.parse;
 
-import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
-import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -28,6 +20,15 @@ import org.javarosa.xform.util.XFormUtils;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.javarosa.xform.parse.XFormParser.buildInstanceStructure;
+import static org.javarosa.xform.parse.XFormParser.getVagueLocation;
 
 class FormInstanceParser {
     private static final Logger logger = LoggerFactory.getLogger(FormInstanceParser.class);
@@ -85,6 +86,16 @@ class FormInstanceParser {
             processRepeats(instanceModel);
             verifyBindings(instanceModel, e.getName());
             verifyActions(instanceModel);
+
+            List<TreeElement> meta = root.getChildrenWithName("meta");
+            if (!meta.isEmpty()) {
+                List<TreeElement> entities = meta.get(0).getChildrenWithName("entities:entity");
+
+                if (!entities.isEmpty()) {
+                    String dataset = entities.get(0).getAttributeValue(null, "dataset");
+                    instanceModel.setDataset(dataset);
+                }
+            }
         }
         applyInstanceProperties(instanceModel);
 
