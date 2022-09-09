@@ -16,12 +16,7 @@
 
 package org.javarosa.core.model.instance;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-
+import org.javarosa.core.model.Entity;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
@@ -33,6 +28,14 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -419,5 +422,9 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
             return ExtUtil.emptyIfNull(this.getInstanceId());
         }
         throw new IllegalArgumentException("No metadata field " + fieldName  + " in the form instance storage system");
+    }
+
+    public List<Entity> getEntities() {
+        return new ArrayList<>();
     }
 }
