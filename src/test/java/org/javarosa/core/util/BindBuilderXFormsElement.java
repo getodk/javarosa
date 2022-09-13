@@ -80,6 +80,11 @@ public class BindBuilderXFormsElement implements XFormsElement {
         return this;
     }
 
+    public BindBuilderXFormsElement saveTo(String expression) {
+        attributes.put("entities:saveto", expression);
+        return this;
+    }
+
     @Override
     public String getName() {
         return "bind";

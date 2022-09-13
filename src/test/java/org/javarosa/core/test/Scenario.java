@@ -16,41 +16,6 @@
 
 package org.javarosa.core.test;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.createTempFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static java.nio.file.Files.write;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.util.stream.Collectors.joining;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
-import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
-import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
-import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -93,6 +58,42 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.write;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.util.stream.Collectors.joining;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
+import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
+import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
+import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
 /**
  * <div style="border: 1px 1px 1px 1px; background-color: #556B2F; color: white; padding: 20px">
@@ -317,6 +318,10 @@ public class Scenario {
         log.info("===============================================================================");
         log.info("       " + msg);
         log.info("===============================================================================");
+    }
+
+    public void finalizeInstance() {
+        formDef.postProcessInstance();
     }
 
     public enum AnswerResult {

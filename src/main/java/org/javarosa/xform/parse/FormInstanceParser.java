@@ -89,11 +89,15 @@ class FormInstanceParser {
 
             List<TreeElement> meta = root.getChildrenWithName("meta");
             if (!meta.isEmpty()) {
-                List<TreeElement> entities = meta.get(0).getChildrenWithName("entities:entity");
+                List<TreeElement> entity = meta.get(0).getChildrenWithName("entities:entity");
 
-                if (!entities.isEmpty()) {
-                    String dataset = entities.get(0).getAttributeValue(null, "dataset");
-                    instanceModel.setDataset(dataset);
+                if (!entity.isEmpty()) {
+                    List<TreeElement> create = entity.get(0).getChildrenWithName("entities:create");
+
+                    if (!create.isEmpty()) {
+                        String dataset = entity.get(0).getAttributeValue(null, "dataset");
+                        instanceModel.setDataset(dataset);
+                    }
                 }
             }
         }

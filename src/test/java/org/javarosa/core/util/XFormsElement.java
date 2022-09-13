@@ -16,11 +16,11 @@
 
 package org.javarosa.core.util;
 
-import static java.util.Collections.emptyMap;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.emptyMap;
 
 public interface XFormsElement {
     static String buildAttributesString(Map<String, String> attributes) {
@@ -67,7 +67,9 @@ public interface XFormsElement {
                         "xmlns=\"http://www.w3.org/2002/xforms\" " +
                         "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
                         "xmlns:jr=\"http://openrosa.org/javarosa\" " +
-                        "xmlns:odk=\"http://www.opendatakit.org/xforms\"",
+                        "xmlns:odk=\"http://www.opendatakit.org/xforms\" "+
+                        "xmlns:orx=\"http://openrosa.org/xforms\" "+
+                        "xmlns:entities=\"http://www.opendatakit.org/xforms/entities\"",
                 head, body
         );
     }

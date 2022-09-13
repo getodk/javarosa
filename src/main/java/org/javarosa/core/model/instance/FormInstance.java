@@ -436,6 +436,8 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
     }
 
     public void addEntity(List<Pair<String, String>> fields) {
-        this.entities.add(new Entity(dataset, fields));
+        if (dataset != null) {
+            this.entities.add(new Entity(dataset, fields));
+        }
     }
 }
