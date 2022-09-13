@@ -318,10 +318,9 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
         super.readExternal(in, pf);
         schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
         dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
-
         namespaces = (HashMap<String,Object>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+        dataset = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
         setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
-
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -329,6 +328,7 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
         ExtUtil.write(out, new ExtWrapNullable(schema));
         ExtUtil.write(out, new ExtWrapNullable(dateSaved));
         ExtUtil.write(out, new ExtWrapMap(namespaces));
+        ExtUtil.write(out, new ExtWrapNullable(dataset));
 
         ExtUtil.write(out, getRoot());
     }

@@ -4,6 +4,7 @@ import kotlin.Pair;
 import org.javarosa.core.model.Entity;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -33,14 +34,11 @@ public class EntitiesTest {
                         t("data id=\"entity-form\"",
                             t("name"),
                             t("orx:meta",
-                                t("entities:entity dataset=\"people\" id=\"\"",
-                                    t("entities:label")
-                                )
+                                t("entities:entity dataset=\"people\" id=\"\"")
                             )
                         )
                     ),
-                    bind("/data/name").type("string").saveTo("name"),
-                    bind("/data/meta/entities:entity/entities:label").type("string").calculate("/data/name")
+                    bind("/data/name").type("string").saveTo("name")
                 )
             ),
             body(
@@ -67,14 +65,12 @@ public class EntitiesTest {
                             t("name"),
                             t("orx:meta",
                                 t("entities:entity dataset=\"people\" id=\"\"",
-                                    t("entities:create"),
-                                    t("entities:label")
+                                    t("entities:create")
                                 )
                             )
                         )
                     ),
-                    bind("/data/name").type("string").saveTo("name"),
-                    bind("/data/meta/entities:entity/entities:label").type("string").calculate("/data/name")
+                    bind("/data/name").type("string").saveTo("name")
                 )
             ),
             body(
@@ -90,5 +86,41 @@ public class EntitiesTest {
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void entityFormCanBeSerialized() throws IOException, DeserializationException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            head(
+                title("Create entity form"),
+                model(
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("name"),
+                            t("orx:meta",
+                                t("entities:entity dataset=\"people\" id=\"\"",
+                                    t("entities:create")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").saveTo("name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        Scenario deserializedScenario = scenario.serializeAndDeserializeForm();
+
+        deserializedScenario.next();
+        deserializedScenario.answer("Shiv Roy");
+        deserializedScenario.finalizeInstance();
+
+        List<Entity> entities = deserializedScenario.getFormDef().getMainInstance().getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Shiv Roy"))));
     }
 }

@@ -92,7 +92,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
-    private List<Pair<IDataReference, String>> saveTos = new ArrayList<>();
+    private HashMap<XPathReference, String> saveTos = new HashMap<>();
 
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
@@ -1010,10 +1010,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         actionController.triggerActionsFromEvent(Actions.EVENT_XFORMS_REVALIDATE, elementsWithActionTriggeredByToplevelEvent, this);
         boolean instanceChanged = postProcessInstance(mainInstance.getRoot());
 
-        List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
-            IDataReference reference = saveTo.getFirst();
+        List<Pair<String, String>> fields = saveTos.entrySet().stream().map(saveTo -> {
+            IDataReference reference = saveTo.getKey();
             String answer = mainInstance.resolveReference(reference).getValue().getDisplayText();
-            return new Pair<>(saveTo.getSecond(), answer);
+            return new Pair<>(saveTo.getValue(), answer);
         }).collect(Collectors.toList());
         mainInstance.addEntity(fields);
 
@@ -1125,6 +1125,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         List<TreeReference> treeReferencesWithActions = (List<TreeReference>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
         elementsWithActionTriggeredByToplevelEvent = getElementsFromReferences(treeReferencesWithActions);
+
+        saveTos = (HashMap<XPathReference, String>) ExtUtil.read(dis, new ExtWrapMap(XPathReference.class, String.class), pf);
     }
 
     /**
@@ -1228,6 +1230,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
         ExtUtil.write(dos, new ExtWrapListPoly(new ArrayList<>(actions)));
         ExtUtil.write(dos, new ExtWrapListPoly(getReferencesFromElements(elementsWithActionTriggeredByToplevelEvent)));
+
+        ExtUtil.write(dos, new ExtWrapMap(saveTos));
     }
 
     /**
@@ -1704,7 +1708,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return formInstances;
     }
 
-    public void setSaveTos(List<Pair<IDataReference, String>> saveTos) {
+    public void setSaveTos(HashMap<XPathReference, String> saveTos) {
         this.saveTos = saveTos;
     }
 }

@@ -16,7 +16,6 @@
 
 package org.javarosa.xform.parse;
 
-import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -165,7 +164,7 @@ public class XFormParser implements IXFormParserFunctions {
     private Localizer localizer;
     private HashMap<String, DataBinding> bindingsByID;
     private List<DataBinding> bindings;
-    private List<Pair<IDataReference, String>> saveTos;
+    private HashMap<XPathReference, String> saveTos;
     private List<TreeReference> actionTargets;
     private List<TreeReference> repeats;
     private List<ItemsetBinding> itemsets;
@@ -341,7 +340,7 @@ public class XFormParser implements IXFormParserFunctions {
         mainInstanceNode = null;
         instanceNodes = new ArrayList<>();
         instanceNodeIdStrs = new ArrayList<>();
-        saveTos = new ArrayList<>();
+        saveTos = new HashMap<>();
 
         itextKnownForms = new ArrayList<>(4);
         itextKnownForms.add("long");
@@ -1932,7 +1931,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         if (maybeSaveTo.isPresent()) {
             String saveTo = maybeSaveTo.get().getAttributeValue();
-            saveTos.add(new Pair<>(reference, saveTo));
+            saveTos.put((XPathReference) reference, saveTo);
         }
 
         if (binding.getId() != null) {
