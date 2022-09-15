@@ -34,7 +34,7 @@ public class EntitiesTest {
                         t("data id=\"entity-form\"",
                             t("name"),
                             t("orx:meta",
-                                t("entities:entity dataset=\"people\" id=\"\"")
+                                t("entities:entity dataset=\"people\"")
                             )
                         )
                     ),
@@ -64,7 +64,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("orx:meta",
-                                t("entities:entity dataset=\"people\" id=\"\"",
+                                t("entities:entity dataset=\"people\"",
                                     t("entities:create")
                                 )
                             )
@@ -98,7 +98,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("orx:meta",
-                                t("entities:entity dataset=\"people\" id=\"\"",
+                                t("entities:entity dataset=\"people\"",
                                     t("entities:create")
                                 )
                             )
