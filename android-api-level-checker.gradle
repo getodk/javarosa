@@ -3,23 +3,11 @@ task androidClean(type: Delete) {
 }
 
 task androidUnpackBlankProject(dependsOn: [androidClean], type: Copy) {
-    from zipTree("javarosa-android-api-level-checker.zip")
+    from "$rootDir/android-api-level-checker"
     into "$buildDir/android-api-level-checker"
 }
 
-task androidSetMinSdkVersion(dependsOn: [androidUnpackBlankProject]) {
-    doLast {
-        def buildFile = new File("$buildDir/android-api-level-checker/app/build.gradle")
-        def oldBuildContents = buildFile.getText("UTF-8")
-        def newBuildContents = oldBuildContents.replace(
-            "minSdkVersion 16", // The minSdkVersion set in javarosa-android-api-level-checker.zip
-            "minSdkVersion ${getValue("androidMinSdkVersion", "21")}"
-        )
-        buildFile.write(newBuildContents)
-    }
-}
-
-task androidCopySources(dependsOn: [androidSetMinSdkVersion], type: Copy) {
+task androidCopySources(dependsOn: [androidUnpackBlankProject], type: Copy) {
     from "${sourceSets.main.java.srcDirs[0]}"
     into "$buildDir/android-api-level-checker/app/src/main/java"
 }

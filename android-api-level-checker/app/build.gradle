@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "org.javarosa"
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.0-beta01'
+
+    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'org.slf4j:slf4j-api:1.7.33'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+
+    // Upgrade to version higher than 1.4 when Collect minSDK >= 26
+    implementation 'org.apache.commons:commons-csv:1.4'
+    implementation 'commons-io:commons-io:2.11.0'
+
+    implementation 'net.sf.kxml:kxml2:2.3.0'
+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+}
