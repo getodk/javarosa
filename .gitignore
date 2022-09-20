@@ -6,6 +6,7 @@
 .gradle
 build
 gradle.properties
+local.properties
 
 # intellij
 .idea
