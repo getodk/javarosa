@@ -1,18 +1,13 @@
-task androidClean(type: Delete) {
-    delete "$buildDir/android-api-level-checker"
-}
-
-task androidUnpackBlankProject(dependsOn: [androidClean], type: Copy) {
-    from "$rootDir/android-api-level-checker"
-    into "$buildDir/android-api-level-checker"
-}
-
-task androidCopySources(dependsOn: [androidUnpackBlankProject], type: Copy) {
+task androidCopySources(dependsOn: [], type: Copy) {
     from "${sourceSets.main.java.srcDirs[0]}"
-    into "$buildDir/android-api-level-checker/app/src/main/java"
+    into "$rootDir/android-api-level-checker/app/src/main/java"
 }
 
+/**
+ * Copies JavaRosa source into the blank Android project at android-api-level-checker and then runs
+ * Android lint checks on the code.
+ **/
 task androidLint(dependsOn: [androidCopySources], type: GradleBuild) {
-    buildFile = "$buildDir/android-api-level-checker/build.gradle"
+    buildFile = "$rootDir/android-api-level-checker/build.gradle"
     tasks = ['lint']
 }
