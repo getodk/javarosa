@@ -46,9 +46,9 @@ jobs:
       - *accept_licenses
       - run:
           name: Android Lint
-          command: ./gradlew androidLint --max-workers=1
+          command: ./gradlew -Pandroid lintDebug --max-workers=1
       - store_artifacts:
-          path: build/android-api-level-checker/app/build/reports/lint-results.html
+          path: build/reports/lint-results-debug.html
           destination: lint-results.html
   package:
     working_directory: ~/work

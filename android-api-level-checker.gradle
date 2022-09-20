@@ -1,9 +1,0 @@
-tasks.register('enableAndroidBuild') {
-    doLast {
-        project.setProperty("android", true)
-    }
-}
-
-task androidLint(dependsOn: [enableAndroidBuild], type: GradleBuild) {
-    tasks = ['lintDebug']
-}

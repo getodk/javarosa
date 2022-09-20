@@ -22,7 +22,7 @@ ODK JavaRosa is part of ODK, a free and open-source set of tools which help orga
 
 ## Requirements
 
-JavaRosa works on API level 21+ (with desugaring enabled) and Java 8+.
+JavaRosa works on Android API level 21+ (with desugaring enabled) and Java 8+.
 
 ## Setting up your development environment
 

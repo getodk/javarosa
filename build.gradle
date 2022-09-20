@@ -17,13 +17,13 @@ buildscript {
  * If `android` is true, the project will be configured as an Android rather than a Java library. This isn't used
  * for building archives (such as an APK), but is useful for performing Android checks like lint.
  */
-if (project.property("android")) {
-    apply plugin: 'com.android.library'
-} else {
+if (!project.hasProperty("android")) {
     apply plugin: 'java'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'me.champeau.jmh'
+} else {
+    apply plugin: 'com.android.library'
 }
 
 repositories {
@@ -77,9 +77,7 @@ tasks.register('installLocal') {
     }
 }
 
-apply from: 'android-api-level-checker.gradle'
-
-if (!project.property("android")) {
+if (!project.hasProperty("android")) {
     jar {
         baseName = 'javarosa'
         // Be sure to update version in pom.xml to match
