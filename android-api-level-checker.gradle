@@ -1,13 +1,9 @@
-task androidCopySources(dependsOn: [], type: Copy) {
-    from "${sourceSets.main.java.srcDirs[0]}"
-    into "$rootDir/android-api-level-checker/app/src/main/java"
+tasks.register('enableAndroidBuild') {
+    doLast {
+        project.setProperty("android", true)
+    }
 }
 
-/**
- * Copies JavaRosa source into the blank Android project at android-api-level-checker and then runs
- * Android lint checks on the code.
- **/
-task androidLint(dependsOn: [androidCopySources], type: GradleBuild) {
-    buildFile = "$rootDir/android-api-level-checker/build.gradle"
-    tasks = ['lint']
+task androidLint(dependsOn: [enableAndroidBuild], type: GradleBuild) {
+    tasks = ['lintDebug']
 }

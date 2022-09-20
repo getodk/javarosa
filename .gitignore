@@ -5,7 +5,6 @@
 # gradle
 .gradle
 build
-gradle.properties
 local.properties
 
 # intellij
