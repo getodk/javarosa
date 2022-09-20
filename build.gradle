@@ -1,11 +1,33 @@
-plugins {
-    id 'java'
-    id 'checkstyle'
-    id 'jacoco'
-    id "me.champeau.jmh" version "0.6.5"
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath "me.champeau.jmh:jmh-gradle-plugin:0.6.7"
+    }
+}
+
+/**
+ * If `android` is true, the project will be configured as an Android rather than a Java library. This isn't used
+ * for building archives (such as an APK), but is useful for performing Android checks like lint.
+ */
+if (!project.hasProperty("android")) {
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
+    apply plugin: 'me.champeau.jmh'
+} else {
+    apply plugin: 'com.android.library'
 }
 
 repositories {
+    google()
     mavenCentral()
 }
 
@@ -28,50 +50,6 @@ compileTestJava {
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
-
-dependencies {
-    // Be sure to update dependencies in pom.xml to match
-    implementation 'joda-time:joda-time:2.10.13'
-    implementation 'org.slf4j:slf4j-api:1.7.33'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
-
-    // Upgrade to version higher than 1.4 when Collect minSDK >= 26
-    implementation 'org.apache.commons:commons-csv:1.4'
-    implementation 'commons-io:commons-io:2.11.0'
-
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
-
-    compileOnly 'net.sf.kxml:kxml2:2.3.0'
-
-    testImplementation 'ch.qos.logback:logback-classic:1.2.10'
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'net.sf.kxml:kxml2:2.3.0'
-    testImplementation 'org.hamcrest:hamcrest-all:1.3'
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
-
-// Required to use fileExtensions property in checkstyle file
-checkstyle {
-    toolVersion = '7.6.1'
-}
-
-jar {
-    baseName = 'javarosa'
-    // Be sure to update version in pom.xml to match
-    // snapshot release = x.x.x-SNAPSHOT
-    // production release = x.x.x
-    version = '3.5.0'
-    archiveName = baseName + '-' + version + '.jar'
-
-    manifest {
-        attributes 'Manifest-Version': "$jar.version"
-    }
-}
 
 tasks.register('installLocal') {
     def lines = []
@@ -99,46 +77,99 @@ tasks.register('installLocal') {
     }
 }
 
+if (!project.hasProperty("android")) {
+    jar {
+        baseName = 'javarosa'
+        // Be sure to update version in pom.xml to match
+        // snapshot release = x.x.x-SNAPSHOT
+        // production release = x.x.x
+        version = '3.5.0'
+        archiveName = baseName + '-' + version + '.jar'
 
-// TODO: does not build UML diagrams
-javadoc {
-    failOnError = false
+        manifest {
+            attributes 'Manifest-Version': "$jar.version"
+        }
+    }
+
+    // TODO: does not build UML diagrams
+    javadoc {
+        failOnError = false
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+// Required to use fileExtensions property in checkstyle file
+    checkstyle {
+        toolVersion = '7.6.1'
+    }
+
+    jmhJar.doFirst {
+        new File("build/resources/test").mkdirs()
+    }
+
+    jmh {
+        excludes = ["(BenchmarkTemplate)"]
+        threads = 1
+        fork = 1
+        warmup = '2s'
+        warmupIterations = 10
+        warmupBatchSize = 1
+        warmupForks = 1
+        iterations = 20
+        timeOnIteration = '2s'
+        timeUnit = 's'
+        benchmarkMode = ['avgt', 'ss']
+        includeTests = true
+        resultFormat = 'CSV'
+        forceGC = true
+
+        duplicateClassesStrategy = DuplicatesStrategy.WARN
+    }
+} else {
+    android {
+        namespace 'com.example'
+
+        compileSdkVersion 30
+        defaultConfig {
+            minSdkVersion 21
+            targetSdkVersion 30
+            versionCode 1
+            versionName "1.0"
+            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        }
+        compileOptions {
+            coreLibraryDesugaringEnabled true
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+        buildTypes {
+            release {
+                minifyEnabled false
+            }
+        }
+    }
 }
 
-jmhJar.doFirst {
-    new File("build/resources/test").mkdirs()
+dependencies {
+    // Be sure to update dependencies in pom.xml to match
+    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'org.slf4j:slf4j-api:1.7.33'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+
+    // Upgrade to version higher than 1.4 when Collect minSDK >= 26
+    implementation 'org.apache.commons:commons-csv:1.4'
+    implementation 'commons-io:commons-io:2.11.0'
+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
+
+    compileOnly 'net.sf.kxml:kxml2:2.3.0'
+
+    testImplementation 'ch.qos.logback:logback-classic:1.2.10'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'net.sf.kxml:kxml2:2.3.0'
+    testImplementation 'org.hamcrest:hamcrest-all:1.3'
 }
-
-jmh {
-    excludes = ["(BenchmarkTemplate)"]
-    threads = 1
-    fork = 1
-    warmup = '2s'
-    warmupIterations = 10
-    warmupBatchSize = 1
-    warmupForks = 1
-    iterations = 20
-    timeOnIteration = '2s'
-    timeUnit = 's'
-    benchmarkMode = ['avgt','ss']
-    includeTests = true
-    resultFormat = 'CSV'
-    forceGC = true
-
-    duplicateClassesStrategy = DuplicatesStrategy.WARN
-}
-
-/**
- * Returns the value of a property of this build if it exists. Otherwise,
- * returns the provided default value.
- *
- * This method is used as a safe way to get properties that might or might not
- * be defined in the gradle.properties file.
- */
-String getValue(String key, String defaultValue) {
-    if (this.hasProperty(key))
-        return this.getProperty(key)
-    return defaultValue
-}
-
-apply from: 'android-api-level-checker.gradle'

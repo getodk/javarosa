@@ -5,7 +5,7 @@
 # gradle
 .gradle
 build
-gradle.properties
+local.properties
 
 # intellij
 .idea
@@ -23,3 +23,6 @@ logback-test.xml
 
 # macOS
 .DS_Store
+
+# Android api level checker
+android-api-level-checker/app/src/main/java/*

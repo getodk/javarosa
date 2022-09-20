@@ -20,6 +20,10 @@ ODK JavaRosa is part of ODK, a free and open-source set of tools which help orga
 * ODK developer Slack chat: [https://slack.getodk.org](https://slack.getodk.org)
 * ODK developer wiki: [https://github.com/getodk/getodk/wiki](https://github.com/getodk/getodk/wiki)
 
+## Requirements
+
+JavaRosa works on Android API level 21+ (with desugaring enabled) and Java 8+.
+
 ## Setting up your development environment
 
 1. Fork the javarosa project ([why and how to fork](https://help.github.com/articles/fork-a-repo/))
