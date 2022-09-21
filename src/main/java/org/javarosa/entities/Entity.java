@@ -1,4 +1,4 @@
-package org.javarosa.core.model;
+package org.javarosa.entities;
 
 import kotlin.Pair;
 

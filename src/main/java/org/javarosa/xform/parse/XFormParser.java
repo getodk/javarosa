@@ -16,7 +16,6 @@
 
 package org.javarosa.xform.parse;
 
-import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -85,8 +84,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -165,7 +164,6 @@ public class XFormParser implements IXFormParserFunctions {
     private Localizer localizer;
     private HashMap<String, DataBinding> bindingsByID;
     private List<DataBinding> bindings;
-    private List<Pair<XPathReference, String>> saveTos;
     private List<TreeReference> actionTargets;
     private List<TreeReference> repeats;
     private List<ItemsetBinding> itemsets;
@@ -176,6 +174,9 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> instanceNodeIdStrs;
     private List<String> itextKnownForms;
     private static HashMap<String, IElementHandler> actionHandlers;
+
+    private final List<BindingAttributeProcessor> bindingAttributeProcessors = new ArrayList<>();
+    private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
 
     /**
      * The string IDs of all instances that are referenced in a instance() function call in the primary instance
@@ -189,7 +190,6 @@ public class XFormParser implements IXFormParserFunctions {
     private int serialQuestionID = 1;
 
     private static IAnswerResolver answerResolver;
-
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
@@ -341,7 +341,6 @@ public class XFormParser implements IXFormParserFunctions {
         mainInstanceNode = null;
         instanceNodes = new ArrayList<>();
         instanceNodeIdStrs = new ArrayList<>();
-        saveTos = new ArrayList<>();
 
         itextKnownForms = new ArrayList<>(4);
         itextKnownForms.add("long");
@@ -401,7 +400,17 @@ public class XFormParser implements IXFormParserFunctions {
                 loadXmlInstance(_f, _instDoc);
             }
         }
+
+        formDefProcessors.forEach(formDefProcessor -> formDefProcessor.processFormDef(_f));
         return _f;
+    }
+
+    public void addBindingAttributeProcessor(BindingAttributeProcessor bindingAttributeProcessor) {
+        bindingAttributeProcessors.add(bindingAttributeProcessor);
+    }
+
+    public void addFormDefProcessor(FormDefProcessor formDefProcessor) {
+        formDefProcessors.add(formDefProcessor);
     }
 
     /**
@@ -488,7 +497,6 @@ public class XFormParser implements IXFormParserFunctions {
 
         collapseRepeatGroups(_f);
 
-        _f.setSaveTos(saveTos);
         final FormInstanceParser instanceParser = new FormInstanceParser(_f, defaultNamespace,
             bindings, repeats, itemsets, selectOnes, multipleItems, actionTargets);
 
@@ -1879,9 +1887,9 @@ public class XFormParser implements IXFormParserFunctions {
         return false;
     }
 
-    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element) {
+    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element, List<BindingAttributeProcessor> bindingAttributeProcessors) {
         return new StandardBindAttributesProcessor(typeMappings).
-            createBinding(this, _f, usedAtts, passedThroughAtts, element);
+            createBinding(this, _f, usedAtts, passedThroughAtts, element, bindingAttributeProcessors);
     }
 
     /**
@@ -1913,7 +1921,7 @@ public class XFormParser implements IXFormParserFunctions {
     ));
 
     private void parseBind(Element element) {
-        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element);
+        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element, bindingAttributeProcessors);
 
         // Warn of unused attributes of parent element
         if (XFormUtils.showUnusedAttributeWarning(element, usedAtts)) {
@@ -1926,14 +1934,6 @@ public class XFormParser implements IXFormParserFunctions {
 
     private void addBinding(DataBinding binding) {
         bindings.add(binding);
-
-        IDataReference reference = binding.getReference();
-        Optional<TreeElement> maybeSaveTo = binding.getAdditionalAttributes().stream().filter(treeElement -> treeElement.getName().equals("saveto")).findFirst();
-
-        if (maybeSaveTo.isPresent()) {
-            String saveTo = maybeSaveTo.get().getAttributeValue();
-            saveTos.add(new Pair<>((XPathReference) reference, saveTo));
-        }
 
         if (binding.getId() != null) {
             if (bindingsByID.put(binding.getId(), binding) != null) {

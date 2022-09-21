@@ -321,7 +321,11 @@ public class Scenario {
     }
 
     public void finalizeInstance() {
-        formDef.postProcessInstance();
+        controller.finalizeForm();
+    }
+
+    public FormEntryController getFormEntryController() {
+        return controller;
     }
 
     public enum AnswerResult {

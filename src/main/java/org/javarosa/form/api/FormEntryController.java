@@ -27,6 +27,9 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class is used to navigate through an xform and appropriately manipulate
  * the FormEntryModel's state.
@@ -48,6 +51,8 @@ public class FormEntryController {
 
     FormEntryModel model;
 
+    private final List<FormPostProcessor> formPostProcessors = new ArrayList<>();
+
     /**
      * Creates a new form entry controller for the model provided
      *
@@ -56,7 +61,6 @@ public class FormEntryController {
     public FormEntryController(FormEntryModel model) {
         this.model = model;
     }
-
 
     public FormEntryModel getModel() {
         return model;
@@ -198,6 +202,16 @@ public class FormEntryController {
         return stepEvent(false);
     }
 
+    public void finalizeForm() {
+        model.getForm().postProcessInstance();
+        formPostProcessors.forEach(formPostProcessor -> {
+            formPostProcessor.processForm(model);
+        });
+    }
+
+    public void addPostProcessor(FormPostProcessor formPostProcessor) {
+        formPostProcessors.add(formPostProcessor);
+    }
 
     /**
      * Moves the current FormIndex to the next/previous relevant position.

@@ -16,8 +16,6 @@
 
 package org.javarosa.core.model.instance;
 
-import kotlin.Pair;
-import org.javarosa.core.model.Entity;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
@@ -33,10 +31,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -52,8 +49,6 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
     public String schema;
     public String formVersion;
     public String uiVersion;
-    private String dataset;
-    private final List<Entity> entities = new ArrayList<>();
 
     private HashMap<String, Object> namespaces = new HashMap<String, Object>();
 
@@ -319,7 +314,6 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
         schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
         dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
         namespaces = (HashMap<String,Object>)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
-        dataset = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
         setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
     }
 
@@ -328,7 +322,6 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
         ExtUtil.write(out, new ExtWrapNullable(schema));
         ExtUtil.write(out, new ExtWrapNullable(dateSaved));
         ExtUtil.write(out, new ExtWrapMap(namespaces));
-        ExtUtil.write(out, new ExtWrapNullable(dataset));
 
         ExtUtil.write(out, getRoot());
     }
@@ -425,19 +418,5 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
             return ExtUtil.emptyIfNull(this.getInstanceId());
         }
         throw new IllegalArgumentException("No metadata field " + fieldName  + " in the form instance storage system");
-    }
-
-    public List<Entity> getEntities() {
-        return entities;
-    }
-
-    public void setDataset(String dataset) {
-        this.dataset = dataset;
-    }
-
-    public void addEntity(List<Pair<String, String>> fields) {
-        if (dataset != null) {
-            this.entities.add(new Entity(dataset, fields));
-        }
     }
 }

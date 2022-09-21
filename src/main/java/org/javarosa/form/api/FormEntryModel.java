@@ -17,8 +17,10 @@
 package org.javarosa.form.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -63,6 +65,8 @@ public class FormEntryModel {
      * "Create/Remove/Interact" hub.
      */
     public static final int REPEAT_STRUCTURE_NON_LINEAR = 2;
+
+    private final Map<Class<?>, Object> attachments = new HashMap<>();
 
 
     public FormEntryModel(FormDef form) {
@@ -659,6 +663,14 @@ public class FormEntryModel {
         } else {
             return form.buildIndex(indexes, multiplicities, elements);
         }
+    }
+
+    public void putAttachment(Object value) {
+        attachments.put(value.getClass(), value);
+    }
+
+    public <T> T getAttachment(Class<T> key) {
+        return (T) attachments.get(key);
     }
 
     private void decrementHelper(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {

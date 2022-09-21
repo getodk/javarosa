@@ -4,8 +4,14 @@ import static org.javarosa.xform.parse.Constants.ID_ATTR;
 import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
 import static org.javarosa.xform.parse.XFormParser.NAMESPACE_JAVAROSA;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
@@ -31,7 +37,7 @@ class StandardBindAttributesProcessor {
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Collection<String> passedThroughAttributes,
-                              Element element) {
+                              Element element, List<BindingAttributeProcessor> bindingAttributeProcessors) {
         final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
@@ -110,7 +116,26 @@ class StandardBindAttributesProcessor {
         binding.setPreload(element.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
         binding.setPreloadParams(element.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
-        saveUnusedAttributes(binding, element, usedAttributes, passedThroughAttributes);
+        bindingAttributeProcessors.forEach(bindingAttributeProcessor -> {
+            for (int i = 0; i < element.getAttributeCount(); i++) {
+                String name = element.getAttributeName(i);
+                if (bindingAttributeProcessor.getUsedAttributes().contains(name)) {
+                    bindingAttributeProcessor.processBindingAttribute(name, element.getAttributeValue(i), binding);
+                }
+            }
+        });
+
+        List<String> processorAttributes = bindingAttributeProcessors.stream()
+            .flatMap((Function<BindingAttributeProcessor, Stream<String>>) bindingAttributeProcessor -> {
+                return bindingAttributeProcessor.getUsedAttributes().stream();
+            })
+            .collect(Collectors.toList());
+
+        List<String> allUsedAttributes = new ArrayList<>();
+        allUsedAttributes.addAll(usedAttributes);
+        allUsedAttributes.addAll(processorAttributes);
+
+        saveUnusedAttributes(binding, element, allUsedAttributes, passedThroughAttributes);
 
         return binding;
     }
