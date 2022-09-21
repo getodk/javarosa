@@ -17,8 +17,10 @@ import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
@@ -166,7 +168,42 @@ public class EntitiesTest {
 
         List<Entity> entities = scenario.getFormDef().getMainInstance().getEntities();
         assertThat(entities.size(), equalTo(1));
-        assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void fillingFormWithSelectSaveTo_andWithCreate_savesValuesCorrectlyToEntity() throws IOException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("team"),
+                            t("orx:meta",
+                                t("entities:entity dataset=\"people\"",
+                                    t("entities:create")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/team").type("string").withAttribute("entities", "saveto", "team")
+                )
+            ),
+            body(
+                select1("/data/team", item("kendall", "Kendall"), item("logan", "Logan"))
+            )
+        ));
+
+        scenario.next();
+        scenario.answer(scenario.choicesOf("/data/team").get(0));
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormDef().getMainInstance().getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("team", "kendall"))));
     }
 }
