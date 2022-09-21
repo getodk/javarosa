@@ -89,10 +89,10 @@ class FormInstanceParser {
 
             List<TreeElement> meta = root.getChildrenWithName("meta");
             if (!meta.isEmpty()) {
-                List<TreeElement> entity = meta.get(0).getChildrenWithName("entities:entity");
+                List<TreeElement> entity = meta.get(0).getChildrenWithName("entity");
 
                 if (!entity.isEmpty()) {
-                    List<TreeElement> create = entity.get(0).getChildrenWithName("entities:create");
+                    List<TreeElement> create = entity.get(0).getChildrenWithName("create");
 
                     if (!create.isEmpty()) {
                         String dataset = entity.get(0).getAttributeValue(null, "dataset");

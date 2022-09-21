@@ -80,8 +80,8 @@ public class BindBuilderXFormsElement implements XFormsElement {
         return this;
     }
 
-    public BindBuilderXFormsElement saveTo(String expression) {
-        attributes.put("entities:saveto", expression);
+    public BindBuilderXFormsElement withAttribute(String namespace, String name, String expression) {
+        attributes.put(namespace + ":" + name, expression);
         return this;
     }
 

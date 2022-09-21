@@ -27,6 +27,9 @@ public class EntitiesTest {
     @Test
     public void fillingFormWithoutCreate_doesNotCreateAnyEntities() throws IOException {
         Scenario scenario = Scenario.init("Entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
             head(
                 title("Entity form"),
                 model(
@@ -38,7 +41,7 @@ public class EntitiesTest {
                             )
                         )
                     ),
-                    bind("/data/name").type("string").saveTo("name")
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
                 )
             ),
             body(
@@ -57,6 +60,9 @@ public class EntitiesTest {
     @Test
     public void fillingFormWithCreate_makesEntityAvailable() throws IOException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
             head(
                 title("Create entity form"),
                 model(
@@ -70,7 +76,7 @@ public class EntitiesTest {
                             )
                         )
                     ),
-                    bind("/data/name").type("string").saveTo("name")
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
                 )
             ),
             body(
@@ -91,6 +97,9 @@ public class EntitiesTest {
     @Test
     public void entityFormCanBeSerialized() throws IOException, DeserializationException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
             head(
                 title("Create entity form"),
                 model(
@@ -104,7 +113,7 @@ public class EntitiesTest {
                             )
                         )
                     ),
-                    bind("/data/name").type("string").saveTo("name")
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
                 )
             ),
             body(
@@ -122,5 +131,42 @@ public class EntitiesTest {
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Shiv Roy"))));
+    }
+
+    @Test
+    public void entitiesNamespaceWorksRegardlessOfName() throws IOException, DeserializationException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("blah", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("name"),
+                            t("orx:meta",
+                                t("blah:entity dataset=\"people\"",
+                                    t("blah:create")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("blah", "saveto", "name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.next();
+        scenario.answer("Tom Wambsgans");
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormDef().getMainInstance().getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 }

@@ -16,9 +16,14 @@
 
 package org.javarosa.core.util;
 
+import kotlin.Pair;
+
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 
@@ -68,9 +73,24 @@ public interface XFormsElement {
                         "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
                         "xmlns:jr=\"http://openrosa.org/javarosa\" " +
                         "xmlns:odk=\"http://www.opendatakit.org/xforms\" "+
-                        "xmlns:orx=\"http://openrosa.org/xforms\" "+
-                        "xmlns:entities=\"http://www.opendatakit.org/xforms/entities\"",
+                        "xmlns:orx=\"http://openrosa.org/xforms\"",
                 head, body
+        );
+    }
+
+    static XFormsElement html(List<Pair<String, String>> additionalNamespaces, HeadXFormsElement head, BodyXFormsElement body) {
+        String additionalNamespacesString = additionalNamespaces.stream()
+            .map(namespace -> "xmlns:" + namespace.getFirst() + "=" + namespace.getSecond() + " ")
+            .collect(Collectors.joining());
+
+        return t("h:html " +
+                "xmlns=\"http://www.w3.org/2002/xforms\" " +
+                "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
+                "xmlns:jr=\"http://openrosa.org/javarosa\" " +
+                "xmlns:odk=\"http://www.opendatakit.org/xforms\" " +
+                "xmlns:orx=\"http://openrosa.org/xforms\" " +
+                additionalNamespacesString,
+            head, body
         );
     }
 
