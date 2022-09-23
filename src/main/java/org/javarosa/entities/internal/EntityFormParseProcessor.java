@@ -34,29 +34,7 @@ public class EntityFormParseProcessor implements BindingAttributeProcessor, Form
 
     @Override
     public void processFormDef(FormDef formDef) {
-        String dataset = parseDataset(formDef.getMainInstance());
-        EntityFormParseAttachment entityFormParseAttachment = new EntityFormParseAttachment(dataset, saveTos);
+        EntityFormParseAttachment entityFormParseAttachment = new EntityFormParseAttachment(saveTos);
         formDef.putParseAttachment(entityFormParseAttachment);
-    }
-
-    private String parseDataset(FormInstance mainInstance) {
-        TreeElement root = mainInstance.getRoot();
-        List<TreeElement> meta = root.getChildrenWithName("meta");
-        if (!meta.isEmpty()) {
-            List<TreeElement> entity = meta.get(0).getChildrenWithName("entity")
-                .stream()
-                .filter(node -> node.getNamespace().equals("http://www.opendatakit.org/xforms/entities"))
-                .collect(Collectors.toList());
-
-            if (!entity.isEmpty()) {
-                List<TreeElement> create = entity.get(0).getChildrenWithName("create");
-
-                if (!create.isEmpty()) {
-                    return entity.get(0).getAttributeValue(null, "dataset");
-                }
-            }
-        }
-
-        return null;
     }
 }

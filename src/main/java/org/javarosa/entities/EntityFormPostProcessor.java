@@ -10,6 +10,7 @@ import org.javarosa.entities.internal.EntityFormParseAttachment;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormPostProcessor;
 import org.javarosa.model.xform.XPathReference;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,10 +26,10 @@ public class EntityFormPostProcessor implements FormPostProcessor {
         FormInstance mainInstance = formDef.getMainInstance();
 
         EntityFormParseAttachment entityFormParseAttachment = formDef.getParseAttachment(EntityFormParseAttachment.class);
-        String dataset = entityFormParseAttachment.getDataset();
         List<Pair<XPathReference, String>> saveTos = entityFormParseAttachment.getSaveTos();
 
-        if (dataset != null && createIsRelevant(mainInstance)) {
+        String dataset = getDatasetToCreateWith(mainInstance);
+        if (dataset != null) {
             List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
                 IDataReference reference = saveTo.getFirst();
                 String answer = mainInstance.resolveReference(reference).getValue().getDisplayText();
@@ -41,7 +42,8 @@ public class EntityFormPostProcessor implements FormPostProcessor {
         }
     }
 
-    private boolean createIsRelevant(FormInstance mainInstance) {
+    @Nullable
+    private String getDatasetToCreateWith(FormInstance mainInstance) {
         TreeElement root = mainInstance.getRoot();
         List<TreeElement> meta = root.getChildrenWithName("meta");
         if (!meta.isEmpty()) {
@@ -54,11 +56,13 @@ public class EntityFormPostProcessor implements FormPostProcessor {
                 List<TreeElement> create = entity.get(0).getChildrenWithName("create");
 
                 if (!create.isEmpty()) {
-                    return create.get(0).isRelevant();
+                    if (create.get(0).isRelevant()) {
+                        return entity.get(0).getAttributeValue(null, "dataset");
+                    }
                 }
             }
         }
 
-        return false;
+        return null;
     }
 }

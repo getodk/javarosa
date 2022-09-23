@@ -19,19 +19,13 @@ import java.util.stream.Collectors;
 
 public class EntityFormParseAttachment implements Externalizable {
 
-    private String dataset;
     private List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
 
     public EntityFormParseAttachment() {
     }
 
-    public EntityFormParseAttachment(String dataset, List<Pair<XPathReference, String>> saveTos) {
-        this.dataset = dataset;
+    public EntityFormParseAttachment(List<Pair<XPathReference, String>> saveTos) {
         this.saveTos = saveTos;
-    }
-
-    public String getDataset() {
-        return dataset;
     }
 
     public List<Pair<XPathReference, String>> getSaveTos() {
@@ -40,15 +34,12 @@ public class EntityFormParseAttachment implements Externalizable {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        dataset = ExtUtil.readString(in);
-
         HashMap<XPathReference, String> saveToMap = (HashMap<XPathReference, String>) ExtUtil.read(in, new ExtWrapMap(XPathReference.class, String.class), pf);
         saveTos = saveToMap.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toList());
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.writeString(out, dataset);
         Map<XPathReference, String> saveTosMap = saveTos.stream()
             .collect(Collectors.toMap(Pair<XPathReference, String>::getFirst, Pair<XPathReference, String>::getSecond));
         ExtUtil.write(out, new ExtWrapMap(new HashMap<>(saveTosMap)));
