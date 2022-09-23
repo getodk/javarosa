@@ -20,6 +20,8 @@ import static java.util.Collections.emptyList;
 
 public class EntityFormPostProcessor implements FormPostProcessor {
 
+    private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
+
     @Override
     public void processForm(FormEntryModel formEntryModel) {
         FormDef formDef = formEntryModel.getForm();
@@ -45,19 +47,16 @@ public class EntityFormPostProcessor implements FormPostProcessor {
     @Nullable
     private String getDatasetToCreateWith(FormInstance mainInstance) {
         TreeElement root = mainInstance.getRoot();
-        List<TreeElement> meta = root.getChildrenWithName("meta");
-        if (!meta.isEmpty()) {
-            List<TreeElement> entity = meta.get(0).getChildrenWithName("entity")
-                .stream()
-                .filter(node -> node.getNamespace().equals("http://www.opendatakit.org/xforms/entities"))
-                .collect(Collectors.toList());
+        TreeElement meta = root.getChild("meta");
+        if (meta != null) {
+            TreeElement entity = meta.getChild("entity");
 
-            if (!entity.isEmpty()) {
-                List<TreeElement> create = entity.get(0).getChildrenWithName("create");
+            if (entity != null && entity.getNamespace().equals(ENTITIES_NAMESPACE)) {
+                TreeElement create = entity.getChild("create");
 
-                if (!create.isEmpty()) {
-                    if (create.get(0).isRelevant()) {
-                        return entity.get(0).getAttributeValue(null, "dataset");
+                if (create != null) {
+                    if (create.isRelevant()) {
+                        return entity.getAttributeValue(null, "dataset");
                     }
                 }
             }
