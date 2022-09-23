@@ -116,7 +116,7 @@ class StandardBindAttributesProcessor {
         binding.setPreload(element.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
         binding.setPreloadParams(element.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
-        bindingAttributeProcessors.forEach(bindingAttributeProcessor -> {
+        bindingAttributeProcessors.stream().forEach(bindingAttributeProcessor -> {
             for (int i = 0; i < element.getAttributeCount(); i++) {
                 String name = element.getAttributeName(i);
                 if (bindingAttributeProcessor.getUsedAttributes().contains(name)) {

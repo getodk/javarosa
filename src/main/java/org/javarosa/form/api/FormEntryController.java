@@ -204,7 +204,7 @@ public class FormEntryController {
 
     public void finalizeForm() {
         model.getForm().postProcessInstance();
-        formPostProcessors.forEach(formPostProcessor -> {
+        formPostProcessors.stream().forEach(formPostProcessor -> {
             formPostProcessor.processForm(model);
         });
     }

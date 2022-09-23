@@ -401,7 +401,7 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        formDefProcessors.forEach(formDefProcessor -> formDefProcessor.processFormDef(_f));
+        formDefProcessors.stream().forEach(formDefProcessor -> formDefProcessor.processFormDef(_f));
         return _f;
     }
 
