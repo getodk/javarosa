@@ -80,7 +80,7 @@ public interface XFormsElement {
 
     static XFormsElement html(List<Pair<String, String>> additionalNamespaces, HeadXFormsElement head, BodyXFormsElement body) {
         String additionalNamespacesString = additionalNamespaces.stream()
-            .map(namespace -> "xmlns:" + namespace.getFirst() + "=" + namespace.getSecond() + " ")
+            .map(namespace -> "xmlns:" + namespace.getFirst() + "=\"" + namespace.getSecond() + "\" ")
             .collect(Collectors.joining());
 
         return t("h:html " +

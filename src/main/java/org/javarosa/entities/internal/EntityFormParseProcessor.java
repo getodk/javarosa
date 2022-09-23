@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EntityFormParseProcessor implements BindingAttributeProcessor, FormDefProcessor {
 
@@ -42,7 +43,10 @@ public class EntityFormParseProcessor implements BindingAttributeProcessor, Form
         TreeElement root = mainInstance.getRoot();
         List<TreeElement> meta = root.getChildrenWithName("meta");
         if (!meta.isEmpty()) {
-            List<TreeElement> entity = meta.get(0).getChildrenWithName("entity");
+            List<TreeElement> entity = meta.get(0).getChildrenWithName("entity")
+                .stream()
+                .filter(node -> node.getNamespace().equals("http://www.opendatakit.org/xforms/entities"))
+                .collect(Collectors.toList());
 
             if (!entity.isEmpty()) {
                 List<TreeElement> create = entity.get(0).getChildrenWithName("create");

@@ -9,20 +9,16 @@ import org.javarosa.entities.Entity;
 import org.javarosa.entities.EntityFormPostProcessor;
 import org.javarosa.entities.EntityXFormParserFactory;
 import org.javarosa.entities.internal.EntitiesAttachment;
-import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormUtils;
-import org.javarosa.xpath.XPathParseTool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
@@ -124,7 +120,6 @@ public class EntitiesTest {
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 
-
     @Test
     public void entityFormCanBeSerialized() throws IOException, DeserializationException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
@@ -203,6 +198,43 @@ public class EntitiesTest {
         List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void mustUseCorrectNamespace() throws IOException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.example.com/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("name"),
+                            t("orx:meta",
+                                t("entities:entity dataset=\"people\"",
+                                    t("entities:create")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+
+        scenario.next();
+        scenario.answer("Tom Wambsgans");
+
+        scenario.finalizeInstance();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        assertThat(entities.size(), equalTo(0));
     }
 
     @Test
