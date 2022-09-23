@@ -3,8 +3,6 @@ package org.javarosa.entities.internal;
 import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.BindingAttributeProcessor;
 import org.javarosa.xform.parse.FormDefProcessor;
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class EntityFormParseProcessor implements BindingAttributeProcessor, FormDefProcessor {
 
