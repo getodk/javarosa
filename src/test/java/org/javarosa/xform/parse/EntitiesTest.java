@@ -121,6 +121,47 @@ public class EntitiesTest {
     }
 
     @Test
+    public void fillingFormWithNonRelevantCreate_doesNotCreateAnyEntities() throws IOException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("name"),
+                            t("join"),
+                            t("orx:meta",
+                                t("entities:entity dataset=\"members\"",
+                                    t("entities:create")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/orx:meta/entities:entity/entities:create").relevant("/data/join = 'yes'"),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
+                )
+            ),
+            body(
+                input("/data/name"),
+                select1("/data/join", item("yes", "Yes"), item("no", "No"))
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+
+        scenario.next();
+        scenario.answer("Roman Roy");
+        scenario.answer(scenario.choicesOf("/data/join").get(1));
+
+        scenario.finalizeInstance();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        assertThat(entities.size(), equalTo(0));
+    }
+
+    @Test
     public void entityFormCanBeSerialized() throws IOException, DeserializationException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
