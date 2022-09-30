@@ -7,10 +7,10 @@ import java.util.List;
 public class Entity {
 
     public final String dataset;
-    public final List<Pair<String, String>> fields;
+    public final List<Pair<String, String>> properties;
 
-    public Entity(String dataset, List<Pair<String, String>> fields) {
+    public Entity(String dataset, List<Pair<String, String>> properties) {
         this.dataset = dataset;
-        this.fields = fields;
+        this.properties = properties;
     }
 }

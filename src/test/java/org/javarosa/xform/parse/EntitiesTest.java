@@ -117,7 +117,7 @@ public class EntitiesTest {
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
-        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 
     @Test
@@ -200,7 +200,7 @@ public class EntitiesTest {
         List<Entity> entities = deserializedScenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
-        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Shiv Roy"))));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Shiv Roy"))));
     }
 
     @Test
@@ -238,7 +238,7 @@ public class EntitiesTest {
         scenario.finalizeInstance();
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
-        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 
     @Test
@@ -313,7 +313,7 @@ public class EntitiesTest {
         scenario.finalizeInstance();
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
-        assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("team", "kendall"))));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("team", "kendall"))));
     }
 
     @Test
