@@ -14,12 +14,14 @@ import java.util.Set;
 
 public class EntityFormParseProcessor implements BindAttributeProcessor, FormDefProcessor {
 
+    private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
+
     private final List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
 
     @Override
-    public Set<String> getUsedAttributes() {
-        HashSet<String> attributes = new HashSet<>();
-        attributes.add("saveto");
+    public Set<Pair<String, String>> getUsedAttributes() {
+        HashSet<Pair<String, String>> attributes = new HashSet<>();
+        attributes.add(new Pair<>(ENTITIES_NAMESPACE, "saveto"));
 
         return attributes;
     }

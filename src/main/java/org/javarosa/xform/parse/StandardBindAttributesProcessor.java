@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
@@ -118,8 +119,10 @@ class StandardBindAttributesProcessor {
 
         bindAttributeProcessors.stream().forEach(bindAttributeProcessor -> {
             for (int i = 0; i < element.getAttributeCount(); i++) {
+                String namespace = element.getAttributeNamespace(i);
                 String name = element.getAttributeName(i);
-                if (bindAttributeProcessor.getUsedAttributes().contains(name)) {
+
+                if (bindAttributeProcessor.getUsedAttributes().contains(new Pair<>(namespace, name))) {
                     bindAttributeProcessor.processBindingAttribute(name, element.getAttributeValue(i), binding);
                 }
             }
@@ -127,7 +130,7 @@ class StandardBindAttributesProcessor {
 
         List<String> processorAttributes = bindAttributeProcessors.stream()
             .flatMap((Function<BindAttributeProcessor, Stream<String>>) bindAttributeProcessor -> {
-                return bindAttributeProcessor.getUsedAttributes().stream();
+                return bindAttributeProcessor.getUsedAttributes().stream().map(Pair::getSecond);
             })
             .collect(Collectors.toList());
 
