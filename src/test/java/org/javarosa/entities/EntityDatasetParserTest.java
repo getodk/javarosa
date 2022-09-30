@@ -2,11 +2,9 @@ package org.javarosa.entities;
 
 import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.entities.internal.EntityDatasetParser;
 import org.javarosa.xform.parse.XFormParser;
-import org.javarosa.xform.util.XFormUtils;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

@@ -16,6 +16,7 @@
 
 package org.javarosa.xform.parse;
 
+import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -402,6 +403,16 @@ public class XFormParser implements IXFormParserFunctions {
 
         formDefProcessors.stream().forEach(formDefProcessor -> formDefProcessor.processFormDef(_f));
         return _f;
+    }
+
+    public void addProcessor(Processor processor) {
+        if (processor instanceof BindAttributeProcessor) {
+            addBindAttributeProcessor((BindAttributeProcessor) processor);
+        }
+
+        if (processor instanceof FormDefProcessor) {
+            addFormDefProcessor((FormDefProcessor) processor);
+        }
     }
 
     public void addBindAttributeProcessor(BindAttributeProcessor bindAttributeProcessor) {
@@ -2382,5 +2393,20 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface ErrorCallback {
         void accept(String message);
+    }
+
+    public interface Processor {
+
+    }
+
+    public interface FormDefProcessor extends Processor {
+        void processFormDef(FormDef formDef);
+    }
+
+    public interface BindAttributeProcessor extends Processor {
+
+        Set<Pair<String, String>> getUsedAttributes();
+
+        void processBindingAttribute(String name, String value, DataBinding binding);
     }
 }

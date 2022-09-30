@@ -4,15 +4,14 @@ import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.xform.parse.BindAttributeProcessor;
-import org.javarosa.xform.parse.FormDefProcessor;
+import org.javarosa.xform.parse.XFormParser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class EntityFormParseProcessor implements BindAttributeProcessor, FormDefProcessor {
+public class EntityFormParseProcessor implements XFormParser.BindAttributeProcessor, XFormParser.FormDefProcessor {
 
     private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
 

@@ -37,8 +37,7 @@ public class EntityXFormParserFactory implements IXFormParserFactory {
 
     private XFormParser configureEntityParsing(XFormParser xFormParser) {
         EntityFormParseProcessor processor = new EntityFormParseProcessor();
-        xFormParser.addBindAttributeProcessor(processor);
-        xFormParser.addFormDefProcessor(processor);
+        xFormParser.addProcessor(processor);
 
         return xFormParser;
     }

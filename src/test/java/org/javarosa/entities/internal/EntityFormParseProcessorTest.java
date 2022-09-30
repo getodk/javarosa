@@ -56,8 +56,7 @@ public class EntityFormParseProcessorTest {
         EntityFormParseProcessor processor = new EntityFormParseProcessor();
 
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
-        parser.addBindAttributeProcessor(processor);
-        parser.addFormDefProcessor(processor);
+        parser.addProcessor(processor);
 
         FormDef formDef = parser.parse(null);
         assertThat(formDef.getExtras().get(EntityFormExtra.class).getSaveTos(), is(empty()));
