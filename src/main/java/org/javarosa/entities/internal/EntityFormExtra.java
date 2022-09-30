@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class EntityFormParseAttachment implements Externalizable {
+public class EntityFormExtra implements Externalizable {
 
     private List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
 
-    public EntityFormParseAttachment() {
+    public EntityFormExtra() {
     }
 
-    public EntityFormParseAttachment(List<Pair<XPathReference, String>> saveTos) {
+    public EntityFormExtra(List<Pair<XPathReference, String>> saveTos) {
         this.saveTos = saveTos;
     }
 

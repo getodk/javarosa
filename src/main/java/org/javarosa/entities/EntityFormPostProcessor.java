@@ -5,8 +5,8 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.entities.internal.EntitiesAttachment;
-import org.javarosa.entities.internal.EntityFormParseAttachment;
+import org.javarosa.entities.internal.Entities;
+import org.javarosa.entities.internal.EntityFormExtra;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormPostProcessor;
 import org.javarosa.model.xform.XPathReference;
@@ -27,8 +27,8 @@ public class EntityFormPostProcessor implements FormPostProcessor {
         FormDef formDef = formEntryModel.getForm();
         FormInstance mainInstance = formDef.getMainInstance();
 
-        EntityFormParseAttachment entityFormParseAttachment = formDef.getParseAttachment(EntityFormParseAttachment.class);
-        List<Pair<XPathReference, String>> saveTos = entityFormParseAttachment.getSaveTos();
+        EntityFormExtra entityFormExtra = formDef.getExtras().get(EntityFormExtra.class);
+        List<Pair<XPathReference, String>> saveTos = entityFormExtra.getSaveTos();
 
         String dataset = getDatasetToCreateWith(mainInstance);
         if (dataset != null) {
@@ -38,9 +38,9 @@ public class EntityFormPostProcessor implements FormPostProcessor {
                 return new Pair<>(saveTo.getSecond(), answer);
             }).collect(Collectors.toList());
 
-            formEntryModel.putAttachment(new EntitiesAttachment(asList(new Entity(dataset, fields))));
+            formEntryModel.getExtras().put(new Entities(asList(new Entity(dataset, fields))));
         } else {
-            formEntryModel.putAttachment(new EntitiesAttachment(emptyList()));
+            formEntryModel.getExtras().put(new Entities(emptyList()));
         }
     }
 

@@ -42,14 +42,15 @@ import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.core.util.Extras;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapExternalizable;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableExtras;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
@@ -94,7 +95,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
-    private Map<String, Externalizable> parseAttachments = new HashMap<>();
+    private ExternalizableExtras extras = new ExternalizableExtras();
 
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
@@ -1119,7 +1120,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         List<TreeReference> treeReferencesWithActions = (List<TreeReference>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
         elementsWithActionTriggeredByToplevelEvent = getElementsFromReferences(treeReferencesWithActions);
 
-        parseAttachments = (HashMap<String, Externalizable>) ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapExternalizable()), pf);
+        extras = (ExternalizableExtras) ExtUtil.read(dis, ExternalizableExtras.class);
     }
 
     /**
@@ -1224,12 +1225,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapListPoly(new ArrayList<>(actions)));
         ExtUtil.write(dos, new ExtWrapListPoly(getReferencesFromElements(elementsWithActionTriggeredByToplevelEvent)));
 
-        HashMap<Object, Object> wrappedParseAttachments = new HashMap<>();
-        parseAttachments.forEach((key, value) -> {
-            wrappedParseAttachments.put(key, new ExtWrapExternalizable(value));
-        });
-
-        ExtUtil.write(dos, new ExtWrapMap(wrappedParseAttachments));
+        ExtUtil.write(dos, extras);
     }
 
     /**
@@ -1706,11 +1702,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return formInstances;
     }
 
-    public void putParseAttachment(Externalizable value) {
-        parseAttachments.put(value.getClass().getName(), value);
-    }
-
-    public <T> T getParseAttachment(Class<T> key) {
-        return (T) parseAttachments.get(key.getName());
+    public Extras<Externalizable> getExtras() {
+        return extras;
     }
 }

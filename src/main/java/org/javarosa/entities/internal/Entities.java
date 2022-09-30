@@ -4,11 +4,11 @@ import org.javarosa.entities.Entity;
 
 import java.util.List;
 
-public class EntitiesAttachment {
+public class Entities {
 
     private final List<Entity> entities;
 
-    public EntitiesAttachment(List<Entity> entities) {
+    public Entities(List<Entity> entities) {
         this.entities = entities;
     }
 

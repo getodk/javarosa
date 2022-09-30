@@ -31,7 +31,7 @@ public class EntityFormParseProcessor implements BindingAttributeProcessor, Form
 
     @Override
     public void processFormDef(FormDef formDef) {
-        EntityFormParseAttachment entityFormParseAttachment = new EntityFormParseAttachment(saveTos);
-        formDef.putParseAttachment(entityFormParseAttachment);
+        EntityFormExtra entityFormExtra = new EntityFormExtra(saveTos);
+        formDef.getExtras().put(entityFormExtra);
     }
 }

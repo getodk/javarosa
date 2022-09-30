@@ -8,7 +8,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entities.Entity;
 import org.javarosa.entities.EntityFormPostProcessor;
 import org.javarosa.entities.EntityXFormParserFactory;
-import org.javarosa.entities.internal.EntitiesAttachment;
+import org.javarosa.entities.internal.Entities;
 import org.javarosa.xform.util.XFormUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -77,7 +77,7 @@ public class EntitiesTest {
         scenario.answer("Tom Wambsgans");
 
         scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(0));
     }
 
@@ -114,7 +114,7 @@ public class EntitiesTest {
         scenario.answer("Tom Wambsgans");
 
         scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
@@ -157,7 +157,7 @@ public class EntitiesTest {
         scenario.answer(scenario.choicesOf("/data/join").get(1));
 
         scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(0));
     }
 
@@ -197,7 +197,7 @@ public class EntitiesTest {
         deserializedScenario.answer("Shiv Roy");
 
         deserializedScenario.finalizeInstance();
-        List<Entity> entities = deserializedScenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = deserializedScenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Shiv Roy"))));
@@ -236,7 +236,7 @@ public class EntitiesTest {
         scenario.answer("Tom Wambsgans");
 
         scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
@@ -274,7 +274,7 @@ public class EntitiesTest {
         scenario.answer("Tom Wambsgans");
 
         scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(0));
     }
 
@@ -311,7 +311,7 @@ public class EntitiesTest {
         scenario.answer(scenario.choicesOf("/data/team").get(0));
 
         scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getAttachment(EntitiesAttachment.class).getEntities();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).fields, equalTo(asList(new Pair<>("team", "kendall"))));
     }
