@@ -47,12 +47,12 @@ public class EntityFormPostProcessor implements FormPostProcessor {
     @Nullable
     private String getDatasetToCreateWith(FormInstance mainInstance) {
         TreeElement root = mainInstance.getRoot();
-        TreeElement meta = root.getChild("meta");
+        TreeElement meta = root.getFirstChild("meta");
         if (meta != null) {
-            TreeElement entity = meta.getChild("entity");
+            TreeElement entity = meta.getFirstChild("entity");
 
             if (entity != null && entity.getNamespace().equals(ENTITIES_NAMESPACE)) {
-                TreeElement create = entity.getChild("create");
+                TreeElement create = entity.getFirstChild("create");
 
                 if (create != null) {
                     if (create.isRelevant()) {

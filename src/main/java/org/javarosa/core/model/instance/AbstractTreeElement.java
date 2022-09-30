@@ -17,7 +17,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
     public abstract String getInstanceName();
 
     @Nullable
-    public T getChild(String name);
+    public T getFirstChild(String name);
 
     @Nullable
     public abstract T getChild(String name, int multiplicity);

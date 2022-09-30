@@ -223,7 +223,7 @@ import org.jetbrains.annotations.Nullable;
 
     @Override
     @Nullable
-    public TreeElement getChild(String name) {
+    public TreeElement getFirstChild(String name) {
         return getChild(name, 0);
     }
 
