@@ -8,7 +8,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.entities.internal.Entities;
 import org.javarosa.entities.internal.EntityFormExtra;
 import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormPostProcessor;
+import org.javarosa.form.api.FormEntryFinalizer;
 import org.javarosa.model.xform.XPathReference;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
-public class EntityFormPostProcessor implements FormPostProcessor {
+public class EntityFinalizer implements FormEntryFinalizer {
 
     private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
 

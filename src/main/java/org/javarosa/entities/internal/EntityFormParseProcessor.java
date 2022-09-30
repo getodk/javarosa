@@ -4,7 +4,7 @@ import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.xform.parse.BindingAttributeProcessor;
+import org.javarosa.xform.parse.BindAttributeProcessor;
 import org.javarosa.xform.parse.FormDefProcessor;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class EntityFormParseProcessor implements BindingAttributeProcessor, FormDefProcessor {
+public class EntityFormParseProcessor implements BindAttributeProcessor, FormDefProcessor {
 
     private final List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
 

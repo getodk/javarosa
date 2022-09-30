@@ -321,7 +321,7 @@ public class Scenario {
     }
 
     public void finalizeInstance() {
-        controller.finalizeForm();
+        controller.finalizeFormEntry();
     }
 
     public FormEntryController getFormEntryController() {

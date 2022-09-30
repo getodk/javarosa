@@ -6,7 +6,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entities.Entity;
-import org.javarosa.entities.EntityFormPostProcessor;
+import org.javarosa.entities.EntityFinalizer;
 import org.javarosa.entities.EntityXFormParserFactory;
 import org.javarosa.entities.internal.Entities;
 import org.javarosa.xform.util.XFormUtils;
@@ -71,7 +71,7 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         scenario.next();
         scenario.answer("Tom Wambsgans");
@@ -108,7 +108,7 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         scenario.next();
         scenario.answer("Tom Wambsgans");
@@ -150,7 +150,7 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         scenario.next();
         scenario.answer("Roman Roy");
@@ -188,10 +188,10 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         Scenario deserializedScenario = scenario.serializeAndDeserializeForm();
-        deserializedScenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        deserializedScenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         deserializedScenario.next();
         deserializedScenario.answer("Shiv Roy");
@@ -230,7 +230,7 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         scenario.next();
         scenario.answer("Tom Wambsgans");
@@ -268,7 +268,7 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         scenario.next();
         scenario.answer("Tom Wambsgans");
@@ -305,7 +305,7 @@ public class EntitiesTest {
             )
         ));
 
-        scenario.getFormEntryController().addPostProcessor(new EntityFormPostProcessor());
+        scenario.getFormEntryController().addPostProcessor(new EntityFinalizer());
 
         scenario.next();
         scenario.answer(scenario.choicesOf("/data/team").get(0));

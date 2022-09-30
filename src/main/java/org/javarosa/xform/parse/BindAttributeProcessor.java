@@ -4,7 +4,7 @@ import org.javarosa.core.model.DataBinding;
 
 import java.util.Set;
 
-public interface BindingAttributeProcessor {
+public interface BindAttributeProcessor {
 
     Set<String> getUsedAttributes();
 

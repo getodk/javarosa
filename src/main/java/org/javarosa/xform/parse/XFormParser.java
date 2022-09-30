@@ -174,7 +174,7 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> itextKnownForms;
     private static HashMap<String, IElementHandler> actionHandlers;
 
-    private final List<BindingAttributeProcessor> bindingAttributeProcessors = new ArrayList<>();
+    private final List<BindAttributeProcessor> bindAttributeProcessors = new ArrayList<>();
     private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
 
     /**
@@ -404,8 +404,8 @@ public class XFormParser implements IXFormParserFunctions {
         return _f;
     }
 
-    public void addBindingAttributeProcessor(BindingAttributeProcessor bindingAttributeProcessor) {
-        bindingAttributeProcessors.add(bindingAttributeProcessor);
+    public void addBindAttributeProcessor(BindAttributeProcessor bindAttributeProcessor) {
+        bindAttributeProcessors.add(bindAttributeProcessor);
     }
 
     public void addFormDefProcessor(FormDefProcessor formDefProcessor) {
@@ -1886,9 +1886,9 @@ public class XFormParser implements IXFormParserFunctions {
         return false;
     }
 
-    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element, List<BindingAttributeProcessor> bindingAttributeProcessors) {
+    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element, List<BindAttributeProcessor> bindAttributeProcessors) {
         return new StandardBindAttributesProcessor(typeMappings).
-            createBinding(this, _f, usedAtts, passedThroughAtts, element, bindingAttributeProcessors);
+            createBinding(this, _f, usedAtts, passedThroughAtts, element, bindAttributeProcessors);
     }
 
     /**
@@ -1920,7 +1920,7 @@ public class XFormParser implements IXFormParserFunctions {
     ));
 
     private void parseBind(Element element) {
-        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element, bindingAttributeProcessors);
+        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element, bindAttributeProcessors);
 
         // Warn of unused attributes of parent element
         if (XFormUtils.showUnusedAttributeWarning(element, usedAtts)) {

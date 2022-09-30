@@ -51,7 +51,7 @@ public class FormEntryController {
 
     FormEntryModel model;
 
-    private final List<FormPostProcessor> formPostProcessors = new ArrayList<>();
+    private final List<FormEntryFinalizer> formEntryFinalizers = new ArrayList<>();
 
     /**
      * Creates a new form entry controller for the model provided
@@ -202,15 +202,15 @@ public class FormEntryController {
         return stepEvent(false);
     }
 
-    public void finalizeForm() {
+    public void finalizeFormEntry() {
         model.getForm().postProcessInstance();
-        formPostProcessors.stream().forEach(formPostProcessor -> {
-            formPostProcessor.processForm(model);
+        formEntryFinalizers.stream().forEach(formEntryFinalizer -> {
+            formEntryFinalizer.processForm(model);
         });
     }
 
-    public void addPostProcessor(FormPostProcessor formPostProcessor) {
-        formPostProcessors.add(formPostProcessor);
+    public void addPostProcessor(FormEntryFinalizer formEntryFinalizer) {
+        formEntryFinalizers.add(formEntryFinalizer);
     }
 
     /**

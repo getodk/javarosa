@@ -1,6 +1,6 @@
 package org.javarosa.form.api;
 
-public interface FormPostProcessor {
+public interface FormEntryFinalizer {
 
     void processForm(FormEntryModel formEntryModel);
 }

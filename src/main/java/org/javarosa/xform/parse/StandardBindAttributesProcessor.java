@@ -37,7 +37,7 @@ class StandardBindAttributesProcessor {
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Collection<String> passedThroughAttributes,
-                              Element element, List<BindingAttributeProcessor> bindingAttributeProcessors) {
+                              Element element, List<BindAttributeProcessor> bindAttributeProcessors) {
         final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
@@ -116,18 +116,18 @@ class StandardBindAttributesProcessor {
         binding.setPreload(element.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
         binding.setPreloadParams(element.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
-        bindingAttributeProcessors.stream().forEach(bindingAttributeProcessor -> {
+        bindAttributeProcessors.stream().forEach(bindAttributeProcessor -> {
             for (int i = 0; i < element.getAttributeCount(); i++) {
                 String name = element.getAttributeName(i);
-                if (bindingAttributeProcessor.getUsedAttributes().contains(name)) {
-                    bindingAttributeProcessor.processBindingAttribute(name, element.getAttributeValue(i), binding);
+                if (bindAttributeProcessor.getUsedAttributes().contains(name)) {
+                    bindAttributeProcessor.processBindingAttribute(name, element.getAttributeValue(i), binding);
                 }
             }
         });
 
-        List<String> processorAttributes = bindingAttributeProcessors.stream()
-            .flatMap((Function<BindingAttributeProcessor, Stream<String>>) bindingAttributeProcessor -> {
-                return bindingAttributeProcessor.getUsedAttributes().stream();
+        List<String> processorAttributes = bindAttributeProcessors.stream()
+            .flatMap((Function<BindAttributeProcessor, Stream<String>>) bindAttributeProcessor -> {
+                return bindAttributeProcessor.getUsedAttributes().stream();
             })
             .collect(Collectors.toList());
 
