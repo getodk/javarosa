@@ -20,6 +20,9 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
     public T getFirstChild(String name);
 
     @Nullable
+    public T getFirstChild(String namespace, String name);
+
+    @Nullable
     public abstract T getChild(String name, int multiplicity);
 
     /**

@@ -17,12 +17,12 @@ public class EntityDatasetParser {
         TreeElement root = mainInstance.getRoot();
         TreeElement meta = root.getFirstChild("meta");
         if (meta != null) {
-            TreeElement entity = meta.getFirstChild("entity");
+            TreeElement entity = meta.getFirstChild(ENTITIES_NAMESPACE, "entity");
 
-            if (entity != null && entity.getNamespace().equals(ENTITIES_NAMESPACE)) {
-                TreeElement create = entity.getFirstChild("create");
+            if (entity != null) {
+                TreeElement create = entity.getFirstChild(ENTITIES_NAMESPACE, "create");
 
-                if (create != null && create.getNamespace().equals(ENTITIES_NAMESPACE)) {
+                if (create != null) {
                     if (create.isRelevant()) {
                         return entity.getAttributeValue(null, "dataset");
                     }

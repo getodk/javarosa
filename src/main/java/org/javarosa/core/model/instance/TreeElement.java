@@ -227,6 +227,18 @@ import org.jetbrains.annotations.Nullable;
         return getChild(name, 0);
     }
 
+    @Nullable
+    @Override
+    public TreeElement getFirstChild(String namespace, String name) {
+        TreeElement firstChild = getFirstChild(name);
+
+        if (firstChild == null || firstChild.getNamespace().equals(namespace)) {
+            return firstChild;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     @Nullable
     public TreeElement getChild(String name, int multiplicity) {
