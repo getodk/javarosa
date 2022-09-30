@@ -1,14 +1,12 @@
-package org.javarosa.xform.parse;
+package org.javarosa.entities;
 
 import kotlin.Pair;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.entities.Entity;
-import org.javarosa.entities.EntityFinalizer;
-import org.javarosa.entities.EntityXFormParserFactory;
 import org.javarosa.entities.internal.Entities;
+import org.javarosa.xform.parse.XFormParserFactory;
 import org.javarosa.xform.util.XFormUtils;
 import org.junit.After;
 import org.junit.Before;
