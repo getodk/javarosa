@@ -3,7 +3,11 @@ package org.javarosa.entities.internal;
 import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.entities.UnrecognizedEntityVersionException;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 
 import java.util.ArrayList;
@@ -11,14 +15,35 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class EntityFormParseProcessor implements XFormParser.BindAttributeProcessor, XFormParser.FormDefProcessor {
+public class EntityFormParseProcessor implements XFormParser.BindAttributeProcessor, XFormParser.FormDefProcessor, XFormParser.ModelAttributeProcessor {
 
     private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
+    public static final String SUPPORTED_VERSION = "v2022.1";
 
     private final List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
 
     @Override
-    public Set<Pair<String, String>> getUsedAttributes() {
+    public Set<Pair<String, String>> getUsedModelAttributes() {
+        HashSet<Pair<String, String>> attributes = new HashSet<>();
+        attributes.add(new Pair<>(ENTITIES_NAMESPACE, "entities-version"));
+
+        return attributes;
+    }
+
+    @Override
+    public void processModelAttribute(String name, String value) throws XFormParseException {
+        try {
+            String[] versionParts = value.split("\\.");
+            if (!SUPPORTED_VERSION.equals(versionParts[0] + "." + versionParts[1])) {
+                throw new UnrecognizedEntityVersionException();
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new UnrecognizedEntityVersionException();
+        }
+    }
+
+    @Override
+    public Set<Pair<String, String>> getUsedBindAttributes() {
         HashSet<Pair<String, String>> attributes = new HashSet<>();
         attributes.add(new Pair<>(ENTITIES_NAMESPACE, "saveto"));
 
@@ -26,7 +51,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     }
 
     @Override
-    public void processBindingAttribute(String name, String value, DataBinding binding) {
+    public void processBindAttribute(String name, String value, DataBinding binding) {
         saveTos.add(new Pair<>((XPathReference) binding.getReference(), value));
     }
 

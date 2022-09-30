@@ -177,6 +177,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     private final List<BindAttributeProcessor> bindAttributeProcessors = new ArrayList<>();
     private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
+    private final List<ModelAttributeProcessor> modelAttributeProcessors = new ArrayList<>();
 
     /**
      * The string IDs of all instances that are referenced in a instance() function call in the primary instance
@@ -413,6 +414,10 @@ public class XFormParser implements IXFormParserFunctions {
         if (processor instanceof FormDefProcessor) {
             addFormDefProcessor((FormDefProcessor) processor);
         }
+
+        if (processor instanceof ModelAttributeProcessor) {
+            addModelAttributeProcessor((ModelAttributeProcessor) processor);
+        }
     }
 
     public void addBindAttributeProcessor(BindAttributeProcessor bindAttributeProcessor) {
@@ -421,6 +426,10 @@ public class XFormParser implements IXFormParserFunctions {
 
     public void addFormDefProcessor(FormDefProcessor formDefProcessor) {
         formDefProcessors.add(formDefProcessor);
+    }
+
+    public void addModelAttributeProcessor(ModelAttributeProcessor modelAttributeProcessor) {
+        modelAttributeProcessors.add(modelAttributeProcessor);
     }
 
     /**
@@ -673,7 +682,19 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     //for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
-    private void parseModel(Element e) {
+    private void parseModel(Element e) throws XFormParseException {
+        modelAttributeProcessors.stream().forEach(processor -> {
+            for (int i = 0; i < e.getAttributeCount(); i++) {
+                String namespace = e.getAttributeNamespace(i);
+                String name = e.getAttributeName(i);
+                String value = e.getAttributeValue(i);
+
+                if (processor.getUsedModelAttributes().contains(new Pair<>(namespace, name))) {
+                    processor.processModelAttribute(name, value);
+                }
+            }
+        });
+
         List<String> usedAtts = new ArrayList<>(); //no attributes parsed in title.
         List<Element> delayedParseElements = new ArrayList<>();
 
@@ -2405,8 +2426,15 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface BindAttributeProcessor extends Processor {
 
-        Set<Pair<String, String>> getUsedAttributes();
+        Set<Pair<String, String>> getUsedBindAttributes();
 
-        void processBindingAttribute(String name, String value, DataBinding binding);
+        void processBindAttribute(String name, String value, DataBinding binding);
+    }
+
+    public interface ModelAttributeProcessor extends Processor {
+
+        Set<Pair<String, String>> getUsedModelAttributes();
+
+        void processModelAttribute(String name, String value) throws XFormParseException;
     }
 }
