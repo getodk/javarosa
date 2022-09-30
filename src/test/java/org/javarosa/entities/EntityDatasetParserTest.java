@@ -5,10 +5,13 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.entities.internal.EntityDatasetParser;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,7 +28,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class EntityDatasetParserTest {
 
     @Test
-    public void parseFirstDatasetToCreate_ignoresDatasetWithCreateActionWithIncorrectNamespace() {
+    public void parseFirstDatasetToCreate_ignoresDatasetWithCreateActionWithIncorrectNamespace() throws IOException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("correct", "http://www.opendatakit.org/xforms/entities"),
@@ -52,10 +55,10 @@ public class EntityDatasetParserTest {
             )
         );
 
-        FormDef formDef = XFormUtils.getFormFromInputStream(new ByteArrayInputStream(form.asXml().getBytes()));
-        FormInstance mainInstance = formDef.getMainInstance();
+        XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
+        FormDef formDef = parser.parse(null);
 
-        String dataset = EntityDatasetParser.parseFirstDatasetToCreate(mainInstance);
+        String dataset = EntityDatasetParser.parseFirstDatasetToCreate(formDef.getMainInstance());
         assertThat(dataset, equalTo(null));
     }
 }
