@@ -20,13 +20,15 @@ import org.kxml2.kdom.Element;
 
 /**
  * Exception thrown when an XForms Parsing error occurs.
+ * Clayton Sims - Aug 18, 2008 : This doesn't actually seem
+ *  to be a RuntimeException to me. Is there justification
+ *  as to why it is?
  * 
  * @author Drew Roos
+ * @deprecated Use non {@link RuntimeException} {@link XFormParser.ParseException} instead
  *
  */
-// Clayton Sims - Aug 18, 2008 : This doesn't actually seem
-// to be a RuntimeException to me. Is there justification
-// as to why it is?
+@Deprecated
 public class XFormParseException extends RuntimeException {
     /**
      *

@@ -42,7 +42,7 @@ public class ExternalSecondaryInstanceParseTest {
 
     //region Parsing of different file types into external secondary instances
     @Test
-    public void itemsFromExternalSecondaryXMLInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
+    public void itemsFromExternalSecondaryXMLInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormDef formDef = parse(r("external-select-xml.xml"));
@@ -58,7 +58,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void itemsFromExternalSecondaryGeoJsonInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
+    public void itemsFromExternalSecondaryGeoJsonInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormDef formDef = parse(r("external-select-geojson.xml"));
@@ -74,7 +74,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void itemsFromExternalSecondaryCSVInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException {
+    public void itemsFromExternalSecondaryCSVInstance_ShouldBeAvailableToXPathParser() throws IOException, XPathSyntaxException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormDef formDef = parse(r("external-select-csv.xml"));
@@ -115,11 +115,13 @@ public class ExternalSecondaryInstanceParseTest {
             fail("Expected XFormParseException because itemset references don't exist in external instance");
         } catch (XFormParseException e) {
             // pass
+        } catch (XFormParser.ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Test
-    public void formWithExternalSecondaryXMLInstance_ShouldSerializeAndDeserialize() throws IOException, DeserializationException {
+    public void formWithExternalSecondaryXMLInstance_ShouldSerializeAndDeserialize() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormDef originalFormDef = parse(r("external-select-xml.xml"));
@@ -131,7 +133,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void deserializedFormDefCreatedFromAFormWithExternalSecondaryXMLInstance_ShouldContainThatExternalInstance() throws IOException, DeserializationException {
+    public void deserializedFormDefCreatedFromAFormWithExternalSecondaryXMLInstance_ShouldContainThatExternalInstance() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         Path formPath = r("external-select-xml.xml");
@@ -147,7 +149,7 @@ public class ExternalSecondaryInstanceParseTest {
     // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
     // secondary instance is declared but not referenced in an instance() call, it is ignored by JavaRosa.
     @Test
-    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced() {
+    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced() throws XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormParseInit fpi = new FormParseInit(r("unused-secondary-instance.xml"));
@@ -157,7 +159,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced_AfterParsingFormWithReference() {
+    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced_AfterParsingFormWithReference() throws XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormParseInit fpi = new FormParseInit(r("external-select-csv.xml"));
@@ -172,7 +174,7 @@ public class ExternalSecondaryInstanceParseTest {
 
     // See https://github.com/getodk/javarosa/issues/451
     @Test
-    public void dummyNodesInExternalInstanceDeclaration_ShouldBeIgnored() throws IOException, XPathSyntaxException {
+    public void dummyNodesInExternalInstanceDeclaration_ShouldBeIgnored() throws IOException, XPathSyntaxException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
         FormDef formDef = parse(r("external-select-xml-dummy-nodes.xml"));
@@ -184,7 +186,7 @@ public class ExternalSecondaryInstanceParseTest {
 
     //region Missing external file
     @Test
-    public void emptyPlaceholderInstanceIsUsed_whenExternalInstanceNotFound() {
+    public void emptyPlaceholderInstanceIsUsed_whenExternalInstanceNotFound() throws XFormParser.ParseException {
         configureReferenceManagerIncorrectly();
         Scenario scenario = Scenario.init("external-select-csv.xml");
 
@@ -192,7 +194,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void realInstanceIsResolved_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileNowExists() throws IOException, DeserializationException {
+    public void realInstanceIsResolved_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileNowExists() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerIncorrectly();
         Scenario scenario = Scenario.init("external-select-csv.xml");
 
@@ -206,7 +208,7 @@ public class ExternalSecondaryInstanceParseTest {
 
     @Test
     // Clients would typically catch this exception and try parsing the form again which would succeed by using the placeholder.
-    public void fileNotFoundException_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileStillMissing() throws IOException, DeserializationException {
+    public void fileNotFoundException_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileStillMissing() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerIncorrectly();
         Scenario scenario = Scenario.init("external-select-csv.xml");
 
@@ -222,7 +224,7 @@ public class ExternalSecondaryInstanceParseTest {
     // It would be possible for a formdef to be serialized without access to the external secondary instance and then
     // deserialized with access. In that case, there's nothing to validate that the value and label references for a
     // dynamic select correspond to real nodes in the secondary instance so there's a runtime exception when making a choice.
-    public void exceptionFromChoiceSelection_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileMissingColumns() throws IOException, DeserializationException {
+    public void exceptionFromChoiceSelection_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileMissingColumns() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerIncorrectly();
 
         Scenario scenario = Scenario.init("Some form", html(

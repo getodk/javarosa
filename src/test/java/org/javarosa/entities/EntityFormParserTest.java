@@ -26,7 +26,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class EntityFormParserTest {
 
     @Test
-    public void parseFirstDatasetToCreate_ignoresDatasetWithCreateActionWithIncorrectNamespace() throws IOException {
+    public void parseFirstDatasetToCreate_ignoresDatasetWithCreateActionWithIncorrectNamespace() throws IOException, XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("correct", "http://www.opendatakit.org/xforms/entities"),

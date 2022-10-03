@@ -283,7 +283,7 @@ public class Scenario {
     // that XFormParser.loadXmlInstance(FormDef f, Reader xmlReader) should probably be public. This is also the method that Collect
     // copies because the FormDef may be built from cache meaning there won't be a Reader/Document available and because it makes
     // some extra calls for search(). We pass in an XFormsElement for now until we decide on an interface that Collect can use.
-    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException {
+    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException, XFormParser.ParseException {
         FormInstance originalInstance = getFormDef().getMainInstance();
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
         byte[] formInstanceBytes = serializer.serializeInstance(originalInstance);
@@ -429,7 +429,7 @@ public class Scenario {
      * Initializes the Scenario using a form defined using the DSL in XFormsElement
      */
     // TODO Extract the form's name from the provided XFormsElement object to simplify args
-    public static Scenario init(String formName, XFormsElement form) throws IOException {
+    public static Scenario init(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
         Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
         String xml = form.asXml();
         System.out.println(xml);
@@ -442,14 +442,14 @@ public class Scenario {
      * <p>
      * A form with the provided filename must exist in the classpath
      */
-    public static Scenario init(String formFileName) {
+    public static Scenario init(String formFileName) throws XFormParser.ParseException {
         return init(r(formFileName));
     }
 
     /**
      * Initializes the Scenario with the form at the provided path
      */
-    public static Scenario init(Path formFile) {
+    public static Scenario init(Path formFile) throws XFormParser.ParseException {
         // TODO explain why this sequence of calls
         StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();

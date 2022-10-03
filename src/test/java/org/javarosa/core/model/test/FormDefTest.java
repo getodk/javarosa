@@ -44,6 +44,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 /**
  * See testAnswerConstraint() for an example of how to write the
@@ -51,7 +52,7 @@ import org.junit.Test;
  */
 public class FormDefTest {
     @Test
-    public void enforces_constraints_defined_in_a_field() {
+    public void enforces_constraints_defined_in_a_field() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("ImageSelectTester.xhtml"));
         scenario.next();
         scenario.next();
@@ -63,7 +64,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void enforcesConstraints_whenInstanceIsDeserialized() throws IOException {
+    public void enforcesConstraints_whenInstanceIsDeserialized() throws IOException, XFormParser.ParseException {
         XFormsElement formDef = html(
             head(
                 title("Some form"),
@@ -96,7 +97,7 @@ public class FormDefTest {
 
     //region Repeat relevance
     @Test
-    public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException {
+    public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - dynamic expression", html(
             head(
                 title("Repeat relevance - dynamic expression"),
@@ -125,7 +126,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatIsIrrelevant_whenRelevanceSetToFalse() throws IOException {
+    public void repeatIsIrrelevant_whenRelevanceSetToFalse() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - false()", html(
             head(
                 title("Repeat relevance - false()"),
@@ -147,7 +148,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatRelevanceChanges_whenDependentValuesOfGrandparentRelevanceExpressionChange() throws IOException {
+    public void repeatRelevanceChanges_whenDependentValuesOfGrandparentRelevanceExpressionChange() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - dynamic expression", html(
             head(
                 title("Repeat relevance - dynamic expression"),
@@ -180,7 +181,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatIsIrrelevant_whenGrandparentRelevanceSetToFalse() throws IOException {
+    public void repeatIsIrrelevant_whenGrandparentRelevanceSetToFalse() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - false()", html(
             head(
                 title("Repeat relevance - false()"),
@@ -207,7 +208,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException {
+    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Nested repeat relevance", html(
             head(
                 title("Nested repeat relevance"),
@@ -268,7 +269,7 @@ public class FormDefTest {
     //endregion
 
     @Test
-    public void fillTemplateString_resolvesRelativeReferences() throws IOException {
+    public void fillTemplateString_resolvesRelativeReferences() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("<output> with relative ref", html(
             head(
                 title("output with relative ref"),
@@ -304,7 +305,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException {
+    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("<output> with relative ref in translation", html(
             head(
                 title("output with relative ref in translation"),

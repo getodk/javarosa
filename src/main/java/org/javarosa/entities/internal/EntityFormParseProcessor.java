@@ -57,7 +57,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     }
 
     @Override
-    public void processFormDef(FormDef formDef) {
+    public void processFormDef(FormDef formDef) throws XFormParser.ParseException {
         if (!versionPresent && EntityFormParser.getEntityElement(formDef.getMainInstance()) != null) {
             throw new XFormParser.MissingModelAttributeException(ENTITIES_NAMESPACE, "entities-version");
         }

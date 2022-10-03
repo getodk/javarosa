@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class AttributesTestCase {
 
     @Test
-    public void testBindAttributes() {
+    public void testBindAttributes() throws XFormParser.ParseException {
         FormParseInit fpi = new FormParseInit(r("form_with_bind_attributes.xml"));
         FormEntryModel formEntryModel = fpi.getFormEntryModel();
         FormDef formDef = fpi.getFormDef();
@@ -38,7 +38,7 @@ public class AttributesTestCase {
     }
 
     @Test
-    public void testAdditionalAttributes() {
+    public void testAdditionalAttributes() throws XFormParser.ParseException {
         FormParseInit fpi = new FormParseInit(r("form_with_additional_attributes.xml"));
         FormEntryModel formEntryModel = fpi.getFormEntryModel();
         FormDef formDef = fpi.getFormDef();

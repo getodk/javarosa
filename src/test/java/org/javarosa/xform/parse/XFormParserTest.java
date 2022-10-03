@@ -97,13 +97,13 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parsesSimpleForm() throws IOException {
+    public void parsesSimpleForm() throws IOException, XFormParser.ParseException {
         FormDef formDef = parse(r("simple-form.xml"));
         assertEquals(formDef.getTitle(), "Simple Form");
     }
 
     @Test
-    public void parsesForm2() throws IOException {
+    public void parsesForm2() throws IOException, XFormParser.ParseException {
         FormDef formDef = parse(r("form2.xml"));
         assertEquals("My Survey", formDef.getTitle());
         assertEquals(3, formDef.getChildren().size());
@@ -111,7 +111,7 @@ public class XFormParserTest {
     }
     
     @Test
-    public void spacesBetweenOutputs_areRespected() throws IOException {
+    public void spacesBetweenOutputs_areRespected() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("spaces-outputs", html(
             head(
                 model(
@@ -136,20 +136,20 @@ public class XFormParserTest {
     }
     
     @Test
-    public void parsesSecondaryInstanceForm() throws IOException {
+    public void parsesSecondaryInstanceForm() throws IOException, XFormParser.ParseException {
         FormDef formDef = parse(SECONDARY_INSTANCE_XML);
         assertEquals("Form with secondary instance", formDef.getTitle());
     }
 
     @Test
-    public void parsesSecondaryInstanceForm2() throws IOException {
+    public void parsesSecondaryInstanceForm2() throws IOException, XFormParser.ParseException {
         Path formName = r("internal_select_10.xml");
         FormDef formDef = parse(formName);
         assertEquals("internal select 10", formDef.getTitle());
     }
 
     @Test
-    public void parsesLastSavedInstanceWithNullSrc() throws IOException {
+    public void parsesLastSavedInstanceWithNullSrc() throws IOException, XFormParser.ParseException {
         Path formName = r("last-saved-blank.xml");
         FormDef formDef = parse(formName, null);
         assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
@@ -160,7 +160,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parsesLastSavedInstanceWithFilledForm() throws IOException {
+    public void parsesLastSavedInstanceWithFilledForm() throws IOException, XFormParser.ParseException {
         Path formName = r("last-saved-blank.xml");
         Path lastSavedSubmissionDirectory = r("last-saved-filled.xml").toAbsolutePath().getParent();
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(lastSavedSubmissionDirectory, "file");
@@ -179,7 +179,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException {
+    public void multipleInstancesFormSavesAndRestores() throws IOException, DeserializationException, XFormParser.ParseException {
         FormDef originalFormDef = parse(r("Simpler_Cascading_Select_Form.xml"));
 
         Path serializedForm = getSerializedFormPath(originalFormDef);
@@ -193,7 +193,7 @@ public class XFormParserTest {
      * see https://github.com/getodk/javarosa/issues/245 why this is needed
      */
     @Test
-    public void rangeFormSavesAndRestores() throws IOException, DeserializationException {
+    public void rangeFormSavesAndRestores() throws IOException, DeserializationException, XFormParser.ParseException {
         FormDef originalFormDef = parse(r("range-form.xml"));
 
         Path serializedForm = getSerializedFormPath(originalFormDef);
@@ -203,7 +203,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parsesRankForm() throws IOException {
+    public void parsesRankForm() throws IOException, XFormParser.ParseException {
         FormDef formDef = parse(r("rank-form.xml"));
         assertEquals(formDef.getTitle(), "Rank Form");
         assertEquals(1, formDef.getChildren().size());
@@ -212,7 +212,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parsesRangeForm() throws IOException {
+    public void parsesRangeForm() throws IOException, XFormParser.ParseException {
         FormDef formDef = parse(r("range-form.xml"));
         RangeQuestion question = (RangeQuestion) formDef.getChild(0);
         assertEquals(CONTROL_RANGE, question.getControlType());
@@ -222,14 +222,14 @@ public class XFormParserTest {
     }
 
     @Test(expected = XFormParseException.class)
-    public void throwsParseExceptionOnBadRangeForm() throws IOException {
+    public void throwsParseExceptionOnBadRangeForm() throws IOException, XFormParser.ParseException {
         parse(r("bad-range-form.xml"));
     }
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
-    public void throwsExceptionOnEmptySelect() throws IOException {
+    public void throwsExceptionOnEmptySelect() throws IOException, XFormParser.ParseException {
         exceptionRule.expect(XFormParseException.class);
         exceptionRule.expectMessage("Select question 'First' has no choices");
 
@@ -238,21 +238,21 @@ public class XFormParserTest {
     }
 
     @Test
-    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException {
+    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("countNonEmptyForm.xml");
         assertThat(scenario.answerOf("/test/count_value"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/test/count_non_empty_value"), is(intAnswer(2)));
     }
 
     @Test
-    public void parsesMetaNamespaceForm() throws IOException {
+    public void parsesMetaNamespaceForm() throws IOException, XFormParser.ParseException {
         FormDef formDef = parse(r("meta-namespace-form.xml"));
         assertEquals(formDef.getTitle(), "Namespace for Metadata");
         assertNoParseErrors(formDef);
     }
 
     @Test
-    public void serializeAndRestoreMetaNamespaceFormInstance() throws IOException {
+    public void serializeAndRestoreMetaNamespaceFormInstance() throws IOException, XFormParser.ParseException {
         // Given
         FormDef formDef = parse(r("meta-namespace-form.xml"));
         assertEquals(formDef.getTitle(), "Namespace for Metadata");
@@ -311,7 +311,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseFormWithTemplateRepeat() throws IOException {
+    public void parseFormWithTemplateRepeat() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("template-repeat.xml"));
 
@@ -321,7 +321,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseIMCIbyDTreeForm() throws IOException {
+    public void parseIMCIbyDTreeForm() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("eIMCI-by-D-Tree.xml"));
 
@@ -331,7 +331,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseFormWithSubmissionElement() throws IOException {
+    public void parseFormWithSubmissionElement() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("submission-element.xml"));
 
@@ -352,12 +352,12 @@ public class XFormParserTest {
      * this is not mandated by the specs but has been implemented this way to keep parsing simpler.
      */
     @Test(expected = RuntimeException.class)
-    public void parseFormWithBodyBeforeModel() throws IOException {
+    public void parseFormWithBodyBeforeModel() throws IOException, XFormParser.ParseException {
         parse(r("body-before-model.xml"));
     }
 
     @Test
-    public void parseFormWithTwoModels() throws IOException {
+    public void parseFormWithTwoModels() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("two-models.xml"));
 
@@ -380,7 +380,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseFormWithSetValueAction() throws IOException {
+    public void parseFormWithSetValueAction() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("form-with-setvalue-action.xml"));
 
@@ -399,7 +399,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseGroupWithNodesetAttrForm() throws IOException {
+    public void parseGroupWithNodesetAttrForm() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("group-with-nodeset-attr.xml"));
 
@@ -422,7 +422,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseGroupWithRefAttrForm() throws IOException, XPathSyntaxException {
+    public void parseGroupWithRefAttrForm() throws IOException, XPathSyntaxException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("group-with-ref-attr.xml"));
 
@@ -458,7 +458,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void testSetValueWithStrings() throws IOException {
+    public void testSetValueWithStrings() throws IOException, XFormParser.ParseException {
         
         Scenario scenario = Scenario.init("default_test.xml");
         assertEquals("string-value", scenario.getAnswerNode("/data/string_val").getValue().getValue().toString());

@@ -370,12 +370,12 @@ public class XFormParser implements IXFormParserFunctions {
         _instDoc = instance;
     }
 
-    public FormDef parse(String lastSavedSrc) throws IOException {
+    public FormDef parse(String lastSavedSrc) throws IOException, ParseException {
         return parse(null, lastSavedSrc);
     }
 
 
-    public FormDef parse() throws IOException {
+    public FormDef parse() throws IOException, ParseException {
         return parse(null, null);
     }
 
@@ -384,7 +384,7 @@ public class XFormParser implements IXFormParserFunctions {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public FormDef parse(String formXmlSrc, String lastSavedSrc) throws IOException {
+    public FormDef parse(String formXmlSrc, String lastSavedSrc) throws IOException, ParseException {
         if (_f == null) {
             logger.info("Parsing form...");
 
@@ -402,7 +402,10 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        formDefProcessors.stream().forEach(formDefProcessor -> formDefProcessor.processFormDef(_f));
+        for (FormDefProcessor formDefProcessor : formDefProcessors) {
+            formDefProcessor.processFormDef(_f);
+        }
+
         return _f;
     }
 
@@ -2421,7 +2424,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public interface FormDefProcessor extends Processor {
-        void processFormDef(FormDef formDef);
+        void processFormDef(FormDef formDef) throws ParseException;
     }
 
     public interface BindAttributeProcessor extends Processor {
@@ -2438,7 +2441,11 @@ public class XFormParser implements IXFormParserFunctions {
         void processModelAttribute(String name, String value) throws XFormParseException;
     }
 
-    public static class MissingModelAttributeException extends XFormParseException {
+    public static class ParseException extends Exception {
+
+    }
+
+    public static class MissingModelAttributeException extends ParseException {
 
         private final String namespace;
         private final String name;

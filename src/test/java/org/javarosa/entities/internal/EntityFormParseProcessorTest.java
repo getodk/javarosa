@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 public class EntityFormParseProcessorTest {
 
     @Test
-    public void whenVersionIsMissing_parsesWithoutError() throws IOException {
+    public void whenVersionIsMissing_parsesWithoutError() throws IOException, XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             head(
                 title("Non entity form"),
@@ -100,7 +100,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test(expected = UnrecognizedEntityVersionException.class)
-    public void whenVersionIsNotRecognized_throwsException() throws IOException {
+    public void whenVersionIsNotRecognized_throwsException() throws IOException, XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -133,7 +133,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test
-    public void whenVersionIsNewPatch_doesNotThrowException() throws IOException {
+    public void whenVersionIsNewPatch_doesNotThrowException() throws IOException, XFormParser.ParseException {
         String newPatchVersion = EntityFormParseProcessor.SUPPORTED_VERSION + ".12";
 
         XFormsElement form = XFormsElement.html(
@@ -168,7 +168,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test
-    public void saveTosWithIncorrectNamespaceAreIgnored() throws IOException {
+    public void saveTosWithIncorrectNamespaceAreIgnored() throws IOException, XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("correct", "http://www.opendatakit.org/xforms/entities"),

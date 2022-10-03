@@ -45,6 +45,7 @@ import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,7 +54,7 @@ public class XPathFuncExprRandomizeTest {
     private FormDef formDef;
 
     @Before
-    public void setUp() {
+    public void setUp() throws XFormParser.ParseException {
         // Take a look to the form file:
         //  - The first pair of fields use randomize without a seed.
         //  - The second pair of fields use randomize with a seed.
