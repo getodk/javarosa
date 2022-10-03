@@ -5,23 +5,25 @@ import org.javarosa.core.util.Extras;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExternalizableExtras extends Extras<Externalizable> implements Externalizable {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        HashMap<String, Externalizable> extras = (HashMap<String, Externalizable>) ExtUtil.read(in, new ExtWrapMap(String.class, new ExtWrapExternalizable()), pf);
-        extras.entrySet().stream().forEach(entry -> put(entry.getValue()));
+        ArrayList<Externalizable> extras = (ArrayList<Externalizable>) ExtUtil.read(in, new ExtWrapList(new ExtWrapExternalizable()), pf);
+        extras.stream().forEach(this::put);
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
-        HashMap<Object, Object> wrappedParseAttachments = new HashMap<>();
-        map.entrySet().stream().forEach(entry -> {
-            wrappedParseAttachments.put(entry.getKey(), new ExtWrapExternalizable(entry.getValue()));
-        });
+        List<ExtWrapExternalizable> wrappedParseAttachments = map.values()
+            .stream()
+            .map(ExtWrapExternalizable::new)
+            .collect(Collectors.toList());
 
-        ExtUtil.write(out, new ExtWrapMap(wrappedParseAttachments));
+        ExtUtil.write(out, new ExtWrapList(wrappedParseAttachments));
     }
 }
