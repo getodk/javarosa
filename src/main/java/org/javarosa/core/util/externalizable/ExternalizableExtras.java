@@ -12,14 +12,14 @@ public class ExternalizableExtras extends Extras<Externalizable> implements Exte
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         HashMap<String, Externalizable> extras = (HashMap<String, Externalizable>) ExtUtil.read(in, new ExtWrapMap(String.class, new ExtWrapExternalizable()), pf);
-        extras.forEach((s, externalizable) -> put(externalizable));
+        extras.entrySet().stream().forEach(entry -> put(entry.getValue()));
     }
 
     @Override
     public void writeExternal(DataOutputStream out) throws IOException {
         HashMap<Object, Object> wrappedParseAttachments = new HashMap<>();
-        map.forEach((key, value) -> {
-            wrappedParseAttachments.put(key, new ExtWrapExternalizable(value));
+        map.entrySet().stream().forEach(entry -> {
+            wrappedParseAttachments.put(entry.getKey(), new ExtWrapExternalizable(entry.getValue()));
         });
 
         ExtUtil.write(out, new ExtWrapMap(wrappedParseAttachments));
