@@ -8,7 +8,7 @@ import org.javarosa.entities.internal.Entities;
 import org.javarosa.entities.internal.EntityDatasetParser;
 import org.javarosa.entities.internal.EntityFormExtra;
 import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormEntryFinalizer;
+import org.javarosa.form.api.FormEntryFinalizationProcessor;
 import org.javarosa.model.xform.XPathReference;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
-public class EntityFinalizer implements FormEntryFinalizer {
+public class EntityFinalizationProcessor implements FormEntryFinalizationProcessor {
 
     @Override
     public void processForm(FormEntryModel formEntryModel) {
