@@ -5,7 +5,6 @@ import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.entities.UnrecognizedEntityVersionException;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     }
 
     @Override
-    public void processModelAttribute(String name, String value) throws XFormParseException {
+    public void processModelAttribute(String name, String value) throws XFormParser.ParseException {
         versionPresent = true;
 
         try {
