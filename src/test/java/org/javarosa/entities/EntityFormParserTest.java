@@ -3,7 +3,7 @@ package org.javarosa.entities;
 import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.XFormsElement;
-import org.javarosa.entities.internal.EntityDatasetParser;
+import org.javarosa.entities.internal.EntityFormParser;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
-public class EntityDatasetParserTest {
+public class EntityFormParserTest {
 
     @Test
     public void parseFirstDatasetToCreate_ignoresDatasetWithCreateActionWithIncorrectNamespace() throws IOException {
@@ -56,7 +56,7 @@ public class EntityDatasetParserTest {
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         FormDef formDef = parser.parse(null);
 
-        String dataset = EntityDatasetParser.parseFirstDatasetToCreate(formDef.getMainInstance());
+        String dataset = EntityFormParser.parseFirstDatasetToCreate(formDef.getMainInstance());
         assertThat(dataset, equalTo(null));
     }
 }

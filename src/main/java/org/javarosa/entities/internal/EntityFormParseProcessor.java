@@ -3,8 +3,6 @@ package org.javarosa.entities.internal;
 import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.entities.UnrecognizedEntityVersionException;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
@@ -21,6 +19,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     public static final String SUPPORTED_VERSION = "v2022.1";
 
     private final List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
+    private boolean versionPresent;
 
     @Override
     public Set<Pair<String, String>> getUsedModelAttributes() {
@@ -32,6 +31,8 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
 
     @Override
     public void processModelAttribute(String name, String value) throws XFormParseException {
+        versionPresent = true;
+
         try {
             String[] versionParts = value.split("\\.");
             if (!SUPPORTED_VERSION.equals(versionParts[0] + "." + versionParts[1])) {
@@ -57,6 +58,10 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
 
     @Override
     public void processFormDef(FormDef formDef) {
+        if (!versionPresent && EntityFormParser.getEntityElement(formDef.getMainInstance()) != null) {
+            throw new XFormParser.MissingModelAttributeException(ENTITIES_NAMESPACE, "entities-version");
+        }
+
         EntityFormExtra entityFormExtra = new EntityFormExtra(saveTos);
         formDef.getExtras().put(entityFormExtra);
     }

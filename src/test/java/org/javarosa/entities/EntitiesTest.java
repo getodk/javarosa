@@ -6,6 +6,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entities.internal.Entities;
+import org.javarosa.entities.internal.EntityFormParseProcessor;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.javarosa.xform.util.XFormUtils;
 import org.junit.After;
@@ -52,7 +53,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"entity-form\"",
                             t("name"),
@@ -87,7 +88,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -126,7 +127,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -167,7 +168,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -209,7 +210,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("blah:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -247,7 +248,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -284,7 +285,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("team"),
@@ -322,7 +323,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),

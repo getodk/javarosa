@@ -109,6 +109,15 @@ public interface XFormsElement {
         return t("model", children);
     }
 
+    static XFormsElement model(List<Pair<String, String>> attributes, XFormsElement... children) {
+        StringBuilder stringBuilder = new StringBuilder();
+        attributes.stream().forEach(attribute -> {
+            stringBuilder.append(" " + attribute.getFirst() + "=\"" + attribute.getSecond() + "\"");
+        });
+
+        return t("model" + stringBuilder, children);
+    }
+
     static XFormsElement mainInstance(XFormsElement... children) {
         return t("instance", children);
     }

@@ -2437,4 +2437,23 @@ public class XFormParser implements IXFormParserFunctions {
 
         void processModelAttribute(String name, String value) throws XFormParseException;
     }
+
+    public static class MissingModelAttributeException extends XFormParseException {
+
+        private final String namespace;
+        private final String name;
+
+        public MissingModelAttributeException(String namespace, String name) {
+            this.namespace = namespace;
+            this.name = name;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }

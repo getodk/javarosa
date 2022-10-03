@@ -5,7 +5,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.entities.internal.Entities;
-import org.javarosa.entities.internal.EntityDatasetParser;
+import org.javarosa.entities.internal.EntityFormParser;
 import org.javarosa.entities.internal.EntityFormExtra;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryFinalizationProcessor;
@@ -27,7 +27,7 @@ public class EntityFinalizationProcessor implements FormEntryFinalizationProcess
         EntityFormExtra entityFormExtra = formDef.getExtras().get(EntityFormExtra.class);
         List<Pair<XPathReference, String>> saveTos = entityFormExtra.getSaveTos();
 
-        String dataset = EntityDatasetParser.parseFirstDatasetToCreate(mainInstance);
+        String dataset = EntityFormParser.parseFirstDatasetToCreate(mainInstance);
         if (dataset != null) {
             List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
                 IDataReference reference = saveTo.getFirst();
