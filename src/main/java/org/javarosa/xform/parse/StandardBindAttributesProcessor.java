@@ -122,7 +122,7 @@ class StandardBindAttributesProcessor {
                 String namespace = element.getAttributeNamespace(i);
                 String name = element.getAttributeName(i);
 
-                if (bindAttributeProcessor.getUsedBindAttributes().contains(new Pair<>(namespace, name))) {
+                if (bindAttributeProcessor.getBindAttributes().contains(new Pair<>(namespace, name))) {
                     bindAttributeProcessor.processBindAttribute(name, element.getAttributeValue(i), binding);
                 }
             }
@@ -130,7 +130,7 @@ class StandardBindAttributesProcessor {
 
         List<String> processorAttributes = bindAttributeProcessors.stream()
             .flatMap((Function<XFormParser.BindAttributeProcessor, Stream<String>>) bindAttributeProcessor -> {
-                return bindAttributeProcessor.getUsedBindAttributes().stream().map(Pair::getSecond);
+                return bindAttributeProcessor.getBindAttributes().stream().map(Pair::getSecond);
             })
             .collect(Collectors.toList());
 

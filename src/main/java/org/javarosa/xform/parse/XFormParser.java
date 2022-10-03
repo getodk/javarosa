@@ -689,7 +689,7 @@ public class XFormParser implements IXFormParserFunctions {
                 String name = e.getAttributeName(i);
                 String value = e.getAttributeValue(i);
 
-                if (processor.getUsedModelAttributes().contains(new Pair<>(namespace, name))) {
+                if (processor.getModelAttributes().contains(new Pair<>(namespace, name))) {
                     processor.processModelAttribute(name, value);
                 }
             }
@@ -2426,14 +2426,14 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface BindAttributeProcessor extends Processor {
 
-        Set<Pair<String, String>> getUsedBindAttributes();
+        Set<Pair<String, String>> getBindAttributes();
 
         void processBindAttribute(String name, String value, DataBinding binding);
     }
 
     public interface ModelAttributeProcessor extends Processor {
 
-        Set<Pair<String, String>> getUsedModelAttributes();
+        Set<Pair<String, String>> getModelAttributes();
 
         void processModelAttribute(String name, String value) throws XFormParseException;
     }

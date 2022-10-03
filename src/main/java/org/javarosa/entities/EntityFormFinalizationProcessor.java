@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
-public class EntityFinalizationProcessor implements FormEntryFinalizationProcessor {
+public class EntityFormFinalizationProcessor implements FormEntryFinalizationProcessor {
 
     @Override
     public void processForm(FormEntryModel formEntryModel) {

@@ -22,7 +22,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     private boolean versionPresent;
 
     @Override
-    public Set<Pair<String, String>> getUsedModelAttributes() {
+    public Set<Pair<String, String>> getModelAttributes() {
         HashSet<Pair<String, String>> attributes = new HashSet<>();
         attributes.add(new Pair<>(ENTITIES_NAMESPACE, "entities-version"));
 
@@ -44,7 +44,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     }
 
     @Override
-    public Set<Pair<String, String>> getUsedBindAttributes() {
+    public Set<Pair<String, String>> getBindAttributes() {
         HashSet<Pair<String, String>> attributes = new HashSet<>();
         attributes.add(new Pair<>(ENTITIES_NAMESPACE, "saveto"));
 
