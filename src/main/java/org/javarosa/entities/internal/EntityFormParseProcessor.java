@@ -15,7 +15,7 @@ import java.util.Set;
 public class EntityFormParseProcessor implements XFormParser.BindAttributeProcessor, XFormParser.FormDefProcessor, XFormParser.ModelAttributeProcessor {
 
     private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
-    public static final String SUPPORTED_VERSION = "v2022.1";
+    public static final String SUPPORTED_VERSION = "2022.1";
 
     private final List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
     private boolean versionPresent;
