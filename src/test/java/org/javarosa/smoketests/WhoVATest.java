@@ -28,11 +28,12 @@ import static org.junit.Assert.assertThat;
 import java.time.LocalDate;
 import java.util.stream.IntStream;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class WhoVATest {
     @Test
-    public void regression_after_2_17_0_relevance_updates() {
+    public void regression_after_2_17_0_relevance_updates() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("whova_form.xml"));
 
         // region Give consent to unblock the rest of the form
@@ -76,7 +77,7 @@ public class WhoVATest {
     }
 
     @Test
-    public void smoke_test_route_fever_and_lumps() {
+    public void smoke_test_route_fever_and_lumps() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("whova_form.xml"));
 
         // region Give consent to unblock the rest of the form

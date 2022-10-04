@@ -6,6 +6,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.jetbrains.annotations.Nullable;
 
 public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
@@ -15,6 +16,13 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
 
     public abstract String getInstanceName();
 
+    @Nullable
+    public T getFirstChild(String name);
+
+    @Nullable
+    public T getFirstChild(String namespace, String name);
+
+    @Nullable
     public abstract T getChild(String name, int multiplicity);
 
     /**

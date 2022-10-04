@@ -5,6 +5,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public class CompactSerializingVisitorTest {
     private FormInstance formInstance;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, XFormParser.ParseException {
         FormParseInit formParser = new FormParseInit(r("sms_form.xml"));
         FormEntryController formEntryController = formParser.getFormEntryController();
         formInstance = formEntryController.getModel().getForm().getInstance();
@@ -72,7 +73,7 @@ public class CompactSerializingVisitorTest {
     }
 
     @Test
-    public void ensureThatFormWithNoSmsTagsIsEmpty() throws IOException {
+    public void ensureThatFormWithNoSmsTagsIsEmpty() throws IOException, XFormParser.ParseException {
         FormParseInit formParser = new FormParseInit(r("simple-form.xml"));
         FormEntryController formEntryController = formParser.getFormEntryController();
         formInstance = formEntryController.getModel().getForm().getInstance();

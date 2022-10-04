@@ -16,48 +16,7 @@
 
 package org.javarosa.xform.parse;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
-import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
-import static org.javarosa.core.model.Constants.CONTROL_INPUT;
-import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_RANGE;
-import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.core.model.Constants.CONTROL_SECRET;
-import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
-import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
-import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
-import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
-import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
-import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
-import static org.javarosa.core.services.ProgramFlow.die;
-import static org.javarosa.xform.parse.Constants.ID_ATTR;
-import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
-import static org.javarosa.xform.parse.Constants.RANK;
-import static org.javarosa.xform.parse.Constants.SELECT;
-import static org.javarosa.xform.parse.Constants.SELECTONE;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
-import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -113,6 +72,49 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
+import static org.javarosa.core.model.Constants.CONTROL_INPUT;
+import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.model.Constants.CONTROL_SECRET;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
+import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
+import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
+import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
+import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
+import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
+import static org.javarosa.core.services.ProgramFlow.die;
+import static org.javarosa.xform.parse.Constants.ID_ATTR;
+import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
+import static org.javarosa.xform.parse.Constants.RANK;
+import static org.javarosa.xform.parse.Constants.SELECT;
+import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
+import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -173,6 +175,10 @@ public class XFormParser implements IXFormParserFunctions {
     private List<String> itextKnownForms;
     private static HashMap<String, IElementHandler> actionHandlers;
 
+    private final List<BindAttributeProcessor> bindAttributeProcessors = new ArrayList<>();
+    private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
+    private final List<ModelAttributeProcessor> modelAttributeProcessors = new ArrayList<>();
+
     /**
      * The string IDs of all instances that are referenced in a instance() function call in the primary instance
      **/
@@ -185,7 +191,6 @@ public class XFormParser implements IXFormParserFunctions {
     private int serialQuestionID = 1;
 
     private static IAnswerResolver answerResolver;
-
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
@@ -213,7 +218,7 @@ public class XFormParser implements IXFormParserFunctions {
         groupLevelHandlers = new HashMap<String, IElementHandler>() {{
             put("input", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     // Attributes that are passed through to additionalAttributes but shouldn't lead to warnings.
                     // These are consistently used by clients but are expected in additionalAttributes for historical
                     // reasons.
@@ -223,7 +228,7 @@ public class XFormParser implements IXFormParserFunctions {
             });
             put("range", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseControl((IFormElement) parent, e, CONTROL_RANGE,
                         asList("start", "end", "step") // Prevent warning about unexpected attributes
                     );
@@ -231,49 +236,49 @@ public class XFormParser implements IXFormParserFunctions {
             });
             put("secret", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseControl((IFormElement) parent, e, CONTROL_SECRET);
                 }
             });
             put(SELECT, new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseControl((IFormElement) parent, e, CONTROL_SELECT_MULTI);
                 }
             });
             put(RANK, new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseControl((IFormElement) parent, e, CONTROL_RANK);
                 }
             });
             put(SELECTONE, new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseControl((IFormElement) parent, e, CONTROL_SELECT_ONE);
                 }
             });
             put("group", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseGroup((IFormElement) parent, e, CONTAINER_GROUP);
                 }
             });
             put("repeat", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseGroup((IFormElement) parent, e, CONTAINER_REPEAT);
                 }
             });
             put("trigger", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseControl((IFormElement) parent, e, CONTROL_TRIGGER);
                 }
             }); //multi-purpose now; need to dig deeper
             put(XFTAG_UPLOAD, new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseUpload((IFormElement) parent, e, CONTROL_UPLOAD);
                 }
             });
@@ -291,7 +296,7 @@ public class XFormParser implements IXFormParserFunctions {
         topLevelHandlers = new HashMap<String, IElementHandler>() {{
             put("model", new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseModel(e);
                 }
             });
@@ -365,12 +370,12 @@ public class XFormParser implements IXFormParserFunctions {
         _instDoc = instance;
     }
 
-    public FormDef parse(String lastSavedSrc) throws IOException {
+    public FormDef parse(String lastSavedSrc) throws ParseException {
         return parse(null, lastSavedSrc);
     }
 
 
-    public FormDef parse() throws IOException {
+    public FormDef parse() throws ParseException {
         return parse(null, null);
     }
 
@@ -379,24 +384,63 @@ public class XFormParser implements IXFormParserFunctions {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public FormDef parse(String formXmlSrc, String lastSavedSrc) throws IOException {
+    public FormDef parse(String formXmlSrc, String lastSavedSrc) throws ParseException {
         if (_f == null) {
             logger.info("Parsing form...");
 
             if (_xmldoc == null) {
-                _xmldoc = getXMLDocument(_reader, stringCache);
+                try {
+                    _xmldoc = getXMLDocument(_reader, stringCache);
+                } catch (IOException e) {
+                    throw new ParseException("IO Exception during parse! " + e.getMessage());
+                }
             }
 
             parseDoc(formXmlSrc, buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
 
             //load in a custom xml instance, if applicable
             if (_instReader != null) {
-                loadXmlInstance(_f, _instReader);
+                try {
+                    loadXmlInstance(_f, _instReader);
+                } catch (IOException e) {
+                    throw new ParseException("IO Exception during parse! " + e.getMessage());
+                }
             } else if (_instDoc != null) {
                 loadXmlInstance(_f, _instDoc);
             }
         }
+
+        for (FormDefProcessor formDefProcessor : formDefProcessors) {
+            formDefProcessor.processFormDef(_f);
+        }
+
         return _f;
+    }
+
+    public void addProcessor(Processor processor) {
+        if (processor instanceof BindAttributeProcessor) {
+            addBindAttributeProcessor((BindAttributeProcessor) processor);
+        }
+
+        if (processor instanceof FormDefProcessor) {
+            addFormDefProcessor((FormDefProcessor) processor);
+        }
+
+        if (processor instanceof ModelAttributeProcessor) {
+            addModelAttributeProcessor((ModelAttributeProcessor) processor);
+        }
+    }
+
+    public void addBindAttributeProcessor(BindAttributeProcessor bindAttributeProcessor) {
+        bindAttributeProcessors.add(bindAttributeProcessor);
+    }
+
+    public void addFormDefProcessor(FormDefProcessor formDefProcessor) {
+        formDefProcessors.add(formDefProcessor);
+    }
+
+    public void addModelAttributeProcessor(ModelAttributeProcessor modelAttributeProcessor) {
+        modelAttributeProcessors.add(modelAttributeProcessor);
     }
 
     /**
@@ -470,7 +514,7 @@ public class XFormParser implements IXFormParserFunctions {
         return doc;
     }
 
-    private void parseDoc(String formXmlSrc, Map<String, String> namespacePrefixesByUri, String lastSavedSrc) {
+    private void parseDoc(String formXmlSrc, Map<String, String> namespacePrefixesByUri, String lastSavedSrc) throws ParseException {
         final StopWatch codeTimer = StopWatch.start();
         _f = new FormDef();
         _f.setFormXmlPath(formXmlSrc);
@@ -584,7 +628,7 @@ public class XFormParser implements IXFormParserFunctions {
         "delHeader"
     )));
 
-    private void parseElement(Element e, Object parent, HashMap<String, IElementHandler> handlers) {
+    private void parseElement(Element e, Object parent, HashMap<String, IElementHandler> handlers) throws ParseException {
         String name = e.getName();
 
         IElementHandler eh = handlers.get(name);
@@ -649,7 +693,19 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     //for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
-    private void parseModel(Element e) {
+    private void parseModel(Element e) throws XFormParser.ParseException {
+        for (ModelAttributeProcessor modelAttributeProcessor : modelAttributeProcessors) {
+            for (int i = 0; i < e.getAttributeCount(); i++) {
+                String namespace = e.getAttributeNamespace(i);
+                String name = e.getAttributeName(i);
+                String value = e.getAttributeValue(i);
+
+                if (modelAttributeProcessor.getModelAttributes().contains(new Pair<>(namespace, name))) {
+                    modelAttributeProcessor.processModelAttribute(name, value);
+                }
+            }
+        }
+
         List<String> usedAtts = new ArrayList<>(); //no attributes parsed in title.
         List<Element> delayedParseElements = new ArrayList<>();
 
@@ -721,7 +777,7 @@ public class XFormParser implements IXFormParserFunctions {
      * event attribute and location in the xform are both valid, and then invokes the more specific
      * handler that is provided.
      */
-    private void parseAction(Element e, Object parent, IElementHandler specificHandler) {
+    private void parseAction(Element e, Object parent, IElementHandler specificHandler) throws ParseException {
         // Check that all events registered to trigger this action are valid events that we support
         List<String> validEvents = getValidEventNames(e.getAttributeValue(null, EVENT_ATTR));
 
@@ -906,7 +962,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) {
+    protected QuestionDef parseUpload(IFormElement parent, Element e, int controlUpload) throws ParseException {
         // get media type value
         String mediaType = e.getAttributeValue(null, "mediatype");
         // parse the control
@@ -1004,11 +1060,11 @@ public class XFormParser implements IXFormParserFunctions {
         return tags;
     }
 
-    private QuestionDef parseControl(IFormElement parent, Element e, int controlType) {
+    private QuestionDef parseControl(IFormElement parent, Element e, int controlType) throws ParseException {
         return parseControl(parent, e, controlType, null, null);
     }
 
-    private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) {
+    private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts) throws ParseException {
         return parseControl(parent, e, controlType, additionalUsedAtts, null);
     }
 
@@ -1024,7 +1080,7 @@ public class XFormParser implements IXFormParserFunctions {
      * @return a {@link org.javarosa.core.model.QuestionDef} representing the form control element
      */
     private QuestionDef parseControl(IFormElement parent, Element e, int controlType, List<String> additionalUsedAtts,
-                                     List<String> passedThroughAtts) {
+                                     List<String> passedThroughAtts) throws ParseException {
         final QuestionDef question = questionForControlType(controlType);
         question.setID(serialQuestionID++); //until we come up with a better scheme
 
@@ -1519,7 +1575,7 @@ public class XFormParser implements IXFormParserFunctions {
 
     }
 
-    private void parseGroup(IFormElement parent, Element e, int groupType) {
+    private void parseGroup(IFormElement parent, Element e, int groupType) throws ParseException {
         GroupDef group = new GroupDef();
         group.setID(serialQuestionID++); //until we come up with a better scheme
         IDataReference dataRef = null;
@@ -1873,9 +1929,9 @@ public class XFormParser implements IXFormParserFunctions {
         return false;
     }
 
-    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element) {
+    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element, List<BindAttributeProcessor> bindAttributeProcessors) {
         return new StandardBindAttributesProcessor(typeMappings).
-            createBinding(this, _f, usedAtts, passedThroughAtts, element);
+            createBinding(this, _f, usedAtts, passedThroughAtts, element, bindAttributeProcessors);
     }
 
     /**
@@ -1907,7 +1963,7 @@ public class XFormParser implements IXFormParserFunctions {
     ));
 
     private void parseBind(Element element) {
-        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element);
+        final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element, bindAttributeProcessors);
 
         // Warn of unused attributes of parent element
         if (XFormUtils.showUnusedAttributeWarning(element, usedAtts)) {
@@ -2210,7 +2266,7 @@ public class XFormParser implements IXFormParserFunctions {
         actionHandlers.put(
             name,
             new IElementHandler() {
-                public void handle(XFormParser p, Element e, Object parent) {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     p.parseAction(e, parent, specificHandler);
                 }
             }
@@ -2369,5 +2425,57 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface ErrorCallback {
         void accept(String message);
+    }
+
+    public interface Processor {
+
+    }
+
+    public interface FormDefProcessor extends Processor {
+        void processFormDef(FormDef formDef) throws ParseException;
+    }
+
+    public interface BindAttributeProcessor extends Processor {
+
+        Set<Pair<String, String>> getBindAttributes();
+
+        void processBindAttribute(String name, String value, DataBinding binding);
+    }
+
+    public interface ModelAttributeProcessor extends Processor {
+
+        Set<Pair<String, String>> getModelAttributes();
+
+        void processModelAttribute(String name, String value) throws ParseException;
+    }
+
+    public static class ParseException extends Exception {
+
+        public ParseException() {
+            super();
+        }
+
+        public ParseException(String message) {
+            super(message);
+        }
+    }
+
+    public static class MissingModelAttributeException extends ParseException {
+
+        private final String namespace;
+        private final String name;
+
+        public MissingModelAttributeException(String namespace, String name) {
+            this.namespace = namespace;
+            this.name = name;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

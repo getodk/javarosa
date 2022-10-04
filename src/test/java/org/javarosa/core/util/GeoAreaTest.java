@@ -32,11 +32,12 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class GeoAreaTest {
     @Test
-    public void area_isComputedForGeoshape() throws IOException {
+    public void area_isComputedForGeoshape() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("geoshape area", html(
             head(
                 title("Geoshape area"),
@@ -60,7 +61,7 @@ public class GeoAreaTest {
     }
 
     @Test
-    public void area_isComputedForGeopointNodeset() throws IOException {
+    public void area_isComputedForGeopointNodeset() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("geopoint nodeset area", html(
             head(
                 title("Geopoint nodeset area"),
@@ -100,7 +101,7 @@ public class GeoAreaTest {
     }
 
     @Test
-    public void area_isComputedForString() throws IOException {
+    public void area_isComputedForString() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("string area", html(
             head(
                 title("String area"),
@@ -134,7 +135,7 @@ public class GeoAreaTest {
     }
 
     @Test
-    public void area_whenShapeHasFewerThanThreePoints_isZero() throws IOException {
+    public void area_whenShapeHasFewerThanThreePoints_isZero() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("geoshape area", html(
             head(
                 title("Geoshape area"),

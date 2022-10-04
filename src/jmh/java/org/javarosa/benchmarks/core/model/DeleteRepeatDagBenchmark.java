@@ -9,6 +9,7 @@ import static org.javarosa.benchmarks.core.model.CreateRepeatDagBenchmark.getSum
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Measurement;
@@ -40,7 +41,7 @@ public class DeleteRepeatDagBenchmark {
         Scenario expressionInsideWithPositionCallScenario;
 
         @Setup(Level.Invocation)
-        public void setUp() throws IOException {
+        public void setUp() throws IOException, XFormParser.ParseException {
             expressionInsideScenario = getExpressionInsideScenario();
             range(0, repeatCount).forEach(n -> {
                 expressionInsideScenario.next();

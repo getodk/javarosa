@@ -20,6 +20,7 @@ import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.junit.Assert.assertThat;
 
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ public class XPathPathExprCurrentGroupCountRefTest {
     private Scenario scenario;
 
     @Before
-    public void setUp() {
+    public void setUp() throws XFormParser.ParseException {
         scenario = Scenario.init("relative-current-ref-group-count-ref.xml");
     }
 

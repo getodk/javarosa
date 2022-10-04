@@ -16,10 +16,6 @@
 
 package org.javarosa.form.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -30,8 +26,13 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.util.Extras;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The data model used during form entry. Represents the current state of the
@@ -63,6 +64,8 @@ public class FormEntryModel {
      * "Create/Remove/Interact" hub.
      */
     public static final int REPEAT_STRUCTURE_NON_LINEAR = 2;
+
+    private final Extras<Object> extras = new Extras<>();
 
 
     public FormEntryModel(FormDef form) {
@@ -659,6 +662,10 @@ public class FormEntryModel {
         } else {
             return form.buildIndex(indexes, multiplicities, elements);
         }
+    }
+
+    public Extras<Object> getExtras() {
+        return extras;
     }
 
     private void decrementHelper(List<Integer> indexes, List<Integer> multiplicities, List<IFormElement> elements) {

@@ -50,6 +50,7 @@ import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStringLiteral;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>An element of a FormInstance.</p>
@@ -221,6 +222,25 @@ import org.javarosa.xpath.expr.XPathStringLiteral;
     }
 
     @Override
+    @Nullable
+    public TreeElement getFirstChild(String name) {
+        return getChild(name, 0);
+    }
+
+    @Nullable
+    @Override
+    public TreeElement getFirstChild(String namespace, String name) {
+        TreeElement firstChild = getFirstChild(name);
+
+        if (firstChild == null || firstChild.getNamespace().equals(namespace)) {
+            return firstChild;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    @Nullable
     public TreeElement getChild(String name, int multiplicity) {
         return children.get(name, multiplicity);
     }

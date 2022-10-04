@@ -6,6 +6,7 @@ import static org.javarosa.benchmarks.BenchmarkUtils.getNigeriaWardsXMLWithExter
 import java.io.IOException;
 import java.nio.file.Path;
 import org.javarosa.xform.parse.FormParserHelper;
+import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -30,7 +31,7 @@ public class FormParserHelperParseExternalInstanceBenchmark {
 
     @Benchmark
     public void
-    benchmarkParseExternalSecondaryInstance(FormParserHelperParseExternalInstanceBenchmarkState state, Blackhole bh) throws IOException {
+    benchmarkParseExternalSecondaryInstance(FormParserHelperParseExternalInstanceBenchmarkState state, Blackhole bh) throws IOException, XFormParser.ParseException {
         bh.consume(FormParserHelper.parse(state.xFormFilePath));
     }
 

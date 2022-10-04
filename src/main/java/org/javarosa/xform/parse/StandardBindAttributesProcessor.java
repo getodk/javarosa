@@ -1,11 +1,6 @@
 package org.javarosa.xform.parse;
 
-import static org.javarosa.xform.parse.Constants.ID_ATTR;
-import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
-import static org.javarosa.xform.parse.XFormParser.NAMESPACE_JAVAROSA;
-
-import java.util.Collection;
-import java.util.Map;
+import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
@@ -20,6 +15,17 @@ import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.javarosa.xform.parse.Constants.ID_ATTR;
+import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
+import static org.javarosa.xform.parse.XFormParser.NAMESPACE_JAVAROSA;
+
 class StandardBindAttributesProcessor {
     private static final Logger logger = LoggerFactory.getLogger(StandardBindAttributesProcessor.class);
 
@@ -31,7 +37,7 @@ class StandardBindAttributesProcessor {
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Collection<String> passedThroughAttributes,
-                              Element element) {
+                              Element element, List<XFormParser.BindAttributeProcessor> bindAttributeProcessors) {
         final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
@@ -110,7 +116,32 @@ class StandardBindAttributesProcessor {
         binding.setPreload(element.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
         binding.setPreloadParams(element.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
-        saveUnusedAttributes(binding, element, usedAttributes, passedThroughAttributes);
+        bindAttributeProcessors.stream().forEach(bindAttributeProcessor -> {
+            for (int i = 0; i < element.getAttributeCount(); i++) {
+                String namespace = element.getAttributeNamespace(i);
+                String name = element.getAttributeName(i);
+
+                if (bindAttributeProcessor.getBindAttributes().contains(new Pair<>(namespace, name))) {
+                    bindAttributeProcessor.processBindAttribute(name, element.getAttributeValue(i), binding);
+                }
+            }
+        });
+
+        List<Pair<String, String>> processorAttributes = bindAttributeProcessors.stream()
+            .flatMap((Function<XFormParser.BindAttributeProcessor, Stream<Pair<String, String>>>) bindAttributeProcessor -> {
+                return bindAttributeProcessor.getBindAttributes().stream();
+            })
+            .collect(Collectors.toList());
+
+        for (int i = 0; i < element.getAttributeCount(); i++) {
+            String namespace = element.getAttributeNamespace(i);
+            String name = element.getAttributeName(i);
+
+            boolean usedAttribute = usedAttributes.contains(name) || processorAttributes.contains(new Pair<>(namespace, name));
+            if (!usedAttribute || passedThroughAttributes.contains(name)) {
+                binding.setAdditionalAttribute(element.getAttributeNamespace(i), name, element.getAttributeValue(i));
+            }
+        }
 
         return binding;
     }
@@ -177,15 +208,5 @@ class StandardBindAttributesProcessor {
         }
 
         return dataType;
-    }
-
-    private void saveUnusedAttributes(DataBinding binding, Element element, Collection<String> usedAttributes,
-                                      Collection<String> passedThroughAttributes) {
-        for (int i = 0; i < element.getAttributeCount(); i++) {
-            String name = element.getAttributeName(i);
-            if (!usedAttributes.contains(name) || passedThroughAttributes.contains(name)) {
-                binding.setAdditionalAttribute(element.getAttributeNamespace(i), name, element.getAttributeValue(i));
-            }
-        }
     }
 }

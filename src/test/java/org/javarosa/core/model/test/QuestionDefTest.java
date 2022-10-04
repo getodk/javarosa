@@ -35,6 +35,7 @@ import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class QuestionDefTest {
     private FormParseInit fpi = null;
 
     @Before
-    public void setUp() {
+    public void setUp() throws XFormParser.ParseException {
         fpi = new FormParseInit();
         fpi.getFirstQuestionDef();
     }

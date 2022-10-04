@@ -26,5 +26,5 @@ import org.kxml2.kdom.Element;
  *
  */
 public interface IElementHandler {
-    /*Object*/ void handle (XFormParser p, Element e, Object parent);
+    /*Object*/ void handle (XFormParser p, Element e, Object parent) throws XFormParser.ParseException;
 }

@@ -16,19 +16,6 @@
 
 package org.javarosa.core.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.ActionController;
@@ -55,12 +42,15 @@ import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.core.util.Extras;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableExtras;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.debug.EvaluationResult;
 import org.javarosa.debug.Event;
@@ -74,6 +64,22 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xml.InternalDataInstanceParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -89,6 +95,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
+    private ExternalizableExtras extras = new ExternalizableExtras();
 
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
@@ -1002,9 +1009,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         // }
     }
 
-    public boolean postProcessInstance() {
+    public void postProcessInstance() {
         actionController.triggerActionsFromEvent(Actions.EVENT_XFORMS_REVALIDATE, elementsWithActionTriggeredByToplevelEvent, this);
-        return postProcessInstance(mainInstance.getRoot());
+        postProcessInstance(mainInstance.getRoot());
     }
 
     /**
@@ -1112,6 +1119,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         List<TreeReference> treeReferencesWithActions = (List<TreeReference>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
         elementsWithActionTriggeredByToplevelEvent = getElementsFromReferences(treeReferencesWithActions);
+
+        extras = (ExternalizableExtras) ExtUtil.read(dis, ExternalizableExtras.class);
     }
 
     /**
@@ -1215,6 +1224,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
         ExtUtil.write(dos, new ExtWrapListPoly(new ArrayList<>(actions)));
         ExtUtil.write(dos, new ExtWrapListPoly(getReferencesFromElements(elementsWithActionTriggeredByToplevelEvent)));
+
+        ExtUtil.write(dos, extras);
     }
 
     /**
@@ -1600,7 +1611,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     @Override
     public List<TreeElement> getAdditionalAttributes() {
         // Not supported.
-        return Collections.emptyList();
+        return emptyList();
     }
 
     public <X extends XFormExtension> X getExtension(Class<X> extension) {
@@ -1689,5 +1700,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public HashMap<String, DataInstance> getFormInstances() {
         return formInstances;
+    }
+
+    public Extras<Externalizable> getExtras() {
+        return extras;
     }
 }

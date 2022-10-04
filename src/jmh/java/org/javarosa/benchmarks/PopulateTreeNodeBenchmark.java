@@ -34,7 +34,7 @@ public class PopulateTreeNodeBenchmark {
         private FormDef formDef;
 
         @Setup(Level.Trial)
-        public void initialize() throws IOException {
+        public void initialize() throws IOException, XFormParser.ParseException {
             Path assetsDir = prepareAssets("nigeria_wards_external_combined.xml", "wards.xml", "lgas.xml", "populate-nodes-attributes-instance.xml");
             Path formFile = assetsDir.resolve("nigeria_wards_external_combined.xml");
             Path submissionFile = assetsDir.resolve("populate-nodes-attributes-instance.xml");

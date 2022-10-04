@@ -16,41 +16,6 @@
 
 package org.javarosa.core.test;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.createTempFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static java.nio.file.Files.write;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.util.stream.Collectors.joining;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
-import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
-import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
-import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -93,6 +58,42 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.write;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.util.stream.Collectors.joining;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
+import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
+import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
+import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
+import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
 /**
  * <div style="border: 1px 1px 1px 1px; background-color: #556B2F; color: white; padding: 20px">
@@ -282,7 +283,7 @@ public class Scenario {
     // that XFormParser.loadXmlInstance(FormDef f, Reader xmlReader) should probably be public. This is also the method that Collect
     // copies because the FormDef may be built from cache meaning there won't be a Reader/Document available and because it makes
     // some extra calls for search(). We pass in an XFormsElement for now until we decide on an interface that Collect can use.
-    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException {
+    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException, XFormParser.ParseException {
         FormInstance originalInstance = getFormDef().getMainInstance();
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
         byte[] formInstanceBytes = serializer.serializeInstance(originalInstance);
@@ -317,6 +318,14 @@ public class Scenario {
         log.info("===============================================================================");
         log.info("       " + msg);
         log.info("===============================================================================");
+    }
+
+    public void finalizeInstance() {
+        controller.finalizeFormEntry();
+    }
+
+    public FormEntryController getFormEntryController() {
+        return controller;
     }
 
     public enum AnswerResult {
@@ -420,7 +429,7 @@ public class Scenario {
      * Initializes the Scenario using a form defined using the DSL in XFormsElement
      */
     // TODO Extract the form's name from the provided XFormsElement object to simplify args
-    public static Scenario init(String formName, XFormsElement form) throws IOException {
+    public static Scenario init(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
         Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
         String xml = form.asXml();
         System.out.println(xml);
@@ -433,14 +442,14 @@ public class Scenario {
      * <p>
      * A form with the provided filename must exist in the classpath
      */
-    public static Scenario init(String formFileName) {
+    public static Scenario init(String formFileName) throws XFormParser.ParseException {
         return init(r(formFileName));
     }
 
     /**
      * Initializes the Scenario with the form at the provided path
      */
-    public static Scenario init(Path formFile) {
+    public static Scenario init(Path formFile) throws XFormParser.ParseException {
         // TODO explain why this sequence of calls
         StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();

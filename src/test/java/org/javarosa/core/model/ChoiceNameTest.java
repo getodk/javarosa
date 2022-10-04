@@ -17,21 +17,22 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class ChoiceNameTest {
-    @Test public void choiceNameCallOnLiteralChoiceValue_getsChoiceName() {
+    @Test public void choiceNameCallOnLiteralChoiceValue_getsChoiceName() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         assertThat(scenario.answerOf("/jr-choice-name/literal_choice_name"), is(stringAnswer("Choice 2")));
     }
 
-    @Test public void choiceNameCallOutsideOfRepeatWithStaticChoices_getsChoiceName() {
+    @Test public void choiceNameCallOutsideOfRepeatWithStaticChoices_getsChoiceName() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         scenario.answer("/jr-choice-name/select_one_outside", "choice3");
         assertThat(scenario.answerOf("/jr-choice-name/select_one_name_outside"), is(stringAnswer("Choice 3")));
     }
 
-    @Test public void choiceNameCallInRepeatWithStaticChoices_getsChoiceName() {
+    @Test public void choiceNameCallInRepeatWithStaticChoices_getsChoiceName() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         scenario.answer("/jr-choice-name/my-repeat[1]/select_one", "choice4");
         scenario.answer("/jr-choice-name/my-repeat[2]/select_one", "choice1");
@@ -42,7 +43,7 @@ public class ChoiceNameTest {
         assertThat(scenario.answerOf("/jr-choice-name/my-repeat[3]/select_one_name"), is(stringAnswer("Choice 5")));
     }
 
-    @Test public void choiceNameCall_respectsLanguage() {
+    @Test public void choiceNameCall_respectsLanguage() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         scenario.setLanguage("French (fr)");
         scenario.answer("/jr-choice-name/select_one_outside", "choice3");
@@ -62,7 +63,7 @@ public class ChoiceNameTest {
 
     // The choice list for question cocotero with dynamic itemset is populated on DAG initialization time triggered by the jr:choice-name
     // expression in the calculate.
-    @Test public void choiceNameCallWithDynamicChoicesAndNoPredicate_selectsName() {
+    @Test public void choiceNameCallWithDynamicChoicesAndNoPredicate_selectsName() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("jr-choice-name.xml"));
         scenario.answer("/jr-choice-name/cocotero_a", "a");
         scenario.answer("/jr-choice-name/cocotero_b", "b");
@@ -72,7 +73,7 @@ public class ChoiceNameTest {
     // The choice list for question city with dynamic itemset is populated at DAG initialization time. Since country hasn't been
     // set yet, the choice list is empty. Setting the country does not automatically trigger re-computation of the choice list for the
     // city question. Instead, clients trigger a recomputation of the list when the list is displayed.
-    @Test public void choiceNameCallWithDynamicChoicesAndPredicate_requiresExplicitDynamicChoicesRecomputation() throws IOException {
+    @Test public void choiceNameCallWithDynamicChoicesAndPredicate_requiresExplicitDynamicChoicesRecomputation() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Dynamic Choices and Predicates", html(
             head(
                 title("Dynamic Choices and Predicates"),

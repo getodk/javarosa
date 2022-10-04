@@ -18,7 +18,7 @@ import org.junit.Test;
 public class TreeElementTests {
 
     @Test
-    public void testPopulate_withNodesAttributes() throws IOException {
+    public void testPopulate_withNodesAttributes() throws IOException, XFormParser.ParseException {
         // Given
         FormParseInit formParseInit = new FormParseInit(r("populate-nodes-attributes.xml"));
 

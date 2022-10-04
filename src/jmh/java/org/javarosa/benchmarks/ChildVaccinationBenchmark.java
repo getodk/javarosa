@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -65,7 +66,7 @@ public class ChildVaccinationBenchmark {
         private List<TreeReference> endOfVisitRefs;
 
         @Setup(Level.Trial)
-        public void initialize() {
+        public void initialize() throws XFormParser.ParseException {
             Path formFile = prepareAssets("child_vaccination_VOL_tool_v12.xml").resolve("child_vaccination_VOL_tool_v12.xml");
             vaccinationPenta1Ref = getRef("/data/household/child_repeat/penta1");
             vaccinationPenta3Ref = getRef("/data/household/child_repeat/penta3");

@@ -16,11 +16,15 @@
 
 package org.javarosa.core.util;
 
-import static java.util.Collections.emptyMap;
+import kotlin.Pair;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyMap;
 
 public interface XFormsElement {
     static String buildAttributesString(Map<String, String> attributes) {
@@ -67,8 +71,25 @@ public interface XFormsElement {
                         "xmlns=\"http://www.w3.org/2002/xforms\" " +
                         "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
                         "xmlns:jr=\"http://openrosa.org/javarosa\" " +
-                        "xmlns:odk=\"http://www.opendatakit.org/xforms\"",
+                        "xmlns:odk=\"http://www.opendatakit.org/xforms\" "+
+                        "xmlns:orx=\"http://openrosa.org/xforms\"",
                 head, body
+        );
+    }
+
+    static XFormsElement html(List<Pair<String, String>> additionalNamespaces, HeadXFormsElement head, BodyXFormsElement body) {
+        String additionalNamespacesString = additionalNamespaces.stream()
+            .map(namespace -> "xmlns:" + namespace.getFirst() + "=\"" + namespace.getSecond() + "\" ")
+            .collect(Collectors.joining());
+
+        return t("h:html " +
+                "xmlns=\"http://www.w3.org/2002/xforms\" " +
+                "xmlns:h=\"http://www.w3.org/1999/xhtml\" " +
+                "xmlns:jr=\"http://openrosa.org/javarosa\" " +
+                "xmlns:odk=\"http://www.opendatakit.org/xforms\" " +
+                "xmlns:orx=\"http://openrosa.org/xforms\" " +
+                additionalNamespacesString,
+            head, body
         );
     }
 
@@ -86,6 +107,15 @@ public interface XFormsElement {
 
     static XFormsElement model(XFormsElement... children) {
         return t("model", children);
+    }
+
+    static XFormsElement model(List<Pair<String, String>> attributes, XFormsElement... children) {
+        StringBuilder stringBuilder = new StringBuilder();
+        attributes.stream().forEach(attribute -> {
+            stringBuilder.append(" " + attribute.getFirst() + "=\"" + attribute.getSecond() + "\"");
+        });
+
+        return t("model" + stringBuilder, children);
     }
 
     static XFormsElement mainInstance(XFormsElement... children) {

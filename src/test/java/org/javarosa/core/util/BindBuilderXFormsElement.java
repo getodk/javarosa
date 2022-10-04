@@ -80,6 +80,11 @@ public class BindBuilderXFormsElement implements XFormsElement {
         return this;
     }
 
+    public BindBuilderXFormsElement withAttribute(String namespace, String name, String expression) {
+        attributes.put(namespace + ":" + name, expression);
+        return this;
+    }
+
     @Override
     public String getName() {
         return "bind";

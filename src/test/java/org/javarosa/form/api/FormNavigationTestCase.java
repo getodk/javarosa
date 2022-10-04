@@ -1,6 +1,7 @@
 package org.javarosa.form.api;
 
 import org.javarosa.core.test.FormParseInit;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,7 +55,7 @@ public class FormNavigationTestCase {
     }
 
     @Test
-    public void formNavigationTestCase() {
+    public void formNavigationTestCase() throws XFormParser.ParseException {
         testIndices();
     }
 
@@ -62,7 +63,7 @@ public class FormNavigationTestCase {
     // For each form, simulate increasing the index until the end of the
     // form and then decreasing until the beginning of the form.
     // Verify the expected indices before and after each operation.
-    public void testIndices() {
+    public void testIndices() throws XFormParser.ParseException {
         FormParseInit fpi = new FormParseInit(r("navigation/" + formName));
         FormEntryController formEntryController = fpi.getFormEntryController();
         FormEntryModel formEntryModel = fpi.getFormEntryModel();

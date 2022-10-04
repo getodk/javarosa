@@ -2,6 +2,7 @@ package org.javarosa.core.model.instance.utils;
 
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,6 +73,7 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
     }
 
     /** Gets the child with the specified name and multiplicity */
+    @Nullable
     public TreeElement get(String name, int multiplicity) {
         TreeElementChildrenList.ElementAndLoc el = getChildAndLoc(name, multiplicity);
         if (el == null) {
