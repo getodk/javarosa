@@ -9,7 +9,6 @@ import org.javarosa.xform.parse.XFormParser.MissingModelAttributeException;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static java.util.Arrays.asList;
@@ -18,6 +17,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 public class EntityFormParseProcessorTest {
 
     @Test
-    public void whenVersionIsMissing_parsesWithoutError() throws IOException, XFormParser.ParseException {
+    public void whenVersionIsMissing_parsesWithoutError() throws XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             head(
                 title("Non entity form"),
@@ -100,7 +100,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test(expected = UnrecognizedEntityVersionException.class)
-    public void whenVersionIsNotRecognized_throwsException() throws IOException, XFormParser.ParseException {
+    public void whenVersionIsNotRecognized_throwsException() throws XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -133,7 +133,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test
-    public void whenVersionIsNewPatch_doesNotThrowException() throws IOException, XFormParser.ParseException {
+    public void whenVersionIsNewPatch_parsesCorrectly() throws XFormParser.ParseException {
         String newPatchVersion = EntityFormParseProcessor.SUPPORTED_VERSION + ".12";
 
         XFormsElement form = XFormsElement.html(
@@ -164,11 +164,13 @@ public class EntityFormParseProcessorTest {
         EntityFormParseProcessor processor = new EntityFormParseProcessor();
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         parser.addProcessor(processor);
-        parser.parse(null);
+
+        FormDef formDef = parser.parse(null);
+        assertThat(formDef.getExtras().get(EntityFormExtra.class), notNullValue());
     }
 
     @Test
-    public void saveTosWithIncorrectNamespaceAreIgnored() throws IOException, XFormParser.ParseException {
+    public void saveTosWithIncorrectNamespaceAreIgnored() throws XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("correct", "http://www.opendatakit.org/xforms/entities"),
