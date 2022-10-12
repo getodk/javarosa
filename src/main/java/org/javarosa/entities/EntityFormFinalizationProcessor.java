@@ -3,6 +3,7 @@ package org.javarosa.entities;
 import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.entities.internal.Entities;
 import org.javarosa.entities.internal.EntityFormParser;
@@ -31,8 +32,13 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         if (dataset != null) {
             List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
                 IDataReference reference = saveTo.getFirst();
-                String answer = mainInstance.resolveReference(reference).getValue().getDisplayText();
-                return new Pair<>(saveTo.getSecond(), answer);
+                IAnswerData answerData = mainInstance.resolveReference(reference).getValue();
+
+                if (answerData != null) {
+                    return new Pair<>(saveTo.getSecond(), answerData.getDisplayText());
+                } else {
+                    return new Pair<>(saveTo.getSecond(), "");
+                }
             }).collect(Collectors.toList());
 
             formEntryModel.getExtras().put(new Entities(asList(new Entity(dataset, fields))));

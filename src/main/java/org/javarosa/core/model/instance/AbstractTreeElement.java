@@ -113,6 +113,7 @@ public interface AbstractTreeElement<T extends AbstractTreeElement> {
     //Support?
     public abstract AbstractTreeElement getParent();
 
+    @Nullable
     public abstract IAnswerData getValue();
 
     public abstract int getDataType();
