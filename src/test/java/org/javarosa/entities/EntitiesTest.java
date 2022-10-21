@@ -317,6 +317,41 @@ public class EntitiesTest {
     }
 
     @Test
+    public void whenSaveToQuestionIsNotAnswered_entityPropertyIsEmptyString() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("name"),
+                            t("orx:meta",
+                                t("entities:entity dataset=\"people\"",
+                                    t("entities:create")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", ""))));
+    }
+
+    @Test
     public void savetoIsRemovedFromBindAttributesForClients() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
