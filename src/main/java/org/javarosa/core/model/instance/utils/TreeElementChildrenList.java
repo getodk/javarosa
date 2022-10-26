@@ -1,14 +1,13 @@
 package org.javarosa.core.model.instance.utils;
 
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.jetbrains.annotations.Nullable;
+import static org.javarosa.core.model.instance.TreeReference.DEFAULT_MULTIPLICITY;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static org.javarosa.core.model.instance.TreeReference.DEFAULT_MULTIPLICITY;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A collection of {@link TreeElement} children. They are stored in an {@link ArrayList}.
@@ -100,7 +99,7 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
      */
     private boolean sameNameAndNormalMult(String name, int mult) {
         return allHaveSameNameAndNormalMult && mult >= 0 &&
-                (children.isEmpty() || name.equals(children.get(0).getName()));
+            (children.isEmpty() || TreeElementNameComparator.elementMatchesName(children.get(0), name));
     }
 
     /**
@@ -190,7 +189,7 @@ public class TreeElementChildrenList implements Iterable<TreeElement> {
 
         for (int i = 0; i < children.size(); i++) {
             TreeElement child = children.get(i);
-            if (name.equals(child.getName()) && child.getMult() == multiplicity) {
+            if (TreeElementNameComparator.elementMatchesName(child, name) && child.getMult() == multiplicity) {
                 return new ElementAndLoc(child, i);
             }
         }
