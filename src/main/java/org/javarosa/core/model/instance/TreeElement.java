@@ -127,19 +127,15 @@ import org.jetbrains.annotations.Nullable;
         attributes = new ArrayList<TreeElement>(0);
     }
 
-    /**
-     * Construct a TreeElement which represents an attribute with the provided
-     * namespace and name.
-     *
-     * @param namespace - if null will be converted to empty string
-     * @param name
-     * @param value
-     * @return A new instance of a TreeElement
-     */
     public static TreeElement constructAttributeElement(String namespace, String name, String value) {
+        return constructAttributeElement(namespace, null, name, value);
+    }
+
+    public static TreeElement constructAttributeElement(String namespace, String namespacePrefix, String name, String value) {
         TreeElement element = new TreeElement(name);
         element.setIsAttribute(true);
-        element.namespace = namespace;
+        element.setNamespace(namespace);
+        element.setNamespacePrefix(namespacePrefix);
         element.multiplicity = TreeReference.INDEX_ATTRIBUTE;
         element.value = new UncastData(value);
         return element;
@@ -176,9 +172,11 @@ import org.jetbrains.annotations.Nullable;
         }
         return null;
     }
-
     public static void setAttribute(TreeElement parent, List<TreeElement> attrs, String namespace, String name, String value) {
+        setAttribute(parent, attrs, namespace, null, name, value);
+    }
 
+    public static void setAttribute(TreeElement parent, List<TreeElement> attrs, String namespace, String namespacePrefix, String name, String value) {
         TreeElement attribut = getAttribute(attrs, namespace, name);
         if ( attribut != null ) {
             if (value == null) {
@@ -193,7 +191,7 @@ import org.jetbrains.annotations.Nullable;
         if ( value == null ) return;
 
         // create an attribute...
-        TreeElement attr = TreeElement.constructAttributeElement(namespace, name, value);
+        TreeElement attr = TreeElement.constructAttributeElement(namespace, namespacePrefix, name, value);
         attr.setParent(parent);
 
         attrs.add(attr);
@@ -349,7 +347,7 @@ import org.jetbrains.annotations.Nullable;
 
         newNode.attributes = new ArrayList<>(attributes.size());
         for (TreeElement attr : attributes) {
-            newNode.setAttribute(attr.getNamespace(), attr.getName(), attr.getAttributeValue());
+            newNode.setAttribute(attr.getNamespace(), attr.getNamespacePrefix(), attr.getName(), attr.getAttributeValue());
         }
 
         if (value != null) {
@@ -446,7 +444,7 @@ import org.jetbrains.annotations.Nullable;
     public void setBindAttributes(List<TreeElement> bindAttributes ) {
         // create new tree elements for all the bind definitions...
         for ( TreeElement ref : bindAttributes ) {
-            setBindAttribute(ref.getNamespace(), ref.getName(), ref.getAttributeValue());
+            setBindAttribute(ref.getNamespace(), ref.getNamespacePrefix(), ref.getName(), ref.getAttributeValue());
         }
     }
 
@@ -485,8 +483,8 @@ import org.jetbrains.annotations.Nullable;
         return element == null ? null: getAttributeValue(element);
     }
 
-    public void setBindAttribute(String namespace, String name, String value) {
-        setAttribute(this, bindAttributes, namespace, name, value);
+    public void setBindAttribute(String namespace, String namespacePrefix, String name, String value) {
+        setAttribute(this, bindAttributes, namespace, namespacePrefix, name, value);
     }
 
     public void setEnabled(boolean enabled) {
@@ -565,6 +563,10 @@ import org.jetbrains.annotations.Nullable;
         return attributes.get(index).namespace;
     }
 
+    public String getAttributeNamespacePrefix(int index) {
+        return attributes.get(index).namespacePrefix;
+    }
+
     @Override
     public String getAttributeName(int index) {
         return attributes.get(index).name;
@@ -609,6 +611,10 @@ import org.jetbrains.annotations.Nullable;
 
     public void setAttribute(String namespace, String name, String value) {
         setAttribute(this, attributes, namespace, name, value);
+    }
+
+    public void setAttribute(String namespace, String namespacePrefix, String name, String value) {
+        setAttribute(this, attributes, namespace, namespacePrefix, name, value);
     }
 
     /* ==== SERIALIZATION ==== */
@@ -841,9 +847,10 @@ import org.jetbrains.annotations.Nullable;
         for (int i = 0; i < incoming.getAttributeCount(); i++) {
             String name = incoming.getAttributeName(i);
             String ns = incoming.getAttributeNamespace(i);
+            String nsPrefix = incoming.getAttributeNamespacePrefix(i);
             String value = incoming.getAttributeValue(i);
 
-            this.setAttribute(ns, name, value);
+            this.setAttribute(ns, nsPrefix, name, value);
         }
     }
 

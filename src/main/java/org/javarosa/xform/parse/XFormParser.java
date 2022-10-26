@@ -16,6 +16,48 @@
 
 package org.javarosa.xform.parse;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
+import static org.javarosa.core.model.Constants.CONTROL_INPUT;
+import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.model.Constants.CONTROL_SECRET;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
+import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
+import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
+import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
+import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
+import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
+import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
+import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
+import static org.javarosa.core.services.ProgramFlow.die;
+import static org.javarosa.xform.parse.Constants.ID_ATTR;
+import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
+import static org.javarosa.xform.parse.Constants.RANK;
+import static org.javarosa.xform.parse.Constants.SELECT;
+import static org.javarosa.xform.parse.Constants.SELECTONE;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
+import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -72,49 +114,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
-import static org.javarosa.core.model.Constants.CONTROL_AUDIO_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_FILE_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_IMAGE_CHOOSE;
-import static org.javarosa.core.model.Constants.CONTROL_INPUT;
-import static org.javarosa.core.model.Constants.CONTROL_OSM_CAPTURE;
-import static org.javarosa.core.model.Constants.CONTROL_RANGE;
-import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.core.model.Constants.CONTROL_SECRET;
-import static org.javarosa.core.model.Constants.CONTROL_SELECT_MULTI;
-import static org.javarosa.core.model.Constants.CONTROL_SELECT_ONE;
-import static org.javarosa.core.model.Constants.CONTROL_TRIGGER;
-import static org.javarosa.core.model.Constants.CONTROL_UPLOAD;
-import static org.javarosa.core.model.Constants.CONTROL_VIDEO_CAPTURE;
-import static org.javarosa.core.model.Constants.DATATYPE_CHOICE;
-import static org.javarosa.core.model.Constants.DATATYPE_MULTIPLE_ITEMS;
-import static org.javarosa.core.model.Constants.XFTAG_UPLOAD;
-import static org.javarosa.core.services.ProgramFlow.die;
-import static org.javarosa.xform.parse.Constants.ID_ATTR;
-import static org.javarosa.xform.parse.Constants.NODESET_ATTR;
-import static org.javarosa.xform.parse.Constants.RANK;
-import static org.javarosa.xform.parse.Constants.SELECT;
-import static org.javarosa.xform.parse.Constants.SELECTONE;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
-import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -2108,6 +2107,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (node.getAttributeCount() > 0) {
             for (int i = 0; i < node.getAttributeCount(); i++) {
                 String attrNamespace = node.getAttributeNamespace(i);
+                String attrNamespacePrefix = namespacePrefixesByUri.get(attrNamespace);
                 String attrName = node.getAttributeName(i);
                 if (attrNamespace.equals(NAMESPACE_JAVAROSA) && attrName.equals("template")) {
                     continue;
@@ -2116,7 +2116,7 @@ public class XFormParser implements IXFormParserFunctions {
                     continue;
                 }
 
-                element.setAttribute(attrNamespace, attrName, node.getAttributeValue(i));
+                element.setAttribute(attrNamespace, attrNamespacePrefix, attrName, node.getAttributeValue(i));
             }
         }
 

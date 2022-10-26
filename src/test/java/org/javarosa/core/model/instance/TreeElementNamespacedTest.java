@@ -117,4 +117,46 @@ public class TreeElementNamespacedTest {
 
         assertThat(result, is(e2));
     }
+
+    @Test
+    public void pathExpressionWithNamespacedAttribute_selectsCorrectAttribute() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Attr", html(
+            asList(new Pair<>("example", "http://example.fake")),
+            head(
+                title("Attr"),
+                model(
+                    mainInstance(t("data id=\"attr\"",
+                        t("question example:a=\"b\" a=\"c\"")
+                    ))
+                )
+            ),
+            body(
+                input("/data/question")
+            )));
+
+        assertThat(scenario.answerOf("/data/question/@a").getDisplayText(), is("c"));
+        assertThat(scenario.answerOf("/data/question/@example:a").getDisplayText(), is("b"));
+    }
+
+    @Test
+    public void pathExpressionWithNamespacedAttribute_selectsCorrectAttribute_afterSerializationDeserialization() throws IOException, XFormParser.ParseException, DeserializationException {
+        Scenario scenario = Scenario.init("Attr", html(
+            asList(new Pair<>("example", "http://example.fake")),
+            head(
+                title("Attr"),
+                model(
+                    mainInstance(t("data id=\"attr\"",
+                        t("question example:a=\"b\" a=\"c\"")
+                    ))
+                )
+            ),
+            body(
+                input("/data/question")
+            )));
+
+        scenario.serializeAndDeserializeForm();
+
+        assertThat(scenario.answerOf("/data/question/@a").getDisplayText(), is("c"));
+        assertThat(scenario.answerOf("/data/question/@example:a").getDisplayText(), is("b"));
+    }
 }
