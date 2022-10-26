@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import java.util.Objects;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
@@ -36,6 +37,7 @@ import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
 import org.javarosa.core.model.instance.utils.IAnswerResolver;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.instance.utils.TreeElementChildrenList;
+import org.javarosa.core.model.instance.utils.TreeElementNameComparator;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.DataUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -137,7 +139,7 @@ import org.jetbrains.annotations.Nullable;
     public static TreeElement constructAttributeElement(String namespace, String name, String value) {
         TreeElement element = new TreeElement(name);
         element.setIsAttribute(true);
-        element.namespace = (namespace == null) ? "" : namespace;
+        element.namespace = namespace;
         element.multiplicity = TreeReference.INDEX_ATTRIBUTE;
         element.value = new UncastData(value);
         return element;
@@ -161,8 +163,15 @@ import org.jetbrains.annotations.Nullable;
      */
     public static TreeElement getAttribute(List<TreeElement> attributes, String namespace, String name) {
         for (TreeElement attribute : attributes) {
-            if(attribute.getName().equals(name) && (namespace == null || namespace.equals(attribute.namespace))) {
-                return attribute;
+            if (name.contains(":")) {
+                if (TreeElementNameComparator.elementMatchesName(attribute, name)) {
+                    return attribute;
+                }
+            } else {
+                if (attribute.getName().equals(name) && (Objects.equals(namespace, attribute.namespace)
+                    || (Objects.equals(attribute.namespace, "") && namespace == null))) {
+                    return attribute;
+                }
             }
         }
         return null;

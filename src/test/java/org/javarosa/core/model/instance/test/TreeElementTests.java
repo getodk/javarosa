@@ -50,7 +50,7 @@ public class TreeElementTests {
 
         assertEquals("regular_group", regularGroup.getName());
         assertEquals(1, regularGroup.getAttributeCount());
-        customAttr1 = regularGroup.getAttribute(null, "custom_attr_1");
+        customAttr1 = regularGroup.getAttribute("custom_name_space", "custom_attr_1");
         assertNotNull(customAttr1);
         assertEquals("custom_attr_1", customAttr1.getName());
         assertEquals("custom_name_space", customAttr1.getNamespace());

@@ -3,6 +3,7 @@ package org.javarosa.core.model.instance;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_ATTRIBUTE;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
@@ -68,5 +69,52 @@ public class TreeElementNamespacedTest {
         Scenario cachedScenario = scenario.serializeAndDeserializeForm();
 
         assertThat(cachedScenario.answerOf("/data/example:calculate"), is(stringAnswer("foo")));
+    }
+
+    @Test
+    public void getAttribute_getsNamespacedAttribute() {
+        TreeElement e1 = new TreeElement("a", INDEX_ATTRIBUTE);
+        TreeElement e2 = new TreeElement("a", INDEX_ATTRIBUTE);
+        e2.setNamespace("https://fake.fake");
+        e2.setNamespacePrefix("example");
+        TreeElement result = TreeElement.getAttribute(asList(e1, e2), "https://fake.fake", "a");
+
+        assertThat(result, is(e2));
+    }
+
+    @Test
+    // This is what happens when evaluating an XPath expression
+    public void getAttribute_getsNamespacedAttribute_usingPrefix() {
+        TreeElement e1 = new TreeElement("a", INDEX_ATTRIBUTE);
+        TreeElement e2 = new TreeElement("a", INDEX_ATTRIBUTE);
+        e2.setNamespace("https://fake.fake");
+        e2.setNamespacePrefix("example");
+        TreeElement result = TreeElement.getAttribute(asList(e1, e2), null, "example:a");
+
+        assertThat(result, is(e2));
+    }
+
+    @Test
+    public void getAttribute_getsDefaultNamespaceAttribute() {
+        TreeElement e1 = new TreeElement("a", INDEX_ATTRIBUTE);
+        e1.setNamespace("https://fake.fake");
+        e1.setNamespacePrefix("example");
+        TreeElement e2 = new TreeElement("a", INDEX_ATTRIBUTE);
+        TreeElement result = TreeElement.getAttribute(asList(e1, e2), null, "a");
+
+        assertThat(result, is(e2));
+    }
+
+    @Test
+    // Attributes in the main instance without a custom namespace have empty string namespace
+    public void getAttribute_getsDefaultNamespaceAttribute_withBlankNamespace() {
+        TreeElement e1 = new TreeElement("a", INDEX_ATTRIBUTE);
+        e1.setNamespace("https://fake.fake");
+        e1.setNamespacePrefix("example");
+        TreeElement e2 = new TreeElement("a", INDEX_ATTRIBUTE);
+        e2.setNamespace("");
+        TreeElement result = TreeElement.getAttribute(asList(e1, e2), null, "a");
+
+        assertThat(result, is(e2));
     }
 }
