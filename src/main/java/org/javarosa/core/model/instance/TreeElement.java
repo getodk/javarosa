@@ -677,6 +677,8 @@ import org.jetbrains.annotations.Nullable;
         bindAttributes = ExtUtil.readAttributes(in, this);
 
         attributes = ExtUtil.readAttributes(in, this);
+
+        namespacePrefix = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
     }
 
     @Override
@@ -731,6 +733,8 @@ import org.jetbrains.annotations.Nullable;
         ExtUtil.writeAttributes(out, bindAttributes);
 
         ExtUtil.writeAttributes(out, attributes);
+
+        ExtUtil.writeString(out, ExtUtil.emptyIfNull(namespacePrefix));
     }
 
     //rebuilding a node from an imported instance
