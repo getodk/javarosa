@@ -39,7 +39,7 @@ public class EntityFormParseProcessorTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta")
+                            t("meta")
                         )
                     ),
                     bind("/data/name").type("string")
@@ -68,10 +68,8 @@ public class EntityFormParseProcessorTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\"")
                             )
                         )
                     ),
@@ -111,10 +109,8 @@ public class EntityFormParseProcessorTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\"")
                             )
                         )
                     ),
@@ -146,10 +142,8 @@ public class EntityFormParseProcessorTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\"")
                             )
                         )
                     ),
@@ -182,10 +176,8 @@ public class EntityFormParseProcessorTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("correct:entity dataset=\"people\"",
-                                    t("correct:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\"")
                             )
                         )
                     ),

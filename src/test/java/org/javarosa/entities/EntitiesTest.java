@@ -58,8 +58,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"")
+                            t("meta",
+                                t("entity dataset=\"people\"")
                             )
                         )
                     ),
@@ -93,10 +93,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\"")
                             )
                         )
                     ),
@@ -133,14 +131,12 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("join"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"members\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"members\" create=\"\"")
                             )
                         )
                     ),
-                    bind("/data/orx:meta/entities:entity/entities:create").relevant("/data/join = 'yes'"),
+                    bind("/data/meta/entity/@create").calculate("/data/join = 'yes'"),
                     bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
                 )
             ),
@@ -173,10 +169,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entities:entity dataset=\"people\" create=\"1\"")
                             )
                         )
                     ),
@@ -215,10 +209,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("blah:entity dataset=\"people\"",
-                                    t("blah:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\"")
                             )
                         )
                     ),
@@ -242,43 +234,6 @@ public class EntitiesTest {
     }
 
     @Test
-    public void mustUseCorrectNamespace() throws IOException, XFormParser.ParseException {
-        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
-            asList(
-                new Pair<>("entities", "http://www.example.com/xforms/entities")
-            ),
-            head(
-                title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
-                    mainInstance(
-                        t("data id=\"create-entity-form\"",
-                            t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
-                            )
-                        )
-                    ),
-                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
-                )
-            ),
-            body(
-                input("/data/name")
-            )
-        ));
-
-        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
-
-        scenario.next();
-        scenario.answer("Tom Wambsgans");
-
-        scenario.finalizeInstance();
-        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
-        assertThat(entities.size(), equalTo(0));
-    }
-
-    @Test
     public void fillingFormWithSelectSaveTo_andWithCreate_savesValuesCorrectlyToEntity() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
@@ -290,10 +245,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("team"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\"")
                             )
                         )
                     ),
@@ -328,10 +281,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\"")
                             )
                         )
                     ),
