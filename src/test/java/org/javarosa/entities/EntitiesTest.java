@@ -119,7 +119,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithNonRelevantCreate_doesNotCreateAnyEntities() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithDynamicCreateExpression_conditionallyCreatesEntities() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -150,10 +150,22 @@ public class EntitiesTest {
 
         scenario.next();
         scenario.answer("Roman Roy");
-        scenario.answer(scenario.choicesOf("/data/join").get(1));
+        scenario.next();
+        scenario.answer(scenario.choicesOf("/data/join").get(0));
 
         scenario.finalizeInstance();
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+
+        scenario.newInstance();
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+        scenario.next();
+        scenario.answer("Roman Roy");
+        scenario.next();
+        scenario.answer(scenario.choicesOf("/data/join").get(1));
+
+        scenario.finalizeInstance();
+        entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(0));
     }
 
