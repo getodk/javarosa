@@ -8,7 +8,6 @@ import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static java.util.Arrays.asList;
@@ -26,11 +25,10 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class EntityFormParserTest {
 
     @Test
-    public void parseFirstDatasetToCreate_ignoresDatasetWithCreateActionWithIncorrectNamespace() throws IOException, XFormParser.ParseException {
+    public void parseFirstDatasetToCreate_findsCreateWithTrueString() throws XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
-                new Pair<>("correct", "http://www.opendatakit.org/xforms/entities"),
-                new Pair<>("incorrect", "blah")
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
             ),
             head(
                 title("Create entity form"),
@@ -38,14 +36,12 @@ public class EntityFormParserTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("correct:entity dataset=\"people\"",
-                                    t("incorrect:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"true\"")
                             )
                         )
                     ),
-                    bind("/data/name").type("string").withAttribute("correct", "saveto", "name")
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
                 )
             ),
             body(
@@ -57,6 +53,6 @@ public class EntityFormParserTest {
         FormDef formDef = parser.parse(null);
 
         String dataset = EntityFormParser.parseFirstDatasetToCreate(formDef.getMainInstance());
-        assertThat(dataset, equalTo(null));
+        assertThat(dataset, equalTo("people"));
     }
 }

@@ -2,6 +2,7 @@ package org.javarosa.entities.internal;
 
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.jetbrains.annotations.Nullable;
 
 public class EntityFormParser {
@@ -17,10 +18,10 @@ public class EntityFormParser {
         TreeElement entity = getEntityElement(mainInstance);
 
         if (entity != null) {
-            TreeElement create = entity.getFirstChild(ENTITIES_NAMESPACE, "create");
+            String create = entity.getAttributeValue(null, "create");
 
             if (create != null) {
-                if (create.isRelevant()) {
+                if (XPathFuncExpr.boolStr(create)) {
                     return entity.getAttributeValue(null, "dataset");
                 }
             }
@@ -35,7 +36,7 @@ public class EntityFormParser {
         TreeElement meta = root.getFirstChild("meta");
 
         if (meta != null) {
-            return meta.getFirstChild(ENTITIES_NAMESPACE, "entity");
+            return meta.getFirstChild("entity");
         } else {
             return null;
         }
