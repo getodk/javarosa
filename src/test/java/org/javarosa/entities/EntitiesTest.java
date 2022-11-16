@@ -293,10 +293,8 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
-                            t("orx:meta",
-                                t("entities:entity dataset=\"people\"",
-                                    t("entities:create")
-                                )
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\"")
                             )
                         )
                     ),
