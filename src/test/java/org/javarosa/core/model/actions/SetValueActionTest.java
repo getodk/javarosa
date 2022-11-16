@@ -497,4 +497,47 @@ public class SetValueActionTest {
         scenario.answer("/data/source", 12);
         assertThat(scenario.answerOf("/data/destination"), is(intAnswer(24)));
     }
+
+    @Test
+    public void setvalue_setsValueOfAttribute() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Setvalue attribute", html(
+            head(
+                title("Setvalue attribute"),
+                model(
+                    mainInstance(t("data id=\"setvalue-attribute\"",
+                        t("element attr=\"\"")
+                    )),
+                    setvalue("odk-instance-first-load", "/data/element/@attr", "7")
+                )
+            ),
+            body(
+                input("/data/element")
+            )));
+
+        assertThat(scenario.answerOf("/data/element/@attr").getDisplayText(), is("7"));
+    }
+
+    @Test
+    public void setvalue_setsValueOfAttribute_afterDeserialization() throws IOException, XFormParser.ParseException, DeserializationException {
+        Scenario scenario = Scenario.init("Setvalue attribute", html(
+            head(
+                title("Setvalue attribute"),
+                model(
+                    mainInstance(t("data id=\"setvalue-attribute\"",
+                        t("element attr=\"\"")
+                    )),
+                    setvalue("odk-instance-first-load", "/data/element/@attr", "7")
+                )
+            ),
+            body(
+                input("/data/element")
+            )));
+
+        assertThat(scenario.answerOf("/data/element/@attr").getDisplayText(), is("7"));
+
+        Scenario cached = scenario.serializeAndDeserializeForm();
+
+        cached.newInstance();
+        assertThat(cached.answerOf("/data/element/@attr").getDisplayText(), is("7"));
+    }
 }
