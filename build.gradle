@@ -83,7 +83,7 @@ if (!project.hasProperty("android")) {
         // Be sure to update version in pom.xml to match
         // snapshot release = x.x.x-SNAPSHOT
         // production release = x.x.x
-        version = '4.0.0'
+        version = '4.0.1-SNAPSHOT'
         archiveName = baseName + '-' + version + '.jar'
 
         manifest {
