@@ -26,7 +26,7 @@
                 ]
             },
             "properties": {
-                "id": "67abie",
+                "id": 67,
                 "name": "Your cool point",
                 "foo": "quux",
                 "special-property": "special value"

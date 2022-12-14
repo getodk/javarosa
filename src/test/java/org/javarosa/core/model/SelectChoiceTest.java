@@ -157,7 +157,7 @@ public class SelectChoiceTest {
         List<Pair<String, String>> secondNodeChildren = scenario.choicesOf("/data/q").get(1).getAdditionalChildren();
         assertThat(secondNodeChildren, hasSize(4));
         assertThat(secondNodeChildren.get(0), equalTo(new Pair<>("geometry", "0.5 104 0 0")));
-        assertThat(secondNodeChildren.get(1), equalTo(new Pair<>("id", "67abie")));
+        assertThat(secondNodeChildren.get(1), equalTo(new Pair<>("id", "67")));
         assertThat(secondNodeChildren.get(2), equalTo(new Pair<>("foo", "quux")));
         assertThat(secondNodeChildren.get(3), equalTo(new Pair<>("special-property", "special value")));
     }
