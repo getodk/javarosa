@@ -1,5 +1,6 @@
 package org.javarosa.core.model.utils.test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
@@ -15,13 +16,30 @@ import static org.javarosa.core.util.XFormsElement.title;
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class QuestionPreloaderTest {
-    @Ignore("Not supported")
     @Test
-    public void preloader_preloadsAttributes() throws IOException, XFormParser.ParseException {
+    public void preloader_preloadsElements() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Preload attribute", html(
+            head(
+                title("Preload element"),
+                model(
+                    mainInstance(t("data id=\"preload-attribute\"",
+                        t("element")
+                    )),
+                    bind("/data/element").preload("uid")
+                )
+            ),
+            body(
+                input("/data/element")
+            )));
+
+        assertThat(scenario.answerOf("/data/element").getDisplayText(), startsWith("uuid:"));
+    }
+
+    @Test
+    public void preloader_doesNotpreloadAttributes() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Preload attribute", html(
             head(
                 title("Preload attribute"),
@@ -36,6 +54,6 @@ public class QuestionPreloaderTest {
                 input("/data/element")
             )));
 
-        assertThat(scenario.answerOf("/data/element/@attr").getDisplayText(), startsWith("uuid"));
+        assertThat(scenario.answerOf("/data/element/@attr").getDisplayText(), is(""));
     }
 }
