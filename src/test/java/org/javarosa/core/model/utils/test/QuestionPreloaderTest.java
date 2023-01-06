@@ -39,6 +39,7 @@ public class QuestionPreloaderTest {
     }
 
     @Test
+    // Unintentional limitation
     public void preloader_doesNotpreloadAttributes() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Preload attribute", html(
             head(
