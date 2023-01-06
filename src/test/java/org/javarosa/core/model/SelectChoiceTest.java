@@ -28,6 +28,7 @@ import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.instance;
 import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.label;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
@@ -90,7 +91,26 @@ public class SelectChoiceTest {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
-        assertThat(scenario.choicesOf("/data/q").get(1).getChild("non-existent"), CoreMatchers.is(nullValue()));
+        assertThat(scenario.choicesOf("/data/q").get(1).getChild("non-existent"), is(nullValue()));
+    }
+
+    @Test
+    public void getChild_returnsEmptyString_whenChoicesAreFromSecondaryInstance_andRequestedChildHasNoValue() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("Select with empty value", html(
+            head(
+                title("Select with empty value"),
+                model(
+                    mainInstance(
+                        t("data id='select-empty'",
+                            t("select"))),
+                    instance("choices",
+                        t("item", t("label", "Item"), t("property", ""))
+                    ))),
+            body(
+                select1Dynamic("/data/select", "instance('choices')/root/item", "name", "label"))
+            ));
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getChild("property"), is(""));
     }
 
     @Test
