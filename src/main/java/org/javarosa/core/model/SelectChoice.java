@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 import kotlin.Pair;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
@@ -122,7 +123,12 @@ public class SelectChoice implements Externalizable, Localizable {
 
         TreeElement child = item.getChild(childName, 0);
         if (child != null) {
-            return child.getValue().getDisplayText();
+            IAnswerData childValue = child.getValue();
+            if (childValue == null) {
+                return "";
+            } else {
+                return childValue.getDisplayText();
+            }
         }
 
         return null;
