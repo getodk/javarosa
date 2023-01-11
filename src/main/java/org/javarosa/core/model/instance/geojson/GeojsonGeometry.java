@@ -17,23 +17,31 @@
 package org.javarosa.core.model.instance.geojson;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class GeojsonGeometry {
-    private String type;
-    private ArrayList<String> coordinates;
 
-    public String getType() {
-        return type;
-    }
+    private String type;
+    private ArrayList<Object> coordinates;
 
     public String getOdkCoordinates() throws IOException {
-        if (!(getType().equals("Point") && coordinates.size() == 2)) {
-            throw new IOException("Only Points are currently supported");
-        }
+        if (type.equals("Point")) {
+            return coordinates.get(1) + " " + coordinates.get(0) + " 0 0";
+        } else if (type.equals("LineString")) {
+            StringJoiner stringJoiner = new StringJoiner("; ");
+            for (Object item : coordinates) {
+                List<Object> point = (List<Object>) item;
+                stringJoiner.add(point.get(1) + " " + point.get(0) + " 0 0");
+            }
 
-        return coordinates.get(1) + " " + coordinates.get(0) + " 0 0";
+            return stringJoiner.toString();
+        } else {
+            throw new IOException("Only Points, LineString are currently supported");
+        }
     }
 }

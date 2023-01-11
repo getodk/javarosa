@@ -94,7 +94,7 @@ public class GeoJsonExternalInstanceTest {
         TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
         assertThat(featureCollection.getNumChildren(), is(2));
         assertThat(featureCollection.getChildAt(0).getChild("geometry", 0).getValue().getValue(), is("0.5 102 0 0"));
-        assertThat(featureCollection.getChildAt(1).getChild("geometry", 0).getValue().getValue(), is("0.5 104 0 0"));
+        assertThat(featureCollection.getChildAt(1).getChild("geometry", 0).getValue().getValue(), is("0.5 104 0 0; 0.5 105 0 0"));
     }
 
     @Test
@@ -144,9 +144,9 @@ public class GeoJsonExternalInstanceTest {
     }
 
     @Test
-    public void parse_throwsException_whenGeometryNotPoint() {
+    public void parse_throwsException_whenGeometryNotSupported() {
         try {
-            GeoJsonExternalInstance.parse("id", r("feature-collection-with-line.geojson").toString());
+            GeoJsonExternalInstance.parse("id", r("feature-collection-with-unsupported-type.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected

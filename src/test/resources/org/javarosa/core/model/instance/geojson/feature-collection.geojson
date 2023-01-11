@@ -19,15 +19,15 @@
         {
             "type": "Feature",
             "geometry": {
-                "type": "Point",
+                "type": "LineString",
                 "coordinates": [
-                    104,
-                    0.5
+                    [104, 0.5],
+                    [105, 0.5]
                 ]
             },
             "properties": {
                 "id": "67abie",
-                "name": "Your cool point",
+                "name": "Your cool line",
                 "foo": "quux",
                 "special-property": "special value"
             }
