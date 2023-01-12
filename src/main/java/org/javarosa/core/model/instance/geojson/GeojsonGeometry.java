@@ -41,13 +41,18 @@ public class GeojsonGeometry {
 
             return stringJoiner.toString();
         } else if (type.equals("Polygon")) {
-            StringJoiner stringJoiner = new StringJoiner("; ");
-            for (Object item : (List<Object>) coordinates.get(0)) {
-                List<Object> point = (List<Object>) item;
-                stringJoiner.add(point.get(1) + " " + point.get(0) + " 0 0");
+            if (!coordinates.isEmpty()) {
+                StringJoiner stringJoiner = new StringJoiner("; ");
+                for (Object item : (List<Object>) coordinates.get(0)) {
+                    List<Object> point = (List<Object>) item;
+                    stringJoiner.add(point.get(1) + " " + point.get(0) + " 0 0");
+                }
+
+                return stringJoiner.toString();
+            } else {
+                return "";
             }
 
-            return stringJoiner.toString();
         } else {
             throw new IOException("Only Points, LineStrings, Polygons and MultiPoints are currently supported");
         }
