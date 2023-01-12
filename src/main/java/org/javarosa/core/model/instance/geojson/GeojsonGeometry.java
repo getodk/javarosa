@@ -32,7 +32,7 @@ public class GeojsonGeometry {
     public String getOdkCoordinates() throws IOException {
         if (type.equals("Point")) {
             return coordinates.get(1) + " " + coordinates.get(0) + " 0 0";
-        } else if (type.equals("LineString")) {
+        } else if (type.equals("LineString") || type.equals("MultiPoint")) {
             StringJoiner stringJoiner = new StringJoiner("; ");
             for (Object item : coordinates) {
                 List<Object> point = (List<Object>) item;
@@ -41,7 +41,7 @@ public class GeojsonGeometry {
 
             return stringJoiner.toString();
         } else {
-            throw new IOException("Only Points, LineString are currently supported");
+            throw new IOException("Only Points, LineStrings and MultiPoints are currently supported");
         }
     }
 }

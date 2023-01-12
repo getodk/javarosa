@@ -31,6 +31,20 @@
                 "foo": "quux",
                 "special-property": "special value"
             }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [52, 3],
+                    [54, 4]
+                ]
+            },
+            "properties": {
+                "id": "24htyl",
+                "name": "Your cool multi point"
+            }
         }
     ]
 }
