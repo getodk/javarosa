@@ -530,11 +530,11 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
     }
 
-    // Users use relevance on calculates to ensure that calculations are only run when the values
-    // they need are populated. Using relevance is easier than adding a condition.
+    // Users use relevance on calculates to ensure that calculated values are only exposed when all their
+    // references are populated. Using relevance is easier than adding a condition.
     @Test
     public void relevance_appliesToElementsWithoutControls() throws IOException, XFormParser.ParseException {
-        Scenario scenario = Scenario.init("Relevance on calculate", html(
+        Scenario scenario = Scenario.init(html(
             head(
                 title("Relevance on calculate"),
                 model(
@@ -544,17 +544,81 @@ public class TriggerableDagTest {
                         t("c2")
                     )),
                     bind("/data/q1").type("string"),
-                    bind("/data/c1").calculate("2 * 2").relevant("/data/q1 = 'yes'"),
+                    bind("/data/c1").calculate("concat('q1: ', /data/q1)").relevant("/data/q1 = 'yes'"),
                     bind("/data/c2").calculate("/data/c1")
                 )),
             body(
                 input("/data/q1")
             )));
 
+        // Without relevance, the answer would be "q1:"
         assertThat(scenario.answerOf("/data/c2"), is(nullValue()));
 
         scenario.answer("/data/q1", "yes");
-        assertThat(scenario.answerOf("/data/c2"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/c2"), is(stringAnswer("q1: yes")));
+    }
+
+    @Test
+    public void multWithEmptyOperand_evaluatesToEmpty() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Calculate with empty operand"),
+                model(
+                    mainInstance(t("data id=\"calculate-empty\"",
+                        t("q1"),
+                        t("c1"),
+                        t("c2")
+                    )),
+                    bind("/data/q1").type("integer"),
+                    bind("/data/c1").calculate("2 * /data/q1"),
+                    bind("/data/c2").calculate("/data/c1")
+                )),
+            body(
+                input("/data/q1"),
+                input("/data/c2")
+            )));
+
+        assertThat(scenario.answerOf("/data/c1"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/c2"), is(nullValue()));
+
+        scenario.answer("/data/q1", "7");
+        assertThat(scenario.answerOf("/data/c1"), is(intAnswer(14)));
+        assertThat(scenario.answerOf("/data/c2"), is(intAnswer(14)));
+    }
+
+    @Test
+    public void calculateWithOneEmptyOperand_evaluatesToEmpty() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Calculate with empty operand"),
+                model(
+                    mainInstance(t("data id=\"calculate-empty\"",
+                        t("a"),
+                        t("b"),
+                        t("a_plus_b"),
+                        t("disp")
+                    )),
+                    bind("/data/a").type("integer"),
+                    bind("/data/b").type("integer"),
+                    bind("/data/a_plus_b").calculate("/data/a + /data/b"),
+                    bind("/data/disp").calculate("/data/a_plus_b")
+                )),
+            body(
+                input("/data/a"),
+                input("/data/b"),
+                input("/data/disp")
+            )));
+
+        assertThat(scenario.answerOf("/data/a_plus_b"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/disp"), is(nullValue()));
+
+        scenario.answer("/data/a", "7");
+        assertThat(scenario.answerOf("/data/a_plus_b"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/disp"), is(nullValue()));
+
+        scenario.answer("/data/b", "3");
+        assertThat(scenario.answerOf("/data/a_plus_b"), is(intAnswer(10)));
+        assertThat(scenario.answerOf("/data/disp"), is(intAnswer(10)));
     }
 
     /**
