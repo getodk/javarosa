@@ -22,7 +22,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -486,6 +488,9 @@ public class XPathFuncExpr extends XPathExpression {
                 return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumeric(argVals[1]).longValue());
 
             throw new XPathUnhandledException("function \'randomize\' requires 1 or 2 arguments. " + args.length + " provided.");
+        } else if (name.equals("base64-decode")) {
+            assertArgsCount(name, args, 1);
+            return base64Decode(argVals[0]);
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
@@ -1245,6 +1250,13 @@ public class XPathFuncExpr extends XPathExpression {
         String re = toString(o2);
 
         return Pattern.matches(re, str);
+    }
+
+    private static String base64Decode(Object o1) {
+        String base64String = toString(o1);
+
+        byte[] decoded = Base64.getDecoder().decode(base64String.getBytes(StandardCharsets.UTF_8));
+        return new String(decoded);
     }
 
     private static Object[] subsetArgList(Object[] args, int start) {
