@@ -20,14 +20,14 @@ import static org.javarosa.xpath.expr.Encoding.BASE64;
 import static org.javarosa.xpath.expr.Encoding.HEX;
 import static org.junit.Assert.assertEquals;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class EncodingTest {
+public class EncodingEncodeTest {
   @Parameterized.Parameter(value = 0)
   public String testName;
 
@@ -51,7 +51,7 @@ public class EncodingTest {
   }
 
   @Test
-  public void encodes_byte_arrays() throws UnsupportedEncodingException {
-    assertEquals(expectedOutput, encodingMethod.encode(input.getBytes("UTF-8")));
+  public void encodes_byte_arrays()  {
+    assertEquals(expectedOutput, encodingMethod.encode(input.getBytes(StandardCharsets.UTF_8)));
   }
 }

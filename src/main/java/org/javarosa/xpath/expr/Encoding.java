@@ -15,7 +15,8 @@
  */
 package org.javarosa.xpath.expr;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 /**
@@ -32,12 +33,23 @@ enum Encoding {
             }
             return sb.toString();
         }
+
+        @Override
+        byte[] decode(byte[] bytes) {
+            int len = bytes.length;
+            byte[] data = new byte[len / 2];
+            for (int i = 0; i < len; i += 2) {
+                data[i / 2] = (byte) ((Character.digit(bytes[i], 16) << 4)
+                    + Character.digit(bytes[i+1], 16));
+            }
+            return data;
+        }
     },
     BASE64("base64") {
+        // Copied from: https://github.com/brsanthu/migbase64/blob/master/src/main/java/com/migcomponents/migbase64/Base64.java
+        // Irrelevant after Java8
         @Override
         String encode(byte[] sArr) {
-            // Copied from: https://github.com/brsanthu/migbase64/blob/master/src/main/java/com/migcomponents/migbase64/Base64.java
-            // Irrelevant after Java8
             int sLen = sArr.length;
             int sOff = 0;
 
@@ -65,12 +77,47 @@ enum Encoding {
                 dArr[dLen - 1] = '=';
             }
 
-            try {
-                return new String(dArr, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                // It’s unlikely that UTF-8 would not be supported
-                throw new RuntimeException("Encoding to base64 failed to use UTF-8");
+            return new String(dArr, StandardCharsets.UTF_8);
+        }
+
+        @Override
+        public byte[] decode(byte[] sArr) {
+            int sepCnt = 0;
+            for (byte b : sArr)
+                if (IA[b & 0xff] < 0)
+                    sepCnt++;
+
+            if ((sArr.length - sepCnt) % 4 != 0)
+                return new byte[0];
+
+            int pad = 0;
+            for (int i = sArr.length; i > 1 && IA[sArr[--i] & 0xff] <= 0; )
+                if (sArr[i] == '=')
+                    pad++;
+
+            int len = ((sArr.length - sepCnt) * 6 >> 3) - pad;
+
+            byte[] dArr = new byte[len];
+
+            for (int s = 0, d = 0; d < len; ) {
+                int i = 0;
+                for (int j = 0; j < 4; j++) {
+                    int c = IA[sArr[s++] & 0xff];
+                    if (c >= 0)
+                        i |= c << (18 - j * 6);
+                    else
+                        j--;
+                }
+
+                dArr[d++] = (byte) (i >> 16);
+                if (d < len) {
+                    dArr[d++] = (byte) (i >> 8);
+                    if (d < len)
+                        dArr[d++] = (byte) i;
+                }
             }
+
+            return dArr;
         }
     };
 
@@ -92,5 +139,15 @@ enum Encoding {
 
     private static final char[] BASE_64_TBL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
 
+    private static final int[] IA = new int[256];
+    static {
+        Arrays.fill(IA, -1);
+        for (int i = 0, iS = BASE_64_TBL.length; i < iS; i++)
+            IA[BASE_64_TBL[i]] = i;
+        IA['='] = 0;
+    }
+
     abstract String encode(byte[] bytes);
+
+    abstract byte[] decode(byte[] bytes);
 }

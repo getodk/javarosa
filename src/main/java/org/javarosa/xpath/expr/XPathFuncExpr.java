@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1255,8 +1254,8 @@ public class XPathFuncExpr extends XPathExpression {
     private static String base64Decode(Object o1) {
         String base64String = toString(o1);
 
-        byte[] decoded = Base64.getDecoder().decode(base64String.getBytes(StandardCharsets.UTF_8));
-        return new String(decoded);
+        byte[] decoded = Encoding.BASE64.decode(base64String.getBytes(StandardCharsets.UTF_8));
+        return new String(decoded, StandardCharsets.UTF_8);
     }
 
     private static Object[] subsetArgList(Object[] args, int start) {

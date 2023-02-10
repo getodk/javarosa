@@ -36,6 +36,6 @@ public class EncodingDecodeTest {
 
     @Test
     public void decodes_byte_arrays() {
-        assertEquals(expectedOutput, encodingMethod.decode(input.getBytes(StandardCharsets.UTF_8)));
+        assertEquals(expectedOutput, new String(encodingMethod.decode(input.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
     }
 }
