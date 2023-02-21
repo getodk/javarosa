@@ -160,6 +160,8 @@ dependencies {
     // Be sure to update dependencies in pom.xml to match
     implementation 'joda-time:joda-time:2.10.13'
     implementation 'org.slf4j:slf4j-api:1.7.33'
+
+    // Upgrade to version higher than 2.13.x when Collect minSDK >= 26 (https://github.com/FasterXML/jackson-databind#android)
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
     // Upgrade to version higher than 1.4 when Collect minSDK >= 26
