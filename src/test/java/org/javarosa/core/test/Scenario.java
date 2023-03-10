@@ -26,6 +26,7 @@ import org.javarosa.core.model.ValidateOutcome;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -510,6 +511,21 @@ public class Scenario {
     }
 
     /**
+     * Answers with an double value the question at the form index
+     * corresponding to the provided reference.
+     * <p>
+     * This method has side effects:
+     * - It will create all the required middle and end repeat group instances
+     * - It changes the current form index
+     */
+    public AnswerResult answer(String xPath, double value) {
+        createMissingRepeats(xPath);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(value);
+    }
+
+    /**
      * Answers with a boolean value the question at the form index
      * corresponding to the provided reference.
      * <p>
@@ -552,6 +568,13 @@ public class Scenario {
      */
     public AnswerResult answer(int value) {
         return answer(new IntegerData(value));
+    }
+
+    /**
+     * Answers the question at the form index
+     */
+    public AnswerResult answer(double value) {
+        return answer(new DecimalData(value));
     }
 
     /**

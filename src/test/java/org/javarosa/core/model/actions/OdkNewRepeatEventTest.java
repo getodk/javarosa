@@ -90,6 +90,34 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
+    public void setOtherThanIntegerValueOnRepeatWithCount_convertsValueToInteger() throws XFormParser.ParseException {
+        Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
+
+        // String
+        scenario.answer("/data/repeat-count", "1");
+        while (!scenario.atTheEndOfForm()) {
+            scenario.next();
+        }
+        assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(0));
+
+        // Decimal
+        scenario.jumpToBeginningOfForm();
+        scenario.answer("/data/repeat-count", 2.5);
+        while (!scenario.atTheEndOfForm()) {
+            scenario.next();
+        }
+        assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(2));
+
+        // Long
+        scenario.jumpToBeginningOfForm();
+        scenario.answer("/data/repeat-count", 3L);
+        while (!scenario.atTheEndOfForm()) {
+            scenario.next();
+        }
+        assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(3));
+    }
+
+    @Test
     public void repeatInFormDefInstance_neverFiresNewRepeatEvent() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
