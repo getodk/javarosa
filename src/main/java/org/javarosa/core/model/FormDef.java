@@ -28,6 +28,7 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.helper.AnswerDataUtil;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
@@ -579,9 +580,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         + repeat.getCountReference().getReference().toString());
                 }
                 // get the total multiplicity possible
-                IAnswerData count = countNode.getValue();
-                long fullcount = count == null ? 0 : (Integer) count.getValue();
-
+                long fullcount = AnswerDataUtil.answerDataToInt(countNode.getValue());
                 if (fullcount <= currentMultiplicity) {
                     return false;
                 }
