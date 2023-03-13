@@ -266,6 +266,34 @@ public class FormDefTest {
         scenario.next();
         assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]/inner[0]")));
     }
+
+    @Test
+    public void innerRepeatGroupIsIrrelevant_whenItsParentRepeatGroupDoesNotExist() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Nested repeat relevance", html(
+            head(
+                title("Nested repeat relevance"),
+                model(
+                    mainInstance(t("data id=\"nested-repeat-relevance\"",
+                        t("outer",
+                            t("inner",
+                                t("q1")
+                            )
+                        )
+                    ))
+                )),
+            body(
+                repeat("/data/outer",
+                    repeat("/data/outer/inner",
+                        input("/data/outer/inner/q1")
+                    )
+                )
+            )));
+
+
+        FormDef formDef = scenario.getFormDef();
+        // outer[1] does not exist at this moment, we only have outer[0]. Checking if its inner repeat group is relevant should be possible and return false.
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer[1]/inner[0]")), is(false));
+    }
     //endregion
 
     @Test
