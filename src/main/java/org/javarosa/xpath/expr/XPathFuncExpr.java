@@ -507,8 +507,8 @@ public class XPathFuncExpr extends XPathExpression {
 
     private static void assertArgsCount(String name, Object[] args, int count) {
         if (args.length != count) {
-            throw new XPathUnhandledException("function \'" + name + "\' requires " +
-                count + " arguments. Only " + args.length + " provided.");
+            throw new XPathUnhandledException("function '" + name + "'. Requires " +
+                count + " arguments but " + args.length + " provided.");
         }
     }
 

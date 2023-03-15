@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
@@ -13,11 +14,13 @@ import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Arrays;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathUnhandledException;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -72,6 +75,32 @@ public class Base64DecodeTest {
     }
 
     public static class InvalidValuesTest {
+        @Test
+        public void base64DecodeFunction_throwsWhenNotExactlyOneArg() throws IOException, XFormParser.ParseException {
+            try {
+                Scenario scenario = Scenario.init("Invalid base64 string", html(
+                    head(
+                        title("Invalid base64 string"),
+                        model(
+                            mainInstance(t("data id=\"base64\"",
+                                t("text", "a"),
+                                t("decoded")
+                            )),
+                            bind("/data/text").type("string"),
+                            bind("/data/decoded").type("string").calculate("base64-decode()")
+                        )
+                    ),
+                    body(
+                        input("/data/text")
+                    ))
+                );
+
+                fail("RuntimeException caused by XPathUnhandledException expected");
+            } catch (RuntimeException e) {
+                assertThat(e.getCause(), instanceOf(XPathUnhandledException.class));
+            }
+        }
+
         @Test
         public void base64DecodeFunction_returnsEmptyStringWhenInputInvalid() throws IOException, XFormParser.ParseException {
             Scenario scenario = Scenario.init("Invalid base64 string", html(
