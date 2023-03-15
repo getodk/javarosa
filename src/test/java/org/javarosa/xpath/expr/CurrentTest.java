@@ -28,7 +28,7 @@ import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
-public class XPathPathExprCurrentTest {
+public class CurrentTest {
     private Scenario scenario;
 
     @Before

@@ -49,7 +49,7 @@ import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
-public class XPathFuncExprRandomizeTest {
+public class RandomizeTest {
 
     private FormDef formDef;
 

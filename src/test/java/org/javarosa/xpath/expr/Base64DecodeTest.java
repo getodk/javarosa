@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Enclosed.class)
-public class XPathFuncExprBase64DecodeTest {
+public class Base64DecodeTest {
 
     @RunWith(Parameterized.class)
     public static class ValidValuesTest {
