@@ -24,7 +24,7 @@ import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
-public class XPathPathExprCurrentGroupCountRefTest {
+public class CurrentGroupCountRefTest {
     private Scenario scenario;
 
     @Before

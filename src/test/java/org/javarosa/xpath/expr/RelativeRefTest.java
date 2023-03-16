@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
-public class XPathPathExprRelativeRefTest {
+public class RelativeRefTest {
     @Test
     public void predicateInRelativeRef_isAppliedToCorrectLevel() throws XPathSyntaxException {
         XPathExpression predicate = XPathParseTool.parseXPath("position() = ../count");
