@@ -16,23 +16,31 @@
 
 package org.javarosa.core.model.condition;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
+import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A collection of objects that affect the evaluation of an expression, like
  * function handlers and (not supported) variable bindings.
  */
 public class EvaluationContext {
+
+    public static boolean cachingEnabled;
+    public static Map<XPathExpression, List<TreeReference>> cachedPassed = new HashMap<>();
+
     /**
      * Unambiguous anchor reference for relative paths
      */
@@ -312,20 +320,37 @@ public class EvaluationContext {
             boolean firstTime = true;
             List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
-                for (int i = 0; i < treeReferences.size(); ++i) {
-                    //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                    TreeReference treeRef = treeReferences.get(i);
+                boolean cachingSupported = cachingEnabled && xpe instanceof XPathEqExpr &&
+                    !(((XPathEqExpr) xpe).a instanceof XPathFuncExpr) &&
+                    !(((XPathEqExpr) xpe).b instanceof XPathFuncExpr);
 
-                    //test the predicate on the treeElement
-                    EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
-                    Object o = xpe.eval(sourceInstance, evalContext);
-                    if (o instanceof Boolean) {
-                        boolean testOutcome = (Boolean) o;
-                        if (testOutcome) {
-                            passed.add(treeRef);
+                if (cachingSupported && cachedPassed.containsKey(xpe)) {
+                    passed.addAll(cachedPassed.get(xpe));
+                } else {
+                    if (cachingSupported) {
+                        cachedPassed.put(xpe, new ArrayList<>());
+                    }
+
+                    for (int i = 0; i < treeReferences.size(); ++i) {
+                        //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+                        TreeReference treeRef = treeReferences.get(i);
+
+                        //test the predicate on the treeElement
+                        EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
+                        Object o = xpe.eval(sourceInstance, evalContext);
+                        if (o instanceof Boolean) {
+                            boolean testOutcome = (Boolean) o;
+                            if (testOutcome) {
+                                passed.add(treeRef);
+
+                                if (cachingSupported) {
+                                    cachedPassed.get(xpe).add(treeRef);
+                                }
+                            }
                         }
                     }
                 }
+
                 firstTime = false;
                 treeReferences.clear();
                 treeReferences.addAll(passed);

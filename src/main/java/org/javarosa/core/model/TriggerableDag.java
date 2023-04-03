@@ -514,6 +514,8 @@ public class TriggerableDag {
                                                          TreeReference changedRef, Set<QuickTriggerable> affectAllRepeatInstances, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> evaluated = new HashSet<>();
 
+        EvaluationContext.cachingEnabled = true;
+
         // Evaluate the provided set of triggerables in the order they appear
         // in the sorted DAG to ensure the correct sequence of evaluations
         for (QuickTriggerable qt : triggerablesDAG)
@@ -523,6 +525,8 @@ public class TriggerableDag {
                 evaluated.add(qt);
             }
 
+        EvaluationContext.cachingEnabled = false;
+        EvaluationContext.cachedPassed.clear();
         return evaluated;
     }
 
