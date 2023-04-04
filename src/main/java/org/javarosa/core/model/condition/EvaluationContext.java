@@ -35,9 +35,6 @@ import java.util.List;
  */
 public class EvaluationContext {
 
-    public static final PredicateCache DISABLED_CACHING = ((predicate, onMiss) -> onMiss.get());
-    public static PredicateCache predicateCache = DISABLED_CACHING;
-
     /**
      * Unambiguous anchor reference for relative paths
      */
@@ -65,6 +62,9 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
+    private PredicateCache predicateCache = ((predicate, onMiss) -> onMiss.get());
+
+
     /**
      * Copy Constructor
      **/
@@ -89,10 +89,13 @@ public class EvaluationContext {
         //and is fixed on the context. Anything that changes the context should
         //invalidate this
         currentContextPosition = base.currentContextPosition;
+
+        predicateCache = base.predicateCache;
     }
 
-    private EvaluationContext(EvaluationContext base, PredicateCache predicateCache) {
+    public EvaluationContext(EvaluationContext base, PredicateCache predicateCache) {
         this(base);
+        this.predicateCache = predicateCache;
     }
 
     public EvaluationContext(EvaluationContext base, TreeReference context) {

@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static org.javarosa.core.model.condition.EvaluationContext.DISABLED_CACHING;
 
 public class TriggerableDag {
     private static final Logger logger = LoggerFactory.getLogger(TriggerableDag.class);
@@ -515,18 +514,17 @@ public class TriggerableDag {
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger,
                                                          TreeReference changedRef, Set<QuickTriggerable> affectAllRepeatInstances, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> evaluated = new HashSet<>();
-        EvaluationContext.predicateCache = new NonFunctionInMemPredicateCache();
+        EvaluationContext cachingContext = new EvaluationContext(evalContext, new NonFunctionInMemPredicateCache());
 
         // Evaluate the provided set of triggerables in the order they appear
         // in the sorted DAG to ensure the correct sequence of evaluations
         for (QuickTriggerable qt : triggerablesDAG)
             if (toTrigger.contains(qt) && !alreadyEvaluated.contains(qt)) {
-                evaluateTriggerable(mainInstance, evalContext, qt, affectAllRepeatInstances.contains(qt), changedRef);
+                evaluateTriggerable(mainInstance, cachingContext, qt, affectAllRepeatInstances.contains(qt), changedRef);
 
                 evaluated.add(qt);
             }
 
-        EvaluationContext.predicateCache = DISABLED_CACHING;
         return evaluated;
     }
 
