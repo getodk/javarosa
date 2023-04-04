@@ -745,20 +745,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     private void resetEvaluationContext() {
-        EvaluationContext ec = new EvaluationContext(null);
-        ec = new EvaluationContext(mainInstance, getFormInstances(), ec);
-        initEvalContext(ec);
-        this.exprEvalContext = ec;
+        this.exprEvalContext = initEvalContext();
     }
 
     public EvaluationContext getEvaluationContext() {
         return this.exprEvalContext;
     }
 
-    /**
-     * @param ec The new Evaluation Context
-     */
-    private void initEvalContext(EvaluationContext ec) {
+    private EvaluationContext initEvalContext() {
+        EvaluationContext ec = new EvaluationContext(mainInstance, getFormInstances(), new EvaluationContext(null));
+
         if (!ec.getFunctionHandlers().containsKey("jr:itext")) {
             final FormDef f = this;
             ec.addFunctionHandler(new IFunctionHandler() {
@@ -917,6 +913,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 }
             });
         }
+
+        return ec;
     }
 
     public String fillTemplateString(String template, TreeReference contextRef) {
