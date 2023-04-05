@@ -96,6 +96,8 @@ public class TriggerableDag {
      */
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
+    private boolean predicateCaching = true;
+
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
     }
@@ -514,13 +516,18 @@ public class TriggerableDag {
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger,
                                                          TreeReference changedRef, Set<QuickTriggerable> affectAllRepeatInstances, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> evaluated = new HashSet<>();
-        EvaluationContext cachingContext = new EvaluationContext(evalContext, new NonFunctionInMemPredicateCache());
+        EvaluationContext context;
+        if (predicateCaching) {
+            context = new EvaluationContext(evalContext, new NonFunctionInMemPredicateCache());
+        } else {
+            context = evalContext;
+        }
 
         // Evaluate the provided set of triggerables in the order they appear
         // in the sorted DAG to ensure the correct sequence of evaluations
         for (QuickTriggerable qt : triggerablesDAG)
             if (toTrigger.contains(qt) && !alreadyEvaluated.contains(qt)) {
-                evaluateTriggerable(mainInstance, cachingContext, qt, affectAllRepeatInstances.contains(qt), changedRef);
+                evaluateTriggerable(mainInstance, context, qt, affectAllRepeatInstances.contains(qt), changedRef);
 
                 evaluated.add(qt);
             }
@@ -727,4 +734,7 @@ public class TriggerableDag {
 
     // endregion
 
+    public void disablePredicateCaching() {
+        this.predicateCaching = false;
+    }
 }

@@ -1703,4 +1703,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public Extras<Externalizable> getExtras() {
         return extras;
     }
+
+    public void disablePredicateCaching() {
+        dagImpl.disablePredicateCaching();
+    }
 }
