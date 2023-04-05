@@ -6,7 +6,11 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class CachingRegressionTest {
+/**
+ * Scenarios that predicate caching (see {@link org.javarosa.core.model.condition.PredicateCache} could break
+ * (or has already broken).
+ */
+public class PredicateCachingRegressionTest {
 
     /**
      * A form with multiple secondary instances can have expressions with "equivalent" predicates that filter on
