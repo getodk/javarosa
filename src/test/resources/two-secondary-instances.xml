@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa"
+    xmlns:odk="http://www.opendatakit.org/xforms" xmlns="http://www.w3.org/2002/xforms">
+    <h:head>
+        <h:title>Two Secondary Instances</h:title>
+        <model odk:xforms-version="1.0.0">
+            <instance>
+                <data id="two-secondary-instances" version="1">
+                    <choice />
+                    <one />
+                    <two />
+                    <both />
+                </data>
+            </instance>
+            <instance id="instance_one">
+                <root>
+                    <item>
+                        <label>A</label>
+                        <name>a</name>
+                    </item>
+                    <item>
+                        <label>B</label>
+                        <name>b</name>
+                    </item>
+                </root>
+            </instance>
+            <instance id="instance_two">
+                <root>
+                    <item>
+                        <label>B</label>
+                        <name>b</name>
+                    </item>
+                    <item>
+                        <label>A</label>
+                        <name>a</name>
+                    </item>
+                </root>
+            </instance>
+            <bind nodeset="/data/choice" type="string" />
+            <bind calculate="instance('instance_one')/root/item[name=/data/choice]/label"
+                nodeset="/data/one" type="string" />
+            <bind calculate="instance('instance_two')/root/item[name=/data/choice]/label"
+                nodeset="/data/two" type="string" />
+            <bind nodeset="/data/both" readonly="true()" type="string" calculate="concat(/data/one,/data/two)" />
+        </model>
+    </h:head>
+    <h:body>
+        <select1 ref="/data/choice">
+            <label>Choice</label>
+            <item>
+                <label>A</label>
+                <value>a</value>
+            </item>
+        </select1>
+    </h:body>
+</h:html>

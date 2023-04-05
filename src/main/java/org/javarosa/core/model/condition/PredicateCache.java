@@ -15,5 +15,5 @@ import java.util.function.Supplier;
 public interface PredicateCache {
 
     @NotNull
-    List<TreeReference> get(XPathExpression predicate, Supplier<List<TreeReference>> onMiss);
+    List<TreeReference> get(TreeReference reference, XPathExpression predicate, Supplier<List<TreeReference>> onMiss);
 }

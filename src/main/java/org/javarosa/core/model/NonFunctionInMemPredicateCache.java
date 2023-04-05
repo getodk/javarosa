@@ -18,21 +18,27 @@ import java.util.function.Supplier;
  */
 public class NonFunctionInMemPredicateCache implements PredicateCache {
 
-    public Map<XPathExpression, List<TreeReference>> cachedEvaluations = new HashMap<>();
+    public Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
     @Override
     @NotNull
-    public List<TreeReference> get(XPathExpression predicate, Supplier<List<TreeReference>> onMiss) {
-        if (cachedEvaluations.containsKey(predicate)) {
-            return cachedEvaluations.get(predicate);
+    public List<TreeReference> get(TreeReference predicateTarget, XPathExpression predicate, Supplier<List<TreeReference>> onMiss) {
+        String key = getKey(predicateTarget, predicate);
+
+        if (cachedEvaluations.containsKey(key)) {
+            return cachedEvaluations.get(key);
         } else {
             List<TreeReference> references = onMiss.get();
             if (isCacheable(predicate)) {
-                cachedEvaluations.put(predicate, references);
+                cachedEvaluations.put(key, references);
             }
 
             return references;
         }
+    }
+
+    private String getKey(TreeReference reference, XPathExpression predicate) {
+        return reference.toString() + predicate.toString();
     }
 
     private boolean isCacheable(XPathExpression predicate) {
