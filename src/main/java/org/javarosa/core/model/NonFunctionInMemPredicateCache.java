@@ -42,8 +42,6 @@ public class NonFunctionInMemPredicateCache implements PredicateCache {
     }
 
     private boolean isCacheable(XPathExpression predicate) {
-        return predicate instanceof XPathEqExpr &&
-            !(((XPathEqExpr) predicate).a instanceof XPathFuncExpr) &&
-            !(((XPathEqExpr) predicate).b instanceof XPathFuncExpr);
+        return !predicate.hasFunc();
     }
 }

@@ -34,6 +34,11 @@ public abstract class XPathUnaryOpExpr extends XPathOpExpr {
         this.a = a;
     }
 
+    @Override
+    public boolean hasFunc() {
+        return a.hasFunc();
+    }
+
     public boolean equals (Object o) {
         if (o instanceof XPathUnaryOpExpr) {
             XPathUnaryOpExpr x = (XPathUnaryOpExpr)o;

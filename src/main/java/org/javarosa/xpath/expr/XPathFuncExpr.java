@@ -1358,4 +1358,9 @@ public class XPathFuncExpr extends XPathExpression {
 
     }
 
+    @Override
+    public boolean hasFunc() {
+        return true;
+    }
+
 }

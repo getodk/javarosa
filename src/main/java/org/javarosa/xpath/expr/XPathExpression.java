@@ -247,4 +247,6 @@ public abstract class XPathExpression implements Externalizable, Serializable {
     public int hashCode () {
         return this.toString().hashCode();
     }
+
+    public abstract boolean hasFunc();
 }

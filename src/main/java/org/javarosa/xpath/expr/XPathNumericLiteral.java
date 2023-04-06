@@ -39,6 +39,11 @@ public class XPathNumericLiteral extends XPathExpression {
         return new Double(d);
     }
 
+    @Override
+    public boolean hasFunc() {
+        return false;
+    }
+
     public String toString () {
         return "{num:" + Double.toString(d) + "}";
     }

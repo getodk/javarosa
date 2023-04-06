@@ -57,6 +57,11 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
         return new Double(result);
     }
 
+    @Override
+    public boolean hasFunc() {
+        return a.hasFunc() || b.hasFunc();
+    }
+
     public String toString () {
         String sOp = null;
 
