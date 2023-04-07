@@ -21,6 +21,7 @@ import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.measure.Measure;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
 
@@ -333,7 +334,10 @@ public class EvaluationContext {
 
                         //test the predicate on the treeElement
                         EvaluationContext evalContext = rescope(treeRef, (firstTimeCapture ? treeRef.getMultLast() : i));
+
+                        Measure.log("PredicateEvaluations");
                         Object o = xpe.eval(sourceInstance, evalContext);
+
                         if (o instanceof Boolean) {
                             boolean testOutcome = (Boolean) o;
                             if (testOutcome) {
