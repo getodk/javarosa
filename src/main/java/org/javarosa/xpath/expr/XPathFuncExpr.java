@@ -1361,10 +1361,11 @@ public class XPathFuncExpr extends XPathExpression {
 
     @Override
     public boolean isNotIdempotent() {
-        return Arrays.stream(IDEMPOTENT_FUNCTIONS).noneMatch(id.toString()::equals);
+        return Arrays.stream(IDEMPOTENT_FUNCTIONS).noneMatch(id.toString()::equals) ||
+            Arrays.stream(args).anyMatch(XPathExpression::isNotIdempotent);
     }
 
-    private static String[] IDEMPOTENT_FUNCTIONS = new String[]{
+    private static final String[] IDEMPOTENT_FUNCTIONS = new String[]{
         "regex",
         "starts-with",
         "ends-with",
