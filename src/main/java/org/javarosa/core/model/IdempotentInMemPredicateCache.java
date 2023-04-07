@@ -2,9 +2,7 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.PredicateCache;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
-import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -13,10 +11,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- *  In memory implementation of a {@link PredicateCache}. Cannot cache predicate evaluations where either side is
- *  a function.
+ *  In memory implementation of a {@link PredicateCache}. Cannot cache predicate evaluations that contain a
+ *  non-idempotent function.
  */
-public class NonFunctionInMemPredicateCache implements PredicateCache {
+public class IdempotentInMemPredicateCache implements PredicateCache {
 
     public Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
@@ -42,6 +40,6 @@ public class NonFunctionInMemPredicateCache implements PredicateCache {
     }
 
     private boolean isCacheable(XPathExpression predicate) {
-        return !predicate.hasFunc();
+        return !predicate.isNotIdempotent();
     }
 }

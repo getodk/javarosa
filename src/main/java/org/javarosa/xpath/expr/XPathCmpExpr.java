@@ -115,8 +115,8 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
     }
 
     @Override
-    public boolean hasFunc() {
-        return a.hasFunc() || b.hasFunc();
+    public boolean isNotIdempotent() {
+        return a.isNotIdempotent() || b.isNotIdempotent();
     }
 
     private boolean handled(Object a, Object b, Object sentinal, List<Object> pivots) throws UnpivotableExpressionException {

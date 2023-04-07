@@ -38,8 +38,8 @@ public class XPathUnionExpr extends XPathBinaryOpExpr {
     }
 
     @Override
-    public boolean hasFunc() {
-        return a.hasFunc() || b.hasFunc();
+    public boolean isNotIdempotent() {
+        return a.isNotIdempotent() || b.isNotIdempotent();
     }
 
     public String toString () {

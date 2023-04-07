@@ -40,7 +40,7 @@ public class XPathStringLiteral extends XPathExpression {
     }
 
     @Override
-    public boolean hasFunc() {
+    public boolean isNotIdempotent() {
         return false;
     }
 

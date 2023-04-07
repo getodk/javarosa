@@ -518,7 +518,7 @@ public class TriggerableDag {
         Set<QuickTriggerable> evaluated = new HashSet<>();
         EvaluationContext context;
         if (predicateCaching) {
-            context = new EvaluationContext(evalContext, new NonFunctionInMemPredicateCache());
+            context = new EvaluationContext(evalContext, new IdempotentInMemPredicateCache());
         } else {
             context = evalContext;
         }

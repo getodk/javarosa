@@ -102,7 +102,7 @@ public class XPathFilterExpr extends XPathExpression {
     }
 
     @Override
-    public boolean hasFunc() {
-        return x.hasFunc() || Arrays.stream(predicates).anyMatch(XPathExpression::hasFunc);
+    public boolean isNotIdempotent() {
+        return x.isNotIdempotent() || Arrays.stream(predicates).anyMatch(XPathExpression::isNotIdempotent);
     }
 }

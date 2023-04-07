@@ -40,7 +40,7 @@ public class XPathVariableReference extends XPathExpression {
     }
 
     @Override
-    public boolean hasFunc() {
+    public boolean isNotIdempotent() {
         return false;
     }
 

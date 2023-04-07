@@ -35,8 +35,8 @@ public abstract class XPathUnaryOpExpr extends XPathOpExpr {
     }
 
     @Override
-    public boolean hasFunc() {
-        return a.hasFunc();
+    public boolean isNotIdempotent() {
+        return a.isNotIdempotent();
     }
 
     public boolean equals (Object o) {

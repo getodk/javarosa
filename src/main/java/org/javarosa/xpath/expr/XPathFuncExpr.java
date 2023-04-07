@@ -16,18 +16,6 @@
 
 package org.javarosa.xpath.expr;
 
-import static java.lang.Double.NaN;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -51,6 +39,19 @@ import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.joda.time.DateTime;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static java.lang.Double.NaN;
 
 /**
  * Representation of an xpath function expression.
@@ -1359,8 +1360,24 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     @Override
-    public boolean hasFunc() {
-        return true;
+    public boolean isNotIdempotent() {
+        return Arrays.stream(IDEMPOTENT_FUNCTIONS).noneMatch(id.toString()::equals);
     }
 
+    private static String[] IDEMPOTENT_FUNCTIONS = new String[]{
+        "regex",
+        "starts-with",
+        "ends-with",
+        "contains",
+        "substr",
+        "substring-before",
+        "substring-after",
+        "translate",
+        "string-length",
+        "normalize-space",
+        "concat",
+        "join",
+        "boolean-from-string",
+        "string"
+    };
 }
