@@ -418,9 +418,9 @@ public class XPathPathExpr extends XPathExpression {
     }
 
     @Override
-    public boolean isNotIdempotent() {
-        return (filtExpr != null && filtExpr.isNotIdempotent()) || Arrays.stream(steps).anyMatch((step) -> {
-            return Arrays.stream(step.predicates).anyMatch(XPathExpression::isNotIdempotent);
+    public boolean isIdempotent() {
+        return (filtExpr == null || filtExpr.isIdempotent()) && Arrays.stream(steps).allMatch((step) -> {
+            return Arrays.stream(step.predicates).allMatch(XPathExpression::isIdempotent);
         });
     }
 }

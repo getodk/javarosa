@@ -1360,9 +1360,9 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     @Override
-    public boolean isNotIdempotent() {
-        return Arrays.stream(IDEMPOTENT_FUNCTIONS).noneMatch(id.toString()::equals) ||
-            Arrays.stream(args).anyMatch(XPathExpression::isNotIdempotent);
+    public boolean isIdempotent() {
+        return Arrays.asList(IDEMPOTENT_FUNCTIONS).contains(id.toString()) &&
+            Arrays.stream(args).allMatch(XPathExpression::isIdempotent);
     }
 
     private static final String[] IDEMPOTENT_FUNCTIONS = new String[]{

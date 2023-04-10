@@ -8,12 +8,12 @@ import static org.hamcrest.Matchers.equalTo;
 public class XPathFuncExprTest {
 
     @Test
-    public void isNotIdempotent_whenArgsContainsNonIdempotentFunc_returnsTrue() {
+    public void isIdempotent_whenArgsContainsNonIdempotentFunc_returnsFalse() {
         // string(random())
         XPathFuncExpr expr = new XPathFuncExpr(new XPathQName("string"), new XPathExpression[] {
             new XPathFuncExpr(new XPathQName("random"), new XPathExpression[] {})
         });
 
-        assertThat(expr.isNotIdempotent(), equalTo(true));
+        assertThat(expr.isIdempotent(), equalTo(false));
     }
 }

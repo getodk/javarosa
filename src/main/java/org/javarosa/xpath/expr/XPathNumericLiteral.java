@@ -40,8 +40,8 @@ public class XPathNumericLiteral extends XPathExpression {
     }
 
     @Override
-    public boolean isNotIdempotent() {
-        return false;
+    public boolean isIdempotent() {
+        return true;
     }
 
     public String toString () {

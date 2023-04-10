@@ -34,11 +34,6 @@ public abstract class XPathUnaryOpExpr extends XPathOpExpr {
         this.a = a;
     }
 
-    @Override
-    public boolean isNotIdempotent() {
-        return a.isNotIdempotent();
-    }
-
     public boolean equals (Object o) {
         if (o instanceof XPathUnaryOpExpr) {
             XPathUnaryOpExpr x = (XPathUnaryOpExpr)o;
@@ -46,6 +41,11 @@ public abstract class XPathUnaryOpExpr extends XPathOpExpr {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isIdempotent() {
+        return a.isIdempotent();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

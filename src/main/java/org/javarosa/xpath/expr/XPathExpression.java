@@ -249,7 +249,7 @@ public abstract class XPathExpression implements Externalizable, Serializable {
     }
 
     /**
-     * Returns true if this expression is not idempotent with respect to the current state of the form.
+     * Returns true if this expression is idempotent with respect to the current state of the form.
      */
-    public abstract boolean isNotIdempotent();
+    public abstract boolean isIdempotent();
 }

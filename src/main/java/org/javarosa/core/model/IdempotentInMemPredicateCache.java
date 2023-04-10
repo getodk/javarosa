@@ -40,6 +40,6 @@ public class IdempotentInMemPredicateCache implements PredicateCache {
     }
 
     private boolean isCacheable(XPathExpression predicate) {
-        return !predicate.isNotIdempotent();
+        return predicate.isIdempotent();
     }
 }
