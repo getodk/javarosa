@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.javarosa.core.model.condition.CachingPredicateFilter;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
@@ -522,10 +521,9 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            IdempotentInMemPredicateCache cache = new IdempotentInMemPredicateCache();
             context = new EvaluationContext(evalContext, Arrays.asList(
-                cache,
-                new CachingPredicateFilter(cache, new XPathEvalPredicateFilter())
+                new IdempotentInMemPredicateCache(),
+                new XPathEvalPredicateFilter()
             ));
         } else {
             context = evalContext;

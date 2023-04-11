@@ -348,14 +348,13 @@ public class EvaluationContext {
     }
 
     private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children) {
-        for (PredicateFilter predicateFilter : predicateFilterChain) {
-            List<TreeReference> filtered = predicateFilter.filter(sourceInstance, treeReference, predicate, children, this);
-            if (filtered != null) {
-                return filtered;
-            }
-        }
+        return filterWithPredicate(sourceInstance, treeReference, predicate, children, 0);
+    }
 
-        return children;
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i) {
+        return predicateFilterChain.get(i).filter(sourceInstance, treeReference, predicate, children, this, () -> {
+            return filterWithPredicate(sourceInstance, treeReference, predicate, children, i + 1);
+        });
     }
 
     public EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
