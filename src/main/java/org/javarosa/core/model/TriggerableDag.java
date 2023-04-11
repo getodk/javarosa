@@ -20,7 +20,6 @@ import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
-import org.javarosa.core.model.condition.XPathEvalPredicateFilter;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -40,7 +39,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 
 public class TriggerableDag {
     private static final Logger logger = LoggerFactory.getLogger(TriggerableDag.class);
@@ -521,10 +520,7 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            context = new EvaluationContext(evalContext, Arrays.asList(
-                new IdempotentInMemPredicateCache(),
-                new XPathEvalPredicateFilter()
-            ));
+            context = new EvaluationContext(evalContext, singletonList(new IdempotentInMemPredicateCache()));
         } else {
             context = evalContext;
         }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class XPathEvalPredicateFilter implements PredicateFilter {
+class XPathEvalPredicateFilter implements PredicateFilter {
 
     @NotNull
     @Override

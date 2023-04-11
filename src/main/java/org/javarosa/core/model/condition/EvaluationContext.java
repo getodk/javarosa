@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
 
@@ -94,9 +96,12 @@ public class EvaluationContext {
         predicateFilterChain = base.predicateFilterChain;
     }
 
-    public EvaluationContext(EvaluationContext base, List<PredicateFilter> predicateFilterChain) {
+    public EvaluationContext(EvaluationContext base, List<PredicateFilter> aroundPredicateFilterChain) {
         this(base);
-        this.predicateFilterChain = predicateFilterChain;
+        this.predicateFilterChain = Stream.concat(
+            aroundPredicateFilterChain.stream(),
+            predicateFilterChain.stream()
+        ).collect(Collectors.toList());
     }
 
     public EvaluationContext(EvaluationContext base, TreeReference context) {
