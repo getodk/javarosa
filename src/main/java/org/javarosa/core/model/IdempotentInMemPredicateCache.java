@@ -1,37 +1,33 @@
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.PredicateCache;
+import org.javarosa.core.model.condition.PredicateFilter;
+import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathExpression;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
-/**
- *  In memory implementation of a {@link PredicateCache}. Cannot cache predicate evaluations that contain a
- *  non-idempotent function.
- */
-public class IdempotentInMemPredicateCache implements PredicateCache {
+public class IdempotentInMemPredicateCache implements PredicateCache, PredicateFilter {
 
     public Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
+    @Nullable
     @Override
-    @NotNull
-    public List<TreeReference> get(TreeReference nodeSet, XPathExpression predicate, Supplier<List<TreeReference>> onMiss) {
+    public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext) {
         String key = getKey(nodeSet, predicate);
+        return cachedEvaluations.getOrDefault(key, null);
+    }
 
-        if (cachedEvaluations.containsKey(key)) {
-            return cachedEvaluations.get(key);
-        } else {
-            List<TreeReference> references = onMiss.get();
-            if (isCacheable(predicate)) {
-                cachedEvaluations.put(key, references);
-            }
-
-            return references;
+    @Override
+    public void cache(TreeReference nodeSet, XPathExpression predicate, List<TreeReference> treeReferences) {
+        String key = getKey(nodeSet, predicate);
+        if (isCacheable(predicate)) {
+            cachedEvaluations.put(key, treeReferences);
         }
     }
 

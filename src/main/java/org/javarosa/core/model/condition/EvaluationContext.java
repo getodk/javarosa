@@ -21,7 +21,6 @@ import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.measure.Measure;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
 
@@ -29,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 /**
  * A collection of objects that affect the evaluation of an expression, like
@@ -63,8 +64,7 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
-    private PredicateCache predicateCache = ((reference, predicate, onMiss) -> onMiss.get());
-
+    private List<PredicateFilter> predicateFilterChain = singletonList(new XPathEvalPredicateFilter());
 
     /**
      * Copy Constructor
@@ -91,12 +91,12 @@ public class EvaluationContext {
         //invalidate this
         currentContextPosition = base.currentContextPosition;
 
-        predicateCache = base.predicateCache;
+        predicateFilterChain = base.predicateFilterChain;
     }
 
-    public EvaluationContext(EvaluationContext base, PredicateCache predicateCache) {
+    public EvaluationContext(EvaluationContext base, List<PredicateFilter> predicateFilterChain) {
         this(base);
-        this.predicateCache = predicateCache;
+        this.predicateFilterChain = predicateFilterChain;
     }
 
     public EvaluationContext(EvaluationContext base, TreeReference context) {
@@ -348,31 +348,17 @@ public class EvaluationContext {
     }
 
     private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children) {
-        return predicateCache.get(treeReference, predicate, () -> {
-            List<TreeReference> predicatePassed = new ArrayList<>(children.size());
-            for (int i = 0; i < children.size(); ++i) {
-                //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                TreeReference treeRef = children.get(i);
-
-                //test the predicate on the treeElement
-                EvaluationContext evalContext = rescope(treeRef, i);
-
-                Measure.log("PredicateEvaluations");
-                Object o = predicate.eval(sourceInstance, evalContext);
-
-                if (o instanceof Boolean) {
-                    boolean testOutcome = (Boolean) o;
-                    if (testOutcome) {
-                        predicatePassed.add(treeRef);
-                    }
-                }
+        for (PredicateFilter predicateFilter : predicateFilterChain) {
+            List<TreeReference> filtered = predicateFilter.filter(sourceInstance, treeReference, predicate, children, this);
+            if (filtered != null) {
+                return filtered;
             }
+        }
 
-            return predicatePassed;
-        });
+        return children;
     }
 
-    private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
+    public EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
         EvaluationContext ec = new EvaluationContext(this, treeRef);
         // broken:
         ec.currentContextPosition = currentContextPosition;

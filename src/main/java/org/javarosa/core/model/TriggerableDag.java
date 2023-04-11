@@ -16,10 +16,12 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.condition.CachingPredicateFilter;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
+import org.javarosa.core.model.condition.XPathEvalPredicateFilter;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -39,6 +41,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -516,9 +519,14 @@ public class TriggerableDag {
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger,
                                                          TreeReference changedRef, Set<QuickTriggerable> affectAllRepeatInstances, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> evaluated = new HashSet<>();
+
         EvaluationContext context;
         if (predicateCaching) {
-            context = new EvaluationContext(evalContext, new IdempotentInMemPredicateCache());
+            IdempotentInMemPredicateCache cache = new IdempotentInMemPredicateCache();
+            context = new EvaluationContext(evalContext, Arrays.asList(
+                cache,
+                new CachingPredicateFilter(cache, new XPathEvalPredicateFilter())
+            ));
         } else {
             context = evalContext;
         }
