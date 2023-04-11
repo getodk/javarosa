@@ -24,7 +24,8 @@ public class IndexingPredicateFilter implements PredicateFilter {
         String key = null;
         if (predicate instanceof XPathEqExpr &&
             ((XPathEqExpr) predicate).a instanceof XPathPathExpr &&
-            ((XPathEqExpr) predicate).b instanceof XPathPathExpr) {
+            ((XPathEqExpr) predicate).b instanceof XPathPathExpr &&
+            ((XPathPathExpr) ((XPathEqExpr) predicate).a).init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE) {
             XPathPathExpr left = (XPathPathExpr) ((XPathEqExpr) predicate).a;
             XPathPathExpr right = (XPathPathExpr) ((XPathEqExpr) predicate).b;
 
