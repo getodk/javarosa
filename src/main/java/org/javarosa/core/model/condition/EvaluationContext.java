@@ -325,34 +325,16 @@ public class EvaluationContext {
             TreeReference nodeSetRef = workingRef.clone();
             nodeSetRef.add(name, -1);
 
-            List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
-                passed.addAll(predicateCache.get(nodeSetRef, xpe, () -> {
-                    List<TreeReference> predicatePassed = new ArrayList<>(treeReferences.size());
-                    for (int i = 0; i < treeReferences.size(); ++i) {
-                        //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                        TreeReference treeRef = treeReferences.get(i);
-
-                        //test the predicate on the treeElement
-                        EvaluationContext evalContext = rescope(treeRef, i);
-
-                        Measure.log("PredicateEvaluations");
-                        Object o = xpe.eval(sourceInstance, evalContext);
-
-                        if (o instanceof Boolean) {
-                            boolean testOutcome = (Boolean) o;
-                            if (testOutcome) {
-                                predicatePassed.add(treeRef);
-                            }
-                        }
-                    }
-
-                    return predicatePassed;
-                }));
+                List<TreeReference> passed = filterWithPredicate(
+                    sourceInstance,
+                    nodeSetRef,
+                    xpe,
+                    treeReferences
+                );
 
                 treeReferences.clear();
                 treeReferences.addAll(passed);
-                passed.clear();
 
                 if (predicateEvaluationProgress != null) {
                     predicateEvaluationProgress[0]++;
@@ -363,6 +345,31 @@ public class EvaluationContext {
         for (TreeReference treeRef : treeReferences) {
             expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
         }
+    }
+
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children) {
+        return predicateCache.get(treeReference, predicate, () -> {
+            List<TreeReference> predicatePassed = new ArrayList<>(children.size());
+            for (int i = 0; i < children.size(); ++i) {
+                //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+                TreeReference treeRef = children.get(i);
+
+                //test the predicate on the treeElement
+                EvaluationContext evalContext = rescope(treeRef, i);
+
+                Measure.log("PredicateEvaluations");
+                Object o = predicate.eval(sourceInstance, evalContext);
+
+                if (o instanceof Boolean) {
+                    boolean testOutcome = (Boolean) o;
+                    if (testOutcome) {
+                        predicatePassed.add(treeRef);
+                    }
+                }
+            }
+
+            return predicatePassed;
+        });
     }
 
     private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
