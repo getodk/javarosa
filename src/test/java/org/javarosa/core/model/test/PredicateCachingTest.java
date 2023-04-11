@@ -21,7 +21,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class PredicateCachingTest {
 
     @Test
-    public void repeatedPredicatesAreOnlyEvaluatedOnceWhileAnswering() throws Exception {
+    public void repeatedEqPredicatesAreOnlyEvaluatedOnceWhileAnswering() throws Exception {
         Scenario scenario = Scenario.init("secondary-instance-filter.xml");
 
         int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
@@ -29,6 +29,19 @@ public class PredicateCachingTest {
         });
 
         // Check that we do less than (size of secondary instance) * (number of calculates with a filter)
+        assertThat(evaluations, lessThan(4));
+    }
+
+    @Test
+    public void repeatedEqPredicatesAreOnlyEvaluatedOnce() throws Exception {
+        Scenario scenario = Scenario.init("secondary-instance-filter.xml");
+
+        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+            scenario.answer("/data/choice", "a");
+            scenario.answer("/data/choice", "a");
+        });
+
+        // Check that we do less than size of secondary instance * 2
         assertThat(evaluations, lessThan(4));
     }
 

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 public class IdempotentInMemPredicateCache implements PredicateFilter {
 
-    public Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
+    private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
     @Nullable
     @Override

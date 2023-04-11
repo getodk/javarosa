@@ -42,6 +42,10 @@ public class Measure {
     }
 
     private static int getCount(String event) {
-        return counts.get(event);
+        if (counts.containsKey(event)) {
+            return counts.get(event);
+        } else {
+            return 0;
+        }
     }
 }

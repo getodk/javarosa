@@ -18,6 +18,7 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -39,6 +40,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +51,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
 
 public class TriggerableDag {
     private static final Logger logger = LoggerFactory.getLogger(TriggerableDag.class);
@@ -98,6 +99,7 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
+    private PredicateFilter predicateIndex = new IndexingPredicateFilter();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -520,7 +522,10 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            context = new EvaluationContext(evalContext, singletonList(new IdempotentInMemPredicateCache()));
+            context = new EvaluationContext(evalContext, Arrays.asList(
+                predicateIndex,
+                new IdempotentInMemPredicateCache()
+            ));
         } else {
             context = evalContext;
         }
