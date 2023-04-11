@@ -109,4 +109,42 @@ public class PredicateCachingTest {
         assertThat(scenario.answerOf("/data/cat").getValue(), equalTo("12"));
         assertThat(scenario.answerOf("/data/dog").getValue(), equalTo("9"));
     }
+
+    @Test
+    public void eqExpressionsWorkIfEitherSideIsRelative() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("calcltr"),
+                        t("calcrtl"),
+                        t("input")
+                    )),
+                    instance("instance",
+                        t("item",
+                            t("value", "A")
+                        ),
+                        t("item",
+                            t("value", "B")
+                        )
+                    ),
+                    bind("/data/calcltr").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/input]/value"),
+                    bind("/data/calcrtl").type("string")
+                        .calculate("instance('instance')/root/item[/data/input = value]/value"),
+                    bind("/data/input").type("string")
+                )
+            ),
+            body(input("/data/input"))
+        ));
+
+        scenario.answer("/data/input", "A");
+        assertThat(scenario.answerOf("/data/calcltr").getValue(), equalTo("A"));
+        assertThat(scenario.answerOf("/data/calcrtl").getValue(), equalTo("A"));
+
+        scenario.answer("/data/input", "B");
+        assertThat(scenario.answerOf("/data/calcltr").getValue(), equalTo("B"));
+        assertThat(scenario.answerOf("/data/calcrtl").getValue(), equalTo("B"));
+    }
 }
