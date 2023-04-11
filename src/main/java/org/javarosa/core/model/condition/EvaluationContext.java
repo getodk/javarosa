@@ -325,10 +325,8 @@ public class EvaluationContext {
             TreeReference nodeSetRef = workingRef.clone();
             nodeSetRef.add(name, -1);
 
-            boolean firstTime = true;
             List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
-                boolean firstTimeCapture = firstTime;
                 passed.addAll(predicateCache.get(nodeSetRef, xpe, () -> {
                     List<TreeReference> predicatePassed = new ArrayList<>(treeReferences.size());
                     for (int i = 0; i < treeReferences.size(); ++i) {
@@ -336,7 +334,7 @@ public class EvaluationContext {
                         TreeReference treeRef = treeReferences.get(i);
 
                         //test the predicate on the treeElement
-                        EvaluationContext evalContext = rescope(treeRef, (firstTimeCapture ? treeRef.getMultLast() : i));
+                        EvaluationContext evalContext = rescope(treeRef, i);
 
                         Measure.log("PredicateEvaluations");
                         Object o = xpe.eval(sourceInstance, evalContext);
@@ -352,7 +350,6 @@ public class EvaluationContext {
                     return predicatePassed;
                 }));
 
-                firstTime = false;
                 treeReferences.clear();
                 treeReferences.addAll(passed);
                 passed.clear();
