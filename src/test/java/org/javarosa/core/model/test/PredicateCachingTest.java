@@ -24,11 +24,8 @@ public class PredicateCachingTest {
     public void repeatedPredicatesAreOnlyEvaluatedOnceWhileAnswering() throws Exception {
         Scenario scenario = Scenario.init("secondary-instance-filter.xml");
 
-        int evaluations = Measure.withMeasure("PredicateEvaluations", new Runnable() {
-            @Override
-            public void run() {
-                scenario.answer("/data/choice","a");
-            }
+        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+            scenario.answer("/data/choice", "a");
         });
 
         // Check that we do less than (size of secondary instance) * (number of calculates with a filter)
