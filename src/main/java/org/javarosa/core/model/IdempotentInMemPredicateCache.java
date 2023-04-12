@@ -21,7 +21,7 @@ public class IdempotentInMemPredicateCache implements PredicateCache {
     @Override
     @NotNull
     public List<TreeReference> get(TreeReference position, String childName, XPathExpression predicate, Supplier<List<TreeReference>> onMiss) {
-        String key = getKey(position, predicate);
+        String key = getKey(position, childName, predicate);
 
         if (cachedEvaluations.containsKey(key)) {
             return cachedEvaluations.get(key);
@@ -35,8 +35,8 @@ public class IdempotentInMemPredicateCache implements PredicateCache {
         }
     }
 
-    private String getKey(TreeReference reference, XPathExpression predicate) {
-        return reference.toString() + predicate.toString();
+    private String getKey(TreeReference reference, String childName, XPathExpression predicate) {
+        return reference.toString() + childName + predicate.toString();
     }
 
     private boolean isCacheable(XPathExpression predicate) {

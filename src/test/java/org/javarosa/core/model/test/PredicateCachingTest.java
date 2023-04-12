@@ -7,6 +7,16 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
+import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.head;
+import static org.javarosa.core.util.XFormsElement.html;
+import static org.javarosa.core.util.XFormsElement.input;
+import static org.javarosa.core.util.XFormsElement.instance;
+import static org.javarosa.core.util.XFormsElement.mainInstance;
+import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.t;
+import static org.javarosa.core.util.XFormsElement.title;
 
 public class PredicateCachingTest {
 
@@ -53,5 +63,40 @@ public class PredicateCachingTest {
         scenario.answer("/data/repeat[1]/choice", "b");
         assertThat(scenario.answerOf("/data/repeat[0]/calculate").getValue(), equalTo("A"));
         assertThat(scenario.answerOf("/data/repeat[1]/calculate").getValue(), equalTo("B"));
+    }
+
+    @Test
+    public void predicatesOnDifferentChildNamesDoNotGetConfused() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("cat"),
+                        t("dog"),
+                        t("input")
+                    )),
+                    instance("instance",
+                        t("cat",
+                            t("name", "Vinnie"),
+                            t("age", "12")
+                        ),
+                        t("dog",
+                            t("name", "Vinnie"),
+                            t("age", "9")
+                        )
+                    ),
+                    bind("/data/cat").type("string")
+                        .calculate("instance('instance')/root/cat[name = 'Vinnie']/age"),
+                    bind("/data/dog").type("string")
+                        .calculate("instance('instance')/root/dog[name = 'Vinnie']/age"),
+                    bind("/data/input").type("string")
+                )
+            ),
+            body(input("/data/input"))
+        ));
+
+        assertThat(scenario.answerOf("/data/cat").getValue(), equalTo("12"));
+        assertThat(scenario.answerOf("/data/dog").getValue(), equalTo("9"));
     }
 }
