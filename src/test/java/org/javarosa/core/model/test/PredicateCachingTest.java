@@ -17,6 +17,7 @@ import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.junit.Assert.fail;
 
 public class PredicateCachingTest {
 
@@ -146,5 +147,10 @@ public class PredicateCachingTest {
         scenario.answer("/data/input", "B");
         assertThat(scenario.answerOf("/data/calcltr").getValue(), equalTo("B"));
         assertThat(scenario.answerOf("/data/calcrtl").getValue(), equalTo("B"));
+    }
+
+    @Test
+    public void eqExpressionsWorkIfBothSidesAreRelative() {
+        fail();
     }
 }
