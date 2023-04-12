@@ -20,7 +20,7 @@ public class IndexingPredicateFilter implements PredicateFilter {
 
     @Nullable
     @Override
-    public List<TreeReference> filter(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
+    public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
         String key = null;
         if (predicate instanceof XPathEqExpr &&
             ((XPathEqExpr) predicate).a instanceof XPathPathExpr &&
@@ -30,7 +30,7 @@ public class IndexingPredicateFilter implements PredicateFilter {
             XPathPathExpr right = (XPathPathExpr) ((XPathEqExpr) predicate).b;
 
             Object rightValue = right.eval(sourceInstance, evaluationContext).unpack();
-            key = treeReference.toString() + left.toString() + rightValue.toString();
+            key = nodeSet.toString() + left.toString() + rightValue.toString();
         }
 
         if (key != null) {
