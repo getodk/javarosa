@@ -345,4 +345,8 @@ public class FormEntryController {
             }
         }
     }
+
+    public void disablePredicateCaching() {
+        model.getForm().disablePredicateCaching();
+    }
 }

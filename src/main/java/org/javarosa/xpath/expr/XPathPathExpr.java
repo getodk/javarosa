@@ -416,4 +416,11 @@ public class XPathPathExpr extends XPathExpression {
         }
         return eval(model, evalContext);
     }
+
+    @Override
+    public boolean isIdempotent() {
+        return (filtExpr == null || filtExpr.isIdempotent()) && Arrays.stream(steps).allMatch((step) -> {
+            return Arrays.stream(step.predicates).allMatch(XPathExpression::isIdempotent);
+        });
+    }
 }

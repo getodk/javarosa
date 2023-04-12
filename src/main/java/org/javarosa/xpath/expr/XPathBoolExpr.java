@@ -57,6 +57,11 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
         return new Boolean(result);
     }
 
+    @Override
+    public boolean isIdempotent() {
+        return a.isIdempotent() && b.isIdempotent();
+    }
+
     public String toString () {
         String sOp = null;
 

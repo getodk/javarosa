@@ -39,6 +39,11 @@ public class XPathStringLiteral extends XPathExpression {
         return s;
     }
 
+    @Override
+    public boolean isIdempotent() {
+        return true;
+    }
+
     public String toString () {
         return "{str:\'" + s + "\'}"; //TODO: s needs to be escaped (' -> \'; \ -> \\)
     }

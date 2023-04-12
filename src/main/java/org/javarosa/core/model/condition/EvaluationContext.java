@@ -16,23 +16,26 @@
 
 package org.javarosa.core.model.condition;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.measure.Measure;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * A collection of objects that affect the evaluation of an expression, like
  * function handlers and (not supported) variable bindings.
  */
 public class EvaluationContext {
+
     /**
      * Unambiguous anchor reference for relative paths
      */
@@ -60,6 +63,9 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
+    private PredicateCache predicateCache = ((reference, predicate, onMiss) -> onMiss.get());
+
+
     /**
      * Copy Constructor
      **/
@@ -84,6 +90,13 @@ public class EvaluationContext {
         //and is fixed on the context. Anything that changes the context should
         //invalidate this
         currentContextPosition = base.currentContextPosition;
+
+        predicateCache = base.predicateCache;
+    }
+
+    public EvaluationContext(EvaluationContext base, PredicateCache predicateCache) {
+        this(base);
+        this.predicateCache = predicateCache;
     }
 
     public EvaluationContext(EvaluationContext base, TreeReference context) {
@@ -309,23 +322,36 @@ public class EvaluationContext {
         }
 
         if (predicates != null) {
+            TreeReference nodeSetRef = workingRef.clone();
+            nodeSetRef.add(name, -1);
+
             boolean firstTime = true;
             List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
-                for (int i = 0; i < treeReferences.size(); ++i) {
-                    //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                    TreeReference treeRef = treeReferences.get(i);
+                boolean firstTimeCapture = firstTime;
+                passed.addAll(predicateCache.get(nodeSetRef, xpe, () -> {
+                    List<TreeReference> predicatePassed = new ArrayList<>(treeReferences.size());
+                    for (int i = 0; i < treeReferences.size(); ++i) {
+                        //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
+                        TreeReference treeRef = treeReferences.get(i);
 
-                    //test the predicate on the treeElement
-                    EvaluationContext evalContext = rescope(treeRef, (firstTime ? treeRef.getMultLast() : i));
-                    Object o = xpe.eval(sourceInstance, evalContext);
-                    if (o instanceof Boolean) {
-                        boolean testOutcome = (Boolean) o;
-                        if (testOutcome) {
-                            passed.add(treeRef);
+                        //test the predicate on the treeElement
+                        EvaluationContext evalContext = rescope(treeRef, (firstTimeCapture ? treeRef.getMultLast() : i));
+
+                        Measure.log("PredicateEvaluations");
+                        Object o = xpe.eval(sourceInstance, evalContext);
+
+                        if (o instanceof Boolean) {
+                            boolean testOutcome = (Boolean) o;
+                            if (testOutcome) {
+                                predicatePassed.add(treeRef);
+                            }
                         }
                     }
-                }
+
+                    return predicatePassed;
+                }));
+
                 firstTime = false;
                 treeReferences.clear();
                 treeReferences.addAll(passed);

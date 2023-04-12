@@ -16,20 +16,6 @@
 
 package org.javarosa.core.model;
 
-import static java.util.Collections.emptySet;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.Recalculate;
@@ -48,6 +34,21 @@ import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Collections.emptySet;
 
 public class TriggerableDag {
     private static final Logger logger = LoggerFactory.getLogger(TriggerableDag.class);
@@ -94,6 +95,8 @@ public class TriggerableDag {
      * An index to look up relevance conditions for each repeat. See buildRelevancePerRepeat.
      */
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
+
+    private boolean predicateCaching = true;
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -513,12 +516,18 @@ public class TriggerableDag {
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger,
                                                          TreeReference changedRef, Set<QuickTriggerable> affectAllRepeatInstances, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> evaluated = new HashSet<>();
+        EvaluationContext context;
+        if (predicateCaching) {
+            context = new EvaluationContext(evalContext, new IdempotentInMemPredicateCache());
+        } else {
+            context = evalContext;
+        }
 
         // Evaluate the provided set of triggerables in the order they appear
         // in the sorted DAG to ensure the correct sequence of evaluations
         for (QuickTriggerable qt : triggerablesDAG)
             if (toTrigger.contains(qt) && !alreadyEvaluated.contains(qt)) {
-                evaluateTriggerable(mainInstance, evalContext, qt, affectAllRepeatInstances.contains(qt), changedRef);
+                evaluateTriggerable(mainInstance, context, qt, affectAllRepeatInstances.contains(qt), changedRef);
 
                 evaluated.add(qt);
             }
@@ -725,4 +734,7 @@ public class TriggerableDag {
 
     // endregion
 
+    public void disablePredicateCaching() {
+        this.predicateCaching = false;
+    }
 }

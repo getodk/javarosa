@@ -39,6 +39,11 @@ public class XPathVariableReference extends XPathExpression {
         return evalContext.getVariable(id.toString());
     }
 
+    @Override
+    public boolean isIdempotent() {
+        return true;
+    }
+
     public String toString () {
         return "{var:" + id.toString() + "}";
     }

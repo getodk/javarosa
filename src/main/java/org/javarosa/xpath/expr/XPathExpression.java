@@ -247,4 +247,9 @@ public abstract class XPathExpression implements Externalizable, Serializable {
     public int hashCode () {
         return this.toString().hashCode();
     }
+
+    /**
+     * Returns true if this expression is idempotent with respect to the current state of the form.
+     */
+    public abstract boolean isIdempotent();
 }

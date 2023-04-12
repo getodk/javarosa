@@ -39,6 +39,11 @@ public class XPathNumericLiteral extends XPathExpression {
         return new Double(d);
     }
 
+    @Override
+    public boolean isIdempotent() {
+        return true;
+    }
+
     public String toString () {
         return "{num:" + Double.toString(d) + "}";
     }

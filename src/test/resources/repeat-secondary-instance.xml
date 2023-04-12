@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa"
+        xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <h:head>
+        <h:title>Repeat Secondary Instance</h:title>
+        <model odk:xforms-version="1.0.0">
+            <instance>
+                <data id="repeat-secondary-instances" version="1">
+                    <repeat>
+                        <choice/>
+                        <calculate/>
+                    </repeat>
+                </data>
+            </instance>
+            <instance id="instance">
+                <root>
+                    <item>
+                        <label>A</label>
+                        <name>a</name>
+                    </item>
+                    <item>
+                        <label>B</label>
+                        <name>b</name>
+                    </item>
+                </root>
+            </instance>
+            <bind nodeset="/data/repeat/choice" type="string"/>
+            <bind calculate="instance('instance')/root/item[name=current()/../choice]/label"
+                  nodeset="/data/repeat/calculate" type="string"/>
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/data/repeat">
+            <label></label>
+            <repeat nodeset="/data/repeat">
+                <select1 ref="/data/repeat/choice">
+                    <label>Choice</label>
+                    <item>
+                        <label>A</label>
+                        <value>a</value>
+                    </item>
+                    <item>
+                        <label>B</label>
+                        <value>b</value>
+                    </item>
+                </select1>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>

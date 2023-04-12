@@ -114,6 +114,11 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
         return this.eval(model, evalContext);
     }
 
+    @Override
+    public boolean isIdempotent() {
+        return a.isIdempotent() && b.isIdempotent();
+    }
+
     private boolean handled(Object a, Object b, Object sentinal, List<Object> pivots) throws UnpivotableExpressionException {
         if(sentinal == a) {
             if(b == null) {

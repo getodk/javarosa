@@ -43,6 +43,11 @@ public abstract class XPathUnaryOpExpr extends XPathOpExpr {
         }
     }
 
+    @Override
+    public boolean isIdempotent() {
+        return a.isIdempotent();
+    }
+
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         a = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
     }

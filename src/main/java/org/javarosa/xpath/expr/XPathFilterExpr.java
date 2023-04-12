@@ -100,4 +100,9 @@ public class XPathFilterExpr extends XPathExpression {
     public Object pivot (DataInstance model, EvaluationContext evalContext, List<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
         throw new UnpivotableExpressionException();
     }
+
+    @Override
+    public boolean isIdempotent() {
+        return x.isIdempotent() && Arrays.stream(predicates).allMatch(XPathExpression::isIdempotent);
+    }
 }

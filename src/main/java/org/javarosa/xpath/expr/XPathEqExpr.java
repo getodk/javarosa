@@ -16,10 +16,6 @@
 
 package org.javarosa.xpath.expr;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -27,6 +23,10 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import static java.lang.Math.abs;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toBoolean;
@@ -71,6 +71,11 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
         boolean result = equal == eq;
         logger.debug("XPathEqExpr{}.eval returning {}. a: {}, b: {}", id(), result, aval, bval);
         return result;
+    }
+
+    @Override
+    public boolean isIdempotent() {
+        return a.isIdempotent() && b.isIdempotent();
     }
 
     public String toString() {
