@@ -63,7 +63,7 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
-    private PredicateCache predicateCache = ((reference, childName, predicate, onMiss) -> onMiss.get());
+    private PredicateCache predicateCache = ((reference, predicate, onMiss) -> onMiss.get());
 
 
     /**
@@ -322,11 +322,14 @@ public class EvaluationContext {
         }
 
         if (predicates != null) {
+            TreeReference nodeSetRef = workingRef.clone();
+            nodeSetRef.add(name, -1);
+
             boolean firstTime = true;
             List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
             for (XPathExpression xpe : predicates) {
                 boolean firstTimeCapture = firstTime;
-                passed.addAll(predicateCache.get(workingRef, name, xpe, () -> {
+                passed.addAll(predicateCache.get(nodeSetRef, xpe, () -> {
                     List<TreeReference> predicatePassed = new ArrayList<>(treeReferences.size());
                     for (int i = 0; i < treeReferences.size(); ++i) {
                         //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
