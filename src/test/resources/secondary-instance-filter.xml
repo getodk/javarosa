@@ -7,7 +7,8 @@
             <instance>
                 <data id="secondary-instance-filter" version="1">
                     <choice />
-                    <calculate />
+                    <calculate1 />
+                    <calculate2 />
                 </data>
             </instance>
             <instance id="instance">
@@ -24,9 +25,9 @@
             </instance>
             <bind nodeset="/data/choice" type="string" />
             <bind calculate="instance('instance')/root/item[name = /data/choice]/label"
-                nodeset="/data/calculate" type="string" />
+                nodeset="/data/calculate1" type="string" />
             <bind calculate="instance('instance')/root/item[name = /data/choice]/name"
-                  nodeset="/data/calculate" type="string" />
+                  nodeset="/data/calculate2" type="string" />
         </model>
     </h:head>
     <h:body>
