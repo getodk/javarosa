@@ -17,7 +17,6 @@ import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
-import static org.junit.Assert.fail;
 
 public class PredicateCachingTest {
 
@@ -150,8 +149,29 @@ public class PredicateCachingTest {
     }
 
     @Test
-    public void eqExpressionsWorkIfBothSidesAreRelative() {
-        fail();
+    public void eqExpressionsWorkIfBothSidesAreRelative() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("calc"),
+                        t("input")
+                    )),
+                    instance("instance",
+                        t("item",
+                            t("value", "A")
+                        )
+                    ),
+                    bind("/data/calc").type("string")
+                        .calculate("instance('instance')/root/item[value = value]/value"),
+                    bind("/data/input").type("string")
+                )
+            ),
+            body(input("/data/input"))
+        ));
+
+        assertThat(scenario.answerOf("/data/calc").getValue(), equalTo("A"));
     }
 
     @Test
