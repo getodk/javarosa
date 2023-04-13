@@ -330,12 +330,20 @@ public class EvaluationContext {
             TreeReference nodeSetRef = workingRef.clone();
             nodeSetRef.add(name, -1);
 
+            List<PredicateFilter> filterChain;
+            if (predicates.size() == 1) {
+                filterChain = predicateFilterChain;
+            } else {
+                filterChain = singletonList(new XPathEvalPredicateFilter());
+            }
+
             for (XPathExpression xpe : predicates) {
                 List<TreeReference> passed = filterWithPredicate(
                     sourceInstance,
                     nodeSetRef,
                     xpe,
-                    treeReferences
+                    treeReferences,
+                    filterChain
                 );
 
                 treeReferences.clear();
@@ -352,13 +360,13 @@ public class EvaluationContext {
         }
     }
 
-    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children) {
-        return filterWithPredicate(sourceInstance, treeReference, predicate, children, 0);
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, List<PredicateFilter> filterChain) {
+        return filterWithPredicate(sourceInstance, treeReference, predicate, children, 0, filterChain);
     }
 
-    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i) {
-        return predicateFilterChain.get(i).filter(sourceInstance, treeReference, predicate, children, this, () -> {
-            return filterWithPredicate(sourceInstance, treeReference, predicate, children, i + 1);
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i, List<PredicateFilter> filterChain) {
+        return filterChain.get(i).filter(sourceInstance, treeReference, predicate, children, this, () -> {
+            return filterWithPredicate(sourceInstance, treeReference, predicate, children, i + 1, filterChain);
         });
     }
 
