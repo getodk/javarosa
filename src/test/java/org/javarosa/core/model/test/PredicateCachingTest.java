@@ -17,6 +17,7 @@ import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.junit.Assert.fail;
 
 public class PredicateCachingTest {
 
@@ -33,6 +34,16 @@ public class PredicateCachingTest {
     }
 
     @Test
+    public void repeatedCompPredicatesAreOnlyEvaluatedOnceWhileAnswering() throws Exception {
+       fail();
+    }
+
+    @Test
+    public void repeatedIdempotentFuncPredicatesAreOnlyEvaluatedOnceWhileAnswering() throws Exception {
+        fail();
+    }
+
+    @Test
     public void repeatedEqPredicatesAreOnlyEvaluatedOnce() throws Exception {
         Scenario scenario = Scenario.init("secondary-instance-filter.xml");
 
@@ -41,8 +52,13 @@ public class PredicateCachingTest {
             scenario.answer("/data/choice", "a");
         });
 
-        // Check that we do less than size of secondary instance * 2
+        // Check that we do less than size of secondary instance * number of times we answer
         assertThat(evaluations, lessThan(4));
+    }
+
+    @Test
+    public void repeatedCompPredicatesAreOnlyEvaluatedOnce() throws Exception {
+        fail();
     }
 
     /**
