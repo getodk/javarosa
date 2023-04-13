@@ -13,8 +13,10 @@ import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
 import static org.javarosa.core.util.XFormsElement.instance;
+import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.junit.Assert.fail;
@@ -23,7 +25,32 @@ public class PredicateCachingTest {
 
     @Test
     public void repeatedEqPredicatesAreOnlyEvaluatedOnceWhileAnswering() throws Exception {
-        Scenario scenario = Scenario.init("secondary-instance-filter.xml");
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("calculate1"),
+                        t("calculate2")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/calculate1").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/choice]/label"),
+                    bind("/data/calculate2").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/choice]/value")
+                )
+            ),
+            body(
+                select1("/data/choice",
+                    item("a", "A")
+                )
+            )
+        ));
 
         int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
             scenario.answer("/data/choice", "a");
@@ -45,7 +72,32 @@ public class PredicateCachingTest {
 
     @Test
     public void repeatedEqPredicatesAreOnlyEvaluatedOnce() throws Exception {
-        Scenario scenario = Scenario.init("secondary-instance-filter.xml");
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("calculate1"),
+                        t("calculate2")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/calculate1").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/choice]/label"),
+                    bind("/data/calculate2").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/choice]/value")
+                )
+            ),
+            body(
+                select1("/data/choice",
+                    item("a", "A")
+                )
+            )
+        ));
 
         int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
             scenario.answer("/data/choice", "a");
