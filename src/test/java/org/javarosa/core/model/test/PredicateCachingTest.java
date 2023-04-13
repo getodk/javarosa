@@ -153,4 +153,46 @@ public class PredicateCachingTest {
     public void eqExpressionsWorkIfBothSidesAreRelative() {
         fail();
     }
+
+    @Test
+    public void predicatesInMultipleSetsDoNotGetConfused() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("calc"),
+                        t("calc2"),
+                        t("input")
+                    )),
+                    instance("instance",
+                        t("item",
+                            t("value", "A"),
+                            t("count", "2"),
+                            t("id", "A2")
+                        ),
+                        t("item",
+                            t("value", "A"),
+                            t("count", "3"),
+                            t("id", "A3")
+                        ),
+                        t("item",
+                            t("value", "B"),
+                            t("count", "2"),
+                            t("id", "B2")
+                        )
+                    ),
+                    bind("/data/calc").type("string")
+                        .calculate("instance('instance')/root/item[value = 'A'][count = '3']/id"),
+                    bind("/data/calc2").type("string")
+                        .calculate("instance('instance')/root/item[value = 'B'][count = '3']/id"),
+                    bind("/data/input").type("string")
+                )
+            ),
+            body(input("/data/input"))
+        ));
+
+        assertThat(scenario.answerOf("/data/calc").getValue(), equalTo("A3"));
+        assertThat(scenario.answerOf("/data/calc2"), equalTo(null));
+    }
 }
