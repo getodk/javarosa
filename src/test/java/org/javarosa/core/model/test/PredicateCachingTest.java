@@ -339,4 +339,36 @@ public class PredicateCachingTest {
         assertThat(scenario.answerOf("/data/calc").getValue(), equalTo("A3"));
         assertThat(scenario.answerOf("/data/calc2"), equalTo(null));
     }
+
+    @Test
+    public void similarCmpAndEqExpressionsDoNotGetConfused() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("input"),
+                        t("calculate1"),
+                        t("calculate2")
+                    )),
+                    instance("instance",
+                        item("1", "A"),
+                        item("2", "B")
+                    ),
+                    bind("/data/input").type("string"),
+                    bind("/data/calculate1").type("string")
+                        .calculate("instance('instance')/root/item[value < /data/input]/label"),
+                    bind("/data/calculate2").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/input]/label")
+                )
+            ),
+            body(
+                input("/data/input")
+            )
+        ));
+
+        scenario.answer("/data/input", "2");
+        assertThat(scenario.answerOf("/data/calculate1").getValue(), equalTo("A"));
+        assertThat(scenario.answerOf("/data/calculate2").getValue(), equalTo("B"));
+    }
 }

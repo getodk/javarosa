@@ -4,6 +4,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.expr.XPathCmpExpr;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -21,16 +22,24 @@ public class IndexingPredicateFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        String key = null;
+        XPathPathExpr left = null;
+        XPathPathExpr right = null;
         if (predicate instanceof XPathEqExpr &&
             ((XPathEqExpr) predicate).a instanceof XPathPathExpr &&
-            ((XPathEqExpr) predicate).b instanceof XPathPathExpr &&
-            ((XPathPathExpr) ((XPathEqExpr) predicate).a).init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE) {
-            XPathPathExpr left = (XPathPathExpr) ((XPathEqExpr) predicate).a;
-            XPathPathExpr right = (XPathPathExpr) ((XPathEqExpr) predicate).b;
+            ((XPathEqExpr) predicate).b instanceof XPathPathExpr) {
+            left = (XPathPathExpr) ((XPathEqExpr) predicate).a;
+            right = (XPathPathExpr) ((XPathEqExpr) predicate).b;
+        } else if (predicate instanceof XPathCmpExpr &&
+            ((XPathCmpExpr) predicate).a instanceof XPathPathExpr &&
+            ((XPathCmpExpr) predicate).b instanceof XPathPathExpr) {
+            left = (XPathPathExpr) ((XPathCmpExpr) predicate).a;
+            right = (XPathPathExpr) ((XPathCmpExpr) predicate).b;
+        }
 
+        String key = null;
+        if (left != null && right != null && left.init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE) {
             Object rightValue = right.eval(sourceInstance, evaluationContext).unpack();
-            key = nodeSet.toString() + left.toString() + rightValue.toString();
+            key = nodeSet.toString() + predicate + left + rightValue.toString();
         }
 
         if (key != null) {
