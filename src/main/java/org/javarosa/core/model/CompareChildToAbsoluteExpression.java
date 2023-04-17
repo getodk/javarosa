@@ -1,10 +1,15 @@
 package org.javarosa.core.model;
 
+import kotlin.Pair;
 import org.javarosa.xpath.expr.XPathCmpExpr;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 class CompareChildToAbsoluteExpression {
 
@@ -32,25 +37,41 @@ class CompareChildToAbsoluteExpression {
 
     @Nullable
     public static CompareChildToAbsoluteExpression parse(XPathExpression expression) {
-        XPathPathExpr left = null;
-        XPathPathExpr right = null;
+        XPathExpression a = null;
+        XPathExpression b = null;
 
-        if (expression instanceof XPathCmpExpr &&
-            ((XPathCmpExpr) expression).a instanceof XPathPathExpr &&
-            ((XPathCmpExpr) expression).b instanceof XPathPathExpr) {
-
-            left = (XPathPathExpr) ((XPathCmpExpr) expression).a;
-            right = (XPathPathExpr) ((XPathCmpExpr) expression).b;
-        } else if (expression instanceof XPathEqExpr &&
-            ((XPathEqExpr) expression).a instanceof XPathPathExpr &&
-            ((XPathEqExpr) expression).b instanceof XPathPathExpr) {
-            left = (XPathPathExpr) ((XPathEqExpr) expression).a;
-            right = (XPathPathExpr) ((XPathEqExpr) expression).b;
+        if (expression instanceof XPathCmpExpr) {
+            a = ((XPathCmpExpr) expression).a;
+            b = ((XPathCmpExpr) expression).b;
+        } else if (expression instanceof XPathEqExpr) {
+            a = ((XPathEqExpr) expression).a;
+            b = ((XPathEqExpr) expression).b;
         }
 
-        if (left != null && left.init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE &&
-            right.init_context == XPathPathExpr.INIT_CONTEXT_ROOT) {
-            return new CompareChildToAbsoluteExpression(left, right, expression);
+        Pair<XPathPathExpr, XPathPathExpr> relativeAndAbsolute = getRelativeAndAbsolute(a, b);
+        if (relativeAndAbsolute != null) {
+            return new CompareChildToAbsoluteExpression(relativeAndAbsolute.getFirst(), relativeAndAbsolute.getSecond(), expression);
+        } else {
+            return null;
+        }
+    }
+
+    private static Pair<XPathPathExpr, XPathPathExpr> getRelativeAndAbsolute(XPathExpression a, XPathExpression b) {
+        XPathPathExpr relative = null;
+        XPathPathExpr absolute = null;
+
+        Queue<XPathExpression> subExpressions = new LinkedList<>(Arrays.asList(a, b));
+        while (!subExpressions.isEmpty()) {
+            XPathExpression subExpression = subExpressions.poll();
+            if (subExpression instanceof XPathPathExpr && ((XPathPathExpr) subExpression).init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE) {
+                relative = (XPathPathExpr) subExpression;
+            } else if (subExpression instanceof XPathPathExpr && ((XPathPathExpr) subExpression).init_context == XPathPathExpr.INIT_CONTEXT_ROOT) {
+                absolute = (XPathPathExpr) subExpression;
+            }
+        }
+
+        if (relative != null && absolute != null) {
+            return new Pair<>(relative, absolute);
         } else {
             return null;
         }
