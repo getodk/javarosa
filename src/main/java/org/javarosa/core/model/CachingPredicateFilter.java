@@ -25,7 +25,7 @@ public class CachingPredicateFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        CompareChildToAbsolutePredicate candidate = CompareChildToAbsolutePredicate.parse(predicate);
+        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
 
         if (candidate != null) {
             Object rightValue = candidate.getAbsoluteSide().eval(sourceInstance, evaluationContext).unpack();

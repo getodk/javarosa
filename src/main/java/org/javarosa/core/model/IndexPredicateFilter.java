@@ -28,7 +28,7 @@ public class IndexPredicateFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        CompareChildToAbsolutePredicate candidate = CompareChildToAbsolutePredicate.parse(predicate);
+        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
         if (candidate != null && candidate.getOriginal() instanceof XPathEqExpr) {
             Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), candidate.getRelativeSide().toString());
             if (!instanceEqIndexes.containsKey(indexKey)) {
@@ -47,7 +47,7 @@ public class IndexPredicateFilter implements PredicateFilter {
         }
     }
 
-    private static void buildEqIndex(DataInstance sourceInstance, CompareChildToAbsolutePredicate predicate, List<TreeReference> children, EvaluationContext evaluationContext, Map<String, List<TreeReference>> eqIndex) {
+    private static void buildEqIndex(DataInstance sourceInstance, CompareChildToAbsoluteExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Map<String, List<TreeReference>> eqIndex) {
         for (int i = 0; i < children.size(); i++) {
             TreeReference child = children.get(i);
 

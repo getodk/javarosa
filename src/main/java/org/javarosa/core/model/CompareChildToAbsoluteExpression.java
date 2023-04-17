@@ -6,13 +6,13 @@ import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.jetbrains.annotations.Nullable;
 
-class CompareChildToAbsolutePredicate {
+class CompareChildToAbsoluteExpression {
 
     private final XPathPathExpr relativeSide;
     private final XPathPathExpr absoluteSide;
     private final XPathExpression original;
 
-    public CompareChildToAbsolutePredicate(XPathPathExpr relativeSide, XPathPathExpr absoluteSide, XPathExpression original) {
+    public CompareChildToAbsoluteExpression(XPathPathExpr relativeSide, XPathPathExpr absoluteSide, XPathExpression original) {
         this.relativeSide = relativeSide;
         this.absoluteSide = absoluteSide;
         this.original = original;
@@ -31,7 +31,7 @@ class CompareChildToAbsolutePredicate {
     }
 
     @Nullable
-    public static CompareChildToAbsolutePredicate parse(XPathExpression expression) {
+    public static CompareChildToAbsoluteExpression parse(XPathExpression expression) {
         XPathPathExpr left = null;
         XPathPathExpr right = null;
 
@@ -50,7 +50,7 @@ class CompareChildToAbsolutePredicate {
 
         if (left != null && left.init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE &&
             right.init_context == XPathPathExpr.INIT_CONTEXT_ROOT) {
-            return new CompareChildToAbsolutePredicate(left, right, expression);
+            return new CompareChildToAbsoluteExpression(left, right, expression);
         } else {
             return null;
         }
