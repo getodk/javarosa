@@ -30,7 +30,7 @@ public class IndexPredicateFilter implements PredicateFilter {
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
         CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
         if (candidate != null && candidate.getOriginal() instanceof XPathEqExpr) {
-            Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), candidate.getRelativeSide().toString());
+            Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), nodeSet.toString() + candidate.getRelativeSide().toString());
             if (!instanceEqIndexes.containsKey(indexKey)) {
                 instanceEqIndexes.put(indexKey, new HashMap<>());
             }
@@ -40,8 +40,8 @@ public class IndexPredicateFilter implements PredicateFilter {
                 buildEqIndex(sourceInstance, candidate, children, evaluationContext, index);
             }
 
-            String rightValue = (String) candidate.getAbsoluteSide().eval(sourceInstance, evaluationContext).unpack();
-            return index.getOrDefault(rightValue, new ArrayList<>());
+            Object absoluteValue = CompareChildToAbsoluteExpression.evalAbsolute(sourceInstance, evaluationContext, candidate);
+            return index.getOrDefault(absoluteValue.toString(), new ArrayList<>());
         } else {
             return next.get();
         }
@@ -54,13 +54,13 @@ public class IndexPredicateFilter implements PredicateFilter {
             EvaluationContext evalContext = evaluationContext.rescope(child, i);
 
             Measure.log("IndexEvaluation");
-            String leftVal = (String) predicate.getRelativeSide().eval(sourceInstance, evalContext).unpack();
+            String relativeValue = (String) predicate.getRelativeSide().eval(sourceInstance, evalContext).unpack();
 
             if (!eqIndex.containsKey(predicate.getRelativeSide().toString())) {
-                eqIndex.put(leftVal, new ArrayList<>());
+                eqIndex.put(relativeValue, new ArrayList<>());
             }
 
-            eqIndex.get(leftVal).add(child);
+            eqIndex.get(relativeValue).add(child);
         }
     }
 }

@@ -28,19 +28,15 @@ public class CachingPredicateFilter implements PredicateFilter {
         CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
 
         if (candidate != null) {
-            Object rightValue = candidate.getAbsoluteSide().eval(sourceInstance, evaluationContext).unpack();
-            String key = nodeSet.toString() + predicate + candidate.getRelativeSide() + rightValue.toString();
+            Object absoluteValue = CompareChildToAbsoluteExpression.evalAbsolute(sourceInstance, evaluationContext, candidate);
+            String key = nodeSet.toString() + predicate + candidate.getRelativeSide() + absoluteValue.toString();
 
-            if (key != null) {
-                if (cachedEvaluations.containsKey(key)) {
-                    return cachedEvaluations.get(key);
-                } else {
-                    List<TreeReference> filtered = next.get();
-                    cachedEvaluations.put(key, filtered);
-                    return filtered;
-                }
+            if (cachedEvaluations.containsKey(key)) {
+                return cachedEvaluations.get(key);
             } else {
-                return next.get();
+                List<TreeReference> filtered = next.get();
+                cachedEvaluations.put(key, filtered);
+                return filtered;
             }
         } else {
             return next.get();
