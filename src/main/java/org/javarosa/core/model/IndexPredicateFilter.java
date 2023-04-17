@@ -17,7 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class IndexingPredicateFilter implements PredicateFilter {
+/**
+ * Uses a (lazily constructed) index to evaluate a predicate for supported expressions - currently just
+ * {@link XPathEqExpr} where one side is relative to the instance child being filtered. Evaluations are fetched in
+ * O(1) time with O(n) expression evaluations only being required the first time a relative side is evaluated.
+ */
+public class IndexPredicateFilter implements PredicateFilter {
 
     private final Map<Pair<String, String>, Map<String, List<TreeReference>>> instanceEqIndexes = new HashMap<>();
 

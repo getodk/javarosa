@@ -14,9 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class CmpCachePredicateFilter implements PredicateFilter {
+/**
+ * Caches down stream evaluations (in the {@link PredicateFilter} chain) for supported expressions - currently just
+ * {@link XPathCmpExpr}. Repeated evaluations are fetched in O(1) time.
+ */
+public class CachingPredicateFilter implements PredicateFilter {
 
-    private final Map<String, List<TreeReference>> cachedCmpEvaluations = new HashMap<>();
+    private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
     @Nullable
     @Override
@@ -34,11 +38,11 @@ public class CmpCachePredicateFilter implements PredicateFilter {
             }
 
             if (key != null) {
-                if (cachedCmpEvaluations.containsKey(key)) {
-                    return cachedCmpEvaluations.get(key);
+                if (cachedEvaluations.containsKey(key)) {
+                    return cachedEvaluations.get(key);
                 } else {
                     List<TreeReference> filtered = next.get();
-                    cachedCmpEvaluations.put(key, filtered);
+                    cachedEvaluations.put(key, filtered);
                     return filtered;
                 }
             } else {

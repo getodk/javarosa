@@ -12,7 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class IdempotentInMemPredicateCache implements PredicateFilter {
+/**
+ * Caches down stream evaluations (in the {@link PredicateFilter} chain) for "idempotent" (with respect to current form
+ * state) predicates. Can only be used for static instances or in cases where form state won't change - will cause
+ * clashes otherwise. Repeated evaluations are fetched in O(1) time.
+ */
+public class IdempotentPredicateCache implements PredicateFilter {
 
     private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
