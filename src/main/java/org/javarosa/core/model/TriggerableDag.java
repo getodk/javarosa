@@ -99,7 +99,8 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
-    private PredicateFilter predicateIndex = new IndexingPredicateFilter();
+    private final PredicateFilter cmpCache = new CmpCachePredicateFilter();
+    private final PredicateFilter predicateIndex = new IndexingPredicateFilter();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -524,6 +525,7 @@ public class TriggerableDag {
         if (predicateCaching) {
             context = new EvaluationContext(evalContext, Arrays.asList(
                 predicateIndex,
+                cmpCache,
                 new IdempotentInMemPredicateCache()
             ));
         } else {

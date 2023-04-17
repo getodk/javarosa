@@ -6,7 +6,6 @@ import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.measure.Measure;
-import org.javarosa.xpath.expr.XPathCmpExpr;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
 
 public class IndexingPredicateFilter implements PredicateFilter {
 
-    private final Map<String, List<TreeReference>> cachedCmpEvaluations = new HashMap<>();
     private final Map<Pair<String, String>, Map<String, List<TreeReference>>> instanceEqIndexes = new HashMap<>();
 
     @Nullable
@@ -45,29 +43,6 @@ public class IndexingPredicateFilter implements PredicateFilter {
             XPathPathExpr right = (XPathPathExpr) ((XPathEqExpr) predicate).b;
             String rightValue = (String) right.eval(sourceInstance, evaluationContext).unpack();
             return index.getOrDefault(rightValue, new ArrayList<>());
-        } else if (predicate instanceof XPathCmpExpr &&
-            ((XPathCmpExpr) predicate).a instanceof XPathPathExpr &&
-            ((XPathCmpExpr) predicate).b instanceof XPathPathExpr) {
-            XPathPathExpr left = (XPathPathExpr) ((XPathCmpExpr) predicate).a;
-            XPathPathExpr right = (XPathPathExpr) ((XPathCmpExpr) predicate).b;
-
-            String key = null;
-            if (left != null && right != null && left.init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE) {
-                Object rightValue = right.eval(sourceInstance, evaluationContext).unpack();
-                key = nodeSet.toString() + predicate + left + rightValue.toString();
-            }
-
-            if (key != null) {
-                if (cachedCmpEvaluations.containsKey(key)) {
-                    return cachedCmpEvaluations.get(key);
-                } else {
-                    List<TreeReference> filtered = next.get();
-                    cachedCmpEvaluations.put(key, filtered);
-                    return filtered;
-                }
-            } else {
-                return next.get();
-            }
         } else {
             return next.get();
         }
