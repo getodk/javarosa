@@ -5,8 +5,8 @@ import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathCmpExpr;
+import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
-import org.javarosa.xpath.expr.XPathPathExpr;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 /**
  * Caches down stream evaluations (in the {@link PredicateFilter} chain) for supported expressions - currently just
- * {@link XPathCmpExpr}. Repeated evaluations are fetched in O(1) time.
+ * {@link XPathCmpExpr} and {@link XPathEqExpr}. Repeated evaluations are fetched in O(1) time.
  */
 public class CachingPredicateFilter implements PredicateFilter {
 
@@ -25,17 +25,11 @@ public class CachingPredicateFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        if (predicate instanceof XPathCmpExpr &&
-            ((XPathCmpExpr) predicate).a instanceof XPathPathExpr &&
-            ((XPathCmpExpr) predicate).b instanceof XPathPathExpr) {
-            XPathPathExpr left = (XPathPathExpr) ((XPathCmpExpr) predicate).a;
-            XPathPathExpr right = (XPathPathExpr) ((XPathCmpExpr) predicate).b;
+        CompareChildToAbsolutePredicate candidate = CompareChildToAbsolutePredicate.parse(predicate);
 
-            String key = null;
-            if (left != null && right != null && left.init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE) {
-                Object rightValue = right.eval(sourceInstance, evaluationContext).unpack();
-                key = nodeSet.toString() + predicate + left + rightValue.toString();
-            }
+        if (candidate != null) {
+            Object rightValue = candidate.getAbsoluteSide().eval(sourceInstance, evaluationContext).unpack();
+            String key = nodeSet.toString() + predicate + candidate.getRelativeSide() + rightValue.toString();
 
             if (key != null) {
                 if (cachedEvaluations.containsKey(key)) {
@@ -52,4 +46,5 @@ public class CachingPredicateFilter implements PredicateFilter {
             return next.get();
         }
     }
+
 }

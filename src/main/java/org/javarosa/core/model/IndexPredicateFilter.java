@@ -8,7 +8,6 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.measure.Measure;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
-import org.javarosa.xpath.expr.XPathPathExpr;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -29,41 +28,35 @@ public class IndexPredicateFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        if (predicate instanceof XPathEqExpr &&
-            ((XPathEqExpr) predicate).a instanceof XPathPathExpr &&
-            ((XPathEqExpr) predicate).b instanceof XPathPathExpr &&
-            ((XPathPathExpr) ((XPathEqExpr) predicate).a).init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE &&
-            ((XPathPathExpr) ((XPathEqExpr) predicate).b).init_context == XPathPathExpr.INIT_CONTEXT_ROOT) {
-            XPathPathExpr left = (XPathPathExpr) ((XPathEqExpr) predicate).a;
-            Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), left.toString());
+        CompareChildToAbsolutePredicate candidate = CompareChildToAbsolutePredicate.parse(predicate);
+        if (candidate != null && candidate.getOriginal() instanceof XPathEqExpr) {
+            Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), candidate.getRelativeSide().toString());
             if (!instanceEqIndexes.containsKey(indexKey)) {
                 instanceEqIndexes.put(indexKey, new HashMap<>());
             }
 
             Map<String, List<TreeReference>> index = instanceEqIndexes.get(indexKey);
             if (index.isEmpty()) {
-                buildEqIndex(sourceInstance, (XPathEqExpr) predicate, children, evaluationContext, index);
+                buildEqIndex(sourceInstance, candidate, children, evaluationContext, index);
             }
 
-            XPathPathExpr right = (XPathPathExpr) ((XPathEqExpr) predicate).b;
-            String rightValue = (String) right.eval(sourceInstance, evaluationContext).unpack();
+            String rightValue = (String) candidate.getAbsoluteSide().eval(sourceInstance, evaluationContext).unpack();
             return index.getOrDefault(rightValue, new ArrayList<>());
         } else {
             return next.get();
         }
     }
 
-    private static void buildEqIndex(DataInstance sourceInstance, XPathEqExpr predicate, List<TreeReference> children, EvaluationContext evaluationContext, Map<String, List<TreeReference>> eqIndex) {
+    private static void buildEqIndex(DataInstance sourceInstance, CompareChildToAbsolutePredicate predicate, List<TreeReference> children, EvaluationContext evaluationContext, Map<String, List<TreeReference>> eqIndex) {
         for (int i = 0; i < children.size(); i++) {
             TreeReference child = children.get(i);
-            XPathPathExpr left = (XPathPathExpr) predicate.a;
 
             EvaluationContext evalContext = evaluationContext.rescope(child, i);
 
             Measure.log("IndexEvaluation");
-            String leftVal = (String) left.eval(sourceInstance, evalContext).unpack();
+            String leftVal = (String) predicate.getRelativeSide().eval(sourceInstance, evalContext).unpack();
 
-            if (!eqIndex.containsKey(left.toString())) {
+            if (!eqIndex.containsKey(predicate.getRelativeSide().toString())) {
                 eqIndex.put(leftVal, new ArrayList<>());
             }
 
