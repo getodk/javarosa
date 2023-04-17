@@ -4,6 +4,7 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.measure.Measure;
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
@@ -48,7 +49,7 @@ public class PredicateCachingTest {
             )
         ));
 
-        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/choice", "a");
         });
 
@@ -83,7 +84,7 @@ public class PredicateCachingTest {
             )
         ));
 
-        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/choice", "2");
         });
 
@@ -118,7 +119,7 @@ public class PredicateCachingTest {
             )
         ));
 
-        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/choice", "1");
         });
 
@@ -153,9 +154,9 @@ public class PredicateCachingTest {
             )
         ));
 
-        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/choice", "a");
-            scenario.answer("/data/choice", "a");
+            scenario.answer("/data/choice", "b");
         });
 
         // Check that we do less than size of secondary instance * number of times we answer
@@ -189,7 +190,7 @@ public class PredicateCachingTest {
             )
         ));
 
-        int evaluations = Measure.withMeasure("PredicateEvaluations", () -> {
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/choice", "2");
             scenario.answer("/data/choice", "2");
         });
@@ -399,5 +400,41 @@ public class PredicateCachingTest {
         scenario.answer("/data/input", "2");
         assertThat(scenario.answerOf("/data/calculate1").getValue(), equalTo("A"));
         assertThat(scenario.answerOf("/data/calculate2").getValue(), equalTo("B"));
+    }
+
+    @Test
+    public void differentEqExpressionsAreNotConfused() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("calc1"),
+                        t("calc2"),
+                        t("input1"),
+                        t("input2")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/calc1").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/input1]/label"),
+                    bind("/data/calc2").type("string")
+                        .calculate("instance('instance')/root/item[label = /data/input2]/label"),
+                    bind("/data/input").type("string")
+                )
+            ),
+            body(
+                input("/data/input1"),
+                input("/data/input2")
+            )
+        ));
+
+        scenario.answer("/data/input1", "a");
+        scenario.answer("/data/input2", "B");
+
+        assertThat(scenario.answerOf("/data/calc1").getValue(), equalTo("A"));
+        assertThat(scenario.answerOf("/data/calc2").getValue(), equalTo("B"));
     }
 }

@@ -28,7 +28,7 @@ class XPathEvalPredicateFilter implements PredicateFilter {
             //test the predicate on the treeElement
             EvaluationContext evalContext = evaluationContext.rescope(treeRef, i);
 
-            Measure.log("PredicateEvaluations");
+            Measure.log("PredicateEvaluation");
             Object o = predicate.eval(sourceInstance, evalContext);
 
             if (o instanceof Boolean) {
