@@ -99,7 +99,7 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
-    private final PredicateFilter cachingPredicateFilter = new CachingPredicateFilter();
+    private final PredicateFilter cachingPredicateFilter = new CompareChildToAbsoluteExpressionFilter();
     private final PredicateFilter indexPredicateFilter = new IndexPredicateFilter();
 
     TriggerableDag(EventNotifierAccessor accessor) {

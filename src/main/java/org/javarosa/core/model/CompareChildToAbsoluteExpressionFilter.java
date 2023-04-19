@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * Caches down stream evaluations (in the {@link PredicateFilter} chain) for supported expressions - currently just
  * {@link XPathCmpExpr} and {@link XPathEqExpr}. Repeated evaluations are fetched in O(1) time.
  */
-public class CachingPredicateFilter implements PredicateFilter {
+public class CompareChildToAbsoluteExpressionFilter implements PredicateFilter {
 
     private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
