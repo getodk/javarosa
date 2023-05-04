@@ -41,7 +41,7 @@ public class IndexPredicateFilter implements PredicateFilter {
                 buildEqIndex(sourceInstance, candidate, children, evaluationContext, index);
             }
 
-            Object absoluteValue = CompareChildToAbsoluteExpression.evalAbsolute(sourceInstance, evaluationContext, candidate);
+            Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
             return index.getOrDefault(absoluteValue.toString(), new ArrayList<>());
         } else {
             return next.get();
@@ -62,10 +62,8 @@ public class IndexPredicateFilter implements PredicateFilter {
         for (int i = 0; i < children.size(); i++) {
             TreeReference child = children.get(i);
 
-            EvaluationContext evalContext = evaluationContext.rescope(child, i);
-
             Measure.log("IndexEvaluation");
-            String relativeValue = (String) predicate.getRelativeSide().eval(sourceInstance, evalContext).unpack();
+            String relativeValue = predicate.evalRelative(sourceInstance, evaluationContext, child, i).toString();
 
             if (!eqIndex.containsKey(predicate.getRelativeSide().toString())) {
                 eqIndex.put(relativeValue, new ArrayList<>());

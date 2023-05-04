@@ -28,7 +28,7 @@ public class CompareChildToAbsoluteExpressionFilter implements PredicateFilter {
         CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
 
         if (candidate != null) {
-            Object absoluteValue = CompareChildToAbsoluteExpression.evalAbsolute(sourceInstance, evaluationContext, candidate);
+            Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
             String key = nodeSet.toString() + predicate + candidate.getRelativeSide() + absoluteValue.toString();
 
             if (cachedEvaluations.containsKey(key)) {

@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import kotlin.Pair;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathCmpExpr;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -25,6 +26,19 @@ class CompareChildToAbsoluteExpression {
         this.relativeSide = relativeSide;
         this.absoluteSide = absoluteSide;
         this.original = original;
+    }
+
+    public Object evalRelative(DataInstance sourceInstance, EvaluationContext evaluationContext, TreeReference child, int childIndex) {
+        EvaluationContext rescopedContext = evaluationContext.rescope(child, childIndex);
+        return getRelativeSide().eval(sourceInstance, rescopedContext).unpack();
+    }
+
+    public Object evalAbsolute(DataInstance sourceInstance, EvaluationContext evaluationContext) {
+        if (absoluteSide instanceof XPathPathExpr) {
+            return ((XPathPathExpr) getAbsoluteSide()).eval(sourceInstance, evaluationContext).unpack();
+        } else {
+            return absoluteSide.eval(sourceInstance, evaluationContext);
+        }
     }
 
     public XPathPathExpr getRelativeSide() {
@@ -57,14 +71,6 @@ class CompareChildToAbsoluteExpression {
             return new CompareChildToAbsoluteExpression(relativeAndAbsolute.getFirst(), relativeAndAbsolute.getSecond(), expression);
         } else {
             return null;
-        }
-    }
-
-    public static Object evalAbsolute(DataInstance sourceInstance, EvaluationContext evaluationContext, CompareChildToAbsoluteExpression expression) {
-        if (expression.absoluteSide instanceof XPathPathExpr) {
-            return ((XPathPathExpr) expression.getAbsoluteSide()).eval(sourceInstance, evaluationContext).unpack();
-        } else {
-            return expression.absoluteSide.eval(sourceInstance, evaluationContext);
         }
     }
 
