@@ -251,14 +251,16 @@ public class PredicateCachingTest {
                         )
                     ),
                     bind("/data/cat").type("string")
-                        .calculate("instance('instance')/root/cat[name = 'Vinnie']/age"),
+                        .calculate("instance('instance')/root/cat[name = /data/input]/age"),
                     bind("/data/dog").type("string")
-                        .calculate("instance('instance')/root/dog[name = 'Vinnie']/age"),
+                        .calculate("instance('instance')/root/dog[name = /data/input]/age"),
                     bind("/data/input").type("string")
                 )
             ),
             body(input("/data/input"))
         ));
+
+        scenario.answer("/data/input", "Vinnie");
 
         assertThat(scenario.answerOf("/data/cat").getValue(), equalTo("12"));
         assertThat(scenario.answerOf("/data/dog").getValue(), equalTo("9"));
@@ -329,7 +331,7 @@ public class PredicateCachingTest {
     }
 
     @Test
-    public void predicatesInMultipleSetsDoNotGetConfused() throws Exception {
+    public void nestedPredicatesDoNotGetConfused() throws Exception {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
@@ -337,7 +339,8 @@ public class PredicateCachingTest {
                     mainInstance(t("data id=\"some-form\"",
                         t("calc"),
                         t("calc2"),
-                        t("input")
+                        t("input1"),
+                        t("input2")
                     )),
                     instance("instance",
                         t("item",
@@ -357,14 +360,21 @@ public class PredicateCachingTest {
                         )
                     ),
                     bind("/data/calc").type("string")
-                        .calculate("instance('instance')/root/item[value = 'A'][count = '3']/id"),
+                        .calculate("instance('instance')/root/item[value = /data/input1][count = '3']/id"),
                     bind("/data/calc2").type("string")
-                        .calculate("instance('instance')/root/item[value = 'B'][count = '3']/id"),
-                    bind("/data/input").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/input2][count = '3']/id"),
+                    bind("/data/input1").type("string"),
+                    bind("/data/input2").type("string")
                 )
             ),
-            body(input("/data/input"))
+            body(
+                input("/data/input1"),
+                input("/data/input2")
+            )
         ));
+
+        scenario.answer("/data/input1", "A");
+        scenario.answer("/data/input2", "B");
 
         assertThat(scenario.answerOf("/data/calc").getValue(), equalTo("A3"));
         assertThat(scenario.answerOf("/data/calc2"), equalTo(null));
