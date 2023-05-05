@@ -31,18 +31,23 @@ public class IndexPredicateFilter implements PredicateFilter {
         CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
 
         if (candidate != null && candidate.getOriginal() instanceof XPathEqExpr && !isNested(nodeSet)) {
-            Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), nodeSet.toString() + candidate.getRelativeSide().toString());
-            if (!instanceEqIndexes.containsKey(indexKey)) {
-                instanceEqIndexes.put(indexKey, new HashMap<>());
-            }
+            XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
+            if (original.isEqual()) {
+                Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), nodeSet.toString() + candidate.getRelativeSide().toString());
+                if (!instanceEqIndexes.containsKey(indexKey)) {
+                    instanceEqIndexes.put(indexKey, new HashMap<>());
+                }
 
-            Map<String, List<TreeReference>> index = instanceEqIndexes.get(indexKey);
-            if (index.isEmpty()) {
-                buildEqIndex(sourceInstance, candidate, children, evaluationContext, index);
-            }
+                Map<String, List<TreeReference>> index = instanceEqIndexes.get(indexKey);
+                if (index.isEmpty()) {
+                    buildEqIndex(sourceInstance, candidate, children, evaluationContext, index);
+                }
 
-            Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
-            return index.getOrDefault(absoluteValue.toString(), new ArrayList<>());
+                Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
+                return index.getOrDefault(absoluteValue.toString(), new ArrayList<>());
+            } else {
+                return next.get();
+            }
         } else {
             return next.get();
         }

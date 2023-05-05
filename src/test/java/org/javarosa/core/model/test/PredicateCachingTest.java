@@ -437,4 +437,35 @@ public class PredicateCachingTest {
         assertThat(scenario.answerOf("/data/calc1").getValue(), equalTo("A"));
         assertThat(scenario.answerOf("/data/calc2").getValue(), equalTo("B"));
     }
+
+    @Test
+    public void differentKindsOfEqExpressionsAreNotConfused() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("calc1"),
+                        t("calc2"),
+                        t("input")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/calc1").type("string")
+                        .calculate("instance('instance')/root/item[value = 'a']/label"),
+                    bind("/data/calc2").type("string")
+                        .calculate("instance('instance')/root/item[value != 'a']/label"),
+                    bind("/data/input").type("string")
+                )
+            ),
+            body(
+                input("/data/input")
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/calc1").getValue(), equalTo("A"));
+        assertThat(scenario.answerOf("/data/calc2").getValue(), equalTo("B"));
+    }
 }
