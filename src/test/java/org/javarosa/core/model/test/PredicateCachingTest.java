@@ -164,7 +164,7 @@ public class PredicateCachingTest {
     }
 
     @Test
-    public void repeatedCompPredicatesAreOnlyEvaluatedOnce() throws Exception {
+    public void repeatedCompPredicatesWithSameAnswerAreOnlyEvaluatedOnce() throws Exception {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
