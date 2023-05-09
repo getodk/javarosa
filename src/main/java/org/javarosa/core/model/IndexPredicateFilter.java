@@ -1,19 +1,16 @@
 package org.javarosa.core.model;
 
-import kotlin.Pair;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.instance.TreeReferenceIndex;
 import org.javarosa.measure.Measure;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +20,11 @@ import java.util.function.Supplier;
  */
 public class IndexPredicateFilter implements PredicateFilter {
 
-    private final Map<Pair<String, String>, Map<String, List<TreeReference>>> instanceEqIndexes = new HashMap<>();
+    private final TreeReferenceIndex index;
+
+    public IndexPredicateFilter(TreeReferenceIndex treeReferenceIndex) {
+        this.index = treeReferenceIndex;
+    }
 
     @Nullable
     @Override
@@ -36,18 +37,13 @@ public class IndexPredicateFilter implements PredicateFilter {
         if (candidate != null) {
             XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
             if (original.isEqual()) {
-                Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), nodeSet.toString() + candidate.getRelativeSide().toString());
-                if (!instanceEqIndexes.containsKey(indexKey)) {
-                    instanceEqIndexes.put(indexKey, new HashMap<>());
-                }
-
-                Map<String, List<TreeReference>> index = instanceEqIndexes.get(indexKey);
-                if (index.isEmpty()) {
-                    buildEqIndex(sourceInstance, candidate, children, evaluationContext, index);
+                String section = sourceInstance.getInstanceId() + nodeSet + candidate.getRelativeSide().toString();
+                if (!index.contains(section)) {
+                    buildIndex(sourceInstance, candidate, children, evaluationContext, section);
                 }
 
                 Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
-                return index.getOrDefault(absoluteValue.toString(), new ArrayList<>());
+                return index.lookup(section, absoluteValue.toString());
             } else {
                 return next.get();
             }
@@ -66,18 +62,13 @@ public class IndexPredicateFilter implements PredicateFilter {
         return false;
     }
 
-    private static void buildEqIndex(DataInstance sourceInstance, CompareChildToAbsoluteExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Map<String, List<TreeReference>> eqIndex) {
+    private void buildIndex(DataInstance sourceInstance, CompareChildToAbsoluteExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
         for (int i = 0; i < children.size(); i++) {
             TreeReference child = children.get(i);
 
             Measure.log("IndexEvaluation");
             String relativeValue = predicate.evalRelative(sourceInstance, evaluationContext, child, i).toString();
-
-            if (!eqIndex.containsKey(relativeValue)) {
-                eqIndex.put(relativeValue, new ArrayList<>());
-            }
-
-            eqIndex.get(relativeValue).add(child);
+            index.add(section, relativeValue, child);
         }
     }
 }

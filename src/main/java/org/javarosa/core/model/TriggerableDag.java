@@ -100,7 +100,7 @@ public class TriggerableDag {
 
     private boolean predicateCaching = true;
     private final PredicateFilter cachingPredicateFilter = new CompareChildToAbsoluteExpressionFilter();
-    private final PredicateFilter indexPredicateFilter = new IndexPredicateFilter();
+    private final PredicateFilter indexPredicateFilter = new IndexPredicateFilter(new InMemTreeReferenceIndex());
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
