@@ -28,9 +28,12 @@ public class IndexPredicateFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
+        if (sourceInstance.getInstanceId() == null || isNested(nodeSet) || !(predicate instanceof XPathEqExpr)) {
+            return next.get();
+        }
 
-        if (candidate != null && candidate.getOriginal() instanceof XPathEqExpr && !isNested(nodeSet)) {
+        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
+        if (candidate != null) {
             XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
             if (original.isEqual()) {
                 Pair<String, String> indexKey = new Pair<>(sourceInstance.getInstanceId(), nodeSet.toString() + candidate.getRelativeSide().toString());

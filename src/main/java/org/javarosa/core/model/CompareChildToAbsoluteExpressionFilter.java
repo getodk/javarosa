@@ -25,8 +25,11 @@ public class CompareChildToAbsoluteExpressionFilter implements PredicateFilter {
     @Nullable
     @Override
     public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
-        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
+        if (sourceInstance.getInstanceId() == null) {
+            return next.get();
+        }
 
+        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
         if (candidate != null) {
             Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
             String key = nodeSet.toString() + predicate + candidate.getRelativeSide() + absoluteValue.toString();

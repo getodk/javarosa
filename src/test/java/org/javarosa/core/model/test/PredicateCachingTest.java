@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
+import static org.javarosa.core.util.XFormsElement.group;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.input;
@@ -17,6 +18,7 @@ import static org.javarosa.core.util.XFormsElement.instance;
 import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
@@ -477,5 +479,41 @@ public class PredicateCachingTest {
 
         assertThat(scenario.answerOf("/data/calc1").getValue(), equalTo("A"));
         assertThat(scenario.answerOf("/data/calc2").getValue(), equalTo("B"));
+    }
+
+    @Test
+    public void repeatsUsedInCalculatesStayUpToDate() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("repeat",
+                            t("name"),
+                            t("age")
+                        ),
+                        t("result")
+                    )),
+                    bind("/data/repeat/input").type("string"),
+                    bind("/data/result").type("string").calculate("/data/repeat[name = 'John Bell']/age")
+                )
+            ),
+            body(
+                group("/data/repeat",
+                    repeat("/data/repeat",
+                        input("/data/repeat/name"),
+                        input("/data/repeat/age")
+                    )
+                )
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/result"), equalTo(null));
+
+        scenario.createNewRepeat("/data/repeat");
+        scenario.answer("/data/repeat[0]/name", "John Bell");
+        scenario.answer("/data/repeat[0]/age", "70");
+
+        assertThat(scenario.answerOf("/data/result").getValue(), equalTo("70"));
     }
 }
