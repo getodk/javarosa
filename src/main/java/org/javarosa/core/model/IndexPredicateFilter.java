@@ -73,7 +73,7 @@ public class IndexPredicateFilter implements PredicateFilter {
             Measure.log("IndexEvaluation");
             String relativeValue = predicate.evalRelative(sourceInstance, evaluationContext, child, i).toString();
 
-            if (!eqIndex.containsKey(predicate.getRelativeSide().toString())) {
+            if (!eqIndex.containsKey(relativeValue)) {
                 eqIndex.put(relativeValue, new ArrayList<>());
             }
 

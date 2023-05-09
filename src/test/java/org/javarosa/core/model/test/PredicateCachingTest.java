@@ -166,6 +166,58 @@ public class PredicateCachingTest {
     }
 
     @Test
+    public void firstPredicateInMultipleEqPredicatesAreOnlyEvaluatedOnce() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("calc"),
+                        t("input1"),
+                        t("input2")
+                    )),
+                    instance("instance",
+                        t("item",
+                            t("value", "A"),
+                            t("count", "2"),
+                            t("id", "A2")
+                        ),
+                        t("item",
+                            t("value", "A"),
+                            t("count", "3"),
+                            t("id", "A3")
+                        ),
+                        t("item",
+                            t("value", "B"),
+                            t("count", "2"),
+                            t("id", "B2")
+                        )
+                    ),
+                    bind("/data/calc").type("string")
+                        .calculate("instance('instance')/root/item[value = /data/input1][count = /data/input2]/id"),
+                    bind("/data/input1").type("string"),
+                    bind("/data/input2").type("string")
+                )
+            ),
+            body(
+                input("/data/input1"),
+                input("/data/input2")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/input1", "A");
+            scenario.answer("/data/input2", "3");
+
+            scenario.answer("/data/input1", "A");
+            scenario.answer("/data/input2", "2");
+        });
+
+        // Check that we do less than size of (secondary instance + filtered secondary instance) * number of times we answer
+        assertThat(evaluations, lessThan(20));
+    }
+
+    @Test
     public void repeatedCompPredicatesWithSameAnswerAreOnlyEvaluatedOnce() throws Exception {
         Scenario scenario = Scenario.init("Some form", html(
             head(

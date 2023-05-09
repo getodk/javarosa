@@ -330,18 +330,18 @@ public class EvaluationContext {
             TreeReference nodeSetRef = workingRef.clone();
             nodeSetRef.add(name, -1);
 
-            List<PredicateFilter> filterChain;
-            if (predicates.size() == 1) {
-                filterChain = predicateFilterChain;
-            } else {
-                filterChain = singletonList(new XPathEvalPredicateFilter());
-            }
+            for (int i = 0; i < predicates.size(); i++) {
+                List<PredicateFilter> filterChain;
+                if (i == 0) {
+                    filterChain = predicateFilterChain;
+                } else {
+                    filterChain = singletonList(new XPathEvalPredicateFilter());
+                }
 
-            for (XPathExpression xpe : predicates) {
                 List<TreeReference> passed = filterWithPredicate(
                     sourceInstance,
                     nodeSetRef,
-                    xpe,
+                    predicates.get(i),
                     treeReferences,
                     filterChain
                 );
