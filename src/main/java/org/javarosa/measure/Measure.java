@@ -17,7 +17,7 @@ public class Measure {
         start();
         work.run();
         int count = getCount(event);
-        start();
+        stop();
 
         return count;
     }
@@ -31,7 +31,7 @@ public class Measure {
             count += getCount(event);
         }
 
-        start();
+        stop();
 
         return count;
     }
