@@ -13,15 +13,6 @@ public class Measure {
 
     }
 
-    public static int withMeasure(String event, Runnable work) {
-        start();
-        work.run();
-        int count = getCount(event);
-        stop();
-
-        return count;
-    }
-
     public static int withMeasure(List<String> events, Runnable work) {
         start();
         work.run();
