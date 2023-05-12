@@ -24,6 +24,7 @@ import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -1706,5 +1707,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public void disablePredicateCaching() {
         dagImpl.disablePredicateCaching();
+    }
+
+    public void addPredicateFilter(PredicateFilter predicateFilter) {
+        dagImpl.addPredicateFilter(predicateFilter);
     }
 }

@@ -40,7 +40,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +47,10 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
 
@@ -101,6 +103,7 @@ public class TriggerableDag {
     private boolean predicateCaching = true;
     private final PredicateFilter cachingPredicateFilter = new CompareChildToAbsoluteExpressionFilter();
     private final PredicateFilter indexPredicateFilter = new IndexPredicateFilter();
+    private final Queue<PredicateFilter> customPredicateFilters = new LinkedList<>();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -523,11 +526,12 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            context = new EvaluationContext(evalContext, Arrays.asList(
-                indexPredicateFilter,
-                cachingPredicateFilter,
-                new IdempotentPredicateCache()
-            ));
+            List<PredicateFilter> filters = Stream.concat(
+                customPredicateFilters.stream(),
+                Stream.of(indexPredicateFilter, cachingPredicateFilter, new IdempotentPredicateCache())
+            ).collect(Collectors.toList());
+
+            context = new EvaluationContext(evalContext, filters);
         } else {
             context = evalContext;
         }
@@ -745,5 +749,9 @@ public class TriggerableDag {
 
     public void disablePredicateCaching() {
         this.predicateCaching = false;
+    }
+
+    public void addPredicateFilter(PredicateFilter predicateFilter) {
+        customPredicateFilters.add(predicateFilter);
     }
 }
