@@ -66,7 +66,8 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
-    private List<PredicateFilter> predicateFilterChain = singletonList(new XPathEvalPredicateFilter());
+    private static final List<PredicateFilter> DEFAULT_PREDICATE_FILTER_CHAIN = singletonList(new XPathEvalPredicateFilter());
+    private List<PredicateFilter> predicateFilterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
 
     /**
      * Copy Constructor
@@ -335,7 +336,7 @@ public class EvaluationContext {
                 if (i == 0) {
                     filterChain = predicateFilterChain;
                 } else {
-                    filterChain = singletonList(new XPathEvalPredicateFilter());
+                    filterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
                 }
 
                 List<TreeReference> passed = filterWithPredicate(
