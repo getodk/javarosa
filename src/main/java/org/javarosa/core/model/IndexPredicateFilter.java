@@ -9,8 +9,13 @@ import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Uses a (lazily constructed) index to evaluate a predicate for supported expressions - currently just
@@ -19,11 +24,7 @@ import java.util.function.Supplier;
  */
 public class IndexPredicateFilter implements PredicateFilter {
 
-    private final TreeReferenceIndex index;
-
-    public IndexPredicateFilter(TreeReferenceIndex treeReferenceIndex) {
-        this.index = treeReferenceIndex;
-    }
+    private final InMemTreeReferenceIndex index = new InMemTreeReferenceIndex();
 
     @Nullable
     @Override
@@ -71,11 +72,33 @@ public class IndexPredicateFilter implements PredicateFilter {
         }
     }
 
-    interface TreeReferenceIndex {
-        boolean contains(String section);
+    private static class InMemTreeReferenceIndex {
 
-        void add(String section, String key, TreeReference reference);
+        private final Map<String, Map<String, List<TreeReference>>> map = new HashMap<>();
 
-        List<TreeReference> lookup(String section, String key);
+        public boolean contains(String section) {
+            return map.containsKey(section);
+        }
+
+        public void add(String section, String key, TreeReference reference) {
+            if (!map.containsKey(section)) {
+                map.put(section, new HashMap<>());
+            }
+
+            Map<String, List<TreeReference>> sectionMap = map.get(section);
+            if (!sectionMap.containsKey(key)) {
+                sectionMap.put(key, new ArrayList<>());
+            }
+
+            sectionMap.get(key).add(reference);
+        }
+
+        public List<TreeReference> lookup(String section, String key) {
+            if (map.containsKey(section) && map.get(section).containsKey(key)) {
+                return map.get(section).get(key);
+            } else {
+                return emptyList();
+            }
+        }
     }
 }
