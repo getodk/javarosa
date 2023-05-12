@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-class CompareChildToAbsoluteExpression {
+public class CompareChildToAbsoluteExpression {
 
     private final XPathPathExpr relativeSide;
     private final XPathExpression absoluteSide;

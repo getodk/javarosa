@@ -7,7 +7,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathCmpExpr;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +22,9 @@ public class CompareChildToAbsoluteExpressionFilter implements PredicateFilter {
 
     private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
-    @Nullable
+    @NotNull
     @Override
-    public List<TreeReference> filter(DataInstance sourceInstance, TreeReference nodeSet, XPathExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, Supplier<List<TreeReference>> next) {
+    public List<TreeReference> filter(@NotNull DataInstance sourceInstance, @NotNull TreeReference nodeSet, @NotNull XPathExpression predicate, @NotNull List<TreeReference> children, @NotNull EvaluationContext evaluationContext, @NotNull Supplier<List<TreeReference>> next) {
         if (sourceInstance.getInstanceId() == null) {
             return next.get();
         }

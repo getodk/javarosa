@@ -14,12 +14,12 @@ class XPathEvalPredicateFilter implements PredicateFilter {
 
     @NotNull
     @Override
-    public List<TreeReference> filter(DataInstance sourceInstance,
-                                      TreeReference nodeSet,
-                                      XPathExpression predicate,
-                                      List<TreeReference> children,
-                                      EvaluationContext evaluationContext,
-                                      Supplier<List<TreeReference>> nextFilter) {
+    public List<TreeReference> filter(@NotNull DataInstance sourceInstance,
+                                      @NotNull TreeReference nodeSet,
+                                      @NotNull XPathExpression predicate,
+                                      @NotNull List<TreeReference> children,
+                                      @NotNull EvaluationContext evaluationContext,
+                                      @NotNull Supplier<List<TreeReference>> nextFilter) {
         List<TreeReference> predicatePassed = new ArrayList<>(children.size());
         for (int i = 0; i < children.size(); ++i) {
             //if there are predicates then we need to see if e.nextElement meets the standard of the predicate

@@ -23,6 +23,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -361,10 +362,12 @@ public class EvaluationContext {
         }
     }
 
+    @NotNull
     private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, List<PredicateFilter> filterChain) {
         return filterWithPredicate(sourceInstance, treeReference, predicate, children, 0, filterChain);
     }
 
+    @NotNull
     private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i, List<PredicateFilter> filterChain) {
         return filterChain.get(i).filter(sourceInstance, treeReference, predicate, children, this, () -> {
             return filterWithPredicate(sourceInstance, treeReference, predicate, children, i + 1, filterChain);
