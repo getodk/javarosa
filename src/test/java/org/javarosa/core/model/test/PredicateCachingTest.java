@@ -7,7 +7,9 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.not;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.group;
@@ -567,5 +569,40 @@ public class PredicateCachingTest {
         scenario.answer("/data/repeat[0]/age", "70");
 
         assertThat(scenario.answerOf("/data/result").getValue(), equalTo("70"));
+    }
+
+    @Test
+    public void eqPredicatesDoNotIncreaseLoadTime() {
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+                try {
+                    Scenario.init("Some form", html(
+                        head(
+                            title("Some form"),
+                            model(
+                                mainInstance(t("data id=\"some-form\"",
+                                    t("choice"),
+                                    t("calculate1"),
+                                    t("calculate2")
+                                )),
+                                instance("instance",
+                                    item("a", "A"),
+                                    item("b", "B")
+                                ),
+                                bind("/data/choice").type("string"),
+                                bind("/data/calculate1").type("string")
+                                    .calculate("instance('instance')/root/item[value = /data/choice]/label")
+                            )
+                        ),
+                        body(
+                            input("/data/choice")
+                        )
+                    ));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        );
+
+        assertThat(evaluations, not(greaterThan(2)));
     }
 }
