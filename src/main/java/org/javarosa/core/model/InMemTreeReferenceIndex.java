@@ -1,7 +1,6 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.instance.TreeReferenceIndex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +9,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 
-class InMemTreeReferenceIndex implements TreeReferenceIndex {
+class InMemTreeReferenceIndex implements IndexPredicateFilter.TreeReferenceIndex {
 
     private final Map<String, Map<String, List<TreeReference>>> map = new HashMap<>();
 

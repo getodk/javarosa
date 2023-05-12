@@ -4,7 +4,6 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.instance.TreeReferenceIndex;
 import org.javarosa.measure.Measure;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -70,5 +69,13 @@ public class IndexPredicateFilter implements PredicateFilter {
             String relativeValue = predicate.evalRelative(sourceInstance, evaluationContext, child, i).toString();
             index.add(section, relativeValue, child);
         }
+    }
+
+    interface TreeReferenceIndex {
+        boolean contains(String section);
+
+        void add(String section, String key, TreeReference reference);
+
+        List<TreeReference> lookup(String section, String key);
     }
 }
