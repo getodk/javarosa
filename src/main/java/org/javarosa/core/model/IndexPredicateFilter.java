@@ -29,7 +29,7 @@ public class IndexPredicateFilter implements PredicateFilter {
     @NotNull
     @Override
     public List<TreeReference> filter(@NotNull DataInstance sourceInstance, @NotNull TreeReference nodeSet, @NotNull XPathExpression predicate, @NotNull List<TreeReference> children, @NotNull EvaluationContext evaluationContext, @NotNull Supplier<List<TreeReference>> next) {
-        if (sourceInstance.getInstanceId() == null || isNested(nodeSet) || !(predicate instanceof XPathEqExpr)) {
+        if (sourceInstance.getInstanceId() == null || !(predicate instanceof XPathEqExpr)) {
             return next.get();
         }
 
@@ -50,16 +50,6 @@ public class IndexPredicateFilter implements PredicateFilter {
         } else {
             return next.get();
         }
-    }
-
-    private static boolean isNested(TreeReference nodeSet) {
-        for (int i = 1; i < nodeSet.size(); i++) {
-            if (nodeSet.getMultiplicity(i) > -1) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private void buildIndex(DataInstance sourceInstance, CompareChildToAbsoluteExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {

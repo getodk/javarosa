@@ -334,7 +334,7 @@ public class EvaluationContext {
 
             for (int i = 0; i < predicates.size(); i++) {
                 List<PredicateFilter> filterChain;
-                if (i == 0) {
+                if (i == 0 && !isNested(nodeSetRef)) {
                     filterChain = predicateFilterChain;
                 } else {
                     filterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
@@ -360,6 +360,16 @@ public class EvaluationContext {
         for (TreeReference treeRef : treeReferences) {
             expandReferenceAccumulator(sourceRef, sourceInstance, treeRef, refs, includeTemplates);
         }
+    }
+
+    private static boolean isNested(TreeReference nodeSet) {
+        for (int i = 1; i < nodeSet.size(); i++) {
+            if (nodeSet.getMultiplicity(i) > -1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @NotNull
