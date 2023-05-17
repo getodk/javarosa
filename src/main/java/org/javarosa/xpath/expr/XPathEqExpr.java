@@ -100,6 +100,10 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
         super.writeExternal(out);
     }
 
+    public boolean isEqual() {
+        return equal;
+    }
+
     private String id() {
         return "@" + Integer.toHexString(System.identityHashCode(this));
     }

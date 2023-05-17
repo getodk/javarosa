@@ -18,6 +18,7 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.PredicateFilter;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -46,7 +47,10 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
 
@@ -97,6 +101,9 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
+    private final PredicateFilter cachingPredicateFilter = new CompareChildToAbsoluteExpressionFilter();
+    private final PredicateFilter indexPredicateFilter = new IndexPredicateFilter();
+    private final Queue<PredicateFilter> customPredicateFilters = new LinkedList<>();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -516,9 +523,15 @@ public class TriggerableDag {
     private Set<QuickTriggerable> doEvaluateTriggerables(FormInstance mainInstance, EvaluationContext evalContext, Set<QuickTriggerable> toTrigger,
                                                          TreeReference changedRef, Set<QuickTriggerable> affectAllRepeatInstances, Set<QuickTriggerable> alreadyEvaluated) {
         Set<QuickTriggerable> evaluated = new HashSet<>();
+
         EvaluationContext context;
         if (predicateCaching) {
-            context = new EvaluationContext(evalContext, new IdempotentInMemPredicateCache());
+            List<PredicateFilter> filters = Stream.concat(
+                customPredicateFilters.stream(),
+                Stream.of(indexPredicateFilter, cachingPredicateFilter, new IdempotentPredicateCache())
+            ).collect(Collectors.toList());
+
+            context = new EvaluationContext(evalContext, filters);
         } else {
             context = evalContext;
         }
@@ -736,5 +749,9 @@ public class TriggerableDag {
 
     public void disablePredicateCaching() {
         this.predicateCaching = false;
+    }
+
+    public void addPredicateFilter(PredicateFilter predicateFilter) {
+        customPredicateFilters.add(predicateFilter);
     }
 }

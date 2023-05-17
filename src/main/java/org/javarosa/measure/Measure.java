@@ -1,6 +1,7 @@
 package org.javarosa.measure;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Measure {
@@ -12,11 +13,16 @@ public class Measure {
 
     }
 
-    public static int withMeasure(String event, Runnable work) {
+    public static int withMeasure(List<String> events, Runnable work) {
         start();
         work.run();
-        int count = getCount(event);
-        start();
+
+        int count = 0;
+        for (String event : events) {
+            count += getCount(event);
+        }
+
+        stop();
 
         return count;
     }
@@ -42,6 +48,10 @@ public class Measure {
     }
 
     private static int getCount(String event) {
-        return counts.get(event);
+        if (counts.containsKey(event)) {
+            return counts.get(event);
+        } else {
+            return 0;
+        }
     }
 }

@@ -21,14 +21,18 @@ import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.measure.Measure;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Collections.singletonList;
 
 /**
  * A collection of objects that affect the evaluation of an expression, like
@@ -63,8 +67,8 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
-    private PredicateCache predicateCache = ((reference, predicate, onMiss) -> onMiss.get());
-
+    private static final List<PredicateFilter> DEFAULT_PREDICATE_FILTER_CHAIN = singletonList(new XPathEvalPredicateFilter());
+    private List<PredicateFilter> predicateFilterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
 
     /**
      * Copy Constructor
@@ -91,12 +95,15 @@ public class EvaluationContext {
         //invalidate this
         currentContextPosition = base.currentContextPosition;
 
-        predicateCache = base.predicateCache;
+        predicateFilterChain = base.predicateFilterChain;
     }
 
-    public EvaluationContext(EvaluationContext base, PredicateCache predicateCache) {
+    public EvaluationContext(EvaluationContext base, List<PredicateFilter> aroundPredicateFilterChain) {
         this(base);
-        this.predicateCache = predicateCache;
+        this.predicateFilterChain = Stream.concat(
+            aroundPredicateFilterChain.stream(),
+            predicateFilterChain.stream()
+        ).collect(Collectors.toList());
     }
 
     public EvaluationContext(EvaluationContext base, TreeReference context) {
@@ -325,37 +332,24 @@ public class EvaluationContext {
             TreeReference nodeSetRef = workingRef.clone();
             nodeSetRef.add(name, -1);
 
-            boolean firstTime = true;
-            List<TreeReference> passed = new ArrayList<TreeReference>(treeReferences.size());
-            for (XPathExpression xpe : predicates) {
-                boolean firstTimeCapture = firstTime;
-                passed.addAll(predicateCache.get(nodeSetRef, xpe, () -> {
-                    List<TreeReference> predicatePassed = new ArrayList<>(treeReferences.size());
-                    for (int i = 0; i < treeReferences.size(); ++i) {
-                        //if there are predicates then we need to see if e.nextElement meets the standard of the predicate
-                        TreeReference treeRef = treeReferences.get(i);
+            for (int i = 0; i < predicates.size(); i++) {
+                List<PredicateFilter> filterChain;
+                if (i == 0 && !isNested(nodeSetRef)) {
+                    filterChain = predicateFilterChain;
+                } else {
+                    filterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
+                }
 
-                        //test the predicate on the treeElement
-                        EvaluationContext evalContext = rescope(treeRef, (firstTimeCapture ? treeRef.getMultLast() : i));
+                List<TreeReference> passed = filterWithPredicate(
+                    sourceInstance,
+                    nodeSetRef,
+                    predicates.get(i),
+                    treeReferences,
+                    filterChain
+                );
 
-                        Measure.log("PredicateEvaluations");
-                        Object o = xpe.eval(sourceInstance, evalContext);
-
-                        if (o instanceof Boolean) {
-                            boolean testOutcome = (Boolean) o;
-                            if (testOutcome) {
-                                predicatePassed.add(treeRef);
-                            }
-                        }
-                    }
-
-                    return predicatePassed;
-                }));
-
-                firstTime = false;
                 treeReferences.clear();
                 treeReferences.addAll(passed);
-                passed.clear();
 
                 if (predicateEvaluationProgress != null) {
                     predicateEvaluationProgress[0]++;
@@ -368,7 +362,29 @@ public class EvaluationContext {
         }
     }
 
-    private EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
+    private static boolean isNested(TreeReference nodeSet) {
+        for (int i = 1; i < nodeSet.size(); i++) {
+            if (nodeSet.getMultiplicity(i) > -1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @NotNull
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, List<PredicateFilter> filterChain) {
+        return filterWithPredicate(sourceInstance, treeReference, predicate, children, 0, filterChain);
+    }
+
+    @NotNull
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i, List<PredicateFilter> filterChain) {
+        return filterChain.get(i).filter(sourceInstance, treeReference, predicate, children, this, () -> {
+            return filterWithPredicate(sourceInstance, treeReference, predicate, children, i + 1, filterChain);
+        });
+    }
+
+    public EvaluationContext rescope(TreeReference treeRef, int currentContextPosition) {
         EvaluationContext ec = new EvaluationContext(this, treeRef);
         // broken:
         ec.currentContextPosition = currentContextPosition;
