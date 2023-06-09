@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1584,10 +1585,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         }
         X newEx;
         try {
-            newEx = extension.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
-        } catch (IllegalAccessException e) {
+            newEx = extension.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException("Illegally Structured XForm Extension " + extension.getName());
         }
         extensions.add(newEx);

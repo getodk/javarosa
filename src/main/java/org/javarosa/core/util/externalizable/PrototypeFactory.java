@@ -18,6 +18,7 @@ package org.javarosa.core.util.externalizable;
 
 import static org.javarosa.xpath.expr.DigestAlgorithm.MD5;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -123,11 +124,13 @@ public class PrototypeFactory {
 
     public static Object getInstance (Class c) {
         try {
-            return c.newInstance();
+            return c.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException iae) {
             throw new CannotCreateObjectException(c.getName() + ": not accessible or no empty constructor");
         } catch (InstantiationException e) {
             throw new CannotCreateObjectException(c.getName() + ": not instantiable");
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            throw new CannotCreateObjectException(c.getName() + ": no such constructor");
         }
     }
 
