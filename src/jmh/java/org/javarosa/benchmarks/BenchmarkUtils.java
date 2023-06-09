@@ -97,7 +97,7 @@ public class BenchmarkUtils {
                         }
                         paramValues[i++] = stateInstance;
                     }
-                Object instance = clazz.newInstance();
+                Object instance = clazz.getDeclaredConstructor().newInstance();
                 method.invoke(instance, paramValues);
             } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e);
