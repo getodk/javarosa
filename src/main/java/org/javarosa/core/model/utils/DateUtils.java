@@ -488,11 +488,7 @@ public class DateUtils {
     /* ==== DATE UTILITY FUNCTIONS ==== */
 
     public static Date getDate(int year, int month, int day) {
-        DateFields f = new DateFields();
-        f.year = year;
-        f.month = month;
-        f.day = day;
-        return (f.check() ? getDate(f) : null);
+        return getDate(DateFields.of(year, month, day));
     }
 
     /**
