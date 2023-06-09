@@ -22,11 +22,11 @@ public final class FormParserHelper {
     private FormParserHelper() {
     }
 
-    public static FormDef parse(Path formName) throws IOException, XFormParser.ParseException {
+    public static FormDef parse(Path formName) throws IOException, ParseException {
         return XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()));
     }
 
-    public static FormDef parse(Path formName, String lastSavedSrc) throws IOException, XFormParser.ParseException {
+    public static FormDef parse(Path formName, String lastSavedSrc) throws IOException, ParseException {
         return XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()), lastSavedSrc);
     }
 

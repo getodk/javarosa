@@ -4,6 +4,7 @@ import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.entities.internal.EntityFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class EntityFormParserTest {
 
     @Test
-    public void parseFirstDatasetToCreate_findsCreateWithTrueString() throws XFormParser.ParseException {
+    public void parseFirstDatasetToCreate_findsCreateWithTrueString() throws ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")

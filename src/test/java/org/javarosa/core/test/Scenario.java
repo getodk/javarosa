@@ -49,6 +49,7 @@ import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -283,7 +284,7 @@ public class Scenario {
     // that XFormParser.loadXmlInstance(FormDef f, Reader xmlReader) should probably be public. This is also the method that Collect
     // copies because the FormDef may be built from cache meaning there won't be a Reader/Document available and because it makes
     // some extra calls for search(). We pass in an XFormsElement for now until we decide on an interface that Collect can use.
-    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException, XFormParser.ParseException {
+    public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException, ParseException {
         FormInstance originalInstance = getFormDef().getMainInstance();
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
         byte[] formInstanceBytes = serializer.serializeInstance(originalInstance);
@@ -429,7 +430,7 @@ public class Scenario {
      * Initializes the Scenario using a form defined using the DSL in XFormsElement
      */
     // TODO Extract the form's name from the provided XFormsElement object to simplify args
-    public static Scenario init(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
+    public static Scenario init(String formName, XFormsElement form) throws IOException, ParseException {
         Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
         String xml = form.asXml();
         System.out.println(xml);
@@ -442,14 +443,14 @@ public class Scenario {
      * <p>
      * A form with the provided filename must exist in the classpath
      */
-    public static Scenario init(String formFileName) throws XFormParser.ParseException {
+    public static Scenario init(String formFileName) throws ParseException {
         return init(r(formFileName));
     }
 
     /**
      * Initializes the Scenario with the form at the provided path
      */
-    public static Scenario init(Path formFile) throws XFormParser.ParseException {
+    public static Scenario init(Path formFile) throws ParseException {
         // TODO explain why this sequence of calls
         StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();

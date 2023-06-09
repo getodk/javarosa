@@ -25,11 +25,11 @@ import org.kxml2.kdom.Element;
  *  as to why it is?
  * 
  * @author Drew Roos
- * @deprecated Use non {@link RuntimeException} {@link XFormParser.ParseException} instead
+ * @deprecated Use non {@link RuntimeException} {@link ParseException} instead
  *
  */
 @Deprecated
-public class XFormParseException extends XFormParser.ParseException {
+public class XFormParseException extends ParseException {
     /**
      *
      */

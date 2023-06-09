@@ -8,14 +8,14 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 public class RecalculateTest {
     private FormDef formDef;
 
     @Before
-    public void setUp() throws XFormParser.ParseException {
+    public void setUp() throws ParseException {
         FormParseInit fpi = new FormParseInit(r("calculate-now.xml"));
         formDef = fpi.getFormDef();
         formDef.initialize(true, new InstanceInitializationFactory());

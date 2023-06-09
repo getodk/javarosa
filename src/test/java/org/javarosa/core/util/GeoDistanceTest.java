@@ -34,14 +34,14 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import org.hamcrest.number.IsCloseTo;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class GeoDistanceTest {
     private static final double NINETY_DEGREES_ON_EQUATOR_KM = EARTH_EQUATORIAL_CIRCUMFERENCE_METERS / 4;
 
     @Test
-    public void distance_isComputedForGeopointNodeset() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForGeopointNodeset() throws IOException, ParseException {
         Scenario scenario = Scenario.init("geopoint nodeset distance", html(
             head(
                 title("Geopoint nodeset distance"),
@@ -71,7 +71,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForGeotrace() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForGeotrace() throws IOException, ParseException {
         Scenario scenario = Scenario.init("geotrace distance", html(
             head(
                 title("Geotrace distance"),
@@ -94,7 +94,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForGeoshape() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForGeoshape() throws IOException, ParseException {
         Scenario scenario = Scenario.init("geoshape distance", html(
             head(
                 title("Geoshape distance"),
@@ -117,7 +117,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForString() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForString() throws IOException, ParseException {
         Scenario scenario = Scenario.init("string distance", html(
             head(
                 title("String distance"),

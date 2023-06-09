@@ -20,7 +20,7 @@ import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.junit.Assert.assertThat;
 
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +28,7 @@ public class CurrentFieldRefTest {
     private Scenario scenario;
 
     @Before
-    public void setUp() throws XFormParser.ParseException {
+    public void setUp() throws ParseException {
         scenario = Scenario.init("relative-current-ref-field-ref.xml");
     }
 

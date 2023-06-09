@@ -12,13 +12,14 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class TreeElementTests {
 
     @Test
-    public void testPopulate_withNodesAttributes() throws IOException, XFormParser.ParseException {
+    public void testPopulate_withNodesAttributes() throws IOException, ParseException {
         // Given
         FormParseInit formParseInit = new FormParseInit(r("populate-nodes-attributes.xml"));
 

@@ -30,7 +30,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class BindAttributeProcessorTest {
 
     @Test
-    public void doesNotProcessAttributeWithIncorrectNamespace() throws IOException, XFormParser.ParseException {
+    public void doesNotProcessAttributeWithIncorrectNamespace() throws IOException, ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("blah", "blah"),
@@ -61,7 +61,7 @@ public class BindAttributeProcessorTest {
         assertThat(processor.processCalled, equalTo(false));
     }
     @Test
-    public void doesNotRemovettributeWithIncorrectNamespace() throws IOException, XFormParser.ParseException {
+    public void doesNotRemovettributeWithIncorrectNamespace() throws IOException, ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("blah", "blah"),

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class CurrentTest {
     private Scenario scenario;
 
     @Before
-    public void setUp() throws XFormParser.ParseException {
+    public void setUp() throws ParseException {
         scenario = Scenario.init("relative-current-ref.xml");
     }
 

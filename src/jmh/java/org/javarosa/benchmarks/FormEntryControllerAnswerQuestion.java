@@ -16,7 +16,7 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -34,7 +34,7 @@ public class FormEntryControllerAnswerQuestion {
         FormEntryModel formEntryModel;
 
         @Setup(Level.Trial)
-        public void initialize() throws IOException, XFormParser.ParseException {
+        public void initialize() throws IOException, ParseException {
             Path formFile = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             FormDef formDef = FormParserHelper.parse(formFile);
             formEntryModel = new FormEntryModel(formDef);

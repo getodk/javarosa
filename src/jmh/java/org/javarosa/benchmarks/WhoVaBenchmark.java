@@ -24,7 +24,7 @@ import static org.javarosa.core.test.Scenario.init;
 import java.time.LocalDate;
 import java.util.stream.IntStream;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -43,7 +43,7 @@ public class WhoVaBenchmark {
         public Scenario scenario;
 
         @Setup(Level.Trial)
-        public void initialize() throws XFormParser.ParseException {
+        public void initialize() throws ParseException {
             scenario = init(prepareAssets("whova_form.xml").resolve("whova_form.xml"));
         }
     }

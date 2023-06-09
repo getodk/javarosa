@@ -37,12 +37,12 @@ import org.hamcrest.MatcherAssert;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class SameRefDifferentInstancesIssue449Test {
     @Test
-    public void formWithSameRefInDifferentInstances_isSuccessfullyDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void formWithSameRefInDifferentInstances_isSuccessfullyDeserialized() throws IOException, DeserializationException, ParseException {
         Path formFile = r("issue_449.xml");
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParent(), "file");
         Scenario scenario = Scenario.init(formFile);
@@ -59,7 +59,7 @@ public class SameRefDifferentInstancesIssue449Test {
     }
 
     @Test
-    public void constraintsAreCorrectlyApplied_afterDeserialization() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void constraintsAreCorrectlyApplied_afterDeserialization() throws IOException, DeserializationException, ParseException {
         Scenario scenario = Scenario.init("Tree reference deserialization", html(
             head(
                 title("Tree reference deserialization"),

@@ -16,7 +16,7 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.util.XFormUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,17 +37,17 @@ public class FormParseInit {
     private FormEntryController fec;
     private FormEntryModel femodel;
 
-    public FormParseInit() throws XFormParser.ParseException {
+    public FormParseInit() throws ParseException {
         FORM_NAME = r("ImageSelectTester.xhtml").toString();
         this.init();
     }
 
-    public FormParseInit(Path form) throws XFormParser.ParseException {
+    public FormParseInit(Path form) throws ParseException {
         FORM_NAME = form.toString();
         this.init();
     }
 
-    private void init() throws XFormParser.ParseException {
+    private void init() throws ParseException {
         String xf_name = FORM_NAME;
         try (FileInputStream is = new FileInputStream(xf_name)) {
             xform = XFormUtils.getFormFromInputStream(is);

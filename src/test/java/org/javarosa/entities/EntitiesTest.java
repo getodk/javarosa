@@ -7,7 +7,7 @@ import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entities.internal.Entities;
 import org.javarosa.entities.internal.EntityFormParseProcessor;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.javarosa.xform.util.XFormUtils;
 import org.junit.After;
@@ -47,7 +47,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithoutCreate_doesNotCreateAnyEntities() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithoutCreate_doesNotCreateAnyEntities() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -82,7 +82,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithCreate_makesEntityAvailable() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithCreate_makesEntityAvailable() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -119,7 +119,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithDynamicCreateExpression_conditionallyCreatesEntities() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithDynamicCreateExpression_conditionallyCreatesEntities() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -170,7 +170,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void entityFormCanBeSerialized() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void entityFormCanBeSerialized() throws IOException, DeserializationException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -210,7 +210,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void entitiesNamespaceWorksRegardlessOfName() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void entitiesNamespaceWorksRegardlessOfName() throws IOException, DeserializationException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("blah", "http://www.opendatakit.org/xforms/entities")
@@ -246,7 +246,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithSelectSaveTo_andWithCreate_savesValuesCorrectlyToEntity() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithSelectSaveTo_andWithCreate_savesValuesCorrectlyToEntity() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -282,7 +282,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void whenSaveToQuestionIsNotAnswered_entityPropertyIsEmptyString() throws IOException, XFormParser.ParseException {
+    public void whenSaveToQuestionIsNotAnswered_entityPropertyIsEmptyString() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -315,7 +315,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void savetoIsRemovedFromBindAttributesForClients() throws IOException, XFormParser.ParseException {
+    public void savetoIsRemovedFromBindAttributesForClients() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")

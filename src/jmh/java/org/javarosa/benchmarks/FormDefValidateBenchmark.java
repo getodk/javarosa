@@ -15,7 +15,7 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.FormParserHelper;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -33,7 +33,7 @@ public class FormDefValidateBenchmark {
         FormDef formDef;
 
         @Setup(Level.Trial)
-        public void initialize() throws IOException, XFormParser.ParseException {
+        public void initialize() throws IOException, ParseException {
             Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
             formDef = FormParserHelper.parse(resourcePath);
             FormEntryModel formEntryModel = new FormEntryModel(formDef);

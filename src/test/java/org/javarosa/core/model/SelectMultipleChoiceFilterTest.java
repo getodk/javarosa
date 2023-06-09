@@ -8,7 +8,7 @@ import static org.javarosa.core.test.AnswerDataMatchers.answerText;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class SelectMultipleChoiceFilterTest {
     private Scenario scenario;
 
     @Before
-    public void setUp() throws XFormParser.ParseException {
+    public void setUp() throws ParseException {
         scenario = Scenario.init("three-level-cascading-multi-select.xml");
     }
 

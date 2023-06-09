@@ -693,7 +693,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     //for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
-    private void parseModel(Element e) throws XFormParser.ParseException {
+    private void parseModel(Element e) throws ParseException {
         for (ModelAttributeProcessor modelAttributeProcessor : modelAttributeProcessors) {
             for (int i = 0; i < e.getAttributeCount(); i++) {
                 String namespace = e.getAttributeNamespace(i);
@@ -2448,17 +2448,6 @@ public class XFormParser implements IXFormParserFunctions {
         Set<Pair<String, String>> getModelAttributes();
 
         void processModelAttribute(String name, String value) throws ParseException;
-    }
-
-    public static class ParseException extends Exception {
-
-        public ParseException() {
-            super();
-        }
-
-        public ParseException(String message) {
-            super(message);
-        }
     }
 
     public static class MissingModelAttributeException extends ParseException {

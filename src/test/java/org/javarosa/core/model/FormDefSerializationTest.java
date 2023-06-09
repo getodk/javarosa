@@ -32,11 +32,11 @@ import static org.javarosa.core.util.XFormsElement.title;
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class FormDefSerializationTest {
-    @Test public void instanceName_forReferenceInMainInstance_isAlwaysNull() throws IOException, DeserializationException, XFormParser.ParseException {
+    @Test public void instanceName_forReferenceInMainInstance_isAlwaysNull() throws IOException, DeserializationException, ParseException {
         Scenario scenario = getSimplestFormScenario();
 
         scenario.next();
@@ -49,7 +49,7 @@ public class FormDefSerializationTest {
     }
 
     // During form evaluation, most relative references are contextualized directly or indirectly using the FormDef evaluation context.
-    @Test public void instanceName_forFormDefEvaluationContext_isAlwaysNull() throws IOException, DeserializationException, XFormParser.ParseException {
+    @Test public void instanceName_forFormDefEvaluationContext_isAlwaysNull() throws IOException, DeserializationException, ParseException {
         Scenario scenario = getSimplestFormScenario();
 
         scenario.next();
@@ -65,7 +65,7 @@ public class FormDefSerializationTest {
     // TreeReference. Then XPathPathExpr.getRefValue sees whether that reference is the same as the latest modified
     // question by using TreeRefence.equals. In the original JavaRosa implementation, the main instance name was null prior
     // to serialization and set after deserialization.
-    @Test public void instanceName_forFormDefMainInstance_isAlwaysNull() throws IOException, DeserializationException, XFormParser.ParseException {
+    @Test public void instanceName_forFormDefMainInstance_isAlwaysNull() throws IOException, DeserializationException, ParseException {
         Scenario scenario = getSimplestFormScenario();
 
         scenario.next();
@@ -77,7 +77,7 @@ public class FormDefSerializationTest {
         assertThat(deserialized.getFormDef().getMainInstance().getBase().getInstanceName(), is(nullValue()));
     }
 
-    private static Scenario getSimplestFormScenario() throws IOException, XFormParser.ParseException {
+    private static Scenario getSimplestFormScenario() throws IOException, ParseException {
         return Scenario.init("Simplest", html(
             head(
                 title("Simplest"),

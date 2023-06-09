@@ -31,7 +31,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class ReadOnlyCalculateTest {
@@ -39,7 +39,7 @@ public class ReadOnlyCalculateTest {
      * Read-only is only a UI concern so calculates should be evaluated on read-only fields.
      */
     @Test
-    public void calculate_evaluatedOnReadonlyFieldWithUi() throws IOException, XFormParser.ParseException {
+    public void calculate_evaluatedOnReadonlyFieldWithUi() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Calculate readonly", html(
             head(
                 title("Calculate readonly"),

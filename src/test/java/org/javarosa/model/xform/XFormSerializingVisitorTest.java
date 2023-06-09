@@ -2,7 +2,7 @@ package org.javarosa.model.xform;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class XFormSerializingVisitorTest {
 
     @Test
-    public void serializeInstance_preservesUnicodeCharacters() throws IOException, XFormParser.ParseException {
+    public void serializeInstance_preservesUnicodeCharacters() throws IOException, ParseException {
         XFormsElement formDef = html(
             head(
                 title("Some form"),

@@ -15,12 +15,12 @@ import static org.javarosa.core.util.XFormsElement.title;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class QuestionPreloaderTest {
     @Test
-    public void preloader_preloadsElements() throws IOException, XFormParser.ParseException {
+    public void preloader_preloadsElements() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Preload attribute", html(
             head(
                 title("Preload element"),
@@ -40,7 +40,7 @@ public class QuestionPreloaderTest {
 
     @Test
     // Unintentional limitation
-    public void preloader_doesNotpreloadAttributes() throws IOException, XFormParser.ParseException {
+    public void preloader_doesNotpreloadAttributes() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Preload attribute", html(
             head(
                 title("Preload attribute"),

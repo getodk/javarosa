@@ -38,7 +38,7 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,7 +47,7 @@ public class EvaluationContextExpandReferenceTest {
     private static EvaluationContext ec;
 
     @BeforeClass
-    public static void setUp() throws IOException, XFormParser.ParseException {
+    public static void setUp() throws IOException, ParseException {
         scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),

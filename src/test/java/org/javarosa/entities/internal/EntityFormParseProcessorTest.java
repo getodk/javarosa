@@ -4,6 +4,7 @@ import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.entities.UnrecognizedEntityVersionException;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParser.MissingModelAttributeException;
 import org.junit.Test;
@@ -31,7 +32,7 @@ import static org.junit.Assert.fail;
 public class EntityFormParseProcessorTest {
 
     @Test
-    public void whenVersionIsMissing_parsesWithoutError() throws XFormParser.ParseException {
+    public void whenVersionIsMissing_parsesWithoutError() throws ParseException {
         XFormsElement form = XFormsElement.html(
             head(
                 title("Non entity form"),
@@ -98,7 +99,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test(expected = UnrecognizedEntityVersionException.class)
-    public void whenVersionIsNotRecognized_throwsException() throws XFormParser.ParseException {
+    public void whenVersionIsNotRecognized_throwsException() throws ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -129,7 +130,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test
-    public void whenVersionIsNewPatch_parsesCorrectly() throws XFormParser.ParseException {
+    public void whenVersionIsNewPatch_parsesCorrectly() throws ParseException {
         String newPatchVersion = EntityFormParseProcessor.SUPPORTED_VERSION + ".12";
 
         XFormsElement form = XFormsElement.html(
@@ -164,7 +165,7 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test
-    public void saveTosWithIncorrectNamespaceAreIgnored() throws XFormParser.ParseException {
+    public void saveTosWithIncorrectNamespaceAreIgnored() throws ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("correct", "http://www.opendatakit.org/xforms/entities"),

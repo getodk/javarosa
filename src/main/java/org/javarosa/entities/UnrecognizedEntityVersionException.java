@@ -1,6 +1,6 @@
 package org.javarosa.entities;
 
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 
-public class UnrecognizedEntityVersionException extends XFormParser.ParseException {
+public class UnrecognizedEntityVersionException extends ParseException {
 }

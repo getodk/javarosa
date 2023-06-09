@@ -44,7 +44,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 /**
  * See testAnswerConstraint() for an example of how to write the
@@ -52,7 +52,7 @@ import org.junit.Test;
  */
 public class FormDefTest {
     @Test
-    public void enforces_constraints_defined_in_a_field() throws XFormParser.ParseException {
+    public void enforces_constraints_defined_in_a_field() throws ParseException {
         Scenario scenario = Scenario.init(r("ImageSelectTester.xhtml"));
         scenario.next();
         scenario.next();
@@ -64,7 +64,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void enforcesConstraints_whenInstanceIsDeserialized() throws IOException, XFormParser.ParseException {
+    public void enforcesConstraints_whenInstanceIsDeserialized() throws IOException, ParseException {
         XFormsElement formDef = html(
             head(
                 title("Some form"),
@@ -97,7 +97,7 @@ public class FormDefTest {
 
     //region Repeat relevance
     @Test
-    public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException, XFormParser.ParseException {
+    public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - dynamic expression", html(
             head(
                 title("Repeat relevance - dynamic expression"),
@@ -126,7 +126,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatIsIrrelevant_whenRelevanceSetToFalse() throws IOException, XFormParser.ParseException {
+    public void repeatIsIrrelevant_whenRelevanceSetToFalse() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - false()", html(
             head(
                 title("Repeat relevance - false()"),
@@ -148,7 +148,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatRelevanceChanges_whenDependentValuesOfGrandparentRelevanceExpressionChange() throws IOException, XFormParser.ParseException {
+    public void repeatRelevanceChanges_whenDependentValuesOfGrandparentRelevanceExpressionChange() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - dynamic expression", html(
             head(
                 title("Repeat relevance - dynamic expression"),
@@ -181,7 +181,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatIsIrrelevant_whenGrandparentRelevanceSetToFalse() throws IOException, XFormParser.ParseException {
+    public void repeatIsIrrelevant_whenGrandparentRelevanceSetToFalse() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Repeat relevance - false()", html(
             head(
                 title("Repeat relevance - false()"),
@@ -208,7 +208,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException, XFormParser.ParseException {
+    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Nested repeat relevance", html(
             head(
                 title("Nested repeat relevance"),
@@ -268,7 +268,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void innerRepeatGroupIsIrrelevant_whenItsParentRepeatGroupDoesNotExist() throws IOException, XFormParser.ParseException {
+    public void innerRepeatGroupIsIrrelevant_whenItsParentRepeatGroupDoesNotExist() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Nested repeat relevance", html(
             head(
                 title("Nested repeat relevance"),
@@ -297,7 +297,7 @@ public class FormDefTest {
     //endregion
 
     @Test
-    public void fillTemplateString_resolvesRelativeReferences() throws IOException, XFormParser.ParseException {
+    public void fillTemplateString_resolvesRelativeReferences() throws IOException, ParseException {
         Scenario scenario = Scenario.init("<output> with relative ref", html(
             head(
                 title("output with relative ref"),
@@ -333,7 +333,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException, XFormParser.ParseException {
+    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException, ParseException {
         Scenario scenario = Scenario.init("<output> with relative ref in translation", html(
             head(
                 title("output with relative ref in translation"),

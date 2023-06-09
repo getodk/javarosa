@@ -34,7 +34,7 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import java.util.Arrays;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -75,7 +75,7 @@ public class IndexedRepeatRelativeRefsTest {
     }
 
     @Test
-    public void indexed_repeat() throws IOException, XFormParser.ParseException {
+    public void indexed_repeat() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),

@@ -20,7 +20,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 import java.io.IOException;
 import org.hamcrest.CoreMatchers;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class InstanceLoadEventsTest {
@@ -93,7 +93,7 @@ public class InstanceLoadEventsTest {
     }
 
     @Test
-    public void instanceLoadEvent_triggersNestedActions() throws IOException, XFormParser.ParseException {
+    public void instanceLoadEvent_triggersNestedActions() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Nested instance load", html(
             head(
                 title("Nested instance load"),
@@ -118,7 +118,7 @@ public class InstanceLoadEventsTest {
     }
 
     @Test
-    public void instanceLoadEvent_triggeredForAllPreExistingRepeatInstances() throws IOException, XFormParser.ParseException {
+    public void instanceLoadEvent_triggeredForAllPreExistingRepeatInstances() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Nested instance load", html(
             head(
                 title("Nested instance load"),

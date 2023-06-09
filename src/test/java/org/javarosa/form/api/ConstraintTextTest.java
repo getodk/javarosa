@@ -20,7 +20,7 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.test.FormParseInit;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -28,7 +28,7 @@ import java.util.Arrays;
 public class ConstraintTextTest {
 
     @Test
-    public void checkConstraintTexts() throws XFormParser.ParseException {
+    public void checkConstraintTexts() throws ParseException {
         FormParseInit fpi = new FormParseInit(r("constraint-message-error.xml"));
         FormEntryModel formEntryModel = fpi.getFormEntryModel();
         FormDef formDef = fpi.getFormDef();

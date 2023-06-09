@@ -15,7 +15,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Measurement;
@@ -47,7 +47,7 @@ public class CreateRepeatDagBenchmark {
         Scenario expressionInsideWithPositionCallScenario;
 
         @Setup(Level.Invocation)
-        public void setUp() throws IOException, XFormParser.ParseException {
+        public void setUp() throws IOException, ParseException {
             expressionInsideScenario = getExpressionInsideScenario();
             expressionInsideWithRefOutsideScenario = getExpressionInsideWithRefOutsideScenario();
             sumExpressionOutsideScenario = getSumExpressionOutsideScenario();
@@ -96,7 +96,7 @@ public class CreateRepeatDagBenchmark {
         });
     }
 
-    static Scenario getExpressionInsideScenario() throws IOException, XFormParser.ParseException {
+    static Scenario getExpressionInsideScenario() throws IOException, ParseException {
         return Scenario.init("Repeat with expression inside", html(
             head(
                 title("Repeat with expression inside"),
@@ -118,7 +118,7 @@ public class CreateRepeatDagBenchmark {
             )));
     }
 
-    static Scenario getExpressionInsideWithRefOutsideScenario() throws IOException, XFormParser.ParseException {
+    static Scenario getExpressionInsideWithRefOutsideScenario() throws IOException, ParseException {
         return Scenario.init("Repeat with expression inside referencing outside", html(
             head(
                 title("Repeat with expression inside referencing outside"),
@@ -140,7 +140,7 @@ public class CreateRepeatDagBenchmark {
             )));
     }
 
-    static Scenario getSumExpressionOutsideScenario() throws IOException, XFormParser.ParseException {
+    static Scenario getSumExpressionOutsideScenario() throws IOException, ParseException {
         return Scenario.init("Repeat with sum expression outside", html(
             head(
                 title("Repeat with sum expression outside"),
@@ -162,7 +162,7 @@ public class CreateRepeatDagBenchmark {
             )));
     }
 
-    static Scenario getExpressionInsideWithPositionCallScenario() throws IOException, XFormParser.ParseException {
+    static Scenario getExpressionInsideWithPositionCallScenario() throws IOException, ParseException {
         return Scenario.init("Repeat with expression inside referencing outside", html(
             head(
                 title("Repeat with expression inside referencing outside"),

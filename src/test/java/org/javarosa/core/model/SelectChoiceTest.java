@@ -46,12 +46,12 @@ import kotlin.Pair;
 import org.hamcrest.CoreMatchers;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class SelectChoiceTest {
     @Test
-    public void value_should_continue_being_an_empty_string_after_deserialization() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void value_should_continue_being_an_empty_string_after_deserialization() throws IOException, DeserializationException, ParseException {
         Scenario scenario = Scenario.init("SelectChoice.getValue() regression test form", html(
             head(
                 title("SelectChoice.getValue() regression test form"),
@@ -78,7 +78,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
+    public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() throws ParseException {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
@@ -87,7 +87,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() throws XFormParser.ParseException {
+    public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() throws ParseException {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
@@ -95,7 +95,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsEmptyString_whenChoicesAreFromSecondaryInstance_andRequestedChildHasNoValue() throws XFormParser.ParseException, IOException {
+    public void getChild_returnsEmptyString_whenChoicesAreFromSecondaryInstance_andRequestedChildHasNoValue() throws ParseException, IOException {
         Scenario scenario = Scenario.init("Select with empty value", html(
             head(
                 title("Select with empty value"),
@@ -114,7 +114,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
+    public void getChild_updates_whenChoicesAreFromRepeat() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Select from repeat", html(
             head(
                 title("Select from repeat"),
@@ -147,7 +147,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsNull_whenCalledOnAChoiceFromInlineSelect() throws IOException, XFormParser.ParseException {
+    public void getChild_returnsNull_whenCalledOnAChoiceFromInlineSelect() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Static select", html(
             head(
                 title("Static select"),
@@ -163,7 +163,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
+    public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() throws ParseException {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
@@ -183,7 +183,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
+    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Select from repeat", html(
             head(
                 title("Select from repeat"),
@@ -220,7 +220,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_returnsEmpty_whenCalledOnAChoiceFromInlineSelect() throws IOException, XFormParser.ParseException {
+    public void getAdditionalChildren_returnsEmpty_whenCalledOnAChoiceFromInlineSelect() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Static select", html(
             head(
                 title("Static select"),

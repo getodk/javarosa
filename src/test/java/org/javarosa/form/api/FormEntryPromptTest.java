@@ -33,13 +33,13 @@ import static org.javarosa.core.util.XFormsElement.title;
 
 import java.io.IOException;
 import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class FormEntryPromptTest {
     //region Binding of select choice values to labels
     @Test
-    public void getSelectItemText_onSelectionFromDynamicSelect_withoutTranslations_returnsLabelInnerText() throws IOException, XFormParser.ParseException {
+    public void getSelectItemText_onSelectionFromDynamicSelect_withoutTranslations_returnsLabelInnerText() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Select", html(
             head(
                 title("Select"),
@@ -68,7 +68,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getSelectItemText_onSelectionFromDynamicSelect_withTranslations_returnsCorrectTranslation() throws IOException, XFormParser.ParseException {
+    public void getSelectItemText_onSelectionFromDynamicSelect_withTranslations_returnsCorrectTranslation() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Multilingual dynamic select", html(
             head(
                 title("Multilingual dynamic select"),
@@ -113,7 +113,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getSelectItemText_onSelectionsInRepeatInstances_returnsLabelInnerText() throws IOException, XFormParser.ParseException {
+    public void getSelectItemText_onSelectionsInRepeatInstances_returnsLabelInnerText() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Select", html(
             head(
                 title("Select"),

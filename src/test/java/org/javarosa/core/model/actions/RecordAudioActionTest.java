@@ -33,12 +33,12 @@ import java.io.IOException;
 import org.javarosa.core.model.actions.recordaudio.RecordAudioActions;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.parse.ParseException;
 import org.junit.Test;
 
 public class RecordAudioActionTest {
     @Test
-    public void recordAudioAction_isProcessedOnFormParse() throws IOException, XFormParser.ParseException {
+    public void recordAudioAction_isProcessedOnFormParse() throws IOException, ParseException {
         Scenario scenario = Scenario.init("Record audio form", html(
             head(
                 title("Record audio form"),
@@ -58,7 +58,7 @@ public class RecordAudioActionTest {
     }
 
     @Test
-    public void recordAudioAction_callsListenerActionTriggeredWhenTriggered() throws IOException, XFormParser.ParseException {
+    public void recordAudioAction_callsListenerActionTriggeredWhenTriggered() throws IOException, ParseException {
         CapturingRecordAudioActionListener listener = new CapturingRecordAudioActionListener();
         RecordAudioActions.setRecordAudioListener(listener);
 
@@ -82,7 +82,7 @@ public class RecordAudioActionTest {
     }
 
     @Test
-    public void targetReferenceInRepeat_isContextualized() throws IOException, XFormParser.ParseException {
+    public void targetReferenceInRepeat_isContextualized() throws IOException, ParseException {
         CapturingRecordAudioActionListener listener = new CapturingRecordAudioActionListener();
         RecordAudioActions.setRecordAudioListener(listener);
 
@@ -107,7 +107,7 @@ public class RecordAudioActionTest {
     }
 
     @Test
-    public void serializationAndDeserialization_maintainsFields() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void serializationAndDeserialization_maintainsFields() throws IOException, DeserializationException, ParseException {
         Scenario scenario = Scenario.init("Record audio form", html(
             head(
                 title("Record audio form"),

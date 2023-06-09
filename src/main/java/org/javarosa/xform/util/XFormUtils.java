@@ -20,6 +20,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
@@ -53,7 +54,7 @@ public class XFormUtils {
         return oldFactory;
     }
 
-    public static FormDef getFormFromResource (String resource) throws XFormParser.ParseException {
+    public static FormDef getFormFromResource (String resource) throws ParseException {
         InputStream is = System.class.getResourceAsStream(resource);
         if (is == null) {
             logger.error("Can't find form resource {}. Is it in the JAR?", resource);
@@ -64,7 +65,7 @@ public class XFormUtils {
     }
 
 
-    public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException, XFormParser.ParseException {
+    public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException, ParseException {
         return _factory.getXFormParser(isr).parse();
     }
 
@@ -75,7 +76,7 @@ public class XFormUtils {
      * @return a FormDef for the parsed form
      * @throws XFormParseException if the form can’t be parsed
      */
-    public static FormDef getFormFromInputStream(InputStream is) throws XFormParser.ParseException {
+    public static FormDef getFormFromInputStream(InputStream is) throws ParseException {
         return getFormFromInputStream(is, null);
     }
 
@@ -85,7 +86,7 @@ public class XFormUtils {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public static FormDef getFormFromInputStream(InputStream is, String lastSavedSrc) throws XFormParser.ParseException {
+    public static FormDef getFormFromInputStream(InputStream is, String lastSavedSrc) throws ParseException {
         InputStreamReader isr = null;
         try {
             try {
@@ -113,7 +114,7 @@ public class XFormUtils {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws XFormParseException, XFormParser.ParseException {
+    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws XFormParseException, ParseException {
         InputStreamReader isr = null;
         try {
             isr = new FileReader(formXmlSrc);

@@ -1,7 +1,6 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.RangeQuestion;
-import org.javarosa.xform.parse.XFormParser.ParseException;
 import org.jetbrains.annotations.NotNull;
 import org.kxml2.kdom.Element;
 

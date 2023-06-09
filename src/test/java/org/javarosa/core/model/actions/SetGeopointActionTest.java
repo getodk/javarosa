@@ -35,8 +35,8 @@ import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointAction;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class SetGeopointActionTest {
@@ -44,19 +44,19 @@ public class SetGeopointActionTest {
         stringAnswer("no client implementation");
 
     @Test(expected = XFormParseException.class)
-    public void when_namespaceIsNotOdk_exceptionIsThrown() throws IOException, XFormParser.ParseException {
+    public void when_namespaceIsNotOdk_exceptionIsThrown() throws IOException, ParseException {
         Scenario.init(r("setgeopoint-action-bad-namespace.xml"));
     }
 
     @Test
-    public void when_instanceIsLoaded_locationIsSetAtTarget() throws IOException, XFormParser.ParseException {
+    public void when_instanceIsLoaded_locationIsSetAtTarget() throws IOException, ParseException {
         Scenario scenario = Scenario.init(r("setgeopoint-action-instance-load.xml"));
 
         assertThat(scenario.answerOf("/data/location"), is(EXPECTED_STUB_ANSWER));
     }
 
     @Test
-    public void when_triggerNodeIsUpdated_locationIsSetAtTarget() throws IOException, XFormParser.ParseException {
+    public void when_triggerNodeIsUpdated_locationIsSetAtTarget() throws IOException, ParseException {
         Scenario scenario = Scenario.init(r("setgeopoint-action-value-changed.xml"));
 
         // The test form has no default value at /data/location, and
