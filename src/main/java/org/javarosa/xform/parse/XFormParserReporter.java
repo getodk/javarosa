@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 @Deprecated
 public class XFormParserReporter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XFormParseException.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParseException.class);
     @Deprecated
     public static final String TYPE_UNKNOWN_MARKUP = "markup";
     @Deprecated

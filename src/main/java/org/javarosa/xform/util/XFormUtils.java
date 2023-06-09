@@ -21,7 +21,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.ParseException;
-import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.kxml2.kdom.Element;
@@ -65,7 +64,7 @@ public class XFormUtils {
     }
 
 
-    public static FormDef getFormRaw(InputStreamReader isr) throws XFormParseException, IOException, ParseException {
+    public static FormDef getFormRaw(InputStreamReader isr) throws ParseException, IOException, ParseException {
         return _factory.getXFormParser(isr).parse();
     }
 
@@ -74,7 +73,7 @@ public class XFormUtils {
      *
      * @param is                         the InputStream containing the form
      * @return a FormDef for the parsed form
-     * @throws XFormParseException if the form can’t be parsed
+     * @throws ParseException if the form can’t be parsed
      */
     public static FormDef getFormFromInputStream(InputStream is) throws ParseException {
         return getFormFromInputStream(is, null);
@@ -92,7 +91,7 @@ public class XFormUtils {
             try {
                 isr = new InputStreamReader(is, "UTF-8");
             } catch (UnsupportedEncodingException uee) {
-                throw new XFormParseException("IO Exception during parse! " + uee.getMessage());
+                throw new ParseException("IO Exception during parse! " + uee.getMessage());
             }
 
             XFormParser xFormParser = _factory.getXFormParser(isr);
@@ -114,14 +113,14 @@ public class XFormUtils {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws XFormParseException, ParseException {
+    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws ParseException, ParseException {
         InputStreamReader isr = null;
         try {
             isr = new FileReader(formXmlSrc);
             XFormParser xFormParser = _factory.getXFormParser(isr);
             return xFormParser.parse(formXmlSrc, lastSavedSrc);
         } catch (IOException e) {
-            throw new XFormParseException("IO Exception during parse! " + e.getMessage());
+            throw new ParseException("IO Exception during parse! " + e.getMessage());
         } finally {
             try {
                 if (isr != null) {

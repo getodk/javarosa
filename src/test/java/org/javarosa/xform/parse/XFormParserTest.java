@@ -230,7 +230,7 @@ public class XFormParserTest {
 
     @Test
     public void throwsExceptionOnEmptySelect() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Select question 'First' has no choices");
 
         Path formName = r("internal_empty_select.xml");

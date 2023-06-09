@@ -60,7 +60,7 @@ class FormInstanceParser {
         this.actionTargets = actionTargets;
     }
 
-    FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) throws XFormParseException {
+    FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) throws ParseException {
         TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace(),
             namespacePrefixesByUri, null);
         FormInstance instanceModel = new FormInstance(root);
@@ -138,7 +138,7 @@ class FormInstanceParser {
         createMissingTemplates(instance, missingTemplates);
     }
 
-    private void verifyBindings(FormInstance instance, String mainInstanceNodeName) throws XFormParseException {
+    private void verifyBindings(FormInstance instance, String mainInstanceNodeName) throws ParseException {
         //check <bind>s (can't bind to '/', bound nodes actually exist)
         for (int i = 0; i < bindings.size(); i++) {
             DataBinding bind = bindings.get(i);
@@ -160,7 +160,7 @@ class FormInstanceParser {
         //check <repeat>s (can't bind to '/' or '/data')
         for (TreeReference ref : getRepeatableRefs()) {
             if (ref.size() <= 1) {
-                throw new XFormParseException("Cannot bind repeat to '/' or '/" + mainInstanceNodeName + "'");
+                throw new ParseException("Cannot bind repeat to '/' or '/" + mainInstanceNodeName + "'");
             }
         }
 
@@ -172,7 +172,7 @@ class FormInstanceParser {
             for (String bindError : bindErrors) {
                 errorMsg.append(bindError).append("\n");
             }
-            throw new XFormParseException(errorMsg.toString());
+            throw new ParseException(errorMsg.toString());
         }
 
         //check that repeat members bind to the proper scope (not above the binding of the parent repeat, and not within any sub-repeat (or outside repeat))
@@ -184,12 +184,12 @@ class FormInstanceParser {
         verifyItemsetSrcDstCompatibility(instance);
     }
 
-    private void verifyActions(FormInstance instance) throws XFormParseException {
+    private void verifyActions(FormInstance instance) throws ParseException {
         //check the target of actions which are manipulating real values
         for (TreeReference target : actionTargets) {
             List<TreeReference> nodes = new EvaluationContext(instance).expandReference(target, true);
             if (nodes.size() == 0) {
-                throw new XFormParseException("Invalid Action - Targets non-existent node: " + target.toString(true));
+                throw new ParseException("Invalid Action - Targets non-existent node: " + target.toString(true));
             }
         }
     }
@@ -266,7 +266,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyRepeatMemberBindings(IFormElement fe, GroupDef parentRepeat) throws XFormParseException {
+    private void verifyRepeatMemberBindings(IFormElement fe, GroupDef parentRepeat) throws ParseException {
         if (fe.getChildren() == null)
             return;
 
@@ -281,10 +281,10 @@ class FormInstanceParser {
             //check if current binding is within scope of repeat binding
             if (!repeatBind.isAncestorOf(childBind, false)) {
                 //catch <repeat nodeset="/a/b"><input ref="/a/c" /></repeat>: repeat question is not a child of the repeated node
-                throw new XFormParseException("<repeat> member's binding [" + childBind + "] is not a descendant of <repeat> binding [" + repeatBind + "]!");
+                throw new ParseException("<repeat> member's binding [" + childBind + "] is not a descendant of <repeat> binding [" + repeatBind + "]!");
             } else if (repeatBind.equals(childBind) && isRepeat) {
                 //catch <repeat nodeset="/a/b"><repeat nodeset="/a/b">...</repeat></repeat> (<repeat nodeset="/a/b"><input ref="/a/b" /></repeat> is ok)
-                throw new XFormParseException("child <repeat>s [" + childBind + "] cannot bind to the same node as their parent <repeat>; only questions/groups can");
+                throw new ParseException("child <repeat>s [" + childBind + "] cannot bind to the same node as their parent <repeat>; only questions/groups can");
             }
 
             //check that, in the instance, current node is not within the scope of any closer repeat binding
@@ -309,7 +309,7 @@ class FormInstanceParser {
                 if (repeatable && !(k == childBind.size() - 1 && isRepeat)) {
                     //catch <repeat nodeset="/a/b"><input ref="/a/b/c/d" /></repeat>...<repeat nodeset="/a/b/c">...</repeat>:
                     //  question's/group's/repeat's most immediate repeat parent in the instance is not its most immediate repeat parent in the form def
-                    throw new XFormParseException("<repeat> member's binding [" + childBind + "] is within the scope of a <repeat> that is not its closest containing <repeat>!");
+                    throw new ParseException("<repeat> member's binding [" + childBind + "] is within the scope of a <repeat> that is not its closest containing <repeat>!");
                 }
             }
 
@@ -317,20 +317,20 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyItemsetBindings(FormInstance instance) throws XFormParseException {
+    private void verifyItemsetBindings(FormInstance instance) throws ParseException {
         for (ItemsetBinding itemset : itemsets) {
             //check proper parent/child relationship
             if (!itemset.nodesetRef.isAncestorOf(itemset.labelRef, false)) {
-                throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
+                throw new ParseException("itemset nodeset ref is not a parent of label ref");
             } else if (itemset.copyRef != null && !itemset.nodesetRef.isAncestorOf(itemset.copyRef, false)) {
-                throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
+                throw new ParseException("itemset nodeset ref is not a parent of copy ref");
             } else if (itemset.valueRef != null && !itemset.nodesetRef.isAncestorOf(itemset.valueRef, false)) {
-                throw new XFormParseException("itemset nodeset ref is not a parent of value ref");
+                throw new ParseException("itemset nodeset ref is not a parent of value ref");
             }
 
             if (itemset.copyRef != null && itemset.valueRef != null) {
                 if (!itemset.copyRef.isAncestorOf(itemset.valueRef, false)) {
-                    throw new XFormParseException("itemset <copy> is not a parent of <value>");
+                    throw new ParseException("itemset <copy> is not a parent of <value>");
                 }
             }
 
@@ -340,7 +340,7 @@ class FormInstanceParser {
             if (itemset.labelRef.getInstanceName() != null) {
                 fi = formDef.getNonMainInstance(itemset.labelRef.getInstanceName());
                 if (fi == null) {
-                    throw new XFormParseException("Instance: " + itemset.labelRef.getInstanceName() + " Does not exists");
+                    throw new ParseException("Instance: " + itemset.labelRef.getInstanceName() + " Does not exists");
                 }
             } else {
                 fi = instance;
@@ -350,22 +350,22 @@ class FormInstanceParser {
             // with placeholder external secondary instances for cases where a ReferenceManager can't be configured.
             if (fi instanceof ExternalDataInstance && !((ExternalDataInstance) fi).isUsingPlaceholder()) {
                 if (fi.getTemplatePath(itemset.labelRef) == null) {
-                    throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
+                    throw new ParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
                 }
                 //check value nodes exist
                 else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
-                    throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
+                    throw new ParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
                 }
             }
         }
     }
 
-    private void verifyItemsetSrcDstCompatibility(FormInstance instance) throws XFormParseException {
+    private void verifyItemsetSrcDstCompatibility(FormInstance instance) throws ParseException {
         for (ItemsetBinding itemset : itemsets) {
             boolean destRepeatable = (instance.getTemplate(itemset.getDestRef()) != null);
             if (itemset.copyMode) {
                 if (!destRepeatable) {
-                    throw new XFormParseException("itemset copies to node(s) which are not repeatable");
+                    throw new ParseException("itemset copies to node(s) which are not repeatable");
                 }
 
                 //validate homogeneity between src and dst nodes
@@ -382,7 +382,7 @@ class FormInstanceParser {
                 //hard-pressed to think of scenarios where this would actually cause problems
             } else {
                 if (destRepeatable) {
-                    throw new XFormParseException("itemset sets value on repeatable nodes");
+                    throw new ParseException("itemset sets value on repeatable nodes");
                 }
             }
         }

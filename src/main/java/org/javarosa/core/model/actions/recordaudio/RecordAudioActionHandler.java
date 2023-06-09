@@ -1,9 +1,5 @@
 package org.javarosa.core.model.actions.recordaudio;
 
-import static org.javarosa.xform.parse.XFormParser.EVENT_ATTR;
-import static org.javarosa.xform.parse.XFormParser.getValidEventNames;
-
-import java.util.List;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
@@ -12,24 +8,29 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.IElementHandler;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
+
+import java.util.List;
+
+import static org.javarosa.xform.parse.XFormParser.EVENT_ATTR;
+import static org.javarosa.xform.parse.XFormParser.getValidEventNames;
 
 public class RecordAudioActionHandler implements IElementHandler {
     public static final String ELEMENT_NAME = "recordaudio";
 
     @Override
-    public void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
+    public void handle(XFormParser p, Element e, Object parent) throws ParseException {
         if (!e.getNamespace().equals(XFormParser.NAMESPACE_ODK)) {
-            throw new XFormParseException("recordaudio action must be in http://www.opendatakit.org/xforms namespace");
+            throw new ParseException("recordaudio action must be in http://www.opendatakit.org/xforms namespace");
         }
 
         String quality = e.getAttributeValue("http://www.opendatakit.org/xforms", "quality");
         String ref = e.getAttributeValue(null, "ref");
 
         if (ref == null) {
-            throw new XFormParseException("odk:recordaudio action must specify a ref");
+            throw new ParseException("odk:recordaudio action must specify a ref");
         }
 
         IDataReference dataRef = FormDef.getAbsRef(new XPathReference(ref), TreeReference.rootRef());
@@ -39,7 +40,7 @@ public class RecordAudioActionHandler implements IElementHandler {
         List<String> validEventNames = getValidEventNames(e.getAttributeValue(null, EVENT_ATTR));
         for (String eventName : validEventNames) {
             if (!Actions.isInstanceLoadEvent(eventName)) {
-                throw new XFormParseException("odk:recordaudio action may only be triggered by instance load events (e.g. odk-instance-load)");
+                throw new ParseException("odk:recordaudio action may only be triggered by instance load events (e.g. odk-instance-load)");
             }
         }
 

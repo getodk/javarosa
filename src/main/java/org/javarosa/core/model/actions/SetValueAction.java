@@ -3,11 +3,6 @@
  */
 package org.javarosa.core.model.actions;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -20,12 +15,17 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.IElementHandler;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.kxml2.kdom.Element;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author ctsims
@@ -60,7 +60,7 @@ public class SetValueAction extends Action {
 
     public static IElementHandler getHandler() {
         return new IElementHandler() {
-            public void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
+            public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                 // the generic parseAction() method in XFormParser already checks to make sure
                 // that parent is an IFormElement, and throws an exception if it is not
                 p.parseSetValueAction(((IFormElement) parent).getActionController(), e);

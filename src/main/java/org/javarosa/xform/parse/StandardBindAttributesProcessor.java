@@ -37,21 +37,21 @@ class StandardBindAttributesProcessor {
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Collection<String> passedThroughAttributes,
-                              Element element, List<XFormParser.BindAttributeProcessor> bindAttributeProcessors) throws XFormParseException {
+                              Element element, List<XFormParser.BindAttributeProcessor> bindAttributeProcessors) throws ParseException {
         final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
 
         final String nodeset = element.getAttributeValue(null, NODESET_ATTR);
         if (nodeset == null) {
-            throw new XFormParseException("XForm Parse: <bind> without nodeset", element);
+            throw new ParseException("XForm Parse: <bind> without nodeset", element);
         }
 
         IDataReference ref;
         try {
             ref = new XPathReference(nodeset);
         } catch (XPathException xpe) {
-            throw new XFormParseException(xpe.getMessage());
+            throw new ParseException(xpe.getMessage());
         }
         ref = parserFunctions.getAbsRef(ref, formDef);
         binding.setReference(ref);
@@ -97,7 +97,7 @@ class StandardBindAttributesProcessor {
             try {
                 binding.constraint = new XPathConditional(xpathConstr);
             } catch (XPathSyntaxException xse) {
-                throw new XFormParseException("bind for " + nodeset + " contains invalid constraint expression [" + xpathConstr + "] " + xse.getMessage());
+                throw new ParseException("bind for " + nodeset + " contains invalid constraint expression [" + xpathConstr + "] " + xse.getMessage());
             }
             binding.constraintMessage = element.getAttributeValue(NAMESPACE_JAVAROSA, "constraintMsg");
         }
@@ -107,7 +107,7 @@ class StandardBindAttributesProcessor {
             try {
                 binding.calculate = formDef.addTriggerable(buildCalculate(xpathCalc, ref));
             } catch (XPathSyntaxException xpse) {
-                throw new XFormParseException("Invalid calculate for the bind attached to \"" + nodeset +
+                throw new ParseException("Invalid calculate for the bind attached to \"" + nodeset +
                     "\" : " + xpse.getMessage() + " in expression " + xpathCalc);
             }
 
@@ -146,7 +146,7 @@ class StandardBindAttributesProcessor {
         return binding;
     }
 
-    private Triggerable buildCondition(String xpath, String type, IDataReference contextRef) throws XFormParseException {
+    private Triggerable buildCondition(String xpath, String type, IDataReference contextRef) throws ParseException {
         final ConditionAction trueAction;
         final ConditionAction falseAction;
         final String prettyType;
@@ -168,7 +168,7 @@ class StandardBindAttributesProcessor {
                 falseAction = ConditionAction.ENABLE;
                 break;
             default:
-                throw new XFormParseException("Unsupported type " + type + " passed to buildCondition");
+                throw new ParseException("Unsupported type " + type + " passed to buildCondition");
         }
 
         final XPathConditional xPathConditional;
@@ -176,7 +176,7 @@ class StandardBindAttributesProcessor {
             xPathConditional = new XPathConditional(xpath);
         } catch (XPathSyntaxException xse) {
             logger.error("XForm Parse Error: Encountered a problem with {} condition for node [{}] at line: {}{}", prettyType, contextRef.getReference().toString(), xpath, xse.getMessage());
-            throw new XFormParseException("Encountered a problem with " + prettyType + " condition for node [" +
+            throw new ParseException("Encountered a problem with " + prettyType + " condition for node [" +
                 contextRef.getReference().toString() + "] at line: " + xpath + ", " + xse.getMessage());
         }
 

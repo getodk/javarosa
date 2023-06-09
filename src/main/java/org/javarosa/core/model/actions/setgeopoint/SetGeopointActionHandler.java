@@ -26,7 +26,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.IElementHandler;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
 
@@ -34,15 +34,15 @@ public abstract class SetGeopointActionHandler implements IElementHandler {
     public static final String ELEMENT_NAME = "setgeopoint";
 
     @Override
-    public final void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
+    public final void handle(XFormParser p, Element e, Object parent) throws ParseException {
         if (!e.getNamespace().equals(XFormParser.NAMESPACE_ODK)) {
-            throw new XFormParseException("setgeopoint action must be in http://www.opendatakit.org/xforms namespace");
+            throw new ParseException("setgeopoint action must be in http://www.opendatakit.org/xforms namespace");
         }
 
         String ref = e.getAttributeValue(null, "ref");
 
         if (ref == null) {
-            throw new XFormParseException("odk:setgeopoint action must specify a ref");
+            throw new ParseException("odk:setgeopoint action must specify a ref");
         }
 
         IDataReference dataRef = FormDef.getAbsRef(new XPathReference(ref), TreeReference.rootRef());

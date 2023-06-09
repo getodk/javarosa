@@ -284,11 +284,11 @@ public class XFormParser implements IXFormParserFunctions {
             });
             put(LABEL_ELEMENT, new IElementHandler() {
                 @Override
-                public void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
+                public void handle(XFormParser p, Element e, Object parent) throws ParseException {
                     if (parent instanceof GroupDef) {
                         p.parseGroupLabel((GroupDef) parent, e);
                     } else
-                        throw new XFormParseException("parent of element is not a group", e);
+                        throw new ParseException("parent of element is not a group", e);
                 }
             });
         }};
@@ -456,7 +456,7 @@ public class XFormParser implements IXFormParserFunctions {
         return namespacePrefixesByURI;
     }
 
-    public static Document getXMLDocument(Reader reader) throws IOException, XFormParseException {
+    public static Document getXMLDocument(Reader reader) throws IOException, ParseException {
         return getXMLDocument(reader, null);
     }
 
@@ -467,12 +467,12 @@ public class XFormParser implements IXFormParserFunctions {
      * @param stringCache an optional string cache, whose presence will cause the use of
      *                    {@link InterningKXmlParser} rather than {@link KXmlParser}.
      * @return the parsed document
-     * @throws IOException
+     * @throws IOException, ParseException
      * @deprecated The InterningKXmlParser is not used.
      */
     @Deprecated
     public static Document getXMLDocument(Reader reader, CacheTable<String> stringCache)
-            throws IOException, XFormParseException {
+            throws IOException, ParseException {
         final StopWatch ctParse = StopWatch.start();
         Document doc = new Document();
 
@@ -491,13 +491,13 @@ public class XFormParser implements IXFormParserFunctions {
         } catch (XmlPullParserException e) {
             String errorMsg = "XML Syntax Error at Line: " + e.getLineNumber() + ", Column: " + e.getColumnNumber() + "!";
             logger.error(errorMsg, e);
-            throw new XFormParseException(errorMsg);
+            throw new ParseException(errorMsg);
         } catch (IOException e) {
             //CTS - 12/09/2012 - Stop swallowing IO Exceptions
             throw e;
         } catch (Exception e) {
             logger.error("Unhandled Exception while Parsing XForm", e);
-            throw new XFormParseException("Unhandled Exception while Parsing XForm");
+            throw new ParseException("Unhandled Exception while Parsing XForm");
         }
 
         try {
@@ -550,7 +550,7 @@ public class XFormParser implements IXFormParserFunctions {
                         } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
                             String msg = "Unable to parse external secondary instance";
                             logger.error(msg, e);
-                            throw new XFormParseException(msg + ": " + e.toString(), instance);
+                            throw new ParseException(msg + ": " + e, instance);
                         }
                         _f.addNonMainInstance(externalDataInstance);
                     } else {
@@ -740,9 +740,9 @@ public class XFormParser implements IXFormParserFunctions {
                 delayedParseElements.add(child);
             } else { //invalid model content
                 if (type == Node.ELEMENT) {
-                    throw new XFormParseException("Unrecognized top-level tag [" + childName + "] found within <model>", child);
+                    throw new ParseException("Unrecognized top-level tag [" + childName + "] found within <model>", child);
                 } else if (type == Node.TEXT && getXMLText(e, i, true).length() != 0) {
-                    throw new XFormParseException("Unrecognized text content found within <model>: \"" + getXMLText(e, i, true) + "\"", child == null ? e : child);
+                    throw new ParseException("Unrecognized text content found within <model>: \"" + getXMLText(e, i, true) + "\"", child == null ? e : child);
                 }
             }
 
@@ -764,7 +764,7 @@ public class XFormParser implements IXFormParserFunctions {
             } else {
                 // For now, anything that isn't a submission is an action
                 if (actionHandlers.containsKey(name) && child.getAttributeValue(null, EVENT_ATTR).equals(Actions.EVENT_ODK_NEW_REPEAT)) {
-                    throw new XFormParseException("Actions triggered by " + Actions.EVENT_ODK_NEW_REPEAT + " must be nested in the repeat form control.", child);
+                    throw new ParseException("Actions triggered by " + Actions.EVENT_ODK_NEW_REPEAT + " must be nested in the repeat form control.", child);
                 } else {
                     actionHandlers.get(name).handle(this, child, _f);
                 }
@@ -785,7 +785,7 @@ public class XFormParser implements IXFormParserFunctions {
             // Check that the action was included in a valid place within the XForm
             if (!(parent instanceof IFormElement)) {
                 // parent must either be a FormDef, GroupDef or QuestionDef
-                throw new XFormParseException("An action element occurred in an invalid location. " +
+                throw new ParseException("An action element occurred in an invalid location. " +
                     "Must be either a child of a control element, or a child of the <model>");
             }
 
@@ -799,7 +799,7 @@ public class XFormParser implements IXFormParserFunctions {
         specificHandler.handle(this, e, parent);
     }
 
-    public static List<String> getValidEventNames(String eventsString) throws XFormParseException {
+    public static List<String> getValidEventNames(String eventsString) throws ParseException {
         List<String> validEvents = new ArrayList<>();
         List<String> invalidEventList = new ArrayList<>();
         for (String event : eventsString.split(" "))
@@ -808,11 +808,11 @@ public class XFormParser implements IXFormParserFunctions {
             else
                 invalidEventList.add(event);
         if (!invalidEventList.isEmpty())
-            throw new XFormParseException("An action was registered for unsupported events: " + XPathFuncExpr.join(", ", invalidEventList.toArray()));
+            throw new ParseException("An action was registered for unsupported events: " + XPathFuncExpr.join(", ", invalidEventList.toArray()));
         return validEvents;
     }
 
-    public void parseSetValueAction(ActionController source, Element e) throws XFormParseException {
+    public void parseSetValueAction(ActionController source, Element e) throws ParseException {
         String ref = e.getAttributeValue(null, REF_ATTR);
         String bind = e.getAttributeValue(null, BIND_ATTR);
 
@@ -823,14 +823,14 @@ public class XFormParser implements IXFormParserFunctions {
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
             if (binding == null) {
-                throw new XFormParseException("XForm Parse: invalid binding ID in submit'" + bind + "'", e);
+                throw new ParseException("XForm Parse: invalid binding ID in submit'" + bind + "'", e);
             }
             dataRef = binding.getReference();
             refFromBind = true;
         } else if (ref != null) {
             dataRef = new XPathReference(ref);
         } else {
-            throw new XFormParseException("setvalue action with no target!", e);
+            throw new ParseException("setvalue action with no target!", e);
         }
 
         if (dataRef != null) {
@@ -857,14 +857,14 @@ public class XFormParser implements IXFormParserFunctions {
                     : XPathParseTool.parseXPath(valueExpression));
             } catch (XPathSyntaxException e1) {
                 logger.error("Error", e1);
-                throw new XFormParseException("Invalid XPath in value set action declaration: '" + valueExpression + "'", e);
+                throw new ParseException("Invalid XPath in value set action declaration: '" + valueExpression + "'", e);
             }
         }
 
         source.registerEventListener(getValidEventNames(e.getAttributeValue(null, EVENT_ATTR)), action);
     }
 
-    private void parseSubmission(Element submission) throws XFormParseException {
+    private void parseSubmission(Element submission) throws ParseException {
         String id = submission.getAttributeValue(null, ID_ATTR);
 
         //These two are always required
@@ -882,13 +882,13 @@ public class XFormParser implements IXFormParserFunctions {
         String ref = submission.getAttributeValue(null, REF_ATTR);
         String bind = submission.getAttributeValue(null, BIND_ATTR);
 
-        IDataReference dataRef = null;
+        IDataReference dataRef;
         boolean refFromBind = false;
 
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
             if (binding == null) {
-                throw new XFormParseException("XForm Parse: invalid binding ID in submit'" + bind + "'", submission);
+                throw new ParseException("XForm Parse: invalid binding ID in submit'" + bind + "'", submission);
             }
             dataRef = binding.getReference();
             refFromBind = true;
@@ -916,7 +916,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private void saveInstanceNode(Element instance) throws XFormParseException {
+    private void saveInstanceNode(Element instance) throws ParseException {
         Element instanceNode = null;
         String instanceId = instance.getAttributeValue("", "id");
         String instanceSrc = instance.getAttributeValue("", "src");
@@ -927,7 +927,7 @@ public class XFormParser implements IXFormParserFunctions {
             for (int i = 0; i < instance.getChildCount(); i++) {
                 if (instance.getType(i) == Node.ELEMENT) {
                     if (instanceNode != null) {
-                        throw new XFormParseException("XForm Parse: <instance> has more than one child element", instance);
+                        throw new ParseException("XForm Parse: <instance> has more than one child element", instance);
                     } else {
                         instanceNode = instance.getElement(i);
                     }
@@ -1098,7 +1098,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
             if (binding == null) {
-                throw new XFormParseException("XForm Parse: invalid binding ID '" + bind + "'", e);
+                throw new ParseException("XForm Parse: invalid binding ID '" + bind + "'", e);
             }
             dataRef = binding.getReference();
             refFromBind = true;
@@ -1114,7 +1114,7 @@ public class XFormParser implements IXFormParserFunctions {
             if (controlType == CONTROL_TRIGGER) {
                 //TODO: special handling for triggers? also, not all triggers created equal
             } else {
-                throw new XFormParseException("XForm Parse: input control with neither 'ref' nor 'bind'", e);
+                throw new ParseException("XForm Parse: input control with neither 'ref' nor 'bind'", e);
             }
         }
 
@@ -1158,9 +1158,9 @@ public class XFormParser implements IXFormParserFunctions {
         }
         if (isItem) {
             if (question.getNumChoices() > 0 && question.getDynamicChoices() != null) {
-                throw new XFormParseException("Select question contains both literal choices and <itemset>");
+                throw new ParseException("Select question contains both literal choices and <itemset>");
             } else if (question.getNumChoices() == 0 && question.getDynamicChoices() == null) {
-                throw new XFormParseException("Select question '" + question.getLabelInnerText() + "' has no choices");
+                throw new ParseException("Select question '" + question.getLabelInnerText() + "' has no choices");
             }
         }
 
@@ -1179,7 +1179,7 @@ public class XFormParser implements IXFormParserFunctions {
         return controlType == CONTROL_RANGE ? new RangeQuestion() : new QuestionDef();
     }
 
-    private void parseQuestionLabel(QuestionDef q, Element e) throws XFormParseException {
+    private void parseQuestionLabel(QuestionDef q, Element e) throws ParseException {
         String label = getLabel(e);
         String ref = e.getAttributeValue("", REF_ATTR);
 
@@ -1205,7 +1205,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private void parseGroupLabel(GroupDef g, Element e) throws XFormParseException {
+    private void parseGroupLabel(GroupDef g, Element e) throws ParseException {
         if (g.getRepeat())
             return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
 
@@ -1235,7 +1235,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private String getLabel(Element e) throws XFormParseException {
+    private String getLabel(Element e) throws ParseException {
         if (e.getChildCount() == 0)
             return null;
 
@@ -1264,7 +1264,7 @@ public class XFormParser implements IXFormParserFunctions {
         return sb.toString().trim();
     }
 
-    private void recurseForOutput(Element e) throws XFormParseException {
+    private void recurseForOutput(Element e) throws ParseException {
         if (e.getChildCount() == 0)
             return;
 
@@ -1292,7 +1292,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private String parseOutput(Element e) throws XFormParseException {
+    private String parseOutput(Element e) throws ParseException {
         List<String> usedAtts = new ArrayList<>();
         usedAtts.add(REF_ATTR);
         usedAtts.add(VALUE);
@@ -1302,10 +1302,10 @@ public class XFormParser implements IXFormParserFunctions {
             xpath = e.getAttributeValue(null, VALUE);
         }
         if (xpath == null) {
-            throw new XFormParseException("XForm Parse: <output> without 'ref' or 'value'", e);
+            throw new ParseException("XForm Parse: <output> without 'ref' or 'value'", e);
         }
 
-        XPathConditional expr = null;
+        XPathConditional expr;
         try {
             expr = new XPathConditional(xpath);
         } catch (XPathSyntaxException xse) {
@@ -1313,7 +1313,7 @@ public class XFormParser implements IXFormParserFunctions {
             return "";
         }
 
-        int index = -1;
+        int index;
         if (_f.getOutputFragments().contains(expr)) {
             index = _f.getOutputFragments().indexOf(expr);
         } else {
@@ -1328,7 +1328,7 @@ public class XFormParser implements IXFormParserFunctions {
         return String.valueOf(index);
     }
 
-    private void parseHint(QuestionDef q, Element e) throws XFormParseException {
+    private void parseHint(QuestionDef q, Element e) throws ParseException {
         List<String> usedAtts = new ArrayList<>();
         usedAtts.add(REF_ATTR);
         String hint = getXMLText(e, true);
@@ -1354,7 +1354,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private void parseItem(QuestionDef q, Element e) throws XFormParseException {
+    private void parseItem(QuestionDef q, Element e) throws ParseException {
         final int MAX_VALUE_LEN = 32;
 
         //catalogue of used attributes in this method/element
@@ -1388,7 +1388,7 @@ public class XFormParser implements IXFormParserFunctions {
 
                         verifyTextMappings(textRef, "Item <label>", true);
                     } else {
-                        throw new XFormParseException("malformed ref [" + ref + "] for <item>", child);
+                        throw new ParseException("malformed ref [" + ref + "] for <item>", child);
                     }
                 }
             } else if (VALUE.equals(childName)) {
@@ -1425,10 +1425,10 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         if (textRef == null && labelInnerText == null) {
-            throw new XFormParseException("<item> without proper <label>", e);
+            throw new ParseException("<item> without proper <label>", e);
         }
         if (value == null) {
-            throw new XFormParseException("<item> without proper <value>", e);
+            throw new ParseException("<item> without proper <value>", e);
         }
 
         if (textRef != null) {
@@ -1443,7 +1443,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private void parseItemset(QuestionDef q, Element e, IFormElement qparent) throws XFormParseException {
+    private void parseItemset(QuestionDef q, Element e, IFormElement qparent) throws ParseException {
         ItemsetBinding itemset = new ItemsetBinding();
 
         ////////////////USED FOR PARSER WARNING OUTPUT ONLY
@@ -1509,7 +1509,7 @@ public class XFormParser implements IXFormParserFunctions {
                         labelItext = true;
                     }
                 } else {
-                    throw new XFormParseException("<label> in <itemset> requires 'ref'");
+                    throw new ParseException("<label> in <itemset> requires 'ref'");
                 }
 
                 XPathPathExpr labelPath = XPathReference.getPathExpr(labelXpath);
@@ -1526,7 +1526,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
 
                 if (copyXpath == null) {
-                    throw new XFormParseException("<copy> in <itemset> requires 'ref'");
+                    throw new ParseException("<copy> in <itemset> requires 'ref'");
                 }
 
                 XPathPathExpr copyPath = XPathReference.getPathExpr(copyXpath);
@@ -1543,7 +1543,7 @@ public class XFormParser implements IXFormParserFunctions {
                 }
 
                 if (valueXpath == null) {
-                    throw new XFormParseException("<value> in <itemset> requires 'ref'");
+                    throw new ParseException("<value> in <itemset> requires 'ref'");
                 }
 
                 XPathPathExpr valuePath = XPathReference.getPathExpr(valueXpath);
@@ -1554,9 +1554,9 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         if (itemset.labelExpr == null) {
-            throw new XFormParseException("<itemset> requires <label>");
+            throw new ParseException("<itemset> requires <label>");
         } else if (itemset.copyExpr == null && itemset.valueExpr == null) {
-            throw new XFormParseException("<itemset> requires <copy> or <value>");
+            throw new ParseException("<itemset> requires <copy> or <value>");
         }
 
         if (itemset.copyExpr != null) {
@@ -1601,7 +1601,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (bind != null) {
             DataBinding binding = bindingsByID.get(bind);
             if (binding == null) {
-                throw new XFormParseException("XForm Parse: invalid binding ID [" + bind + "]", e);
+                throw new ParseException("XForm Parse: invalid binding ID [" + bind + "]", e);
             }
             dataRef = binding.getReference();
             refFromBind = true;
@@ -1610,7 +1610,7 @@ public class XFormParser implements IXFormParserFunctions {
                 if (nodeset != null) {
                     dataRef = new XPathReference(nodeset);
                 } else {
-                    throw new XFormParseException("XForm Parse: <repeat> with no binding ('bind' or 'nodeset')", e);
+                    throw new ParseException("XForm Parse: <repeat> with no binding ('bind' or 'nodeset')", e);
                 }
             } else {
                 if (ref != null) {
@@ -1750,7 +1750,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
     }
 
-    private void parseIText(Element itext) throws XFormParseException {
+    private void parseIText(Element itext) throws ParseException {
         Localizer l = new Localizer(true, true);
 
         ArrayList<String> usedAtts = new ArrayList<>(); //used for warning message
@@ -1764,7 +1764,7 @@ public class XFormParser implements IXFormParserFunctions {
         }
 
         if (l.getAvailableLocales().length == 0)
-            throw new XFormParseException("no <translation>s defined", itext);
+            throw new ParseException("no <translation>s defined", itext);
 
         if (l.getDefaultLocale() == null)
             l.setDefaultLocale(l.getAvailableLocales()[0]);
@@ -1777,7 +1777,7 @@ public class XFormParser implements IXFormParserFunctions {
         localizer = l;
     }
 
-    private void parseTranslation(Localizer l, Element trans) throws XFormParseException {
+    private void parseTranslation(Localizer l, Element trans) throws ParseException {
         /////for warning message
         List<String> usedAtts = new ArrayList<>();
         usedAtts.add("lang");
@@ -1786,17 +1786,17 @@ public class XFormParser implements IXFormParserFunctions {
 
         String lang = trans.getAttributeValue("", "lang");
         if (lang == null || lang.length() == 0) {
-            throw new XFormParseException("no language specified for <translation>", trans);
+            throw new ParseException("no language specified for <translation>", trans);
         }
         String isDefault = trans.getAttributeValue("", "default");
 
         if (!l.addAvailableLocale(lang)) {
-            throw new XFormParseException("duplicate <translation> for language '" + lang + "'", trans);
+            throw new ParseException("duplicate <translation> for language '" + lang + "'", trans);
         }
 
         if (isDefault != null) {
             if (l.getDefaultLocale() != null)
-                throw new XFormParseException("more than one <translation> set as default", trans);
+                throw new ParseException("more than one <translation> set as default", trans);
             l.setDefaultLocale(lang);
         }
 
@@ -1826,7 +1826,7 @@ public class XFormParser implements IXFormParserFunctions {
         l.registerLocaleResource(lang, source);
     }
 
-    private void parseTextHandle(TableLocaleSource l, Element text) throws XFormParseException {
+    private void parseTextHandle(TableLocaleSource l, Element text) throws ParseException {
         String id = text.getAttributeValue("", ID_ATTR);
 
         //used for parser warnings...
@@ -1839,7 +1839,7 @@ public class XFormParser implements IXFormParserFunctions {
         //////////
 
         if (id == null || id.length() == 0) {
-            throw new XFormParseException("no id defined for <text>", text);
+            throw new ParseException("no id defined for <text>", text);
         }
 
         for (int k = 0; k < text.getChildCount(); k++) {
@@ -1847,7 +1847,7 @@ public class XFormParser implements IXFormParserFunctions {
             if (value == null)
                 continue;
             if (!value.getName().equals(VALUE)) {
-                throw new XFormParseException("Unrecognized element [" + value.getName() + "] in Itext->translation->text");
+                throw new ParseException("Unrecognized element [" + value.getName() + "] in Itext->translation->text");
             }
 
             String form = value.getAttributeValue("", FORM_ATTR);
@@ -1861,7 +1861,7 @@ public class XFormParser implements IXFormParserFunctions {
 
             String textID = (form == null ? id : id + ";" + form);  //kind of a hack
             if (l.hasMapping(textID)) {
-                throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\"" + ". Can only have one definition for each text form.", text);
+                throw new ParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\"" + ". Can only have one definition for each text form.", text);
             }
             l.setLocaleMapping(textID, data);
 
@@ -1881,14 +1881,14 @@ public class XFormParser implements IXFormParserFunctions {
         return localizer.hasMapping(locale == null ? localizer.getDefaultLocale() : locale, textID);
     }
 
-    private void verifyTextMappings(String textID, String type, boolean allowSubforms) throws XFormParseException {
+    private void verifyTextMappings(String textID, String type, boolean allowSubforms) throws ParseException {
         String[] locales = localizer.getAvailableLocales();
 
         for (String locale : locales) {
             //Test whether there is a default translation, or whether there is any special form available.
             if (!(hasITextMapping(textID, locale) || (allowSubforms && hasSpecialFormMapping(textID, locale)))) {
                 if (locale.equals(localizer.getDefaultLocale())) {
-                    throw new XFormParseException(type + " '" + textID +
+                    throw new ParseException(type + " '" + textID +
                         "': text is not localizable for default locale [" + localizer.getDefaultLocale() + "]!");
                 }
 
@@ -1929,9 +1929,8 @@ public class XFormParser implements IXFormParserFunctions {
         return false;
     }
 
-    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element, List<BindAttributeProcessor> bindAttributeProcessors) throws XFormParseException {
-        return new StandardBindAttributesProcessor(typeMappings).
-            createBinding(this, _f, usedAtts, passedThroughAtts, element, bindAttributeProcessors);
+    private DataBinding processStandardBindAttributes(List<String> usedAtts, List<String> passedThroughAtts, Element element, List<BindAttributeProcessor> bindAttributeProcessors) throws ParseException {
+        return new StandardBindAttributesProcessor(typeMappings).createBinding(this, _f, usedAtts, passedThroughAtts, element, bindAttributeProcessors);
     }
 
     /**
@@ -1962,7 +1961,7 @@ public class XFormParser implements IXFormParserFunctions {
         "saveIncomplete"
     ));
 
-    private void parseBind(Element element) throws XFormParseException {
+    private void parseBind(Element element) throws ParseException {
         final DataBinding binding = processStandardBindAttributes(usedAtts, passedThroughAtts, element, bindAttributeProcessors);
 
         // Warn of unused attributes of parent element
@@ -1974,12 +1973,12 @@ public class XFormParser implements IXFormParserFunctions {
         addBinding(binding);
     }
 
-    private void addBinding(DataBinding binding) throws XFormParseException {
+    private void addBinding(DataBinding binding) throws ParseException {
         bindings.add(binding);
 
         if (binding.getId() != null) {
             if (bindingsByID.put(binding.getId(), binding) != null) {
-                throw new XFormParseException("XForm Parse: <bind>s with duplicate ID: '" + binding.getId() + "'");
+                throw new ParseException("XForm Parse: <bind>s with duplicate ID: '" + binding.getId() + "'");
             }
         }
     }
@@ -1987,7 +1986,7 @@ public class XFormParser implements IXFormParserFunctions {
     /**
      * e is the top-level _data_ node of the instance (immediate (and only) child of <instance>)
      */
-    private void addMainInstanceToFormDef(Element e, FormInstance instanceModel) throws XFormParseException {
+    private void addMainInstanceToFormDef(Element e, FormInstance instanceModel) throws ParseException {
         loadInstanceData(e, instanceModel.getRoot(), _f);
 
         _f.setInstance(instanceModel);
@@ -1996,7 +1995,7 @@ public class XFormParser implements IXFormParserFunctions {
         try {
             _f.finalizeTriggerables();
         } catch (IllegalStateException ise) {
-            throw new XFormParseException(ise.getMessage() == null ? "Form has an illegal cycle in its calculate and relevancy expressions!" : ise.getMessage());
+            throw new ParseException(ise.getMessage() == null ? "Form has an illegal cycle in its calculate and relevancy expressions!" : ise.getMessage());
         }
     }
 
@@ -2013,7 +2012,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public static TreeElement buildInstanceStructure(Element node, TreeElement parent, Map<String,
-        String> namespacePrefixesByUri, Integer multiplicityFromGroup) throws XFormParseException {
+        String> namespacePrefixesByUri, Integer multiplicityFromGroup) throws ParseException {
         return buildInstanceStructure(node, parent, null, node.getNamespace(), namespacePrefixesByUri, multiplicityFromGroup);
     }
 
@@ -2032,7 +2031,7 @@ public class XFormParser implements IXFormParserFunctions {
      */
     public static TreeElement buildInstanceStructure(Element node, TreeElement parent,
                                                      String instanceName, String docnamespace, Map<String, String> namespacePrefixesByUri,
-                                                     Integer multiplicityFromGroup) throws XFormParseException {
+                                                     Integer multiplicityFromGroup) throws ParseException {
         TreeElement element;
 
         //catch when text content is mixed with children
@@ -2060,7 +2059,7 @@ public class XFormParser implements IXFormParserFunctions {
         if (isTemplate(node)) {
             multiplicity = TreeReference.INDEX_TEMPLATE;
             if (parent != null && parent.getChild(name, TreeReference.INDEX_TEMPLATE) != null) {
-                throw new XFormParseException("More than one node declared as the template for the same repeated set [" + name + "]", node);
+                throw new ParseException("More than one node declared as the template for the same repeated set [" + name + "]", node);
             }
         } else {
             multiplicity = multiplicityFromGroup != null ? multiplicityFromGroup :
@@ -2075,7 +2074,7 @@ public class XFormParser implements IXFormParserFunctions {
             element.setInstanceName(instanceName);
         } else {
             if (typeMappings.get(modelType) == null) {
-                throw new XFormParseException("ModelType " + modelType + " is not recognized.", node);
+                throw new ParseException("ModelType " + modelType + " is not recognized.", node);
             }
             element = new TreeElement(name, multiplicity);
             logger.info("No model type prototype available for {}", modelType);
@@ -2214,7 +2213,7 @@ public class XFormParser implements IXFormParserFunctions {
         _f.reportDependencyCycles();
     }
 
-    private void loadXmlInstance(FormDef f, Reader xmlReader) throws IOException, XFormParseException {
+    private void loadXmlInstance(FormDef f, Reader xmlReader) throws IOException, ParseException {
         loadXmlInstance(f, getXMLDocument(xmlReader));
     }
 
@@ -2223,7 +2222,7 @@ public class XFormParser implements IXFormParserFunctions {
      * <p>
      * call before f.initialize()!
      */
-    private static void loadXmlInstance(FormDef f, Document xmlInst) throws XFormParseException {
+    private static void loadXmlInstance(FormDef f, Document xmlInst) throws ParseException {
         TreeElement savedRoot = XFormParser.restoreDataModel(xmlInst, null).getRoot();
         TreeElement templateRoot = f.getMainInstance().getRoot().deepCopy(true);
 
@@ -2311,7 +2310,7 @@ public class XFormParser implements IXFormParserFunctions {
         return text;
     }
 
-    public static FormInstance restoreDataModel(InputStream input, Class restorableType) throws IOException, XFormParseException {
+    public static FormInstance restoreDataModel(InputStream input, Class restorableType) throws IOException, ParseException {
         Document doc = getXMLDocument(new InputStreamReader(input, "UTF-8"));
         if (doc == null) {
             throw new RuntimeException("syntax error in XML instance; could not parse");
@@ -2319,7 +2318,7 @@ public class XFormParser implements IXFormParserFunctions {
         return restoreDataModel(doc, restorableType);
     }
 
-    public static FormInstance restoreDataModel(Document doc, Class restorableType) throws XFormParseException {
+    public static FormInstance restoreDataModel(Document doc, Class restorableType) throws ParseException {
         Restorable r = (restorableType != null ? (Restorable) PrototypeFactory.getInstance(restorableType) : null);
 
         Element e = doc.getRootElement();
@@ -2339,7 +2338,7 @@ public class XFormParser implements IXFormParserFunctions {
     public static FormInstance restoreDataModel(byte[] data, Class restorableType)  {
         try {
             return restoreDataModel(new ByteArrayInputStream(data), restorableType);
-        } catch (IOException | XFormParseException e) {
+        } catch (IOException | ParseException e) {
             logger.error("Error", e);
             throw new RuntimeException("Bad parsing from byte array " + e.getMessage());
         }

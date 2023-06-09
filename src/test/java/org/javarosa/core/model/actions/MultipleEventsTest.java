@@ -3,7 +3,6 @@ package org.javarosa.core.model.actions;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.ParseException;
-import org.javarosa.xform.parse.XFormParseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -71,7 +70,7 @@ public class MultipleEventsTest {
 
     @Test
     public void invalidEventNames_throwException() throws ParseException {
-        expectedException.expect(XFormParseException.class);
+        expectedException.expect(ParseException.class);
         expectedException.expectMessage("An action was registered for unsupported events: odk-inftance-first-load, my-fake-event");
 
         Scenario.init("invalid-events.xml");

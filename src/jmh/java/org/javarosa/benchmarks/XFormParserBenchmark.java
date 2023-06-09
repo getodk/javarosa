@@ -1,7 +1,7 @@
 package org.javarosa.benchmarks;
 
 import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.ParseException;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.kdom.Document;
@@ -54,7 +54,7 @@ public class XFormParserBenchmark {
         Document kxmlDocument;
         try {
             kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         bh.consume(kxmlDocument);
@@ -69,7 +69,7 @@ public class XFormParserBenchmark {
         Document kxmlDocument;
         try {
             kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         bh.consume(kxmlDocument);
@@ -85,7 +85,7 @@ public class XFormParserBenchmark {
         Document kxmlDocument;
         try {
             kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         bh.consume(kxmlDocument);
@@ -100,7 +100,7 @@ public class XFormParserBenchmark {
         Document kxmlDocument;
         try {
             kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         bh.consume(kxmlDocument);
@@ -118,19 +118,19 @@ public class XFormParserBenchmark {
         Document externalXFormInstanceDocument = null;
         try {
             externalXFormInstanceDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(externalInstanceXFormReader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         Document lgaExternalInstanceDocument = null;
         try {
             lgaExternalInstanceDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(lgaSecondaryInstanceReader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         Document wardExternalInstanceDocument = null;
         try {
             wardExternalInstanceDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(wardsSecondaryInstanceReader);
-        } catch (XFormParseException e) {
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 

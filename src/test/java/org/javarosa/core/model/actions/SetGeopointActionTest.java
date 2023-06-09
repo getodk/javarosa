@@ -16,6 +16,21 @@
 
 package org.javarosa.core.model.actions;
 
+import org.hamcrest.Matcher;
+import org.javarosa.core.model.actions.setgeopoint.SetGeopointAction;
+import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointAction;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.test.Scenario;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.xform.parse.ParseException;
+import org.junit.Test;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
@@ -24,26 +39,11 @@ import static org.javarosa.core.util.externalizable.ExtUtil.defaultPrototypes;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import org.hamcrest.Matcher;
-import org.javarosa.core.model.actions.setgeopoint.SetGeopointAction;
-import org.javarosa.core.model.actions.setgeopoint.StubSetGeopointAction;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.test.Scenario;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xform.parse.ParseException;
-import org.javarosa.xform.parse.XFormParseException;
-import org.junit.Test;
-
 public class SetGeopointActionTest {
     private static final Matcher<StringData> EXPECTED_STUB_ANSWER =
         stringAnswer("no client implementation");
 
-    @Test(expected = XFormParseException.class)
+    @Test(expected = ParseException.class)
     public void when_namespaceIsNotOdk_exceptionIsThrown() throws IOException, ParseException {
         Scenario.init(r("setgeopoint-action-bad-namespace.xml"));
     }

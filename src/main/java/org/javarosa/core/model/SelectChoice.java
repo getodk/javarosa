@@ -10,7 +10,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.ParseException;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInputStream;
@@ -94,7 +94,7 @@ public class SelectChoice implements Externalizable, Localizable {
         if (value == null) {
             //TODO - remove runtime exception
             throw new RuntimeException(
-                    new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!")
+                    new ParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!")
             );
         }
 

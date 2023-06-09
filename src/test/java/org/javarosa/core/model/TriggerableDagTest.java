@@ -47,7 +47,6 @@ import org.javarosa.core.util.XFormsElement;
 import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.ParseException;
-import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathPathExprEval;
 import org.junit.Before;
@@ -105,7 +104,7 @@ public class TriggerableDagTest {
     //region Cycles
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_calculate_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
@@ -115,7 +114,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_in_calculate_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
@@ -127,7 +126,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_relevance_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
@@ -137,7 +136,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_read_only_condition_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
@@ -147,7 +146,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_by_self_reference_in_required_condition_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", buildFormForDagCyclesCheck(
@@ -264,7 +263,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_involving_fields_inside_and_outside_of_repeat_groups_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", html(
@@ -292,7 +291,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_self_reference_cycles_in_fields_of_repeat_groups_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", html(
@@ -345,7 +344,7 @@ public class TriggerableDagTest {
 
     @Test
     public void parsing_forms_with_cycles_between_fields_of_the_same_repeat_instance_should_fail() throws IOException, ParseException {
-        exceptionRule.expect(XFormParseException.class);
+        exceptionRule.expect(ParseException.class);
         exceptionRule.expectMessage("Cycle detected in form's relevant and calculation logic!");
 
         Scenario.init("Some form", html(

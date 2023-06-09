@@ -124,11 +124,9 @@ public class ExternalSecondaryInstanceParseTest {
                     // Define a select using value and label references that don't exist in the secondary instance
                     select1Dynamic("/data/first", "instance('external-csv')/root/item", "foo", "bar")
                 )));
-            fail("Expected XFormParseException because itemset references don't exist in external instance");
-        } catch (XFormParseException e) {
-            // pass
+            fail("Expected ParseException because itemset references don't exist in external instance");
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            assertEquals("<label> node for itemset doesn't exist! [instance(external-csv)/root/item/bar]", e.getMessage());
         }
     }
 

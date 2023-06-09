@@ -1,5 +1,11 @@
 package org.javarosa.core.model.actions;
 
+import org.javarosa.core.test.Scenario;
+import org.javarosa.xform.parse.ParseException;
+import org.junit.Test;
+
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -16,12 +22,6 @@ import static org.javarosa.core.util.XFormsElement.setvalue;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
-
-import java.io.IOException;
-import org.javarosa.core.test.Scenario;
-import org.javarosa.xform.parse.ParseException;
-import org.javarosa.xform.parse.XFormParseException;
-import org.junit.Test;
 
 /**
  * Specification: https://getodk.github.io/xforms-spec/#the-odk-new-repeat-event.
@@ -177,7 +177,7 @@ public class OdkNewRepeatEventTest {
     }
 
     // Not part of ODK XForms so throws parse exception.
-    @Test(expected = XFormParseException.class)
+    @Test(expected = ParseException.class)
     public void setValueOnRepeatInsertInModel_notAllowed() throws ParseException {
         Scenario.init(r("event-odk-new-repeat-model.xml"));
     }

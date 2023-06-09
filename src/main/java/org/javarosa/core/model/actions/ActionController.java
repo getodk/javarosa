@@ -1,15 +1,6 @@
 package org.javarosa.core.model.actions;
 
 
-import static org.javarosa.xform.parse.XFormParser.getValidEventNames;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
@@ -21,9 +12,19 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import static org.javarosa.xform.parse.XFormParser.getValidEventNames;
 
 /**
  * Registers actions that should be triggered by certain events, and handles the triggering
@@ -55,7 +56,7 @@ public class ActionController implements Externalizable {
      * @param action the action to associate with the events.
      * @deprecated Use {@link #registerEventListener(List, Action)}
      */
-    public void registerEventListener(String event, Action action) throws XFormParseException {
+    public void registerEventListener(String event, Action action) throws ParseException {
         // event could be a single event or a space separated event list.
         registerEventListener(getValidEventNames(event), action);
     }
