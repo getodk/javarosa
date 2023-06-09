@@ -64,7 +64,7 @@ public class XFormUtils {
     }
 
 
-    public static FormDef getFormRaw(InputStreamReader isr) throws ParseException, IOException, ParseException {
+    public static FormDef getFormRaw(InputStreamReader isr) throws ParseException {
         return _factory.getXFormParser(isr).parse();
     }
 
@@ -113,7 +113,7 @@ public class XFormUtils {
      * @param lastSavedSrc The src of the last-saved instance of this form (for auto-filling). If null,
      *                     no data will be loaded and the instance will be blank.
      */
-    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws ParseException, ParseException {
+    public static FormDef getFormFromFormXml(String formXmlSrc, String lastSavedSrc) throws ParseException {
         InputStreamReader isr = null;
         try {
             isr = new FileReader(formXmlSrc);
@@ -143,9 +143,7 @@ public class XFormUtils {
             } else {
                 logger.info("ResourceStream NULL");
             }
-        } catch (IOException e) {
-            logger.error("Error", e);
-        } catch (DeserializationException e) {
+        } catch (IOException | DeserializationException e) {
             logger.error("Error", e);
         } finally {
             if (is != null) {

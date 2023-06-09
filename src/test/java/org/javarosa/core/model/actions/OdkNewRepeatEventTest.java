@@ -24,7 +24,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 
 /**
- * Specification: https://getodk.github.io/xforms-spec/#the-odk-new-repeat-event.
+ * Specification: <a href="https://getodk.github.io/xforms-spec/#the-odk-new-repeat-event">...</a>.
  */
 public class OdkNewRepeatEventTest {
     @Test
