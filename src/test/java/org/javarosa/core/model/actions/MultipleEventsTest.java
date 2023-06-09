@@ -3,19 +3,16 @@ package org.javarosa.core.model.actions;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.ParseException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class MultipleEventsTest {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void nestedFirstLoadEvent_setsValue() throws ParseException {
         Scenario scenario = Scenario.init("multiple-events.xml");
@@ -69,10 +66,8 @@ public class MultipleEventsTest {
     }
 
     @Test
-    public void invalidEventNames_throwException() throws ParseException {
-        expectedException.expect(ParseException.class);
-        expectedException.expectMessage("An action was registered for unsupported events: odk-inftance-first-load, my-fake-event");
-
-        Scenario.init("invalid-events.xml");
+    public void invalidEventNames_throwException2() {
+        Throwable exception = assertThrows(ParseException.class, () -> Scenario.init("invalid-events.xml"));
+        assertEquals("An action was registered for unsupported events: odk-inftance-first-load, my-fake-event", exception.getMessage());
     }
 }
