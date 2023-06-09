@@ -1,13 +1,15 @@
 package org.javarosa.core.model.data.test;
 
-import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.junit.Assert.assertEquals;
+import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.utils.DateFields;
+import org.javarosa.core.model.utils.DateUtils;
+import org.junit.Test;
 
 import java.util.Date;
 import java.util.TimeZone;
-import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.utils.DateUtils;
-import org.junit.Test;
+
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
+import static org.junit.Assert.assertEquals;
 
 /**
  * This test is intended to show the limitation of {@link TimeData}.
@@ -24,8 +26,8 @@ import org.junit.Test;
  * (in Kiev or London for example).
  * <p>
  * Related issues:
- * https://github.com/getodk/javarosa/pull/478
- * https://github.com/getodk/collect/issues/170
+ * <a href="https://github.com/getodk/javarosa/pull/478">...</a>
+ * <a href="https://github.com/getodk/collect/issues/170">...</a>
  */
 public class TimeDataLimitationsTest {
     public static final TimeZone WARSAW = TimeZone.getTimeZone("Europe/Warsaw");
@@ -53,10 +55,7 @@ public class TimeDataLimitationsTest {
 
     @Test
     public void editingFormsSavedInTheSameLocationButAfterDSTChangeTest() {
-        DateUtils.DateFields dateFields = new DateUtils.DateFields();
-        dateFields.year = 2019;
-        dateFields.month = 8;
-        dateFields.day = 1;
+        DateFields dateFields = DateFields.of(2019, 8, 1);
 
         withTimeZone(WARSAW, () -> {
             String savedTime = "10:00:00.000+02:00";

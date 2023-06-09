@@ -13,24 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.javarosa.core.model.utils.test;
+
+import org.javarosa.core.model.utils.DateFields;
+import org.javarosa.core.model.utils.DateUtils;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.model.utils.DateUtils.DateFields;
-
-import org.junit.Test;
-
 public class DateUtilsFormatTests {
-  
+
     @Test
     public void testFormatWeekOfYear() {
         String week = DateUtils.format(DateFields.of(2018, 4, 1, 10, 20, 30, 400), "%W");
         assertEquals("13", week);
-        
+
         week = DateUtils.format(DateFields.of(2018, 1, 1, 10, 20, 30, 400), "%W");
         assertEquals("1", week);
 
@@ -38,10 +35,9 @@ public class DateUtilsFormatTests {
         // it's actually the 52nd week of the previous year.
         week = DateUtils.format(DateFields.of(2017, 1, 1, 10, 20, 30, 400), "%W");
         assertEquals("52", week);
-       
+
         // 12/29/2020 is the 53rd week of the year 
         week = DateUtils.format(DateFields.of(2020, 12, 29, 10, 20, 30, 400), "%W");
         assertEquals("53", week);
     }
-    
 }
