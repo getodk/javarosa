@@ -21,6 +21,7 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xform.parse.XFormParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class ActionController implements Externalizable {
      * @param action the action to associate with the events.
      * @deprecated Use {@link #registerEventListener(List, Action)}
      */
-    public void registerEventListener(String event, Action action) {
+    public void registerEventListener(String event, Action action) throws XFormParseException {
         // event could be a single event or a space separated event list.
         registerEventListener(getValidEventNames(event), action);
     }

@@ -287,6 +287,8 @@ public class TreeReference implements Externalizable, Serializable {
     public TreeReference anchor(TreeReference baseReference) throws XPathException {
         if (isAbsolute()) {
             return this.clone();
+        } else if (baseReference == null) {
+            throw new XPathException("Binding path [" + this + "] not allowed with parent binding of [" + baseReference + "]");
         } else if (!baseReference.isAbsolute()) {
             throw new XPathException(baseReference.toString(true) + " is not an absolute reference");
         } else if (refLevel > baseReference.size()) {

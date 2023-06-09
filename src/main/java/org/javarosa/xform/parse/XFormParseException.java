@@ -29,7 +29,7 @@ import org.kxml2.kdom.Element;
  *
  */
 @Deprecated
-public class XFormParseException extends RuntimeException {
+public class XFormParseException extends XFormParser.ParseException {
     /**
      *
      */

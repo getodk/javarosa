@@ -20,7 +20,7 @@ public class RecordAudioActionHandler implements IElementHandler {
     public static final String ELEMENT_NAME = "recordaudio";
 
     @Override
-    public void handle(XFormParser p, Element e, Object parent) {
+    public void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
         if (!e.getNamespace().equals(XFormParser.NAMESPACE_ODK)) {
             throw new XFormParseException("recordaudio action must be in http://www.opendatakit.org/xforms namespace");
         }

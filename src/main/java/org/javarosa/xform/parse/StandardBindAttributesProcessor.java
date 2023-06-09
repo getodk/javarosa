@@ -33,11 +33,11 @@ class StandardBindAttributesProcessor {
         this.typeMappings = typeMappings;
     }
 
-    private Map<String, Integer> typeMappings;
+    private final Map<String, Integer> typeMappings;
 
     DataBinding createBinding(IXFormParserFunctions parserFunctions, FormDef formDef,
                               Collection<String> usedAttributes, Collection<String> passedThroughAttributes,
-                              Element element, List<XFormParser.BindAttributeProcessor> bindAttributeProcessors) {
+                              Element element, List<XFormParser.BindAttributeProcessor> bindAttributeProcessors) throws XFormParseException {
         final DataBinding binding = new DataBinding();
 
         binding.setId(element.getAttributeValue("", ID_ATTR));
@@ -146,7 +146,7 @@ class StandardBindAttributesProcessor {
         return binding;
     }
 
-    private Triggerable buildCondition(String xpath, String type, IDataReference contextRef) {
+    private Triggerable buildCondition(String xpath, String type, IDataReference contextRef) throws XFormParseException {
         final ConditionAction trueAction;
         final ConditionAction falseAction;
         final String prettyType;

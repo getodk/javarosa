@@ -60,7 +60,7 @@ class FormInstanceParser {
         this.actionTargets = actionTargets;
     }
 
-    FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) {
+    FormInstance parseInstance(Element e, boolean isMainInstance, String name, Map<String, String> namespacePrefixesByUri) throws XFormParseException {
         TreeElement root = buildInstanceStructure(e, null, !isMainInstance ? name : null, e.getNamespace(),
             namespacePrefixesByUri, null);
         FormInstance instanceModel = new FormInstance(root);
@@ -138,7 +138,7 @@ class FormInstanceParser {
         createMissingTemplates(instance, missingTemplates);
     }
 
-    private void verifyBindings(FormInstance instance, String mainInstanceNodeName) {
+    private void verifyBindings(FormInstance instance, String mainInstanceNodeName) throws XFormParseException {
         //check <bind>s (can't bind to '/', bound nodes actually exist)
         for (int i = 0; i < bindings.size(); i++) {
             DataBinding bind = bindings.get(i);
@@ -152,7 +152,7 @@ class FormInstanceParser {
                 List<TreeReference> nodes = new EvaluationContext(instance).expandReference(ref, true);
                 if (nodes.size() == 0) {
                     logger.warn("XForm Parse Warning: <bind> defined for a node that doesn't exist " +
-                        "[{}]. The node's name was probably changed and the bind should be updated.", ref.toString());
+                        "[{}]. The node's name was probably changed and the bind should be updated.", ref);
                 }
             }
         }
@@ -184,7 +184,7 @@ class FormInstanceParser {
         verifyItemsetSrcDstCompatibility(instance);
     }
 
-    private void verifyActions(FormInstance instance) {
+    private void verifyActions(FormInstance instance) throws XFormParseException {
         //check the target of actions which are manipulating real values
         for (TreeReference target : actionTargets) {
             List<TreeReference> nodes = new EvaluationContext(instance).expandReference(target, true);
@@ -225,7 +225,7 @@ class FormInstanceParser {
                     template = instance.getTemplate(nref);
 
                 if (!FormInstance.isHomogeneous(template, node)) {
-                    logger.warn("XForm Parse Warning: Not all repeated nodes for a given repeat binding [{}] are homogeneous! This will cause serious problems!", nref.toString());
+                    logger.warn("XForm Parse Warning: Not all repeated nodes for a given repeat binding [{}] are homogeneous! This will cause serious problems!", nref);
                 }
             }
         }
@@ -255,8 +255,8 @@ class FormInstanceParser {
             } else {
                 List<TreeReference> nodes = new EvaluationContext(instance).expandReference(tref, true);
                 if (nodes.size() == 0) {
-                    logger.error("XForm Parse Error: {} bound to non-existent node: [{}]", type, tref.toString());
-                    errors.add(type + " bound to non-existent node: [" + tref.toString() + "]");
+                    logger.error("XForm Parse Error: {} bound to non-existent node: [{}]", type, tref);
+                    errors.add(type + " bound to non-existent node: [" + tref + "]");
                 }
                 //we can't check whether questions map to the right kind of node ('data' node vs. 'sub-tree' node) as that depends
                 //on the question's data type, which we don't know yet
@@ -266,7 +266,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyRepeatMemberBindings(IFormElement fe, GroupDef parentRepeat) {
+    private void verifyRepeatMemberBindings(IFormElement fe, GroupDef parentRepeat) throws XFormParseException {
         if (fe.getChildren() == null)
             return;
 
@@ -281,10 +281,10 @@ class FormInstanceParser {
             //check if current binding is within scope of repeat binding
             if (!repeatBind.isAncestorOf(childBind, false)) {
                 //catch <repeat nodeset="/a/b"><input ref="/a/c" /></repeat>: repeat question is not a child of the repeated node
-                throw new XFormParseException("<repeat> member's binding [" + childBind.toString() + "] is not a descendant of <repeat> binding [" + repeatBind.toString() + "]!");
+                throw new XFormParseException("<repeat> member's binding [" + childBind + "] is not a descendant of <repeat> binding [" + repeatBind + "]!");
             } else if (repeatBind.equals(childBind) && isRepeat) {
                 //catch <repeat nodeset="/a/b"><repeat nodeset="/a/b">...</repeat></repeat> (<repeat nodeset="/a/b"><input ref="/a/b" /></repeat> is ok)
-                throw new XFormParseException("child <repeat>s [" + childBind.toString() + "] cannot bind to the same node as their parent <repeat>; only questions/groups can");
+                throw new XFormParseException("child <repeat>s [" + childBind + "] cannot bind to the same node as their parent <repeat>; only questions/groups can");
             }
 
             //check that, in the instance, current node is not within the scope of any closer repeat binding
@@ -309,7 +309,7 @@ class FormInstanceParser {
                 if (repeatable && !(k == childBind.size() - 1 && isRepeat)) {
                     //catch <repeat nodeset="/a/b"><input ref="/a/b/c/d" /></repeat>...<repeat nodeset="/a/b/c">...</repeat>:
                     //  question's/group's/repeat's most immediate repeat parent in the instance is not its most immediate repeat parent in the form def
-                    throw new XFormParseException("<repeat> member's binding [" + childBind.toString() + "] is within the scope of a <repeat> that is not its closest containing <repeat>!");
+                    throw new XFormParseException("<repeat> member's binding [" + childBind + "] is within the scope of a <repeat> that is not its closest containing <repeat>!");
                 }
             }
 
@@ -317,7 +317,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyItemsetBindings(FormInstance instance) {
+    private void verifyItemsetBindings(FormInstance instance) throws XFormParseException {
         for (ItemsetBinding itemset : itemsets) {
             //check proper parent/child relationship
             if (!itemset.nodesetRef.isAncestorOf(itemset.labelRef, false)) {
@@ -336,7 +336,7 @@ class FormInstanceParser {
 
             //make sure the labelref is tested against the right instance
             //check if it's not the main instance
-            DataInstance fi = null;
+            DataInstance fi;
             if (itemset.labelRef.getInstanceName() != null) {
                 fi = formDef.getNonMainInstance(itemset.labelRef.getInstanceName());
                 if (fi == null) {
@@ -360,7 +360,7 @@ class FormInstanceParser {
         }
     }
 
-    private void verifyItemsetSrcDstCompatibility(FormInstance instance) {
+    private void verifyItemsetSrcDstCompatibility(FormInstance instance) throws XFormParseException {
         for (ItemsetBinding itemset : itemsets) {
             boolean destRepeatable = (instance.getTemplate(itemset.getDestRef()) != null);
             if (itemset.copyMode) {
@@ -473,8 +473,7 @@ class FormInstanceParser {
                     "the template node of the parent repeat; ignoring template... [{}]", instanceNode.getName());
                 return true;
             } else if (!repeatable) {
-                logger.warn("XForm Parse Warning: Warning: template node found for ref that is not repeatable; " +
-                    "ignoring... [{}]" + instanceNode.getName());
+                logger.warn("XForm Parse Warning: Warning: template node found for ref that is not repeatable; " + "ignoring... [{}]" + instanceNode.getName());
                 return true;
             }
         }
@@ -518,7 +517,7 @@ class FormInstanceParser {
                 instance.copyNode(firstMatch, templRef);
             } catch (InvalidReferenceException e) {
                 logger.warn("XForm Parse Warning: Could not create a default repeat template; this is " +
-                    "almost certainly a homogeneity error! Your form will not work! (Failed on {})", templRef.toString());
+                    "almost certainly a homogeneity error! Your form will not work! (Failed on {})", templRef);
             }
             trimRepeatChildren(instance.resolveReference(templRef));
         }
@@ -559,7 +558,7 @@ class FormInstanceParser {
                         node.setDataType(type);
                     } else {
                         logger.warn("XForm Parse Warning: Select question {} appears to have data type that " +
-                            "is incompatible with selection", ref.toString());
+                            "is incompatible with selection", ref);
                     }
                 }
             }

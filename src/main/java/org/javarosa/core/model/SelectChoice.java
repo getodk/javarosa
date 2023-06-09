@@ -84,15 +84,18 @@ public class SelectChoice implements Externalizable, Localizable {
         this(labelID, labelInnerText, value, isLocalizable, null, null);
     }
 
-    public SelectChoice(String labelOrID, String Value, boolean isLocalizable, TreeElement item, String labelRefName) {
+    public SelectChoice(String labelOrID, String value, boolean isLocalizable, TreeElement item, String labelRefName) {
         this(isLocalizable ? labelOrID : null,
-            isLocalizable ? null : labelOrID,
-            Value, isLocalizable, item, labelRefName);
+                isLocalizable ? null : labelOrID,
+                value, isLocalizable, item, labelRefName);
     }
 
     private SelectChoice(String labelID, String labelInnerText, String value, boolean isLocalizable, TreeElement item, String labelRefName) {
         if (value == null) {
-            throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
+            //TODO - remove runtime exception
+            throw new RuntimeException(
+                    new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!")
+            );
         }
 
         this.value = value;

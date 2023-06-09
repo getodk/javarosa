@@ -20,6 +20,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.IElementHandler;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -59,7 +60,7 @@ public class SetValueAction extends Action {
 
     public static IElementHandler getHandler() {
         return new IElementHandler() {
-            public void handle(XFormParser p, Element e, Object parent) {
+            public void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
                 // the generic parseAction() method in XFormParser already checks to make sure
                 // that parent is an IFormElement, and throws an exception if it is not
                 p.parseSetValueAction(((IFormElement) parent).getActionController(), e);

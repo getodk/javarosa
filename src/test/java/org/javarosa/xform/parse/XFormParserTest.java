@@ -221,7 +221,7 @@ public class XFormParserTest {
         assertEquals(0.5d, question.getRangeStep().doubleValue(), 0);
     }
 
-    @Test(expected = XFormParseException.class)
+    @Test(expected = XFormParser.ParseException.class)
     public void throwsParseExceptionOnBadRangeForm() throws IOException, XFormParser.ParseException {
         parse(r("bad-range-form.xml"));
     }
@@ -238,7 +238,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException, XFormParser.ParseException {
+    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init("countNonEmptyForm.xml");
         assertThat(scenario.answerOf("/test/count_value"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/test/count_non_empty_value"), is(intAnswer(2)));

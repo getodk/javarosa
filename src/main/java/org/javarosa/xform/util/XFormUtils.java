@@ -75,7 +75,7 @@ public class XFormUtils {
      * @return a FormDef for the parsed form
      * @throws XFormParseException if the form can’t be parsed
      */
-    public static FormDef getFormFromInputStream(InputStream is) throws XFormParseException, XFormParser.ParseException {
+    public static FormDef getFormFromInputStream(InputStream is) throws XFormParser.ParseException {
         return getFormFromInputStream(is, null);
     }
 

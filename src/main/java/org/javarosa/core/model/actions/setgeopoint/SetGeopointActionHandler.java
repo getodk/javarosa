@@ -34,7 +34,7 @@ public abstract class SetGeopointActionHandler implements IElementHandler {
     public static final String ELEMENT_NAME = "setgeopoint";
 
     @Override
-    public final void handle(XFormParser p, Element e, Object parent) {
+    public final void handle(XFormParser p, Element e, Object parent) throws XFormParseException {
         if (!e.getNamespace().equals(XFormParser.NAMESPACE_ODK)) {
             throw new XFormParseException("setgeopoint action must be in http://www.opendatakit.org/xforms namespace");
         }
