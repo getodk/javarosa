@@ -33,8 +33,7 @@ public class XPathNumNegExpr extends XPathUnaryOpExpr {
     }
 
     public Object eval (DataInstance model, EvaluationContext evalContext) {
-        double aval = XPathFuncExpr.toNumeric(a.eval(model, evalContext)).doubleValue();
-        return new Double(-aval);
+        return -(double) XPathFuncExpr.toNumeric(a.eval(model, evalContext));
     }
 
     public String toString () {

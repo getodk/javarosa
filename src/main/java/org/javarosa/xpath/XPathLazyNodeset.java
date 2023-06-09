@@ -19,7 +19,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
  * instance.
  *
  * 2) A nodeset which wasn't able to reference into any known model (generally a reference which is
- * written in error). In this state, the size of the nodeset can be evaluated, but the acual reference
+ * written in error). In this state, the size of the nodeset can be evaluated, but the actual reference
  * cannot be returned, since it doesn't have any semantic value.
  *
  * (2) may be a deviation from normal XPath. This should be evaluated in the future.
@@ -35,7 +35,7 @@ public class XPathLazyNodeset extends XPathNodeset {
     /**
      * Construct an XPath nodeset.
      *
-     * @param nodes
+     * @param unExpandedRef
      * @param instance
      * @param ec
      */
@@ -47,7 +47,7 @@ public class XPathLazyNodeset extends XPathNodeset {
 
     private void performEvaluation() {
         synchronized(evaluated) {
-            if(evaluated.booleanValue()) {
+            if(evaluated) {
                 return;
             }
          List<TreeReference> nodes = ec.expandReference(unExpandedRef);
@@ -72,7 +72,7 @@ public class XPathLazyNodeset extends XPathNodeset {
      */
     public Object unpack () {
         synchronized(evaluated) {
-            if(evaluated.booleanValue()) {
+            if(evaluated) {
                 return super.unpack();
             }
 
@@ -81,7 +81,7 @@ public class XPathLazyNodeset extends XPathNodeset {
 
             //first, see if this treeref is usable without expansion
             int size = unExpandedRef.size();
-            boolean safe = true;;
+            boolean safe = true;
             for(int i = 0 ;  i < size ; ++i) {
                 //We can't evaluated any predicates for sure
                 if(unExpandedRef.getPredicate(i) != null) {
