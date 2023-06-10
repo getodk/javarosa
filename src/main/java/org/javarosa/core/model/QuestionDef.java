@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -36,6 +35,8 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.javarosa.core.model.IFormElement.*;
 
 /**
  * The definition of a Question to be presented to users when
@@ -192,9 +193,7 @@ public class QuestionDef implements IFormElement, Localizable {
             return;
         }
 
-        if(choices.contains(choice)){
-            choices.remove(choice);
-        }
+        choices.remove(choice);
     }
 
     public List<SelectChoice> getChoices () {
@@ -378,7 +377,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
     @Override
     public void setTextID(String textID) {
-        if(DateUtils.stringContains(textID,";")){
+        if(stringContains(textID,";")){
             logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(textID.indexOf(";")));
             textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }

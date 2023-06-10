@@ -17,13 +17,14 @@
 package org.javarosa.core.model.utils.test;
 
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.utils.DateUtils.getXMLStringValue;
 import static org.junit.Assert.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
+
+import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
 
 public class DateUtilsGetXmlStringValueTest {
@@ -37,7 +38,7 @@ public class DateUtilsGetXmlStringValueTest {
     public void xml_string_is_well_formatted() {
         LocalDateTime nowDateTime = LocalDateTime.now();
         Date nowDate = Date.from(nowDateTime.toInstant(OffsetDateTime.now().getOffset()));
-        String nowXmlFormatterDate = getXMLStringValue(nowDate);
+        String nowXmlFormatterDate = DateUtils.formatDate(nowDate, DateUtils.FORMAT_ISO8601);
         assertThat(LocalDate.parse(nowXmlFormatterDate), is(nowDateTime.toLocalDate()));
     }
 

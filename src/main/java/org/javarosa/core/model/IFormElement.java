@@ -32,6 +32,12 @@ import org.javarosa.core.util.externalizable.Externalizable;
  *
  */
 public interface IFormElement extends Localizable, Externalizable {
+    static boolean stringContains(String string, String substring) {
+        if (string == null || substring == null) {
+            return false;
+        }
+        return string.contains(substring);
+    }
 
     /**
      * @return The unique ID of this element
@@ -90,18 +96,8 @@ public interface IFormElement extends Localizable, Externalizable {
      */
     IDataReference getBind();
 
-    /**
-     * Registers a state observer for this element.
-     *
-     * @param qsl
-     */
     void registerStateObserver (FormElementStateListener qsl);
 
-    /**
-     * Unregisters a state observer for this element.
-     *
-     * @param qsl
-     */
     void unregisterStateObserver (FormElementStateListener qsl);
 
     /**
@@ -111,38 +107,16 @@ public interface IFormElement extends Localizable, Externalizable {
      */
     String getLabelInnerText();
 
-
-    /**
-     * @return
-     */
     String getAppearanceAttr();
 
     void setAppearanceAttr (String appearanceAttr);
 
     ActionController getActionController();
 
-    /**
-     * Capture additional attributes on a Question or Group
-     *
-     * @param namespace
-     * @param name
-     * @param value
-     */
     void setAdditionalAttribute(String namespace, String name, String value);
 
-    /**
-     * Retrieve the value of an additional attribute on a Question or Group
-     * @param namespace
-     * @param name
-     * @return
-     */
     String getAdditionalAttribute(String namespace, String name);
 
-    /**
-     * Retrieve all additional attributes on a Question or Group
-     *
-     * @return
-     */
     List<TreeElement> getAdditionalAttributes();
 
 }

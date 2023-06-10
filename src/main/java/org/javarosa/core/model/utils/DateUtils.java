@@ -736,23 +736,4 @@ public class DateUtils {
         while (s.length() < pad) s = String.format("0%s", s);
         return s;
     }
-
-
-    /* ==== GARBAGE (backward compatibility; too lazy to remove them now) ==== */
-
-    public static String getXMLStringValue(Date val) {
-        return formatDate(val, FORMAT_ISO8601);
-    }
-
-    public static Date getDateTimeFromString(String value) {
-        return parseDateTime(value);
-    }
-
-    public static boolean stringContains(String string, String substring) {
-        if (string == null || substring == null) {
-            return false;
-        }
-        return string.contains(substring);
-    }
-
 }

@@ -316,7 +316,7 @@ public class XPathEvalTest {
             testEval("date(true())", new XPathTypeMismatchException());
             testEval("date(convertible())", null, ec, new XPathTypeMismatchException());
             testEval("format-date('2018-01-02T10:20:30.123', \"%Y-%m-%e %H:%M:%S\")", "2018-01-2 10:20:30");
-            testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.getDateTimeFromString("2000-01-01T10:20:30.000"));
+            testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.parseDateTime("2000-01-01T10:20:30.000"));
             testEval("decimal-date-time('2000-01-01T10:20:30.000')", 10957.430902777778);
             testEval("decimal-time('2000-01-01T10:20:30.000+03:00')", .30590277777810115);
             testEval("decimal-date-time('-1000')", new XPathTypeMismatchException());

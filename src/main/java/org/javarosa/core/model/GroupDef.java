@@ -20,7 +20,6 @@ import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -38,6 +37,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.javarosa.core.model.IFormElement.*;
+
 /** The definition of a group in a form or questionaire.
  *
  * @author Daniel Kayiwa
@@ -50,7 +51,7 @@ public class GroupDef implements IFormElement, Localizable {
     private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
     private int id;    /** The group number. */
     private IDataReference binding;    /** reference to a location in the model to store data in */
-    private List<TreeElement> additionalAttributes = new ArrayList<TreeElement>(0);
+    private List<TreeElement> additionalAttributes = new ArrayList<>(0);
 
     private String labelInnerText;
     private String appearanceAttr;
@@ -82,7 +83,7 @@ public class GroupDef implements IFormElement, Localizable {
         setID(id);
         setChildren(children);
         setRepeat(repeat);
-        observers = new ArrayList<FormElementStateListener>(0);
+        observers = new ArrayList<>(0);
 
         actionController = new ActionController();
     }
@@ -124,7 +125,7 @@ public class GroupDef implements IFormElement, Localizable {
     }
 
     public void setChildren (List<IFormElement> children) {
-        this.children = (children == null ? new ArrayList<IFormElement>(0) : children);
+        this.children = (children == null ? new ArrayList<>(0) : children);
     }
 
     public void addChild (IFormElement fe) {
@@ -280,7 +281,7 @@ public class GroupDef implements IFormElement, Localizable {
             this.textID = null;
             return;
         }
-        if(DateUtils.stringContains(textID,";")){
+        if(stringContains(textID,";")){
             logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(textID.indexOf(";")));
             textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }
