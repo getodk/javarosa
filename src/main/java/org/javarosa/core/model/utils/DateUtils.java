@@ -579,8 +579,8 @@ public class DateUtils {
      * reference date, and the given parameters.
      */
     public static Date getPastPeriodDate(Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
-        Date d = null;
-
+        // this method isnt tested yet...
+        // if(true)throw new IllegalArgumentException("booyah");
         if (type.equals("week")) {
             //1 week period
             //start: day of week that starts period
@@ -640,14 +640,13 @@ public class DateUtils {
             }
 
             diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
-            d = new Date(ref.getTime() - diff * DAY_IN_MS);
+            return new Date(ref.getTime() - diff * DAY_IN_MS);
         } else if (type.equals("month")) {
             //not supported
+            return null;
         } else {
             throw new IllegalArgumentException();
         }
-
-        return d;
     }
 
     /**
