@@ -31,7 +31,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 
       List<Object> pivots = conditional.pivot(instance, c);
 
-      List<CmpPivot> internalPivots = new ArrayList<CmpPivot>(pivots.size());
+      List<CmpPivot> internalPivots = new ArrayList<>(pivots.size());
         for(Object p : pivots) {
             if(!(p instanceof CmpPivot)) {
                 throw new UnpivotableExpressionException();
@@ -49,20 +49,8 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
         }
     }
 
-    public T getMin() {
-        return min == null ? null : minCast;
-    }
-
-    public boolean isMinInclusive() {
-        return minInclusive;
-    }
-
     public T getMax() {
         return max == null ? null : maxCast;
-    }
-
-    public boolean isMaxInclusive() {
-        return maxInclusive;
     }
 
     private void evaluatePivot(CmpPivot pivot, IConditionExpr conditional, EvaluationContext c, FormInstance instance) throws UnpivotableExpressionException {
@@ -74,22 +62,22 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
         c.isConstraint = true;
 
         c.candidateValue = castToValue(val);
-        boolean eq = XPathFuncExpr.toBoolean(conditional.eval(instance, c)).booleanValue();
+        boolean eq = XPathFuncExpr.toBoolean(conditional.eval(instance, c));
 
         c.candidateValue = castToValue(lt);
-        boolean ltr = XPathFuncExpr.toBoolean(conditional.eval(instance, c)).booleanValue();
+        boolean ltr = XPathFuncExpr.toBoolean(conditional.eval(instance, c));
 
         c.candidateValue = castToValue(gt);
-        boolean gtr = XPathFuncExpr.toBoolean(conditional.eval(instance, c)).booleanValue();
+        boolean gtr = XPathFuncExpr.toBoolean(conditional.eval(instance, c));
 
         if(ltr && !gtr) {
-            max = new Double(val);
+            max = val;
             maxInclusive = eq;
             maxCast= castToValue(max);
         }
 
         if(!ltr && gtr) {
-            min = new Double(val);
+            min = val;
             minInclusive = eq;
             minCast = castToValue(min);
         }
