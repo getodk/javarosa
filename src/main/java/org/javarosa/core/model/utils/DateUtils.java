@@ -340,7 +340,7 @@ public class DateUtils {
             //Clean up string for later processing
             timeStr = timeStr.substring(0, timeStr.length() - 1);
             timeOffset = new DateFields();
-        } else if (timeStr.indexOf("+") != -1 || timeStr.indexOf("-") != -1) {
+        } else if (timeStr.contains("+") || timeStr.contains("-")) {
             timeOffset = new DateFields();
 
             List<String> pieces = split(timeStr, "+", false);
@@ -349,9 +349,7 @@ public class DateUtils {
             //so we need to invert the sign on the offset string
             int offsetSign = -1;
 
-            if (pieces.size() > 1) {
-                //offsetSign is already correct
-            } else {
+            if (pieces.size() <= 1) {
                 pieces = split(timeStr, "-", false);
                 offsetSign = 1;
             }
@@ -360,7 +358,7 @@ public class DateUtils {
 
             String offset = pieces.get(1);
             String hours = offset;
-            if (offset.indexOf(":") != -1) {
+            if (offset.contains(":")) {
                 List<String> tzPieces = split(offset, ":", false);
                 hours = tzPieces.get(0);
                 int mins = Integer.parseInt(tzPieces.get(1));
@@ -386,14 +384,13 @@ public class DateUtils {
         //Now apply any relevant offsets from the timezone.
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-        long msecOffset = (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
+        long msecOffset = (((60L * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
         c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
 
         //c is now in the timezone of the parsed value, so put
         //it in the local timezone.
 
         c.setTimeZone(TimeZone.getDefault());
-        long four = c.get(Calendar.HOUR);
 
         DateFields adjusted = getFields(c.getTime());
 
@@ -413,21 +410,17 @@ public class DateUtils {
 
     /**
      * Parse the raw components of time (hh:mm:ss) with no timezone information
-     *
-     * @param timeStr
-     * @param f
-     * @return
      */
     private static boolean parseRawTime(String timeStr, DateFields f) {
         List<String> pieces = split(timeStr, ":", false);
         if (pieces.size() != 2 && pieces.size() != 3) return false;
 
         try {
-            f.hour = Integer.parseInt((String) pieces.get(0));
-            f.minute = Integer.parseInt((String) pieces.get(1));
+            f.hour = Integer.parseInt(pieces.get(0));
+            f.minute = Integer.parseInt(pieces.get(1));
 
             if (pieces.size() == 3) {
-                String secStr = (String) pieces.get(2);
+                String secStr = pieces.get(2);
                 int i;
                 for (i = 0; i < secStr.length(); i++) {
                     char c = secStr.charAt(i);
@@ -493,9 +486,6 @@ public class DateUtils {
 
     /**
      * Returns the fractional time within the local day.
-     *
-     * @param d
-     * @return
      */
     public static double decimalTimeOfLocalDay(Date d) {
         long milli = d.getTime();
@@ -553,7 +543,6 @@ public class DateUtils {
      * the provided date and the current date.
      */
     private static String formatDaysFromToday(DateFields f) {
-        String daysAgoStr = "";
         Date d = DateUtils.getDate(f);
         int daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
 
@@ -599,16 +588,25 @@ public class DateUtils {
             //includeToday: whether today's date can count as the last day of the period
             //nAgo: how many periods ago; 1=most recent period, 0=period in progress
 
-            int target_dow = -1, current_dow = -1, diff;
+            int target_dow = -1, current_dow, diff;
             int offset = (includeToday ? 1 : 0);
 
-            if (start.equals("sun")) target_dow = 0;
-            else if (start.equals("mon")) target_dow = 1;
-            else if (start.equals("tue")) target_dow = 2;
-            else if (start.equals("wed")) target_dow = 3;
-            else if (start.equals("thu")) target_dow = 4;
-            else if (start.equals("fri")) target_dow = 5;
-            else if (start.equals("sat")) target_dow = 6;
+            switch (start) {
+                case "sun": target_dow = 0;
+                    break;
+                case "mon": target_dow = 1;
+                    break;
+                case "tue": target_dow = 2;
+                    break;
+                case "wed": target_dow = 3;
+                    break;
+                case "thu": target_dow = 4;
+                    break;
+                case "fri": target_dow = 5;
+                    break;
+                case "sat": target_dow = 6;
+                    break;
+            }
 
             if (target_dow == -1) throw new RuntimeException();
 
@@ -653,60 +651,23 @@ public class DateUtils {
     }
 
     /**
-     * Gets the number of months separating the two dates.
-     *
-     * @param earlierDate The earlier date, chronologically
-     * @param laterDate   The later date, chronologically
-     * @return the number of months separating the two dates.
-     */
-    public static int getMonthsDifference(Date earlierDate, Date laterDate) {
-        Date span = new Date(laterDate.getTime() - earlierDate.getTime());
-        Date firstDate = new Date(0);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(firstDate);
-        int firstYear = calendar.get(Calendar.YEAR);
-        int firstMonth = calendar.get(Calendar.MONTH);
-
-        calendar.setTime(span);
-        int spanYear = calendar.get(Calendar.YEAR);
-        int spanMonth = calendar.get(Calendar.MONTH);
-        int months = (spanYear - firstYear) * 12 + (spanMonth - firstMonth);
-        return months;
-    }
-
-    /**
      * @param date the date object to be analyzed
      * @return The number of days (as a double precision floating point) since the Epoch
      */
     public static int daysSinceEpoch(Date date) {
-        return dateDiff(getDate(1970, 1, 1), date);
+        return daysBetween(getDate(1970, 1, 1), date);
     }
-
 
     public static Double fractionalDaysSinceEpoch(Date a) {
         return (a.getTime() - getDate(1970, 1, 1).getTime()) / (double) DAY_IN_MS;
     }
 
-    /**
-     * add n days to date d
-     *
-     * @param d
-     * @param n
-     * @return
-     */
     public static Date dateAdd(Date d, int n) {
         return roundDate(new Date(roundDate(d).getTime() + DAY_IN_MS * n + DAY_IN_MS / 2));
         //half-day offset is needed to handle differing DST offsets!
     }
 
-    /**
-     * return the number of days between a and b, positive if b is later than a
-     *
-     * @param a
-     * @param b
-     * @return # days difference
-     */
-    public static int dateDiff(Date a, Date b) {
+    public static int daysBetween(Date a, Date b) {
         return (int) MathUtils.divLongNotSuck(roundDate(b).getTime() - roundDate(a).getTime() + DAY_IN_MS / 2, DAY_IN_MS);
         //half-day offset is needed to handle differing DST offsets!
     }
@@ -724,7 +685,7 @@ public class DateUtils {
     public static List<String> split(String str, String delimiter, boolean combineMultipleDelimiters) {
 
         int index = str.indexOf(delimiter);
-        List<String> pieces = new ArrayList<String>(index + 1);
+        List<String> pieces = new ArrayList<>(index + 1);
         while (index >= 0) {
             pieces.add(str.substring(0, index));
             str = str.substring(index + delimiter.length());
@@ -734,7 +695,7 @@ public class DateUtils {
 
         if (combineMultipleDelimiters) {
             for (int i = 0; i < pieces.size(); i++) {
-                if (((String) pieces.get(i)).length() == 0) {
+                if (pieces.get(i).length() == 0) {
                     pieces.remove(i);
                     i--;
                 }
@@ -755,31 +716,15 @@ public class DateUtils {
      */
     public static String intPad(int n, int pad) {
         String s = String.valueOf(n);
-        while (s.length() < pad) s = "0" + s;
+        while (s.length() < pad) s = String.format("0%s", s);
         return s;
     }
 
 
     /* ==== GARBAGE (backward compatibility; too lazy to remove them now) ==== */
 
-    public static String formatDateToTimeStamp(Date date) {
-        return formatDateTime(date, FORMAT_ISO8601);
-    }
-
-    public static String getShortStringValue(Date val) {
-        return formatDate(val, FORMAT_HUMAN_READABLE_SHORT);
-    }
-
     public static String getXMLStringValue(Date val) {
         return formatDate(val, FORMAT_ISO8601);
-    }
-
-    public static String get24HourTimeFromDate(Date d) {
-        return formatTime(d, FORMAT_HUMAN_READABLE_SHORT);
-    }
-
-    public static Date getDateFromString(String value) {
-        return parseDate(value);
     }
 
     public static Date getDateTimeFromString(String value) {
@@ -790,11 +735,7 @@ public class DateUtils {
         if (string == null || substring == null) {
             return false;
         }
-        if (string.indexOf(substring) == -1) {
-            return false;
-        } else {
-            return true;
-        }
+        return string.contains(substring);
     }
 
 }
