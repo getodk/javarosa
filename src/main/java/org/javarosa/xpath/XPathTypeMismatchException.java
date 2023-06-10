@@ -17,16 +17,17 @@
 package org.javarosa.xpath;
 
 public class XPathTypeMismatchException extends XPathException {
-    /**
-     *
-     */
     private static final long serialVersionUID = -1953231431177255217L;
 
-    public XPathTypeMismatchException () {
-
+    public XPathTypeMismatchException() {
+        super();
     }
 
-    public XPathTypeMismatchException (String s) {
-        super("type mismatch \n" + s);
+    public XPathTypeMismatchException(String message) {
+        super("type mismatch \n" + message);
+    }
+
+    public XPathTypeMismatchException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

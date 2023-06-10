@@ -39,7 +39,6 @@ public class DateUtils {
     public static final int FORMAT_ISO8601 = 1;
     public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
     public static final int FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY = 5;
-    //public static final int FORMAT_HUMAN_READABLE_LONG = 3;
     public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
 
     /**
@@ -272,7 +271,7 @@ public class DateUtils {
         DateFields fields = new DateFields();
         int i = str.indexOf("T");
         if (i != -1) {
-            if (stringDoesntHaveDateFields(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
+            if (stringDoesntHaveDateFields(str.substring(0, i)) || !parseTime(str.substring(i + 1), fields)) {
                 return null;
             } else {
                 DateFields newDate = dateFieldsFromString(str.substring(0, i));
@@ -285,9 +284,8 @@ public class DateUtils {
     }
 
     public static Date parseDate(String str) {
-        DateFields fields = new DateFields();
-        if (stringDoesntHaveDateFields(str, fields)) {
-            return null;
+        if (stringDoesntHaveDateFields(str)) {
+            throw new IllegalArgumentException("Fields = " + str);
         }
         return getDate(dateFieldsFromString(str));
     }
@@ -310,26 +308,13 @@ public class DateUtils {
         return getDate(fields);
     }
 
-    private static boolean stringDoesntHaveDateFields(String dateStr, DateFields f) {
+    private static boolean stringDoesntHaveDateFields(String dateStr) {
         try {
-            DateFields fields = dateFieldsFromString(dateStr);
-            f = fields;
+            dateFieldsFromString(dateStr);
             return false;
         } catch (Exception e) {
             return true;
         }
-//        List<String> pieces = split(dateStr, "-", false);
-//        if (pieces.size() != 3) return true;
-//
-//        try {
-//            f.year = Integer.parseInt(pieces.get(0));
-//            f.month = Integer.parseInt(pieces.get(1));
-//            f.day = Integer.parseInt(pieces.get(2));
-//        } catch (NumberFormatException nfe) {
-//            return true;
-//        }
-//
-//        return !f.check();
     }
 
     private static DateFields dateFieldsFromString(String dateStr) {

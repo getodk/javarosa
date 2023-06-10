@@ -806,55 +806,65 @@ public class XPathFuncExpr extends XPathExpression {
         input = unpack(input);
 
         if (input instanceof Double) {
-            if (preserveTime) {
-                Double n = (Double) input;
-
-                if (n.isNaN()) {
-                    return n;
-                }
-
-                if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
-                    throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
-                }
-
-                long timeMillis = (long) (n * DateUtils.DAY_IN_MS);
-
-                Date d = new Date(timeMillis);
-                return d;
-            } else {
-                Double n = toInt(input);
-
-                if (n.isNaN()) {
-                    return n;
-                }
-
-                if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
-                    throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
-                }
-
-                return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
-            }
+            return dateFromDouble(input, preserveTime);
         } else if (input instanceof String) {
-            String s = (String) input;
-
-            if (s.length() == 0) {
-                return s;
-            }
-
-            Date d = DateUtils.parseDateTime(s);
-            if (d == null) {
-                throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.");
-            } else {
-                return d;
-            }
+            return dateFromString((String) input);
         } else if (input instanceof Date) {
-            if (preserveTime) {
-                return (Date) input;
-            } else {
-                return DateUtils.roundDate((Date) input);
-            }
+            return dateFromDate(input, preserveTime);
         } else {
             throw new XPathTypeMismatchException("The value \"" + input.toString() + "\" can't be converted to a date.");
+        }
+    }
+
+    private static Object dateFromDate(Object input, boolean preserveTime) {
+        if (preserveTime) {
+            return input;
+        } else {
+            return DateUtils.roundDate((Date) input);
+        }
+    }
+
+    private static Object dateFromString(String input) {
+
+        if (input.length() == 0) {
+            return input;
+        }
+
+        try {
+            return DateUtils.parseDateTime(input);
+        }catch(IllegalArgumentException noArgs){
+            throw new XPathTypeMismatchException("The value \"" + input + "\" can't be converted to a date.", noArgs);
+        }
+    }
+
+    private static Object dateFromDouble(Object input, boolean preserveTime) {
+        if (preserveTime) {
+            Double n = (Double) input;
+
+            if (n.isNaN()) {
+                return n;
+            }
+
+            if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
+                throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
+            }
+
+            long timeMillis = (long) (n * DateUtils.DAY_IN_MS);
+
+            Date d = new Date(timeMillis);
+            return d;
+        } else {
+            Double n = toInt(input);
+
+            if (n.isNaN()) {
+                return n;
+            }
+
+            if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
+                throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
+            }
+
+            return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
         }
     }
 
@@ -884,17 +894,16 @@ public class XPathFuncExpr extends XPathExpression {
                 return s;
             }
 
-            Date d = DateUtils.parseDateTime(s);
-            if (d == null) {
-                throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.");
-            } else {
+            try{
+                Date d = DateUtils.parseDateTime(s);
                 if (keepDate) {
                     long milli = d.getTime();
-                    Double v = ((double) milli) / DateUtils.DAY_IN_MS;
-                    return v;
+                    return (double) milli / DateUtils.DAY_IN_MS;
                 } else {
                     return DateUtils.decimalTimeOfLocalDay(d);
                 }
+            }catch(IllegalArgumentException badArgs){
+                throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.", badArgs);
             }
         } else if (o instanceof Date) {
             Date d = (Date) o;
