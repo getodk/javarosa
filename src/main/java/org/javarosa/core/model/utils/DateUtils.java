@@ -18,9 +18,12 @@ package org.javarosa.core.model.utils;
 
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +37,21 @@ import java.util.TimeZone;
  */
 
 public class DateUtils {
+    @NotNull
+    public static Date dateFromLocalDate(LocalDate someDate) {
+        return Date.from(someDate.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+        );
+    }
+
+    public static LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+    }
+
+
     public static final int MONTH_OFFSET = (1 - Calendar.JANUARY);
 
     public static final int FORMAT_ISO8601 = 1;
