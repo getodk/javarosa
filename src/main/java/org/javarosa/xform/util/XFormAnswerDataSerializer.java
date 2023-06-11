@@ -40,7 +40,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.model.utils.DateFormatter;
 import org.kxml2.kdom.Element;
 
 /**
@@ -101,7 +101,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
      * formatting
      */
     public Object serializeAnswerData(DateData data) {
-        return DateUtils.formatDate((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
+        return DateFormatter.formatDate((Date)data.getValue(), DateFormatter.FORMAT_ISO8601);
     }
 
     /**
@@ -110,7 +110,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
      * formatting
      */
     public Object serializeAnswerData(DateTimeData data) {
-        return DateUtils.formatDateTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
+        return DateFormatter.formatDateTime((Date)data.getValue(), DateFormatter.FORMAT_ISO8601);
     }
 
     /**
@@ -119,7 +119,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
      * formatting
      */
     public Object serializeAnswerData(TimeData data) {
-        return DateUtils.formatTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
+        return DateFormatter.formatTime((Date)data.getValue(), DateFormatter.FORMAT_ISO8601);
     }
 
     /**

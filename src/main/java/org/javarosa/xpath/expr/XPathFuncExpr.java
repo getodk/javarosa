@@ -23,6 +23,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.utils.DateFormatter;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.util.GeoUtils;
@@ -764,7 +765,7 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (o instanceof String) {
             val = (String) o;
         } else if (o instanceof Date) {
-            val = DateUtils.formatDate((Date) o, DateUtils.FORMAT_ISO8601);
+            val = DateFormatter.formatDate((Date) o, DateFormatter.FORMAT_ISO8601);
         } else if (o instanceof IExprDataType) {
             val = ((IExprDataType) o).toString();
         }
@@ -935,7 +936,7 @@ public class XPathFuncExpr extends XPathExpression {
     public static String formatDateTime(Object inputValue, Object format) {
         Object parseResult = toDate(inputValue, true);
         return parseResult instanceof Date
-            ? DateUtils.format((Date) parseResult, toString(format))
+            ? DateFormatter.format((Date) parseResult, toString(format))
             : "";
     }
 

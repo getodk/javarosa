@@ -8,6 +8,8 @@ import java.util.TimeZone;
 
 
 public class DateFields {
+    public static final int MONTH_OFFSET = (1 - Calendar.JANUARY);
+
     public static DateFields of(int year, int month, int day, int hour, int minute, int second, int secTicks) {
         // The official API returns an ISO 8601 day of week
         // with a range of values from 1 for Monday to 7 for Sunday].
@@ -35,7 +37,7 @@ public class DateFields {
             cd.setTimeZone(TimeZone.getTimeZone(timezone));
         }
 
-        return new DateFields(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + DateUtils.MONTH_OFFSET, cd.get(Calendar.DAY_OF_MONTH), cd.get(Calendar.HOUR_OF_DAY), cd.get(Calendar.MINUTE), cd.get(Calendar.SECOND), cd.get(Calendar.MILLISECOND), cd.get(Calendar.DAY_OF_WEEK), cd.get(Calendar.WEEK_OF_YEAR));
+        return new DateFields(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + MONTH_OFFSET, cd.get(Calendar.DAY_OF_MONTH), cd.get(Calendar.HOUR_OF_DAY), cd.get(Calendar.MINUTE), cd.get(Calendar.SECOND), cd.get(Calendar.MILLISECOND), cd.get(Calendar.DAY_OF_WEEK), cd.get(Calendar.WEEK_OF_YEAR));
     }
 
     public int year;
@@ -77,7 +79,7 @@ public class DateFields {
     }
 
     public boolean check() {
-        return (inRange(month, 1, 12) && inRange(day, 1, DateUtils.daysInMonth(month - DateUtils.MONTH_OFFSET, year)) && inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999) && inRange(week, 1, 53));
+        return (inRange(month, 1, 12) && inRange(day, 1, DateUtils.daysInMonth(month - MONTH_OFFSET, year)) && inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999) && inRange(week, 1, 53));
     }
 
     private static boolean inRange(int x, int min, int max) {

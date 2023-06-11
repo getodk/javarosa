@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.data;
 
+import org.javarosa.core.model.utils.DateFormatter;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -67,7 +68,7 @@ public class DateTimeData implements IAnswerData {
 
     @Override
     public String getDisplayText () {
-        return DateUtils.formatDateTime(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
+        return DateFormatter.formatDateTime(d, DateFormatter.FORMAT_HUMAN_READABLE_SHORT);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class DateTimeData implements IAnswerData {
 
     @Override
     public UncastData uncast() {
-        return new UncastData(DateUtils.formatDateTime(d, DateUtils.FORMAT_ISO8601));
+        return new UncastData(DateFormatter.formatDateTime(d, DateFormatter.FORMAT_ISO8601));
     }
 
     @Override

@@ -18,8 +18,8 @@ package org.javarosa.core.model.utils.test;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.utils.DateUtils.FORMAT_ISO8601;
-import static org.javarosa.core.model.utils.DateUtils.formatDateTime;
+import static org.javarosa.core.model.utils.DateFormatter.FORMAT_ISO8601;
+import static org.javarosa.core.model.utils.DateFormatter.formatDateTime;
 import static org.javarosa.core.model.utils.DateUtils.parseDateTime;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertThat;

@@ -28,7 +28,8 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.stream.Stream;
-import org.javarosa.core.model.utils.DateUtils;
+
+import org.javarosa.core.model.utils.DateFormatter;
 import org.junit.Test;
 
 public class DateUtilsFormatLocalizationTests {
@@ -43,8 +44,8 @@ public class DateUtilsFormatLocalizationTests {
             Locale.forLanguageTag("es-ES"),
             Locale.FRENCH
         ).forEach(locale -> withLocale(locale, l -> {
-            assertThat(DateUtils.format(date, "%b"), is(JANUARY.getDisplayName(SHORT, l)));
-            assertThat(DateUtils.format(date, "%a"), is(SUNDAY.getDisplayName(SHORT, l)));
+            assertThat(DateFormatter.format(date, "%b"), is(JANUARY.getDisplayName(SHORT, l)));
+            assertThat(DateFormatter.format(date, "%a"), is(SUNDAY.getDisplayName(SHORT, l)));
         }));
     }
 

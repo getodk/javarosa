@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 
-import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.model.utils.DateFormatter;
 import org.junit.Test;
 
 public class DateUtilsGetXmlStringValueTest {
@@ -38,7 +38,7 @@ public class DateUtilsGetXmlStringValueTest {
     public void xml_string_is_well_formatted() {
         LocalDateTime nowDateTime = LocalDateTime.now();
         Date nowDate = Date.from(nowDateTime.toInstant(OffsetDateTime.now().getOffset()));
-        String nowXmlFormatterDate = DateUtils.formatDate(nowDate, DateUtils.FORMAT_ISO8601);
+        String nowXmlFormatterDate = DateFormatter.formatDate(nowDate, DateFormatter.FORMAT_ISO8601);
         assertThat(LocalDate.parse(nowXmlFormatterDate), is(nowDateTime.toLocalDate()));
     }
 

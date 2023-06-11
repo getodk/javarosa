@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
-import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.model.utils.DateFormatter;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.slf4j.Logger;
@@ -159,7 +159,7 @@ class IFunctionHandlerHelpers {
             int lastIndex = Math.max(fullName.lastIndexOf('.'), fullName.lastIndexOf('$'));
             sb.append(fullName.substring(lastIndex + 1, fullName.length()));
             sb.append(":");
-            sb.append(oa[i] instanceof Date ? DateUtils.formatDate((Date) oa[i], DateUtils.FORMAT_ISO8601) : oa[i].toString());
+            sb.append(oa[i] instanceof Date ? DateFormatter.formatDate((Date) oa[i], DateFormatter.FORMAT_ISO8601) : oa[i].toString());
             if (i < oa.length - 1)
                 sb.append(",");
         }
