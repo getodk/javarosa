@@ -17,13 +17,6 @@ public class DateFormatterTest {
         assertEquals("2023-06-11", formattedDate);
     }
 
-    @Test public void formatsDateAsDaysFromToday(){
-        LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
-        Date dateToTest = dateFromLocalDate(someLocalDate);
-        String formattedDate = DateFormatter.formatDate(dateToTest, DateFormatter.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY);
-        assertEquals("11/06/23", formattedDate);
-    }
-
     @Test public void formatsDateAsHumanShort(){
         LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
         Date dateToTest = dateFromLocalDate(someLocalDate);

@@ -8,7 +8,6 @@ import java.util.TimeZone;
 public class DateFormatter {
     public static final int FORMAT_ISO8601 = 1;
     public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
-    public static final int FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY = 5;
     public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
     /** RFC 822 **/
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
@@ -53,8 +52,6 @@ public class DateFormatter {
                 return formatDateISO8601(f);
             case FORMAT_HUMAN_READABLE_SHORT:
                 return formatDateColloquial(f);
-            case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY:
-                return formatDaysFromToday(f);
             case FORMAT_TIMESTAMP_SUFFIX:
                 return formatDateSuffix(f);
             case FORMAT_TIMESTAMP_HTTP:
@@ -201,34 +198,6 @@ public class DateFormatter {
         }
 
         return sb.toString();
-    }
-
-    /**
-     * Provides text representing a span of time.
-     *
-     * @param f The fields for the date to be compared against the current date.
-     * @return a string which is a human readable representation of the difference between
-     * the provided date and the current date.
-     */
-    private static String formatDaysFromToday(DateFields f) {
-        return formatDate(f, FORMAT_HUMAN_READABLE_SHORT);
-//        Date d = DateUtils.getDate(f);
-//        int daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
-//        if (daysAgo == 0) {
-//            return Localization.get("date.today");
-//        } else if (daysAgo == 1) {
-//            return Localization.get("date.yesterday");
-//        } else if (daysAgo == 2) {
-//            return Localization.get("date.twoago", new String[]{String.valueOf(daysAgo)});
-//        } else if (daysAgo > 2 && daysAgo <= 6) {
-//            return Localization.get("date.nago", new String[]{String.valueOf(daysAgo)});
-//        } else if (daysAgo == -1) {
-//            return Localization.get("date.tomorrow");
-//        } else if (daysAgo < -1 && daysAgo >= -6) {
-//            return Localization.get("date.nfromnow", new String[]{String.valueOf(-daysAgo)});
-//        } else {
-//            return formatDate(f, FORMAT_HUMAN_READABLE_SHORT);
-//        }
     }
 
     /**
