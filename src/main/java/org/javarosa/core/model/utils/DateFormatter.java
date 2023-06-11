@@ -1,6 +1,5 @@
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.services.locale.Localization;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Date;
@@ -11,9 +10,7 @@ public class DateFormatter {
     public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
     public static final int FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY = 5;
     public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
-    /**
-     * RFC 822
-     **/
+    /** RFC 822 **/
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
     public static String formatDateTime(Date d, int format) {
@@ -42,12 +39,12 @@ public class DateFormatter {
         return formatDate(fields, format) + delim + formatTime(fields, format);
     }
 
-    public static String formatDate(Date d, int format) {
-        return (d == null ? "" : formatDate(DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
-    }
-
     public static String formatTime(Date d, int format) {
         return (d == null ? "" : formatTime(DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
+    }
+
+    public static String formatDate(Date d, int format) {
+        return (d == null ? "" : formatDate(DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
     }
 
     static String formatDate(DateFields f, int format) {
@@ -82,16 +79,12 @@ public class DateFormatter {
         }
     }
 
-    /**
-     * RFC 822
-     **/
+    /** RFC 822 **/
     private static String formatDateHttp(DateFields f) {
         return format(f, "%a, %d %b %Y");
     }
 
-    /**
-     * RFC 822
-     **/
+    /** RFC 822 **/
     private static String formatTimeHttp(DateFields f) {
         return format(f, "%H:%M:%S GMT");
     }
@@ -107,7 +100,7 @@ public class DateFormatter {
         if (year.length() == 4) {
             year = year.substring(2, 4);
         }
-        //Otherwise we have an old or bizzarre date, don't try to do anything
+        //Otherwise we have an old or bizarre date, don't try to do anything
 
         return intPad(f.day, 2) + "/" + intPad(f.month, 2) + "/" + year;
     }
@@ -218,24 +211,24 @@ public class DateFormatter {
      * the provided date and the current date.
      */
     private static String formatDaysFromToday(DateFields f) {
-        Date d = DateUtils.getDate(f);
-        int daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
-
-        if (daysAgo == 0) {
-            return Localization.get("date.today");
-        } else if (daysAgo == 1) {
-            return Localization.get("date.yesterday");
-        } else if (daysAgo == 2) {
-            return Localization.get("date.twoago", new String[]{String.valueOf(daysAgo)});
-        } else if (daysAgo > 2 && daysAgo <= 6) {
-            return Localization.get("date.nago", new String[]{String.valueOf(daysAgo)});
-        } else if (daysAgo == -1) {
-            return Localization.get("date.tomorrow");
-        } else if (daysAgo < -1 && daysAgo >= -6) {
-            return Localization.get("date.nfromnow", new String[]{String.valueOf(-daysAgo)});
-        } else {
-            return formatDate(f, FORMAT_HUMAN_READABLE_SHORT);
-        }
+        return formatDate(f, FORMAT_HUMAN_READABLE_SHORT);
+//        Date d = DateUtils.getDate(f);
+//        int daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
+//        if (daysAgo == 0) {
+//            return Localization.get("date.today");
+//        } else if (daysAgo == 1) {
+//            return Localization.get("date.yesterday");
+//        } else if (daysAgo == 2) {
+//            return Localization.get("date.twoago", new String[]{String.valueOf(daysAgo)});
+//        } else if (daysAgo > 2 && daysAgo <= 6) {
+//            return Localization.get("date.nago", new String[]{String.valueOf(daysAgo)});
+//        } else if (daysAgo == -1) {
+//            return Localization.get("date.tomorrow");
+//        } else if (daysAgo < -1 && daysAgo >= -6) {
+//            return Localization.get("date.nfromnow", new String[]{String.valueOf(-daysAgo)});
+//        } else {
+//            return formatDate(f, FORMAT_HUMAN_READABLE_SHORT);
+//        }
     }
 
     /**
