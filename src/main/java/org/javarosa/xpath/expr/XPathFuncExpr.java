@@ -897,26 +897,31 @@ public class XPathFuncExpr extends XPathExpression {
 
             try{
                 Date d = DateUtils.parseDateTime(s);
-                if (keepDate) {
-                    long milli = d.getTime();
-                    return (double) milli / DateUtils.DAY_IN_MS;
-                } else {
-                    return DateUtils.decimalTimeOfLocalDay(d);
-                }
+                return decimalFromDate(d, keepDate);
+//                if (keepDate) {
+//                    long milli = d.getTime();
+//                    return (double) milli / DateUtils.DAY_IN_MS;
+//                } else {
+//                    return DateUtils.decimalTimeOfLocalDay(d);
+//                }
             }catch(IllegalArgumentException badArgs){
                 throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.", badArgs);
             }
         } else if (o instanceof Date) {
-            Date d = (Date) o;
-            if (keepDate) {
-                long milli = d.getTime();
-                Double v = ((double) milli) / DateUtils.DAY_IN_MS;
-                return v;
-            } else {
-                return DateUtils.decimalTimeOfLocalDay(d);
-            }
+            return decimalFromDate((Date) o, keepDate);
         } else {
             throw new XPathTypeMismatchException("The value \"" + o.toString() + "\" can't be converted to a date.");
+        }
+    }
+
+    private static double decimalFromDate(Date o, boolean keepDate) {
+        Date d = o;
+        if (keepDate) {
+            long milli = d.getTime();
+            Double v = ((double) milli) / DateUtils.DAY_IN_MS;
+            return v;
+        } else {
+            return DateUtils.decimalTimeOfLocalDay(d);
         }
     }
 

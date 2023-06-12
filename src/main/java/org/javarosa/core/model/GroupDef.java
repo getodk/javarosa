@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.javarosa.core.model.IFormElement.*;
+import static org.javarosa.core.model.IFormElement.stringContains;
 
 /** The definition of a group in a form or questionaire.
  *

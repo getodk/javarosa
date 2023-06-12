@@ -36,7 +36,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.javarosa.core.model.IFormElement.*;
+import static org.javarosa.core.model.IFormElement.stringContains;
+
 
 /**
  * The definition of a Question to be presented to users when

@@ -2,6 +2,7 @@ package org.javarosa.core.model.utils;
 
 import org.joda.time.LocalDateTime;
 
+import java.time.temporal.WeekFields;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -15,10 +16,14 @@ public class DateFields {
         // with a range of values from 1 for Monday to 7 for Sunday].
         // TODO migrate dow field to a DayOfWeek type to avoid any possible
         // interpretation errors
+//        java.time.LocalDateTime dateTime = java.time.LocalDateTime.of(year, month, day, hour, minute, second, secTicks);
+//        int dow = dateTime.getDayOfWeek().getValue();
+//        int week = dateTime.get(WeekFields.ISO.weekOfYear());
         LocalDateTime ldt = new LocalDateTime(year, month, day, hour, minute, second, secTicks);
         int iso8601Dow = ldt.getDayOfWeek();
         int dow = iso8601Dow == 7 ? 0 : iso8601Dow;
         int week = ldt.getWeekOfWeekyear();
+
         return new DateFields(year, month, day, hour, minute, second, secTicks, dow, week);
     }
 

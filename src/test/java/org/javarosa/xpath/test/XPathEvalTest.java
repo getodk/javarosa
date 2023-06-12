@@ -16,6 +16,33 @@
 
 package org.javarosa.xpath.test;
 
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.xpath.XPathException;
+import org.javarosa.xpath.XPathNodeset;
+import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.XPathTypeMismatchException;
+import org.javarosa.xpath.XPathUnhandledException;
+import org.javarosa.xpath.XPathUnsupportedException;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Double.NEGATIVE_INFINITY;
@@ -42,36 +69,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.xpath.XPathNodeset;
-import org.javarosa.xpath.XPathParseTool;
-import org.javarosa.xpath.XPathException;
-import org.javarosa.xpath.XPathTypeMismatchException;
-import org.javarosa.xpath.XPathUnhandledException;
-import org.javarosa.xpath.XPathUnsupportedException;
-import org.javarosa.xpath.expr.XPathExpression;
-import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 @RunWith(Parameterized.class)
 public class XPathEvalTest {
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
-    @Parameterized.Parameter(value = 0)
+    @Parameterized.Parameter()
     public Locale locale;
 
     private EvaluationContext ec;
@@ -79,8 +80,8 @@ public class XPathEvalTest {
     @Parameterized.Parameters(name = "Locale {0}")
     public static Iterable<Object[]> testParametersProvider() {
         return Arrays.asList(new Object[][]{
-            {Locale.forLanguageTag("en")},
-            {Locale.forLanguageTag("pl")}
+                {Locale.forLanguageTag("en")},
+                {Locale.forLanguageTag("pl")}
         });
     }
 
@@ -282,10 +283,10 @@ public class XPathEvalTest {
     public void other_string_functions_with_context() {
         FormInstance instance1 = buildInstance();
         testEval("/data/path[normalize-space()='some value']", instance1, null,
-            createExpectedNodesetFromInstance(instance1, "path", 2));
+                createExpectedNodesetFromInstance(instance1, "path", 2));
 
         testEval("/data/path[string-length()=17]", instance1, null,
-            createExpectedNodesetFromInstance(instance1, "path", 2));
+                createExpectedNodesetFromInstance(instance1, "path", 2));
     }
 
     @Test
@@ -323,7 +324,6 @@ public class XPathEvalTest {
             testEval("decimal-date-time('-01-2019')", new XPathTypeMismatchException());
         });
     }
-
     @Test
     public void boolean_functions() {
         testEval("not(true())", FALSE);
@@ -612,19 +612,19 @@ public class XPathEvalTest {
         // happy flow scenario where the index node is not blank
         FormInstance instance1 = createTestDataForIndexedRepeatFunction(1);
         testEval(
-            "indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )",
-            instance1,
-            null,
-            createExpectedNodesetFromIndexedRepeatFunction(instance1, 1, "name")
+                "indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )",
+                instance1,
+                null,
+                createExpectedNodesetFromIndexedRepeatFunction(instance1, 1, "name")
         );
 
         // situation where the referenced index node is blank and the default value (0 which means the first repeat group) is used
         FormInstance instance2 = createTestDataForIndexedRepeatFunction(null);
         testEval(
-            "indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )",
-            instance2,
-            null,
-            createExpectedNodesetFromIndexedRepeatFunction(instance2, 0, "name")
+                "indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )",
+                instance2,
+                null,
+                createExpectedNodesetFromIndexedRepeatFunction(instance2, 0, "name")
         );
     }
 
@@ -715,18 +715,18 @@ public class XPathEvalTest {
     private XPathNodeset createExpectedNodesetFromInstance(FormInstance testInstance, String nodeName, int index) {
         TreeReference referencedNode = testInstance.getRoot().getChildrenWithName(nodeName).get(index).getRef();
         return new XPathNodeset(
-            Collections.singletonList(referencedNode),
-            testInstance,
-            new EvaluationContext(new EvaluationContext(testInstance), referencedNode)
+                Collections.singletonList(referencedNode),
+                testInstance,
+                new EvaluationContext(new EvaluationContext(testInstance), referencedNode)
         );
     }
 
     private XPathNodeset createExpectedNodesetFromIndexedRepeatFunction(FormInstance testInstance, int repeatIndex, String nodeName) {
         TreeReference referencedNode = testInstance.getRoot().getChildAt(repeatIndex).getChildrenWithName(nodeName).get(0).getRef();
         return new XPathNodeset(
-            Collections.singletonList(referencedNode),
-            testInstance,
-            new EvaluationContext(new EvaluationContext(testInstance), referencedNode)
+                Collections.singletonList(referencedNode),
+                testInstance,
+                new EvaluationContext(new EvaluationContext(testInstance), referencedNode)
         );
     }
 
