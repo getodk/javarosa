@@ -17,7 +17,7 @@ public enum DateFormat {
         }
 
         @Override
-        protected String formatTime(DateFields fields, int key) {
+        protected String formatTime(DateFields fields) {
             String time = DateFormatter.intPad(fields.hour, 2) + ":" + DateFormatter.intPad(fields.minute, 2) + ":" + DateFormatter.intPad(fields.second, 2) + "." + DateFormatter.intPad(fields.secTicks, 3);
 
             //Time Zone ops (1 in the first field corresponds to 'CE' ERA)
@@ -57,7 +57,7 @@ public enum DateFormat {
         }
 
         @Override
-        protected String formatTime(DateFields fields, int key) {
+        protected String formatTime(DateFields fields) {
             return DateFormatter.intPad(fields.hour, 2) + ":" + DateFormatter.intPad(fields.minute, 2);
         }
     },
@@ -68,7 +68,7 @@ public enum DateFormat {
         }
 
         @Override
-        protected String formatTime(DateFields fields, int key) {
+        protected String formatTime(DateFields fields) {
             return DateFormatter.intPad(fields.hour, 2) + DateFormatter.intPad(fields.minute, 2) + DateFormatter.intPad(fields.second, 2);
         }
     },
@@ -80,7 +80,7 @@ public enum DateFormat {
         }
 
         @Override
-        protected String formatTime(DateFields fields, int key) {
+        protected String formatTime(DateFields fields) {
             return DateFormatter.format(fields, "%H:%M:%S GMT");
         }
     };
@@ -109,10 +109,10 @@ public enum DateFormat {
     }
 
     public String formatTime(Date date) {
-        return formatTime(DateFields.getFields(date, this.key == TIMESTAMP_HTTP.key ? "UTC" : null), this.key);
+        return formatTime(DateFields.getFields(date, this.key == TIMESTAMP_HTTP.key ? "UTC" : null));
     }
 
     abstract String formatDate(DateFields f);
 
-    protected abstract String formatTime(DateFields fields, int key);
+    protected abstract String formatTime(DateFields fields);
 }
