@@ -5,7 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Stream;
+
+import static org.javarosa.core.model.utils.DateFormatter.FORMAT_TIMESTAMP_HTTP;
 
 public enum DateFormat {
 
@@ -13,6 +16,32 @@ public enum DateFormat {
         @Override
         String formatDate(DateFields f) {
             return f.year + "-" + DateFormatter.intPad(f.month, 2) + "-" + DateFormatter.intPad(f.day, 2);
+        }
+
+        @Override
+        protected String formatTime(DateFields fields, int key) {
+            String time = DateFormatter.intPad(fields.hour, 2) + ":" + DateFormatter.intPad(fields.minute, 2) + ":" + DateFormatter.intPad(fields.second, 2) + "." + DateFormatter.intPad(fields.secTicks, 3);
+
+            //Time Zone ops (1 in the first field corresponds to 'CE' ERA)
+            int milliday = ((fields.hour * 60 + fields.minute) * 60 + fields.second) * 1000 + fields.secTicks;
+            int offset = TimeZone.getDefault().getOffset(1, fields.year, fields.month - 1, fields.day, fields.dow, milliday);
+
+            //NOTE: offset is in millis
+            if (offset == 0) {
+                time += "Z";
+            } else {
+
+                //Start with sign
+                String offsetSign = offset > 0 ? "+" : "-";
+
+                int value = Math.abs(offset) / 1000 / 60;
+
+                String hrs = DateFormatter.intPad(value / 60, 2);
+                String mins = ":" + DateFormatter.intPad(value % 60, 2);
+
+                time += offsetSign + hrs + mins;
+            }
+            return time;
         }
     },
     HUMAN_READABLE_SHORT(2, " ") {
@@ -28,11 +57,21 @@ public enum DateFormat {
 
             return DateFormatter.intPad(f.day, 2) + "/" + DateFormatter.intPad(f.month, 2) + "/" + year;
         }
+
+        @Override
+        protected String formatTime(DateFields fields, int key) {
+            return DateFormatter.intPad(fields.hour, 2) + ":" + DateFormatter.intPad(fields.minute, 2);
+        }
     },
     TIMESTAMP_SUFFIX(7, "") {
         @Override
         String formatDate(DateFields f) {
             return f.year + DateFormatter.intPad(f.month, 2) + DateFormatter.intPad(f.day, 2);
+        }
+
+        @Override
+        protected String formatTime(DateFields fields, int key) {
+            return DateFormatter.intPad(fields.hour, 2) + DateFormatter.intPad(fields.minute, 2) + DateFormatter.intPad(fields.second, 2);
         }
     },
     /** RFC 822 */
@@ -41,11 +80,16 @@ public enum DateFormat {
         String formatDate(DateFields f) {
             return DateFormatter.format(f, "%a, %d %b %Y");
         }
+
+        @Override
+        protected String formatTime(DateFields fields, int key) {
+            return DateFormatter.format(fields, "%H:%M:%S GMT");
+        }
     };
 
     @NotNull
     public static Optional<DateFormat> getByKey(int format) {
-        Stream<DateFormat> formatStream = Arrays.stream(values()).filter(keyvalue -> keyvalue.key == format);
+        Stream<DateFormat> formatStream = Arrays.stream(values()).filter(dateFormat -> dateFormat.key == format);
         return formatStream.findFirst();
     }
 
@@ -66,5 +110,11 @@ public enum DateFormat {
         return formatDate(fields);
     }
 
+    public String formatTime(Date date) {
+        return formatTime(DateFields.getFields(date, this.key == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), this.key);
+    }
+
     abstract String formatDate(DateFields f);
+
+    protected abstract String formatTime(DateFields fields, int key);
 }

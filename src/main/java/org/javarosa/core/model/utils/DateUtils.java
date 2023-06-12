@@ -43,7 +43,7 @@ public class DateUtils {
         );
     }
 
-    public static LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
+    public static LocalDate localDateFromDate(Date dateToConvert) {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();

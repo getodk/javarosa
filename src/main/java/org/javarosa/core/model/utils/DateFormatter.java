@@ -4,7 +4,6 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.TimeZone;
 
 public class DateFormatter {
     public static final int FORMAT_ISO8601 = 1;
@@ -18,17 +17,26 @@ public class DateFormatter {
         if (date == null) return "";
 
         Optional<DateFormat> optional = DateFormat.getByKey(format);
-        if (optional.isPresent()) {
-            DateFormat dateFormat = optional.get();
-            return dateFormat.formatDate(date) + dateFormat.delimiter + formatTime(date, format);
-        } else {
+        if (!optional.isPresent()) {
             //TODO - is emptyString what we want?
             return "";
         }
+
+        DateFormat dateFormat = optional.get();
+        return dateFormat.formatDate(date) + dateFormat.delimiter + dateFormat.formatTime(date);
     }
 
-    public static String formatTime(Date d, int format) {
-        return (d == null ? "" : formatTime(DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
+    public static String formatTime(Date date, int format) {
+        //TODO - is emptyString what we want?
+        if (date == null) return "";
+
+        Optional<DateFormat> optional = DateFormat.getByKey(format);
+        if (!optional.isPresent()) {
+            //TODO - is emptyString what we want?
+            return "";
+        }
+        DateFormat dateFormat = optional.get();
+        return dateFormat.formatTime(date);
     }
 
     public static String formatDate(Date date, int format) {
@@ -40,61 +48,20 @@ public class DateFormatter {
             //TODO - is emptyString what we want?
             return "";
         }
-//        return (date == null ? "" : formatDate(DateFields.getFields(date, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
-    }
-
-    public static String formatTime(DateFields f, int format) {
-        switch (format) {
-            case FORMAT_ISO8601:
-                return formatTimeISO8601(f);
-            case FORMAT_HUMAN_READABLE_SHORT:
-                return formatTimeColloquial(f);
-            case FORMAT_TIMESTAMP_SUFFIX:
-                return formatTimeSuffix(f);
-            case FORMAT_TIMESTAMP_HTTP:
-                return formatTimeHttp(f);
-            default:
-                return null;
-        }
     }
 
     /**
      * RFC 822
      **/
-    private static String formatTimeHttp(DateFields f) {
+    static String formatTimeHttp(DateFields f) {
         return format(f, "%H:%M:%S GMT");
     }
 
-    private static String formatTimeISO8601(DateFields f) {
-        String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
-
-        //Time Zone ops (1 in the first field corresponds to 'CE' ERA)
-        int milliday = ((f.hour * 60 + f.minute) * 60 + f.second) * 1000 + f.secTicks;
-        int offset = TimeZone.getDefault().getOffset(1, f.year, f.month - 1, f.day, f.dow, milliday);
-
-        //NOTE: offset is in millis
-        if (offset == 0) {
-            time += "Z";
-        } else {
-
-            //Start with sign
-            String offsetSign = offset > 0 ? "+" : "-";
-
-            int value = Math.abs(offset) / 1000 / 60;
-
-            String hrs = intPad(value / 60, 2);
-            String mins = ":" + intPad(value % 60, 2);
-
-            time += offsetSign + hrs + mins;
-        }
-        return time;
-    }
-
-    private static String formatTimeColloquial(DateFields f) {
+    static String formatTimeColloquial(DateFields f) {
         return intPad(f.hour, 2) + ":" + intPad(f.minute, 2);
     }
 
-    private static String formatTimeSuffix(DateFields f) {
+    static String formatTimeSuffix(DateFields f) {
         return intPad(f.hour, 2) + intPad(f.minute, 2) + intPad(f.second, 2);
     }
 
