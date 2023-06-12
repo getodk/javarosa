@@ -3,6 +3,7 @@ package org.javarosa.core.model.utils;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 
 public class DateFormatter {
@@ -12,56 +13,37 @@ public class DateFormatter {
     /** RFC 822 **/
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
-    public static String formatDateTime(Date d, int format) {
-        if (d == null) {
+    public static String formatDateTime(Date date, int format) {
+        //TODO - is emptyString what we want?
+        if (date == null) return "";
+
+        Optional<DateFormat> optional = DateFormat.getByKey(format);
+        if (optional.isPresent()) {
+            DateFormat dateFormat = optional.get();
+            return dateFormat.formatDate(date) + dateFormat.delimiter + formatTime(date, format);
+        } else {
+            //TODO - is emptyString what we want?
             return "";
         }
-
-        DateFields fields = DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null);
-
-        String delim;
-        switch (format) {
-            case FORMAT_ISO8601:
-                delim = "T";
-                break;
-            case FORMAT_TIMESTAMP_SUFFIX:
-                delim = "";
-                break;
-            case FORMAT_TIMESTAMP_HTTP:
-                delim = " ";
-                break;
-            default:
-                delim = " ";
-                break;
-        }
-
-        return formatDate(fields, format) + delim + formatTime(fields, format);
     }
 
     public static String formatTime(Date d, int format) {
         return (d == null ? "" : formatTime(DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
     }
 
-    public static String formatDate(Date d, int format) {
-        return (d == null ? "" : formatDate(DateFields.getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
-    }
-
-    static String formatDate(DateFields f, int format) {
-        switch (format) {
-            case FORMAT_ISO8601:
-                return formatDateISO8601(f);
-            case FORMAT_HUMAN_READABLE_SHORT:
-                return formatDateColloquial(f);
-            case FORMAT_TIMESTAMP_SUFFIX:
-                return formatDateSuffix(f);
-            case FORMAT_TIMESTAMP_HTTP:
-                return formatDateHttp(f);
-            default:
-                return null;
+    public static String formatDate(Date date, int format) {
+        Optional<DateFormat> optional = DateFormat.getByKey(format);
+        if (optional.isPresent()) {
+            DateFormat dateFormat = optional.get();
+            return dateFormat.formatDate(date);
+        } else {
+            //TODO - is emptyString what we want?
+            return "";
         }
+//        return (date == null ? "" : formatDate(DateFields.getFields(date, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
     }
 
-    private static String formatTime(DateFields f, int format) {
+    public static String formatTime(DateFields f, int format) {
         switch (format) {
             case FORMAT_ISO8601:
                 return formatTimeISO8601(f);
@@ -76,34 +58,11 @@ public class DateFormatter {
         }
     }
 
-    /** RFC 822 **/
-    private static String formatDateHttp(DateFields f) {
-        return format(f, "%a, %d %b %Y");
-    }
-
-    /** RFC 822 **/
+    /**
+     * RFC 822
+     **/
     private static String formatTimeHttp(DateFields f) {
         return format(f, "%H:%M:%S GMT");
-    }
-
-    private static String formatDateISO8601(DateFields f) {
-        return f.year + "-" + intPad(f.month, 2) + "-" + intPad(f.day, 2);
-    }
-
-    private static String formatDateColloquial(DateFields f) {
-        String year = Integer.valueOf(f.year).toString();
-
-        //Normal Date
-        if (year.length() == 4) {
-            year = year.substring(2, 4);
-        }
-        //Otherwise we have an old or bizarre date, don't try to do anything
-
-        return intPad(f.day, 2) + "/" + intPad(f.month, 2) + "/" + year;
-    }
-
-    private static String formatDateSuffix(DateFields f) {
-        return f.year + intPad(f.month, 2) + intPad(f.day, 2);
     }
 
     private static String formatTimeISO8601(DateFields f) {
