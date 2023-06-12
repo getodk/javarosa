@@ -40,6 +40,9 @@ public class DateFormatter {
     }
 
     public static String formatDate(Date date, int format) {
+        //TODO - is emptyString what we want?
+        if (date == null) return "";
+
         Optional<DateFormat> optional = DateFormat.getByKey(format);
         if (optional.isPresent()) {
             DateFormat dateFormat = optional.get();
@@ -48,21 +51,6 @@ public class DateFormatter {
             //TODO - is emptyString what we want?
             return "";
         }
-    }
-
-    /**
-     * RFC 822
-     **/
-    static String formatTimeHttp(DateFields f) {
-        return format(f, "%H:%M:%S GMT");
-    }
-
-    static String formatTimeColloquial(DateFields f) {
-        return intPad(f.hour, 2) + ":" + intPad(f.minute, 2);
-    }
-
-    static String formatTimeSuffix(DateFields f) {
-        return intPad(f.hour, 2) + intPad(f.minute, 2) + intPad(f.second, 2);
     }
 
     public static String format(Date d, String format) {

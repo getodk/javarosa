@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
-import static org.javarosa.core.model.utils.DateFormatter.FORMAT_TIMESTAMP_HTTP;
-
 public enum DateFormat {
 
     ISO8601(1, "T") {
@@ -111,7 +109,7 @@ public enum DateFormat {
     }
 
     public String formatTime(Date date) {
-        return formatTime(DateFields.getFields(date, this.key == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), this.key);
+        return formatTime(DateFields.getFields(date, this.key == TIMESTAMP_HTTP.key ? "UTC" : null), this.key);
     }
 
     abstract String formatDate(DateFields f);
