@@ -123,6 +123,10 @@ public class DateFormatter {
                 .replace("S", "_S_")
                 .replace("_s_", "SSS")
                 .replace("_S_", "ss")
+                .replace("w", "_w_")
+                .replace("W", "_W_")
+                .replace("_w_", "W")
+                .replace("_W_", "w")
 
                 //translate XPATH notation to java.time notation
                 .replace("d", "dd")
