@@ -65,8 +65,8 @@ public class DateUtils {
     }
 
     public static Date getDate(DateFields f, String timezone) {
-        LocalDateTime ldt = getLocalDateTime(f);
-        return timezone == null ? ldt.toDate() : ldt.toDate(TimeZone.getTimeZone(timezone));
+        TimeZone tz = (timezone == null) ? TimeZone.getDefault() : TimeZone.getTimeZone(timezone);
+        return getLocalDateTime(f).toDate(tz);
     }
 
     public static LocalDateTime getLocalDateTime(DateFields f) {
