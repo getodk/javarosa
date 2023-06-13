@@ -14,8 +14,8 @@ import org.javarosa.xpath.expr.XPathFuncExpr;
  */
 public class DateRangeHint extends RangeHint<DateData> {
 
-    protected DateData castToValue(double value) throws UnpivotableExpressionException {
-        return new DateData((Date)XPathFuncExpr.toDate(new Double(Math.floor(value)), false));
+    protected DateData castToValue(double value) {
+        return new DateData((Date)XPathFuncExpr.toDate(Math.floor(value), false));
     }
 
     protected double unit() {

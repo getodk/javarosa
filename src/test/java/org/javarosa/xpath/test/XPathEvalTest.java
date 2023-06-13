@@ -66,7 +66,7 @@ import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_STATEFUL_R
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_STATEFUL_WRITE;
 import static org.javarosa.xpath.test.IFunctionHandlerHelpers.HANDLER_TESTFUNC;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)

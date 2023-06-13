@@ -44,7 +44,7 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 
         //short-circuiting
         if ((!aval && op == AND) || (aval && op == OR)) {
-            return new Boolean(aval);
+            return aval;
         }
 
         boolean bval = XPathFuncExpr.toBoolean(b.eval(model, evalContext)).booleanValue();
@@ -54,7 +54,7 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
         case AND: result = aval && bval; break;
         case OR: result = aval || bval; break;
         }
-        return new Boolean(result);
+        return result;
     }
 
     @Override

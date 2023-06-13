@@ -2,7 +2,6 @@ package org.javarosa.core.model.utils;
 
 import org.joda.time.LocalDateTime;
 
-import java.time.temporal.WeekFields;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;

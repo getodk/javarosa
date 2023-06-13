@@ -19,7 +19,7 @@ package org.javarosa.core.model.utils.test;
 import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

@@ -45,6 +45,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
@@ -1111,7 +1112,7 @@ public class XPathFuncExpr extends XPathExpression {
         if (numDecimals >= 0) {
             try {
                 // Per XPath specification, round up or towards zero
-                int method = (number < 0) ? BigDecimal.ROUND_HALF_DOWN : BigDecimal.ROUND_HALF_UP;
+                RoundingMode method = (number < 0) ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
                 return (new BigDecimal(
                     Double.toString(number)))
                     .setScale(numDecimals, method)

@@ -66,7 +66,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
         case GTE: result = fa >= fb; break;
         }
 
-        return new Boolean(result);
+        return result;
     }
 
     public String toString () {
@@ -135,15 +135,15 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
                 } else {
                     //These are probably the
                     if(b instanceof Integer) {
-                        val = new Double(((Integer) b).doubleValue());
+                        val = ((Integer) b).doubleValue();
                     } else if(b instanceof Long) {
-                        val = new Double(((Long) b).doubleValue());
+                        val = ((Long) b).doubleValue();
                     } else if(b instanceof Float) {
-                        val = new Double(((Float) b).doubleValue());
+                        val = ((Float) b).doubleValue();
                     } else if(b instanceof Short) {
-                        val = new Double(((Short) b).shortValue());
+                        val = (double) (Short) b;
                     } else if(b instanceof Byte) {
-                        val = new Double(((Byte) b).byteValue());
+                        val = (double) (Byte) b;
                     } else {
                         if(b instanceof String) {
                             try {

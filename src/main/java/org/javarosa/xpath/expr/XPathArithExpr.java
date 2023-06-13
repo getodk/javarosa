@@ -54,7 +54,7 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
         case DIVIDE: result = aval / bval; break;
         case MODULO: result = aval % bval; break;
         }
-        return new Double(result);
+        return result;
     }
 
     @Override

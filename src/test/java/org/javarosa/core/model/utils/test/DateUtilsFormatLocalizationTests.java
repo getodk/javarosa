@@ -21,7 +21,7 @@ import static java.time.Month.JANUARY;
 import static java.time.format.TextStyle.SHORT;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.test.utils.SystemHelper.withLocale;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

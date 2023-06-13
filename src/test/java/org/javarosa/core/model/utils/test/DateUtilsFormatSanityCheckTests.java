@@ -22,7 +22,7 @@ import static org.javarosa.core.model.utils.DateFormatter.FORMAT_ISO8601;
 import static org.javarosa.core.model.utils.DateFormatter.formatDateTime;
 import static org.javarosa.core.model.utils.DateUtils.parseDateTime;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
