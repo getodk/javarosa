@@ -805,22 +805,21 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (input instanceof String) {
             return dateFromString((String) input);
         } else if (input instanceof Date) {
-            return dateFromDate(input, preserveTime);
+            return dateFromDate((Date) input, preserveTime);
         } else {
             throw new XPathTypeMismatchException("The value \"" + input.toString() + "\" can't be converted to a date.");
         }
     }
 
-    private static Object dateFromDate(Object input, boolean preserveTime) {
+    private static Date dateFromDate(Date date, boolean preserveTime) {
         if (preserveTime) {
-            return input;
+            return date;
         } else {
-            return DateUtils.roundDate((Date) input);
+            return DateUtils.roundDate(date);
         }
     }
 
     private static Object dateFromString(String input) {
-
         if (input.length() == 0) {
             return input;
         }

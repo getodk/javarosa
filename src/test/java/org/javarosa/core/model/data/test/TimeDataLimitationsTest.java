@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static org.javarosa.core.model.utils.DateUtils.getDate;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 
@@ -61,14 +62,21 @@ public class TimeDataLimitationsTest {
             String savedTime = "10:00:00.000+02:00";
 
             // A user opens saved form in Warsaw and during summertime as well - the hour should be the same
-            TimeData timeData = new TimeData(DateUtils.parseTimeWithFixedDate(savedTime, dateFields));
+            TimeData timeData = new TimeData(parseTimeWithFixedDate(savedTime, dateFields));
             assertEquals("10:00", timeData.getDisplayText());
 
             // A user opens saved form in Warsaw as well but during wintertime - the hour is edited -1h (the mentioned limitation)
             dateFields.month = 12;
-            timeData = new TimeData(DateUtils.parseTimeWithFixedDate(savedTime, dateFields));
+            timeData = new TimeData(parseTimeWithFixedDate(savedTime, dateFields));
             assertEquals("09:00", timeData.getDisplayText());
         });
+    }
+
+    private static Date parseTimeWithFixedDate(String str, DateFields fields) {
+        if (!DateUtils.parseTime(str, fields)) {
+            return null;
+        }
+        return getDate(fields);
     }
 
     static class StringWrapper {

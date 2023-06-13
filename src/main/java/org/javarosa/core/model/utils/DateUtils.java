@@ -31,24 +31,17 @@ import java.util.TimeZone;
 public class DateUtils {
     @NotNull
     public static Date dateFromLocalDate(LocalDate someDate) {
-        return Date.from(someDate.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-        );
+        return Date.from(someDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDate localDateFromDate(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
 
     public static final long DAY_IN_MS = 86400000L;
 
-    public DateUtils() {
-        super();
-    }
+    public DateUtils() { }
 
     public static DateFields getFields(Date d) {
         return DateFields.getFields(d, null);
@@ -103,13 +96,6 @@ public class DateUtils {
     }
 
 
-    public static Date parseTimeWithFixedDate(String str, DateFields fields) {
-        if (!parseTime(str, fields)) {
-            return null;
-        }
-        return getDate(fields);
-    }
-
     private static boolean stringDoesntHaveDateFields(String dateStr) {
         try {
             dateFieldsFromString(dateStr);
@@ -123,14 +109,10 @@ public class DateUtils {
         List<String> pieces = split(dateStr, "-", false);
         if (pieces.size() != 3) throw new IllegalArgumentException("Wrong number of fields to parse date: " + dateStr);
 
-        return DateFields.of(
-                Integer.parseInt(pieces.get(0)),
-                Integer.parseInt(pieces.get(1)),
-                Integer.parseInt(pieces.get(2))
-        );
+        return DateFields.of(Integer.parseInt(pieces.get(0)), Integer.parseInt(pieces.get(1)), Integer.parseInt(pieces.get(2)));
     }
 
-    private static boolean parseTime(String timeStr, DateFields f) {
+    public static boolean parseTime(String timeStr, DateFields f) {
         //get timezone information first. Make a Datefields set for the possible offset
         //NOTE: DO NOT DO DIRECT COMPUTATIONS AGAINST THIS. It's a holder for hour/minute
         //data only, but has data in other fields
@@ -281,10 +263,6 @@ public class DateUtils {
 //        return getDate(DateFields.of(d.getYear(), d.getMonth(), d.getDay()));
     }
 
-    public static Date today() {
-        return roundDate(new Date());
-    }
-
     /* ==== CALENDAR FUNCTIONS ==== */
 
     /**
@@ -300,7 +278,7 @@ public class DateUtils {
         long milliOff = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET));
         milli += milliOff;
         // and now convert to fractional day.
-        Double v = ((double) milli) / DAY_IN_MS;
+        double v = ((double) milli) / DAY_IN_MS;
         return v - Math.floor(v);
     }
 
@@ -367,19 +345,26 @@ public class DateUtils {
             int offset = (includeToday ? 1 : 0);
 
             switch (start) {
-                case "sun": target_dow = 0;
+                case "sun":
+                    target_dow = 0;
                     break;
-                case "mon": target_dow = 1;
+                case "mon":
+                    target_dow = 1;
                     break;
-                case "tue": target_dow = 2;
+                case "tue":
+                    target_dow = 2;
                     break;
-                case "wed": target_dow = 3;
+                case "wed":
+                    target_dow = 3;
                     break;
-                case "thu": target_dow = 4;
+                case "thu":
+                    target_dow = 4;
                     break;
-                case "fri": target_dow = 5;
+                case "fri":
+                    target_dow = 5;
                     break;
-                case "sat": target_dow = 6;
+                case "sat":
+                    target_dow = 6;
                     break;
             }
 
