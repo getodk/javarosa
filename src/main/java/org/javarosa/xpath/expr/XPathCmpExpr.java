@@ -128,7 +128,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
                 //WTF?
                 throw new UnpivotableExpressionException();
             } else {
-                Double val;
+                double val;
                 //either of
                 if(b instanceof Double) {
                     val = (Double)b;

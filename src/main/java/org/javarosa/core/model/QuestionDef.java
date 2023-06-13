@@ -335,10 +335,6 @@ public class QuestionDef implements IFormElement, Localizable {
         observers.remove(qsl);
     }
 
-    public void unregisterAll () {
-        observers.clear();
-    }
-
     public void alertStateObservers (int changeFlags) {
       for (FormElementStateListener observer : observers) {
          observer.formElementStateChanged(this, changeFlags);

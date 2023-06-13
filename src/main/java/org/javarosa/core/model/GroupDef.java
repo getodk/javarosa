@@ -183,10 +183,6 @@ public class GroupDef implements IFormElement, Localizable {
         return count;
     }
 
-    public TreeReference getConextualizedCountReference(TreeReference context) {
-        return FormInstance.unpackReference(count).contextualize(context);
-    }
-
     public String toString() {
         return "<group>";
     }

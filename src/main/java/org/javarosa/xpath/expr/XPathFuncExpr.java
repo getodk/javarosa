@@ -155,26 +155,27 @@ public class XPathFuncExpr extends XPathExpression {
         HashMap<String, IFunctionHandler> funcHandlers = evalContext.getFunctionHandlers();
 
         //TODO: Func handlers should be able to declare the desire for short circuiting as well
-        if (name.equals("if")) {
-            assertArgsCount(name, args, 3);
-            return ifThenElse(model, evalContext, args, argVals);
-        } else if (name.equals("coalesce")) {
-            assertArgsCount(name, args, 2);
-            argVals[0] = args[0].eval(model, evalContext);
-            if (!isNull(argVals[0])) {
-                return argVals[0];
-            } else {
-                // that was null, so try the other one...
-                argVals[1] = args[1].eval(model, evalContext);
-                return argVals[1];
-            }
-        } else if (name.equals("indexed-repeat")) {
-            if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
-                return indexedRepeat(model, evalContext, args, argVals);
-            } else {
-                throw new XPathUnhandledException("function \'" + name + "\' requires " +
-                    "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
-            }
+        switch (name) {
+            case "if":
+                assertArgsCount(name, args, 3);
+                return ifThenElse(model, evalContext, args, argVals);
+            case "coalesce":
+                assertArgsCount(name, args, 2);
+                argVals[0] = args[0].eval(model, evalContext);
+                if (!isNull(argVals[0])) {
+                    return argVals[0];
+                } else {
+                    // that was null, so try the other one...
+                    argVals[1] = args[1].eval(model, evalContext);
+                    return argVals[1];
+                }
+            case "indexed-repeat":
+                if ((args.length == 3 || args.length == 5 || args.length == 7 || args.length == 9 || args.length == 11)) {
+                    return indexedRepeat(model, evalContext, args);
+                } else {
+                    throw new XPathUnhandledException("function '" + name + "' requires " +
+                            "3, 5, 7, 9 or 11 arguments. Only " + args.length + " provided.");
+                }
         }
 
         for (int i = 0; i < args.length; i++) {
@@ -304,8 +305,8 @@ public class XPathFuncExpr extends XPathExpression {
                 }
                 return position(evalContext.getContextRef());
             } else {
-                throw new XPathUnhandledException("function \'" + name +
-                    "\' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
+                throw new XPathUnhandledException("function '" + name +
+                        "' requires either exactly one argument or no arguments. Only " + args.length + " provided.");
             }
         } else if (name.equals("count")) {
             assertArgsCount(name, args, 1);
@@ -489,7 +490,7 @@ public class XPathFuncExpr extends XPathExpression {
             if (args.length == 2)
                 return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumeric(argVals[1]).longValue());
 
-            throw new XPathUnhandledException("function \'randomize\' requires 1 or 2 arguments. " + args.length + " provided.");
+            throw new XPathUnhandledException("function 'randomize' requires 1 or 2 arguments. " + args.length + " provided.");
         } else if (name.equals("base64-decode")) {
             assertArgsCount(name, args, 1);
             return base64Decode(argVals[0]);
@@ -504,7 +505,7 @@ public class XPathFuncExpr extends XPathExpression {
             if (fallbackHandler != null)
                 return evalCustomFunction(fallbackHandler, name, argVals, evalContext);
 
-            throw new XPathUnhandledException("function \'" + name + "\'");
+            throw new XPathUnhandledException("function '" + name + "'");
         }
     }
 
@@ -537,7 +538,7 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (handler.rawArgs()) {
             return handler.eval(args, ec);  //should we have support for expanding nodesets here?
         } else {
-            throw new XPathTypeMismatchException("for function \'" + handler.getName() + "\'");
+            throw new XPathTypeMismatchException("for function '" + handler.getName() + "'");
         }
     }
 
@@ -613,25 +614,17 @@ public class XPathFuncExpr extends XPathExpression {
         o = unpack(o);
         if (o instanceof String && ((String) o).length() == 0) {
             return true;
-        } else if (o instanceof Double && ((Double) o).isNaN()) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return o instanceof Double && ((Double) o).isNaN();
     }
 
     public static Double stringLength(Object o) {
         String s = toString(o);
-        if (s == null) {
-            return 0.0;
-        }
         return (double) s.length();
     }
 
     public static String normalizeSpace(Object o) {
         String s = toString(o);
-        String normalized = s.trim().replaceAll("\\s+", " ");
-        return normalized;
+        return s.trim().replaceAll("\\s+", " ");
     }
 
     /**
@@ -732,7 +725,7 @@ public class XPathFuncExpr extends XPathExpression {
             return val;
         } else {
             long l = val.longValue();
-            Double dbl = (double) l;
+            double dbl = (double) l;
             if (l == 0 && (val < 0. || val.equals(-0.))) {
                 dbl = -0.;
             }
@@ -768,7 +761,7 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (o instanceof Date) {
             val = DateFormatter.formatDate((Date) o, DateFormatter.FORMAT_ISO8601);
         } else if (o instanceof IExprDataType) {
-            val = ((IExprDataType) o).toString();
+            val = o.toString();
         }
 
         if (val != null) {
@@ -853,8 +846,7 @@ public class XPathFuncExpr extends XPathExpression {
 
             long timeMillis = (long) (n * DateUtils.DAY_IN_MS);
 
-            Date d = new Date(timeMillis);
-            return d;
+            return new Date(timeMillis);
         } else {
             Double n = toInt(input);
 
@@ -874,13 +866,13 @@ public class XPathFuncExpr extends XPathExpression {
         o = unpack(o);
 
         if (o instanceof Double) {
-            Double n = (Double) o;
+            double n = (Double) o;
 
-            if (n.isNaN()) {
+            if (Double.isNaN(n)) {
                 return n;
             }
 
-            if (n.isInfinite() || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
+            if (Double.isInfinite(n) || n > Integer.MAX_VALUE || n < Integer.MIN_VALUE) {
                 throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
             }
 
@@ -916,13 +908,11 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     private static double decimalFromDate(Date o, boolean keepDate) {
-        Date d = o;
         if (keepDate) {
-            long milli = d.getTime();
-            Double v = ((double) milli) / DateUtils.DAY_IN_MS;
-            return v;
+            long milli = o.getTime();
+            return ((double) milli) / DateUtils.DAY_IN_MS;
         } else {
-            return DateUtils.decimalTimeOfLocalDay(d);
+            return DateUtils.decimalTimeOfLocalDay(o);
         }
     }
 
@@ -967,7 +957,7 @@ public class XPathFuncExpr extends XPathExpression {
      * args[5] = generic XPath expression for add'l group to index (if 7 parameters passed)
      * args[6] = index number for group (if 7 parameters passed)
      */
-    public static Object indexedRepeat(DataInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) throws XPathTypeMismatchException {
+    public static Object indexedRepeat(DataInstance model, EvaluationContext ec, XPathExpression[] args) throws XPathTypeMismatchException {
         // initialize target and context references
         if (!(args[0] instanceof XPathPathExpr)) {
             throw new XPathTypeMismatchException("indexed-repeat(): first parameter must be XPath field reference");
@@ -1083,7 +1073,7 @@ public class XPathFuncExpr extends XPathExpression {
     /**
      * sum the values in a nodeset; each element is coerced to a numeric value
      */
-    public static Double sum(Object argVals[]) {
+    public static Double sum(Object[] argVals) {
         double sum = 0.0;
         for (Object argVal : argVals) {
             Double dargVal = toNumeric(argVal);
@@ -1334,6 +1324,7 @@ public class XPathFuncExpr extends XPathExpression {
         for (String identity : identities) {
             if (identity.equals(name)) {
                 id = true;
+                break;
             }
         }
 
