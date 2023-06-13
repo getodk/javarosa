@@ -44,13 +44,12 @@ public class DateFormatter {
         if (date == null) return "";
 
         Optional<DateFormat> optional = DateFormat.getByKey(format);
-        if (optional.isPresent()) {
-            DateFormat dateFormat = optional.get();
-            return dateFormat.formatDate(date);
-        } else {
+        if (!optional.isPresent()) {
             //TODO - is emptyString what we want?
             return "";
         }
+        DateFormat dateFormat = optional.get();
+        return dateFormat.formatDate(date);
     }
 
     public static String format(Date d, String format) {
