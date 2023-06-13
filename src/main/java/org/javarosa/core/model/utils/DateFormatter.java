@@ -20,12 +20,10 @@ public class DateFormatter {
 
     @NotNull
     private static DateFormat getDateFormat(Date date, int format) {
-        //TODO - is emptyString what we want?
         if (date == null) throw new IllegalArgumentException("Date can't be null");
 
         Optional<DateFormat> optional = DateFormat.getByKey(format);
         if (!optional.isPresent()) {
-            //TODO - is emptyString what we want?
             throw new IllegalArgumentException("DateFormat unknown: "+format);
         }
         return optional.get();
