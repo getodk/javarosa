@@ -38,6 +38,15 @@ public class DateUtils {
         return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static java.time.LocalDateTime localDateTimeFromDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static Date dateFromLocalDate(java.time.LocalDateTime someDateTime) {
+        return Date.from(someDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+
 
     public static final long DAY_IN_MS = 86400000L;
 
@@ -463,5 +472,4 @@ public class DateUtils {
 
         return pieces;
     }
-
 }

@@ -3,6 +3,8 @@ package org.javarosa.core.model.utils;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.format.DateTimeFormat;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 
@@ -10,7 +12,9 @@ public class DateFormatter {
     public static final int FORMAT_ISO8601 = 1;
     public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
     public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
-    /** RFC 822 **/
+    /**
+     * RFC 822
+     **/
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
     public static String formatDateTime(Date date, int format) {
@@ -24,7 +28,7 @@ public class DateFormatter {
 
         Optional<DateFormat> optional = DateFormat.getByKey(format);
         if (!optional.isPresent()) {
-            throw new IllegalArgumentException("DateFormat unknown: "+format);
+            throw new IllegalArgumentException("DateFormat unknown: " + format);
         }
         return optional.get();
     }
@@ -40,7 +44,12 @@ public class DateFormatter {
     }
 
     public static String format(Date d, String format) {
-        return format(DateUtils.getFields(d), format);
+        DateTimeFormatter formatter =
+                format != null
+                        ? formatTheFormat(format)
+                        : DateTimeFormatter.ofPattern(("yyyy-MM-dd'T'HH:mm:ss.SSS"));
+        LocalDateTime localDate = DateUtils.localDateTimeFromDate(d);
+        return formatter.format(localDate);
     }
 
     public static String format(DateFields f, String format) {
@@ -98,6 +107,41 @@ public class DateFormatter {
         }
 
         return sb.toString();
+    }
+
+    public static DateTimeFormatter formatTheFormat(String format) {
+        String replaced = format
+                .replace("%", "")
+                .replace("T", "'T'") //some formats add a T to delineate date and time
+
+                //see the XPathEvalTest for in context examples of why these substitutions are necessary
+                .replace("m", "_mon_")
+                .replace("M", "_MIN_")
+                .replace("_mon_", "MM")
+                .replace("_MIN_", "m")
+                .replace("s", "_s_")
+                .replace("S", "_S_")
+                .replace("_s_", "SSS")
+                .replace("_S_", "ss")
+
+                //translate XPATH notation to java.time notation
+                .replace("d", "dd")
+                .replace("e", "d")
+                .replace("H", "HH")
+                .replace("a", "EEE")
+                .replace("b", "MMM");
+
+        //see DateFormatterTest.canFormatXPathFormFormat()
+        char lastChar = replaced.charAt(replaced.length() - 1);
+        try {
+            int count = Integer.parseInt(String.valueOf(lastChar));
+            replaced = replaced.substring(0, replaced.length() - 1);
+            for (int i = 0; i < count; i++) {
+                replaced = replaced.concat("S");
+            }
+        } catch (NumberFormatException nfe) {/* ignore */}
+
+        return DateTimeFormatter.ofPattern(replaced);
     }
 
     /**

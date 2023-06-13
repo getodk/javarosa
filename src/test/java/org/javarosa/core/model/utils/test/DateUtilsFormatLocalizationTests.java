@@ -16,12 +16,8 @@
 
 package org.javarosa.core.model.utils.test;
 
-import static java.time.DayOfWeek.SUNDAY;
-import static java.time.Month.JANUARY;
-import static java.time.format.TextStyle.SHORT;
-import static org.hamcrest.Matchers.is;
-import static org.javarosa.test.utils.SystemHelper.withLocale;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.javarosa.core.model.utils.DateFormatter;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -29,8 +25,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.stream.Stream;
 
-import org.javarosa.core.model.utils.DateFormatter;
-import org.junit.Test;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.Month.JANUARY;
+import static java.time.format.TextStyle.SHORT;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.utils.SystemHelper.withLocale;
 
 public class DateUtilsFormatLocalizationTests {
     @Test
@@ -40,9 +40,9 @@ public class DateUtilsFormatLocalizationTests {
         Date date = Date.from(localDateTime.toInstant(OffsetDateTime.now().getOffset()));
 
         Stream.of(
-            Locale.ENGLISH,
-            Locale.forLanguageTag("es-ES"),
-            Locale.FRENCH
+                Locale.ENGLISH,
+                Locale.forLanguageTag("es-ES"),
+                Locale.FRENCH
         ).forEach(locale -> withLocale(locale, l -> {
             assertThat(DateFormatter.format(date, "%b"), is(JANUARY.getDisplayName(SHORT, l)));
             assertThat(DateFormatter.format(date, "%a"), is(SUNDAY.getDisplayName(SHORT, l)));
