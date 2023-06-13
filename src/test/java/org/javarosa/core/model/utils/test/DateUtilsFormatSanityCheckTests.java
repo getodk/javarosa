@@ -35,7 +35,7 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class DateUtilsFormatSanityCheckTests {
-    @Parameterized.Parameter(value = 0)
+    @Parameterized.Parameter()
     public long inputTimestamp;
 
     @Parameterized.Parameters(name = "Input timestamp: {0}")

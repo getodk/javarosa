@@ -56,8 +56,8 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
         aval = XPathFuncExpr.toNumeric(aval);
         bval = XPathFuncExpr.toNumeric(bval);
 
-        double fa = ((Double)aval).doubleValue();
-        double fb = ((Double)bval).doubleValue();
+        double fa = (Double) aval;
+        double fb = (Double) bval;
 
         switch (op) {
         case LT: result = fa < fb; break;
@@ -128,7 +128,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
                 //WTF?
                 throw new UnpivotableExpressionException();
             } else {
-                Double val = null;
+                Double val;
                 //either of
                 if(b instanceof Double) {
                     val = (Double)b;
@@ -159,7 +159,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
                 }
 
 
-                pivots.add(new CmpPivot(val.doubleValue(), op));
+                pivots.add(new CmpPivot(val, op));
                 return true;
             }
         }

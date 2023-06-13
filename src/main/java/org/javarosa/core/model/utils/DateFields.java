@@ -90,7 +90,4 @@ public class DateFields {
         return (x >= min && x <= max);
     }
 
-    public DateFields withTime(DateFields fields) {
-        return of(this.year, this.month, this.day, fields.hour, fields.minute, fields.second, fields.secTicks);
-    }
 }

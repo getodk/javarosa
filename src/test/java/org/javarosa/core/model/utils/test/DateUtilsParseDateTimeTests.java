@@ -38,7 +38,7 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class DateUtilsParseDateTimeTests {
-    @Parameterized.Parameter(value = 0)
+    @Parameterized.Parameter()
     public String input;
 
     @Parameterized.Parameter(value = 1)

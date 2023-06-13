@@ -117,10 +117,6 @@ public class QuestionDef implements IFormElement, Localizable {
         osmTags = tags;
     }
 
-    public List<OSMTag> getOsmTags() {
-        return osmTags;
-    }
-
     @Override
     public String getAppearanceAttr () {
         return appearanceAttr;
@@ -182,7 +178,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
     public void addSelectChoice (SelectChoice choice) {
         if (choices == null) {
-            choices = new ArrayList<SelectChoice>(1);
+            choices = new ArrayList<>(1);
         }
         choice.setIndex(choices.size());
         choices.add(choice);
