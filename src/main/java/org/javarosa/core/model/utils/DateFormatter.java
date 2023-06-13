@@ -1,5 +1,6 @@
 package org.javarosa.core.model.utils;
 
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Date;
@@ -13,42 +14,30 @@ public class DateFormatter {
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
     public static String formatDateTime(Date date, int format) {
-        //TODO - is emptyString what we want?
-        if (date == null) return "";
-
-        Optional<DateFormat> optional = DateFormat.getByKey(format);
-        if (!optional.isPresent()) {
-            //TODO - is emptyString what we want?
-            return "";
-        }
-
-        DateFormat dateFormat = optional.get();
+        DateFormat dateFormat = getDateFormat(date, format);
         return dateFormat.formatDate(date) + dateFormat.delimiter + dateFormat.formatTime(date);
     }
 
-    public static String formatTime(Date date, int format) {
+    @NotNull
+    private static DateFormat getDateFormat(Date date, int format) {
         //TODO - is emptyString what we want?
-        if (date == null) return "";
+        if (date == null) throw new IllegalArgumentException("Date can't be null");
 
         Optional<DateFormat> optional = DateFormat.getByKey(format);
         if (!optional.isPresent()) {
             //TODO - is emptyString what we want?
-            return "";
+            throw new IllegalArgumentException("DateFormat unknown: "+format);
         }
-        DateFormat dateFormat = optional.get();
+        return optional.get();
+    }
+
+    public static String formatTime(Date date, int format) {
+        DateFormat dateFormat = getDateFormat(date, format);
         return dateFormat.formatTime(date);
     }
 
     public static String formatDate(Date date, int format) {
-        //TODO - is emptyString what we want?
-        if (date == null) return "";
-
-        Optional<DateFormat> optional = DateFormat.getByKey(format);
-        if (!optional.isPresent()) {
-            //TODO - is emptyString what we want?
-            return "";
-        }
-        DateFormat dateFormat = optional.get();
+        DateFormat dateFormat = getDateFormat(date, format);
         return dateFormat.formatDate(date);
     }
 
