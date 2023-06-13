@@ -17,9 +17,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.actions.ActionController;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -39,18 +37,30 @@ import java.util.List;
 
 import static org.javarosa.core.model.IFormElement.stringContains;
 
-/** The definition of a group in a form or questionaire.
+/**
+ * The definition of a group in a form or questionaire.
  *
  * @author Daniel Kayiwa
- *
  */
 public class GroupDef implements IFormElement, Localizable {
     private static final Logger logger = LoggerFactory.getLogger(GroupDef.class);
 
-    private List<IFormElement> children;    /** A list of questions on a group. */
-    private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
-    private int id;    /** The group number. */
-    private IDataReference binding;    /** reference to a location in the model to store data in */
+    private List<IFormElement> children;
+    /**
+     * A list of questions on a group.
+     */
+    private boolean repeat;
+    /**
+     * True if this is a "repeat", false if it is a "group"
+     */
+    private int id;
+    /**
+     * The group number.
+     */
+    private IDataReference binding;
+    /**
+     * reference to a location in the model to store data in
+     */
     private List<TreeElement> additionalAttributes = new ArrayList<>(0);
 
     private String labelInnerText;
@@ -75,7 +85,7 @@ public class GroupDef implements IFormElement, Localizable {
 
     private ActionController actionController;
 
-    public GroupDef () {
+    public GroupDef() {
         this(Constants.NULL_ID, null, false);
     }
 
@@ -88,11 +98,11 @@ public class GroupDef implements IFormElement, Localizable {
         actionController = new ActionController();
     }
 
-    public int getID () {
+    public int getID() {
         return id;
     }
 
-    public void setID (int id) {
+    public void setID(int id) {
         this.id = id;
     }
 
@@ -110,7 +120,7 @@ public class GroupDef implements IFormElement, Localizable {
 
     public String getAdditionalAttribute(String namespace, String name) {
         TreeElement e = TreeElement.getAttribute(additionalAttributes, namespace, name);
-        if ( e != null ) {
+        if (e != null) {
             return e.getAttributeValue();
         }
         return null;
@@ -124,15 +134,15 @@ public class GroupDef implements IFormElement, Localizable {
         return children;
     }
 
-    public void setChildren (List<IFormElement> children) {
+    public void setChildren(List<IFormElement> children) {
         this.children = (children == null ? new ArrayList<>(0) : children);
     }
 
-    public void addChild (IFormElement fe) {
+    public void addChild(IFormElement fe) {
         children.add(fe);
     }
 
-    public IFormElement getChild (int i) {
+    public IFormElement getChild(int i) {
         if (children == null || i >= children.size()) {
             return null;
         } else {
@@ -143,11 +153,11 @@ public class GroupDef implements IFormElement, Localizable {
     /**
      * @return true if this represents a <repeat> element
      */
-    public boolean getRepeat () {
+    public boolean getRepeat() {
         return repeat;
     }
 
-    public void setRepeat (boolean repeat) {
+    public void setRepeat(boolean repeat) {
         this.repeat = repeat;
     }
 
@@ -155,16 +165,16 @@ public class GroupDef implements IFormElement, Localizable {
         return labelInnerText;
     }
 
-    public void setLabelInnerText(String lit){
+    public void setLabelInnerText(String lit) {
         labelInnerText = lit;
     }
 
 
-    public String getAppearanceAttr () {
+    public String getAppearanceAttr() {
         return appearanceAttr;
     }
 
-    public void setAppearanceAttr (String appearanceAttr) {
+    public void setAppearanceAttr(String appearanceAttr) {
         this.appearanceAttr = appearanceAttr;
     }
 
@@ -174,9 +184,9 @@ public class GroupDef implements IFormElement, Localizable {
     }
 
     public void localeChanged(String locale, Localizer localizer) {
-       for (IFormElement child : children) {
-          child.localeChanged(locale, localizer);
-       }
+        for (IFormElement child : children) {
+            child.localeChanged(locale, localizer);
+        }
     }
 
     public IDataReference getCountReference() {
@@ -186,31 +196,34 @@ public class GroupDef implements IFormElement, Localizable {
     public String toString() {
         return "<group>";
     }
+
     /*
      * (non-Javadoc)
      * @see org.javarosa.core.model.IFormElement#getDeepChildCount()
      */
     public int getDeepChildCount() {
         int total = 0;
-      for (IFormElement child : children) {
-         total += child.getDeepChildCount();
-      }
+        for (IFormElement child : children) {
+            total += child.getDeepChildCount();
+        }
         return total;
     }
 
-    /** Reads a group definition object from the supplied stream. */
+    /**
+     * Reads a group definition object from the supplied stream.
+     */
     public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
         try {
             setID(ExtUtil.readInt(dis));
-            setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-            setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
-            setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-            setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+            setAppearanceAttr((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+            setBind((IDataReference) ExtUtil.read(dis, new ExtWrapTagged(), pf));
+            setTextID((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+            setLabelInnerText((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
             setRepeat(ExtUtil.readBool(dis));
-            setChildren((List<IFormElement>)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+            setChildren((List<IFormElement>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
             noAddRemove = ExtUtil.readBool(dis);
-            count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
+            count = (IDataReference) ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 
             chooseCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
             addCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
@@ -225,12 +238,14 @@ public class GroupDef implements IFormElement, Localizable {
             additionalAttributes = ExtUtil.readAttributes(dis, null);
 
             actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
-        } catch ( OutOfMemoryError e ) {
+        } catch (OutOfMemoryError e) {
             throw new DeserializationException("serialization format change caused misalignment and out-of-memory error");
         }
     }
 
-    /** Write the group definition object to the supplied stream. */
+    /**
+     * Write the group definition object to the supplied stream.
+     */
     public void writeExternal(DataOutputStream dos) throws IOException {
         ExtUtil.writeNumeric(dos, getID());
         ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
@@ -258,13 +273,13 @@ public class GroupDef implements IFormElement, Localizable {
         ExtUtil.write(dos, new ExtWrapNullable(actionController));
     }
 
-    public void registerStateObserver (FormElementStateListener qsl) {
+    public void registerStateObserver(FormElementStateListener qsl) {
         if (!observers.contains(qsl)) {
             observers.add(qsl);
         }
     }
 
-    public void unregisterStateObserver (FormElementStateListener qsl) {
+    public void unregisterStateObserver(FormElementStateListener qsl) {
         observers.remove(qsl);
     }
 
@@ -273,13 +288,13 @@ public class GroupDef implements IFormElement, Localizable {
     }
 
     public void setTextID(String textID) {
-        if(textID==null){
+        if (textID == null) {
             this.textID = null;
             return;
         }
-        if(stringContains(textID,";")){
+        if (stringContains(textID, ";")) {
             logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(textID.indexOf(";")));
-            textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
+            textID = textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }
         this.textID = textID;
     }

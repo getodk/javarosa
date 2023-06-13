@@ -283,10 +283,10 @@ public class XPathEvalTest {
     public void other_string_functions_with_context() {
         FormInstance instance1 = buildInstance();
         testEval("/data/path[normalize-space()='some value']", instance1, null,
-                createExpectedNodesetFromInstance(instance1, "path", 2));
+                createExpectedNodesetFromInstance(instance1));
 
         testEval("/data/path[string-length()=17]", instance1, null,
-                createExpectedNodesetFromInstance(instance1, "path", 2));
+                createExpectedNodesetFromInstance(instance1));
     }
 
     @Test
@@ -615,7 +615,7 @@ public class XPathEvalTest {
                 "indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )",
                 instance1,
                 null,
-                createExpectedNodesetFromIndexedRepeatFunction(instance1, 1, "name")
+                createExpectedNodesetFromIndexedRepeatFunction(instance1, 1)
         );
 
         // situation where the referenced index node is blank and the default value (0 which means the first repeat group) is used
@@ -624,7 +624,7 @@ public class XPathEvalTest {
                 "indexed-repeat( /data/repeat/name , /data/repeat , /data/index1 )",
                 instance2,
                 null,
-                createExpectedNodesetFromIndexedRepeatFunction(instance2, 0, "name")
+                createExpectedNodesetFromIndexedRepeatFunction(instance2, 0)
         );
     }
 
@@ -712,8 +712,8 @@ public class XPathEvalTest {
         }
     }
 
-    private XPathNodeset createExpectedNodesetFromInstance(FormInstance testInstance, String nodeName, int index) {
-        TreeReference referencedNode = testInstance.getRoot().getChildrenWithName(nodeName).get(index).getRef();
+    private XPathNodeset createExpectedNodesetFromInstance(FormInstance testInstance) {
+        TreeReference referencedNode = testInstance.getRoot().getChildrenWithName("path").get(2).getRef();
         return new XPathNodeset(
                 Collections.singletonList(referencedNode),
                 testInstance,
@@ -721,8 +721,8 @@ public class XPathEvalTest {
         );
     }
 
-    private XPathNodeset createExpectedNodesetFromIndexedRepeatFunction(FormInstance testInstance, int repeatIndex, String nodeName) {
-        TreeReference referencedNode = testInstance.getRoot().getChildAt(repeatIndex).getChildrenWithName(nodeName).get(0).getRef();
+    private XPathNodeset createExpectedNodesetFromIndexedRepeatFunction(FormInstance testInstance, int repeatIndex) {
+        TreeReference referencedNode = testInstance.getRoot().getChildAt(repeatIndex).getChildrenWithName("name").get(0).getRef();
         return new XPathNodeset(
                 Collections.singletonList(referencedNode),
                 testInstance,
