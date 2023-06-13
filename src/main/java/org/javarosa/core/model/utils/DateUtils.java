@@ -28,12 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-/**
- * Static utility methods for Dates in j2me
- *
- * @author Clayton Sims
- */
-
 public class DateUtils {
     @NotNull
     public static Date dateFromLocalDate(LocalDate someDate) {
