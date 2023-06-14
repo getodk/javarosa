@@ -2,13 +2,13 @@ package org.javarosa.core.model.data.test;
 
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.utils.DateFields;
-import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
 
 import java.util.Date;
 import java.util.TimeZone;
 
 import static org.javarosa.core.model.utils.DateUtils.getDate;
+import static org.javarosa.core.model.utils.DateUtils.parseTime;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 
@@ -43,12 +43,12 @@ public class TimeDataLimitationsTest {
             savedTime.set(isSummerTime ? "10:00:00.000+02:00" : "10:00:00.000+01:00");
 
             // A user opens saved form in Warsaw as well - the hour should be the same
-            TimeData timeData = new TimeData(DateUtils.parseTime(savedTime.get()));
+            TimeData timeData = new TimeData(parseTime(savedTime.get()));
             assertEquals("10:00", timeData.getDisplayText());
         });
         // A user travels to Kiev (GMT+3) and opens the saved form again - the hour should be edited +1h
         withTimeZone(KIEV, () -> {
-            TimeData timeData = new TimeData(DateUtils.parseTime(savedTime.get()));
+            TimeData timeData = new TimeData(parseTime(savedTime.get()));
             assertEquals("11:00", timeData.getDisplayText());
         });
 
@@ -62,21 +62,21 @@ public class TimeDataLimitationsTest {
             String savedTime = "10:00:00.000+02:00";
 
             // A user opens saved form in Warsaw and during summertime as well - the hour should be the same
-            TimeData timeData = new TimeData(parseTimeWithFixedDate(savedTime, dateFields));
+            TimeData timeData = new TimeData(parseTimeWithFixedDate(savedTime, dateFields, WARSAW));
             assertEquals("10:00", timeData.getDisplayText());
 
             // A user opens saved form in Warsaw as well but during wintertime - the hour is edited -1h (the mentioned limitation)
             dateFields.month = 12;
-            timeData = new TimeData(parseTimeWithFixedDate(savedTime, dateFields));
+            timeData = new TimeData(parseTimeWithFixedDate(savedTime, dateFields, WARSAW));
             assertEquals("09:00", timeData.getDisplayText());
         });
     }
 
-    private static Date parseTimeWithFixedDate(String str, DateFields fields) {
-        if (!DateUtils.parseTime(str, fields)) {
+    private static Date parseTimeWithFixedDate(String str, DateFields fields, TimeZone timeZone) {
+        if (!parseTime(str, fields)) {
             return null;
         }
-        return getDate(fields);
+        return getDate(fields, timeZone);
     }
 
     static class StringWrapper {

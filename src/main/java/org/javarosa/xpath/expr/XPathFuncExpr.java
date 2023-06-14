@@ -84,6 +84,25 @@ public class XPathFuncExpr extends XPathExpression {
         }
     }
 
+    /**
+     * @param date the date object to be analyzed
+     * @return The number of days (as a double precision floating point) since the Epoch
+     */
+    private static int daysSinceEpoch(Date date) {
+        Date a = DateUtils.getDate(1970, 1, 1);
+        return (int) MathUtils.divLongNotSuck(DateUtils.roundDate(date).getTime() - DateUtils.roundDate(a).getTime() + DAY_IN_MS / 2, DAY_IN_MS);
+        //half-day offset is needed to handle differing DST offsets!
+    }
+
+    private static Double fractionalDaysSinceEpoch(Date a) {
+        return (a.getTime() - DateUtils.getDate(1970, 1, 1).getTime()) / (double) DAY_IN_MS;
+    }
+
+    private static Date dateAdd(Date d, int n) {
+        return DateUtils.roundDate(new Date(DateUtils.roundDate(d).getTime() + DAY_IN_MS * n + DAY_IN_MS / 2));
+        //half-day offset is needed to handle differing DST offsets!
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -661,7 +680,7 @@ public class XPathFuncExpr extends XPathExpression {
 
     public static Double toDouble(Object o) {
         if (o instanceof Date) {
-            return DateUtils.fractionalDaysSinceEpoch((Date) o);
+            return fractionalDaysSinceEpoch((Date) o);
         } else {
             return toNumeric(o);
         }
@@ -702,7 +721,7 @@ public class XPathFuncExpr extends XPathExpression {
                 val = NaN;
             }
         } else if (o instanceof Date) {
-            val = (double) DateUtils.daysSinceEpoch((Date) o);
+            val = (double) daysSinceEpoch((Date) o);
         } else if (o instanceof IExprDataType) {
             val = ((IExprDataType) o).toNumeric();
         }
@@ -860,7 +879,7 @@ public class XPathFuncExpr extends XPathExpression {
                 throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
             }
 
-            return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
+            return dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
         }
     }
 

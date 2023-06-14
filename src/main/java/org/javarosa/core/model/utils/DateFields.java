@@ -2,6 +2,7 @@ package org.javarosa.core.model.utils;
 
 import org.joda.time.LocalDateTime;
 
+import java.time.YearMonth;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -34,12 +35,10 @@ public class DateFields {
         return DateFields.of(year, month, day, 0, 0, 0, 0);
     }
 
-    public static DateFields getFields(Date d, String timezone) {
+    public static DateFields getFields(Date d, TimeZone aDefault) {
         Calendar cd = Calendar.getInstance();
         cd.setTime(d);
-        if (timezone != null) {
-            cd.setTimeZone(TimeZone.getTimeZone(timezone));
-        }
+        cd.setTimeZone(aDefault);
 
         return new DateFields(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + MONTH_OFFSET, cd.get(Calendar.DAY_OF_MONTH), cd.get(Calendar.HOUR_OF_DAY), cd.get(Calendar.MINUTE), cd.get(Calendar.SECOND), cd.get(Calendar.MILLISECOND), cd.get(Calendar.DAY_OF_WEEK), cd.get(Calendar.WEEK_OF_YEAR));
     }
@@ -83,11 +82,21 @@ public class DateFields {
     }
 
     public boolean check() {
-        return (inRange(month, 1, 12) && inRange(day, 1, DateUtils.daysInMonth(month - MONTH_OFFSET, year)) && inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999) && inRange(week, 1, 53));
+        return (inRange(month, 1, 12)
+                && inRange(day, 1, daysInMonth(month, year))
+                && inRange(hour, 0, 23)
+                && inRange(minute, 0, 59)
+                && inRange(second, 0, 59)
+                && inRange(secTicks, 0, 999)
+                && inRange(week, 1, 53));
+    }
+
+    private int daysInMonth(int month, int year) {
+        return YearMonth.of(year, month).lengthOfMonth();
     }
 
     private static boolean inRange(int x, int min, int max) {
-        return (x >= min && x <= max);
+        return x >= min && x <= max;
     }
 
 }

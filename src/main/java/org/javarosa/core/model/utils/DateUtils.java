@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
 
@@ -52,16 +51,11 @@ public class DateUtils {
     public DateUtils() {
     }
 
-    public static DateFields getFields(Date d) {
-        return DateFields.getFields(d, null);
-    }
-
     public static Date getDate(DateFields f) {
-        return getDate(f, null);
+        return getDate(f, TimeZone.getDefault());
     }
 
-    public static Date getDate(DateFields f, String timezone) {
-        TimeZone tz = (timezone == null) ? TimeZone.getDefault() : TimeZone.getTimeZone(timezone);
+    public static Date getDate(DateFields f, TimeZone tz) {
         return getLocalDateTime(f).toDate(tz);
     }
 
@@ -103,7 +97,8 @@ public class DateUtils {
     }
 
     public static Date parseTime(String str) {
-        DateFields fields = getFields(new Date());
+        Date d = new Date();
+        DateFields fields = DateFields.getFields(d, TimeZone.getDefault());
         fields.second = 0;
         fields.secTicks = 0;
         if (!parseTime(str, fields)) {
@@ -180,17 +175,16 @@ public class DateUtils {
         }
 
         //Now apply any relevant offsets from the timezone.
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        Calendar c = Calendar.getInstance(utc);
         long msecOffset = (((60L * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
-        c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
-
+        c.setTime(new Date(DateUtils.getDate(f, utc).getTime() + msecOffset));
         //c is now in the timezone of the parsed value, so put
         //it in the local timezone.
-
         c.setTimeZone(TimeZone.getDefault());
 
-        DateFields adjusted = getFields(c.getTime());
+        Date d = c.getTime();
+        DateFields adjusted = DateFields.getFields(d, TimeZone.getDefault());
 
         // time zone adjustment may +/- across midnight
         // which can result in +/- across a year
@@ -272,45 +266,9 @@ public class DateUtils {
      */
     public static Date roundDate(Date d) {
         if (d == null) return null;
-        DateFields f = getFields(d);
+        DateFields f = DateFields.getFields(d, TimeZone.getDefault());
         return getDate(DateFields.of(f.year, f.month, f.day));
-//        return getDate(DateFields.of(d.getYear(), d.getMonth(), d.getDay()));
     }
-
-    /* ==== CALENDAR FUNCTIONS ==== */
-
-
-    /**
-     * Returns the number of days in the month given for
-     * a given year.
-     *
-     * @param month The month to be tested
-     * @param year  The year in which the month is to be tested
-     * @return the number of days in the given month on the given
-     * year.
-     */
-    public static int daysInMonth(int month, int year) {
-        if (month == Calendar.APRIL || month == Calendar.JUNE || month == Calendar.SEPTEMBER || month == Calendar.NOVEMBER) {
-            return 30;
-        } else if (month == Calendar.FEBRUARY) {
-            return 28 + (isLeap(year) ? 1 : 0);
-        } else {
-            return 31;
-        }
-    }
-
-    /**
-     * Determines whether a year is a leap year in the
-     * proleptic Gregorian calendar.
-     *
-     * @param year The year to be tested
-     * @return True, if the year given is a leap year,
-     * false otherwise.
-     */
-    public static boolean isLeap(int year) {
-        return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
-    }
-
 
     /* ==== Parsing to Human Text ==== */
 
@@ -355,28 +313,6 @@ public class DateUtils {
         DOW(int ordinal) {
             this.order = ordinal;
         }
-    }
-
-    /**
-     * @param date the date object to be analyzed
-     * @return The number of days (as a double precision floating point) since the Epoch
-     */
-    public static int daysSinceEpoch(Date date) {
-        return daysBetween(getDate(1970, 1, 1), date);
-    }
-
-    public static Double fractionalDaysSinceEpoch(Date a) {
-        return (a.getTime() - getDate(1970, 1, 1).getTime()) / (double) DAY_IN_MS;
-    }
-
-    public static Date dateAdd(Date d, int n) {
-        return roundDate(new Date(roundDate(d).getTime() + DAY_IN_MS * n + DAY_IN_MS / 2));
-        //half-day offset is needed to handle differing DST offsets!
-    }
-
-    public static int daysBetween(Date a, Date b) {
-        return (int) MathUtils.divLongNotSuck(roundDate(b).getTime() - roundDate(a).getTime() + DAY_IN_MS / 2, DAY_IN_MS);
-        //half-day offset is needed to handle differing DST offsets!
     }
 
     /* ==== UTILITY ==== */
