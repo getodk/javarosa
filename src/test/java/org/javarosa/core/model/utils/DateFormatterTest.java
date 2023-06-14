@@ -31,6 +31,7 @@ public class DateFormatterTest {
         String formattedDate = DateFormatter.formatDate(dateToTest, DateFormatter.FORMAT_HUMAN_READABLE_SHORT);
         assertEquals("11/06/23", formattedDate);
     }
+
     @Test public void formatsDateAsTimeStampSuffix(){
         LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
         Date dateToTest = dateFromLocalDate(someLocalDate);
