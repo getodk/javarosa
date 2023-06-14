@@ -279,22 +279,6 @@ public class DateUtils {
 
     /* ==== CALENDAR FUNCTIONS ==== */
 
-    /**
-     * Returns the fractional time within the local day.
-     */
-    public static double decimalTimeOfLocalDay(Date d) {
-        long milli = d.getTime();
-        // time is local time.
-        // We want to obtain milliseconds from start of local day.
-        // the Math.floor() function below will do milliseconds from
-        // start of UTC day. Adjust back to UTC time-of-day.
-        Calendar c = Calendar.getInstance(TimeZone.getDefault());
-        long milliOff = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET));
-        milli += milliOff;
-        // and now convert to fractional day.
-        double v = ((double) milli) / DAY_IN_MS;
-        return v - Math.floor(v);
-    }
 
     /**
      * Returns the number of days in the month given for

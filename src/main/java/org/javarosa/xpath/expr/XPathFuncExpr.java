@@ -48,12 +48,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import static java.lang.Double.NaN;
+import static org.javarosa.core.model.utils.DateUtils.DAY_IN_MS;
 
 /**
  * Representation of an xpath function expression.
@@ -843,7 +846,7 @@ public class XPathFuncExpr extends XPathExpression {
                 throw new XPathTypeMismatchException("The value \"" + n + "\" is out of range for representing a date.");
             }
 
-            long timeMillis = (long) (n * DateUtils.DAY_IN_MS);
+            long timeMillis = (long) (n * DAY_IN_MS);
 
             return new Date(timeMillis);
         } else {
@@ -909,11 +912,27 @@ public class XPathFuncExpr extends XPathExpression {
     private static double decimalFromDate(Date o, boolean keepDate) {
         if (keepDate) {
             long milli = o.getTime();
-            return ((double) milli) / DateUtils.DAY_IN_MS;
+            return ((double) milli) / DAY_IN_MS;
         } else {
-            return DateUtils.decimalTimeOfLocalDay(o);
+            return decimalTimeOfLocalDay(o);
         }
     }
+
+    /** Returns the fractional time within the local day. */
+    private static double decimalTimeOfLocalDay(Date d) {
+        long milli = d.getTime();
+        // time is local time.
+        // We want to obtain milliseconds from start of local day.
+        // the Math.floor() function below will do milliseconds from
+        // start of UTC day. Adjust back to UTC time-of-day.
+        Calendar c = Calendar.getInstance(TimeZone.getDefault());
+        long milliOff = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET));
+        milli += milliOff;
+        // and now convert to fractional day.
+        double v = ((double) milli) / DAY_IN_MS;
+        return v - Math.floor(v);
+    }
+
 
     public static Boolean boolNot(Object o) {
         boolean b = toBoolean(o);
