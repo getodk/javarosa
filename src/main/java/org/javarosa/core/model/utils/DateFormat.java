@@ -60,9 +60,13 @@ public enum DateFormat {
     };
 
     @NotNull
-    public static Optional<DateFormat> getByKey(int format) {
+    public static DateFormat getByKey(int format) {
         Stream<DateFormat> formatStream = Arrays.stream(values()).filter(dateFormat -> dateFormat.key == format);
-        return formatStream.findFirst();
+        Optional<DateFormat> optional = formatStream.findFirst();
+        if (!optional.isPresent()) {
+            throw new IllegalArgumentException("DateFormat unknown: " + format);
+        }
+        return optional.get();
     }
 
     public final int key;

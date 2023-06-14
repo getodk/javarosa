@@ -6,41 +6,28 @@ import org.joda.time.format.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Optional;
 
 public class DateFormatter {
     public static final int FORMAT_ISO8601 = 1;
     public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
     public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
-    /**
-     * RFC 822
-     **/
+    /** RFC 822 **/
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
     public static String formatDateTime(Date date, int format) {
-        DateFormat dateFormat = getDateFormat(date, format);
-        return dateFormat.formatDateTime(date);
+        return getDateFormat(format).formatDateTime(date);
     }
 
-    @NotNull
-    private static DateFormat getDateFormat(Date date, int format) {
-        if (date == null) throw new IllegalArgumentException("Date can't be null");
-
-        Optional<DateFormat> optional = DateFormat.getByKey(format);
-        if (!optional.isPresent()) {
-            throw new IllegalArgumentException("DateFormat unknown: " + format);
-        }
-        return optional.get();
+    private static DateFormat getDateFormat(int format) {
+        return DateFormat.getByKey(format);
     }
 
     public static String formatTime(Date date, int format) {
-        DateFormat dateFormat = getDateFormat(date, format);
-        return dateFormat.formatTime(date);
+        return getDateFormat(format).formatTime(date);
     }
 
     public static String formatDate(Date date, int format) {
-        DateFormat dateFormat = getDateFormat(date, format);
-        return dateFormat.formatDate(date);
+        return getDateFormat(format).formatDate(date);
     }
 
     @NotNull
