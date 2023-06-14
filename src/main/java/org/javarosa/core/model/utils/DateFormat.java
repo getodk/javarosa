@@ -2,6 +2,8 @@ package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -10,78 +12,50 @@ import java.util.stream.Stream;
 
 public enum DateFormat {
 
-    ISO8601(1, "T") {
-        @Override
-        String formatDate(DateFields f) {
-            return f.year + "-" + DateFormatter.intPad(f.month, 2) + "-" + DateFormatter.intPad(f.day, 2);
+    ISO8601(1, "'T'", "Y-MM-dd", "HH:mm:ss.SSS") {  //"11:22:33.123+01:00" yyyy-MM-dd'T'HH:mm:ss.SSS
+
+        public String formatDateTime(Date date) {
+            return DateFormatter
+                    .format(date, DateTimeFormatter
+                            .ofPattern(datePattern + delimiter + timePattern + offset(date)));
         }
 
-        @Override
-        protected String formatTime(DateFields fields) {
-            String time = DateFormatter.intPad(fields.hour, 2) + ":" + DateFormatter.intPad(fields.minute, 2) + ":" + DateFormatter.intPad(fields.second, 2) + "." + DateFormatter.intPad(fields.secTicks, 3);
+        public String formatDate(Date date) {
+            return DateFormatter.format(date, DateTimeFormatter.ofPattern(datePattern));
+        }
 
-            //Time Zone ops (1 in the first field corresponds to 'CE' ERA)
-            int milliday = ((fields.hour * 60 + fields.minute) * 60 + fields.second) * 1000 + fields.secTicks;
-            int offset = TimeZone.getDefault().getOffset(1, fields.year, fields.month - 1, fields.day, fields.dow, milliday);
+        public String formatTime(Date date) {
+            return DateFormatter.format(date, DateTimeFormatter.ofPattern((timePattern + offset(date))));
+        }
 
-            //NOTE: offset is in millis
-            if (offset == 0) {
-                time += "Z";
-            } else {
-
-                //Start with sign
-                String offsetSign = offset > 0 ? "+" : "-";
-
-                int value = Math.abs(offset) / 1000 / 60;
-
-                String hrs = DateFormatter.intPad(value / 60, 2);
-                String mins = ":" + DateFormatter.intPad(value % 60, 2);
-
-                time += offsetSign + hrs + mins;
-            }
-            return time;
+        private String offset(Date date) {
+            int offset = date.getTimezoneOffset();
+            if (offset == 0) return "";
+            String sign = (offset > 0) ? "-" : "+";
+            return sign
+                    + DateFormatter.intPad(Math.abs(offset / 60), 2) + ":"
+                    + DateFormatter.intPad(Math.abs(offset % 60), 2);
         }
     },
-    HUMAN_READABLE_SHORT(2, " ") {
-        @Override
-        String formatDate(DateFields f) {
-            String year = Integer.valueOf(f.year).toString();
-
-            //Normal Date
-            if (year.length() == 4) {
-                year = year.substring(2, 4);
-            }
-            //Otherwise we have an old or bizarre date, don't try to do anything
-
-            return DateFormatter.intPad(f.day, 2) + "/" + DateFormatter.intPad(f.month, 2) + "/" + year;
-        }
-
-        @Override
-        protected String formatTime(DateFields fields) {
-            return DateFormatter.intPad(fields.hour, 2) + ":" + DateFormatter.intPad(fields.minute, 2);
-        }
+    HUMAN_READABLE_SHORT(2, " ", "%d/%m/YY", "HH:mm") {
     },
-    TIMESTAMP_SUFFIX(7, "") {
-        @Override
-        String formatDate(DateFields f) {
-            return f.year + DateFormatter.intPad(f.month, 2) + DateFormatter.intPad(f.day, 2);
-        }
-
-        @Override
-        protected String formatTime(DateFields fields) {
-            return DateFormatter.intPad(fields.hour, 2) + DateFormatter.intPad(fields.minute, 2) + DateFormatter.intPad(fields.second, 2);
-        }
+    TIMESTAMP_SUFFIX(7, "", "%Y%m%d", "HHmmss") {
     },
     /** RFC 822 */
-    TIMESTAMP_HTTP(9, " ") {
-        @Override
-        String formatDate(DateFields f) {
-            return DateFormatter.format(f, "%a, %d %b %Y");
+    TIMESTAMP_HTTP(9, " ", "E, d MMM Y", "HH:mm:ss z") {
+        public String formatDateTime(Date d) {
+            return toUTC(d, datePattern+delimiter+timePattern);
         }
-
-        @Override
-        protected String formatTime(DateFields fields) {
-            return DateFormatter.format(fields, "%H:%M:%S GMT");
+        public String formatDate(Date date) {
+            return toUTC(date, datePattern);
+        }
+        public String formatTime(Date date) {
+            return toUTC(date, timePattern);
+        }
+        private String toUTC(Date currentDate, String pattern) {
+            SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return formatter.format(currentDate);
         }
     };
 
@@ -93,26 +67,31 @@ public enum DateFormat {
 
     public final int key;
     public final String delimiter;
+    public final String datePattern;
+    public final String timePattern;
 
-    DateFormat(int key, String delimiter) {
+    DateFormat(int key, String delimiter, String datePattern, String timePattern) {
         this.key = key;
         this.delimiter = delimiter;
+        this.datePattern = datePattern;
+        this.timePattern = timePattern;
     }
 
+    public String formatDateTime(Date d) {
+        //TODO - is emptyString what we want?
+        if (d == null) return "";
+
+        return DateFormatter.format(d, datePattern+delimiter+timePattern);
+    }
 
     public String formatDate(Date d) {
         //TODO - is emptyString what we want?
         if (d == null) return "";
 
-        DateFields fields = DateFields.getFields(d, this.key == TIMESTAMP_HTTP.key ? "UTC" : null);
-        return formatDate(fields);
+        return DateFormatter.format(d, datePattern);
     }
 
     public String formatTime(Date date) {
-        return formatTime(DateFields.getFields(date, this.key == TIMESTAMP_HTTP.key ? "UTC" : null));
+        return DateFormatter.format(date, DateTimeFormatter.ofPattern(timePattern));
     }
-
-    abstract String formatDate(DateFields f);
-
-    protected abstract String formatTime(DateFields fields);
 }

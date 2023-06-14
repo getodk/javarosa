@@ -61,9 +61,9 @@ public class DateFormatterTest {
     }
 
     /* from testEval("date-time('2000-01-01T10:20:30.000')", DateUtils.parseDateTime("2000-01-01T10:20:30.000")); */
-    @Test public void canFormatXPathFormFormat(){
+    @Test public void dateTimeFromXPathEval(){
+        Date parseDateTime = DateUtils.parseDateTime("2000-01-01T10:20:30.000");
         LocalDateTime localDateTime = LocalDateTime.parse("2000-01-01T10:20:30.000");
-        Date date = DateUtils.dateFromLocalDate(localDateTime);
-        assertThat(DateFormatter.format(date, null), is("2000-01-01T10:20:30.000"));
+        assertThat(dateFromLocalDate(localDateTime), is(parseDateTime));
     }
 }

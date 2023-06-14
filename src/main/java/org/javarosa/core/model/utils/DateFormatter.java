@@ -19,7 +19,7 @@ public class DateFormatter {
 
     public static String formatDateTime(Date date, int format) {
         DateFormat dateFormat = getDateFormat(date, format);
-        return dateFormat.formatDate(date) + dateFormat.delimiter + dateFormat.formatTime(date);
+        return dateFormat.formatDateTime(date);
     }
 
     @NotNull
@@ -43,11 +43,17 @@ public class DateFormatter {
         return dateFormat.formatDate(date);
     }
 
+    @NotNull
     public static String format(Date d, String format) {
         DateTimeFormatter formatter =
                 format != null
                         ? formatTheFormat(format)
                         : DateTimeFormatter.ofPattern(("yyyy-MM-dd'T'HH:mm:ss.SSS"));
+        return format(d, formatter);
+    }
+
+    @NotNull
+    public static String format(Date d, DateTimeFormatter formatter) {
         LocalDateTime localDate = DateUtils.localDateTimeFromDate(d);
         return formatter.format(localDate);
     }
@@ -139,9 +145,11 @@ public class DateFormatter {
         char lastChar = replaced.charAt(replaced.length() - 1);
         try {
             int count = Integer.parseInt(String.valueOf(lastChar));
-            replaced = replaced.substring(0, replaced.length() - 1);
-            for (int i = 0; i < count; i++) {
-                replaced = replaced.concat("S");
+            if(count > 0) {
+                replaced = replaced.substring(0, replaced.length() - 1);
+                for (int i = 0; i < count; i++) {
+                    replaced = replaced.concat("S");
+                }
             }
         } catch (NumberFormatException nfe) {/* ignore */}
 
