@@ -47,10 +47,10 @@ public class DateUtils {
     }
 
 
-
     public static final long DAY_IN_MS = 86400000L;
 
-    public DateUtils() { }
+    public DateUtils() {
+    }
 
     public static DateFields getFields(Date d) {
         return DateFields.getFields(d, null);
@@ -78,7 +78,12 @@ public class DateUtils {
             if (stringDoesntHaveDateFields(str.substring(0, i)) || !parseTime(str.substring(i + 1), fields)) {
                 return null;
             } else {
-                DateFields newDate = dateFieldsFromString(str.substring(0, i));
+                String dateStr = str.substring(0, i);
+                List<String> pieces = split(dateStr, "-", false);
+                if (pieces.size() != 3)
+                    throw new IllegalArgumentException("Wrong number of fields to parse date: " + dateStr);
+
+                DateFields newDate = DateFields.of(Integer.parseInt(pieces.get(0)), Integer.parseInt(pieces.get(1)), Integer.parseInt(pieces.get(2)));
                 parseTime(str.substring(i + 1), newDate);
                 return getDate(newDate);
             }
@@ -91,7 +96,10 @@ public class DateUtils {
         if (stringDoesntHaveDateFields(str)) {
             throw new IllegalArgumentException("Fields = " + str);
         }
-        return getDate(dateFieldsFromString(str));
+        List<String> pieces = split(str, "-", false);
+        if (pieces.size() != 3) throw new IllegalArgumentException("Wrong number of fields to parse date: " + str);
+
+        return getDate(DateFields.of(Integer.parseInt(pieces.get(0)), Integer.parseInt(pieces.get(1)), Integer.parseInt(pieces.get(2))));
     }
 
     public static Date parseTime(String str) {
@@ -107,18 +115,15 @@ public class DateUtils {
 
     private static boolean stringDoesntHaveDateFields(String dateStr) {
         try {
-            dateFieldsFromString(dateStr);
+            List<String> pieces = split(dateStr, "-", false);
+            if (pieces.size() != 3)
+                throw new IllegalArgumentException("Wrong number of fields to parse date: " + dateStr);
+
+            DateFields.of(Integer.parseInt(pieces.get(0)), Integer.parseInt(pieces.get(1)), Integer.parseInt(pieces.get(2)));
             return false;
         } catch (Exception e) {
             return true;
         }
-    }
-
-    private static DateFields dateFieldsFromString(String dateStr) {
-        List<String> pieces = split(dateStr, "-", false);
-        if (pieces.size() != 3) throw new IllegalArgumentException("Wrong number of fields to parse date: " + dateStr);
-
-        return DateFields.of(Integer.parseInt(pieces.get(0)), Integer.parseInt(pieces.get(1)), Integer.parseInt(pieces.get(2)));
     }
 
     public static boolean parseTime(String timeStr, DateFields f) {
@@ -335,86 +340,36 @@ public class DateUtils {
      * @param type         "week", or "month", representing the time period which is to be returned.
      * @param start        "sun", "mon", ... etc. representing the start of the time period.
      * @param beginning    true=return first day of period, false=return last day of period
-     * @param includeToday Whether to include the current date in the returned calculation
+     * @param includeToday Whether today's date can count as the last day of the period
      * @param nAgo         How many periods ago. 1=most recent period, 0=period in progress
      * @return a Date object representing the amount of time between the
      * reference date, and the given parameters.
      */
     public static Date getPastPeriodDate(Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
-        // this method isnt tested yet...
-        // if(true)throw new IllegalArgumentException("booyah");
         if (type.equals("week")) {
-            //1 week period
-            //start: day of week that starts period
-            //beginning: true=return first day of period, false=return last day of period
-            //includeToday: whether today's date can count as the last day of the period
-            //nAgo: how many periods ago; 1=most recent period, 0=period in progress
-
-            int target_dow = -1, current_dow, diff;
-            int offset = (includeToday ? 1 : 0);
-
-            switch (start) {
-                case "sun":
-                    target_dow = 0;
-                    break;
-                case "mon":
-                    target_dow = 1;
-                    break;
-                case "tue":
-                    target_dow = 2;
-                    break;
-                case "wed":
-                    target_dow = 3;
-                    break;
-                case "thu":
-                    target_dow = 4;
-                    break;
-                case "fri":
-                    target_dow = 5;
-                    break;
-                case "sat":
-                    target_dow = 6;
-                    break;
-            }
-
-            if (target_dow == -1) throw new RuntimeException();
-
             Calendar cd = Calendar.getInstance();
             cd.setTime(ref);
-
-            switch (cd.get(Calendar.DAY_OF_WEEK)) {
-                case Calendar.SUNDAY:
-                    current_dow = 0;
-                    break;
-                case Calendar.MONDAY:
-                    current_dow = 1;
-                    break;
-                case Calendar.TUESDAY:
-                    current_dow = 2;
-                    break;
-                case Calendar.WEDNESDAY:
-                    current_dow = 3;
-                    break;
-                case Calendar.THURSDAY:
-                    current_dow = 4;
-                    break;
-                case Calendar.FRIDAY:
-                    current_dow = 5;
-                    break;
-                case Calendar.SATURDAY:
-                    current_dow = 6;
-                    break;
-                default:
-                    throw new RuntimeException(); //something is wrong
-            }
-
-            diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
+            int current_dow = cd.get(Calendar.DAY_OF_WEEK) - 1;
+            int target_dow = DOW.valueOf(start).order;
+            int offset = (includeToday ? 1 : 0);
+            int diff = ((current_dow - target_dow + 7 + offset) % 7 - offset)
+                    + (7 * nAgo)
+                    - (beginning ? 0 : 6); //booyah
             return new Date(ref.getTime() - diff * DAY_IN_MS);
         } else if (type.equals("month")) {
             //not supported
             return null;
         } else {
             throw new IllegalArgumentException();
+        }
+    }
+
+    //convenience, should go away soon
+    private enum DOW {
+        sun(0), mon(1), tue(2), wed(3), thu(4), fri(5), sat(6);
+        final int order;
+        DOW(int ordinal) {
+            this.order = ordinal;
         }
     }
 
