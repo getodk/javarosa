@@ -14,6 +14,7 @@ import static java.time.format.TextStyle.SHORT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDate;
+import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDateTime;
 import static org.junit.Assert.assertEquals;
 
 public class DateFormatterTest {
@@ -57,7 +58,7 @@ public class DateFormatterTest {
     /* from testEval("format-date('2018-01-02T10:20:30.123', \"%Y-%m-%e %H:%M:%S\")", "2018-01-2 10:20:30"); */
     @Test public void canFormatFreestyleDateTime(){
         LocalDateTime localDateTime = LocalDateTime.parse("2018-01-02T10:20:30.123");
-        Date date = DateUtils.dateFromLocalDate(localDateTime);
+        Date date = dateFromLocalDateTime(localDateTime);
         assertThat(DateFormatter.format(date, "%Y-%m-%e %H:%M:%S"), is("2018-01-2 10:20:30"));
     }
 
@@ -65,6 +66,6 @@ public class DateFormatterTest {
     @Test public void dateTimeFromXPathEval(){
         Date parseDateTime = DateUtils.parseDateTime("2000-01-01T10:20:30.000");
         LocalDateTime localDateTime = LocalDateTime.parse("2000-01-01T10:20:30.000");
-        assertThat(dateFromLocalDate(localDateTime), is(parseDateTime));
+        assertThat(dateFromLocalDateTime(localDateTime), is(parseDateTime));
     }
 }

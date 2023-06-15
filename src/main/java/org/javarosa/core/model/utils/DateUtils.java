@@ -17,9 +17,9 @@
 package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,19 +32,27 @@ import static org.javarosa.core.model.utils.StringUtils.split;
 public class DateUtils {
     @NotNull
     public static Date dateFromLocalDate(LocalDate someDate) {
-        return Date.from(someDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        ZoneId zoneId = ZoneId.systemDefault();
+        return dateFromLocalDate(someDate, zoneId);
     }
 
-    public static LocalDate localDateFromDate(Date dateToConvert) {
-        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    @NotNull
+    private static Date dateFromLocalDate(LocalDate someDate, ZoneId zoneId) {
+        return Date.from(someDate.atStartOfDay().atZone(zoneId).toInstant());
     }
 
-    public static java.time.LocalDateTime localDateTimeFromDate(Date date) {
+    public static Date dateFromLocalDateTime(LocalDateTime someDateTime) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        return dateFromLocalDateTime(someDateTime, zoneId);
+    }
+
+    @NotNull
+    private static Date dateFromLocalDateTime(LocalDateTime someDateTime, ZoneId zoneId) {
+        return Date.from(someDateTime.atZone(zoneId).toInstant());
+    }
+
+    public static LocalDateTime localDateTimeFromDate(Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-
-    public static Date dateFromLocalDate(java.time.LocalDateTime someDateTime) {
-        return Date.from(someDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static final long DAY_IN_MS = 86400000L;
@@ -57,26 +65,25 @@ public class DateUtils {
     }
 
     public static Date getDate(DateFields f, TimeZone tz) {
-        return getLocalDateTime(f).toDate(tz);
-    }
-
-    public static org.joda.time.LocalDateTime getLocalDateTime(DateFields f) {
-        return new org.joda.time.LocalDateTime(f.year, f.month, f.day, f.hour, f.minute, f.second, f.secTicks);
+        return dateFromLocalDateTime(f.asLocalDateTime(), ZoneId.of(tz.getID()));
     }
 
     //Convert {@link org.joda.time.DateTime} to {@link java.time.LocalDateTime}
-    static java.time.LocalDateTime toJavaTimeLocalDateTime(DateTime dateTime) {
-        int millisOfSecond = dateTime.getMillisOfSecond();
-        int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millisOfSecond, TimeUnit.MILLISECONDS));
-        System.out.println(nanoseconds);
-        return java.time.LocalDateTime.of(
+    static LocalDateTime toJavaTimeLocalDateTime(org.joda.time.DateTime dateTime) {
+        return LocalDateTime.of(
                 dateTime.getYear(),
                 dateTime.getMonthOfYear(),
                 dateTime.getDayOfMonth(),
                 dateTime.getHourOfDay(),
                 dateTime.getMinuteOfHour(),
                 dateTime.getSecondOfMinute(),
-                nanoseconds);
+                secTicksAsNanoSeconds(dateTime.getMillisOfSecond()));
+    }
+
+    public static int secTicksAsNanoSeconds(int millis) {
+        int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millis, TimeUnit.MILLISECONDS));
+        System.out.println(nanoseconds);
+        return nanoseconds;
     }
 
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
@@ -114,7 +121,7 @@ public class DateUtils {
 
     public static Date parseTime(String str) {
         Date d = new Date();
-        DateFields fields = DateFields.getFields(d, TimeZone.getDefault());
+        DateFields fields = getFields(d, TimeZone.getDefault());
         fields.second = 0;
         fields.secTicks = 0;
         if (!parseTime(str, fields)) {
@@ -200,7 +207,7 @@ public class DateUtils {
         c.setTimeZone(TimeZone.getDefault());
 
         Date d = c.getTime();
-        DateFields adjusted = DateFields.getFields(d, TimeZone.getDefault());
+        DateFields adjusted = getFields(d, TimeZone.getDefault());
 
         // time zone adjustment may +/- across midnight
         // which can result in +/- across a year
@@ -282,7 +289,7 @@ public class DateUtils {
      */
     public static Date roundDate(Date d) {
         if (d == null) return null;
-        DateFields f = DateFields.getFields(d, TimeZone.getDefault());
+        DateFields f = getFields(d, TimeZone.getDefault());
         return getDate(DateFields.of(f.year, f.month, f.day));
     }
 
@@ -320,6 +327,14 @@ public class DateUtils {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private static DateFields getFields(Date d, TimeZone aDefault) {
+        Calendar cd = Calendar.getInstance();
+        cd.setTime(d);
+        cd.setTimeZone(aDefault);
+
+        return new DateFields(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + DateFields.MONTH_OFFSET, cd.get(Calendar.DAY_OF_MONTH), cd.get(Calendar.HOUR_OF_DAY), cd.get(Calendar.MINUTE), cd.get(Calendar.SECOND), cd.get(Calendar.MILLISECOND), cd.get(Calendar.DAY_OF_WEEK), cd.get(Calendar.WEEK_OF_YEAR));
     }
 
     //convenience, should go away soon

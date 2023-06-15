@@ -1,30 +1,25 @@
 package org.javarosa.core.model.utils;
 
-import org.joda.time.LocalDateTime;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.temporal.WeekFields;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.Locale;
+
+import static org.javarosa.core.model.utils.DateUtils.secTicksAsNanoSeconds;
 
 
 public class DateFields {
     public static final int MONTH_OFFSET = (1 - Calendar.JANUARY);
 
     public static DateFields of(int year, int month, int day, int hour, int minute, int second, int secTicks) {
-        // The official API returns an ISO 8601 day of week
-        // with a range of values from 1 for Monday to 7 for Sunday].
-        // TODO migrate dow field to a DayOfWeek type to avoid any possible
-        // interpretation errors
-//        java.time.LocalDateTime dateTime = java.time.LocalDateTime.of(year, month, day, hour, minute, second, secTicks);
-//        int dow = dateTime.getDayOfWeek().getValue();
-//        int week = dateTime.get(WeekFields.ISO.weekOfYear());
-        LocalDateTime ldt = new LocalDateTime(year, month, day, hour, minute, second, secTicks);
-        int iso8601Dow = ldt.getDayOfWeek();
-        int dow = iso8601Dow == 7 ? 0 : iso8601Dow;
-        int week = ldt.getWeekOfWeekyear();
+        WeekFields weekNumbering = WeekFields.of(Locale.getDefault());
+        LocalDate date = LocalDate.of(year, month, day);
+        int currentWeek = date.get(weekNumbering.weekOfWeekBasedYear());
 
-        return new DateFields(year, month, day, hour, minute, second, secTicks, dow, week);
+        return new DateFields(year, month, day, hour, minute, second, secTicks, date.getDayOfWeek().getValue(), currentWeek);
     }
 
     public static DateFields of(int year, int month, int day) {
@@ -33,14 +28,6 @@ public class DateFields {
         // TODO migrate dow field to a DayOfWeek type to avoid any possible
         // interpretation errors
         return DateFields.of(year, month, day, 0, 0, 0, 0);
-    }
-
-    public static DateFields getFields(Date d, TimeZone aDefault) {
-        Calendar cd = Calendar.getInstance();
-        cd.setTime(d);
-        cd.setTimeZone(aDefault);
-
-        return new DateFields(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + MONTH_OFFSET, cd.get(Calendar.DAY_OF_MONTH), cd.get(Calendar.HOUR_OF_DAY), cd.get(Calendar.MINUTE), cd.get(Calendar.SECOND), cd.get(Calendar.MILLISECOND), cd.get(Calendar.DAY_OF_WEEK), cd.get(Calendar.WEEK_OF_YEAR));
     }
 
     public int year;
@@ -62,14 +49,16 @@ public class DateFields {
         second = 0;
         secTicks = 0;
 
-        LocalDateTime ldt = new LocalDateTime(year, month, day, hour, minute, second, secTicks);
-        int iso8601Dow = ldt.getDayOfWeek();
-        dow = iso8601Dow == 7 ? 0 : iso8601Dow;
-        week = ldt.getWeekOfWeekyear();
+        WeekFields weekNumbering = WeekFields.of(Locale.getDefault());
+        LocalDate date = LocalDate.of(year, month, day);
+        int currentWeek = date.get(weekNumbering.weekOfWeekBasedYear());
+        dow = date.getDayOfWeek().getValue();
+        week = currentWeek;
+
         if (!check()) throw new IllegalArgumentException("Fields = " + this);
     }
 
-    private DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow, int week) {
+    public DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow, int week) {
         this.year = year;
         this.month = month;
         this.day = day;
@@ -89,6 +78,12 @@ public class DateFields {
                 && inRange(second, 0, 59)
                 && inRange(secTicks, 0, 999)
                 && inRange(week, 1, 53));
+    }
+
+    public LocalDateTime asLocalDateTime() {
+        LocalDate localDate = LocalDate.of(year, month, day);
+        LocalTime localTime = LocalTime.of(hour, minute, second, secTicksAsNanoSeconds(secTicks));
+        return LocalDateTime.of(localDate, localTime);
     }
 
     private int daysInMonth(int month, int year) {

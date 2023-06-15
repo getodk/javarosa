@@ -1,7 +1,6 @@
 package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.format.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,63 +42,6 @@ public class DateFormatter {
     public static String format(Date d, DateTimeFormatter formatter) {
         LocalDateTime localDate = DateUtils.localDateTimeFromDate(d);
         return formatter.format(localDate);
-    }
-
-    public static String format(DateFields f, String format) {
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < format.length(); i++) {
-            char c = format.charAt(i);
-
-            if (c == '%') {
-                i++;
-                if (i >= format.length()) {
-                    throw new RuntimeException("date format string ends with %");
-                } else {
-                    c = format.charAt(i);
-                }
-
-                if (c == '%') {            //literal '%'
-                    sb.append("%");
-                } else if (c == 'Y') {    //4-digit year
-                    sb.append(intPad(f.year, 4));
-                } else if (c == 'y') {    //2-digit year
-                    sb.append(intPad(f.year, 4).substring(2));
-                } else if (c == 'm') {    //0-padded month
-                    sb.append(intPad(f.month, 2));
-                } else if (c == 'n') {    //numeric month
-                    sb.append(f.month);
-                } else if (c == 'b') {    //short text month
-                    sb.append(DateUtils.getLocalDateTime(f).toString(DateTimeFormat.forPattern("MMM")));
-                } else if (c == 'd') {    //0-padded day of month
-                    sb.append(intPad(f.day, 2));
-                } else if (c == 'e') {    //day of month
-                    sb.append(f.day);
-                } else if (c == 'H') {    //0-padded hour (24-hr time)
-                    sb.append(intPad(f.hour, 2));
-                } else if (c == 'h') {    //hour (24-hr time)
-                    sb.append(f.hour);
-                } else if (c == 'M') {    //0-padded minute
-                    sb.append(intPad(f.minute, 2));
-                } else if (c == 'S') {    //0-padded second
-                    sb.append(intPad(f.second, 2));
-                } else if (c == '3') {    //0-padded millisecond ticks (000-999)
-                    sb.append(intPad(f.secTicks, 3));
-                } else if (c == 'a') {    //Three letter short text day
-                    sb.append(DateUtils.getLocalDateTime(f).toString(DateTimeFormat.forPattern("EEE")));
-                } else if (c == 'W') { // week of the year
-                    sb.append(f.week);
-                } else if (c == 'Z' || c == 'A' || c == 'B') {
-                    throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
-                } else {
-                    throw new RuntimeException("unrecognized escape in date format string [%" + c + "]");
-                }
-            } else {
-                sb.append(c);
-            }
-        }
-
-        return sb.toString();
     }
 
     public static DateTimeFormatter formatTheFormat(String format) {
