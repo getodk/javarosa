@@ -26,7 +26,6 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
 import static org.junit.Assert.assertEquals;
 
-// TODO Migrate to java.time for conformity
 //copy of JodaTimeToDateTest to implement same tests in java.time before changing the xpath expressions
 public class JavaTimeToDateTest {
     private static final DateTime EPOCH
