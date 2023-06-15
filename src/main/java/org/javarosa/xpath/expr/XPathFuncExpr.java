@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -360,7 +361,7 @@ public class XPathFuncExpr extends XPathExpression {
             return DateUtils.roundDate(new Date());
         } else if (name.equals("now")) {
             assertArgsCount(name, args, 0);
-            return DateUtils.now();
+            return Date.from(Instant.now());
         } else if (name.equals("concat")) {
             if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
                 return join("", ((XPathNodeset) argVals[0]).toArgList());
