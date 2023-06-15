@@ -3,8 +3,6 @@ package org.javarosa.xpath.expr;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -26,10 +24,7 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
 import static org.junit.Assert.assertEquals;
 
-//copy of JodaTimeToDateTest to implement same tests in java.time before changing the xpath expressions
-public class JavaTimeToDateTest {
-    private static final DateTime EPOCH
-            = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+public class ToDateTest {
     public static final ZonedDateTime EPOCH_UTC_ZONED_DATE_TIME
             = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")); // 1970-01-01T00:00:00 UTC
 
@@ -77,12 +72,6 @@ public class JavaTimeToDateTest {
 
     @Test
     public void convertsISO8601DatesWithoutOffsetPreservingTime() {
-        //old
-        assertEquals(
-                date(2018, 1, 1, 10, 20, 30, 400).toInstant().toEpochMilli(),
-                ((Date) toDate("2018-01-01T10:20:30.400", true)).toInstant().toEpochMilli()
-        );
-        //new
         assertEquals(
                 date(2018, 1, 1, 10, 20, 30, 400),
                 toDate("2018-01-01T10:20:30.400", true)
@@ -91,13 +80,6 @@ public class JavaTimeToDateTest {
 
     @Test
     public void convertsISO8601DatesWithOffsetPreservingTime() {
-        //old
-        assertEquals(
-                new DateTime(2018, 1, 1, 10, 20, 30, 400, DateTimeZone.forOffsetHours(2)).toDate(),
-                toDate("2018-01-01T10:20:30.400+02", true)
-        );
-
-        //new
         LocalDateTime localDateTime = localDateTime(2018, 1, 1, 10, 20, 30, 400);
         ZonedDateTime zonedDateTime = adjustLocalDateToOffsetTimeZone(localDateTime, 2);
         assertEquals(
@@ -108,12 +90,6 @@ public class JavaTimeToDateTest {
 
     @Test
     public void convertsTimestampsWithoutPreservingTime() {
-        //old
-        withTimeZone(TimeZone.getTimeZone("Z"), () -> assertEquals(
-                EPOCH.withZone(DateTimeZone.getDefault()).plusDays(365).toDate(),
-                toDate(365d, false)
-        ));
-        //new
         assertEquals(
                 dateFromZonedDateTime(EPOCH_UTC_ZONED_DATE_TIME.plusDays(365)), // 1971-01-01T00:00:00 UTC
                 toDate(365d, false));
@@ -132,13 +108,6 @@ public class JavaTimeToDateTest {
 
     @Test
     public void convertsTimestampsToDatesAtMidnightUTC() {
-        //old
-        DateTime expectedDate = EPOCH.withZone(DateTimeZone.UTC).plusDays(365);
-        assertEquals(
-                expectedDate.toDate(),
-                toDate(365d, true)
-        );
-        //new
         TimeZone UTC = TimeZone.getTimeZone(ZoneId.of("UTC"));
         withTimeZone(UTC, tz -> assertEquals(
                         epochPlusAYear("UTC"),
