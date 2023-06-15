@@ -17,6 +17,7 @@
 package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -63,7 +64,7 @@ public class DateUtils {
     }
 
     //Convert {@link org.joda.time.DateTime} to {@link java.time.LocalDateTime}
-    public static java.time.LocalDateTime toJavaTimeLocalDateTime(org.joda.time.DateTime dateTime) {
+    static java.time.LocalDateTime toJavaTimeLocalDateTime(DateTime dateTime) {
         int millisOfSecond = dateTime.getMillisOfSecond();
         int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millisOfSecond, TimeUnit.MILLISECONDS));
         System.out.println(nanoseconds);
