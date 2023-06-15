@@ -21,15 +21,13 @@ import org.joda.time.DateTime;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static org.javarosa.core.model.utils.StringUtils.split;
 
 public class DateUtils {
     @NotNull
@@ -328,27 +326,9 @@ public class DateUtils {
     private enum DOW {
         sun(0), mon(1), tue(2), wed(3), thu(4), fri(5), sat(6);
         final int order;
+
         DOW(int ordinal) {
             this.order = ordinal;
         }
-    }
-
-    /* ==== UTILITY ==== */
-
-    /**
-     * Tokenizes a string based on the given delimiter string
-     *
-     * @param str       The string to be split
-     * @param delimiter The delimiter to be used. will be wrapped so may be a special regex character
-     * @return An array of strings contained in original which were
-     * seperated by the delimiter
-     */
-    public static List<String> split(String str, String delimiter, boolean combineMultipleDelimiters) {
-        String[] split = str.split("[" + delimiter + "]");
-        Stream<String> stringStream = Arrays.stream(split);
-        if (combineMultipleDelimiters) {
-            stringStream = stringStream.filter(string -> !string.trim().isEmpty());
-        }
-        return stringStream.collect(Collectors.toList());
     }
 }

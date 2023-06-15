@@ -17,7 +17,6 @@
 package org.javarosa.core.model.data;
 
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -31,12 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.javarosa.core.model.utils.StringUtils.split;
+
 /**
  * A response to a question requesting a selection of
  * any number of items from a list or ordering them.
  *
  * @author Drew Roos
- *
  */
 public class MultipleItemsData implements IAnswerData {
     private List<Selection> vs; //List of Selection
@@ -54,8 +54,8 @@ public class MultipleItemsData implements IAnswerData {
     }
 
     @Override
-    public IAnswerData clone () {
-       List<Selection> v = new ArrayList<>(vs.size());
+    public IAnswerData clone() {
+        List<Selection> v = new ArrayList<>(vs.size());
         for (Selection v1 : vs) {
             v.add(v1.clone());
         }
@@ -63,20 +63,20 @@ public class MultipleItemsData implements IAnswerData {
     }
 
     @Override
-    public void setValue (Object o) {
-        if(o == null) {
+    public void setValue(Object o) {
+        if (o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
 
         ArrayList<Selection> selections = new ArrayList<>(((List<Object>) o).size());
-        for ( Object obj : (List<Object>) o) {
+        for (Object obj : (List<Object>) o) {
             selections.add((Selection) obj);
         }
         vs = selections;
     }
 
     @Override
-    public @NotNull Object getValue () {
+    public @NotNull Object getValue() {
         return new ArrayList<>(vs);
     }
 
@@ -84,7 +84,7 @@ public class MultipleItemsData implements IAnswerData {
      * @return THE XMLVALUE!!
      */
     @Override
-    public String getDisplayText () {
+    public String getDisplayText() {
         StringBuilder b = new StringBuilder();
 
         for (int i = 0; i < vs.size(); i++) {
@@ -100,7 +100,7 @@ public class MultipleItemsData implements IAnswerData {
     @SuppressWarnings("unchecked")
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-        vs = (List<Selection>)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
+        vs = (List<Selection>) ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
     }
 
     @Override
@@ -112,11 +112,11 @@ public class MultipleItemsData implements IAnswerData {
     public UncastData uncast() {
         StringBuilder selectString = new StringBuilder();
 
-       for (Selection selection : vs) {
-          if (selectString.length() > 0)
-             selectString.append(" ");
-          selectString.append(selection.getValue());
-       }
+        for (Selection selection : vs) {
+            if (selectString.length() > 0)
+                selectString.append(" ");
+            selectString.append(selection.getValue());
+        }
         //As Crazy, and stupid, as it sounds, this is the XForms specification
         //for storing multiple selections.
         return new UncastData(selectString.toString());
@@ -125,10 +125,10 @@ public class MultipleItemsData implements IAnswerData {
     @Override
     public MultipleItemsData cast(UncastData data) throws IllegalArgumentException {
 
-       List<String> choices = DateUtils.split(data.value, " ", true);
-       List<Selection> v = new ArrayList<>(choices.size());
+        List<String> choices = split(data.value, " ", true);
+        List<Selection> v = new ArrayList<>(choices.size());
 
-        for(String s : choices) {
+        for (String s : choices) {
             v.add(new Selection(s));
         }
         return new MultipleItemsData(v);

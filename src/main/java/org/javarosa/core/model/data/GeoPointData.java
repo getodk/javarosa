@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model.data;
 
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
@@ -27,19 +26,20 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import static org.javarosa.core.model.utils.StringUtils.split;
+
 
 /**
  * A response to a question requesting an GeoPoint Value.
- *
+ * <p>
  * Ensure that any missing values are reset to MISSING_VALUE
  * This is currently 0.0, but perhaps should be NaN?
- *
+ * <p>
  * An uninitialized GeoPoint is:
- *  [0.0, 0.0, MISSING_VALUE, MISSING_VALUE]
+ * [0.0, 0.0, MISSING_VALUE, MISSING_VALUE]
  *
  * @author mitchellsundt@gmail.com
  * @author Yaw Anokwa
- *
  */
 public class GeoPointData implements IAnswerData, IExprDataType {
 
@@ -58,7 +58,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
      */
     public GeoPointData() {
         // reset missing data...
-        for (int i = REQUIRED_ARRAY_SIZE ; i < gp.length ; ++i ) {
+        for (int i = REQUIRED_ARRAY_SIZE; i < gp.length; ++i) {
             this.gp[i] = MISSING_VALUE;
         }
     }
@@ -76,7 +76,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
         len = gp.length;
         System.arraycopy(gp, 0, this.gp, 0, len);
         // make sure that any old data is removed...
-        for (int i = len ; i < gp.length ; ++i ) {
+        for (int i = len; i < gp.length; ++i) {
             this.gp[i] = MISSING_VALUE;
         }
     }
@@ -90,14 +90,14 @@ public class GeoPointData implements IAnswerData, IExprDataType {
 
     @Override
     public String getDisplayText() {
-        if ( !toBoolean() ) {
+        if (!toBoolean()) {
             // it hasn't been set...
             return "";
         }
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < len; i++) {
             b.append(gp[i]);
-            if ( i != len - 1) {
+            if (i != len - 1) {
                 b.append(" ");
             }
         }
@@ -130,7 +130,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
             gp[i] = ExtUtil.readDecimal(in);
         }
         // make sure that any old data is removed...
-        for (int i = len ; i < gp.length ; ++i ) {
+        for (int i = len; i < gp.length; ++i) {
             this.gp[i] = MISSING_VALUE;
         }
     }
@@ -154,13 +154,13 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     public GeoPointData cast(UncastData data) throws IllegalArgumentException {
         double[] ret = new double[4];
         // make sure that missing data is flagged as absent...
-        for (int i = REQUIRED_ARRAY_SIZE ; i < ret.length ; ++i ) {
+        for (int i = REQUIRED_ARRAY_SIZE; i < ret.length; ++i) {
             ret[i] = MISSING_VALUE;
         }
 
-      List<String> choices = DateUtils.split(data.value, " ", true);
+        List<String> choices = split(data.value, " ", true);
         int i = 0;
-        for(String s : choices) {
+        for (String s : choices) {
             double d = Double.parseDouble(s);
             ret[i] = d;
             ++i;
@@ -177,7 +177,7 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     @Override
     public Double toNumeric() {
         // return accuracy...
-        if ( !toBoolean() ) {
+        if (!toBoolean()) {
             // we have no captured geopoint...
             // bigger than the radius of the earth (meters)...
             return NO_ACCURACY_VALUE;
@@ -191,11 +191,11 @@ public class GeoPointData implements IAnswerData, IExprDataType {
     }
 
 
-  public double getPart(int i) {
-    if (i < len) {
-      return gp[i];
-    } else {
-      throw new ArrayIndexOutOfBoundsException("Cannot find coordinates part with index " + i);
+    public double getPart(int i) {
+        if (i < len) {
+            return gp[i];
+        } else {
+            throw new ArrayIndexOutOfBoundsException("Cannot find coordinates part with index " + i);
+        }
     }
-  }
 }

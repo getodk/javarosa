@@ -57,6 +57,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.Double.NaN;
 import static org.javarosa.core.model.utils.DateUtils.DAY_IN_MS;
+import static org.javarosa.core.model.utils.StringUtils.split;
 
 /**
  * Representation of an xpath function expression.
@@ -130,11 +131,11 @@ public class XPathFuncExpr extends XPathExpression {
             //May 6, 2013 - Added "random", since two calls asking for a random
             //Jun 4, 2013 - Added "now" and "today", since these could change during the course of a survey
             if (!id.equals(x.id) || args.length != x.args.length ||
-                id.toString().equals("uuid") ||
-                id.toString().equals("random") ||
-                id.toString().equals("once") ||
-                id.toString().equals("now") ||
-                id.toString().equals("today")) {
+                    id.toString().equals("uuid") ||
+                    id.toString().equals("random") ||
+                    id.toString().equals("once") ||
+                    id.toString().equals("now") ||
+                    id.toString().equals("today")) {
                 return false;
             }
 
@@ -499,8 +500,8 @@ public class XPathFuncExpr extends XPathExpression {
             return GeoUtils.calculateDistance(latLongs);
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from(toString(argVals[1])).digest(
-                toString(argVals[0]),
-                args.length == 3 ? Encoding.from(toString(argVals[2])) : Encoding.BASE64
+                    toString(argVals[0]),
+                    args.length == 3 ? Encoding.from(toString(argVals[2])) : Encoding.BASE64
             );
         } else if (name.equals("randomize")) {
             if (!(argVals[0] instanceof XPathNodeset))
@@ -534,7 +535,7 @@ public class XPathFuncExpr extends XPathExpression {
     private static void assertArgsCount(String name, Object[] args, int count) {
         if (args.length != count) {
             throw new XPathUnhandledException("function '" + name + "'. Requires " +
-                count + " arguments but " + args.length + " provided.");
+                    count + " arguments but " + args.length + " provided.");
         }
     }
 
@@ -706,8 +707,8 @@ public class XPathFuncExpr extends XPathExpression {
              */
 
             final String s = ((String) o)
-                .replace(',', '.') // Some locales use ',' instead of '.'
-                .trim();
+                    .replace(',', '.') // Some locales use ',' instead of '.'
+                    .trim();
 
             try {
                 for (int i = 0; i < s.length(); i++) {
@@ -848,7 +849,7 @@ public class XPathFuncExpr extends XPathExpression {
 
         try {
             return DateUtils.parseDateTime(input);
-        }catch(IllegalArgumentException noArgs){
+        } catch (IllegalArgumentException noArgs) {
             throw new XPathTypeMismatchException("The value \"" + input + "\" can't be converted to a date.", noArgs);
         }
     }
@@ -909,7 +910,7 @@ public class XPathFuncExpr extends XPathExpression {
                 return s;
             }
 
-            try{
+            try {
                 Date d = DateUtils.parseDateTime(s);
                 return decimalFromDate(d, keepDate);
 //                if (keepDate) {
@@ -918,7 +919,7 @@ public class XPathFuncExpr extends XPathExpression {
 //                } else {
 //                    return DateUtils.decimalTimeOfLocalDay(d);
 //                }
-            }catch(IllegalArgumentException badArgs){
+            } catch (IllegalArgumentException badArgs) {
                 throw new XPathTypeMismatchException("The value \"" + s + "\" can't be converted to a date.", badArgs);
             }
         } else if (o instanceof Date) {
@@ -969,8 +970,8 @@ public class XPathFuncExpr extends XPathExpression {
     public static String formatDateTime(Object inputValue, Object format) {
         Object parseResult = toDate(inputValue, true);
         return parseResult instanceof Date
-            ? DateFormatter.format((Date) parseResult, toString(format))
-            : "";
+                ? DateFormatter.format((Date) parseResult, toString(format))
+                : "";
     }
 
     private Double position(TreeReference refAt) {
@@ -1060,8 +1061,7 @@ public class XPathFuncExpr extends XPathExpression {
      */
     public static Double countSelected(Object o) {
         String s = (String) unpack(o);
-
-        return (double) DateUtils.split(s, " ", true).size();
+        return (double) split(s, " ", true).size();
     }
 
     /**
@@ -1073,7 +1073,7 @@ public class XPathFuncExpr extends XPathExpression {
     public static String selectedAt(Object o1, Object o2) {
         String selection = (String) unpack(o1);
         int index = toInt(o2).intValue();
-        List<String> stringVector = DateUtils.split(selection, " ", true);
+        List<String> stringVector = split(selection, " ", true);
         if (stringVector.size() > index && index >= 0) {
             return stringVector.get(index);
         } else {
@@ -1141,9 +1141,9 @@ public class XPathFuncExpr extends XPathExpression {
                 // Per XPath specification, round up or towards zero
                 RoundingMode method = (number < 0) ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP;
                 return (new BigDecimal(
-                    Double.toString(number)))
-                    .setScale(numDecimals, method)
-                    .doubleValue();
+                        Double.toString(number)))
+                        .setScale(numDecimals, method)
+                        .doubleValue();
             } catch (NumberFormatException ex) {
                 if (Double.isInfinite(number)) {
                     return number;
@@ -1239,7 +1239,7 @@ public class XPathFuncExpr extends XPathExpression {
      * arguments 3 through the end are the individual factors, each coerced to a boolean value
      *
      * @return true if the count of 'true' factors is between the applicable minimum and maximum,
-     *     inclusive
+     * inclusive
      */
     public static Boolean checklist(Object oMin, Object oMax, Object[] factors) {
         int min = toNumeric(oMin).intValue();
@@ -1341,7 +1341,7 @@ public class XPathFuncExpr extends XPathExpression {
      * @param providedArity number of arguments actually provided to the function
      */
     private static void checkArity(String name, int expectedArity, int providedArity)
-        throws XPathArityException {
+            throws XPathArityException {
         if (expectedArity != providedArity) {
             throw new XPathArityException(name, expectedArity, providedArity);
         }
@@ -1406,23 +1406,23 @@ public class XPathFuncExpr extends XPathExpression {
     @Override
     public boolean isIdempotent() {
         return Arrays.asList(IDEMPOTENT_FUNCTIONS).contains(id.toString()) &&
-            Arrays.stream(args).allMatch(XPathExpression::isIdempotent);
+                Arrays.stream(args).allMatch(XPathExpression::isIdempotent);
     }
 
     private static final String[] IDEMPOTENT_FUNCTIONS = new String[]{
-        "regex",
-        "starts-with",
-        "ends-with",
-        "contains",
-        "substr",
-        "substring-before",
-        "substring-after",
-        "translate",
-        "string-length",
-        "normalize-space",
-        "concat",
-        "join",
-        "boolean-from-string",
-        "string"
+            "regex",
+            "starts-with",
+            "ends-with",
+            "contains",
+            "substr",
+            "substring-before",
+            "substring-after",
+            "translate",
+            "string-length",
+            "normalize-space",
+            "concat",
+            "join",
+            "boolean-from-string",
+            "string"
     };
 }

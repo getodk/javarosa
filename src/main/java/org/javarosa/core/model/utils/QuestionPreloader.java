@@ -16,9 +16,6 @@
 
 package org.javarosa.core.model.utils;
 
-import java.util.Date;
-import java.util.List;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -30,25 +27,29 @@ import org.javarosa.core.util.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+import java.util.List;
+
+import static org.javarosa.core.model.utils.StringUtils.split;
+
 /**
- * The Question Preloader is responsible for maintaining a set of handlers which are capable 
+ * The Question Preloader is responsible for maintaining a set of handlers which are capable
  * of parsing 'preload' elements, and their parameters, and returning IAnswerData objects.
- * 
- * @author Clayton Sims
  *
+ * @author Clayton Sims
  */
 public class QuestionPreloader {
     private static final Logger logger = LoggerFactory.getLogger(QuestionPreloader.class);
 
     /* String -> IPreloadHandler */
     // NOTE: this is not java.util.Map!!!
-    private Map<String,IPreloadHandler> preloadHandlers;
+    private Map<String, IPreloadHandler> preloadHandlers;
 
     /**
      * Creates a new Preloader with default handlers
      */
     public QuestionPreloader() {
-        preloadHandlers = new Map<String,IPreloadHandler>();
+        preloadHandlers = new Map<String, IPreloadHandler>();
         initPreloadHandlers();
     }
 
@@ -164,7 +165,7 @@ public class QuestionPreloader {
     /**
      * Returns the IAnswerData preload value for the given preload type and parameters
      *
-     * @param preloadType The type of the preload to be returned
+     * @param preloadType   The type of the preload to be returned
      * @param preloadParams Parameters for the preload handler
      * @return An IAnswerData corresponding to a pre-loaded value for the given
      * Arguments. null if no preload could successfully be derived due to either
@@ -172,7 +173,7 @@ public class QuestionPreloader {
      */
     public IAnswerData getQuestionPreload(String preloadType, String preloadParams) {
         IPreloadHandler handler = preloadHandlers.get(preloadType);
-        if(handler != null) {
+        if (handler != null) {
             return handler.handlePreload(preloadParams);
         } else {
             logger.error("Do not know how to handle preloader [{}]", preloadType);
@@ -180,9 +181,9 @@ public class QuestionPreloader {
         }
     }
 
-    public boolean questionPostProcess (TreeElement node, String preloadType, String params) {
+    public boolean questionPostProcess(TreeElement node, String preloadType, String params) {
         IPreloadHandler handler = preloadHandlers.get(preloadType);
-        if(handler != null) {
+        if (handler != null) {
             return handler.handlePostProcess(node, params);
         } else {
             logger.error("Do not know how to handle preloader [{}]", preloadType);
@@ -202,10 +203,10 @@ public class QuestionPreloader {
         if (preloadParams.equals("today")) {
             d = new Date();
         } else if (preloadParams.substring(0, 11).equals("prevperiod-")) {
-         List<String> v = DateUtils.split(preloadParams.substring(11), "-", false);
+            List<String> v = split(preloadParams.substring(11), "-", false);
             String[] params = new String[v.size()];
             for (int i = 0; i < params.length; i++)
-                params[i] = (String)v.get(i);
+                params[i] = (String) v.get(i);
 
             try {
                 String type = params[0];
@@ -258,7 +259,7 @@ public class QuestionPreloader {
         return data;
     }
 
-    private void saveProperty (String propName, TreeElement node) {
+    private void saveProperty(String propName, TreeElement node) {
         IAnswerData answer = node.getValue();
         String value = (answer == null ? null : answer.getDisplayText());
         if (propName != null && propName.length() > 0 && value != null && value.length() > 0)
