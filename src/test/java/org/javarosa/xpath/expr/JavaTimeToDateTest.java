@@ -3,15 +3,22 @@ package org.javarosa.xpath.expr;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.POSITIVE_INFINITY;
+import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDate;
+import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDateTime;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
 import static org.junit.Assert.assertEquals;
@@ -20,70 +27,71 @@ import static org.junit.Assert.assertEquals;
 //copy of JodaTimeToDateTest to implement same tests in java.time before changing the xpath expressions
 public class JavaTimeToDateTest {
     private static final DateTime EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-    public static final TimeZone PST = TimeZone.getTimeZone(ZoneId.of("America/Los_Angeles"));
 
     private static Date date(int year, int month, int day) {
-        return new LocalDateTime(year, month, day, 0, 0, 0, 0).toDate();
+        return dateFromLocalDate(LocalDate.of(year, month, day));
+    }
+
+    public static int secTicksAsNanoSeconds(int millis) {
+        int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millis, TimeUnit.MILLISECONDS));
+        System.out.println(nanoseconds);
+        return nanoseconds;
     }
 
     private static Date date(int year, int month, int day, int hour, int minute, int second, int milli) {
-        return new LocalDateTime(year, month, day, hour, minute, second, milli).toDate();
+        return dateFromLocalDateTime(LocalDateTime.of(LocalDate.of(year, month, day), LocalTime.of(hour, minute, second, secTicksAsNanoSeconds(milli))));
     }
 
     @Test
     public void convertsISO8601DatesWithoutPreservingTime() {
         assertEquals(
-            date(2018, 1, 1),
-            toDate("2018-01-01", false)
+                date(2018, 1, 1),
+                toDate("2018-01-01", false)
         );
     }
 
     @Test
     public void convertsISO8601DatesWithoutOffsetPreservingTime() {
         assertEquals(
-            date(2018, 1, 1, 10, 20, 30, 400),
-            toDate("2018-01-01T10:20:30.400", true)
+                date(2018, 1, 1, 10, 20, 30, 400).toInstant().toEpochMilli(),
+                ((Date) toDate("2018-01-01T10:20:30.400", true)).toInstant().toEpochMilli()
+        );
+        assertEquals(
+                date(2018, 1, 1, 10, 20, 30, 400),
+                toDate("2018-01-01T10:20:30.400", true)
         );
     }
 
     @Test
     public void convertsISO8601DatesWithOffsetPreservingTime() {
         assertEquals(
-            new DateTime(2018, 1, 1, 10, 20, 30, 400, DateTimeZone.forOffsetHours(2)).toDate(),
-            toDate("2018-01-01T10:20:30.400+02", true)
+                new DateTime(2018, 1, 1, 10, 20, 30, 400, DateTimeZone.forOffsetHours(2)).toDate(),
+                toDate("2018-01-01T10:20:30.400+02", true)
         );
     }
 
     @Test
     public void convertsTimestampsWithoutPreservingTime() {
         withTimeZone(TimeZone.getTimeZone("Z"), () -> assertEquals(
-            EPOCH.withZone(DateTimeZone.getDefault()).plusDays(365).toDate(),
-            toDate(365d, false)
+                EPOCH.withZone(DateTimeZone.getDefault()).plusDays(365).toDate(),
+                toDate(365d, false)
         ));
     }
 
     @Test
     public void convertsTimestampsWithoutPreservingTimeOnLocalTimeZone() {
+        TimeZone PST = TimeZone.getTimeZone(ZoneId.of("America/Los_Angeles"));
         withTimeZone(PST, tz -> {
-                DateTime utcEpoch = EPOCH.withZone(DateTimeZone.UTC); // 1970-01-01T00:00:00 UTC
-                DateTime properExpectedDate = utcEpoch.plusDays(365); // 1971-01-01T00:00:00 UTC
-                // Explanation for all this:
-                //
-                // Since our current implementation is based on java.util.Date, we are forced to
-                // use the default timezone, and we need to compensate for that. Otherwise, we will
-                // get offset dates by the same amount of hours as the timezone we're running this
-                // test (PST aka America/Los_Angeles: -6 hours).
-                //
-                // By running zonedDateTime.withZoneSameLocal(zoneId), we offset the date to represent
-                // the same local datetime in our target zone.
-                // 1971-01-01T00:00:00 PST (or 1971-01-01T06:00:00 UTC which is the EPOCH plus
-                // 365 days *and 6 hours*, but will make our code work)
-                DateTime expectedDate = properExpectedDate.withZoneRetainFields(DateTimeZone.forTimeZone(tz));
-                assertEquals(
-                    expectedDate.toDate(),
-                    toDate(365d, false)
-                );
-            }
+                    ZonedDateTime zonedutcEpoch = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC")); // 1970-01-01T00:00:00 UTC
+                    ZonedDateTime zonedDateTime = zonedutcEpoch.plusDays(365); // 1971-01-01T00:00:00 UTC
+                    zonedDateTime = zonedDateTime.withZoneSameLocal(ZoneId.of(tz.getID()));
+                    Date datedFromLocalDateTime = dateFromLocalDateTime(zonedDateTime.toLocalDateTime());
+
+                    assertEquals(
+                            datedFromLocalDateTime,
+                            toDate(365d, false)
+                    );
+                }
         );
     }
 
@@ -91,8 +99,8 @@ public class JavaTimeToDateTest {
     public void convertsTimestampsToDatesAtMidnightUTC() {
         DateTime expectedDate = EPOCH.withZone(DateTimeZone.UTC).plusDays(365);
         assertEquals(
-            expectedDate.toDate(),
-            toDate(365d, true)
+                expectedDate.toDate(),
+                toDate(365d, true)
         );
     }
 
