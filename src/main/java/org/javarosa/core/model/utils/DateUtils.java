@@ -22,11 +22,14 @@ import org.joda.time.DateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DateUtils {
     @NotNull
@@ -336,30 +339,16 @@ public class DateUtils {
      * Tokenizes a string based on the given delimiter string
      *
      * @param str       The string to be split
-     * @param delimiter The delimiter to be used
+     * @param delimiter The delimiter to be used. will be wrapped so may be a special regex character
      * @return An array of strings contained in original which were
      * seperated by the delimiter
      */
     public static List<String> split(String str, String delimiter, boolean combineMultipleDelimiters) {
-
-        int index = str.indexOf(delimiter);
-        List<String> pieces = new ArrayList<>(index + 1);
-        while (index >= 0) {
-            pieces.add(str.substring(0, index));
-            str = str.substring(index + delimiter.length());
-            index = str.indexOf(delimiter);
-        }
-        pieces.add(str);
-
+        String[] split = str.split("[" + delimiter + "]");
+        Stream<String> stringStream = Arrays.stream(split);
         if (combineMultipleDelimiters) {
-            for (int i = 0; i < pieces.size(); i++) {
-                if (pieces.get(i).length() == 0) {
-                    pieces.remove(i);
-                    i--;
-                }
-            }
+            stringStream = stringStream.filter(string -> !string.trim().isEmpty());
         }
-
-        return pieces;
+        return stringStream.collect(Collectors.toList());
     }
 }
