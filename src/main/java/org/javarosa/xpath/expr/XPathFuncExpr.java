@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.condition.EvaluationContext;
