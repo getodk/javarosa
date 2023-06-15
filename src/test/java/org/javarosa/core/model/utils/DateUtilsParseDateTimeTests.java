@@ -99,11 +99,11 @@ public class DateUtilsParseDateTimeTests {
         return LocalDateTime.ofInstant(inputInstant, ZoneId.systemDefault());
     }
 
-    @Test
-    public void jodaToJavaTest() {
-        Date now = new Date(Instant.now().toEpochMilli());
-        LocalDateTime javaDateTime = DateUtils.localDateTimeFromDate(now);
-        org.joda.time.DateTime jodaDateTime = new org.joda.time.DateTime(now);
-        assertEquals(javaDateTime, DateUtils.toJavaTimeLocalDateTime(jodaDateTime));
-    }
+//    @Test
+//    public void jodaToJavaTest() {
+//        Date now = new Date(Instant.now().toEpochMilli());
+//        LocalDateTime javaDateTime = DateUtils.localDateTimeFromDate(now);
+//        org.joda.time.DateTime jodaDateTime = new org.joda.time.DateTime(now);
+//        assertEquals(javaDateTime, DateUtils.toJavaTimeLocalDateTime(jodaDateTime));
+//    }
 }

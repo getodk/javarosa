@@ -16,7 +16,7 @@ import org.joda.time.LocalDateTime;
 import org.junit.Test;
 
 // TODO Migrate to java.time for conformity
-public class ToDateTest {
+public class JodaToDateTest {
     private static final DateTime EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
     public static final TimeZone PST = TimeZone.getTimeZone(ZoneId.of("America/Los_Angeles"));
 

@@ -69,16 +69,16 @@ public class DateUtils {
     }
 
     //Convert {@link org.joda.time.DateTime} to {@link java.time.LocalDateTime}
-    static LocalDateTime toJavaTimeLocalDateTime(org.joda.time.DateTime dateTime) {
-        return LocalDateTime.of(
-                dateTime.getYear(),
-                dateTime.getMonthOfYear(),
-                dateTime.getDayOfMonth(),
-                dateTime.getHourOfDay(),
-                dateTime.getMinuteOfHour(),
-                dateTime.getSecondOfMinute(),
-                secTicksAsNanoSeconds(dateTime.getMillisOfSecond()));
-    }
+//    static LocalDateTime toJavaTimeLocalDateTime(org.joda.time.DateTime dateTime) {
+//        return LocalDateTime.of(
+//                dateTime.getYear(),
+//                dateTime.getMonthOfYear(),
+//                dateTime.getDayOfMonth(),
+//                dateTime.getHourOfDay(),
+//                dateTime.getMinuteOfHour(),
+//                dateTime.getSecondOfMinute(),
+//                secTicksAsNanoSeconds(dateTime.getMillisOfSecond()));
+//    }
 
     public static int secTicksAsNanoSeconds(int millis) {
         int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millis, TimeUnit.MILLISECONDS));
