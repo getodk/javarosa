@@ -61,8 +61,8 @@ public class JavaTimeToDateTest {
     }
 
     @NotNull
-    private static Date epochPlusAYear(String tzID, int daysFromEpoch) {
-        ZonedDateTime zonedDateTime = EPOCH_UTC_ZONED_DATE_TIME.plusDays(daysFromEpoch); // 1971-01-01T00:00:00 UTC
+    private static Date epochPlusAYear(String tzID) {
+        ZonedDateTime zonedDateTime = EPOCH_UTC_ZONED_DATE_TIME.plusDays(365); // 1971-01-01T00:00:00 UTC
         zonedDateTime = zonedDateTime.withZoneSameLocal(ZoneId.of(tzID));
         return dateFromLocalDateTime(zonedDateTime.toLocalDateTime());
     }
@@ -124,13 +124,10 @@ public class JavaTimeToDateTest {
     public void convertsTimestampsWithoutPreservingTimeOnLocalTimeZone() {
         //new
         TimeZone PST = TimeZone.getTimeZone(ZoneId.of("America/Los_Angeles"));
-        withTimeZone(PST, tz -> {
-                    Date datedFromLocalDateTime = epochPlusAYear(tz.getID(), 365);
-                    assertEquals(
-                            datedFromLocalDateTime,
-                            toDate(365d, false)
-                    );
-                }
+        withTimeZone(PST, tz -> assertEquals(
+                        epochPlusAYear(tz.getID()),
+                        toDate(365d, false)
+                )
         );
     }
 
@@ -141,6 +138,13 @@ public class JavaTimeToDateTest {
         assertEquals(
                 expectedDate.toDate(),
                 toDate(365d, true)
+        );
+        //new
+        TimeZone UTC = TimeZone.getTimeZone(ZoneId.of("UTC"));
+        withTimeZone(UTC, tz -> assertEquals(
+                        epochPlusAYear("UTC"),
+                        toDate(365d, true)
+                )
         );
     }
 
@@ -202,5 +206,4 @@ public class JavaTimeToDateTest {
         // We can't explicitly test for all possible types.
         toDate(2L, false);
     }
-
 }
