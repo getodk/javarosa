@@ -18,6 +18,7 @@ package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -55,6 +56,10 @@ public class DateUtils {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    public static Date now() {
+        return Date.from(Instant.now());
+    }
+
     public static final long DAY_IN_MS = 86400000L;
 
     public DateUtils() {
@@ -67,18 +72,6 @@ public class DateUtils {
     public static Date getDate(DateFields f, TimeZone tz) {
         return dateFromLocalDateTime(f.asLocalDateTime(), ZoneId.of(tz.getID()));
     }
-
-    //Convert {@link org.joda.time.DateTime} to {@link java.time.LocalDateTime}
-//    static LocalDateTime toJavaTimeLocalDateTime(org.joda.time.DateTime dateTime) {
-//        return LocalDateTime.of(
-//                dateTime.getYear(),
-//                dateTime.getMonthOfYear(),
-//                dateTime.getDayOfMonth(),
-//                dateTime.getHourOfDay(),
-//                dateTime.getMinuteOfHour(),
-//                dateTime.getSecondOfMinute(),
-//                secTicksAsNanoSeconds(dateTime.getMillisOfSecond()));
-//    }
 
     public static int secTicksAsNanoSeconds(int millis) {
         int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millis, TimeUnit.MILLISECONDS));
@@ -293,8 +286,6 @@ public class DateUtils {
         return getDate(DateFields.of(f.year, f.month, f.day));
     }
 
-    /* ==== Parsing to Human Text ==== */
-
     /* ==== DATE OPERATIONS ==== */
 
     /**
@@ -317,9 +308,7 @@ public class DateUtils {
             int current_dow = cd.get(Calendar.DAY_OF_WEEK) - 1;
             int target_dow = DOW.valueOf(start).order;
             int offset = (includeToday ? 1 : 0);
-            int diff = ((current_dow - target_dow + 7 + offset) % 7 - offset)
-                    + (7 * nAgo)
-                    - (beginning ? 0 : 6); //booyah
+            int diff = ((current_dow - target_dow + 7 + offset) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
             return new Date(ref.getTime() - diff * DAY_IN_MS);
         } else if (type.equals("month")) {
             //not supported

@@ -27,7 +27,6 @@ import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.Stream;
@@ -36,7 +35,6 @@ import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class DateUtilsParseDateTimeTests {
@@ -98,12 +96,4 @@ public class DateUtilsParseDateTimeTests {
         // No time offset declared. Return a LocalTime
         return LocalDateTime.ofInstant(inputInstant, ZoneId.systemDefault());
     }
-
-//    @Test
-//    public void jodaToJavaTest() {
-//        Date now = new Date(Instant.now().toEpochMilli());
-//        LocalDateTime javaDateTime = DateUtils.localDateTimeFromDate(now);
-//        org.joda.time.DateTime jodaDateTime = new org.joda.time.DateTime(now);
-//        assertEquals(javaDateTime, DateUtils.toJavaTimeLocalDateTime(jodaDateTime));
-//    }
 }
