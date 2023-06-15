@@ -17,7 +17,6 @@
 package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.LocalDateTime;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class DateUtils {
     @NotNull
@@ -45,7 +45,6 @@ public class DateUtils {
         return Date.from(someDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-
     public static final long DAY_IN_MS = 86400000L;
 
     public DateUtils() {
@@ -59,8 +58,23 @@ public class DateUtils {
         return getLocalDateTime(f).toDate(tz);
     }
 
-    public static LocalDateTime getLocalDateTime(DateFields f) {
-        return new LocalDateTime(f.year, f.month, f.day, f.hour, f.minute, f.second, f.secTicks);
+    public static org.joda.time.LocalDateTime getLocalDateTime(DateFields f) {
+        return new org.joda.time.LocalDateTime(f.year, f.month, f.day, f.hour, f.minute, f.second, f.secTicks);
+    }
+
+    //Convert {@link org.joda.time.DateTime} to {@link java.time.LocalDateTime}
+    public static java.time.LocalDateTime toJavaTimeLocalDateTime(org.joda.time.DateTime dateTime) {
+        int millisOfSecond = dateTime.getMillisOfSecond();
+        int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millisOfSecond, TimeUnit.MILLISECONDS));
+        System.out.println(nanoseconds);
+        return java.time.LocalDateTime.of(
+                dateTime.getYear(),
+                dateTime.getMonthOfYear(),
+                dateTime.getDayOfMonth(),
+                dateTime.getHourOfDay(),
+                dateTime.getMinuteOfHour(),
+                dateTime.getSecondOfMinute(),
+                nanoseconds);
     }
 
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */

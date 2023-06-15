@@ -16,10 +16,10 @@
 
 package org.javarosa.core.model.utils.test;
 
-import static java.util.TimeZone.getTimeZone;
-import static org.hamcrest.Matchers.is;
-import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.javarosa.core.model.utils.DateUtils;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -28,13 +28,16 @@ import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.Stream;
-import org.javarosa.core.model.utils.DateUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+
+import static java.util.TimeZone.getTimeZone;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class DateUtilsParseDateTimeTests {
@@ -47,15 +50,15 @@ public class DateUtilsParseDateTimeTests {
     @Parameterized.Parameters(name = "Input: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {"2016-04-13T16:26:00.000", LocalDateTime.parse("2016-04-13T16:26:00.000")},
-            {"2016-04-13T16:26:00.000-07", OffsetDateTime.parse("2016-04-13T16:26:00.000-07:00")},
-            {"2015-12-16T16:09:00.000-08", OffsetDateTime.parse("2015-12-16T16:09:00.000-08:00")},
-            {"2015-12-16T07:09:00.000+08", OffsetDateTime.parse("2015-12-16T07:09:00.000+08:00")},
-            {"2015-11-30T16:09:00.000-08", OffsetDateTime.parse("2015-11-30T16:09:00.000-08:00")},
-            {"2015-11-01T07:09:00.000+08", OffsetDateTime.parse("2015-11-01T07:09:00.000+08:00")},
-            {"2015-12-31T16:09:00.000-08", OffsetDateTime.parse("2015-12-31T16:09:00.000-08:00")},
-            {"1970-01-01T01:00:00.000", LocalDateTime.parse("1970-01-01T01:00:00.000")},
-            {"1970-01-01T01:00:00.000+01", OffsetDateTime.parse("1970-01-01T01:00:00.000+01:00")},
+                {"2016-04-13T16:26:00.000", LocalDateTime.parse("2016-04-13T16:26:00.000")},
+                {"2016-04-13T16:26:00.000-07", OffsetDateTime.parse("2016-04-13T16:26:00.000-07:00")},
+                {"2015-12-16T16:09:00.000-08", OffsetDateTime.parse("2015-12-16T16:09:00.000-08:00")},
+                {"2015-12-16T07:09:00.000+08", OffsetDateTime.parse("2015-12-16T07:09:00.000+08:00")},
+                {"2015-11-30T16:09:00.000-08", OffsetDateTime.parse("2015-11-30T16:09:00.000-08:00")},
+                {"2015-11-01T07:09:00.000+08", OffsetDateTime.parse("2015-11-01T07:09:00.000+08:00")},
+                {"2015-12-31T16:09:00.000-08", OffsetDateTime.parse("2015-12-31T16:09:00.000-08:00")},
+                {"1970-01-01T01:00:00.000", LocalDateTime.parse("1970-01-01T01:00:00.000")},
+                {"1970-01-01T01:00:00.000+01", OffsetDateTime.parse("1970-01-01T01:00:00.000+01:00")},
 
         });
     }
@@ -63,11 +66,11 @@ public class DateUtilsParseDateTimeTests {
     @Test
     public void parseDateTime_produces_expected_results_in_all_time_zones() {
         Stream.of(
-            TimeZone.getDefault(),
-            getTimeZone("UTC"),
-            getTimeZone("GMT+12"),
-            getTimeZone("GMT-13"),
-            getTimeZone("GMT+0230")
+                TimeZone.getDefault(),
+                getTimeZone("UTC"),
+                getTimeZone("GMT+12"),
+                getTimeZone("GMT-13"),
+                getTimeZone("GMT+0230")
         ).forEach(tz -> withTimeZone(tz, () -> assertThat(parseDateTime(input), is(expectedDateTime))));
     }
 
@@ -95,5 +98,13 @@ public class DateUtilsParseDateTimeTests {
 
         // No time offset declared. Return a LocalTime
         return LocalDateTime.ofInstant(inputInstant, ZoneId.systemDefault());
+    }
+
+    @Test
+    public void jodaToJavaTest() {
+        Date now = new Date(Instant.now().toEpochMilli());
+        LocalDateTime javaDateTime = DateUtils.localDateTimeFromDate(now);
+        org.joda.time.DateTime jodaDateTime = new org.joda.time.DateTime(now);
+        assertEquals(javaDateTime, DateUtils.toJavaTimeLocalDateTime(jodaDateTime));
     }
 }
