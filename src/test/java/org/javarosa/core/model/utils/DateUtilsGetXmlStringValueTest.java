@@ -14,18 +14,17 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils.test;
+package org.javarosa.core.model.utils;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 
-import org.javarosa.core.model.utils.DateFormatter;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class DateUtilsGetXmlStringValueTest {
     /**

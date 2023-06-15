@@ -14,9 +14,8 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils.test;
+package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

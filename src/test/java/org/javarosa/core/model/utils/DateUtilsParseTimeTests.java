@@ -14,12 +14,11 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils.test;
+package org.javarosa.core.model.utils;
 
-import static java.util.TimeZone.getTimeZone;
-import static org.hamcrest.Matchers.is;
-import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -33,10 +32,11 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.Stream;
-import org.javarosa.core.model.utils.DateUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+
+import static java.util.TimeZone.getTimeZone;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 
 @RunWith(Parameterized.class)
 public class DateUtilsParseTimeTests {
@@ -49,12 +49,12 @@ public class DateUtilsParseTimeTests {
     @Parameterized.Parameters(name = "Input: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {"14:00", LocalTime.parse("14:00")},
-            {"14:00Z", OffsetTime.parse("14:00Z")},
-            {"14:00+02", OffsetTime.parse("14:00+02:00")},
-            {"14:00-02", OffsetTime.parse("14:00-02:00")},
-            {"14:00+02:30", OffsetTime.parse("14:00+02:30")},
-            {"14:00-02:30", OffsetTime.parse("14:00-02:30")},
+                {"14:00", LocalTime.parse("14:00")},
+                {"14:00Z", OffsetTime.parse("14:00Z")},
+                {"14:00+02", OffsetTime.parse("14:00+02:00")},
+                {"14:00-02", OffsetTime.parse("14:00-02:00")},
+                {"14:00+02:30", OffsetTime.parse("14:00+02:30")},
+                {"14:00-02:30", OffsetTime.parse("14:00-02:30")},
         });
     }
 
@@ -79,11 +79,11 @@ public class DateUtilsParseTimeTests {
         // to the same time declaration from the input string (ignoring their date part,
         // of course).
         Stream.of(
-            TimeZone.getDefault(),
-            getTimeZone("UTC"),
-            getTimeZone("GMT+12"),
-            getTimeZone("GMT-13"),
-            getTimeZone("GMT+0230")
+                TimeZone.getDefault(),
+                getTimeZone("UTC"),
+                getTimeZone("GMT+12"),
+                getTimeZone("GMT-13"),
+                getTimeZone("GMT+0230")
         ).forEach(tz -> withTimeZone(tz, () -> assertThat(parseTime(input), is(expectedTime))));
     }
 

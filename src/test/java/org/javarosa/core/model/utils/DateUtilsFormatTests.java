@@ -13,11 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.javarosa.core.model.utils.test;
+package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.utils.DateFields;
-import org.javarosa.core.model.utils.DateFormatter;
-import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

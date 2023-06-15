@@ -14,14 +14,8 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils.test;
+package org.javarosa.core.model.utils;
 
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
-import java.util.HashMap;
 
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -33,17 +27,23 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
 import org.junit.Test;
 
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 public class LocalizerTest {
 
 
-    private void testSerialize (Localizer l, String msg) {
+    private void testSerialize(Localizer l, String msg) {
         PrototypeFactory pf = new PrototypeFactory();
         pf.addClass(TableLocaleSource.class);
         ExternalizableTest.testExternalizable(l, pf, "Localizer [" + msg + "]");
     }
 
     @Test
-    public void testEmpty () {
+    public void testEmpty() {
         Localizer l = new Localizer();
 
         String[] locales = l.getAvailableLocales();
@@ -61,7 +61,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testAddLocale () {
+    public void testAddLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -75,19 +75,18 @@ public class LocalizerTest {
         if (!l.hasLocale(TEST_LOCALE)) {
             fail("Localizer reports it does not contain newly added locale");
         }
-        OrderedMap<String,String> localeData = l.getLocaleData(TEST_LOCALE);
+        OrderedMap<String, String> localeData = l.getLocaleData(TEST_LOCALE);
         if (localeData == null || localeData.size() != 0) {
             fail("Newly created locale not empty (or undefined)");
         }
     }
 
     @Test
-    public void testAddLocaleWithData () {
+    public void testAddLocaleWithData() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         TableLocaleSource localeData = new TableLocaleSource();
         localeData.setLocaleMapping("textID", "text");
-
 
 
         if (l.hasLocale(TEST_LOCALE)) {
@@ -100,13 +99,13 @@ public class LocalizerTest {
         if (!l.hasLocale(TEST_LOCALE)) {
             fail("Localizer reports it does not contain newly added locale");
         }
-        if (!localeData.getLocalizedText().get("textID").equals(l.getRawText(TEST_LOCALE,"textID"))) {
+        if (!localeData.getLocalizedText().get("textID").equals(l.getRawText(TEST_LOCALE, "textID"))) {
             fail("Newly stored locale does not match source");
         }
     }
 
     @Test
-    public void testAddExistingLocale () {
+    public void testAddExistingLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -115,21 +114,21 @@ public class LocalizerTest {
         table.setLocaleMapping("textID", "text");
         l.registerLocaleResource(TEST_LOCALE, table);
 
-        OrderedMap<String,String> localeData = l.getLocaleData(TEST_LOCALE);
+        OrderedMap<String, String> localeData = l.getLocaleData(TEST_LOCALE);
 
         boolean result = l.addAvailableLocale(TEST_LOCALE);
         if (result) {
             fail("Localizer overwrote existing locale");
         }
 
-        OrderedMap<String,String> newLocaleData = l.getLocaleData(TEST_LOCALE);
+        OrderedMap<String, String> newLocaleData = l.getLocaleData(TEST_LOCALE);
         if (!localeData.equals(newLocaleData)) {
             fail("Localizer overwrote existing locale");
         }
     }
 
     @Test
-    public void testSetCurrentLocaleExists () {
+    public void testSetCurrentLocaleExists() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -141,7 +140,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testSetCurrentLocaleNotExists () {
+    public void testSetCurrentLocaleNotExists() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -155,7 +154,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testUnsetCurrentLocale () {
+    public void testUnsetCurrentLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -171,7 +170,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testSetDefaultLocaleExists () {
+    public void testSetDefaultLocaleExists() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -183,7 +182,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testSetDefaultLocaleNotExists () {
+    public void testSetDefaultLocaleNotExists() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -197,7 +196,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testUnsetDefaultLocale () {
+    public void testUnsetDefaultLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -215,7 +214,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testSetToDefault () {
+    public void testSetToDefault() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -228,7 +227,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testSetToDefaultNoDefault () {
+    public void testSetToDefaultNoDefault() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -243,7 +242,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testDestroyLocale () {
+    public void testDestroyLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -255,7 +254,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testDestroyLocaleNotExist () {
+    public void testDestroyLocaleNotExist() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -266,7 +265,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testDestroyCurrentLocale () {
+    public void testDestroyCurrentLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -282,7 +281,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testDestroyDefaultLocale () {
+    public void testDestroyDefaultLocale() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -295,7 +294,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testAvailableLocales () {
+    public void testAvailableLocales() {
         Localizer l = new Localizer();
         String[] locales;
 
@@ -337,7 +336,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testGetNextLocale () {
+    public void testGetNextLocale() {
         Localizer l = new Localizer();
         l.addAvailableLocale("test1");
         l.addAvailableLocale("test2");
@@ -368,7 +367,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testGetLocaleMap () {
+    public void testGetLocaleMap() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -379,7 +378,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testGetLocaleMapNotExist () {
+    public void testGetLocaleMapNotExist() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -393,7 +392,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testTextMapping () {
+    public void testTextMapping() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
         l.addAvailableLocale(TEST_LOCALE);
@@ -415,7 +414,7 @@ public class LocalizerTest {
 
 
     @Test
-    public void testTextMappingOverwrite () {
+    public void testTextMappingOverwrite() {
         Localizer l = new Localizer();
         final String TEST_LOCALE = "test";
 
@@ -437,7 +436,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testGetText () {
+    public void testGetText() {
         for (int localeCase = 1; localeCase <= 3; localeCase++) {
             for (int formCase = 1; formCase <= 2; formCase++) {
                 testGetText(localeCase, formCase);
@@ -452,14 +451,23 @@ public class LocalizerTest {
     //private static final int BASE_FORM = 1;
     private static final int CUSTOM_FORM = 2;
 
-    private void testGetText (int localeCase, int formCase) {
+    private void testGetText(int localeCase, int formCase) {
         String ourLocale = null;
         String otherLocale = null;
 
         switch (localeCase) {
-        case DEFAULT_LOCALE: ourLocale = "default"; otherLocale = null; break;
-        case NON_DEFAULT_LOCALE: ourLocale = "other"; otherLocale = "default"; break;
-        case NEUTRAL_LOCALE: ourLocale = "neutral"; otherLocale = null; break;
+            case DEFAULT_LOCALE:
+                ourLocale = "default";
+                otherLocale = null;
+                break;
+            case NON_DEFAULT_LOCALE:
+                ourLocale = "other";
+                otherLocale = "default";
+                break;
+            case NEUTRAL_LOCALE:
+                ourLocale = "neutral";
+                otherLocale = null;
+                break;
         }
 
         String textID = "textID" + (formCase == CUSTOM_FORM ? ";form" : "");
@@ -477,14 +485,14 @@ public class LocalizerTest {
         }
     }
 
-    private void testGetText (int i, int j, int k, String ourLocale, String otherLocale, String textID, int localeCase, int formCase) {
+    private void testGetText(int i, int j, int k, String ourLocale, String otherLocale, String textID, int localeCase, int formCase) {
         Localizer l = buildLocalizer(i, j, k, ourLocale, otherLocale);
         String expected = expectedText(textID, l);
         String text, text2;
 
         text = l.getText(textID, ourLocale);
         if (expected == null ? text != null : !expected.equals(text)) {
-            fail("Did not retrieve expected text from localizer ["+localeCase+","+formCase+","+i+","+j+","+k+"]");
+            fail("Did not retrieve expected text from localizer [" + localeCase + "," + formCase + "," + i + "," + j + "," + k + "]");
         }
 
         try {
@@ -502,7 +510,7 @@ public class LocalizerTest {
         }
     }
 
-    private Localizer buildLocalizer (int i, int j, int k, String ourLocale, String otherLocale) {
+    private Localizer buildLocalizer(int i, int j, int k, String ourLocale, String otherLocale) {
         Localizer l = new Localizer(i / 2 == 0, i % 2 == 0);
 
         TableLocaleSource firstLocale = new TableLocaleSource();
@@ -536,7 +544,7 @@ public class LocalizerTest {
         return l;
     }
 
-    private String expectedText (String textID, Localizer l) {
+    private String expectedText(String textID, Localizer l) {
         boolean[] searchOrder = new boolean[4];
         boolean fallbackLocale = l.getFallbackLocale();
         boolean fallbackForm = l.getFallbackForm();
@@ -555,10 +563,18 @@ public class LocalizerTest {
                 continue;
 
             switch (i + 1) {
-            case 1: text = l.getRawText(l.getLocale(), textID); break;
-            case 2: text = l.getRawText(l.getLocale(), baseTextID); break;
-            case 3: text = l.getRawText(l.getDefaultLocale(), textID); break;
-            case 4: text = l.getRawText(l.getDefaultLocale(), baseTextID); break;
+                case 1:
+                    text = l.getRawText(l.getLocale(), textID);
+                    break;
+                case 2:
+                    text = l.getRawText(l.getLocale(), baseTextID);
+                    break;
+                case 3:
+                    text = l.getRawText(l.getDefaultLocale(), textID);
+                    break;
+                case 4:
+                    text = l.getRawText(l.getDefaultLocale(), baseTextID);
+                    break;
             }
         }
 
@@ -566,7 +582,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testGetTextNoCurrentLocale () {
+    public void testGetTextNoCurrentLocale() {
         Localizer l = new Localizer();
         TableLocaleSource table = new TableLocaleSource();
         l.addAvailableLocale("test");
@@ -589,7 +605,7 @@ public class LocalizerTest {
         public String locale;
         public Localizer l;
 
-        public void localeChanged (String locale, Localizer l) {
+        public void localeChanged(String locale, Localizer l) {
             flag = true;
             this.locale = locale;
             this.l = l;
@@ -597,7 +613,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testLocalizationObservers () {
+    public void testLocalizationObservers() {
         Localizer l = new Localizer();
         l.addAvailableLocale("test1");
         l.addAvailableLocale("test2");
@@ -633,7 +649,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testLocalizationObserverUpdateOnRegister () {
+    public void testLocalizationObserverUpdateOnRegister() {
         Localizer l = new Localizer();
         l.addAvailableLocale("test1");
         l.setLocale("test1");
@@ -647,7 +663,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testNullArgs () {
+    public void testNullArgs() {
         Localizer l = new Localizer();
         l.addAvailableLocale("test");
 
@@ -730,7 +746,7 @@ public class LocalizerTest {
         }
 
         try {
-            l.getText("textID", (String)null);
+            l.getText("textID", (String) null);
 
             fail("getText: Did not get expected exception");
         } catch (UnregisteredLocaleException nsee) {
@@ -747,7 +763,7 @@ public class LocalizerTest {
     }
 
     @Test
-    public void testSerialization () {
+    public void testSerialization() {
         Localizer l = new Localizer(true, true);
         TableLocaleSource firstLocale = new TableLocaleSource();
         TableLocaleSource secondLocale = new TableLocaleSource();
@@ -809,39 +825,47 @@ public class LocalizerTest {
 
         final String D = "${1}${0}";
 
-        final String[] res = new String[] {"One", "Two"};
+        final String[] res = new String[]{"One", "Two"};
 
 
-        assertEquals(Localizer.processArguments("${0}", new String[] {F}), F);
-        assertEquals(Localizer.processArguments("${0},${1}", new String[] {F,S}), F + "," + S);
-        assertEquals(Localizer.processArguments("testing ${0}", new String[] {F}), "testing " + F);
+        assertEquals(Localizer.processArguments("${0}", new String[]{F}), F);
+        assertEquals(Localizer.processArguments("${0},${1}", new String[]{F, S}), F + "," + S);
+        assertEquals(Localizer.processArguments("testing ${0}", new String[]{F}), "testing " + F);
 
-        assertEquals(Localizer.processArguments("1${arbitrary}2", new String[] {F}), "1" + F + "2");
+        assertEquals(Localizer.processArguments("1${arbitrary}2", new String[]{F}), "1" + F + "2");
 
         final String[] holder = new String[1];
 
-        runAsync(new Runnable() { public void run() {
-                holder[0] = Localizer.processArguments("${0}", new String[] {C});
-            }});
+        runAsync(new Runnable() {
+            public void run() {
+                holder[0] = Localizer.processArguments("${0}", new String[]{C});
+            }
+        });
 
         assertEquals(holder[0], C);
 
 
-        runAsync(new Runnable() { public void run() {
-            holder[0] = Localizer.processArguments("${0}", new String[] {D});
-        }});
+        runAsync(new Runnable() {
+            public void run() {
+                holder[0] = Localizer.processArguments("${0}", new String[]{D});
+            }
+        });
 
         assertEquals(holder[0], D);
 
-        runAsync(new Runnable() { public void run() {
-            holder[0] = Localizer.processArguments(holder[0], res);
-        }});
+        runAsync(new Runnable() {
+            public void run() {
+                holder[0] = Localizer.processArguments(holder[0], res);
+            }
+        });
 
         assertEquals(holder[0], res[1] + res[0]);
 
-        runAsync(new Runnable() { public void run() {
-            holder[0] = Localizer.processArguments("$ {0} ${1}", res);
-        }});
+        runAsync(new Runnable() {
+            public void run() {
+                holder[0] = Localizer.processArguments("$ {0} ${1}", res);
+            }
+        });
 
         assertEquals(holder[0], "$ {0} " + res[1]);
 
@@ -855,7 +879,7 @@ public class LocalizerTest {
         } catch (InterruptedException e) {
 
         }
-        if(t.isAlive()) {
+        if (t.isAlive()) {
             throw new RuntimeException("Failed to return from recursive argument processing");
         }
     }
@@ -864,22 +888,22 @@ public class LocalizerTest {
     public void testHashSub() {
         final String F = "first";
         final String S = "second";
-        HashMap<String,String> h = new HashMap<String,String>();
+        HashMap<String, String> h = new HashMap<String, String>();
         h.put("fir", F);
         h.put("also first", F);
         h.put("sec", S);
 
-        assertEquals(Localizer.processArguments("${fir}",h), F);
-        assertEquals(Localizer.processArguments("${fir},${sec}",h), F+","+S);
-        assertEquals(Localizer.processArguments("${sec},${fir}",h), S+","+F);
-        assertEquals(Localizer.processArguments("${empty}",h), "${empty}");
-        assertEquals(Localizer.processArguments("${fir},${fir},${also first}",h), F+","+F+","+F);
+        assertEquals(Localizer.processArguments("${fir}", h), F);
+        assertEquals(Localizer.processArguments("${fir},${sec}", h), F + "," + S);
+        assertEquals(Localizer.processArguments("${sec},${fir}", h), S + "," + F);
+        assertEquals(Localizer.processArguments("${empty}", h), "${empty}");
+        assertEquals(Localizer.processArguments("${fir},${fir},${also first}", h), F + "," + F + "," + F);
     }
 
 
     @Test
     public void testFallbacks() {
-        Localizer localizer =  new Localizer(true,true);
+        Localizer localizer = new Localizer(true, true);
 
         localizer.addAvailableLocale("one");
         localizer.addAvailableLocale("two");

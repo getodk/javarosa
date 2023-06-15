@@ -14,9 +14,8 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils.test;
+package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.utils.DateFormatter;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
