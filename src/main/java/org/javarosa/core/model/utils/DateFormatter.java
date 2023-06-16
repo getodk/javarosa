@@ -3,6 +3,7 @@ package org.javarosa.core.model.utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -31,20 +32,23 @@ public class DateFormatter {
 
     @NotNull
     public static String format(Date d, String format) {
-        DateTimeFormatter formatter =
-                format != null
-                        ? formatTheFormat(format)
-                        : DateTimeFormatter.ofPattern(("yyyy-MM-dd'T'HH:mm:ss.SSS"));
-        return format(d, formatter);
+        return format(d, formatterFrom(format));
+    }
+
+    @NotNull
+    public static DateTimeFormatter formatterFrom(String pattern) {
+        return pattern != null
+                ? DateTimeFormatter.ofPattern(xpathPatternAsJavaTimePattern(pattern))
+                : DateTimeFormatter.ofPattern(("yyyy-MM-dd'T'HH:mm:ss.SSS"));
     }
 
     @NotNull
     public static String format(Date d, DateTimeFormatter formatter) {
-        LocalDateTime localDate = DateUtils.localDateTimeFromDate(d);
+        LocalDateTime localDate = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         return formatter.format(localDate);
     }
 
-    public static DateTimeFormatter formatTheFormat(String format) {
+    public static String xpathPatternAsJavaTimePattern(String format) {
         String replaced = format
                 .replace("%", "")
                 .replace("T", "'T'") //some formats add a T to delineate date and time
@@ -70,7 +74,6 @@ public class DateFormatter {
                 .replace("a", "EEE")
                 .replace("b", "MMM");
 
-        //see DateFormatterTest.canFormatXPathFormFormat()
         char lastChar = replaced.charAt(replaced.length() - 1);
         try {
             int count = Integer.parseInt(String.valueOf(lastChar));
@@ -82,21 +85,6 @@ public class DateFormatter {
             }
         } catch (NumberFormatException nfe) {/* ignore */}
 
-        return DateTimeFormatter.ofPattern(replaced);
-    }
-
-    /**
-     * Converts an integer to a string, ensuring that the string
-     * contains a certain number of digits
-     *
-     * @param n   The integer to be converted
-     * @param pad The length of the string to be returned
-     * @return A string representing n, which has pad - #digits(n)
-     * 0's preceding the number.
-     */
-    public static String intPad(int n, int pad) {
-        String s = String.valueOf(n);
-        while (s.length() < pad) s = String.format("0%s", s);
-        return s;
+        return replaced;
     }
 }

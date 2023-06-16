@@ -18,7 +18,6 @@ package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -52,14 +51,6 @@ public class DateUtils {
         return Date.from(someDateTime.atZone(zoneId).toInstant());
     }
 
-    public static LocalDateTime localDateTimeFromDate(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-
-    public static Date now() {
-        return Date.from(Instant.now());
-    }
-
     public static final long DAY_IN_MS = 86400000L;
 
     public DateUtils() {
@@ -74,9 +65,7 @@ public class DateUtils {
     }
 
     public static int secTicksAsNanoSeconds(int millis) {
-        int nanoseconds = Math.toIntExact(TimeUnit.NANOSECONDS.convert(millis, TimeUnit.MILLISECONDS));
-        System.out.println(nanoseconds);
-        return nanoseconds;
+        return Math.toIntExact(TimeUnit.NANOSECONDS.convert(millis, TimeUnit.MILLISECONDS));
     }
 
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */

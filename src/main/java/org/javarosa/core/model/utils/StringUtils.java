@@ -22,4 +22,19 @@ public class StringUtils {
         }
         return stringStream.collect(Collectors.toList());
     }
+
+    /**
+     * Converts an integer to a string, ensuring that the string
+     * contains a certain number of digits
+     *
+     * @param n   The integer to be converted
+     * @param pad The length of the string to be returned
+     * @return A string representing n, which has pad - #digits(n)
+     * 0's preceding the number.
+     */
+    public static String intPad(int n, int pad) {
+        String s = String.valueOf(n);
+        while (s.length() < pad) s = String.format("0%s", s);
+        return s;
+    }
 }

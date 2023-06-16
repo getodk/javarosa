@@ -33,8 +33,8 @@ public enum DateFormat {
             if (offset == 0) return "";
             String sign = (offset > 0) ? "-" : "+";
             return sign
-                    + DateFormatter.intPad(Math.abs(offset / 60), 2) + ":"
-                    + DateFormatter.intPad(Math.abs(offset % 60), 2);
+                    + StringUtils.intPad(Math.abs(offset / 60), 2) + ":"
+                    + StringUtils.intPad(Math.abs(offset % 60), 2);
         }
     },
     HUMAN_READABLE_SHORT(2, " ", "%d/%m/YY", "HH:mm") {
