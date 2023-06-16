@@ -2,8 +2,8 @@ package org.javarosa.core.model.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -44,8 +44,8 @@ public class DateFormatter {
 
     @NotNull
     public static String format(Date d, DateTimeFormatter formatter) {
-        LocalDateTime localDate = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        return formatter.format(localDate);
+        ZonedDateTime zonedDateTime = d.toInstant().atZone(ZoneId.systemDefault());
+        return formatter.format(zonedDateTime);
     }
 
     public static String xpathPatternAsJavaTimePattern(String format) {
