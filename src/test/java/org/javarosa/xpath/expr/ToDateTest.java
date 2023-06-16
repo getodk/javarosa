@@ -32,7 +32,7 @@ public class ToDateTest {
         ZoneOffset offsetFromLocal = ZoneOffset.ofHours(hoursToOffset);
         ZoneId zoneIdFromLocal = ZoneId.ofOffset("GMT", offsetFromLocal);
         ZoneId resetZoneId = ZoneId.ofOffset("GMT", ZoneOffset.ofHours(0));
-        return ZonedDateTime.of(localDateTime.toLocalDate(), localDateTime.toLocalTime(), zoneIdFromLocal).withZoneSameInstant(resetZoneId);
+        return ZonedDateTime.of(localDateTime, zoneIdFromLocal).withZoneSameInstant(resetZoneId);
     }
 
     private static int secTicksAsNanoSeconds(int millis) {

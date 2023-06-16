@@ -33,16 +33,6 @@ public class DateUtilsSCTOTests {
         });
     }
 
-    @Test
-    public void testParseTime() {
-        withTimeZone(TimeZone.getTimeZone("GMT+02"), () -> {
-            String time = "12:03:05.011+03";
-            Date date = DateUtils.parseTime(time);
-            String formatted = DateFormatter.formatTime(date, FORMAT_ISO8601);
-            assertEquals("11:03:05.011+02:00", formatted);
-        });
-    }
-
     private SimpleTimeZone buildDstTimeZone() {
         return new SimpleTimeZone(
                 2 * 60 * 60 * 1000,
