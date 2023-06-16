@@ -39,8 +39,7 @@ public class DateUtils {
     }
 
     public static Date dateFromLocalDateTime(LocalDateTime someDateTime) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        return dateFromLocalDateTime(someDateTime, zoneId);
+        return dateFromLocalDateTime(someDateTime, ZoneId.systemDefault());
     }
 
     @NotNull

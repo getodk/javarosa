@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.POSITIVE_INFINITY;
-import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDate;
 import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDateTime;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toDate;
@@ -65,7 +64,7 @@ public class ToDateTest {
     @Test
     public void convertsISO8601DatesWithoutPreservingTime() {
         assertEquals(
-                dateFromLocalDate(LocalDate.of(2018, 1, 1)),
+                dateFromLocalDateTime(LocalDateTime.of(LocalDate.of(2018, 1, 1), LocalTime.MIDNIGHT)),
                 toDate("2018-01-01", false)
         );
     }
@@ -118,7 +117,7 @@ public class ToDateTest {
 
     @Test
     public void datesGoUnchanged() {
-        Date date = dateFromLocalDate(LocalDate.of(2018, 1, 1));
+        Date date = dateFromLocalDateTime(LocalDateTime.of(LocalDate.of(2018, 1, 1), LocalTime.MIDNIGHT));
         assertEquals(date, toDate(date, false));
         assertEquals(date, toDate(date, true));
     }
