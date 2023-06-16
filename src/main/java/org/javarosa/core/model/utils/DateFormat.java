@@ -25,7 +25,7 @@ public enum DateFormat {
         }
 
         public String formatTime(Date date) {
-            return DateFormatter.format(date, DateTimeFormatter.ofPattern((timePattern + offset(date))));
+            return DateFormatter.format(date, DateTimeFormatter.ofPattern((timePattern)));
         }
 
         private String offset(Date date) {

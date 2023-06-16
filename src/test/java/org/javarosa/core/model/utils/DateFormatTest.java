@@ -4,9 +4,10 @@ import org.junit.Test;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+
+import static java.time.ZoneId.of;
 import static org.javarosa.core.model.utils.DateFormat.HUMAN_READABLE_SHORT;
 import static org.javarosa.core.model.utils.DateFormat.ISO8601;
 import static org.javarosa.core.model.utils.DateFormat.TIMESTAMP_HTTP;
@@ -19,8 +20,8 @@ public class DateFormatTest {
     @Before
     public void setUp(){
         Instant instant = Instant.parse("2023-06-11T11:22:33.123Z");
-        Clock clock = Clock.fixed(instant, ZoneId.of("Europe/London"));
-        ZonedDateTime someDateTime = Instant.now(clock).atZone(ZoneId.of("UTC"));
+        Clock clock = Clock.fixed(instant, of("Europe/London"));
+        ZonedDateTime someDateTime = Instant.now(clock).atZone(of("UTC"));
         localDateTime = someDateTime.toLocalDateTime();
     }
 
@@ -51,7 +52,7 @@ public class DateFormatTest {
     @Test
     public void formatsTimeAsISO8601() {
         Date dateToTest = dateFromLocalDateTime(localDateTime);
-        assertEquals("11:22:33.123+01:00", ISO8601.formatTime(dateToTest));
+        assertEquals("11:22:33.123", ISO8601.formatTime(dateToTest));
     }
 
     @Test
@@ -68,12 +69,13 @@ public class DateFormatTest {
 
     @Test
     public void formatsTimeAsTimeStampHTTP() {
-        Date dateToTest = dateFromLocalDateTime(localDateTime);
+        Date dateToTest = dateFromLocalDateTime(localDateTime, of("UTC"));
+        assertEquals("11:22:33 UTC", TIMESTAMP_HTTP.formatTime(dateToTest));
+    }
+
+    @Test
+    public void formatsTimeAsTimeStampHTTPWhenInAnotherTimeZone() {
+        Date dateToTest = dateFromLocalDateTime(localDateTime, of("Europe/London"));
         assertEquals("10:22:33 UTC", TIMESTAMP_HTTP.formatTime(dateToTest));
     }
-     /*
-org.javarosa.core.model.utils.DateFormatterTest > formatsDateAsTimeStampHTTP FAILED
-    org.junit.ComparisonFailure at DateFormatterTest.java:47
-     */
-
 }
