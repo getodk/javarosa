@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,12 +34,8 @@ public class DateUtils {
     @NotNull
     public static Date dateFromLocalDate(LocalDate someDate) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return dateFromLocalDate(someDate, zoneId);
-    }
-
-    @NotNull
-    private static Date dateFromLocalDate(LocalDate someDate, ZoneId zoneId) {
-        return Date.from(someDate.atStartOfDay().atZone(zoneId).toInstant());
+        LocalTime noon = LocalTime.NOON;
+        return dateFromLocalDateTime(LocalDateTime.of(someDate, noon), zoneId);
     }
 
     public static Date dateFromLocalDateTime(LocalDateTime someDateTime) {
@@ -47,7 +44,7 @@ public class DateUtils {
     }
 
     @NotNull
-    private static Date dateFromLocalDateTime(LocalDateTime someDateTime, ZoneId zoneId) {
+    public static Date dateFromLocalDateTime(LocalDateTime someDateTime, ZoneId zoneId) {
         return Date.from(someDateTime.atZone(zoneId).toInstant());
     }
 

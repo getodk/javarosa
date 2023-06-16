@@ -1,10 +1,14 @@
 package org.javarosa.core.model.utils;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import java.time.LocalDate;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Locale;
 
@@ -13,38 +17,48 @@ import static java.time.Month.JANUARY;
 import static java.time.format.TextStyle.SHORT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDate;
+import static org.javarosa.core.model.utils.DateFormatter.FORMAT_HUMAN_READABLE_SHORT;
+import static org.javarosa.core.model.utils.DateFormatter.FORMAT_ISO8601;
+import static org.javarosa.core.model.utils.DateFormatter.FORMAT_TIMESTAMP_HTTP;
+import static org.javarosa.core.model.utils.DateFormatter.FORMAT_TIMESTAMP_SUFFIX;
 import static org.javarosa.core.model.utils.DateUtils.dateFromLocalDateTime;
 import static org.junit.Assert.assertEquals;
 
 public class DateFormatterTest {
+
+    private LocalDateTime localDateTime;
+
+    @Before
+    public void setUp(){
+        Instant instant = Instant.parse("2023-06-11T11:22:33.123Z");
+        Clock clock = Clock.fixed(instant, ZoneId.of("Europe/London"));
+        ZonedDateTime someDateTime = Instant.now(clock).atZone(ZoneId.of("UTC"));
+        localDateTime = someDateTime.toLocalDateTime();
+    }
+
     @Test
     public void formatsDateAsISO8601(){
-        LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
-        Date dateToTest = dateFromLocalDate(someLocalDate);
-        String formattedDate = DateFormatter.formatDate(dateToTest, DateFormatter.FORMAT_ISO8601);
+        Date dateToTest = dateFromLocalDateTime(localDateTime);
+        String formattedDate = DateFormatter.formatDate(dateToTest, FORMAT_ISO8601);
         assertEquals("2023-06-11", formattedDate);
     }
 
     @Test public void formatsDateAsHumanShort(){
-        LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
-        Date dateToTest = dateFromLocalDate(someLocalDate);
-        String formattedDate = DateFormatter.formatDate(dateToTest, DateFormatter.FORMAT_HUMAN_READABLE_SHORT);
+        Date dateToTest = dateFromLocalDateTime(localDateTime);
+        String formattedDate = DateFormatter.formatDate(dateToTest, FORMAT_HUMAN_READABLE_SHORT);
         assertEquals("11/06/23", formattedDate);
     }
 
     @Test public void formatsDateAsTimeStampSuffix(){
-        LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
-        Date dateToTest = dateFromLocalDate(someLocalDate);
-        String formattedDate = DateFormatter.formatDate(dateToTest, DateFormatter.FORMAT_TIMESTAMP_SUFFIX);
+        Date dateToTest = dateFromLocalDateTime(localDateTime);
+        String formattedDate = DateFormatter.formatDate(dateToTest, FORMAT_TIMESTAMP_SUFFIX);
         assertEquals("20230611", formattedDate);
     }
 
     @Test public void formatsDateAsTimeStampHTTP(){
-        LocalDate someLocalDate = LocalDate.of(2023, 6, 11);
-        Date dateToTest = dateFromLocalDate(someLocalDate);
-        String formattedDate = DateFormatter.formatDate(dateToTest, DateFormatter.FORMAT_TIMESTAMP_HTTP);
-        assertEquals("Sat, 10 Jun 2023", formattedDate);
+        Date dateToTest = dateFromLocalDateTime(localDateTime);
+        String formattedDate = DateFormatter.formatDate(dateToTest, FORMAT_TIMESTAMP_HTTP);
+        assertEquals("Sun, 11 Jun 2023", formattedDate);
     }
 
     @Test public void canFormatFreestyleMonth(){
