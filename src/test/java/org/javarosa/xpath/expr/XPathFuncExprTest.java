@@ -24,6 +24,10 @@ public class XPathFuncExprTest {
         assertEquals("EEE, dd MMM Y HH:m:ss", xpathPatternAsJavaTimePattern("%a, %d %b %Y %H:%M:%S"));
         assertEquals("dd/MM/YY HH:m", xpathPatternAsJavaTimePattern("%d/%m/YY %H:%M"));
         assertEquals("YMMddHHmss", xpathPatternAsJavaTimePattern("%Y%m%d%H%M%S"));
+
+        //from a test case
+        assertEquals("w", xpathPatternAsJavaTimePattern("%W"));
+        assertEquals("W", xpathPatternAsJavaTimePattern("%w"));
     }
 
     @Test

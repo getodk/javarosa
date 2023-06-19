@@ -48,8 +48,9 @@ public class DateFormatter {
         return formatter.format(zonedDateTime);
     }
 
-    public static String xpathPatternAsJavaTimePattern(String format) {
-        String replaced = format
+    // TODO? replace with version of DateFormatSymbols
+    public static String xpathPatternAsJavaTimePattern(String pattern) {
+        String replaced = pattern
                 .replace("%", "")
                 .replace("T", "'T'") //some formats add a T to delineate date and time
 
