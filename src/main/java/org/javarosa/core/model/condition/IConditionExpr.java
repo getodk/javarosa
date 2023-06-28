@@ -23,6 +23,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.xpath.expr.XPathExpression;
 
 /**
  * A condition expression is an expression which is evaluated against the current
@@ -101,4 +102,6 @@ public interface IConditionExpr extends Externalizable {
      * @throws UnpivotableExpressionException
      */
    List<Object> pivot(DataInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException;
+
+   XPathExpression getExpr();
 }
