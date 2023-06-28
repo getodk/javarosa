@@ -16,13 +16,6 @@
 
 package org.javarosa.xpath.expr;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.DataInstance;
@@ -32,6 +25,14 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.XPathUnsupportedException;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class XPathFilterExpr extends XPathExpression {
     public XPathExpression x;
@@ -104,5 +105,10 @@ public class XPathFilterExpr extends XPathExpression {
     @Override
     public boolean isIdempotent() {
         return x.isIdempotent() && Arrays.stream(predicates).allMatch(XPathExpression::isIdempotent);
+    }
+
+    @Override
+    public boolean containsFunc(@NotNull String name) {
+        return x.containsFunc(name) || Arrays.stream(predicates).anyMatch(expression -> expression.containsFunc(name));
     }
 }

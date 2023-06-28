@@ -23,6 +23,7 @@ import java.util.List;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.DataInstance;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 import org.javarosa.core.util.externalizable.Externalizable;
 
@@ -252,4 +253,6 @@ public abstract class XPathExpression implements Externalizable, Serializable {
      * Returns true if this expression is idempotent with respect to the current state of the form.
      */
     public abstract boolean isIdempotent();
+
+    public abstract boolean containsFunc(@NotNull String name);
 }

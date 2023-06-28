@@ -24,6 +24,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class XPathUnaryOpExpr extends XPathOpExpr {
     public XPathExpression a;
@@ -46,6 +47,11 @@ public abstract class XPathUnaryOpExpr extends XPathOpExpr {
     @Override
     public boolean isIdempotent() {
         return a.isIdempotent();
+    }
+
+    @Override
+    public boolean containsFunc(@NotNull String name) {
+        return a.containsFunc(name);
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

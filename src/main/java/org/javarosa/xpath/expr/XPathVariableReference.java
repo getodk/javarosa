@@ -25,6 +25,7 @@ import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.jetbrains.annotations.NotNull;
 
 public class XPathVariableReference extends XPathExpression {
     public XPathQName id;
@@ -42,6 +43,11 @@ public class XPathVariableReference extends XPathExpression {
     @Override
     public boolean isIdempotent() {
         return true;
+    }
+
+    @Override
+    public boolean containsFunc(@NotNull String name) {
+        return false;
     }
 
     public String toString () {
