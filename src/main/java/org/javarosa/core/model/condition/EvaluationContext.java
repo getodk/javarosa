@@ -67,8 +67,8 @@ public class EvaluationContext {
     private DataInstance instance;
     private int[] predicateEvaluationProgress;
 
-    private static final List<PredicateFilter> DEFAULT_PREDICATE_FILTER_CHAIN = singletonList(new XPathEvalPredicateFilter());
-    private List<PredicateFilter> predicateFilterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
+    private static final List<FilterStrategy> DEFAULT_FILTER_CHAIN = singletonList(new RawFilterStrategy());
+    private List<FilterStrategy> filterStrategyChain = DEFAULT_FILTER_CHAIN;
 
     /**
      * Copy Constructor
@@ -95,14 +95,14 @@ public class EvaluationContext {
         //invalidate this
         currentContextPosition = base.currentContextPosition;
 
-        predicateFilterChain = base.predicateFilterChain;
+        filterStrategyChain = base.filterStrategyChain;
     }
 
-    public EvaluationContext(EvaluationContext base, List<PredicateFilter> aroundPredicateFilterChain) {
+    public EvaluationContext(EvaluationContext base, List<FilterStrategy> beforeFilterStrategyChain) {
         this(base);
-        this.predicateFilterChain = Stream.concat(
-            aroundPredicateFilterChain.stream(),
-            predicateFilterChain.stream()
+        this.filterStrategyChain = Stream.concat(
+            beforeFilterStrategyChain.stream(),
+            filterStrategyChain.stream()
         ).collect(Collectors.toList());
     }
 
@@ -333,11 +333,11 @@ public class EvaluationContext {
             nodeSetRef.add(name, -1);
 
             for (int i = 0; i < predicates.size(); i++) {
-                List<PredicateFilter> filterChain;
+                List<FilterStrategy> filterChain;
                 if (i == 0 && !isNested(nodeSetRef)) {
-                    filterChain = predicateFilterChain;
+                    filterChain = filterStrategyChain;
                 } else {
-                    filterChain = DEFAULT_PREDICATE_FILTER_CHAIN;
+                    filterChain = DEFAULT_FILTER_CHAIN;
                 }
 
                 List<TreeReference> passed = filterWithPredicate(
@@ -373,12 +373,12 @@ public class EvaluationContext {
     }
 
     @NotNull
-    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, List<PredicateFilter> filterChain) {
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, List<FilterStrategy> filterChain) {
         return filterWithPredicate(sourceInstance, treeReference, predicate, children, 0, filterChain);
     }
 
     @NotNull
-    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i, List<PredicateFilter> filterChain) {
+    private List<TreeReference> filterWithPredicate(DataInstance sourceInstance, TreeReference treeReference, XPathExpression predicate, List<TreeReference> children, int i, List<FilterStrategy> filterChain) {
         return filterChain.get(i).filter(sourceInstance, treeReference, predicate, children, this, () -> {
             return filterWithPredicate(sourceInstance, treeReference, predicate, children, i + 1, filterChain);
         });

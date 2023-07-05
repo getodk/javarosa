@@ -1,7 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.PredicateFilter;
+import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathCmpExpr;
@@ -15,10 +15,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Caches down stream evaluations (in the {@link PredicateFilter} chain) for supported expressions - currently just
+ * Caches down stream evaluations (in the {@link FilterStrategy} chain) for supported expressions - currently just
  * {@link XPathCmpExpr} and {@link XPathEqExpr}. Repeated evaluations are fetched in O(1) time.
  */
-public class CompareChildToAbsoluteExpressionFilter implements PredicateFilter {
+public class ComparisonExpressionCacheFilterStrategy implements FilterStrategy {
 
     private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 
