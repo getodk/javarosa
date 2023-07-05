@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Supplier;
 
-public interface PredicateFilter {
+public interface FilterStrategy {
 
     @NotNull
     List<TreeReference> filter(@NotNull DataInstance sourceInstance,

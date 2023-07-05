@@ -1,7 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.PredicateFilter;
+import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.measure.Measure;
@@ -22,7 +22,7 @@ import static java.util.Collections.emptyList;
  * {@link XPathEqExpr} where one side is relative to the instance child being filtered. Evaluations are fetched in
  * O(1) time with O(n) expression evaluations only being required the first time a relative side is evaluated.
  */
-public class IndexPredicateFilter implements PredicateFilter {
+public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
 
     private final InMemTreeReferenceIndex index = new InMemTreeReferenceIndex();
 

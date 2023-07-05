@@ -1,7 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.PredicateFilter;
+import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Caches down stream evaluations (in the {@link PredicateFilter} chain) for "idempotent" (with respect to current form
+ * Caches down stream evaluations (in the {@link FilterStrategy} chain) for "idempotent" (with respect to current form
  * state) predicates. Can only be used for static instances or in cases where form state won't change - will cause
  * clashes otherwise. Repeated evaluations are fetched in O(1) time.
  */
-public class IdempotentPredicateCache implements PredicateFilter {
+public class IdempotentExpressionCacheFilterStrategy implements FilterStrategy {
 
     private final Map<String, List<TreeReference>> cachedEvaluations = new HashMap<>();
 

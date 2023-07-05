@@ -18,7 +18,7 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.PredicateFilter;
+import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -101,9 +101,9 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
-    private final PredicateFilter cachingPredicateFilter = new CompareChildToAbsoluteExpressionFilter();
-    private final PredicateFilter indexPredicateFilter = new IndexPredicateFilter();
-    private final Queue<PredicateFilter> customPredicateFilters = new LinkedList<>();
+    private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
+    private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
+    private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -526,9 +526,9 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            List<PredicateFilter> filters = Stream.concat(
-                customPredicateFilters.stream(),
-                Stream.of(indexPredicateFilter, cachingPredicateFilter, new IdempotentPredicateCache())
+            List<FilterStrategy> filters = Stream.concat(
+                customFilterStrategies.stream(),
+                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy, new IdempotentExpressionCacheFilterStrategy())
             ).collect(Collectors.toList());
 
             context = new EvaluationContext(evalContext, filters);
@@ -751,7 +751,7 @@ public class TriggerableDag {
         this.predicateCaching = false;
     }
 
-    public void addPredicateFilter(PredicateFilter predicateFilter) {
-        customPredicateFilters.add(predicateFilter);
+    public void addFilterStrategy(FilterStrategy filterStrategy) {
+        customFilterStrategies.add(filterStrategy);
     }
 }
