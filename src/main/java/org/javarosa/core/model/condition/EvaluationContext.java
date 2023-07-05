@@ -334,7 +334,7 @@ public class EvaluationContext {
 
             for (int i = 0; i < predicates.size(); i++) {
                 List<FilterStrategy> filterChain;
-                if (i == 0 && !isNested(nodeSetRef)) {
+                if (i == 0 && hasNoPredicates(nodeSetRef)) {
                     filterChain = filterStrategyChain;
                 } else {
                     filterChain = DEFAULT_FILTER_CHAIN;
@@ -362,14 +362,14 @@ public class EvaluationContext {
         }
     }
 
-    private static boolean isNested(TreeReference nodeSet) {
+    private static boolean hasNoPredicates(TreeReference nodeSet) {
         for (int i = 1; i < nodeSet.size(); i++) {
             if (nodeSet.getMultiplicity(i) > -1) {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     @NotNull
