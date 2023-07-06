@@ -64,6 +64,7 @@ import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStringLiteral;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.jetbrains.annotations.NotNull;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -178,6 +179,7 @@ public class XFormParser implements IXFormParserFunctions {
     private final List<BindAttributeProcessor> bindAttributeProcessors = new ArrayList<>();
     private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
     private final List<ModelAttributeProcessor> modelAttributeProcessors = new ArrayList<>();
+    private final List<QuestionProcessor> questionProcessors = new ArrayList<>();
 
     /**
      * The string IDs of all instances that are referenced in a instance() function call in the primary instance
@@ -428,6 +430,10 @@ public class XFormParser implements IXFormParserFunctions {
 
         if (processor instanceof ModelAttributeProcessor) {
             addModelAttributeProcessor((ModelAttributeProcessor) processor);
+        }
+
+        if (processor instanceof QuestionProcessor) {
+            questionProcessors.add((QuestionProcessor) processor);
         }
     }
 
@@ -1172,6 +1178,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         processAdditionalAttributes(question, e, usedAtts, passedThroughAtts);
 
+        questionProcessors.stream().forEach(questionProcessor -> questionProcessor.processQuestion(question));
         return question;
     }
 
@@ -2447,6 +2454,10 @@ public class XFormParser implements IXFormParserFunctions {
         Set<Pair<String, String>> getModelAttributes();
 
         void processModelAttribute(String name, String value) throws ParseException;
+    }
+
+    public interface QuestionProcessor extends Processor {
+        void processQuestion(@NotNull QuestionDef question);
     }
 
     public static class ParseException extends Exception {
