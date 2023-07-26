@@ -22,9 +22,9 @@ import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.Actions;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.condition.IFunctionHandler;
-import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -75,10 +75,14 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 
@@ -156,6 +160,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private List<IConditionExpr> outputFragments;
 
     private TriggerableDag dagImpl;
+
+    private boolean predicateCaching = true;
+    private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
+    private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
 
     private EvaluationContext exprEvalContext;
 
@@ -750,7 +758,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public EvaluationContext getEvaluationContext() {
-        return this.exprEvalContext;
+        EvaluationContext context;
+        if (predicateCaching) {
+            List<FilterStrategy> filters = Stream.concat(
+                customFilterStrategies.stream(),
+                Stream.of(comparisonExpressionCacheFilterStrategy)
+            ).collect(Collectors.toList());
+
+            context = new EvaluationContext(this.exprEvalContext, filters);
+        } else {
+            context = this.exprEvalContext;
+        }
+
+        return context;
     }
 
     private EvaluationContext initEvalContext() {
@@ -1706,10 +1726,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public void disablePredicateCaching() {
+        predicateCaching = false;
         dagImpl.disablePredicateCaching();
     }
 
     public void addFilterStrategy(FilterStrategy filterStrategy) {
-        dagImpl.addFilterStrategy(filterStrategy);
+        customFilterStrategies.add(filterStrategy);
     }
 }

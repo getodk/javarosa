@@ -47,11 +47,9 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 
 public class TriggerableDag {
@@ -101,9 +99,7 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
-    private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
     private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
-    private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -526,12 +522,10 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            List<FilterStrategy> filters = Stream.concat(
-                customFilterStrategies.stream(),
-                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy, new IdempotentExpressionCacheFilterStrategy())
-            ).collect(Collectors.toList());
-
-            context = new EvaluationContext(evalContext, filters);
+            context = new EvaluationContext(evalContext, asList(
+                new IdempotentExpressionCacheFilterStrategy(),
+                equalityExpressionIndexFilterStrategy
+            ));
         } else {
             context = evalContext;
         }
@@ -748,10 +742,6 @@ public class TriggerableDag {
     // endregion
 
     public void disablePredicateCaching() {
-        this.predicateCaching = false;
-    }
-
-    public void addFilterStrategy(FilterStrategy filterStrategy) {
-        customFilterStrategies.add(filterStrategy);
+        predicateCaching = false;
     }
 }
