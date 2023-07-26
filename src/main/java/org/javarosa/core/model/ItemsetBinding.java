@@ -40,12 +40,6 @@ import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 public class ItemsetBinding implements Externalizable, Localizable {
-    // Temporarily cached filtered list (not serialized)
-    private List<SelectChoice> cachedFilteredChoiceList;
-
-    // Values needed to determine whether the cached list should be expired (not serialized)
-    private Map<TreeReference, IAnswerData> cachedTriggerValues;
-    private Long cachedRandomizeSeed;
 
     /**
      * note that storing both the ref and expr for everything is kind of redundant, but we're forced
@@ -135,7 +129,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
-        cachedFilteredChoiceList = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
+        List<SelectChoice> shuffledChoices = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
 
         // TODO: write a test that fails if this is removed. It looks like a no-op because it's not accessing the shuffled collection.
         if (randomize) {
@@ -153,10 +147,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
             }
         }
 
-        cachedTriggerValues = currentTriggerValues;
-        cachedRandomizeSeed = currentRandomizeSeed;
-
-        return cachedFilteredChoiceList;
+        return shuffledChoices;
     }
 
     /**
@@ -264,23 +255,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     /**
-     * Updates the model using the previously-cached choice list.
-     *
-     * @see #updateQuestionAnswerInModel(FormDef, TreeReference, Map) for details and side-effects
-     */
-    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef) {
-        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
-        if (selectChoicesForAnswer != null) {
-            for (SelectChoice choice : cachedFilteredChoiceList) {
-                if (selectChoicesForAnswer.containsKey(choice.getValue())) {
-                    selectChoicesForAnswer.put(choice.getValue(), choice);
-                }
-            }
-        }
-        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
-    }
-
-    /**
      * @param selections          an answer to a multiple selection question
      * @param selectChoicesForAnswer maps each value that could be in @{code selections} to a SelectChoice if it should be bound
      *                            or null if it should be removed.
@@ -308,12 +282,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
         return null;
     }
 
+    @Override
     public void localeChanged(String locale, Localizer localizer) {
-        if (cachedFilteredChoiceList != null) {
-            for (SelectChoice selectChoice : cachedFilteredChoiceList) {
-                selectChoice.localeChanged(locale, localizer);
-            }
-        }
+
     }
 
     public TreeReference getDestRef () {
