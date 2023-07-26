@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
@@ -30,6 +31,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +67,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
     public boolean randomize = false;
     public XPathNumericLiteral randomSeedNumericExpr = null;
     public XPathPathExpr randomSeedPathExpr = null;
+
+    private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
 
     /**
      * @deprecated No tests and no evidence it's used.
@@ -108,8 +112,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
             formInstance = formDef.getMainInstance();
         }
 
-        List<TreeReference> filteredItemReferences = nodesetExpr.evalNodeset(formDef.getMainInstance(),
-            new EvaluationContext(formDef.getEvaluationContext(), contextRef.contextualize(curQRef)));
+        EvaluationContext evalContext = new EvaluationContext(formDef.getEvaluationContext(), contextRef.contextualize(curQRef));
+        EvaluationContext cachingContext = new EvaluationContext(evalContext, Arrays.asList(comparisonExpressionCacheFilterStrategy));
+        List<TreeReference> filteredItemReferences = nodesetExpr.evalNodeset(formDef.getMainInstance(), cachingContext);
 
         if (filteredItemReferences == null) {
             throw new XPathException("Could not find references depended on by" + nodesetRef.getInstanceName());
