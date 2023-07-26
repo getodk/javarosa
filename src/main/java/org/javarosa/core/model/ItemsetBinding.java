@@ -1,18 +1,5 @@
 package org.javarosa.core.model;
 
-import static org.javarosa.core.model.FormDef.getAbsRef;
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
@@ -38,6 +25,19 @@ import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.javarosa.core.model.FormDef.getAbsRef;
+import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 public class ItemsetBinding implements Externalizable, Localizable {
     // Temporarily cached filtered list (not serialized)
@@ -101,14 +101,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         boolean allTriggerRefsBound = currentTriggerValues != null;
 
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
-
-        // Return cached list if possible
-        if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
-            && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)) {
-            updateQuestionAnswerInModel(formDef, curQRef);
-
-            return randomize && cachedRandomizeSeed == null ? shuffle(cachedFilteredChoiceList) : cachedFilteredChoiceList;
-        }
 
         formDef.getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
 
