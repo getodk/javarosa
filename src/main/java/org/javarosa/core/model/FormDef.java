@@ -163,6 +163,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private boolean predicateCaching = true;
     private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
+    private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
     private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
 
     private EvaluationContext exprEvalContext;
@@ -762,7 +763,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         if (predicateCaching) {
             List<FilterStrategy> filters = Stream.concat(
                 customFilterStrategies.stream(),
-                Stream.of(comparisonExpressionCacheFilterStrategy)
+                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
             ).collect(Collectors.toList());
 
             context = new EvaluationContext(this.exprEvalContext, filters);
