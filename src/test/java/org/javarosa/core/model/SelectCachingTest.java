@@ -96,6 +96,44 @@ public class SelectCachingTest {
     }
 
     @Test
+    public void repeatedCompChoiceFiltersAreOnlyEvaluatedOnce_whileLiteralExpressionIsTheSame() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("select1"),
+                        t("select2")
+                    )),
+                    instance("instance",
+                        item("1", "A"),
+                        item("2", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/select1").type("string"),
+                    bind("/data/select2").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                select1Dynamic("/data/select1", "instance('instance')/root/item[value</data/choice]"),
+                select1Dynamic("/data/select2", "instance('instance')/root/item[value</data/choice]")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/choice", "3");
+
+            scenario.choicesOf("/data/select1");
+            scenario.choicesOf("/data/select2");
+        });
+
+        // Check that we do less than (size of secondary instance) * (number of choice lookups)
+        assertThat(evaluations, lessThan(4));
+    }
+
+    @Test
     public void repeatedEqChoiceFiltersAreOnlyEvaluatedOnce() throws Exception {
         Scenario scenario = Scenario.init("Some form", html(
             head(
