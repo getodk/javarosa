@@ -23,7 +23,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class SelectCachingTest {
 
     @Test
-    public void EqChoiceFiltersAreOnlyEvaluatedOnceForRepeatedChoiceListEvaluations() throws Exception {
+    public void eqChoiceFiltersAreOnlyEvaluatedOnceForRepeatedChoiceListEvaluations() throws Exception {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
