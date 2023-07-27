@@ -166,8 +166,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
     private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
 
-    private EvaluationContext exprEvalContext;
-
     private QuestionPreloader preloader = new QuestionPreloader();
 
     // XML ID's cannot start with numbers, so this should never conflict
@@ -213,8 +211,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         dagImpl = new TriggerableDag(ia);
 
-        // This is kind of a wreck...
-        resetEvaluationContext();
         outputFragments = new ArrayList<>();
         submissionProfiles = new HashMap<>();
         formInstances = new HashMap<>();
@@ -240,7 +236,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public void addNonMainInstance(DataInstance instance) {
         formInstances.put(instance.getName(), instance);
-        resetEvaluationContext();
     }
 
     public void setFormXmlPath(String formXmlPath) {
@@ -269,7 +264,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     public void setInstance(FormInstance fi) {
         mainInstance = fi;
         fi.setFormId(getID());
-        resetEvaluationContext();
 
         // construct the references in all the question itemsets
         // now so that the entire main instance is available
@@ -551,7 +545,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         QuickTriggerable qc = dagImpl.getRelevanceForRepeat(repeatRef.genericize());
         if (qc != null) {
-            relev = (boolean) qc.eval(mainInstance, new EvaluationContext(exprEvalContext, repeatRef));
+            relev = (boolean) qc.eval(mainInstance, new EvaluationContext(getEvaluationContext(), repeatRef));
         }
 
         if (relev) {
@@ -632,13 +626,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         // delete existing dest nodes that are not in the answer selection
         HashMap<String, TreeElement> existingValues = new HashMap<>();
-        List<TreeReference> existingNodes = exprEvalContext.expandReference(destRef);
+        List<TreeReference> existingNodes = getEvaluationContext().expandReference(destRef);
         for (TreeReference existingNode : existingNodes) {
             TreeElement node = getMainInstance().resolveReference(existingNode);
 
             if (itemset.valueRef != null) {
                 String value = itemset.getRelativeValue().evalReadable(this.getMainInstance(),
-                    new EvaluationContext(exprEvalContext, node.getRef()));
+                    new EvaluationContext(getEvaluationContext(), node.getRef()));
                 if (selectedValues.contains(value)) {
                     existingValues.put(value, node); // cache node if in selection
                     // and already exists
@@ -743,7 +737,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         if (c == null) {
             return true;
         }
-        EvaluationContext ec = new EvaluationContext(exprEvalContext, ref);
+        EvaluationContext ec = new EvaluationContext(getEvaluationContext(), ref);
         ec.isConstraint = true;
         ec.candidateValue = data;
 
@@ -754,27 +748,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return result;
     }
 
-    private void resetEvaluationContext() {
-        this.exprEvalContext = initEvalContext();
-    }
-
     public EvaluationContext getEvaluationContext() {
-        EvaluationContext context;
-        if (predicateCaching) {
-            List<FilterStrategy> filters = Stream.concat(
-                customFilterStrategies.stream(),
-                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
-            ).collect(Collectors.toList());
-
-            context = new EvaluationContext(this.exprEvalContext, filters);
-        } else {
-            context = this.exprEvalContext;
-        }
-
-        return context;
-    }
-
-    private EvaluationContext initEvalContext() {
         EvaluationContext ec = new EvaluationContext(mainInstance, getFormInstances(), new EvaluationContext(null));
 
         if (!ec.getFunctionHandlers().containsKey("jr:itext")) {
@@ -936,6 +910,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             });
         }
 
+        if (predicateCaching) {
+            List<FilterStrategy> filters = Stream.concat(
+                customFilterStrategies.stream(),
+                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
+            ).collect(Collectors.toList());
+
+            ec = new EvaluationContext(ec, filters);
+        }
+
         return ec;
     }
 
@@ -963,7 +946,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         continue;
 
                     IConditionExpr expr = outputFragments.get(ix);
-                    EvaluationContext ec = new EvaluationContext(exprEvalContext, contextRef);
+                    EvaluationContext ec = new EvaluationContext(getEvaluationContext(), contextRef);
                     ec.setOriginalContext(contextRef);
                     ec.setVariables(variables);
                     String value = expr.evalReadable(this.getMainInstance(), ec);
@@ -1133,7 +1116,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         extensions = (List<XFormExtension>) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 
-        resetEvaluationContext();
         actionController = (ActionController) ExtUtil.read(dis, new ExtWrapNullable(ActionController.class), pf);
         actions = new HashSet<>((List<String>) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
@@ -1661,8 +1643,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      */
     public void seal() {
         dagImpl = null;
-        // We may need ths one, actually
-        exprEvalContext = null;
     }
 
     /**
