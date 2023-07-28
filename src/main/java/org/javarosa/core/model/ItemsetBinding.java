@@ -1,5 +1,16 @@
 package org.javarosa.core.model;
 
+import static org.javarosa.core.model.FormDef.getAbsRef;
+import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
@@ -25,19 +36,6 @@ import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.javarosa.core.model.FormDef.getAbsRef;
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 public class ItemsetBinding implements Externalizable, Localizable {
 
@@ -91,9 +89,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
      * part of the new filtered list is removed and the new answer is saved back to the model.
      */
     public List<SelectChoice> getChoices(FormDef formDef, TreeReference curQRef) {
-        Map<TreeReference, IAnswerData> currentTriggerValues = getCurrentTriggerValues(formDef, curQRef);
-        boolean allTriggerRefsBound = currentTriggerValues != null;
-
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
 
         formDef.getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
@@ -148,34 +143,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         }
 
         return shuffledChoices;
-    }
-
-    /**
-     * Returns a map:
-     *  - keys: the references that are triggers for the nodeset expression
-     *  - values: current values at those references
-     *
-     * Returns null if the nodeset expression has any triggers that are unbounded references because there's no single
-     * value we could track in that case.
-     */
-    private Map<TreeReference, IAnswerData> getCurrentTriggerValues(FormDef formDef, TreeReference curQRef) {
-        Map<TreeReference, IAnswerData> currentTriggerValues = new HashMap<>();
-
-        Set<TreeReference> triggers = nodesetExpr.getTriggers(curQRef);
-        for (TreeReference trigger : triggers) {
-            // Only store values for expressions in the primary instance. Secondary instances can never change so no need to store their values.
-            if (trigger.getInstanceName() == null) {
-                TreeElement element = formDef.getMainInstance().resolveReference(trigger);
-
-                // Unbounded references (e.g. ref to a repeat nodeset rather than a repeat instance) don't have a value we can keep track of.
-                if (element != null && !element.isRepeatable()) {
-                    currentTriggerValues.put(trigger, element.getValue());
-                } else {
-                    return null;
-                }
-            }
-        }
-        return currentTriggerValues;
     }
 
     private SelectChoice getChoiceForTreeReference(FormDef formDef, DataInstance formInstance, int i, TreeReference item) {
