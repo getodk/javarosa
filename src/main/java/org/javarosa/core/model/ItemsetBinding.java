@@ -124,8 +124,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
-        List<SelectChoice> shuffledChoices = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
-
         // TODO: write a test that fails if this is removed. It looks like a no-op because it's not accessing the shuffled collection.
         if (randomize) {
             // Match indices to new positions
@@ -142,7 +140,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
             }
         }
 
-        return shuffledChoices;
+        return randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
     }
 
     private SelectChoice getChoiceForTreeReference(FormDef formDef, DataInstance formInstance, int i, TreeReference item) {
