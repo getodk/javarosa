@@ -62,6 +62,7 @@ public class XPathConditional implements IConditionExpr {
 
     }
 
+    @Override
     public XPathExpression getExpr () {
         return expr;
     }

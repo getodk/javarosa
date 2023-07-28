@@ -38,6 +38,7 @@ import org.javarosa.xpath.XPathArityException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import java.io.DataInputStream;
@@ -77,6 +78,10 @@ public class XPathFuncExpr extends XPathExpression {
         if (id.name.equals("instance") && args[0] instanceof XPathStringLiteral) {
             XFormParser.recordInstanceFunctionCall(((XPathStringLiteral) args[0]).s);
         }
+    }
+
+    public XPathFuncExpr(XPathQName id) {
+        this(id, new XPathExpression[] {});
     }
 
     public String toString() {
@@ -1363,6 +1368,11 @@ public class XPathFuncExpr extends XPathExpression {
     public boolean isIdempotent() {
         return Arrays.asList(IDEMPOTENT_FUNCTIONS).contains(id.toString()) &&
             Arrays.stream(args).allMatch(XPathExpression::isIdempotent);
+    }
+
+    @Override
+    public boolean containsFunc(@NotNull String name) {
+        return name.equals(id.name) || Arrays.stream(args).anyMatch(expression -> expression.containsFunc(name));
     }
 
     private static final String[] IDEMPOTENT_FUNCTIONS = new String[]{

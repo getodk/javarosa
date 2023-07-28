@@ -16,23 +16,15 @@
 
 package org.javarosa.xpath.expr;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
+import org.javarosa.core.model.data.GeoTraceData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
@@ -53,8 +45,17 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnsupportedException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class XPathPathExpr extends XPathExpression {
     private static final Logger logger = LoggerFactory.getLogger(XPathPathExpr.class.getSimpleName());
@@ -422,5 +423,12 @@ public class XPathPathExpr extends XPathExpression {
         return (filtExpr == null || filtExpr.isIdempotent()) && Arrays.stream(steps).allMatch((step) -> {
             return Arrays.stream(step.predicates).allMatch(XPathExpression::isIdempotent);
         });
+    }
+
+    @Override
+    public boolean containsFunc(@NotNull String name) {
+        return (filtExpr != null && filtExpr.containsFunc(name)) || Arrays.stream(steps).anyMatch(xPathStep -> Arrays.stream(xPathStep.predicates)
+            .anyMatch(expression -> expression.containsFunc(name))
+        );
     }
 }

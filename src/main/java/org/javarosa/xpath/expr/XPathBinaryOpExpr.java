@@ -28,6 +28,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class XPathBinaryOpExpr extends XPathOpExpr {
     public XPathExpression a, b;
@@ -37,6 +38,11 @@ public abstract class XPathBinaryOpExpr extends XPathOpExpr {
     public XPathBinaryOpExpr (XPathExpression a, XPathExpression b) {
         this.a = a;
         this.b = b;
+    }
+
+    @Override
+    public boolean containsFunc(@NotNull String name) {
+        return a.containsFunc(name) || b.containsFunc(name);
     }
 
     public String toString (String op) {
