@@ -22,6 +22,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.helper.AnswerDataUtil;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -433,7 +434,7 @@ public class FormEntryModel {
                     TreeReference contextualized = countRef.contextualize(index.getReference());
                     IAnswerData count = getForm().getMainInstance().resolveReference(contextualized).getValue();
                     if (count != null) {
-                        long fullcount = ((Integer) count.getValue()).intValue();
+                        long fullcount = AnswerDataUtil.answerDataToInt(count);
                         TreeReference ref = getForm().getChildInstanceRef(index);
                         TreeElement element = getForm().getMainInstance().resolveReference(ref);
                         if (element == null) {
