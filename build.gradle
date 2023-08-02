@@ -22,7 +22,7 @@ plugins {
  * for building archives (such as an APK), but is useful for performing Android checks like lint.
  */
 if (!project.hasProperty("android")) {
-    apply plugin: 'java'
+//    apply plugin: 'java'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'me.champeau.jmh'
