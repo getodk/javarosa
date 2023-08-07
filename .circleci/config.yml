@@ -17,7 +17,7 @@ jobs:
   build:
     working_directory: ~/work
     docker:
-      - image: cimg/openjdk:17.0-jdk
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
       - restore_cache:
