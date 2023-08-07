@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:8.1.0'
         classpath "me.champeau.jmh:jmh-gradle-plugin:0.6.7"
     }
 }
@@ -133,10 +133,10 @@ if (!project.hasProperty("android")) {
     android {
         namespace 'com.example'
 
-        compileSdkVersion 30
+        compileSdkVersion 31
         defaultConfig {
             minSdkVersion 21
-            targetSdkVersion 30
+            targetSdkVersion 31
             versionCode 1
             versionName "1.0"
             testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
