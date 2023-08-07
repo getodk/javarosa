@@ -17,7 +17,7 @@ jobs:
   build:
     working_directory: ~/work
     docker:
-      - image: circleci/openjdk:17-jdk
+      - image: circleci/openjdk:17.0-jdk
     steps:
       - checkout
       - restore_cache:
