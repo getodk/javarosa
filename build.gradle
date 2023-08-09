@@ -69,7 +69,7 @@ compileTestKotlin {
 lint {
     htmlReport = true
     abortOnError = true
-    warningsAsErrors = false
+    warningsAsErrors = true
     checkDependencies = true
 }
 
