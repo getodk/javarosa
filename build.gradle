@@ -17,14 +17,10 @@ buildscript {
  * If `android` is true, the project will be configured as an Android rather than a Java library. This isn't used
  * for building archives (such as an APK), but is useful for performing Android checks like lint.
  */
-if (!project.hasProperty("android")) {
-    apply plugin: 'java'
-    apply plugin: 'checkstyle'
-    apply plugin: 'jacoco'
-    apply plugin: 'me.champeau.jmh'
-} else {
-    apply plugin: 'com.android.library'
-}
+apply plugin: 'java'
+apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
+apply plugin: 'me.champeau.jmh'
 
 repositories {
     google()
@@ -77,81 +73,56 @@ tasks.register('installLocal') {
     }
 }
 
-if (!project.hasProperty("android")) {
-    jar {
-        archiveBaseName = 'javarosa'
-        // Be sure to update version in pom.xml to match
-        // snapshot release = x.x.x-SNAPSHOT
-        // production release = x.x.x
-        archiveVersion = '4.3.0-SNAPSHOT'
-        archiveFileName = "${archiveBaseName}-${archiveVersion}.jar"
+jar {
+    archiveBaseName = 'javarosa'
+    // Be sure to update version in pom.xml to match
+    // snapshot release = x.x.x-SNAPSHOT
+    // production release = x.x.x
+    archiveVersion = '4.3.0-SNAPSHOT'
+    archiveFileName = "${archiveBaseName}-${archiveVersion}.jar"
 
-        manifest {
-            attributes 'Manifest-Version': "$jar.archiveVersion"
-        }
+    manifest {
+        attributes 'Manifest-Version': "$jar.archiveVersion"
     }
+}
 
-    // TODO: does not build UML diagrams
-    javadoc {
-        failOnError = false
-    }
+// TODO: does not build UML diagrams
+javadoc {
+    failOnError = false
+}
 
-    jacocoTestReport {
-        reports {
-            xml.required = true
-        }
+jacocoTestReport {
+    reports {
+        xml.required = true
     }
+}
 
 // Required to use fileExtensions property in checkstyle file
-    checkstyle {
-        toolVersion = '7.6.1'
-    }
+checkstyle {
+    toolVersion = '7.6.1'
+}
 
-    jmhJar.doFirst {
-        new File("build/resources/test").mkdirs()
-    }
+jmhJar.doFirst {
+    new File("build/resources/test").mkdirs()
+}
 
-    jmh {
-        excludes = ["(BenchmarkTemplate)"]
-        threads = 1
-        fork = 1
-        warmup = '2s'
-        warmupIterations = 10
-        warmupBatchSize = 1
-        warmupForks = 1
-        iterations = 20
-        timeOnIteration = '2s'
-        timeUnit = 's'
-        benchmarkMode = ['avgt', 'ss']
-        includeTests = true
-        resultFormat = 'CSV'
-        forceGC = true
+jmh {
+    excludes = ["(BenchmarkTemplate)"]
+    threads = 1
+    fork = 1
+    warmup = '2s'
+    warmupIterations = 10
+    warmupBatchSize = 1
+    warmupForks = 1
+    iterations = 20
+    timeOnIteration = '2s'
+    timeUnit = 's'
+    benchmarkMode = ['avgt', 'ss']
+    includeTests = true
+    resultFormat = 'CSV'
+    forceGC = true
 
-        duplicateClassesStrategy = DuplicatesStrategy.WARN
-    }
-} else {
-    android {
-        namespace 'com.example'
-
-        compileSdkVersion 31
-        defaultConfig {
-            minSdkVersion 21
-            targetSdkVersion 31
-            versionCode 1
-            versionName "1.0"
-            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        }
-        compileOptions {
-            coreLibraryDesugaringEnabled true
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
-        buildTypes {
-            release {
-                minifyEnabled false
-            }
-        }
-    }
+    duplicateClassesStrategy = DuplicatesStrategy.WARN
 }
 
 dependencies {
@@ -175,3 +146,14 @@ dependencies {
     testImplementation 'net.sf.kxml:kxml2:2.3.0'
     testImplementation 'org.hamcrest:hamcrest-all:1.3'
 }
+
+
+abstract class lintDebug extends DefaultTask {
+    @TaskAction
+    def analyseLint() {
+        println 'THIS IS NOT THE TASK YOU WANT. LOOK AT ../reports/lint-results.html'
+    }
+}
+
+// Temporary target so as not to break the CircleCI build. This task will be superseded by the 'lint' task in the main build.
+tasks.register('lintDebug', lintDebug)
