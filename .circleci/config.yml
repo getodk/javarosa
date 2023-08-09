@@ -48,7 +48,7 @@ jobs:
           name: Android Lint
           command: ./gradlew -Pandroid lintDebug --max-workers=1
       - store_artifacts:
-          path: build/reports/lint-results-debug.html
+          path: build/reports/lint-results.html
           destination: lint-results.html
   package:
     working_directory: ~/work
