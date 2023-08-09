@@ -853,10 +853,11 @@ public class LocalizerTest {
         try {
             t.join(50);
         } catch (InterruptedException e) {
-
+            System.out.println("t.getState() = " + t.getState());
         }
+        //DEBUG on circleci
         if(t.isAlive()) {
-            throw new RuntimeException("Failed to return from recursive argument processing");
+            throw new RuntimeException("Failed to return from recursive argument processing"+ "\nThreadState: "+t.getState());
         }
     }
 
