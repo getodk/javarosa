@@ -18,13 +18,13 @@ buildscript {
 }
 
 plugins {
+    id 'java-library'
     id 'org.jetbrains.kotlin.jvm' version '1.8.22'
-    id "me.champeau.jmh" version "0.7.1"
+    id 'me.champeau.jmh' version '0.7.1'
+    id 'jacoco'
+    id 'checkstyle'
 }
 
-apply plugin: 'java-library'
-apply plugin: 'checkstyle'
-apply plugin: 'jacoco'
 apply plugin: 'com.android.lint'
 
 repositories {
@@ -38,13 +38,16 @@ sourceSets {
     test.java.srcDirs = ['src/test/java']
     test.resources.srcDirs = ['src/test/resources']
 }
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
     }
 }
+
 compileJava {
     options.compilerArgs << "-Xlint:deprecation"
     options.encoding = 'UTF-8'
@@ -150,17 +153,16 @@ jmh {
 
 dependencies {
     // Be sure to update dependencies in pom.xml to match
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
     implementation 'joda-time:joda-time:2.10.13'
     implementation 'org.slf4j:slf4j-api:1.7.33'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
 
     // Upgrade to version higher than 1.4 when Collect minSDK >= 26
     implementation 'org.apache.commons:commons-csv:1.4'
-
     // Upgrade to version higher than 2.5 when Collect minSDK >= 26
     implementation 'commons-io:commons-io:2.5'
 
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
 
     compileOnly 'net.sf.kxml:kxml2:2.3.0'
 
