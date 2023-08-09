@@ -105,10 +105,9 @@ jar {
     // snapshot release = x.x.x-SNAPSHOT
     // production release = x.x.x
     archiveVersion = '4.3.0-SNAPSHOT'
-    archiveFileName = "${archiveBaseName}-${archiveVersion}.jar"
 
     manifest {
-        attributes 'Manifest-Version': '$jar.archiveVersion'
+        attributes 'Manifest-Version': archiveVersion
     }
 }
 
