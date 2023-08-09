@@ -13,18 +13,18 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22"
         classpath 'com.android.tools.build:gradle:8.1.0'
-        classpath "me.champeau.jmh:jmh-gradle-plugin:0.6.7"
+        classpath "me.champeau.jmh:jmh-gradle-plugin:0.7.1"
     }
 }
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.22'
+    id "me.champeau.jmh" version "0.7.1"
 }
 
 apply plugin: 'java'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
-apply plugin: 'me.champeau.jmh'
 apply plugin: 'com.android.lint'
 
 repositories {
@@ -38,6 +38,8 @@ sourceSets {
     test.java.srcDirs = ['src/test/java']
     test.resources.srcDirs = ['src/test/resources']
 }
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
