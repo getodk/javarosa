@@ -1,6 +1,8 @@
 package org.javarosa.core.model;
 
 import org.javarosa.xpath.expr.XPathEqExpr;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathQName;
@@ -45,6 +47,26 @@ public class CompareChildToAbsoluteExpressionTest {
         assertThat(parsed, not(nullValue()));
         assertThat(parsed.getRelativeSide(), equalTo(expression.a));
         assertThat(parsed.getAbsoluteSide(), equalTo(expression.b));
+    }
+
+    @Test
+    public void parse_parsesFunctionWithAbsoluteAndRelativeArgs() {
+        XPathFuncExpr expression = new XPathFuncExpr(
+            new XPathQName("blah"),
+            new XPathExpression[]{
+                new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
+                    new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("name")) }
+                ),
+                new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_ROOT, new XPathStep[]{
+                    new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("something")) }
+                ),
+            }
+        );
+
+        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        assertThat(parsed, not(nullValue()));
+        assertThat(parsed.getRelativeSide(), equalTo(expression.args[0]));
+        assertThat(parsed.getAbsoluteSide(), equalTo(expression.args[1]));
     }
 
     @Test

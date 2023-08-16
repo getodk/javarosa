@@ -7,6 +7,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.xpath.expr.XPathCmpExpr;
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStringLiteral;
@@ -64,6 +65,9 @@ public class CompareChildToAbsoluteExpression {
         } else if (expression instanceof XPathEqExpr) {
             a = ((XPathEqExpr) expression).a;
             b = ((XPathEqExpr) expression).b;
+        } else if(expression instanceof XPathFuncExpr && ((XPathFuncExpr) expression).args.length == 2) {
+            a = ((XPathFuncExpr) expression).args[0];
+            b = ((XPathFuncExpr) expression).args[1];
         }
 
         Pair<XPathPathExpr, XPathExpression> relativeAndAbsolute = getRelativeAndAbsolute(a, b);
