@@ -10,6 +10,8 @@ import org.javarosa.xpath.expr.XPathStep;
 import org.javarosa.xpath.expr.XPathStringLiteral;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -50,9 +52,10 @@ public class CompareChildToAbsoluteExpressionTest {
     }
 
     @Test
-    public void parse_parsesFunctionWithAbsoluteAndRelativeArgs() {
+    public void parse_parsesIdempotentFunctionWithAbsoluteAndRelativeArgs() {
+        String[] idempotentFunctions = XPathFuncExpr.IDEMPOTENT_FUNCTIONS;
         XPathFuncExpr expression = new XPathFuncExpr(
-            new XPathQName("blah"),
+            new XPathQName(idempotentFunctions[new Random().nextInt(idempotentFunctions.length)]),
             new XPathExpression[]{
                 new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
                     new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("name")) }
@@ -67,6 +70,24 @@ public class CompareChildToAbsoluteExpressionTest {
         assertThat(parsed, not(nullValue()));
         assertThat(parsed.getRelativeSide(), equalTo(expression.args[0]));
         assertThat(parsed.getAbsoluteSide(), equalTo(expression.args[1]));
+    }
+
+    @Test
+    public void parse_doesNotParseNonIdempotentFunction() {
+        XPathFuncExpr expression = new XPathFuncExpr(
+            new XPathQName("blah"),
+            new XPathExpression[]{
+                new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
+                    new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("name")) }
+                ),
+                new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_ROOT, new XPathStep[]{
+                    new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("something")) }
+                ),
+            }
+        );
+
+        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        assertThat(parsed, nullValue());
     }
 
     @Test

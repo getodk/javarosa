@@ -65,7 +65,8 @@ public class CompareChildToAbsoluteExpression {
         } else if (expression instanceof XPathEqExpr) {
             a = ((XPathEqExpr) expression).a;
             b = ((XPathEqExpr) expression).b;
-        } else if(expression instanceof XPathFuncExpr && ((XPathFuncExpr) expression).args.length == 2) {
+        } else if (expression instanceof XPathFuncExpr && expression.isIdempotent()
+            && ((XPathFuncExpr) expression).args.length == 2) {
             a = ((XPathFuncExpr) expression).args[0];
             b = ((XPathFuncExpr) expression).args[1];
         }
