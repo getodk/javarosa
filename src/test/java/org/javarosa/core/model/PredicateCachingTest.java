@@ -220,7 +220,7 @@ public class PredicateCachingTest {
     }
 
     @Test
-    public void repeatedCompPredicatesWithSameAnswerAreOnlyEvaluatedOnce() throws Exception {
+    public void repeatedCompPredicatesWithSameAbsoluteValueAreOnlyEvaluatedOnce() throws Exception {
         Scenario scenario = Scenario.init("Some form", html(
             head(
                 title("Some form"),
@@ -249,6 +249,42 @@ public class PredicateCachingTest {
         int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/choice", "2");
             scenario.answer("/data/choice", "2");
+        });
+
+        // Check that we do less than size of secondary instance * number of times we answer
+        assertThat(evaluations, lessThan(4));
+    }
+
+    @Test
+    public void repeatedIdempotentFuncPredicatesWithSameAbsoluteValueAreOnlyEvaluatedOnce() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("calculate1"),
+                        t("calculate2")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/calculate1").type("string")
+                        .calculate("instance('instance')/root/item[regex(value,/data/choice)]/label"),
+                    bind("/data/calculate2").type("string")
+                        .calculate("instance('instance')/root/item[regex(value,/data/choice)]/value")
+                )
+            ),
+            body(
+                input("/data/choice")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/choice", "a");
+            scenario.answer("/data/choice", "a");
         });
 
         // Check that we do less than size of secondary instance * number of times we answer
