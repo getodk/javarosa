@@ -900,8 +900,8 @@ public class Scenario {
         TreeReference reference = expandSingle(getRef(xPath));
 
         FormEntryPrompt questionPrompt = model.getQuestionPrompt(getIndexOf(reference));
-        // This call triggers the correct population of dynamic choices.
-        questionPrompt.getAnswerValue();
+//        // This call triggers the correct population of dynamic choices.
+//        questionPrompt.getAnswerValue();
         QuestionDef control = questionPrompt.getQuestion();
         return control.getChoices() == null
             // If the (static) choices is null, that means there is an itemset and choices are dynamic
