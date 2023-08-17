@@ -2,6 +2,7 @@ package org.javarosa.core.model;
 
 import org.javarosa.xpath.expr.XPathEqExpr;
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFilterExpr;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -18,6 +19,22 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 public class CompareChildToAbsoluteExpressionTest {
+
+    @Test
+    public void parse_doesNotParseExpressionsWhereBothSidesAreRelative() {
+        XPathEqExpr expression = new XPathEqExpr(
+            true,
+            new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
+                new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("name")) }
+            ),
+            new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
+                new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("name")) }
+            )
+        );
+
+        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        assertThat(parsed, nullValue());
+    }
 
     @Test
     public void parse_parsesStringLiteralAsAbsolute() {
@@ -88,6 +105,25 @@ public class CompareChildToAbsoluteExpressionTest {
 
         CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
         assertThat(parsed, nullValue());
+    }
+
+    @Test
+    public void parse_parsesContextRelativeExpressionsAsAbsolute() {
+        XPathEqExpr expression = new XPathEqExpr(
+            true,
+            new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
+                new XPathStep(XPathStep.AXIS_CHILD, new XPathQName("name")) }
+            ),
+            new XPathPathExpr(
+                new XPathFilterExpr(new XPathFuncExpr(new XPathQName("blah"), new XPathExpression[0]), new XPathExpression[0]),
+                new XPathStep[0]
+            )
+        );
+
+        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        assertThat(parsed, not(nullValue()));
+        assertThat(parsed.getRelativeSide(), equalTo(expression.a));
+        assertThat(parsed.getAbsoluteSide(), equalTo(expression.b));
     }
 
     @Test
