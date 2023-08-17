@@ -209,5 +209,43 @@ public class SelectCachingTest {
         // Check that we do less than (size of secondary instance) * (number of choice lookups)
         assertThat(evaluations, lessThan(8));
     }
+
+    @Test
+    public void eqChoiceFiltersInRepeatsWithCurrentPathExpressionsAreOnlyEvaluatedOnce() throws Exception {
+        Scenario scenario = Scenario.init("Select in repeat", html(
+            head(
+                title("Select in repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("outer",
+                                t("filter"),
+                                t("inner",
+                                    t("select"))))),
+
+                    instance("choices",
+                        item("a", "A"),
+                        item("b", "B")))),
+            body(
+                repeat("/data/outer",
+                    input("filter"),
+                    repeat("/data/outer/inner",
+                        select1Dynamic("/data/outer/inner/select", "instance('choices')/root/item[value=current()/../../filter]"))
+                ))));
+
+        scenario.answer("/data/outer[0]/filter", "a");
+        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.answer("/data/outer[1]/filter", "a");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.choicesOf("/data/outer[0]/inner[0]/select");
+            scenario.choicesOf("/data/outer[0]/inner[1]/select");
+        });
+
+        // Check that we do less than (size of secondary instance) * (number of choice lookups)
+        assertThat(evaluations, lessThan(4));
+    }
     //endregion
 }

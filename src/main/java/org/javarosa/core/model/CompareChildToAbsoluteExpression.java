@@ -86,10 +86,12 @@ public class CompareChildToAbsoluteExpression {
         Queue<XPathExpression> subExpressions = new LinkedList<>(Arrays.asList(a, b));
         while (!subExpressions.isEmpty()) {
             XPathExpression subExpression = subExpressions.poll();
-            if (subExpression instanceof XPathPathExpr && ((XPathPathExpr) subExpression).init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE)
-                relative = (XPathPathExpr) subExpression;
-            else if (subExpression instanceof XPathPathExpr && ((XPathPathExpr) subExpression).init_context == XPathPathExpr.INIT_CONTEXT_ROOT) {
-                absolute = subExpression;
+            if (subExpression instanceof XPathPathExpr) {
+                if (((XPathPathExpr) subExpression).init_context == XPathPathExpr.INIT_CONTEXT_RELATIVE)
+                    relative = (XPathPathExpr) subExpression;
+                else {
+                    absolute = subExpression;
+                }
             } else if (subExpression instanceof XPathNumericLiteral || subExpression instanceof XPathStringLiteral) {
                 absolute = subExpression;
             }
