@@ -18,7 +18,6 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.FilterStrategy;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.AbstractTreeElement;
@@ -41,16 +40,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
 
@@ -101,9 +98,6 @@ public class TriggerableDag {
     private Map<TreeReference, QuickTriggerable> relevancePerRepeat = new HashMap<>();
 
     private boolean predicateCaching = true;
-    private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
-    private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
-    private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
 
     TriggerableDag(EventNotifierAccessor accessor) {
         this.accessor = accessor;
@@ -526,12 +520,9 @@ public class TriggerableDag {
 
         EvaluationContext context;
         if (predicateCaching) {
-            List<FilterStrategy> filters = Stream.concat(
-                customFilterStrategies.stream(),
-                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy, new IdempotentExpressionCacheFilterStrategy())
-            ).collect(Collectors.toList());
-
-            context = new EvaluationContext(evalContext, filters);
+            context = new EvaluationContext(evalContext, Collections.singletonList(
+                new IdempotentExpressionCacheFilterStrategy()
+            ));
         } else {
             context = evalContext;
         }
@@ -748,10 +739,6 @@ public class TriggerableDag {
     // endregion
 
     public void disablePredicateCaching() {
-        this.predicateCaching = false;
-    }
-
-    public void addFilterStrategy(FilterStrategy filterStrategy) {
-        customFilterStrategies.add(filterStrategy);
+        predicateCaching = false;
     }
 }

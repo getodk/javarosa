@@ -1,4 +1,4 @@
-package org.javarosa.core.model.test;
+package org.javarosa.core.model;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.measure.Measure;

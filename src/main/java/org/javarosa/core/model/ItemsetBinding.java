@@ -1,18 +1,5 @@
 package org.javarosa.core.model;
 
-import static org.javarosa.core.model.FormDef.getAbsRef;
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
@@ -39,13 +26,20 @@ import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 
-public class ItemsetBinding implements Externalizable, Localizable {
-    // Temporarily cached filtered list (not serialized)
-    private List<SelectChoice> cachedFilteredChoiceList;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-    // Values needed to determine whether the cached list should be expired (not serialized)
-    private Map<TreeReference, IAnswerData> cachedTriggerValues;
-    private Long cachedRandomizeSeed;
+import static org.javarosa.core.model.FormDef.getAbsRef;
+import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
+
+public class ItemsetBinding implements Externalizable, Localizable {
 
     /**
      * note that storing both the ref and expr for everything is kind of redundant, but we're forced
@@ -102,14 +96,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
 
-        // Return cached list if possible
-        if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
-            && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)) {
-            updateQuestionAnswerInModel(formDef, curQRef);
-
-            return randomize && cachedRandomizeSeed == null ? shuffle(cachedFilteredChoiceList) : cachedFilteredChoiceList;
-        }
-
         formDef.getEventNotifier().publishEvent(new Event("Dynamic choices", new EvaluationResult(curQRef, null)));
 
         DataInstance formInstance;
@@ -122,8 +108,8 @@ public class ItemsetBinding implements Externalizable, Localizable {
             formInstance = formDef.getMainInstance();
         }
 
-        List<TreeReference> filteredItemReferences = nodesetExpr.evalNodeset(formDef.getMainInstance(),
-            new EvaluationContext(formDef.getEvaluationContext(), contextRef.contextualize(curQRef)));
+        EvaluationContext evalContext = new EvaluationContext(formDef.getEvaluationContext(), contextRef.contextualize(curQRef));
+        List<TreeReference> filteredItemReferences = nodesetExpr.evalNodeset(formDef.getMainInstance(), evalContext);
 
         if (filteredItemReferences == null) {
             throw new XPathException("Could not find references depended on by" + nodesetRef.getInstanceName());
@@ -143,7 +129,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
         updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
-        cachedFilteredChoiceList = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
+        List<SelectChoice> shuffledChoices = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
 
         // TODO: write a test that fails if this is removed. It looks like a no-op because it's not accessing the shuffled collection.
         if (randomize) {
@@ -161,10 +147,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
             }
         }
 
-        cachedTriggerValues = currentTriggerValues;
-        cachedRandomizeSeed = currentRandomizeSeed;
-
-        return cachedFilteredChoiceList;
+        return shuffledChoices;
     }
 
     /**
@@ -272,23 +255,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     /**
-     * Updates the model using the previously-cached choice list.
-     *
-     * @see #updateQuestionAnswerInModel(FormDef, TreeReference, Map) for details and side-effects
-     */
-    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef) {
-        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
-        if (selectChoicesForAnswer != null) {
-            for (SelectChoice choice : cachedFilteredChoiceList) {
-                if (selectChoicesForAnswer.containsKey(choice.getValue())) {
-                    selectChoicesForAnswer.put(choice.getValue(), choice);
-                }
-            }
-        }
-        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
-    }
-
-    /**
      * @param selections          an answer to a multiple selection question
      * @param selectChoicesForAnswer maps each value that could be in @{code selections} to a SelectChoice if it should be bound
      *                            or null if it should be removed.
@@ -316,12 +282,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
         return null;
     }
 
+    @Override
     public void localeChanged(String locale, Localizer localizer) {
-        if (cachedFilteredChoiceList != null) {
-            for (SelectChoice selectChoice : cachedFilteredChoiceList) {
-                selectChoice.localeChanged(locale, localizer);
-            }
-        }
+
     }
 
     public TreeReference getDestRef () {
