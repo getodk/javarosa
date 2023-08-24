@@ -16,6 +16,7 @@ import static org.javarosa.core.util.XFormsElement.instance;
 import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
@@ -171,4 +172,42 @@ public class SelectCachingTest {
         // Check that we do less than (size of secondary instance) * (number of choice lookups)
         assertThat(evaluations, lessThan(4));
     }
+
+    //region repeats
+    @Test
+    public void eqChoiceFilter_inRepeat_onlyEvaluatedOnce() throws Exception {
+        Scenario scenario = Scenario.init("Select in repeat", html(
+            head(
+                title("Select in repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("filter"),
+                            t("repeat",
+                                t("select")))),
+
+                    instance("choices",
+                        item("a", "A"),
+                        item("aa", "AA"),
+                        item("b", "B"),
+                        item("bb", "BB")))),
+            body(
+                input("filter"),
+                repeat("/data/repeat",
+                    select1Dynamic("/data/repeat/select", "instance('choices')/root/item[value=/data/filter]"))
+            )));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/filter", "a");
+
+            scenario.choicesOf("/data/repeat[0]/select");
+
+            scenario.createNewRepeat("/data/repeat");
+            scenario.choicesOf("/data/repeat[1]/select");
+        });
+
+        // Check that we do less than (size of secondary instance) * (number of choice lookups)
+        assertThat(evaluations, lessThan(8));
+    }
+    //endregion
 }
