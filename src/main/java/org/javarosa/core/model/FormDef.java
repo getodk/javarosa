@@ -103,6 +103,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private static EventNotifier defaultEventNotifier = new EventNotifierSilent();
     private ExternalizableExtras extras = new ExternalizableExtras();
 
+    private EvaluationContext evaluationContext;
+
     /**
      * Takes a (possibly relative) reference, and makes it absolute based on its parent.
      * Moved from the parser to this class so it can be used more cleanly by ItemsetBinding.
@@ -236,6 +238,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      * Getters and setters for the lists
      */
     public void addNonMainInstance(DataInstance instance) {
+        resetEvaluationContext();
         formInstances.put(instance.getName(), instance);
     }
 
@@ -263,6 +266,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public void setInstance(FormInstance fi) {
+        resetEvaluationContext();
+
         mainInstance = fi;
         fi.setFormId(getID());
 
@@ -748,177 +753,179 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     public EvaluationContext getEvaluationContext() {
-        EvaluationContext ec = new EvaluationContext(mainInstance, getFormInstances(), new EvaluationContext(null));
+        if (evaluationContext == null) {
+            evaluationContext = new EvaluationContext(mainInstance, getFormInstances(), new EvaluationContext(null));
 
-        if (!ec.getFunctionHandlers().containsKey("jr:itext")) {
-            final FormDef f = this;
-            ec.addFunctionHandler(new IFunctionHandler() {
-                @Override
-                public String getName() {
-                    return "jr:itext";
-                }
-
-                @Override
-                public Object eval(Object[] args, EvaluationContext ec) {
-                    String textID = (String) args[0];
-                    try {
-                        // SUUUUPER HACKY
-                        String form = ec.getOutputTextForm();
-                        if (form != null) {
-                            textID = textID + ";" + form;
-                            String result = f.getLocalizer().getRawText(f.getLocalizer().getLocale(),
-                                textID);
-                            return result == null ? "" : result;
-                        } else {
-                            String text = f.getLocalizer().getText(textID);
-                            return text == null ? "[itext:" + textID + "]" : text;
-                        }
-                    } catch (NoSuchElementException nsee) {
-                        return "[nolocale]";
+            if (!evaluationContext.getFunctionHandlers().containsKey("jr:itext")) {
+                final FormDef f = this;
+                evaluationContext.addFunctionHandler(new IFunctionHandler() {
+                    @Override
+                    public String getName() {
+                        return "jr:itext";
                     }
-                }
 
-                @Override
-                public List<Class[]> getPrototypes() {
-                    Class[] proto = {String.class};
-                    List<Class[]> v = new ArrayList<>(1);
-                    v.add(proto);
-                    return v;
-                }
-
-                @Override
-                public boolean rawArgs() {
-                    return false;
-                }
-
-                @Override
-                public boolean realTime() {
-                    return false;
-                }
-            });
-        }
-
-        /*
-         * Given a select value, looks the label up in the choice list defined by the given question and returns it in
-         * the currently-set language.
-         *
-         * arg 1: select value
-         * arg 2: string xpath referring to question that defines the select
-         *
-         * this won't work at all if the original label needed to be
-         * processed/calculated in some way (<output>s, etc.) (is this even
-         * allowed?) likely won't work with multi-media labels _might_ work for
-         * itemsets, but probably not very well or at all; could potentially work
-         * better if we had some context info
-         *
-         * it's mainly intended for the simple case of reversing a question with
-         * compile-time-static fields, for use inside an <output>
-         */
-        if (!ec.getFunctionHandlers().containsKey("jr:choice-name")) {
-            final FormDef f = this;
-            ec.addFunctionHandler(new IFunctionHandler() {
-                @Override
-                public String getName() {
-                    return "jr:choice-name";
-                }
-
-                @Override
-                public Object eval(Object[] args, EvaluationContext ec) {
-                    try {
-                        String value = (String) args[0];
-                        String questionXpath = (String) args[1];
-                        TreeReference ref = RestoreUtils.xfFact.ref(questionXpath);
-                        ref = ref.anchor(ec.getContextRef());
-
-                        QuestionDef q = findQuestionByRef(ref, f);
-                        if (q == null
-                            || (q.getControlType() != Constants.CONTROL_SELECT_ONE
-                            && q.getControlType() != Constants.CONTROL_SELECT_MULTI
-                            && q.getControlType() != Constants.CONTROL_RANK)) {
-                            return "";
-                        }
-
-                        List<SelectChoice> choices;
-
-                        ItemsetBinding itemset = q.getDynamicChoices();
-                        if (itemset != null) {
-                            // 2019-HM: See ChoiceNameTest for test and more explanation
-
-                            // NOTE: We have no context against which to evaluate a dynamic selection list. This will
-                            // generally cause that evaluation to break if any filtering is done, or, worst case, give
-                            // unexpected results.
-                            //
-                            // We should hook into the existing code (FormEntryPrompt) for pulling display text for select
-                            // choices. however, it's hard, because we don't really have any context to work with, and all
-                            // the situations where that context would be used don't make sense for trying to reverse a
-                            // select value back to a label in an unrelated expression
-                            if (ref.isAmbiguous()) {
-                                // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
-                                // like we do when we populate those at FormEntryPrompt (line 251).
-                                // The "ref" here is ambiguous, so we need to make it concrete first.
-                                ref = ref.contextualize(ec.getContextRef());
+                    @Override
+                    public Object eval(Object[] args, EvaluationContext ec) {
+                        String textID = (String) args[0];
+                        try {
+                            // SUUUUPER HACKY
+                            String form = ec.getOutputTextForm();
+                            if (form != null) {
+                                textID = textID + ";" + form;
+                                String result = f.getLocalizer().getRawText(f.getLocalizer().getLocale(),
+                                    textID);
+                                return result == null ? "" : result;
+                            } else {
+                                String text = f.getLocalizer().getText(textID);
+                                return text == null ? "[itext:" + textID + "]" : text;
                             }
-                            choices = itemset.getChoices(f, ref);
-                        } else { // static choices
-                            choices = q.getChoices();
+                        } catch (NoSuchElementException nsee) {
+                            return "[nolocale]";
                         }
-                        if (choices != null) {
-                            for (SelectChoice ch : choices) {
-                                if (ch.getValue().equals(value)) {
-                                    // this is really not ideal. we should hook into the existing code (FormEntryPrompt)
-                                    // for pulling display text for select choices. however, it's hard, because we don't
-                                    // really have any context to work with, and all the situations where that context
-                                    // would be used don't make sense for trying to reverse a select value back to a
-                                    // label in an unrelated expression
+                    }
 
-                                    String textID = ch.getTextID();
-                                    String templateStr;
-                                    if (textID != null) {
-                                        templateStr = f.getLocalizer().getText(textID);
-                                    } else {
-                                        templateStr = ch.getLabelInnerText();
+                    @Override
+                    public List<Class[]> getPrototypes() {
+                        Class[] proto = {String.class};
+                        List<Class[]> v = new ArrayList<>(1);
+                        v.add(proto);
+                        return v;
+                    }
+
+                    @Override
+                    public boolean rawArgs() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean realTime() {
+                        return false;
+                    }
+                });
+            }
+
+            /*
+             * Given a select value, looks the label up in the choice list defined by the given question and returns it in
+             * the currently-set language.
+             *
+             * arg 1: select value
+             * arg 2: string xpath referring to question that defines the select
+             *
+             * this won't work at all if the original label needed to be
+             * processed/calculated in some way (<output>s, etc.) (is this even
+             * allowed?) likely won't work with multi-media labels _might_ work for
+             * itemsets, but probably not very well or at all; could potentially work
+             * better if we had some context info
+             *
+             * it's mainly intended for the simple case of reversing a question with
+             * compile-time-static fields, for use inside an <output>
+             */
+            if (!evaluationContext.getFunctionHandlers().containsKey("jr:choice-name")) {
+                final FormDef f = this;
+                evaluationContext.addFunctionHandler(new IFunctionHandler() {
+                    @Override
+                    public String getName() {
+                        return "jr:choice-name";
+                    }
+
+                    @Override
+                    public Object eval(Object[] args, EvaluationContext ec) {
+                        try {
+                            String value = (String) args[0];
+                            String questionXpath = (String) args[1];
+                            TreeReference ref = RestoreUtils.xfFact.ref(questionXpath);
+                            ref = ref.anchor(ec.getContextRef());
+
+                            QuestionDef q = findQuestionByRef(ref, f);
+                            if (q == null
+                                || (q.getControlType() != Constants.CONTROL_SELECT_ONE
+                                && q.getControlType() != Constants.CONTROL_SELECT_MULTI
+                                && q.getControlType() != Constants.CONTROL_RANK)) {
+                                return "";
+                            }
+
+                            List<SelectChoice> choices;
+
+                            ItemsetBinding itemset = q.getDynamicChoices();
+                            if (itemset != null) {
+                                // 2019-HM: See ChoiceNameTest for test and more explanation
+
+                                // NOTE: We have no context against which to evaluate a dynamic selection list. This will
+                                // generally cause that evaluation to break if any filtering is done, or, worst case, give
+                                // unexpected results.
+                                //
+                                // We should hook into the existing code (FormEntryPrompt) for pulling display text for select
+                                // choices. however, it's hard, because we don't really have any context to work with, and all
+                                // the situations where that context would be used don't make sense for trying to reverse a
+                                // select value back to a label in an unrelated expression
+                                if (ref.isAmbiguous()) {
+                                    // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
+                                    // like we do when we populate those at FormEntryPrompt (line 251).
+                                    // The "ref" here is ambiguous, so we need to make it concrete first.
+                                    ref = ref.contextualize(ec.getContextRef());
+                                }
+                                choices = itemset.getChoices(f, ref);
+                            } else { // static choices
+                                choices = q.getChoices();
+                            }
+                            if (choices != null) {
+                                for (SelectChoice ch : choices) {
+                                    if (ch.getValue().equals(value)) {
+                                        // this is really not ideal. we should hook into the existing code (FormEntryPrompt)
+                                        // for pulling display text for select choices. however, it's hard, because we don't
+                                        // really have any context to work with, and all the situations where that context
+                                        // would be used don't make sense for trying to reverse a select value back to a
+                                        // label in an unrelated expression
+
+                                        String textID = ch.getTextID();
+                                        String templateStr;
+                                        if (textID != null) {
+                                            templateStr = f.getLocalizer().getText(textID);
+                                        } else {
+                                            templateStr = ch.getLabelInnerText();
+                                        }
+                                        return fillTemplateString(templateStr, ref);
                                     }
-                                    return fillTemplateString(templateStr, ref);
                                 }
                             }
+                            return "";
+                        } catch (Exception e) {
+                            throw new WrappedException("error in evaluation of xpath function [choice-name]",
+                                e);
                         }
-                        return "";
-                    } catch (Exception e) {
-                        throw new WrappedException("error in evaluation of xpath function [choice-name]",
-                            e);
                     }
-                }
 
-                @Override
-                public List<Class[]> getPrototypes() {
-                    Class[] proto = {String.class, String.class};
-                    List<Class[]> v = new ArrayList<>(1);
-                    v.add(proto);
-                    return v;
-                }
+                    @Override
+                    public List<Class[]> getPrototypes() {
+                        Class[] proto = {String.class, String.class};
+                        List<Class[]> v = new ArrayList<>(1);
+                        v.add(proto);
+                        return v;
+                    }
 
-                @Override
-                public boolean rawArgs() {
-                    return false;
-                }
+                    @Override
+                    public boolean rawArgs() {
+                        return false;
+                    }
 
-                @Override
-                public boolean realTime() {
-                    return false;
-                }
-            });
+                    @Override
+                    public boolean realTime() {
+                        return false;
+                    }
+                });
+            }
+
+            if (predicateCaching) {
+                List<FilterStrategy> filters = Stream.concat(
+                    customFilterStrategies.stream(),
+                    Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
+                ).collect(Collectors.toList());
+
+                evaluationContext = new EvaluationContext(evaluationContext, filters);
+            }
         }
 
-        if (predicateCaching) {
-            List<FilterStrategy> filters = Stream.concat(
-                customFilterStrategies.stream(),
-                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
-            ).collect(Collectors.toList());
-
-            ec = new EvaluationContext(ec, filters);
-        }
-
-        return ec;
+        return evaluationContext;
     }
 
     public String fillTemplateString(String template, TreeReference contextRef) {
@@ -1712,5 +1719,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public void addFilterStrategy(FilterStrategy filterStrategy) {
         customFilterStrategies.add(filterStrategy);
+    }
+
+    private void resetEvaluationContext() {
+        evaluationContext = null;
     }
 }
