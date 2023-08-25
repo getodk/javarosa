@@ -57,6 +57,7 @@ import org.javarosa.xpath.expr.XPathNumNegExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -438,6 +439,14 @@ public class Scenario {
         return Scenario.init(formFile);
     }
 
+    public static FormDef createFormDef(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
+        Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
+        String xml = form.asXml();
+        System.out.println(xml);
+        write(formFile, xml.getBytes(UTF_8), CREATE);
+        return Scenario.createFormDef(formFile);
+    }
+
     /**
      * Initializes the Scenario with provided form filename.
      * <p>
@@ -451,13 +460,24 @@ public class Scenario {
      * Initializes the Scenario with the form at the provided path
      */
     public static Scenario init(Path formFile) throws XFormParser.ParseException {
+        FormDef formDef = createFormDef(formFile);
+        formDef.initialize(true, new InstanceInitializationFactory());
+        return Scenario.from(formDef);
+    }
+
+    public static Scenario init(FormDef formDef) throws XFormParser.ParseException {
+        formDef.initialize(true, new InstanceInitializationFactory());
+        return Scenario.from(formDef);
+    }
+
+    @NotNull
+    public static FormDef createFormDef(Path formFile) throws XFormParser.ParseException {
         // TODO explain why this sequence of calls
         StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();
         FormParseInit fpi = new FormParseInit(formFile);
         FormDef formDef = fpi.getFormDef();
-        formDef.initialize(true, new InstanceInitializationFactory());
-        return Scenario.from(formDef);
+        return formDef;
     }
 
     // endregion

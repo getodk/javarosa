@@ -38,9 +38,14 @@ import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.form.api.FormEntryCaption;
@@ -370,5 +375,55 @@ public class FormDefTest {
 
         caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
         MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 2"));
+    }
+
+    @Test
+    public void canAddFunctionHandlersBeforeInitialize() throws Exception {
+        FormDef formDef = Scenario.createFormDef("custom-func-form", html(
+            head(
+                title("custom-func-form"),
+                model(
+                    mainInstance(t("data",
+                        t("calculate"),
+                        t("input")
+                    )),
+                    bind("/data/calculate").type("string").calculate("custom-func()")
+                )
+            ),
+            body(
+                input("/data/input",
+                    label("/data/calculate")
+                )
+            )
+        ));
+
+        formDef.getEvaluationContext().addFunctionHandler(new IFunctionHandler() {
+            @Override
+            public String getName() {
+                return "custom-func";
+            }
+
+            @Override
+            public List<Class[]> getPrototypes() {
+                return new ArrayList<Class[]>();
+            }
+
+            @Override
+            public boolean rawArgs() {
+                return true;
+            }
+
+            @Override
+            public boolean realTime() {
+                return false;
+            }
+
+            @Override
+            public Object eval(Object[] args, EvaluationContext ec) {
+                return "blah";
+            }
+        });
+
+        Scenario.init(formDef);
     }
 }
