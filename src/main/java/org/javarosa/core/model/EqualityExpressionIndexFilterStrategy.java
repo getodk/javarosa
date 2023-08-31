@@ -37,7 +37,7 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
         if (candidate != null) {
             XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
             if (original.isEqual()) {
-                String section = sourceInstance.getInstanceId() + nodeSet + candidate.getRelativeSide().toString();
+                String section = nodeSet + candidate.getRelativeSide().toString();
                 if (!index.contains(section)) {
                     buildIndex(sourceInstance, candidate, children, evaluationContext, section);
                 }
