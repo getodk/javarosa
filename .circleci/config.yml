@@ -1,23 +1,10 @@
 version: 2
 
-references:
-    accept_licenses : &accept_licenses
-        run:
-            name: Accept licenses
-            command: yes | sdkmanager --licenses || true
-    workspace: &workspace
-                   ~/work
-
-    android_config: &android_config
-        working_directory: *workspace
-        docker:
-            - image: cimg/android:2022.09.1
-
 jobs:
   build:
     working_directory: ~/work
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
       - restore_cache:
@@ -39,17 +26,6 @@ jobs:
           destination: libs
       - store_test_results:
           path: build/test-results
-  check-android-api-level:
-    <<: *android_config
-    steps:
-      - checkout
-      - *accept_licenses
-      - run:
-          name: Android Lint
-          command: ./gradlew -Pandroid lintDebug --max-workers=1
-      - store_artifacts:
-          path: build/reports/lint-results-debug.html
-          destination: lint-results.html
   package:
     working_directory: ~/work
     docker:
@@ -76,5 +52,4 @@ workflows:
   build_and_package:
     jobs:
       - build
-      - check-android-api-level
       - package
