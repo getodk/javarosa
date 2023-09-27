@@ -202,5 +202,35 @@ public class FormEntryPromptTest {
         scenario.next();
         assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("message"));
     }
+
+    @Test
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawString() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("Required questions", html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "Your message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "message")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("message"));
+    }
     //endregion
 }
