@@ -212,7 +212,7 @@ public class FormEntryPrompt extends FormEntryCaption {
                     if (!value.equals("")) {
                         return (String) value;
                     }
-                    return null;
+                    return constraintText;
                 } catch (Exception e) {
                     return constraintText;
                 }
