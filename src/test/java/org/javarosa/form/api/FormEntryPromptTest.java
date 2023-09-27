@@ -18,6 +18,8 @@ package org.javarosa.form.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
 import static org.javarosa.core.util.XFormsElement.html;
@@ -146,6 +148,59 @@ public class FormEntryPromptTest {
         scenario.next();
         questionPrompt = scenario.getFormEntryPromptAtIndex();
         assertThat(questionPrompt.getAnswerText(), is("A"));
+    }
+
+    @Test
+    public void getRequiredText_shouldReturnNullIfRequiredTextNotSpecified() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("Required questions", html(
+            head(
+                title("Required questions"),
+                model(
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is(nullValue()));
+    }
+
+    @Test
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("Required questions", html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "jr:itext('/data/q1:requiredMsg')")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("message"));
     }
     //endregion
 }
