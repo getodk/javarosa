@@ -35,6 +35,9 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,6 +186,41 @@ public class FormEntryPrompt extends FormEntryCaption {
             }
             return text;
         }
+    }
+
+    public String getRequiredText() {
+        // look for the text under the requiredMsg bind attribute
+        String constraintText = form.getMainInstance().resolveReference(index.getReference()).getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA,
+            "requiredMsg");
+        if (constraintText != null) {
+            XPathExpression xpathRequiredMsg;
+            try {
+                xpathRequiredMsg = XPathParseTool.parseXPath("string(" + constraintText + ")");
+            } catch (Exception e) {
+                // Expected in probably most cases.
+                // This is a string literal, so no need to evaluate anything.
+                return constraintText;
+            }
+
+            if (xpathRequiredMsg != null) {
+                try {
+                    TreeElement treeElement = form.getMainInstance().resolveReference(
+                        index.getReference());
+                    EvaluationContext ec = new EvaluationContext(form.getEvaluationContext(),
+                        treeElement.getRef());
+                    Object value = xpathRequiredMsg.eval(form.getMainInstance(), ec);
+                    if (!value.equals("")) {
+                        return (String) value;
+                    }
+                    return null;
+                } catch (Exception e) {
+                    return constraintText;
+                }
+            } else {
+                return constraintText;
+            }
+        }
+        return null;
     }
 
     public String getConstraintText() {
