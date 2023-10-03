@@ -79,15 +79,14 @@ tasks.register('installLocal') {
 
 if (!project.hasProperty("android")) {
     jar {
-        baseName = 'javarosa'
         // Be sure to update version in pom.xml to match
         // snapshot release = x.x.x-SNAPSHOT
         // production release = x.x.x
-        version = '4.3.0-SNAPSHOT'
-        archiveName = baseName + '-' + version + '.jar'
+        archiveVersion = '4.3.0-SNAPSHOT'
+        archiveBaseName = "javarosa"
 
         manifest {
-            attributes 'Manifest-Version': "$jar.version"
+            attributes 'Manifest-Version': "$jar.archiveVersion"
         }
     }
 
@@ -98,7 +97,9 @@ if (!project.hasProperty("android")) {
 
     jacocoTestReport {
         reports {
-            xml.enabled true
+            xml {
+                enabled false
+            }
         }
     }
 
