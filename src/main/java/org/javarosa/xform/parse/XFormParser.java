@@ -87,6 +87,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -196,6 +198,8 @@ public class XFormParser implements IXFormParserFunctions {
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
+
+    private static final Lock parseLock = new ReentrantLock();
 
     public static void setAnswerResolver(IAnswerResolver answerResolver) {
         XFormParser.answerResolver = answerResolver;
@@ -387,36 +391,45 @@ public class XFormParser implements IXFormParserFunctions {
      *                     no data will be loaded and the instance will be blank.
      */
     public FormDef parse(String formXmlSrc, String lastSavedSrc) throws ParseException {
-        if (_f == null) {
-            logger.info("Parsing form...");
+        try {
+            if (!parseLock.tryLock()) {
+                throw new IllegalStateException("Another XForm is being parsed!");
+            }
 
-            if (_xmldoc == null) {
-                try {
-                    _xmldoc = getXMLDocument(_reader, stringCache);
-                } catch (IOException e) {
-                    throw new ParseException("IO Exception during parse! " + e.getMessage());
+
+            if (_f == null) {
+                logger.info("Parsing form...");
+
+                if (_xmldoc == null) {
+                    try {
+                        _xmldoc = getXMLDocument(_reader, stringCache);
+                    } catch (IOException e) {
+                        throw new ParseException("IO Exception during parse! " + e.getMessage());
+                    }
+                }
+
+                parseDoc(formXmlSrc, buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
+
+                //load in a custom xml instance, if applicable
+                if (_instReader != null) {
+                    try {
+                        loadXmlInstance(_f, _instReader);
+                    } catch (IOException e) {
+                        throw new ParseException("IO Exception during parse! " + e.getMessage());
+                    }
+                } else if (_instDoc != null) {
+                    loadXmlInstance(_f, _instDoc);
                 }
             }
 
-            parseDoc(formXmlSrc, buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
-
-            //load in a custom xml instance, if applicable
-            if (_instReader != null) {
-                try {
-                    loadXmlInstance(_f, _instReader);
-                } catch (IOException e) {
-                    throw new ParseException("IO Exception during parse! " + e.getMessage());
-                }
-            } else if (_instDoc != null) {
-                loadXmlInstance(_f, _instDoc);
+            for (FormDefProcessor formDefProcessor : formDefProcessors) {
+                formDefProcessor.processFormDef(_f);
             }
-        }
 
-        for (FormDefProcessor formDefProcessor : formDefProcessors) {
-            formDefProcessor.processFormDef(_f);
+            return _f;
+        } finally {
+            parseLock.unlock();
         }
-
-        return _f;
     }
 
     public void addProcessor(Processor processor) {
