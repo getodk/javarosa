@@ -16,6 +16,7 @@
 
 package org.javarosa.xpath;
 
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.Lexer;
 import org.javarosa.xpath.parser.Parser;
@@ -38,6 +39,11 @@ public class XPathParseTool {
     };
 
     public static XPathExpression parseXPath (String xpath) throws XPathSyntaxException {
-        return Parser.parse(Lexer.lex(xpath));
+        XPathExpression expression = Parser.parse(Lexer.lex(xpath));
+        for (XFormParser.XPathProcessor processor : XFormParser.tempXPathProcessors) {
+            processor.processXPath(expression);
+        }
+
+        return expression;
     }
 }

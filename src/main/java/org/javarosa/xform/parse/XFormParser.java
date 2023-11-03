@@ -59,6 +59,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -182,6 +183,9 @@ public class XFormParser implements IXFormParserFunctions {
     private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
     private final List<ModelAttributeProcessor> modelAttributeProcessors = new ArrayList<>();
     private final List<QuestionProcessor> questionProcessors = new ArrayList<>();
+    private final List<XPathProcessor> xpathProcessors = new ArrayList<>();
+
+    public static final List<XPathProcessor> tempXPathProcessors = new ArrayList<>();
 
     /**
      * The string IDs of all instances that are referenced in a instance() function call in the primary instance
@@ -396,6 +400,7 @@ public class XFormParser implements IXFormParserFunctions {
                 throw new IllegalStateException("Another XForm is being parsed!");
             }
 
+            tempXPathProcessors.addAll(xpathProcessors);
 
             if (_f == null) {
                 logger.info("Parsing form...");
@@ -428,6 +433,7 @@ public class XFormParser implements IXFormParserFunctions {
 
             return _f;
         } finally {
+            tempXPathProcessors.clear();
             parseLock.unlock();
         }
     }
@@ -447,6 +453,10 @@ public class XFormParser implements IXFormParserFunctions {
 
         if (processor instanceof QuestionProcessor) {
             questionProcessors.add((QuestionProcessor) processor);
+        }
+
+        if (processor instanceof XPathProcessor) {
+            xpathProcessors.add((XPathProcessor) processor);
         }
     }
 
@@ -2449,6 +2459,10 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface Processor {
 
+    }
+
+    public interface XPathProcessor extends Processor {
+        void processXPath(@NotNull XPathExpression xPathExpression);
     }
 
     public interface FormDefProcessor extends Processor {
