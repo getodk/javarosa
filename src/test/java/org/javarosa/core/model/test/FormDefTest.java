@@ -44,8 +44,10 @@ import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.form.api.FormEntryCaption;
@@ -300,6 +302,43 @@ public class FormDefTest {
         assertThat(formDef.isRepeatRelevant(getRef("/data/outer[1]/inner[0]")), is(false));
     }
     //endregion
+
+    @Test
+    public void canCreateRepeat_returnsFalse_when_repeatCountSetButTheGroupItBelongsToDoesNotExist() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Nested repeat relevance", html(
+            head(
+                title("Nested repeat relevance"),
+                model(
+                    mainInstance(t("data id=\"nested-repeat-relevance\"",
+                        t("outer",
+                            t("inner_count"),
+                            t("inner",
+                                t("question")
+                            )
+                        )
+                    )),
+                    bind("/data/outer/inner_count").type("string").calculate("5")
+                )),
+            body(
+                repeat("/data/outer",
+                    repeat("/data/outer/inner", "/data/outer/inner_count",
+                        input("/data/outer/inner/question")
+                    )
+                )
+            )));
+
+        scenario.next();
+        FormIndex outerGroupIndex = scenario.getCurrentIndex();
+
+        scenario.next();
+        TreeReference innerGroupRef = scenario.refAtIndex();
+        FormIndex index = scenario.getCurrentIndex();
+
+        FormDef formDef = scenario.getFormDef();
+        formDef.deleteRepeat(outerGroupIndex);
+
+        assertThat(formDef.canCreateRepeat(innerGroupRef, index), is(false));
+    }
 
     @Test
     public void fillTemplateString_resolvesRelativeReferences() throws IOException, XFormParser.ParseException {
