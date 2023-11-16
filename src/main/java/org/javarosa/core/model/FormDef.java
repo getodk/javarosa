@@ -585,8 +585,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 TreeElement countNode = this.getMainInstance().resolveReference(
                     countRef.contextualize(repeatRef));
                 if (countNode == null) {
-                    throw new RuntimeException("Could not locate the repeat count value expected at "
-                        + repeat.getCountReference().getReference().toString());
+                    return false;
                 }
                 // get the total multiplicity possible
                 long fullcount = AnswerDataUtil.answerDataToInt(countNode.getValue());
