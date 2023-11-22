@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class EntityFormParseProcessor implements XFormParser.BindAttributeProcessor, XFormParser.FormDefProcessor, XFormParser.ModelAttributeProcessor {
 
     private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
-    public static final String SUPPORTED_VERSION = "2022.1";
+    private static final String[] SUPPORTED_VERSIONS = {"2022.1", "2023.1"};
 
     private final List<Pair<XPathReference, String>> saveTos = new ArrayList<>();
     private boolean versionPresent;
@@ -32,12 +33,7 @@ public class EntityFormParseProcessor implements XFormParser.BindAttributeProces
     public void processModelAttribute(String name, String value) throws XFormParser.ParseException {
         versionPresent = true;
 
-        try {
-            String[] versionParts = value.split("\\.");
-            if (!SUPPORTED_VERSION.equals(versionParts[0] + "." + versionParts[1])) {
-                throw new UnrecognizedEntityVersionException();
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        if (Stream.of(SUPPORTED_VERSIONS).noneMatch(value::startsWith)) {
             throw new UnrecognizedEntityVersionException();
         }
     }
