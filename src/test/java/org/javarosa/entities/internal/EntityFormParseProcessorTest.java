@@ -130,7 +130,7 @@ public class EntityFormParseProcessorTest {
 
     @Test
     public void whenVersionIsNewPatch_parsesCorrectly() throws XFormParser.ParseException {
-        String newPatchVersion = EntityFormParseProcessor.SUPPORTED_VERSION + ".12";
+        String newPatchVersion = "2022.1.12";
 
         XFormsElement form = XFormsElement.html(
             asList(
@@ -164,6 +164,41 @@ public class EntityFormParseProcessorTest {
     }
 
     @Test
+    public void whenVersionIsNewVersionWithUpdates_parsesCorrectly() throws XFormParser.ParseException {
+        String updateVersion = "2023.1.0";
+
+        XFormsElement form = XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(asList(new Pair<>("entities:entities-version", updateVersion)),
+                    mainInstance(
+                        t("data id=\"update-entity-form\"",
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" update=\"1\" id=\"17\"")
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        );
+
+        EntityFormParseProcessor processor = new EntityFormParseProcessor();
+        XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
+        parser.addProcessor(processor);
+
+        FormDef formDef = parser.parse(null);
+        assertThat(formDef.getExtras().get(EntityFormExtra.class), notNullValue());
+    }
+
+    @Test
     public void saveTosWithIncorrectNamespaceAreIgnored() throws XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
@@ -172,7 +207,7 @@ public class EntityFormParseProcessorTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("correct:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("correct:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),

@@ -6,7 +6,6 @@ import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entities.internal.Entities;
-import org.javarosa.entities.internal.EntityFormParseProcessor;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.javarosa.xform.util.XFormUtils;
@@ -54,7 +53,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"entity-form\"",
                             t("name"),
@@ -89,7 +88,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -126,7 +125,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -177,7 +176,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -217,7 +216,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("blah:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("blah:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -253,7 +252,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("team"),
@@ -289,7 +288,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
@@ -322,7 +321,7 @@ public class EntitiesTest {
             ),
             head(
                 title("Create entity form"),
-                model(asList(new Pair<>("entities:entities-version", EntityFormParseProcessor.SUPPORTED_VERSION + ".1")),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("name"),
