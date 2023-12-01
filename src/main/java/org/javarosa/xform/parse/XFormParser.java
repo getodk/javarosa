@@ -59,6 +59,7 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -87,6 +88,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -180,6 +183,9 @@ public class XFormParser implements IXFormParserFunctions {
     private final List<FormDefProcessor> formDefProcessors = new ArrayList<>();
     private final List<ModelAttributeProcessor> modelAttributeProcessors = new ArrayList<>();
     private final List<QuestionProcessor> questionProcessors = new ArrayList<>();
+    private final List<XPathProcessor> xpathProcessors = new ArrayList<>();
+
+    public static final List<XPathProcessor> tempXPathProcessors = new ArrayList<>();
 
     /**
      * The string IDs of all instances that are referenced in a instance() function call in the primary instance
@@ -196,6 +202,8 @@ public class XFormParser implements IXFormParserFunctions {
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
+
+    private static final Lock parseLock = new ReentrantLock();
 
     public static void setAnswerResolver(IAnswerResolver answerResolver) {
         XFormParser.answerResolver = answerResolver;
@@ -387,36 +395,47 @@ public class XFormParser implements IXFormParserFunctions {
      *                     no data will be loaded and the instance will be blank.
      */
     public FormDef parse(String formXmlSrc, String lastSavedSrc) throws ParseException {
-        if (_f == null) {
-            logger.info("Parsing form...");
+        try {
+            if (!parseLock.tryLock()) {
+                throw new IllegalStateException("Another XForm is being parsed!");
+            }
 
-            if (_xmldoc == null) {
-                try {
-                    _xmldoc = getXMLDocument(_reader, stringCache);
-                } catch (IOException e) {
-                    throw new ParseException("IO Exception during parse! " + e.getMessage());
+            tempXPathProcessors.addAll(xpathProcessors);
+
+            if (_f == null) {
+                logger.info("Parsing form...");
+
+                if (_xmldoc == null) {
+                    try {
+                        _xmldoc = getXMLDocument(_reader, stringCache);
+                    } catch (IOException e) {
+                        throw new ParseException("IO Exception during parse! " + e.getMessage());
+                    }
+                }
+
+                parseDoc(formXmlSrc, buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
+
+                //load in a custom xml instance, if applicable
+                if (_instReader != null) {
+                    try {
+                        loadXmlInstance(_f, _instReader);
+                    } catch (IOException e) {
+                        throw new ParseException("IO Exception during parse! " + e.getMessage());
+                    }
+                } else if (_instDoc != null) {
+                    loadXmlInstance(_f, _instDoc);
                 }
             }
 
-            parseDoc(formXmlSrc, buildNamespacesMap(_xmldoc.getRootElement()), lastSavedSrc);
-
-            //load in a custom xml instance, if applicable
-            if (_instReader != null) {
-                try {
-                    loadXmlInstance(_f, _instReader);
-                } catch (IOException e) {
-                    throw new ParseException("IO Exception during parse! " + e.getMessage());
-                }
-            } else if (_instDoc != null) {
-                loadXmlInstance(_f, _instDoc);
+            for (FormDefProcessor formDefProcessor : formDefProcessors) {
+                formDefProcessor.processFormDef(_f);
             }
-        }
 
-        for (FormDefProcessor formDefProcessor : formDefProcessors) {
-            formDefProcessor.processFormDef(_f);
+            return _f;
+        } finally {
+            tempXPathProcessors.clear();
+            parseLock.unlock();
         }
-
-        return _f;
     }
 
     public void addProcessor(Processor processor) {
@@ -434,6 +453,10 @@ public class XFormParser implements IXFormParserFunctions {
 
         if (processor instanceof QuestionProcessor) {
             questionProcessors.add((QuestionProcessor) processor);
+        }
+
+        if (processor instanceof XPathProcessor) {
+            xpathProcessors.add((XPathProcessor) processor);
         }
     }
 
@@ -2436,6 +2459,10 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface Processor {
 
+    }
+
+    public interface XPathProcessor extends Processor {
+        void processXPath(@NotNull XPathExpression xPathExpression);
     }
 
     public interface FormDefProcessor extends Processor {
