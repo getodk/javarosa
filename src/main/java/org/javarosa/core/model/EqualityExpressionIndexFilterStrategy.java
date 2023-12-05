@@ -33,16 +33,16 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
             return next.get();
         }
 
-        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
+        CompareToNodeExpression candidate = CompareToNodeExpression.parse(predicate);
         if (candidate != null) {
             XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
             if (original.isEqual()) {
-                String section = nodeSet + candidate.getRelativeSide().toString();
+                String section = nodeSet + candidate.getNodeSide().toString();
                 if (!index.contains(section)) {
                     buildIndex(sourceInstance, candidate, children, evaluationContext, section);
                 }
 
-                Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
+                Object absoluteValue = candidate.evalContextSide(sourceInstance, evaluationContext);
                 return index.lookup(section, absoluteValue.toString());
             } else {
                 return next.get();
@@ -52,12 +52,12 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
         }
     }
 
-    private void buildIndex(DataInstance sourceInstance, CompareChildToAbsoluteExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
+    private void buildIndex(DataInstance sourceInstance, CompareToNodeExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
         for (int i = 0; i < children.size(); i++) {
             TreeReference child = children.get(i);
 
             Measure.log("IndexEvaluation");
-            String relativeValue = predicate.evalRelative(sourceInstance, evaluationContext, child, i).toString();
+            String relativeValue = predicate.evalNodeSide(sourceInstance, evaluationContext, child, i).toString();
             index.add(section, relativeValue, child);
         }
     }

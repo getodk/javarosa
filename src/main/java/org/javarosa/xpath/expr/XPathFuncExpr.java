@@ -1375,7 +1375,7 @@ public class XPathFuncExpr extends XPathExpression {
         return name.equals(id.name) || Arrays.stream(args).anyMatch(expression -> expression.containsFunc(name));
     }
 
-    private static final String[] IDEMPOTENT_FUNCTIONS = new String[]{
+    public static final String[] IDEMPOTENT_FUNCTIONS = new String[]{
         "regex",
         "starts-with",
         "ends-with",
