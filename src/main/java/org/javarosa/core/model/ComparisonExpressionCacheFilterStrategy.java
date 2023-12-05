@@ -29,10 +29,10 @@ public class ComparisonExpressionCacheFilterStrategy implements FilterStrategy {
             return next.get();
         }
 
-        CompareChildToAbsoluteExpression candidate = CompareChildToAbsoluteExpression.parse(predicate);
+        CompareToNodeExpression candidate = CompareToNodeExpression.parse(predicate);
         if (candidate != null) {
-            Object absoluteValue = candidate.evalAbsolute(sourceInstance, evaluationContext);
-            String key = nodeSet.toString() + predicate + candidate.getRelativeSide() + absoluteValue.toString();
+            Object absoluteValue = candidate.evalContextSide(sourceInstance, evaluationContext);
+            String key = nodeSet.toString() + predicate + candidate.getNodeSide() + absoluteValue.toString();
 
             if (cachedEvaluations.containsKey(key)) {
                 return cachedEvaluations.get(key);

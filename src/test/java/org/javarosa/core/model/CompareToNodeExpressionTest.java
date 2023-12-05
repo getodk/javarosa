@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-public class CompareChildToAbsoluteExpressionTest {
+public class CompareToNodeExpressionTest {
 
     @Test
     public void parse_doesNotParseExpressionsWhereBothSidesAreRelative() {
@@ -32,12 +32,12 @@ public class CompareChildToAbsoluteExpressionTest {
             )
         );
 
-        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        CompareToNodeExpression parsed = CompareToNodeExpression.parse(expression);
         assertThat(parsed, nullValue());
     }
 
     @Test
-    public void parse_parsesStringLiteralAsAbsolute() {
+    public void parse_parsesStringLiteralAsContextSide() {
         XPathEqExpr expression = new XPathEqExpr(
             true,
             new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
@@ -46,14 +46,14 @@ public class CompareChildToAbsoluteExpressionTest {
             new XPathStringLiteral("string")
         );
 
-        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        CompareToNodeExpression parsed = CompareToNodeExpression.parse(expression);
         assertThat(parsed, not(nullValue()));
-        assertThat(parsed.getRelativeSide(), equalTo(expression.a));
-        assertThat(parsed.getAbsoluteSide(), equalTo(expression.b));
+        assertThat(parsed.getNodeSide(), equalTo(expression.a));
+        assertThat(parsed.getContextSide(), equalTo(expression.b));
     }
 
     @Test
-    public void parse_parsesNumericLiteralAsAbsolute() {
+    public void parse_parsesNumericLiteralAsContextSide() {
         XPathEqExpr expression = new XPathEqExpr(
             true,
             new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
@@ -62,10 +62,10 @@ public class CompareChildToAbsoluteExpressionTest {
             new XPathNumericLiteral(45.0)
         );
 
-        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        CompareToNodeExpression parsed = CompareToNodeExpression.parse(expression);
         assertThat(parsed, not(nullValue()));
-        assertThat(parsed.getRelativeSide(), equalTo(expression.a));
-        assertThat(parsed.getAbsoluteSide(), equalTo(expression.b));
+        assertThat(parsed.getNodeSide(), equalTo(expression.a));
+        assertThat(parsed.getContextSide(), equalTo(expression.b));
     }
 
     @Test
@@ -83,10 +83,10 @@ public class CompareChildToAbsoluteExpressionTest {
             }
         );
 
-        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        CompareToNodeExpression parsed = CompareToNodeExpression.parse(expression);
         assertThat(parsed, not(nullValue()));
-        assertThat(parsed.getRelativeSide(), equalTo(expression.args[0]));
-        assertThat(parsed.getAbsoluteSide(), equalTo(expression.args[1]));
+        assertThat(parsed.getNodeSide(), equalTo(expression.args[0]));
+        assertThat(parsed.getContextSide(), equalTo(expression.args[1]));
     }
 
     @Test
@@ -103,12 +103,12 @@ public class CompareChildToAbsoluteExpressionTest {
             }
         );
 
-        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        CompareToNodeExpression parsed = CompareToNodeExpression.parse(expression);
         assertThat(parsed, nullValue());
     }
 
     @Test
-    public void parse_parsesContextRelativeExpressionsAsAbsolute() {
+    public void parse_parsesContextExpressionsAsContextSide() {
         XPathEqExpr expression = new XPathEqExpr(
             true,
             new XPathPathExpr(XPathPathExpr.INIT_CONTEXT_RELATIVE, new XPathStep[]{
@@ -120,10 +120,10 @@ public class CompareChildToAbsoluteExpressionTest {
             )
         );
 
-        CompareChildToAbsoluteExpression parsed = CompareChildToAbsoluteExpression.parse(expression);
+        CompareToNodeExpression parsed = CompareToNodeExpression.parse(expression);
         assertThat(parsed, not(nullValue()));
-        assertThat(parsed.getRelativeSide(), equalTo(expression.a));
-        assertThat(parsed.getAbsoluteSide(), equalTo(expression.b));
+        assertThat(parsed.getNodeSide(), equalTo(expression.a));
+        assertThat(parsed.getContextSide(), equalTo(expression.b));
     }
 
     @Test
@@ -137,15 +137,15 @@ public class CompareChildToAbsoluteExpressionTest {
 
         XPathEqExpr ltr = new XPathEqExpr(true, relative, absolute);
         XPathEqExpr rtl = new XPathEqExpr(true, absolute, relative);
-        CompareChildToAbsoluteExpression ltrParsed = CompareChildToAbsoluteExpression.parse(ltr);
-        CompareChildToAbsoluteExpression rtlParsed = CompareChildToAbsoluteExpression.parse(rtl);
+        CompareToNodeExpression ltrParsed = CompareToNodeExpression.parse(ltr);
+        CompareToNodeExpression rtlParsed = CompareToNodeExpression.parse(rtl);
 
         assertThat(ltrParsed, not(nullValue()));
-        assertThat(ltrParsed.getRelativeSide(), equalTo(relative));
-        assertThat(ltrParsed.getAbsoluteSide(), equalTo(absolute));
+        assertThat(ltrParsed.getNodeSide(), equalTo(relative));
+        assertThat(ltrParsed.getContextSide(), equalTo(absolute));
 
         assertThat(rtlParsed, not(nullValue()));
-        assertThat(rtlParsed.getRelativeSide(), equalTo(relative));
-        assertThat(rtlParsed.getAbsoluteSide(), equalTo(absolute));
+        assertThat(rtlParsed.getNodeSide(), equalTo(relative));
+        assertThat(rtlParsed.getContextSide(), equalTo(absolute));
     }
 }
