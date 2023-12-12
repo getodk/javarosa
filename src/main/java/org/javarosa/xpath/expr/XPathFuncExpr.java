@@ -16,9 +16,6 @@
 
 package org.javarosa.xpath.expr;
 
-import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
-import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -29,6 +26,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.util.Base64;
+import org.javarosa.core.util.Ed25519;
 import org.javarosa.core.util.GeoUtils;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.PropertyUtils;
@@ -502,27 +500,7 @@ public class XPathFuncExpr extends XPathExpression {
             return base64Decode(argVals[0]);
         } else if (name.equals("extract-signed")) {
             assertArgsCount(name, args, 2);
-
-            byte[] decodedContents = Base64.decode(toString(argVals[0]).getBytes());
-
-            byte[] signature = new byte[64];
-            System.arraycopy(decodedContents, 0, signature, 0, 64);
-
-            int messageLength = decodedContents.length - 64;
-            byte[] message = new byte[messageLength];
-            System.arraycopy(decodedContents, 64, message, 0, messageLength);
-
-            byte[] decodedPublicKey = Base64.decode(toString(argVals[1]).getBytes());
-            Ed25519PublicKeyParameters publicKeyParameters = new Ed25519PublicKeyParameters(decodedPublicKey, 0);
-            Signer signer = new Ed25519Signer();
-            signer.init(false, publicKeyParameters);
-            signer.update(message, 0, message.length);
-
-            if (signer.verifySignature(signature)) {
-                return new String(message);
-            } else {
-                return "";
-            }
+            return extractSigned(argVals[0], argVals[1]);
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
@@ -1289,6 +1267,18 @@ public class XPathFuncExpr extends XPathExpression {
 
         byte[] decoded = Encoding.BASE64.decode(base64String.getBytes(StandardCharsets.UTF_8));
         return new String(decoded, StandardCharsets.UTF_8);
+    }
+
+    private static String extractSigned(Object o1, Object o2) {
+        byte[] decodedContents = Base64.decode(toString(o1).getBytes());
+        byte[] decodedPublicKey = Base64.decode(toString(o2).getBytes());
+
+        String extracted = Ed25519.extractSigned(decodedContents, decodedPublicKey);
+        if (extracted != null) {
+            return extracted;
+        } else {
+            return "";
+        }
     }
 
     private static Object[] subsetArgList(Object[] args, int start) {
