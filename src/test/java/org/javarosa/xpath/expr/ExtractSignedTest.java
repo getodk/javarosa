@@ -137,6 +137,19 @@ public class ExtractSignedTest {
         assertThat(scenario.answerOf("/data/extracted"), is(nullValue()));
     }
 
+    @Test
+    public void whenNonSignaturePartIncludesUnicode_successfullyDecodes() throws Exception{
+        String message = "🎃";
+        AsymmetricCipherKeyPair keyPair = createKeyPair();
+
+        byte[] signedMessage = signMessage(message, keyPair.getPrivate());
+        String encodedPublicKey = Encoding.BASE64.encode(((Ed25519PublicKeyParameters) keyPair.getPublic()).getEncoded());
+        String encodedContents = Encoding.BASE64.encode(signedMessage);
+
+        Scenario scenario = createScenario(encodedContents, encodedPublicKey);
+        assertThat(scenario.answerOf("/data/extracted"), is(stringAnswer(message)));
+    }
+
     private static AsymmetricCipherKeyPair createKeyPair() {
         Ed25519KeyPairGenerator ed25519KeyPairGenerator = new Ed25519KeyPairGenerator();
         ed25519KeyPairGenerator.init(new Ed25519KeyGenerationParameters(new SecureRandom()));

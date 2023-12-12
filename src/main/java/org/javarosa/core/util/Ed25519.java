@@ -5,6 +5,8 @@ import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
+
 public class Ed25519 {
 
     private static final int SIGNATURE_LENGTH = 64;
@@ -23,7 +25,7 @@ public class Ed25519 {
         System.arraycopy(contents, SIGNATURE_LENGTH, message, 0, messageLength);
 
         if (verify(publicKey, signature, message)) {
-            return new String(message);
+            return new String(message, StandardCharsets.UTF_8);
         } else {
             return null;
         }
