@@ -9,12 +9,14 @@ import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.javarosa.core.test.Scenario;
+import org.javarosa.xpath.XPathUnhandledException;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
@@ -27,6 +29,7 @@ import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+import static org.junit.Assert.fail;
 
 public class ExtractSignedTest {
 
@@ -40,9 +43,9 @@ public class ExtractSignedTest {
         String encodedPublicKey = Encoding.BASE64.encode(((Ed25519PublicKeyParameters) keyPair.getPublic()).getEncoded());
         String encodedContents = Encoding.BASE64.encode(signedMessage);
 
-        Scenario scenario = Scenario.init("extract sign form", html(
+        Scenario scenario = Scenario.init("extract signed form", html(
             head(
-                title("extract sign form"),
+                title("extract signed form"),
                 model(
                     mainInstance(t("data id=\"extract-signed\"",
                         t("contents", encodedContents),
@@ -71,9 +74,9 @@ public class ExtractSignedTest {
         String encodedPublicKey = Encoding.BASE64.encode(((Ed25519PublicKeyParameters) keyPair2.getPublic()).getEncoded());
         String encodedContents = Encoding.BASE64.encode(signedMessage);
 
-        Scenario scenario = Scenario.init("extract sign form", html(
+        Scenario scenario = Scenario.init("extract signed form", html(
             head(
-                title("extract sign form"),
+                title("extract signed form"),
                 model(
                     mainInstance(t("data id=\"extract-signed\"",
                         t("contents", encodedContents),
@@ -89,6 +92,31 @@ public class ExtractSignedTest {
         );
 
         assertThat(scenario.answerOf("/data/extracted"), is(nullValue()));
+    }
+
+    @Test
+    public void whenNoArgs_throwsException() throws Exception {
+        try {
+            Scenario.init("extract signed form", html(
+                head(
+                    title("extract signed form"),
+                    model(
+                        mainInstance(t("data id=\"extract-signed\"",
+                            t("contents", "blah"),
+                            t("extracted")
+                        )),
+                        bind("/data/extracted").type("string").calculate("extract-signed()")
+                    )
+                ),
+                body(
+                    input("/data/contents")
+                ))
+            );
+
+            fail("RuntimeException caused by XPathUnhandledException expected");
+        } catch (RuntimeException e) {
+            assertThat(e.getCause(), instanceOf(XPathUnhandledException.class));
+        }
     }
 
     private static AsymmetricCipherKeyPair createKeyPair() {

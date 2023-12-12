@@ -501,6 +501,8 @@ public class XPathFuncExpr extends XPathExpression {
             assertArgsCount(name, args, 1);
             return base64Decode(argVals[0]);
         } else if (name.equals("extract-signed")) {
+            assertArgsCount(name, args, 2);
+
             byte[] decodedContents = Base64.decode(toString(argVals[0]).getBytes());
 
             byte[] signature = new byte[64];
