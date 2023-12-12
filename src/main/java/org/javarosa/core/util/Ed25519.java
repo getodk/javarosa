@@ -11,6 +11,10 @@ public class Ed25519 {
 
     @Nullable
     public static String extractSigned(byte[] contents, byte[] publicKey) {
+        if (contents.length < 64) {
+            return null;
+        }
+
         byte[] signature = new byte[SIGNATURE_LENGTH];
         System.arraycopy(contents, 0, signature, 0, SIGNATURE_LENGTH);
 
@@ -26,11 +30,19 @@ public class Ed25519 {
     }
 
     private static boolean verify(byte[] publicKey, byte[] signature, byte[] message) {
-        Ed25519PublicKeyParameters publicKeyParameters = new Ed25519PublicKeyParameters(publicKey, 0);
-        Signer signer = new Ed25519Signer();
-        signer.init(false, publicKeyParameters);
-        signer.update(message, 0, message.length);
+        try {
+            Ed25519PublicKeyParameters publicKeyParameters = new Ed25519PublicKeyParameters(publicKey, 0);
+            Signer signer = new Ed25519Signer();
+            signer.init(false, publicKeyParameters);
+            signer.update(message, 0, message.length);
 
-        return signer.verifySignature(signature);
+            return signer.verifySignature(signature);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // The key was too small
+            return false;
+        } catch (IllegalArgumentException e) {
+            // The key was invalid
+            return false;
+        }
     }
 }
