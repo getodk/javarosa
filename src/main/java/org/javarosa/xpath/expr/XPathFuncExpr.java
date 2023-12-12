@@ -16,6 +16,9 @@
 
 package org.javarosa.xpath.expr;
 
+import org.bouncycastle.crypto.Signer;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -25,6 +28,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.util.Base64;
 import org.javarosa.core.util.GeoUtils;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.PropertyUtils;
@@ -496,6 +500,27 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("base64-decode")) {
             assertArgsCount(name, args, 1);
             return base64Decode(argVals[0]);
+        } else if (name.equals("extract-signed")) {
+            byte[] decodedContents = Base64.decode(toString(argVals[0]).getBytes());
+
+            byte[] signature = new byte[64];
+            System.arraycopy(decodedContents, 0, signature, 0, 64);
+
+            int messageLength = decodedContents.length - 64;
+            byte[] message = new byte[messageLength];
+            System.arraycopy(decodedContents, 64, message, 0, messageLength);
+
+            byte[] decodedPublicKey = Base64.decode(toString(argVals[1]).getBytes());
+            Ed25519PublicKeyParameters publicKeyParameters = new Ed25519PublicKeyParameters(decodedPublicKey, 0);
+            Signer signer = new Ed25519Signer();
+            signer.init(false, publicKeyParameters);
+            signer.update(message, 0, message.length);
+
+            if (signer.verifySignature(signature)) {
+                return new String(message);
+            } else {
+                return "";
+            }
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
