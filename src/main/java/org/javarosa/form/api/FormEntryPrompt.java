@@ -190,16 +190,16 @@ public class FormEntryPrompt extends FormEntryCaption {
 
     public String getRequiredText() {
         // look for the text under the requiredMsg bind attribute
-        String constraintText = form.getMainInstance().resolveReference(index.getReference()).getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA,
+        String requiredMsgText = form.getMainInstance().resolveReference(index.getReference()).getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA,
             "requiredMsg");
-        if (constraintText != null) {
+        if (requiredMsgText != null) {
             XPathExpression xpathRequiredMsg;
             try {
-                xpathRequiredMsg = XPathParseTool.parseXPath("string(" + constraintText + ")");
+                xpathRequiredMsg = XPathParseTool.parseXPath("string(" + requiredMsgText + ")");
             } catch (Exception e) {
                 // Expected in probably most cases.
                 // This is a string literal, so no need to evaluate anything.
-                return constraintText;
+                return requiredMsgText;
             }
 
             if (xpathRequiredMsg != null) {
@@ -212,12 +212,12 @@ public class FormEntryPrompt extends FormEntryCaption {
                     if (!value.equals("")) {
                         return (String) value;
                     }
-                    return constraintText;
+                    return requiredMsgText;
                 } catch (Exception e) {
-                    return constraintText;
+                    return requiredMsgText;
                 }
             } else {
-                return constraintText;
+                return requiredMsgText;
             }
         }
         return null;
