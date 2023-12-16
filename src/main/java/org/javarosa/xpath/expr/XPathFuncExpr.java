@@ -25,6 +25,8 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.util.Base64;
+import org.javarosa.core.util.Ed25519;
 import org.javarosa.core.util.GeoUtils;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.PropertyUtils;
@@ -496,6 +498,9 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (name.equals("base64-decode")) {
             assertArgsCount(name, args, 1);
             return base64Decode(argVals[0]);
+        } else if (name.equals("extract-signed")) {
+            assertArgsCount(name, args, 2);
+            return extractSigned(argVals[0], argVals[1]);
         } else {
             //check for custom handler
             IFunctionHandler handler = funcHandlers.get(name);
@@ -1262,6 +1267,18 @@ public class XPathFuncExpr extends XPathExpression {
 
         byte[] decoded = Encoding.BASE64.decode(base64String.getBytes(StandardCharsets.UTF_8));
         return new String(decoded, StandardCharsets.UTF_8);
+    }
+
+    private static String extractSigned(Object o1, Object o2) {
+        byte[] decodedContents = Base64.decode(toString(o1).getBytes());
+        byte[] decodedPublicKey = Base64.decode(toString(o2).getBytes());
+
+        String extracted = Ed25519.extractSigned(decodedContents, decodedPublicKey);
+        if (extracted != null) {
+            return extracted;
+        } else {
+            return "";
+        }
     }
 
     private static Object[] subsetArgList(Object[] args, int start) {

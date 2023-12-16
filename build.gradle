@@ -168,6 +168,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.5'
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
 
     compileOnly 'net.sf.kxml:kxml2:2.3.0'
 
