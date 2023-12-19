@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:8.1.2'
         classpath "me.champeau.jmh:jmh-gradle-plugin:0.6.7"
     }
 }
@@ -48,8 +48,8 @@ compileTestJava {
     options.compilerArgs << "-Xlint:deprecation"
 }
 
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
+targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_17
 
 tasks.register('installLocal') {
     def lines = []
@@ -134,18 +134,18 @@ if (!project.hasProperty("android")) {
     android {
         namespace 'com.example'
 
-        compileSdkVersion 30
+        compileSdkVersion 34
         defaultConfig {
             minSdkVersion 21
-            targetSdkVersion 30
+            targetSdkVersion 33
             versionCode 1
             versionName "1.0"
             testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         }
         compileOptions {
             coreLibraryDesugaringEnabled true
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
         }
         buildTypes {
             release {
