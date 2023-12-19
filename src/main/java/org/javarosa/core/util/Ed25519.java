@@ -1,11 +1,18 @@
 package org.javarosa.core.util;
 
-import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
-import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.EdECPoint;
+import java.security.spec.EdECPublicKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.NamedParameterSpec;
 
 public class Ed25519 {
 
@@ -33,18 +40,44 @@ public class Ed25519 {
 
     private static boolean verify(byte[] publicKey, byte[] signature, byte[] message) {
         try {
-            Ed25519PublicKeyParameters publicKeyParameters = new Ed25519PublicKeyParameters(publicKey, 0);
-            Signer signer = new Ed25519Signer();
-            signer.init(false, publicKeyParameters);
-            signer.update(message, 0, message.length);
+            Signature signer = Signature.getInstance("Ed25519");
 
-            return signer.verifySignature(signature);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // The key was too small
-            return false;
-        } catch (IllegalArgumentException e) {
-            // The key was invalid
+            EdECPublicKeySpec pubSpec = getPubSpec(publicKey);
+            KeyFactory keyFactory = KeyFactory.getInstance("Ed25519");
+            signer.initVerify(keyFactory.generatePublic(pubSpec));
+
+            signer.update(message);
+            return signer.verify(signature);
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeySpecException e) {
+            throw new RuntimeException();
+        } catch (InvalidKeyException e) {
             return false;
         }
+    }
+
+    private static EdECPublicKeySpec getPubSpec(byte[] publicKey) {
+        byte[] publicKeyCopy = new byte[publicKey.length];
+        System.arraycopy(publicKey, 0, publicKeyCopy, 0, publicKey.length);
+
+        int lastbyteInt = publicKeyCopy[publicKeyCopy.length - 1];
+        boolean isXOdd = (lastbyteInt & 255) >> 7 == 1;
+
+        publicKeyCopy[publicKeyCopy.length - 1] &= 127;
+        BigInteger y = new BigInteger(1, reverseBytes(publicKeyCopy));
+
+        NamedParameterSpec paramSpec = new NamedParameterSpec("Ed25519");
+        EdECPoint point = new EdECPoint(isXOdd, y);
+        return new EdECPublicKeySpec(paramSpec, point);
+    }
+
+    private static byte[] reverseBytes(byte[] bytes) {
+        byte[] reversed = new byte[bytes.length];
+        int lastIndex = bytes.length - 1;
+
+        for (int i = 0; i < bytes.length; i++) {
+            reversed[lastIndex - i] = bytes[i];
+        }
+
+        return reversed;
     }
 }
