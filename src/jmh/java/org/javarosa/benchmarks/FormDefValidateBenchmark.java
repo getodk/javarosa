@@ -58,7 +58,7 @@ public class FormDefValidateBenchmark {
 
     @Benchmark
     public void benchmarkFormDefValidate(FormDefValidateState state, Blackhole bh) {
-        ValidateOutcome validateOutcome = state.formDef.validate(true);
+        ValidateOutcome validateOutcome = state.formDef.validate();
         bh.consume(validateOutcome);
     }
 }

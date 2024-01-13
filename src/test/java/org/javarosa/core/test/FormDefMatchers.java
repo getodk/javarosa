@@ -26,7 +26,7 @@ public class FormDefMatchers {
         return new TypeSafeMatcher<FormDef>() {
             @Override
             protected boolean matchesSafely(FormDef item) {
-                return item.validate(true) == null;
+                return item.validate() == null;
             }
 
             @Override
