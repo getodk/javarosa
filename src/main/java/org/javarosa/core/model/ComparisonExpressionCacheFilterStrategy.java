@@ -32,15 +32,9 @@ public class ComparisonExpressionCacheFilterStrategy implements FilterStrategy {
 
         CompareToNodeExpression candidate = CompareToNodeExpression.parse(predicate);
         if (candidate != null) {
-            String key = getKey(sourceInstance, nodeSet, predicate, evaluationContext, candidate);
+            String key = getExpressionKey(sourceInstance, nodeSet, predicate, evaluationContext, candidate);
 
-            if (cachedEvaluations.containsKey(key)) {
-                return cachedEvaluations.get(key);
-            } else {
-                List<TreeReference> filtered = next.get();
-                cachedEvaluations.put(key, filtered);
-                return filtered;
-            }
+            return getCachedEvaluations(next, key);
         } else if (predicate instanceof XPathBoolExpr) {
             XPathExpression a = ((XPathBoolExpr) predicate).a;
             XPathExpression b = ((XPathBoolExpr) predicate).b;
@@ -49,17 +43,11 @@ public class ComparisonExpressionCacheFilterStrategy implements FilterStrategy {
             CompareToNodeExpression candidateB = CompareToNodeExpression.parse(b);
 
             if (candidateA != null && candidateB != null) {
-                String keyA = getKey(sourceInstance, nodeSet, a, evaluationContext, candidateA);
-                String keyB = getKey(sourceInstance, nodeSet, b, evaluationContext, candidateB);
-                String key = keyA + keyB + predicate;
+                String keyA = getExpressionKey(sourceInstance, nodeSet, a, evaluationContext, candidateA);
+                String keyB = getExpressionKey(sourceInstance, nodeSet, b, evaluationContext, candidateB);
+                String key = "XPathBoolExpr:" + ((XPathBoolExpr) predicate).op + keyA + keyB;
 
-                if (cachedEvaluations.containsKey(key)) {
-                    return cachedEvaluations.get(key);
-                } else {
-                    List<TreeReference> filtered = next.get();
-                    cachedEvaluations.put(key, filtered);
-                    return filtered;
-                }
+                return getCachedEvaluations(next, key);
             } else {
                 return next.get();
             }
@@ -68,10 +56,19 @@ public class ComparisonExpressionCacheFilterStrategy implements FilterStrategy {
         }
     }
 
+    private List<TreeReference> getCachedEvaluations(@NotNull Supplier<List<TreeReference>> next, String key) {
+        if (cachedEvaluations.containsKey(key)) {
+            return cachedEvaluations.get(key);
+        } else {
+            List<TreeReference> filtered = next.get();
+            cachedEvaluations.put(key, filtered);
+            return filtered;
+        }
+    }
+
     @NotNull
-    private static String getKey(@NotNull DataInstance sourceInstance, @NotNull TreeReference nodeSet, @NotNull XPathExpression predicate, @NotNull EvaluationContext evaluationContext, CompareToNodeExpression candidate) {
+    private static String getExpressionKey(@NotNull DataInstance sourceInstance, @NotNull TreeReference nodeSet, @NotNull XPathExpression predicate, @NotNull EvaluationContext evaluationContext, CompareToNodeExpression candidate) {
         Object absoluteValue = candidate.evalContextSide(sourceInstance, evaluationContext);
         return nodeSet.toString() + predicate + candidate.getNodeSide() + absoluteValue.toString();
     }
-
 }

@@ -2,7 +2,6 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.measure.Measure;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
