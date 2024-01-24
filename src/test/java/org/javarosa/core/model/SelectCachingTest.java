@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.equalTo;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -54,8 +54,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
 
     @Test
@@ -92,8 +92,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select2");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
 
     @Test
@@ -130,8 +130,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select2");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
 
     @Test
@@ -169,8 +169,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select2");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
 
     //region repeats
@@ -206,8 +206,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/repeat[1]/select");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(8));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(4));
     }
 
     @Test
@@ -244,8 +244,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/outer[0]/inner[1]/select");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
     //endregion
 }
