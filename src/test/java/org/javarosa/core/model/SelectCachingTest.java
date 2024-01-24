@@ -2,6 +2,7 @@ package org.javarosa.core.model;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.measure.Measure;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
@@ -56,6 +57,73 @@ public class SelectCachingTest {
 
         // Check that we do just (size of secondary instance)
         assertThat(evaluations, equalTo(2));
+    }
+
+    @Test
+    public void andOfTwoEqChoiceFiltersAreOnlyEvaluatedOnceForRepeatedChoiceListEvaluations() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice and value=/data/choice]")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/choice", "a");
+
+            scenario.choicesOf("/data/select");
+            scenario.choicesOf("/data/select");
+        });
+
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
+    }
+
+    @Test
+    public void andOfTwoEqChoiceFiltersIsNotConfusedWithOr() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("select1"),
+                        t("select2")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/select1").type("string"),
+                    bind("/data/select2").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                select1Dynamic("/data/select1", "instance('instance')/root/item[value=/data/choice or value!=/data/choice]"),
+                select1Dynamic("/data/select2", "instance('instance')/root/item[value=/data/choice and value!=/data/choice]")
+            )
+        ));
+
+        scenario.answer("/data/choice", "a");
+        assertThat(scenario.choicesOf("/data/select1").size(), equalTo(2));
+        assertThat(scenario.choicesOf("/data/select2").size(), equalTo(0));
     }
 
     @Test
