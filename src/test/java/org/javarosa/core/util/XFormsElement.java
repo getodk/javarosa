@@ -18,12 +18,12 @@ package org.javarosa.core.util;
 
 import kotlin.Pair;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 
 public interface XFormsElement {
@@ -43,7 +43,7 @@ public interface XFormsElement {
             return emptyMap();
         Map<String, String> attributes = new HashMap<>();
         String[] words = name.split(" ");
-        for (String word : Arrays.asList(words).subList(1, words.length)) {
+        for (String word : asList(words).subList(1, words.length)) {
             String[] parts = word.split("(?<!\\))=(\"|')");
             attributes.put(parts[0], parts[1].substring(0, parts[1].length() - 1));
         }
@@ -59,7 +59,7 @@ public interface XFormsElement {
     static XFormsElement t(String name, XFormsElement... children) {
         if (children.length == 0)
             return new EmptyXFormsElement(parseName(name), parseAttributes(name));
-        return new TagXFormsElement(parseName(name), parseAttributes(name), Arrays.asList(children));
+        return new TagXFormsElement(parseName(name), parseAttributes(name), asList(children));
     }
 
     static XFormsElement t(String name, String innerHtml) {
@@ -135,7 +135,16 @@ public interface XFormsElement {
     }
 
     static XFormsElement select1Dynamic(String ref, String nodesetRef) {
-        return select1Dynamic(ref, nodesetRef, "value", "label");
+        XFormsElement value = t("value ref=\"value\"");
+        XFormsElement label = t("label ref=\"label\"");
+
+        HashMap<String, String> itemsetAttributes = new HashMap<>();
+        itemsetAttributes.put("nodeset", nodesetRef);
+        TagXFormsElement itemset = new TagXFormsElement("itemset", itemsetAttributes, asList(value, label));
+
+        HashMap<String, String> select1Attributes = new HashMap<>();
+        select1Attributes.put("ref", ref);
+        return new TagXFormsElement("select1", select1Attributes, asList(itemset));
     }
 
     static XFormsElement select1Dynamic(String ref, String nodesetRef, String valueRef, String labelRef) {
@@ -186,13 +195,13 @@ public interface XFormsElement {
 
     class HeadXFormsElement extends TagXFormsElement {
         public HeadXFormsElement(XFormsElement[] children) {
-            super("h:head", emptyMap(), Arrays.asList(children));
+            super("h:head", emptyMap(), asList(children));
         }
     }
 
     class BodyXFormsElement extends TagXFormsElement {
         public BodyXFormsElement(XFormsElement[] children) {
-            super("h:body", emptyMap(), Arrays.asList(children));
+            super("h:body", emptyMap(), asList(children));
         }
     }
 }
