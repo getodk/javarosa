@@ -7,6 +7,7 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
 import static org.javarosa.core.util.XFormsElement.head;
@@ -238,6 +239,82 @@ public class SelectCachingTest {
 
         // Check that we do just (size of secondary instance)
         assertThat(evaluations, equalTo(2));
+    }
+
+    @Test
+    public void nestedPredicatesAreOnlyEvaluatedOnceForAQuestionWhileTheFormStateIsStable() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("other_choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/other_choice").type("string"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                input("/data/other_choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice][value=/data/other_choice]")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/choice", "a");
+            scenario.answer("/data/other_choice", "a");
+
+            scenario.choicesOf("/data/select");
+            scenario.choicesOf("/data/select");
+        });
+
+        /* Check that we do less than (secondary instance size) * (number of lookups) - the number could fluctuate
+          depending on how the nested predicates are individually cached/indexed.
+         */
+        assertThat(evaluations, lessThan(4));
+    }
+
+    @Test
+    public void nestedPredicatesAreCorrectAfterFormStateChanges() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("other_choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/other_choice").type("string"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                input("/data/other_choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice][value=/data/other_choice]")
+            )
+        ));
+
+        scenario.answer("/data/choice", "a");
+        scenario.answer("/data/other_choice", "a");
+        assertThat(scenario.choicesOf("/data/select").size(), equalTo(1));
+
+        scenario.answer("/data/other_choice", "b");
+        assertThat(scenario.choicesOf("/data/select").size(), equalTo(0));
     }
 
     //region repeats
