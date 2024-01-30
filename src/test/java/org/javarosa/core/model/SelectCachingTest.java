@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.XFormsElement.body;
@@ -54,8 +55,75 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
+    }
+
+    @Test
+    public void andOfTwoEqChoiceFiltersAreOnlyEvaluatedOnceForRepeatedChoiceListEvaluations() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice and value=/data/choice]")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/choice", "a");
+
+            scenario.choicesOf("/data/select");
+            scenario.choicesOf("/data/select");
+        });
+
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
+    }
+
+    @Test
+    public void andOfTwoEqChoiceFiltersIsNotConfusedWithOr() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("select1"),
+                        t("select2")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/select1").type("string"),
+                    bind("/data/select2").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                select1Dynamic("/data/select1", "instance('instance')/root/item[value=/data/choice or value!=/data/choice]"),
+                select1Dynamic("/data/select2", "instance('instance')/root/item[value=/data/choice and value!=/data/choice]")
+            )
+        ));
+
+        scenario.answer("/data/choice", "a");
+        assertThat(scenario.choicesOf("/data/select1").size(), equalTo(2));
+        assertThat(scenario.choicesOf("/data/select2").size(), equalTo(0));
     }
 
     @Test
@@ -92,8 +160,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select2");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
 
     @Test
@@ -130,8 +198,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select2");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
 
     @Test
@@ -169,8 +237,84 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/select2");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
+    }
+
+    @Test
+    public void nestedPredicatesAreOnlyEvaluatedOnceForAQuestionWhileTheFormStateIsStable() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("other_choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/other_choice").type("string"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                input("/data/other_choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice][value=/data/other_choice]")
+            )
+        ));
+
+        int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
+            scenario.answer("/data/choice", "a");
+            scenario.answer("/data/other_choice", "a");
+
+            scenario.choicesOf("/data/select");
+            scenario.choicesOf("/data/select");
+        });
+
+        /* Check that we do less than (secondary instance size) * (number of lookups) - the number could fluctuate
+          depending on how the nested predicates are individually cached/indexed.
+         */
         assertThat(evaluations, lessThan(4));
+    }
+
+    @Test
+    public void nestedPredicatesAreCorrectAfterFormStateChanges() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("other_choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string"),
+                    bind("/data/other_choice").type("string"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                input("/data/other_choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice][value=/data/other_choice]")
+            )
+        ));
+
+        scenario.answer("/data/choice", "a");
+        scenario.answer("/data/other_choice", "a");
+        assertThat(scenario.choicesOf("/data/select").size(), equalTo(1));
+
+        scenario.answer("/data/other_choice", "b");
+        assertThat(scenario.choicesOf("/data/select").size(), equalTo(0));
     }
 
     //region repeats
@@ -206,8 +350,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/repeat[1]/select");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(8));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(4));
     }
 
     @Test
@@ -244,8 +388,8 @@ public class SelectCachingTest {
             scenario.choicesOf("/data/outer[0]/inner[1]/select");
         });
 
-        // Check that we do less than (size of secondary instance) * (number of choice lookups)
-        assertThat(evaluations, lessThan(4));
+        // Check that we do just (size of secondary instance)
+        assertThat(evaluations, equalTo(2));
     }
     //endregion
 }
