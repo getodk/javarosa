@@ -721,6 +721,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return dagImpl.triggerTriggerables(getMainInstance(), getEvaluationContext(), ref);
     }
 
+    public ValidateOutcome validate() {
+        return validate(true);
+    }
+
+    /**
+     * @deprecated Use 'validate' without the 'markCompleted' parameter, as the 'true' value has been the only one used.
+     */
+    @Deprecated
     public ValidateOutcome validate(boolean markCompleted) {
 
         FormEntryModel formEntryModelToBeValidated = new FormEntryModel(this);

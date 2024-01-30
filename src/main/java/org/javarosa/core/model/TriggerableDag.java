@@ -406,6 +406,14 @@ public class TriggerableDag {
      * FormEntryController is based upon the FormDef, but has its own model and
      * controller independent of anything at the UI layer.
      */
+    public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated) {
+        return validate(formEntryControllerToBeValidated, true);
+    }
+
+    /**
+     * @deprecated Use 'validate' without the 'markCompleted' parameter, as the 'true' value has been the only one used.
+     */
+    @Deprecated
     public ValidateOutcome validate(FormEntryController formEntryControllerToBeValidated, boolean markCompleted) {
 
         formEntryControllerToBeValidated.jumpToIndex(FormIndex.createBeginningOfFormIndex());

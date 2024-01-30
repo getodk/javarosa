@@ -168,7 +168,7 @@ public class Scenario {
     }
 
     public ValidateOutcome getValidationOutcome() {
-        return formDef.validate(true);
+        return formDef.validate();
     }
 
     /**
