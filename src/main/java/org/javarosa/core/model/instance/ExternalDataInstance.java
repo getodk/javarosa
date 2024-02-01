@@ -1,9 +1,5 @@
 package org.javarosa.core.model.instance;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import org.javarosa.core.model.instance.geojson.GeoJsonExternalInstance;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
@@ -17,6 +13,11 @@ import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 // This is still a work in progress.
 
@@ -62,6 +63,11 @@ public class ExternalDataInstance extends DataInstance {
         TreeElement root;
         try {
             root = parseExternalInstance(instanceSrc, instanceId);
+
+            // Avoid parse error for missing name and label refs if a select is built on an empty placeholder file
+            if (!root.hasChildren()) {
+                root = PLACEHOLDER_ROOT;
+            }
         } catch (FileNotFoundException | InvalidReferenceException e) {
             logger.info("External instance not found, falling back to placeholder");
             root = PLACEHOLDER_ROOT;

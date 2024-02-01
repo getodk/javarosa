@@ -1,5 +1,23 @@
 package org.javarosa.xform.parse;
 
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.test.FormParseInit;
+import org.javarosa.core.test.Scenario;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.junit.Test;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,23 +39,6 @@ import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.AbstractTreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.test.FormParseInit;
-import org.javarosa.core.test.Scenario;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xpath.expr.XPathPathExpr;
-import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.junit.Test;
 
 public class ExternalSecondaryInstanceParseTest {
 
@@ -130,6 +131,30 @@ public class ExternalSecondaryInstanceParseTest {
         } catch (XFormParser.ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    public void csvSecondaryInstanceWithHeaderOnly_parsesWithoutError() throws IOException, XFormParser.ParseException {
+        configureReferenceManagerCorrectly();
+
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("first")
+                    )),
+
+                    t("instance id=\"external-csv\" src=\"jr://file-csv/header_only.csv\""),
+
+                    bind("/data/first").type("string")
+                )
+            ),
+            body(
+                select1Dynamic("/data/first", "instance('external-csv')/root/item")
+            )));
+
+        assertThat(scenario.choicesOf("/data/first").size(), is(0));
     }
 
     @Test
