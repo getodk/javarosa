@@ -62,6 +62,9 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
         }
     }
 
+    /**
+     * Non thread safe index for tree references based on nested string keys (a "section" and an "item").
+     */
     private static class InMemTreeReferenceIndex {
 
         private final Map<String, Map<String, List<TreeReference>>> map = new HashMap<>();
@@ -70,22 +73,22 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
             return map.containsKey(section);
         }
 
-        public void add(String section, String key, TreeReference reference) {
+        public void add(String section, String item, TreeReference reference) {
             if (!map.containsKey(section)) {
                 map.put(section, new HashMap<>());
             }
 
             Map<String, List<TreeReference>> sectionMap = map.get(section);
-            if (!sectionMap.containsKey(key)) {
-                sectionMap.put(key, new ArrayList<>());
+            if (!sectionMap.containsKey(item)) {
+                sectionMap.put(item, new ArrayList<>());
             }
 
-            sectionMap.get(key).add(reference);
+            sectionMap.get(item).add(reference);
         }
 
-        public List<TreeReference> lookup(String section, String key) {
-            if (map.containsKey(section) && map.get(section).containsKey(key)) {
-                return map.get(section).get(key);
+        public List<TreeReference> lookup(String section, String item) {
+            if (map.containsKey(section) && map.get(section).containsKey(item)) {
+                return map.get(section).get(item);
             } else {
                 return emptyList();
             }
