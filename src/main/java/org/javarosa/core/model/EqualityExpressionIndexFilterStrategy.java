@@ -38,9 +38,7 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
             XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
             if (original.isEqual()) {
                 String section = nodeSet + candidate.getNodeSide().toString();
-                if (!index.contains(section)) {
-                    buildIndex(sourceInstance, candidate, children, evaluationContext, section);
-                }
+                buildIndexIfNeeded(sourceInstance, candidate, children, evaluationContext, section);
 
                 Object absoluteValue = candidate.evalContextSide(sourceInstance, evaluationContext);
                 return index.lookup(section, absoluteValue.toString());
@@ -52,13 +50,18 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
         }
     }
 
-    private void buildIndex(DataInstance sourceInstance, CompareToNodeExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
-        for (int i = 0; i < children.size(); i++) {
-            TreeReference child = children.get(i);
+    /**
+     * Synchronized to prevent two or more threads from modifying the index at once
+     */
+    private synchronized void buildIndexIfNeeded(DataInstance sourceInstance, CompareToNodeExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
+        if (!index.contains(section)) {
+            for (int i = 0; i < children.size(); i++) {
+                TreeReference child = children.get(i);
 
-            Measure.log("IndexEvaluation");
-            String relativeValue = predicate.evalNodeSide(sourceInstance, evaluationContext, child, i).toString();
-            index.add(section, relativeValue, child);
+                Measure.log("IndexEvaluation");
+                String relativeValue = predicate.evalNodeSide(sourceInstance, evaluationContext, child, i).toString();
+                index.add(section, relativeValue, child);
+            }
         }
     }
 
