@@ -56,7 +56,10 @@ public class ComparisonExpressionCacheFilterStrategy implements FilterStrategy {
         }
     }
 
-    private List<TreeReference> getCachedEvaluations(@NotNull Supplier<List<TreeReference>> next, String key) {
+    /**
+     * Synchronized to prevent two or more threads from modifying {@link #cachedEvaluations} at once
+     */
+    private synchronized List<TreeReference> getCachedEvaluations(@NotNull Supplier<List<TreeReference>> next, String key) {
         if (cachedEvaluations.containsKey(key)) {
             return cachedEvaluations.get(key);
         } else {

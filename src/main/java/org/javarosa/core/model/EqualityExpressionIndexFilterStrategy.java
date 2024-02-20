@@ -38,9 +38,7 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
             XPathEqExpr original = (XPathEqExpr) candidate.getOriginal();
             if (original.isEqual()) {
                 String section = nodeSet + candidate.getNodeSide().toString();
-                if (!index.contains(section)) {
-                    buildIndex(sourceInstance, candidate, children, evaluationContext, section);
-                }
+                buildIndexIfNeeded(sourceInstance, candidate, children, evaluationContext, section);
 
                 Object absoluteValue = candidate.evalContextSide(sourceInstance, evaluationContext);
                 return index.lookup(section, absoluteValue.toString());
@@ -52,16 +50,24 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
         }
     }
 
-    private void buildIndex(DataInstance sourceInstance, CompareToNodeExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
-        for (int i = 0; i < children.size(); i++) {
-            TreeReference child = children.get(i);
+    /**
+     * Synchronized to prevent two or more threads from modifying the index at once
+     */
+    private synchronized void buildIndexIfNeeded(DataInstance sourceInstance, CompareToNodeExpression predicate, List<TreeReference> children, EvaluationContext evaluationContext, String section) {
+        if (!index.contains(section)) {
+            for (int i = 0; i < children.size(); i++) {
+                TreeReference child = children.get(i);
 
-            Measure.log("IndexEvaluation");
-            String relativeValue = predicate.evalNodeSide(sourceInstance, evaluationContext, child, i).toString();
-            index.add(section, relativeValue, child);
+                Measure.log("IndexEvaluation");
+                String relativeValue = predicate.evalNodeSide(sourceInstance, evaluationContext, child, i).toString();
+                index.add(section, relativeValue, child);
+            }
         }
     }
 
+    /**
+     * Non thread safe index for tree references based on nested string keys (a "section" and an "item").
+     */
     private static class InMemTreeReferenceIndex {
 
         private final Map<String, Map<String, List<TreeReference>>> map = new HashMap<>();
@@ -70,22 +76,22 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
             return map.containsKey(section);
         }
 
-        public void add(String section, String key, TreeReference reference) {
+        public void add(String section, String item, TreeReference reference) {
             if (!map.containsKey(section)) {
                 map.put(section, new HashMap<>());
             }
 
             Map<String, List<TreeReference>> sectionMap = map.get(section);
-            if (!sectionMap.containsKey(key)) {
-                sectionMap.put(key, new ArrayList<>());
+            if (!sectionMap.containsKey(item)) {
+                sectionMap.put(item, new ArrayList<>());
             }
 
-            sectionMap.get(key).add(reference);
+            sectionMap.get(item).add(reference);
         }
 
-        public List<TreeReference> lookup(String section, String key) {
-            if (map.containsKey(section) && map.get(section).containsKey(key)) {
-                return map.get(section).get(key);
+        public List<TreeReference> lookup(String section, String item) {
+            if (map.containsKey(section) && map.get(section).containsKey(item)) {
+                return map.get(section).get(item);
             } else {
                 return emptyList();
             }
