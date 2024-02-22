@@ -184,6 +184,7 @@ public class XFormParser implements IXFormParserFunctions {
     private final List<ModelAttributeProcessor> modelAttributeProcessors = new ArrayList<>();
     private final List<QuestionProcessor> questionProcessors = new ArrayList<>();
     private final List<XPathProcessor> xpathProcessors = new ArrayList<>();
+    private List<ExternalDataInstanceProcessor> externalDataInstanceProcessors = new ArrayList<>();
 
     public static final List<XPathProcessor> tempXPathProcessors = new ArrayList<>();
 
@@ -199,6 +200,7 @@ public class XFormParser implements IXFormParserFunctions {
     private int serialQuestionID = 1;
 
     private static IAnswerResolver answerResolver;
+
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
@@ -458,6 +460,10 @@ public class XFormParser implements IXFormParserFunctions {
         if (processor instanceof XPathProcessor) {
             xpathProcessors.add((XPathProcessor) processor);
         }
+
+        if (processor instanceof ExternalDataInstanceProcessor) {
+            externalDataInstanceProcessors.add((ExternalDataInstanceProcessor) processor);
+        }
     }
 
     public void addBindAttributeProcessor(BindAttributeProcessor bindAttributeProcessor) {
@@ -575,7 +581,7 @@ public class XFormParser implements IXFormParserFunctions {
                     if (instanceSrc != null) {
                         ExternalDataInstance externalDataInstance;
                         try {
-                            externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId);
+                            externalDataInstance = ExternalDataInstance.build(instanceSrc, instanceId, externalDataInstanceProcessors);
                         } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
                             String msg = "Unable to parse external secondary instance";
                             logger.error(msg, e);
@@ -2485,6 +2491,10 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface QuestionProcessor extends Processor {
         void processQuestion(@NotNull QuestionDef question);
+    }
+
+    public interface ExternalDataInstanceProcessor extends Processor {
+        void processInstance(@NotNull String id, @NotNull TreeElement root);
     }
 
     public static class ParseException extends Exception {

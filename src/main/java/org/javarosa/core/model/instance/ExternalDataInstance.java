@@ -18,6 +18,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 // This is still a work in progress.
 
@@ -58,7 +59,7 @@ public class ExternalDataInstance extends DataInstance {
      * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
      * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
      */
-    public static ExternalDataInstance build(String instanceSrc, String instanceId)
+    public static ExternalDataInstance build(String instanceSrc, String instanceId, List<XFormParser.ExternalDataInstanceProcessor> externalDataInstanceProcessors)
         throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement root;
         try {
@@ -72,6 +73,11 @@ public class ExternalDataInstance extends DataInstance {
             logger.info("External instance not found, falling back to placeholder");
             root = PLACEHOLDER_ROOT;
         }
+
+        for (XFormParser.ExternalDataInstanceProcessor processor : externalDataInstanceProcessors) {
+            processor.processInstance(instanceId, root);
+        }
+
         return new ExternalDataInstance(root, instanceId, instanceSrc);
     }
 
