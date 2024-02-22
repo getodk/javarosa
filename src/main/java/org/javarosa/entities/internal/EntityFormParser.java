@@ -14,9 +14,7 @@ public class EntityFormParser {
     }
 
     @Nullable
-    public static String parseFirstDatasetToCreate(FormInstance mainInstance) {
-        TreeElement entity = getEntityElement(mainInstance);
-
+    public static String parseFirstDatasetToCreate(TreeElement entity) {
         if (entity != null) {
             String create = entity.getAttributeValue(null, "create");
 
@@ -28,6 +26,20 @@ public class EntityFormParser {
         }
 
         return null;
+    }
+
+    public static String parseLabel(TreeElement entity) {
+        TreeElement labelElement = entity.getFirstChild("label");
+
+        if (labelElement != null) {
+            return (String) labelElement.getValue().getValue();
+        } else {
+            return "";
+        }
+    }
+
+    public static String parseId(TreeElement entity) {
+        return entity.getAttributeValue("", "id");
     }
 
     @Nullable

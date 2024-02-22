@@ -52,7 +52,7 @@ public class EntityFormParserTest {
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         FormDef formDef = parser.parse(null);
 
-        String dataset = EntityFormParser.parseFirstDatasetToCreate(formDef.getMainInstance());
+        String dataset = EntityFormParser.parseFirstDatasetToCreate(EntityFormParser.getEntityElement(formDef.getMainInstance()));
         assertThat(dataset, equalTo("people"));
     }
 }

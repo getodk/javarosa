@@ -5,11 +5,12 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.entities.internal.Entities;
-import org.javarosa.entities.internal.EntityFormParser;
 import org.javarosa.entities.internal.EntityFormExtra;
-import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.entities.internal.EntityFormParser;
 import org.javarosa.form.api.FormEntryFinalizationProcessor;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
 
 import java.util.List;
@@ -28,7 +29,8 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         EntityFormExtra entityFormExtra = formDef.getExtras().get(EntityFormExtra.class);
         List<Pair<XPathReference, String>> saveTos = entityFormExtra.getSaveTos();
 
-        String dataset = EntityFormParser.parseFirstDatasetToCreate(mainInstance);
+        TreeElement entityElement = EntityFormParser.getEntityElement(mainInstance);
+        String dataset = EntityFormParser.parseFirstDatasetToCreate(entityElement);
         if (dataset != null) {
             List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
                 IDataReference reference = saveTo.getFirst();
@@ -41,7 +43,9 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
                 }
             }).collect(Collectors.toList());
 
-            formEntryModel.getExtras().put(new Entities(asList(new Entity(dataset, fields))));
+            String id = EntityFormParser.parseId(entityElement);
+            String label = EntityFormParser.parseLabel(entityElement);
+            formEntryModel.getExtras().put(new Entities(asList(new Entity(dataset, id, label, fields))));
         } else {
             formEntryModel.getExtras().put(new Entities(emptyList()));
         }
