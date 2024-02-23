@@ -3,6 +3,7 @@ package org.javarosa.entities.internal;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class EntityFormParser {
@@ -11,34 +12,8 @@ public class EntityFormParser {
 
     }
 
-    @Nullable
-    public static String parseFirstDatasetToCreate(TreeElement entity) {
-        if (entity != null) {
-            String create = entity.getAttributeValue(null, "create");
-
-            if (create != null) {
-                if (XPathFuncExpr.boolStr(create)) {
-                    return entity.getAttributeValue(null, "dataset");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static String parseFirstDatasetToUpdate(TreeElement entity) {
-        if (entity != null) {
-            String create = entity.getAttributeValue(null, "update");
-
-            if (create != null) {
-                if (XPathFuncExpr.boolStr(create)) {
-                    return entity.getAttributeValue(null, "dataset");
-                }
-            }
-        }
-
-        return null;
+    public static String parseDataset(TreeElement entity) {
+        return entity.getAttributeValue(null, "dataset");
     }
 
     public static String parseLabel(TreeElement entity) {
@@ -69,5 +44,30 @@ public class EntityFormParser {
         } else {
             return null;
         }
+    }
+
+    @Nullable
+    public static EntityAction parseAction(@NotNull TreeElement entity) {
+        String create = entity.getAttributeValue(null, "create");
+        String update = entity.getAttributeValue(null, "update");
+
+        if (create != null) {
+            if (XPathFuncExpr.boolStr(create)) {
+                return EntityAction.CREATE;
+            }
+        }
+
+        if (update != null) {
+            if (XPathFuncExpr.boolStr(update)) {
+                return EntityAction.UPDATE;
+            }
+        }
+
+        return null;
+    }
+
+    public enum EntityAction {
+        CREATE,
+        UPDATE
     }
 }

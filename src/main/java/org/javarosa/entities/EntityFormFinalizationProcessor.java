@@ -30,19 +30,21 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         List<Pair<XPathReference, String>> saveTos = entityFormExtra.getSaveTos();
 
         TreeElement entityElement = EntityFormParser.getEntityElement(mainInstance);
-        String createDataset = EntityFormParser.parseFirstDatasetToCreate(entityElement);
-        String updateDataset = EntityFormParser.parseFirstDatasetToUpdate(entityElement);
+        if (entityElement != null) {
+            EntityFormParser.EntityAction action = EntityFormParser.parseAction(entityElement);
+            String dataset = EntityFormParser.parseDataset(entityElement);
 
-        if (createDataset != null) {
-            Entity entity = createEntity(entityElement, 1, createDataset, saveTos, mainInstance);
-            formEntryModel.getExtras().put(new Entities(asList(entity)));
-        } else if (updateDataset != null ){
-            int baseVersion = EntityFormParser.parseBaseVersion(entityElement);
-            int newVersion = baseVersion + 1;
-            Entity entity = createEntity(entityElement, newVersion, updateDataset, saveTos, mainInstance);
-            formEntryModel.getExtras().put(new Entities(asList(entity)));
-        } else {
-            formEntryModel.getExtras().put(new Entities(emptyList()));
+            if (action == EntityFormParser.EntityAction.CREATE) {
+                Entity entity = createEntity(entityElement, 1, dataset, saveTos, mainInstance);
+                formEntryModel.getExtras().put(new Entities(asList(entity)));
+            } else if (action == EntityFormParser.EntityAction.UPDATE){
+                int baseVersion = EntityFormParser.parseBaseVersion(entityElement);
+                int newVersion = baseVersion + 1;
+                Entity entity = createEntity(entityElement, newVersion, dataset, saveTos, mainInstance);
+                formEntryModel.getExtras().put(new Entities(asList(entity)));
+            } else {
+                formEntryModel.getExtras().put(new Entities(emptyList()));
+            }
         }
     }
 
