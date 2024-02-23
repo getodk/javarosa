@@ -28,6 +28,21 @@ public class EntityFormParser {
         return null;
     }
 
+    @Nullable
+    public static String parseFirstDatasetToUpdate(TreeElement entity) {
+        if (entity != null) {
+            String create = entity.getAttributeValue(null, "update");
+
+            if (create != null) {
+                if (XPathFuncExpr.boolStr(create)) {
+                    return entity.getAttributeValue(null, "dataset");
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static String parseLabel(TreeElement entity) {
         TreeElement labelElement = entity.getFirstChild("label");
 
@@ -40,6 +55,10 @@ public class EntityFormParser {
 
     public static String parseId(TreeElement entity) {
         return entity.getAttributeValue("", "id");
+    }
+
+    public static Integer parseBaseVersion(TreeElement entity) {
+        return Integer.valueOf(entity.getAttributeValue("", "baseVersion"));
     }
 
     @Nullable
