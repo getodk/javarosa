@@ -1,12 +1,12 @@
 package org.javarosa.core.model.instance;
 
-import org.javarosa.core.model.instance.geojson.GeoJsonExternalInstance;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
@@ -47,7 +47,7 @@ public class ExternalDataInstance extends DataInstance {
     /**
      * Builds an ExternalDataInstance by parsing the file at the given location or fills in a placeholder if the file
      * can't be found or derived.
-     *
+     * <p>
      * The placeholder makes it possible to successfully parse a form without an external
      * instance in cases where a client isn't providing a form-filling interface (e.g. form validation or discovery).
      *
@@ -83,10 +83,7 @@ public class ExternalDataInstance extends DataInstance {
 
     private static TreeElement parseExternalInstance(String instanceSrc, String instanceId)
         throws IOException, InvalidReferenceException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
-        String path = getPath(instanceSrc);
-        return instanceSrc.contains("file-csv") ? CsvExternalInstance.parse(instanceId, path)
-            : instanceSrc.endsWith("geojson") ? GeoJsonExternalInstance.parse(instanceId, path)
-            : XmlExternalInstance.parse(instanceId, path);
+        return XFormUtils.getExternalInstance(ReferenceManager.instance(), instanceId, instanceSrc);
     }
 
     @Override
@@ -123,7 +120,8 @@ public class ExternalDataInstance extends DataInstance {
         path = ExtUtil.readString(in);
         try {
             setRoot(parseExternalInstance(path, getInstanceId()));
-        } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException | UnfullfilledRequirementsException e) {
+        } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException |
+                 UnfullfilledRequirementsException e) {
             throw new DeserializationException("Unable to parse external instance: " + e);
         }
     }
@@ -132,15 +130,5 @@ public class ExternalDataInstance extends DataInstance {
     public void writeExternal(DataOutputStream out) throws IOException {
         super.writeExternal(out);
         ExtUtil.write(out, path);
-    }
-
-    /**
-     * Returns the path of the URI at srcLocation.
-     *
-     * @param srcLocation the value of the <code>src</code> attribute of the <code>instance</code> element
-     */
-    private static String getPath(String srcLocation) throws InvalidReferenceException {
-        String uri = ReferenceManager.instance().deriveReference(srcLocation).getLocalURI();
-        return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
     }
 }

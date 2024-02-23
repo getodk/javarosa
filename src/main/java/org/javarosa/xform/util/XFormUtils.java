@@ -17,15 +17,23 @@
 package org.javarosa.xform.util;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.xform.parse.ExternalInstanceParser;
+import org.javarosa.xform.parse.ExternalInstanceParserFactory;
 import org.javarosa.xform.parse.IXFormParserFactory;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
+import org.javarosa.xml.util.InvalidStructureException;
+import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.DataInputStream;
 import java.io.FileReader;
@@ -46,6 +54,12 @@ public class XFormUtils {
     private static final Logger logger = LoggerFactory.getLogger(XFormUtils.class);
 
     private static IXFormParserFactory _factory = new XFormParserFactory();
+    private static ExternalInstanceParserFactory externalInstanceParserFactory = new ExternalInstanceParserFactory() {
+        @Override
+        public ExternalInstanceParser getExternalInstanceParser() {
+            return new ExternalInstanceParser();
+        }
+    };
 
     public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
         IXFormParserFactory oldFactory = _factory;
@@ -166,6 +180,9 @@ public class XFormUtils {
         return returnForm;
     }
 
+    public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
+        return externalInstanceParserFactory.getExternalInstanceParser().parse(referenceManager, id, instanceSrc);
+    }
 
     /////Parser Attribute warning stuff
 
