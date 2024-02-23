@@ -51,15 +51,15 @@ public class EntityFormParser {
         String create = entity.getAttributeValue(null, "create");
         String update = entity.getAttributeValue(null, "update");
 
-        if (create != null) {
-            if (XPathFuncExpr.boolStr(create)) {
-                return EntityAction.CREATE;
-            }
-        }
-
         if (update != null) {
             if (XPathFuncExpr.boolStr(update)) {
                 return EntityAction.UPDATE;
+            }
+        }
+
+        if (create != null) {
+            if (XPathFuncExpr.boolStr(create)) {
+                return EntityAction.CREATE;
             }
         }
 
