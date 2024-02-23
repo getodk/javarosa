@@ -7,8 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class EntityFormParser {
 
-    private static final String ENTITIES_NAMESPACE = "http://www.opendatakit.org/xforms/entities";
-
     private EntityFormParser() {
 
     }
