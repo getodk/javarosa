@@ -34,7 +34,7 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         String updateDataset = EntityFormParser.parseFirstDatasetToUpdate(entityElement);
 
         if (createDataset != null) {
-            Entity entity = createEntity(entityElement, -1, createDataset, saveTos, mainInstance);
+            Entity entity = createEntity(entityElement, 1, createDataset, saveTos, mainInstance);
             formEntryModel.getExtras().put(new Entities(asList(entity)));
         } else if (updateDataset != null ){
             int baseVersion = EntityFormParser.parseBaseVersion(entityElement);

@@ -122,6 +122,7 @@ public class EntitiesTest {
         assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).id, equalTo(scenario.answerOf("/data/meta/entity/@id").getValue()));
         assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
+        assertThat(entities.get(0).version, equalTo(1));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 
