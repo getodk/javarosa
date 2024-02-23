@@ -54,17 +54,16 @@ public class XFormUtils {
     private static final Logger logger = LoggerFactory.getLogger(XFormUtils.class);
 
     private static IXFormParserFactory _factory = new XFormParserFactory();
-    private static ExternalInstanceParserFactory externalInstanceParserFactory = new ExternalInstanceParserFactory() {
-        @Override
-        public ExternalInstanceParser getExternalInstanceParser() {
-            return new ExternalInstanceParser();
-        }
-    };
+    private static ExternalInstanceParserFactory externalInstanceParserFactory = ExternalInstanceParser::new;
 
     public static IXFormParserFactory setXFormParserFactory(IXFormParserFactory factory) {
         IXFormParserFactory oldFactory = _factory;
         _factory = factory;
         return oldFactory;
+    }
+
+    public static void setExternalInstanceParserFactory(ExternalInstanceParserFactory factory) {
+        externalInstanceParserFactory = factory;
     }
 
     public static FormDef getFormFromResource (String resource) throws XFormParser.ParseException {

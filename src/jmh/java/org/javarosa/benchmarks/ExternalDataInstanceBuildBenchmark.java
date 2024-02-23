@@ -15,7 +15,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static java.util.Collections.emptyList;
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
@@ -39,7 +38,7 @@ public class ExternalDataInstanceBuildBenchmark {
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         ExternalDataInstance wardsExternalInstance =
-            ExternalDataInstance.build("jr://file/wards.xml", "wards", emptyList());
+            ExternalDataInstance.build("jr://file/wards.xml", "wards");
         bh.consume(wardsExternalInstance);
     }
 
@@ -49,7 +48,7 @@ public class ExternalDataInstanceBuildBenchmark {
         throws IOException, XmlPullParserException, InvalidReferenceException,
         UnfullfilledRequirementsException, InvalidStructureException {
         ExternalDataInstance lgaIExternalInstance =
-            ExternalDataInstance.build("jr://file/lgas.xml", "lgas", emptyList());
+            ExternalDataInstance.build("jr://file/lgas.xml", "lgas");
         bh.consume(lgaIExternalInstance);
     }
 }
