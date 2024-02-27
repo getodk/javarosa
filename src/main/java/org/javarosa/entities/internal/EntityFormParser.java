@@ -31,7 +31,11 @@ public class EntityFormParser {
     }
 
     public static Integer parseBaseVersion(TreeElement entity) {
-        return Integer.valueOf(entity.getAttributeValue("", "baseVersion"));
+        try {
+            return Integer.valueOf(entity.getAttributeValue("", "baseVersion"));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     @Nullable
