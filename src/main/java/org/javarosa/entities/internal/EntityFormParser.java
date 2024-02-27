@@ -16,13 +16,14 @@ public class EntityFormParser {
         return entity.getAttributeValue(null, "dataset");
     }
 
+    @Nullable
     public static String parseLabel(TreeElement entity) {
         TreeElement labelElement = entity.getFirstChild("label");
 
         if (labelElement != null) {
             return (String) labelElement.getValue().getValue();
         } else {
-            return "";
+            return null;
         }
     }
 
