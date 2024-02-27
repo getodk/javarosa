@@ -1,12 +1,5 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
-import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
-import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
-
-import java.io.IOException;
-import java.nio.file.Path;
-
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.xml.util.InvalidStructureException;
@@ -18,6 +11,13 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
+import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
+import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 
 public class ExternalDataInstanceBuildBenchmark {
     public static void main(String[] args) {

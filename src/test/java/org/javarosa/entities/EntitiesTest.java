@@ -28,6 +28,7 @@ import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.select1;
+import static org.javarosa.core.util.XFormsElement.setvalue;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 
@@ -93,11 +94,16 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"\"",
+                                    t("label")
+                                )
                             )
                         )
                     ),
-                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name"),
+                    bind("/data/meta/entity/@id").type("string"),
+                    bind("/data/meta/entity/label").type("string").calculate("/data/name"),
+                    setvalue("odk-instance-first-load", "/data/meta/entity/@id", "uuid()")
                 )
             ),
             body(
@@ -114,6 +120,8 @@ public class EntitiesTest {
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
         assertThat(entities.size(), equalTo(1));
         assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo(scenario.answerOf("/data/meta/entity/@id").getValue()));
+        assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 

@@ -199,6 +199,7 @@ public class XFormParser implements IXFormParserFunctions {
     private int serialQuestionID = 1;
 
     private static IAnswerResolver answerResolver;
+
     public static IAnswerResolver getAnswerResolver() {
         return answerResolver;
     }
