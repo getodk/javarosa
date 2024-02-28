@@ -1,9 +1,5 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.test.Scenario;
-import org.javarosa.measure.Measure;
-import org.junit.Test;
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,6 +19,10 @@ import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+
+import org.javarosa.core.test.Scenario;
+import org.javarosa.measure.Measure;
+import org.junit.Test;
 
 public class PredicateCachingTest {
 
@@ -312,13 +312,13 @@ public class PredicateCachingTest {
         scenario.createNewRepeat("/data/repeat");
         scenario.createNewRepeat("/data/repeat");
 
-        scenario.answer("/data/repeat[0]/choice", "a");
-        assertThat(scenario.answerOf("/data/repeat[0]/calculate").getValue(), equalTo("A"));
-        assertThat(scenario.answerOf("/data/repeat[1]/calculate"), equalTo(null));
+        scenario.answer("/data/repeat[1]/choice", "a");
+        assertThat(scenario.answerOf("/data/repeat[1]/calculate").getValue(), equalTo("A"));
+        assertThat(scenario.answerOf("/data/repeat[2]/calculate"), equalTo(null));
 
-        scenario.answer("/data/repeat[1]/choice", "b");
-        assertThat(scenario.answerOf("/data/repeat[0]/calculate").getValue(), equalTo("A"));
-        assertThat(scenario.answerOf("/data/repeat[1]/calculate").getValue(), equalTo("B"));
+        scenario.answer("/data/repeat[2]/choice", "b");
+        assertThat(scenario.answerOf("/data/repeat[1]/calculate").getValue(), equalTo("A"));
+        assertThat(scenario.answerOf("/data/repeat[2]/calculate").getValue(), equalTo("B"));
     }
 
     @Test
@@ -601,8 +601,8 @@ public class PredicateCachingTest {
         assertThat(scenario.answerOf("/data/result"), equalTo(null));
 
         scenario.createNewRepeat("/data/repeat");
-        scenario.answer("/data/repeat[0]/name", "John Bell");
-        scenario.answer("/data/repeat[0]/age", "70");
+        scenario.answer("/data/repeat[1]/name", "John Bell");
+        scenario.answer("/data/repeat[1]/age", "70");
 
         assertThat(scenario.answerOf("/data/result").getValue(), equalTo("70"));
     }

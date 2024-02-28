@@ -17,6 +17,7 @@
 package org.javarosa.core.model.condition;
 
 import static java.util.stream.IntStream.range;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
@@ -33,7 +34,6 @@ import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import org.javarosa.core.model.instance.TreeReference;
@@ -74,23 +74,23 @@ public class EvaluationContextExpandReferenceTest {
         // Using the String representation to simplify things, since TreeReference.equals
         // wouldn't work the way we want, and TestHelpers.buildRef() has its limitations
         assertThat(ec.expandReference(getRef("/data/group/number")), hasItems(
-            getRef("/data/group[0]/number[0]"),
-            getRef("/data/group[1]/number[0]"),
-            getRef("/data/group[2]/number[0]"),
-            getRef("/data/group[3]/number[0]"),
-            getRef("/data/group[4]/number[0]")
+            getRef("/data/group[1]/number[1]"),
+            getRef("/data/group[2]/number[1]"),
+            getRef("/data/group[3]/number[1]"),
+            getRef("/data/group[4]/number[1]"),
+            getRef("/data/group[5]/number[1]")
         ));
     }
 
     @Test
     public void test_include_templates_case() {
         assertThat(ec.expandReference(getRef("/data/group/number"), true), contains(
-            getRef("/data/group[0]/number[0]"),
-            getRef("/data/group[1]/number[0]"),
-            getRef("/data/group[2]/number[0]"),
-            getRef("/data/group[3]/number[0]"),
-            getRef("/data/group[4]/number[0]"),
-            getRef("/data/group[@template]/number[0]")
+            getRef("/data/group[1]/number[1]"),
+            getRef("/data/group[2]/number[1]"),
+            getRef("/data/group[3]/number[1]"),
+            getRef("/data/group[4]/number[1]"),
+            getRef("/data/group[5]/number[1]"),
+            getRef("/data/group[@template]/number[1]")
         ));
     }
 
@@ -101,25 +101,25 @@ public class EvaluationContextExpandReferenceTest {
 
     @Test
     public void returns_itself_if_fully_qualified() {
-        TreeReference numberRef = getRef("/data/group[3]/number[0]");
+        TreeReference numberRef = getRef("/data/group[4]/number[1]");
         assertThat(ec.expandReference(numberRef), contains(numberRef));
 
-        TreeReference groupRef = getRef("/data/group[3]");
+        TreeReference groupRef = getRef("/data/group[4]");
         assertThat(ec.expandReference(groupRef), contains(groupRef));
     }
 
     @Test
     public void expands_partially_qualified_refs() {
         assertThat(
-            ec.expandReference(getRef("/data/group[3]/number")),
-            contains(getRef("/data/group[3]/number[0]"))
+            ec.expandReference(getRef("/data/group[4]/number")),
+            contains(getRef("/data/group[4]/number[1]"))
         );
         assertThat(ec.expandReference(getRef("/data/group")), contains(
-            getRef("/data/group[0]"),
             getRef("/data/group[1]"),
             getRef("/data/group[2]"),
             getRef("/data/group[3]"),
-            getRef("/data/group[4]")
+            getRef("/data/group[4]"),
+            getRef("/data/group[5]")
         ));
     }
 }

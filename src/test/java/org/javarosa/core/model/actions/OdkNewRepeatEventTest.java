@@ -42,12 +42,12 @@ public class OdkNewRepeatEventTest {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         scenario.createNewRepeat("/data/my-repeat");
-        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
+        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-position").getDisplayText(), is("1"));
 
         scenario.createNewRepeat("/data/my-repeat");
-        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-position").getDisplayText(), is("2"));
+        assertThat(scenario.answerOf("/data/my-repeat[2]/defaults-to-position").getDisplayText(), is("2"));
 
-        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
+        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-position").getDisplayText(), is("1"));
     }
 
     @Test
@@ -72,10 +72,10 @@ public class OdkNewRepeatEventTest {
 
         assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(4));
 
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[0]/defaults-to-position-again").getDisplayText(), is("1"));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[1]/defaults-to-position-again").getDisplayText(), is("2"));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[2]/defaults-to-position-again").getDisplayText(), is("3"));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[3]/defaults-to-position-again").getDisplayText(), is("4"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[1]/defaults-to-position-again").getDisplayText(), is("1"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[2]/defaults-to-position-again").getDisplayText(), is("2"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[3]/defaults-to-position-again").getDisplayText(), is("3"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[4]/defaults-to-position-again").getDisplayText(), is("4"));
 
         // Adding repeats should trigger odk-new-repeat for those new nodes
         scenario.answer("/data/repeat-count", 6);
@@ -85,7 +85,7 @@ public class OdkNewRepeatEventTest {
             scenario.next();
         }
         assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(6));
-        assertThat(scenario.answerOf("/data/my-jr-count-repeat[5]/defaults-to-position-again").getDisplayText(), is("6"));
+        assertThat(scenario.answerOf("/data/my-jr-count-repeat[6]/defaults-to-position-again").getDisplayText(), is("6"));
 
     }
 
@@ -121,11 +121,11 @@ public class OdkNewRepeatEventTest {
     public void repeatInFormDefInstance_neverFiresNewRepeatEvent() throws XFormParser.ParseException {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
-        assertThat(scenario.answerOf("/data/my-repeat-without-template[0]/my-value"), is(nullValue()));
         assertThat(scenario.answerOf("/data/my-repeat-without-template[1]/my-value"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/my-repeat-without-template[2]/my-value"), is(nullValue()));
 
         scenario.createNewRepeat("/data/my-repeat-without-template");
-        assertThat(scenario.answerOf("/data/my-repeat-without-template[2]/my-value").getDisplayText(), is("2"));
+        assertThat(scenario.answerOf("/data/my-repeat-without-template[3]/my-value").getDisplayText(), is("2"));
     }
 
     @Test
@@ -160,11 +160,11 @@ public class OdkNewRepeatEventTest {
         scenario.createNewRepeat("/data/repeat2");
         scenario.createNewRepeat("/data/repeat2");
 
-        assertThat(scenario.answerOf("/data/repeat1[1]/q1").getDisplayText(), is("foobar"));
         assertThat(scenario.answerOf("/data/repeat1[2]/q1").getDisplayText(), is("foobar"));
+        assertThat(scenario.answerOf("/data/repeat1[3]/q1").getDisplayText(), is("foobar"));
 
-        assertThat(scenario.answerOf("/data/repeat2[1]/q1").getDisplayText(), is("barbaz"));
         assertThat(scenario.answerOf("/data/repeat2[2]/q1").getDisplayText(), is("barbaz"));
+        assertThat(scenario.answerOf("/data/repeat2[3]/q1").getDisplayText(), is("barbaz"));
     }
 
     @Test
@@ -199,9 +199,9 @@ public class OdkNewRepeatEventTest {
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
-        assertThat(scenario.answerOf("/data/repeat[0]/q"), is(intAnswer(7)));
-        assertThat(scenario.answerOf("/data/repeat[1]/q"), is(intAnswer(8)));
+        assertThat(scenario.answerOf("/data/repeat[1]/q"), is(intAnswer(7)));
         assertThat(scenario.answerOf("/data/repeat[2]/q"), is(intAnswer(8)));
+        assertThat(scenario.answerOf("/data/repeat[3]/q"), is(intAnswer(8)));
     }
 
     // Not part of ODK XForms so throws parse exception.

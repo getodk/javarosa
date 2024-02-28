@@ -1,9 +1,5 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.test.Scenario;
-import org.javarosa.measure.Measure;
-import org.junit.Test;
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -21,6 +17,10 @@ import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
+
+import org.javarosa.core.test.Scenario;
+import org.javarosa.measure.Measure;
+import org.junit.Test;
 
 public class SelectCachingTest {
 
@@ -344,10 +344,10 @@ public class SelectCachingTest {
         int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
             scenario.answer("/data/filter", "a");
 
-            scenario.choicesOf("/data/repeat[0]/select");
+            scenario.choicesOf("/data/repeat[1]/select");
 
             scenario.createNewRepeat("/data/repeat");
-            scenario.choicesOf("/data/repeat[1]/select");
+            scenario.choicesOf("/data/repeat[2]/select");
         });
 
         // Check that we do just (size of secondary instance)
@@ -377,15 +377,15 @@ public class SelectCachingTest {
                         select1Dynamic("/data/outer/inner/select", "instance('choices')/root/item[value=current()/../../filter]"))
                 ))));
 
-        scenario.answer("/data/outer[0]/filter", "a");
-        scenario.createNewRepeat("/data/outer[0]/inner");
         scenario.answer("/data/outer[1]/filter", "a");
         scenario.createNewRepeat("/data/outer[1]/inner");
-        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.answer("/data/outer[2]/filter", "a");
+        scenario.createNewRepeat("/data/outer[2]/inner");
+        scenario.createNewRepeat("/data/outer[2]/inner");
 
         int evaluations = Measure.withMeasure(asList("PredicateEvaluation", "IndexEvaluation"), () -> {
-            scenario.choicesOf("/data/outer[0]/inner[0]/select");
-            scenario.choicesOf("/data/outer[0]/inner[1]/select");
+            scenario.choicesOf("/data/outer[1]/inner[1]/select");
+            scenario.choicesOf("/data/outer[1]/inner[2]/select");
         });
 
         // Check that we do just (size of secondary instance)

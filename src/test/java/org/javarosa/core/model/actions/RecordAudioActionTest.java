@@ -103,7 +103,7 @@ public class RecordAudioActionTest {
             )
         ));
 
-        assertThat(listener.getAbsoluteTargetRef(), is(getRef("/data/repeat[0]/recording")));
+        assertThat(listener.getAbsoluteTargetRef(), is(getRef("/data/repeat[1]/recording")));
     }
 
     @Test

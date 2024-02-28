@@ -18,6 +18,7 @@ package org.javarosa.smoketests;
 
 
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.Scenario.getRef;
@@ -29,7 +30,6 @@ import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA_FI
 import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA_FIRST_AND_MEASLES;
 import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.MEASLES;
 import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.NONE;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.time.LocalDate;

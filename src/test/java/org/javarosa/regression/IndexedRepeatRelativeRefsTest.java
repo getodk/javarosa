@@ -104,9 +104,9 @@ public class IndexedRepeatRelativeRefsTest {
             )
         ));
 
-        scenario.answer("/data/some-group[0]/item[0]/value", 11);
-        scenario.answer("/data/some-group[0]/item[1]/value", 22);
-        scenario.answer("/data/some-group[0]/item[2]/value", 33);
+        scenario.answer("/data/some-group[1]/item[1]/value", 11);
+        scenario.answer("/data/some-group[1]/item[2]/value", 22);
+        scenario.answer("/data/some-group[1]/item[3]/value", 33);
 
         assertThat(scenario.answerOf("/data/total-items"), is(intAnswer(3)));
         assertThat(scenario.answerOf("/data/some-group/last-value"), is(intAnswer(33)));

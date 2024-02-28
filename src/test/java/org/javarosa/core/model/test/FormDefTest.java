@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.Scenario.AnswerResult.CONSTRAINT_VIOLATED;
@@ -35,13 +36,10 @@ import static org.javarosa.core.util.XFormsElement.select1;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -126,10 +124,10 @@ public class FormDefTest {
             )));
         FormDef formDef = scenario.getFormDef();
 
-        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[1]")), is(false));
 
         scenario.answer("/data/selectYesNo", "yes");
-        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(true));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[1]")), is(true));
     }
 
     @Test
@@ -251,27 +249,27 @@ public class FormDefTest {
 
         scenario.next();
 
-        // For ref /data/outer[0]/inner[0], the parent position is 1 so the boolean expression is false. That means
-        // none of the inner groups in /data/outer[0] can be relevant.
-        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]")));
-
-        scenario.next();
+        // For ref /data/outer[1]/inner[1], the parent position is 1 so the boolean expression is false. That means
+        // none of the inner groups in /data/outer[1] can be relevant.
         assertThat(scenario.refAtIndex(), is(getRef("/data/outer[1]")));
 
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[1]/inner[0]")));
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[2]")));
 
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[1]/inner[0]/q1[0]")));
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[2]/inner[1]")));
+
+        scenario.next();
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[2]/inner[1]/q1[1]")));
 
         scenario.answer("/data/relevance-condition", "1");
 
         scenario.jumpToBeginningOfForm();
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]")));
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[1]")));
 
         scenario.next();
-        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[0]/inner[0]")));
+        assertThat(scenario.refAtIndex(), is(getRef("/data/outer[1]/inner[1]")));
     }
 
     @Test
@@ -298,8 +296,8 @@ public class FormDefTest {
 
 
         FormDef formDef = scenario.getFormDef();
-        // outer[1] does not exist at this moment, we only have outer[0]. Checking if its inner repeat group is relevant should be possible and return false.
-        assertThat(formDef.isRepeatRelevant(getRef("/data/outer[1]/inner[0]")), is(false));
+        // outer[2] does not exist at this moment, we only have outer[1]. Checking if its inner repeat group is relevant should be possible and return false.
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer[2]/inner[1]")), is(false));
     }
     //endregion
 
@@ -366,14 +364,14 @@ public class FormDefTest {
         scenario.next();
 
         FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 1"));
+        assertThat(caption.getQuestionText(), is("Position: 1"));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
 
         caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 2"));
+        assertThat(caption.getQuestionText(), is("Position: 2"));
     }
 
     @Test
@@ -406,14 +404,14 @@ public class FormDefTest {
         scenario.next();
 
         FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 1"));
+        assertThat(caption.getQuestionText(), is("Position: 1"));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
 
         caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-        MatcherAssert.assertThat(caption.getQuestionText(), is("Position: 2"));
+        assertThat(caption.getQuestionText(), is("Position: 2"));
     }
 
     @Test

@@ -16,9 +16,9 @@
 
 package org.javarosa.core.model.instance;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.Scenario.getRef;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,49 +76,49 @@ public class TreeReferenceIsAncestorOfTest {
             // Multiplicity scenario: undefined ancestor is ancestor of any other multiplicity, regardless of level
             {"/foo is ancestor of /foo/bar", "/foo", "/foo/bar", IRRELEVANT, true},
             {"/foo is ancestor of /foo[-1]/bar", "/foo", "/foo[-1]/bar", IRRELEVANT, true},
-            {"/foo is ancestor of /foo[0]/bar", "/foo", "/foo[0]/bar", IRRELEVANT, true},
-            {"/foo is ancestor of /foo[2]/bar", "/foo", "/foo[2]/bar", IRRELEVANT, true},
+            {"/foo is ancestor of /foo[1]/bar", "/foo", "/foo[1]/bar", IRRELEVANT, true},
+            {"/foo is ancestor of /foo[3]/bar", "/foo", "/foo[3]/bar", IRRELEVANT, true},
             {"/foo/bar is ancestor of /foo/bar/baz", "/foo/bar", "/foo/bar/baz", IRRELEVANT, true},
             {"/foo/bar is ancestor of /foo/bar[-1]/baz", "/foo/bar", "/foo/bar[-1]/baz", IRRELEVANT, true},
-            {"/foo/bar is ancestor of /foo/bar[0]/baz", "/foo/bar", "/foo/bar[0]/baz", IRRELEVANT, true},
-            {"/foo/bar is ancestor of /foo/bar[2]/baz", "/foo/bar", "/foo/bar[2]/baz", IRRELEVANT, true},
+            {"/foo/bar is ancestor of /foo/bar[1]/baz", "/foo/bar", "/foo/bar[1]/baz", IRRELEVANT, true},
+            {"/foo/bar is ancestor of /foo/bar[3]/baz", "/foo/bar", "/foo/bar[3]/baz", IRRELEVANT, true},
 
             // Multiplicity scenario: [-1] ancestor is ancestor of any other multiplity, regardless of level
             {"/foo[-1] is ancestor of /foo/bar", "/foo[-1]", "/foo/bar", IRRELEVANT, true},
             {"/foo[-1] is ancestor of /foo[-1]/bar", "/foo[-1]", "/foo[-1]/bar", IRRELEVANT, true},
-            {"/foo[-1] is ancestor of /foo[0]/bar", "/foo[-1]", "/foo[0]/bar", IRRELEVANT, true},
-            {"/foo[-1] is ancestor of /foo[2]/bar", "/foo[-1]", "/foo[2]/bar", IRRELEVANT, true},
+            {"/foo[-1] is ancestor of /foo[1]/bar", "/foo[-1]", "/foo[1]/bar", IRRELEVANT, true},
+            {"/foo[-1] is ancestor of /foo[3]/bar", "/foo[-1]", "/foo[3]/bar", IRRELEVANT, true},
             {"/foo/bar[-1] is ancestor of /foo/bar/baz", "/foo/bar[-1]", "/foo/bar/baz", IRRELEVANT, true},
             {"/foo/bar[-1] is ancestor of /foo/bar[-1]/baz", "/foo/bar[-1]", "/foo/bar[-1]/bzr", IRRELEVANT, true},
-            {"/foo/bar[-1] is ancestor of /foo/bar[0]/baz", "/foo/bar[-1]", "/foo/bar[0]/bzr", IRRELEVANT, true},
-            {"/foo/bar[-1] is ancestor of /foo/bar[2]/baz", "/foo/bar[-1]", "/foo/bar[2]/bzr", IRRELEVANT, true},
+            {"/foo/bar[-1] is ancestor of /foo/bar[1]/baz", "/foo/bar[-1]", "/foo/bar[1]/bzr", IRRELEVANT, true},
+            {"/foo/bar[-1] is ancestor of /foo/bar[3]/baz", "/foo/bar[-1]", "/foo/bar[3]/bzr", IRRELEVANT, true},
 
             // Multiplicity scenario: [0] ancestor is ancestor of other special multiplicities only at first level
-            {"/foo[0] is ancestor of /foo/bar", "/foo[0]", "/foo/bar", IRRELEVANT, true},
-            {"/foo[0] is ancestor of /foo[-1]/bar", "/foo[0]", "/foo[-1]/bar", IRRELEVANT, true},
-            {"/foo[0] is ancestor of /foo[0]/bar", "/foo[0]", "/foo[0]/bar", IRRELEVANT, true},
-            {"/foo[0] is not ancestor of /foo[2]/bar", "/foo[0]", "/foo[2]/bar", IRRELEVANT, false},
-            {"/foo/bar[0] is not ancestor of /foo/bar/baz", "/foo/bar[0]", "/foo/bar/baz", IRRELEVANT, false},
-            {"/foo/bar[0] is not ancestor of /foo/bar[-1]/baz", "/foo/bar[0]", "/foo/bar[-1]/baz", IRRELEVANT, false},
-            {"/foo/bar[0] is ancestor of /foo/bar[0]/baz", "/foo/bar[0]", "/foo/bar[0]/baz", IRRELEVANT, true},
-            {"/foo/bar[0] is not ancestor of /foo/bar[2]/baz", "/foo/bar[0]", "/foo/bar[2]/baz", IRRELEVANT, false},
+            {"/foo[0] is ancestor of /foo/bar", "/foo[1]", "/foo/bar", IRRELEVANT, true},
+            {"/foo[0] is ancestor of /foo[-1]/bar", "/foo[1]", "/foo[-1]/bar", IRRELEVANT, true},
+            {"/foo[0] is ancestor of /foo[1]/bar", "/foo[1]", "/foo[1]/bar", IRRELEVANT, true},
+            {"/foo[0] is not ancestor of /foo[3]/bar", "/foo[1]", "/foo[3]/bar", IRRELEVANT, false},
+            {"/foo/bar[0] is not ancestor of /foo/bar/baz", "/foo/bar[1]", "/foo/bar/baz", IRRELEVANT, false},
+            {"/foo/bar[0] is not ancestor of /foo/bar[-1]/baz", "/foo/bar[1]", "/foo/bar[-1]/baz", IRRELEVANT, false},
+            {"/foo/bar[0] is ancestor of /foo/bar[1]/baz", "/foo/bar[1]", "/foo/bar[1]/baz", IRRELEVANT, true},
+            {"/foo/bar[0] is not ancestor of /foo/bar[3]/baz", "/foo/bar[1]", "/foo/bar[3]/baz", IRRELEVANT, false},
 
             // Multiplicity scenario: [2] ancestor is not ancestor of special multiplicities, regardless of level
-            {"/foo[2] is ancestor of /foo/bar", "/foo[2]", "/foo[0]/bar", IRRELEVANT, false},
-            {"/foo[2] is ancestor of /foo[-1]/bar", "/foo[2]", "/foo[-1]/bar", IRRELEVANT, false},
-            {"/foo[2] is ancestor of /foo[0]/bar", "/foo[2]", "/foo[0]/bar", IRRELEVANT, false},
-            {"/foo[2] is ancestor of /foo[2]/bar", "/foo[2]", "/foo[2]/bar", IRRELEVANT, true},
-            {"/foo/bar[2] is ancestor of /foo/bar/baz", "/foo/bar[2]", "/foo/bar[0]/baz", IRRELEVANT, false},
-            {"/foo/bar[2] is ancestor of /foo/bar[-1]/baz", "/foo/bar[2]", "/foo/bar[-1]/baz", IRRELEVANT, false},
-            {"/foo/bar[2] is ancestor of /foo/bar[0]/baz", "/foo/bar[2]", "/foo/bar[0]/baz", IRRELEVANT, false},
-            {"/foo/bar[2] is ancestor of /foo/bar[2]/baz", "/foo/bar[2]", "/foo/bar[2]/baz", IRRELEVANT, true},
+            {"/foo[2] is ancestor of /foo/bar", "/foo[3]", "/foo[1]/bar", IRRELEVANT, false},
+            {"/foo[2] is ancestor of /foo[-1]/bar", "/foo[3]", "/foo[-1]/bar", IRRELEVANT, false},
+            {"/foo[2] is ancestor of /foo[1]/bar", "/foo[3]", "/foo[1]/bar", IRRELEVANT, false},
+            {"/foo[2] is ancestor of /foo[3]/bar", "/foo[3]", "/foo[3]/bar", IRRELEVANT, true},
+            {"/foo/bar[2] is ancestor of /foo/bar/baz", "/foo/bar[3]", "/foo/bar[1]/baz", IRRELEVANT, false},
+            {"/foo/bar[2] is ancestor of /foo/bar[-1]/baz", "/foo/bar[3]", "/foo/bar[-1]/baz", IRRELEVANT, false},
+            {"/foo/bar[2] is ancestor of /foo/bar[1]/baz", "/foo/bar[3]", "/foo/bar[1]/baz", IRRELEVANT, false},
+            {"/foo/bar[2] is ancestor of /foo/bar[3]/baz", "/foo/bar[3]", "/foo/bar[3]/baz", IRRELEVANT, true},
 
             // Multiplicity scenario: Mixed bag of other interesting examples
-            {"/foo[-1]/bar[2] is ancestor of /foo/bar[2]/baz", "/foo[-1]/bar[2]", "/foo/bar[2]/baz", IRRELEVANT, true},
-            {"/foo[-1]/bar[2] is ancestor of /foo[-1]/bar[2]/baz", "/foo[-1]/bar[2]", "/foo[-1]/bar[2]/baz", IRRELEVANT, true},
-            {"/foo[-1]/bar[2] is ancestor of /foo[0]/bar[2]/baz", "/foo[-1]/bar[2]", "/foo[0]/bar[2]/baz", IRRELEVANT, true},
-            {"/foo[-1]/bar[2] is ancestor of /foo[2]/bar[2]/baz", "/foo[-1]/bar[2]", "/foo[2]/bar[2]/baz", IRRELEVANT, true},
-            {"/foo[2]/bar[2] is ancestor of /foo[3]/bar[2]/baz", "/foo[2]/bar[2]", "/foo[3]/bar[2]/baz", IRRELEVANT, false},
+            {"/foo[-1]/bar[2] is ancestor of /foo/bar[3]/baz", "/foo[-1]/bar[3]", "/foo/bar[3]/baz", IRRELEVANT, true},
+            {"/foo[-1]/bar[2] is ancestor of /foo[-1]/bar[3]/baz", "/foo[-1]/bar[3]", "/foo[-1]/bar[3]/baz", IRRELEVANT, true},
+            {"/foo[-1]/bar[2] is ancestor of /foo[1]/bar[3]/baz", "/foo[-1]/bar[3]", "/foo[1]/bar[3]/baz", IRRELEVANT, true},
+            {"/foo[-1]/bar[2] is ancestor of /foo[3]/bar[3]/baz", "/foo[-1]/bar[3]", "/foo[3]/bar[3]/baz", IRRELEVANT, true},
+            {"/foo[2]/bar[2] is ancestor of /foo[4]/bar[3]/baz", "/foo[3]/bar[3]", "/foo[4]/bar[3]/baz", IRRELEVANT, false},
         });
     }
 

@@ -15,9 +15,9 @@
  */
 package org.javarosa.xpath.expr;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
-import static org.junit.Assert.assertThat;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
@@ -47,9 +47,9 @@ public class CurrentGroupCountRefTest {
         scenario.answer("Kim");
         scenario.next();
 
-        assertThat(scenario.answerOf("/data/my_group[0]/name"), is(stringAnswer("Janet")));
-        assertThat(scenario.answerOf("/data/my_group[1]/name"), is(stringAnswer("Bob")));
-        assertThat(scenario.answerOf("/data/my_group[2]/name"), is(stringAnswer("Kim")));
+        assertThat(scenario.answerOf("/data/my_group[1]/name"), is(stringAnswer("Janet")));
+        assertThat(scenario.answerOf("/data/my_group[2]/name"), is(stringAnswer("Bob")));
+        assertThat(scenario.answerOf("/data/my_group[3]/name"), is(stringAnswer("Kim")));
         assertThat(scenario.atTheEndOfForm(), is(true));
         assertThat(scenario.countRepeatInstancesOf("/data/my_group"), is(3));
     }

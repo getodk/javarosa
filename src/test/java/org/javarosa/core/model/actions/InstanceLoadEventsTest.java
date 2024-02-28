@@ -111,10 +111,10 @@ public class InstanceLoadEventsTest {
             )
         ));
 
-        assertThat(scenario.answerOf("/data/repeat[0]/q1"), CoreMatchers.is(stringAnswer("16")));
+        assertThat(scenario.answerOf("/data/repeat[1]/q1"), CoreMatchers.is(stringAnswer("16")));
 
         scenario.createNewRepeat("/data/repeat");
-        assertThat(scenario.answerOf("/data/repeat[1]/q1"), CoreMatchers.is(nullValue()));
+        assertThat(scenario.answerOf("/data/repeat[2]/q1"), CoreMatchers.is(nullValue()));
     }
 
     @Test
@@ -138,10 +138,10 @@ public class InstanceLoadEventsTest {
             )
         ));
 
-        assertThat(scenario.answerOf("/data/repeat[0]/q1"), CoreMatchers.is(stringAnswer("16")));
         assertThat(scenario.answerOf("/data/repeat[1]/q1"), CoreMatchers.is(stringAnswer("16")));
+        assertThat(scenario.answerOf("/data/repeat[2]/q1"), CoreMatchers.is(stringAnswer("16")));
 
         scenario.createNewRepeat("/data/repeat");
-        assertThat(scenario.answerOf("/data/repeat[2]/q1"), CoreMatchers.is(nullValue()));
+        assertThat(scenario.answerOf("/data/repeat[3]/q1"), CoreMatchers.is(nullValue()));
     }
 }
