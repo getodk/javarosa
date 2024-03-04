@@ -392,4 +392,32 @@ public class SelectCachingTest {
         assertThat(evaluations, equalTo(2));
     }
     //endregion
+
+    @Test
+    public void eqChoiceFiltersForIntsWork() throws Exception {
+        Scenario scenario = Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("choice"),
+                        t("select")
+                    )),
+                    instance("instance",
+                        item("1", "One"),
+                        item("2", "Two")
+                    ),
+                    bind("/data/choice").type("int"),
+                    bind("/data/select").type("string")
+                )
+            ),
+            body(
+                input("/data/choice"),
+                select1Dynamic("/data/select", "instance('instance')/root/item[value=/data/choice]")
+            )
+        ));
+
+        scenario.answer("/data/choice", 1);
+        assertThat(scenario.choicesOf("/data/select").size(), equalTo(1));
+    }
 }
