@@ -41,7 +41,12 @@ public class EqualityExpressionIndexFilterStrategy implements FilterStrategy {
                 buildIndexIfNeeded(sourceInstance, candidate, children, evaluationContext, section);
 
                 Object absoluteValue = candidate.evalContextSide(sourceInstance, evaluationContext);
-                return index.lookup(section, absoluteValue.toString());
+
+                if (absoluteValue instanceof String) {
+                    return index.lookup(section, (String) absoluteValue);
+                } else {
+                    return next.get();
+                }
             } else {
                 return next.get();
             }
