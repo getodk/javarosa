@@ -30,24 +30,38 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         List<Pair<XPathReference, String>> saveTos = entityFormExtra.getSaveTos();
 
         TreeElement entityElement = EntityFormParser.getEntityElement(mainInstance);
-        String dataset = EntityFormParser.parseFirstDatasetToCreate(entityElement);
-        if (dataset != null) {
-            List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
-                IDataReference reference = saveTo.getFirst();
-                IAnswerData answerData = mainInstance.resolveReference(reference).getValue();
+        if (entityElement != null) {
+            EntityFormParser.EntityAction action = EntityFormParser.parseAction(entityElement);
+            String dataset = EntityFormParser.parseDataset(entityElement);
 
-                if (answerData != null) {
-                    return new Pair<>(saveTo.getSecond(), answerData.getDisplayText());
-                } else {
-                    return new Pair<>(saveTo.getSecond(), "");
-                }
-            }).collect(Collectors.toList());
-
-            String id = EntityFormParser.parseId(entityElement);
-            String label = EntityFormParser.parseLabel(entityElement);
-            formEntryModel.getExtras().put(new Entities(asList(new Entity(dataset, id, label, fields))));
-        } else {
-            formEntryModel.getExtras().put(new Entities(emptyList()));
+            if (action == EntityFormParser.EntityAction.CREATE) {
+                Entity entity = createEntity(entityElement, 1, dataset, saveTos, mainInstance);
+                formEntryModel.getExtras().put(new Entities(asList(entity)));
+            } else if (action == EntityFormParser.EntityAction.UPDATE){
+                int baseVersion = EntityFormParser.parseBaseVersion(entityElement);
+                int newVersion = baseVersion + 1;
+                Entity entity = createEntity(entityElement, newVersion, dataset, saveTos, mainInstance);
+                formEntryModel.getExtras().put(new Entities(asList(entity)));
+            } else {
+                formEntryModel.getExtras().put(new Entities(emptyList()));
+            }
         }
+    }
+
+    private Entity createEntity(TreeElement entityElement, int version, String dataset, List<Pair<XPathReference, String>> saveTos, FormInstance mainInstance) {
+        List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
+            IDataReference reference = saveTo.getFirst();
+            IAnswerData answerData = mainInstance.resolveReference(reference).getValue();
+
+            if (answerData != null) {
+                return new Pair<>(saveTo.getSecond(), answerData.getDisplayText());
+            } else {
+                return new Pair<>(saveTo.getSecond(), "");
+            }
+        }).collect(Collectors.toList());
+
+        String id = EntityFormParser.parseId(entityElement);
+        String label = EntityFormParser.parseLabel(entityElement);
+        return new Entity(dataset, id, label, version, fields);
     }
 }

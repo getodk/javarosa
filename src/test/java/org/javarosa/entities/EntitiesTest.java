@@ -122,6 +122,178 @@ public class EntitiesTest {
         assertThat(entities.get(0).dataset, equalTo("people"));
         assertThat(entities.get(0).id, equalTo(scenario.answerOf("/data/meta/entity/@id").getValue()));
         assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
+        assertThat(entities.get(0).version, equalTo(1));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void fillingFormWithUpdate_makesEntityAvailable() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Update entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2023.1.0")),
+                    mainInstance(
+                        t("data id=\"update-entity-form\"",
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" update=\"1\" id=\"123\" baseVersion=\"1\"",
+                                    t("label")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name"),
+                    bind("/data/meta/entity/@id").type("string"),
+                    bind("/data/meta/entity/label").type("string").calculate("/data/name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+
+        scenario.next();
+        scenario.answer("Tom Wambsgans");
+
+        scenario.finalizeInstance();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo("123"));
+        assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
+        assertThat(entities.get(0).version, equalTo(2));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void fillingFormWithUpdate_andNoLabel_makesEntityAvailableWithNullLabel() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Update entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2023.1.0")),
+                    mainInstance(
+                        t("data id=\"update-entity-form\"",
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" update=\"1\" id=\"123\" baseVersion=\"1\"")
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name"),
+                    bind("/data/meta/entity/@id").type("string")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+
+        scenario.next();
+        scenario.answer("Tom Wambsgans");
+
+        scenario.finalizeInstance();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo("123"));
+        assertThat(entities.get(0).label, equalTo(null));
+        assertThat(entities.get(0).version, equalTo(2));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void fillingFormWithCreateAndUpdate_makesEntityAvailableAsSecondVersion() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Upsert entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2023.1.0")),
+                    mainInstance(
+                        t("data id=\"upsert-entity-form\"",
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\" update=\"1\" id=\"123\" baseVersion=\"1\"",
+                                    t("label")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name"),
+                    bind("/data/meta/entity/label").type("string").calculate("/data/name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+
+        scenario.next();
+        scenario.answer("Tom Wambsgans");
+
+        scenario.finalizeInstance();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo("123"));
+        assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
+        assertThat(entities.get(0).version, equalTo(2));
+        assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void fillingFormWithCreateAndUpdate_butNoBaseVersion_makesEntityAvailableAsFirstVersion() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Upsert entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2023.1.0")),
+                    mainInstance(
+                        t("data id=\"upsert-entity-form\"",
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\" update=\"1\" id=\"123\"",
+                                    t("label")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name"),
+                    bind("/data/meta/entity/label").type("string").calculate("/data/name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+
+        scenario.next();
+        scenario.answer("Tom Wambsgans");
+
+        scenario.finalizeInstance();
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo("123"));
+        assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
+        assertThat(entities.get(0).version, equalTo(1));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
     }
 

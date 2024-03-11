@@ -25,7 +25,7 @@ import static org.javarosa.core.util.XFormsElement.title;
 public class EntityFormParserTest {
 
     @Test
-    public void parseFirstDatasetToCreate_findsCreateWithTrueString() throws XFormParser.ParseException {
+    public void parseAction_findsCreateWithTrueString() throws XFormParser.ParseException {
         XFormsElement form = XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -52,7 +52,39 @@ public class EntityFormParserTest {
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         FormDef formDef = parser.parse(null);
 
-        String dataset = EntityFormParser.parseFirstDatasetToCreate(EntityFormParser.getEntityElement(formDef.getMainInstance()));
-        assertThat(dataset, equalTo("people"));
+        EntityFormParser.EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
+        assertThat(dataset, equalTo(EntityFormParser.EntityAction.CREATE));
+    }
+
+    @Test
+    public void parseAction_findsUpdateWithTrueString() throws XFormParser.ParseException {
+        XFormsElement form = XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" update=\"true\"")
+                            )
+                        )
+                    ),
+                    bind("/data/name").type("string").withAttribute("entities", "saveto", "name")
+                )
+            ),
+            body(
+                input("/data/name")
+            )
+        );
+
+        XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
+        FormDef formDef = parser.parse(null);
+
+        EntityFormParser.EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
+        assertThat(dataset, equalTo(EntityFormParser.EntityAction.UPDATE));
     }
 }
