@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
@@ -32,7 +33,6 @@ import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
 import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -834,7 +834,7 @@ public class TriggerableDagTest {
                         ))),
                     // position(..) means the full cascade is evaulated as part of triggerTriggerables
                     bind("/data/repeat/position").calculate("position(..)"),
-                    bind("/data/repeat/position_2").calculate("/data/repeat/position * 2"),
+                    bind("/data/repeat/position_2").calculate("../position * 2"),
                     bind("/data/repeat/other").calculate("2 * 2"),
                     // concat needs to be evaluated after /data/repeat/other has a value
                     bind("/data/repeat/concatenated").calculate("concat(../position_2, '-', ../other)"))),
@@ -1017,7 +1017,7 @@ public class TriggerableDagTest {
                     )),
                     bind("/data/sum").type("int").calculate("sum(/data/repeat/position1)"),
                     bind("/data/repeat/position1").type("int").calculate("position(..)"),
-                    bind("/data/repeat/position2").type("int").calculate("/data/repeat/position1"))),
+                    bind("/data/repeat/position2").type("int").calculate("../position1"))),
 
             body(
                 repeat("/data/repeat",
@@ -1194,7 +1194,7 @@ public class TriggerableDagTest {
                     )),
                     bind("/data/house/number").type("int").calculate("position(..)"),
                     bind("/data/house/name").type("string").required(),
-                    bind("/data/house/name_and_number").type("string").calculate("concat(/data/house/name, /data/house/number)")
+                    bind("/data/house/name_and_number").type("string").calculate("concat(../name, ../number)")
                 )
             ),
             body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
@@ -1245,7 +1245,7 @@ public class TriggerableDagTest {
                     )),
                     bind("/data/house/number").type("int").calculate("position(..)"),
                     bind("/data/house/name").type("string").required(),
-                    bind("/data/house/name_and_number").type("string").calculate("concat(/data/house/name, 'X')")
+                    bind("/data/house/name_and_number").type("string").calculate("concat(../name, 'X')")
                 )
             ),
             body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
@@ -1729,7 +1729,7 @@ public class TriggerableDagTest {
                     bind("/data/inner_trigger").type("int"),
                     bind("/data/outer").relevant("/data/outer_trigger = 'D'"),
                     bind("/data/outer/inner_condition").type("boolean").calculate("/data/inner_trigger > 10"),
-                    bind("/data/outer/inner").relevant("/data/outer/inner_condition"),
+                    bind("/data/outer/inner").relevant("../inner_condition"),
                     bind("/data/outer/inner/target_question").type("string")
                 )
             ),

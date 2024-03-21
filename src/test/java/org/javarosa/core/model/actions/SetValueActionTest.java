@@ -374,7 +374,7 @@ public class SetValueActionTest {
             body(
                 repeat("/data/repeat1",
                     input("/data/repeat1/source",
-                        setvalue("xforms-value-changed", "/data/repeat1/repeat2/destination", "/data/repeat1/source")),
+                        setvalue("xforms-value-changed", "/data/repeat1/repeat2/destination", "../../source")),
                     repeat("/data/repeat1/repeat2",
                         input("/data/repeat1/repeat2/destination")
             )))));
