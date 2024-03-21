@@ -144,28 +144,28 @@ public class RepeatTest {
                 )
             )));
 
-        scenario.answer("/data/outer[0]/outerq1", "5");
-        assertThat(scenario.answerOf("/data/outer[0]/outercalcabs"), is(new IntegerData(6)));
-        assertThat(scenario.answerOf("/data/outer[0]/outercalcrel"), is(new IntegerData(6)));
+        scenario.answer("/data/outer[1]/outerq1", "5");
+        assertThat(scenario.answerOf("/data/outer[1]/outercalcabs"), is(new IntegerData(6)));
+        assertThat(scenario.answerOf("/data/outer[1]/outercalcrel"), is(new IntegerData(6)));
 
         scenario.createNewRepeat("/data/outer");
 
-        scenario.answer("/data/outer[1]/outerq1", "23");
+        scenario.answer("/data/outer[2]/outerq1", "23");
         // In a standards-compliant XPath engine, this would be 6 because /data/outer/outerq1 in the calculate expression
-        // would always be equivalent to /data/outer[0]/outerq1
-        assertThat(scenario.answerOf("/data/outer[1]/outercalcabs"), is(new IntegerData(24)));
-        assertThat(scenario.answerOf("/data/outer[1]/outercalcrel"), is(new IntegerData(24)));
+        // would always be equivalent to /data/outer[1]/outerq1
+        assertThat(scenario.answerOf("/data/outer[2]/outercalcabs"), is(new IntegerData(24)));
+        assertThat(scenario.answerOf("/data/outer[2]/outercalcrel"), is(new IntegerData(24)));
 
-        scenario.answer("/data/outer[0]/inner[0]/innerq1", 18);
-        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/innercalcabs"), is(new IntegerData(20)));
-        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/innercalcrel"), is(new IntegerData(20)));
+        scenario.answer("/data/outer[1]/inner[1]/innerq1", 18);
+        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/innercalcabs"), is(new IntegerData(20)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/innercalcrel"), is(new IntegerData(20)));
 
-        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
 
-        scenario.answer("/data/outer[0]/inner[1]/innerq1", 19);
+        scenario.answer("/data/outer[1]/inner[2]/innerq1", 19);
         // In a standards-compliant XPath engine, this would be 20 because /data/outer/inner/innerq1 in the calculate expression
-        // would always be equivalent to /data/outer[0]/inner[0]/innerq1
-        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/innercalcabs"), is(new IntegerData(21)));
-        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/innercalcrel"), is(new IntegerData(21)));
+        // would always be equivalent to /data/outer[1]/inner[1]/innerq1
+        assertThat(scenario.answerOf("/data/outer[1]/inner[2]/innercalcabs"), is(new IntegerData(21)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[2]/innercalcrel"), is(new IntegerData(21)));
     }
 }

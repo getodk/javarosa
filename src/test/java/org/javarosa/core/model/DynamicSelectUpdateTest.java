@@ -58,13 +58,13 @@ public class DynamicSelectUpdateTest {
     public void selectFromRepeat_whenRepeatAdded_updatesChoices() throws Exception {
         Scenario scenario = Scenario.init("Select from repeat", getSelectFromRepeatForm());
 
-        scenario.answer("/data/repeat[0]/value","a");
-        scenario.answer("/data/repeat[0]/label","A");
+        scenario.answer("/data/repeat[1]/value","a");
+        scenario.answer("/data/repeat[1]/label","A");
         assertThat(scenario.choicesOf("/data/select"), contains(
             choice("a", "A")));
 
-        scenario.answer("/data/repeat[1]/value","b");
-        scenario.answer("/data/repeat[1]/label","B");
+        scenario.answer("/data/repeat[2]/value","b");
+        scenario.answer("/data/repeat[2]/label","B");
         assertThat(scenario.choicesOf("/data/select"), containsInAnyOrder(
             choice("a", "A"),
             choice("b", "B")));
@@ -74,13 +74,13 @@ public class DynamicSelectUpdateTest {
     public void selectFromRepeat_whenRepeatChanged_updatesChoices() throws Exception {
         Scenario scenario = Scenario.init("Select from repeat", getSelectFromRepeatForm());
 
-        scenario.answer("/data/repeat[0]/value","a");
-        scenario.answer("/data/repeat[0]/label","A");
+        scenario.answer("/data/repeat[1]/value","a");
+        scenario.answer("/data/repeat[1]/label","A");
         assertThat(scenario.choicesOf("/data/select"), contains(
             choice("a", "A")));
 
-        scenario.answer("/data/repeat[0]/value","c");
-        scenario.answer("/data/repeat[0]/label","C");
+        scenario.answer("/data/repeat[1]/value","c");
+        scenario.answer("/data/repeat[1]/label","C");
         assertThat(scenario.choicesOf("/data/select"), contains(
             choice("c", "C")));
         assertThat(scenario.choicesOf("/data/select").size(), is(1));
@@ -90,12 +90,12 @@ public class DynamicSelectUpdateTest {
     public void selectFromRepeat_whenRepeatRemoved_updatesChoices() throws Exception {
         Scenario scenario = Scenario.init("Select from repeat", getSelectFromRepeatForm());
 
-        scenario.answer("/data/repeat[0]/value", "a");
-        scenario.answer("/data/repeat[0]/label", "A");
+        scenario.answer("/data/repeat[1]/value", "a");
+        scenario.answer("/data/repeat[1]/label", "A");
         assertThat(scenario.choicesOf("/data/select"), contains(
             choice("a", "A")));
 
-        scenario.removeRepeat("/data/repeat[0]");
+        scenario.removeRepeat("/data/repeat[1]");
         assertThat(scenario.choicesOf("/data/select").size(), is(0));
     }
 
@@ -103,8 +103,8 @@ public class DynamicSelectUpdateTest {
     public void selectFromRepeat_withPredicate_whenPredicateTriggerChanges_updatesChoices() throws Exception {
         Scenario scenario = Scenario.init("Select from repeat", getSelectFromRepeatForm("starts-with(value,current()/../filter)"));
 
-        scenario.answer("/data/repeat[0]/value", "a");
-        scenario.answer("/data/repeat[0]/label", "A");
+        scenario.answer("/data/repeat[1]/value", "a");
+        scenario.answer("/data/repeat[1]/label", "A");
         scenario.answer("/data/filter", "a");
         assertThat(scenario.choicesOf("/data/select"), contains(
             choice("a", "A")));
@@ -243,10 +243,10 @@ public class DynamicSelectUpdateTest {
                 )
             ));
 
-        scenario.answer("/data/repeat[0]/question", "a");
+        scenario.answer("/data/repeat[1]/question", "a");
         assertThat(scenario.choicesOf("/data/select").size(), is(3));
 
-        scenario.answer("/data/repeat[1]/question", "b");
+        scenario.answer("/data/repeat[2]/question", "b");
         List<SelectChoice> choices = scenario.choicesOf("/data/select");
         assertThat(choices.size(), is(2));
         // Because of the repeat trigger in the count expression, choices should be recomputed every time they're requested
@@ -278,18 +278,17 @@ public class DynamicSelectUpdateTest {
                     select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"))
             )));
 
-        scenario.answer("/data/repeat[0]/filter", "a");
         scenario.answer("/data/repeat[1]/filter", "a");
-        List<SelectChoice> repeat0Choices = scenario.choicesOf("/data/repeat[0]/select");
-        List<SelectChoice> repeat1Choices = scenario.choicesOf("/data/repeat[1]/select");
+        scenario.answer("/data/repeat[2]/filter", "a");
+        List<SelectChoice> repeat0Choices = scenario.choicesOf("/data/repeat[1]/select");
+        List<SelectChoice> repeat1Choices = scenario.choicesOf("/data/repeat[2]/select");
 
-        // The trigger keys are /data/repeat[0]/filter and /data/repeat[1]/filter which means no caching between them
+        // The trigger keys are /data/repeat[1]/filter and /data/repeat[2]/filter which means no caching between them
         assertThat(repeat0Choices, not(sameInstance(repeat1Choices)));
 
-        scenario.answer("/data/repeat[1]/filter", "bb");
-        assertThat(scenario.choicesOf("/data/repeat[0]/select").size(), is(2));
-        assertThat(scenario.choicesOf("/data/repeat[1]/select").size(), is(1));
+        scenario.answer("/data/repeat[2]/filter", "bb");
+        assertThat(scenario.choicesOf("/data/repeat[1]/select").size(), is(2));
+        assertThat(scenario.choicesOf("/data/repeat[2]/select").size(), is(1));
     }
-    //endregion
     //endregion
 }

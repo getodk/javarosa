@@ -1,8 +1,5 @@
 package org.javarosa.form.api;
 
-import org.javarosa.core.test.Scenario;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.Scenario.getRef;
@@ -20,6 +17,9 @@ import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
 import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
 import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
+
+import org.javarosa.core.test.Scenario;
+import org.junit.Test;
 
 public class FormEntryControllerTest {
 
@@ -55,10 +55,10 @@ public class FormEntryControllerTest {
 
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[0]/question1[0]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[1]/question1[1]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[1]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[2]")));
     }
 
     @Test
@@ -102,10 +102,10 @@ public class FormEntryControllerTest {
 
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[0]/question1[0]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[1]/question1[1]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[1]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[2]")));
     }
 
     @Test
@@ -152,10 +152,10 @@ public class FormEntryControllerTest {
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[0]/repeat2[0]/question3[0]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[1]/repeat2[1]/question3[1]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[0]/repeat2[1]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat1[1]/repeat2[2]")));
     }
 
     @Test
@@ -195,10 +195,10 @@ public class FormEntryControllerTest {
         assertThat(controller.stepToNextEvent(), is(EVENT_REPEAT));
         assertThat(controller.stepToNextEvent(), is(EVENT_GROUP));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[0]/group[0]/question1[0]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[1]/group[1]/question1[1]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[1]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/repeat[2]")));
     }
 
     @Test
@@ -225,9 +225,9 @@ public class FormEntryControllerTest {
 
         FormEntryController controller = new FormEntryController(new FormEntryModel(scenario.getFormDef()));
         assertThat(controller.stepToNextEvent(), is(EVENT_QUESTION));
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/question1[0]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/question1[1]")));
 
         controller.jumpToNewRepeatPrompt();
-        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/question1[0]")));
+        assertThat(controller.getModel().getFormIndex().getReference(), is(getRef("/data/question1[1]")));
     }
 }

@@ -15,9 +15,9 @@
  */
 package org.javarosa.xpath.expr;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
-import static org.junit.Assert.assertThat;
 
 import org.javarosa.core.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
@@ -34,17 +34,17 @@ public class CurrentFieldRefTest {
 
     @Test
     public void current_in_a_field_ref_should_be_the_same_as_a_relative_ref() {
-        // The ref on /data/my_group[0]/name uses current()/name instead of an absolute path
-        scenario.answer("/data/my_group[0]/name", "Bob");
-        scenario.answer("/data/my_group[1]/name", "Janet");
+        // The ref on /data/my_group[1]/name uses current()/name instead of an absolute path
+        scenario.answer("/data/my_group[1]/name", "Bob");
+        scenario.answer("/data/my_group[2]/name", "Janet");
 
         assertThat(
-            scenario.answerOf("/data/my_group[0]/name"),
+            scenario.answerOf("/data/my_group[1]/name"),
             is(stringAnswer("Bob"))
         );
 
         assertThat(
-            scenario.answerOf("/data/my_group[1]/name"),
+            scenario.answerOf("/data/my_group[2]/name"),
             is(stringAnswer("Janet"))
         );
     }

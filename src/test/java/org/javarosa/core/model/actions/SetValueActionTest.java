@@ -215,17 +215,17 @@ public class SetValueActionTest {
 
         final int REPEAT_COUNT = 5;
 
-        for (int i = 0; i < REPEAT_COUNT; i++) {
+        for (int i = 1; i <= REPEAT_COUNT; i++) {
             scenario.createNewRepeat("/data/repeat");
             assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(nullValue()));
         }
 
-        for (int i = 0; i < REPEAT_COUNT; i++) {
+        for (int i = 1; i <= REPEAT_COUNT; i++) {
             scenario.answer("/data/repeat[" + i + "]/source", 7);
         }
 
-        for (int i = 0; i < REPEAT_COUNT; i++) {
-            assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(intAnswer(4 * (i + 1))));
+        for (int i = 1; i <= REPEAT_COUNT; i++) {
+            assertThat(scenario.answerOf("/data/repeat[" + i + "]/destination"), is(intAnswer(4 * i)));
         }
     }
 
@@ -255,7 +255,7 @@ public class SetValueActionTest {
         scenario.createNewRepeat("/data/repeat");
 
         scenario.answer("/data/source", "foo");
-        assertThat(scenario.answerOf("/data/repeat[0]/destination").getDisplayText(), is("foo"));
+        assertThat(scenario.answerOf("/data/repeat[1]/destination").getDisplayText(), is("foo"));
     }
 
     @Ignore("TODO: verifyActions seems like it may be overzealous")
@@ -285,7 +285,7 @@ public class SetValueActionTest {
         scenario.createNewRepeat("/data/repeat");
 
         scenario.answer("/data/source", "foo");
-        assertThat(scenario.answerOf("/data/repeat[1]/destination").getDisplayText(), is("foo"));
+        assertThat(scenario.answerOf("/data/repeat[2]/destination").getDisplayText(), is("foo"));
     }
 
     @Test
@@ -345,14 +345,14 @@ public class SetValueActionTest {
 
         final int REPEAT_COUNT = 5;
 
-        for (int i = 0; i < REPEAT_COUNT; i++) {
+        for (int i = 1; i <= REPEAT_COUNT; i++) {
             scenario.createNewRepeat("/data/repeat");
             assertThat(scenario.answerOf("/data/destination"), is(intAnswer(0)));
         }
 
-        for (int i = 0; i < REPEAT_COUNT; i++) {
+        for (int i = 1; i <= REPEAT_COUNT; i++) {
             scenario.answer("/data/repeat[" + i + "]/source", 7);
-            assertThat(scenario.answerOf("/data/destination"), is(intAnswer(i + 1)));
+            assertThat(scenario.answerOf("/data/destination"), is(intAnswer(i)));
         }
     }
 

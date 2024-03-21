@@ -487,13 +487,13 @@ public class TriggerableDagTest {
             XPathPathExpr.getRefValue(
                 scenario.getFormDef().getMainInstance(),
                 scenario.getEvaluationContext(),
-                scenario.expandSingle(getRef(("/data/node[1]/value")))
+                scenario.expandSingle(getRef(("/data/node[2]/value")))
             ),
             is("")
         );
         // ... as opposed to the value that we can get by resolving the same
         // reference with the main instance, which has the expected `2` value
-        assertThat(scenario.answerOf("/data/node[1]/value"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/node[2]/value"), is(intAnswer(2)));
     }
 
     @Test
@@ -806,8 +806,8 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.answer(0);
 
-        assertThat(scenario.answerOf("/data/repeat[" + 0 + "]/inner2"), CoreMatchers.is(intAnswer(0)));
-        assertThat(scenario.answerOf("/data/repeat[" + 0 + "]/inner3"), CoreMatchers.is(intAnswer(0)));
+        assertThat(scenario.answerOf("/data/repeat[1]/inner2"), CoreMatchers.is(intAnswer(0)));
+        assertThat(scenario.answerOf("/data/repeat[1]/inner3"), CoreMatchers.is(intAnswer(0)));
 
         scenario.next();
         scenario.createNewRepeat();
@@ -815,8 +815,8 @@ public class TriggerableDagTest {
 
         scenario.answer(1);
 
-        assertThat(scenario.answerOf("/data/repeat[" + 1 + "]/inner2"), CoreMatchers.is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/repeat[" + 1 + "]/inner3"), CoreMatchers.is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/repeat[2]/inner2"), CoreMatchers.is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/repeat[2]/inner3"), CoreMatchers.is(intAnswer(4)));
     }
 
     @Test
@@ -845,13 +845,13 @@ public class TriggerableDagTest {
 
         scenario.next();
         scenario.next();
-        assertThat(scenario.answerOf("/data/repeat[" + 0 + "]/concatenated"), CoreMatchers.is(stringAnswer("2-4")));
+        assertThat(scenario.answerOf("/data/repeat[1]/concatenated"), CoreMatchers.is(stringAnswer("2-4")));
 
         scenario.next();
         scenario.createNewRepeat();
 
         scenario.next();
-        assertThat(scenario.answerOf("/data/repeat[" + 1 + "]/concatenated"), CoreMatchers.is(stringAnswer("4-4")));
+        assertThat(scenario.answerOf("/data/repeat[2]/concatenated"), CoreMatchers.is(stringAnswer("4-4")));
     }
 
     // Illustrates the second case in TriggerableDAG.getTriggerablesAffectingAllInstances
@@ -879,18 +879,18 @@ public class TriggerableDagTest {
 
         dagEvents.clear();
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/count"), CoreMatchers.is(intAnswer(n + 1)));
+            assertThat(scenario.answerOf("/data/count"), CoreMatchers.is(intAnswer(n)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[5]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
     }
 
     // In this case, the count(/data/repeat) expression is represented by a single triggerable. The expression gets
@@ -918,18 +918,18 @@ public class TriggerableDagTest {
                 )
             )));
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[5]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
     }
 
     // In this case, /data/repeat in the count(/data/repeat) expression is given the context of the current repeat so the
@@ -954,18 +954,18 @@ public class TriggerableDagTest {
                 )
             )));
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[4]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
     }
 
     @Test
@@ -987,18 +987,18 @@ public class TriggerableDagTest {
                 )
             )));
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n + 1)));
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(n)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(5))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[4]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-count"), CoreMatchers.is(intAnswer(4))));
     }
 
     @Test
@@ -1025,18 +1025,18 @@ public class TriggerableDagTest {
                 )
             )));
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer((n + 1) * (n + 2) / 2)));
+            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer(n * (n + 1) / 2)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position1"), CoreMatchers.is(intAnswer(n + 1))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position1"), CoreMatchers.is(intAnswer(n))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[5]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position2"), CoreMatchers.is(intAnswer(n + 1))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/position2"), CoreMatchers.is(intAnswer(n))));
     }
 
 
@@ -1064,34 +1064,34 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.answer(11);
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(11)));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
         scenario.answer(22);
 
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[2]/number"), is(intAnswer(22)));
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(11)));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
         scenario.answer(33);
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[3]/prev-number"), is(intAnswer(22)));
 
-        scenario.removeRepeat("/data/group[1]");
+        scenario.removeRepeat("/data/group[2]");
 
-        assertThat(scenario.answerOf("/data/group[0]/prev-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(33)));
-        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/prev-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[2]/number"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/group[2]/prev-number"), is(intAnswer(11)));
     }
 
     @Test
@@ -1124,16 +1124,16 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.createNewRepeat();
 
-        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(true));
+        assertThat(scenario.getAnswerNode("/data/repeat[1]/group/in_group").isRelevant(), is(true));
 
         scenario.createNewRepeat("/data/repeat");
 
+        assertThat(scenario.getAnswerNode("/data/repeat[2]/group/in_group").isRelevant(), is(false));
         assertThat(scenario.getAnswerNode("/data/repeat[1]/group/in_group").isRelevant(), is(false));
-        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(false));
 
-        scenario.removeRepeat("/data/repeat[1]");
+        scenario.removeRepeat("/data/repeat[2]");
 
-        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/in_group").isRelevant(), is(true));
+        assertThat(scenario.getAnswerNode("/data/repeat[1]/group/in_group").isRelevant(), is(true));
     }
     //endregion
 
@@ -1152,27 +1152,27 @@ public class TriggerableDagTest {
             ),
             body(group("/data/house", repeat("/data/house", input("number"))))
         )).onDagEvent(dagEvents::add);
-        range(0, 5).forEach(__ -> {
+        range(1, 6).forEach(__ -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
         });
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(5)));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[5]/number"), is(intAnswer(5)));
 
         // Start recording DAG events now
         dagEvents.clear();
 
-        scenario.removeRepeat("/data/house[1]");
+        scenario.removeRepeat("/data/house[2]");
 
-        assertThat(scenario.answerOf("/data/house[0]/number"), is(intAnswer(1)));
-        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(4)));
-        assertThat(scenario.answerOf("/data/house[4]/number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[1]/number"), is(intAnswer(1)));
+        assertThat(scenario.answerOf("/data/house[2]/number"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/house[3]/number"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/house[4]/number"), is(intAnswer(4)));
+        assertThat(scenario.answerOf("/data/house[5]/number"), is(nullValue()));
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0)",
             "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for "
@@ -1199,28 +1199,28 @@ public class TriggerableDagTest {
             ),
             body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
         )).onDagEvent(dagEvents::add);
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
-            scenario.answer((char) (65 + n));
+            scenario.answer((char) (64 + n));
         });
-        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("A1")));
-        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("B2")));
-        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("C3")));
-        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("D4")));
-        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("E5")));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("A1")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("B2")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("C3")));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("D4")));
+        assertThat(scenario.answerOf("/data/house[5]/name_and_number"), is(stringAnswer("E5")));
 
         // Start recording DAG events now
         dagEvents.clear();
 
-        scenario.removeRepeat("/data/house[1]");
+        scenario.removeRepeat("/data/house[2]");
 
-        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("A1")));
-        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("C2")));
-        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("D3")));
-        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("E4")));
-        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("A1")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("C2")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("D3")));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("E4")));
+        assertThat(scenario.answerOf("/data/house[5]/name_and_number"), is(nullValue()));
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0)",
             "Processing 'Recalculate' for name_and_number [1_1] (A1), name_and_number [2_1] (C2), name_and_number [3_1] (D3), name_and_number [4_1] (E4)",
@@ -1250,28 +1250,28 @@ public class TriggerableDagTest {
             ),
             body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
         )).onDagEvent(dagEvents::add);
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
-            scenario.answer((char) (65 + n));
+            scenario.answer((char) (64 + n));
         });
-        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("AX")));
-        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("BX")));
-        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("CX")));
-        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("DX")));
-        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("EX")));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("AX")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("BX")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("CX")));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("DX")));
+        assertThat(scenario.answerOf("/data/house[5]/name_and_number"), is(stringAnswer("EX")));
 
         // Start recording DAG events now
         dagEvents.clear();
 
-        scenario.removeRepeat("/data/house[1]");
+        scenario.removeRepeat("/data/house[2]");
 
-        assertThat(scenario.answerOf("/data/house[0]/name_and_number"), is(stringAnswer("AX")));
-        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("CX")));
-        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("DX")));
-        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("EX")));
-        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/house[1]/name_and_number"), is(stringAnswer("AX")));
+        assertThat(scenario.answerOf("/data/house[2]/name_and_number"), is(stringAnswer("CX")));
+        assertThat(scenario.answerOf("/data/house[3]/name_and_number"), is(stringAnswer("DX")));
+        assertThat(scenario.answerOf("/data/house[4]/name_and_number"), is(stringAnswer("EX")));
+        assertThat(scenario.answerOf("/data/house[5]/name_and_number"), is(nullValue()));
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for number [1_1] (1.0), number [2_1] (2.0), number [3_1] (3.0), number [4_1] (4.0)",
             "Processing 'Deleted: number [2_1]: 1 triggerables were fired.' for ",
@@ -1304,7 +1304,7 @@ public class TriggerableDagTest {
         });
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(55)));
 
-        scenario.removeRepeat("/data/house[2]");
+        scenario.removeRepeat("/data/house[3]");
 
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(45)));
     }
@@ -1327,7 +1327,7 @@ public class TriggerableDagTest {
             ),
             body(group("/data/house", repeat("/data/house", input("number"))))
         )).onDagEvent(dagEvents::add);
-        range(0, 10).forEach(n -> {
+        range(1, 11).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
@@ -1336,7 +1336,7 @@ public class TriggerableDagTest {
         // Start recording DAG events now
         dagEvents.clear();
 
-        scenario.removeRepeat("/data/house[2]");
+        scenario.removeRepeat("/data/house[3]");
 
         assertThat(scenario.answerOf("/data/summary"), is(intAnswer(45)));
         assertDagEvents(dagEvents,
@@ -1366,7 +1366,7 @@ public class TriggerableDagTest {
             ),
             body(group("/data/repeat", repeat("/data/repeat", input("number"))))
         )).onDagEvent(dagEvents::add);
-        range(0, 10).forEach(n -> {
+        range(1, 11).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
@@ -1375,7 +1375,7 @@ public class TriggerableDagTest {
         // Start recording DAG events now
         dagEvents.clear();
 
-        scenario.removeRepeat("/data/repeat[2]");
+        scenario.removeRepeat("/data/repeat[3]");
 
         assertDagEvents(dagEvents,
             "Processing 'Recalculate' for numberx2 [3_1] (NaN)",
@@ -1410,18 +1410,18 @@ public class TriggerableDagTest {
             ),
             body(group("/data/house", repeat("/data/house", input("/data/house/name"))))
         )).onDagEvent(dagEvents::add);
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
             scenario.next();
-            scenario.answer((char) (65 + n));
+            scenario.answer((char) (64 + n));
         });
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABCDE")));
 
         // Start recording DAG events now
         dagEvents.clear();
 
-        scenario.removeRepeat("/data/house[2]");
+        scenario.removeRepeat("/data/house[3]");
 
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ABDE")));
         assertDagEvents(dagEvents,
@@ -1455,7 +1455,7 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/repeat-count"), is(intAnswer(3)));
 
-        scenario.removeRepeat("/data/repeat[2]");
+        scenario.removeRepeat("/data/repeat[3]");
         assertThat(scenario.answerOf("/data/repeat-count"), is(intAnswer(2)));
     }
 
@@ -1484,7 +1484,7 @@ public class TriggerableDagTest {
 
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("abc")));
 
-        scenario.removeRepeat("/data/repeat[2]");
+        scenario.removeRepeat("/data/repeat[3]");
         assertThat(scenario.answerOf("/data/summary"), is(stringAnswer("ab")));
     }
     //endregion
@@ -1593,18 +1593,18 @@ public class TriggerableDagTest {
                 )
             )));
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer((n + 1) * 5)));
+            assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(n * 5)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[4]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
     }
 
     @Ignore("Fails on v2.17.0 (before DAG simplification)")
@@ -1635,18 +1635,18 @@ public class TriggerableDagTest {
                 )
             )));
 
-        range(0, 5).forEach(n -> {
+        range(1, 6).forEach(n -> {
             scenario.next();
             scenario.createNewRepeat();
-            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer((n + 1) * 5)));
+            assertThat(scenario.answerOf("/data/sum"), CoreMatchers.is(intAnswer(n * 5)));
             scenario.next();
         });
 
-        range(0, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
+        range(1, 6).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(25))));
 
-        scenario.removeRepeat("/data/repeat[3]");
+        scenario.removeRepeat("/data/repeat[4]");
 
-        range(0, 4).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
+        range(1, 5).forEach(n -> assertThat(scenario.answerOf("/data/repeat[" + n + "]/inner-sum"), CoreMatchers.is(intAnswer(20))));
     }
 
     @Ignore("Fails on v2.17.0 (before DAG simplification)")
@@ -1677,20 +1677,20 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.answer(11);
 
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(nullValue()));
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(11)));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
         scenario.answer(22);
 
-        assertThat(scenario.answerOf("/data/group[0]/number"), is(intAnswer(11)));
-        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/number"), is(intAnswer(11)));
+        assertThat(scenario.answerOf("/data/group[2]/number"), is(intAnswer(22)));
 
         // This assertion is false because setting the answer to 22 didn't trigger recomputation across repeat instances
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
 
         scenario.next();
         scenario.createNewRepeat();
@@ -1698,10 +1698,10 @@ public class TriggerableDagTest {
         scenario.answer(33);
 
         // This assertion is true because adding a new repeat triggered recomputation across repeat instances
-        assertThat(scenario.answerOf("/data/group[0]/next-number"), is(intAnswer(22)));
+        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(22)));
         // This assertion is false because setting the answer to 33 didn't trigger recomputation across repeat instances
-        assertThat(scenario.answerOf("/data/group[1]/next-number"), is(intAnswer(33)));
-        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/group[2]/next-number"), is(intAnswer(33)));
+        assertThat(scenario.answerOf("/data/group[3]/next-number"), is(nullValue()));
     }
 
     @Ignore("Fails on v2.17.0 (before DAG simplification)")
@@ -1823,8 +1823,8 @@ public class TriggerableDagTest {
         scenario.next();
         scenario.answer("Some field 1-1");
         scenario.next();
-        assertThat(scenario.countRepeatInstancesOf("/data/outer[0]/inner"), is(3));
-        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(2));
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(3));
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[2]/inner"), is(2));
     }
 
     @Test
@@ -1854,18 +1854,18 @@ public class TriggerableDagTest {
                 ))
             )));
         scenario.createNewRepeat("/data/outer");
-        scenario.createNewRepeat("/data/outer[0]/inner");
-        scenario.createNewRepeat("/data/outer[0]/inner");
-        scenario.createNewRepeat("/data/outer[0]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[1]/inner");
         scenario.createNewRepeat("/data/outer");
-        scenario.createNewRepeat("/data/outer[1]/inner");
-        scenario.createNewRepeat("/data/outer[1]/inner");
+        scenario.createNewRepeat("/data/outer[2]/inner");
+        scenario.createNewRepeat("/data/outer[2]/inner");
 
-        assertThat(scenario.answerOf("/data/outer[0]/inner[0]/count"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/outer[0]/inner[1]/count"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/outer[0]/inner[2]/count"), is(intAnswer(3)));
-        assertThat(scenario.answerOf("/data/outer[1]/inner[0]/count"), is(intAnswer(2)));
-        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/count"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[2]/count"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/outer[1]/inner[3]/count"), is(intAnswer(3)));
+        assertThat(scenario.answerOf("/data/outer[2]/inner[1]/count"), is(intAnswer(2)));
+        assertThat(scenario.answerOf("/data/outer[2]/inner[2]/count"), is(intAnswer(2)));
     }
 
     @Test

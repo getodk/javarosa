@@ -27,7 +27,7 @@ public class TreeReferenceGenericizeTest {
     public void genericize_sets_all_steps_with_unbound_multiplicity() {
         assertThat(getRef("/foo/bar").genericize(), is(getRef("/foo/bar")));
 
-        TreeReference originalRef = getRef("/foo[2]/bar[3]");
+        TreeReference originalRef = getRef("/foo[3]/bar[4]");
         assertThat(originalRef.getMultiplicity(0), is(2));
         assertThat(originalRef.getMultiplicity(1), is(3));
 
