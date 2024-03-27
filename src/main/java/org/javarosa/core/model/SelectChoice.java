@@ -95,7 +95,7 @@ public class SelectChoice implements Externalizable, Localizable {
             throw new XFormParseException("SelectChoice{id,innerText}:{" + labelID + "," + labelInnerText + "}, has null Value!");
         }
 
-        this.value = value;
+        this.value = value.trim();
         this.isLocalizable = isLocalizable;
         this.textID = labelID;
         this.labelInnerText = labelInnerText;
