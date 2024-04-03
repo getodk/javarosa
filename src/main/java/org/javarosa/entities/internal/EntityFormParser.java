@@ -2,6 +2,7 @@ package org.javarosa.entities.internal;
 
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.entities.EntityAction;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,10 +70,5 @@ public class EntityFormParser {
         }
 
         return null;
-    }
-
-    public enum EntityAction {
-        CREATE,
-        UPDATE
     }
 }

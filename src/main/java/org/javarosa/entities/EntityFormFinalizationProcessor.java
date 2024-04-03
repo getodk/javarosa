@@ -31,16 +31,16 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
 
         TreeElement entityElement = EntityFormParser.getEntityElement(mainInstance);
         if (entityElement != null) {
-            EntityFormParser.EntityAction action = EntityFormParser.parseAction(entityElement);
+            EntityAction action = EntityFormParser.parseAction(entityElement);
             String dataset = EntityFormParser.parseDataset(entityElement);
 
-            if (action == EntityFormParser.EntityAction.CREATE) {
-                Entity entity = createEntity(entityElement, 1, dataset, saveTos, mainInstance);
+            if (action == EntityAction.CREATE) {
+                Entity entity = createEntity(entityElement, 1, dataset, saveTos, mainInstance, action);
                 formEntryModel.getExtras().put(new Entities(asList(entity)));
-            } else if (action == EntityFormParser.EntityAction.UPDATE){
+            } else if (action == EntityAction.UPDATE){
                 int baseVersion = EntityFormParser.parseBaseVersion(entityElement);
                 int newVersion = baseVersion + 1;
-                Entity entity = createEntity(entityElement, newVersion, dataset, saveTos, mainInstance);
+                Entity entity = createEntity(entityElement, newVersion, dataset, saveTos, mainInstance, action);
                 formEntryModel.getExtras().put(new Entities(asList(entity)));
             } else {
                 formEntryModel.getExtras().put(new Entities(emptyList()));
@@ -48,7 +48,7 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         }
     }
 
-    private Entity createEntity(TreeElement entityElement, int version, String dataset, List<Pair<XPathReference, String>> saveTos, FormInstance mainInstance) {
+    private Entity createEntity(TreeElement entityElement, int version, String dataset, List<Pair<XPathReference, String>> saveTos, FormInstance mainInstance, EntityAction action) {
         List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
             IDataReference reference = saveTo.getFirst();
             IAnswerData answerData = mainInstance.resolveReference(reference).getValue();
@@ -62,6 +62,6 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
 
         String id = EntityFormParser.parseId(entityElement);
         String label = EntityFormParser.parseLabel(entityElement);
-        return new Entity(dataset, id, label, version, fields);
+        return new Entity(action, dataset, id, label, version, fields);
     }
 }

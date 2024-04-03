@@ -13,13 +13,15 @@ public class Entity {
 
     @Nullable
     public final String label;
-    public Integer version;
+    public final Integer version;
+    public final EntityAction action;
 
-    public Entity(String dataset, String id, @Nullable String label, Integer version, List<Pair<String, String>> properties) {
+    public Entity(EntityAction action, String dataset, String id, @Nullable String label, Integer version, List<Pair<String, String>> properties) {
         this.dataset = dataset;
         this.id = id;
         this.label = label;
         this.version = version;
         this.properties = properties;
+        this.action = action;
     }
 }
