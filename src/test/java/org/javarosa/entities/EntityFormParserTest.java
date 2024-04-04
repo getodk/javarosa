@@ -52,8 +52,8 @@ public class EntityFormParserTest {
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         FormDef formDef = parser.parse(null);
 
-        EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
-        assertThat(dataset, equalTo(EntityAction.CREATE));
+        EntityAction action = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
+        assertThat(action, equalTo(EntityAction.CREATE));
     }
 
     @Test
