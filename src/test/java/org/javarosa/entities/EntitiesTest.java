@@ -124,6 +124,7 @@ public class EntitiesTest {
         assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
         assertThat(entities.get(0).version, equalTo(1));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+        assertThat(entities.get(0).action, equalTo(EntityAction.CREATE));
     }
 
     @Test
@@ -168,6 +169,7 @@ public class EntitiesTest {
         assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
         assertThat(entities.get(0).version, equalTo(2));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+        assertThat(entities.get(0).action, equalTo(EntityAction.UPDATE));
     }
 
     @Test
@@ -252,6 +254,7 @@ public class EntitiesTest {
         assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
         assertThat(entities.get(0).version, equalTo(2));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+        assertThat(entities.get(0).action, equalTo(EntityAction.UPDATE));
     }
 
     @Test
@@ -295,6 +298,7 @@ public class EntitiesTest {
         assertThat(entities.get(0).label, equalTo("Tom Wambsgans"));
         assertThat(entities.get(0).version, equalTo(1));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+        assertThat(entities.get(0).action, equalTo(EntityAction.UPDATE));
     }
 
     @Test

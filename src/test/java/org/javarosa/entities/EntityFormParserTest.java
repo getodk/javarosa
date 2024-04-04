@@ -52,8 +52,8 @@ public class EntityFormParserTest {
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         FormDef formDef = parser.parse(null);
 
-        EntityFormParser.EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
-        assertThat(dataset, equalTo(EntityFormParser.EntityAction.CREATE));
+        EntityAction action = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
+        assertThat(action, equalTo(EntityAction.CREATE));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class EntityFormParserTest {
         XFormParser parser = new XFormParser(new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes())));
         FormDef formDef = parser.parse(null);
 
-        EntityFormParser.EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
-        assertThat(dataset, equalTo(EntityFormParser.EntityAction.UPDATE));
+        EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
+        assertThat(dataset, equalTo(EntityAction.UPDATE));
     }
 }
