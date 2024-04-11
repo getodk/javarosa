@@ -9,6 +9,7 @@ import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -18,12 +19,24 @@ import java.util.List;
 public class ExternalInstanceParser {
 
     private List<ExternalDataInstanceProcessor> externalDataInstanceProcessors = new ArrayList<>();
+    private List<ExternalDataInstanceInterceptor> externalDataInstanceInterceptors = new ArrayList<>();
 
     public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
-        String path = getPath(referenceManager, instanceSrc);
-        TreeElement root = instanceSrc.contains("file-csv") ? CsvExternalInstance.parse(instanceId, path)
-            : instanceSrc.endsWith("geojson") ? GeoJsonExternalInstance.parse(instanceId, path)
-            : XmlExternalInstance.parse(instanceId, path);
+        TreeElement root = null;
+
+        for (ExternalDataInstanceInterceptor interceptor : externalDataInstanceInterceptors) {
+            root = interceptor.parse(instanceId, instanceSrc);
+            if (root != null) {
+                break;
+            }
+        }
+
+        if (root == null) {
+            String path = getPath(referenceManager, instanceSrc);
+            root = instanceSrc.contains("file-csv") ? CsvExternalInstance.parse(instanceId, path)
+                : instanceSrc.endsWith("geojson") ? GeoJsonExternalInstance.parse(instanceId, path)
+                : XmlExternalInstance.parse(instanceId, path);
+        }
 
         for (ExternalDataInstanceProcessor processor : externalDataInstanceProcessors) {
             processor.processInstance(instanceId, root);
@@ -33,7 +46,11 @@ public class ExternalInstanceParser {
     }
 
     public void addProcessor(Processor processor) {
-        externalDataInstanceProcessors.add((ExternalDataInstanceProcessor) processor);
+        if (processor instanceof ExternalDataInstanceProcessor) {
+            externalDataInstanceProcessors.add((ExternalDataInstanceProcessor) processor);
+        } else {
+            externalDataInstanceInterceptors.add((ExternalDataInstanceInterceptor) processor);
+        }
     }
 
     /**
@@ -49,6 +66,11 @@ public class ExternalInstanceParser {
 
     public interface Processor {
 
+    }
+
+    public interface ExternalDataInstanceInterceptor extends ExternalInstanceParser.Processor {
+        @Nullable
+        TreeElement parse(@NotNull String instanceId, @NotNull String instanceSrc);
     }
 
     public interface ExternalDataInstanceProcessor extends ExternalInstanceParser.Processor {
