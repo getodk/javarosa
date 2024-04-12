@@ -16,6 +16,25 @@
 
 package org.javarosa.core.model;
 
+import static java.util.Collections.emptyList;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.ActionController;
@@ -66,26 +85,6 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xml.InternalDataInstanceParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -866,10 +865,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                                 // the situations where that context would be used don't make sense for trying to reverse a
                                 // select value back to a label in an unrelated expression
                                 if (ref.isAmbiguous()) {
-                                    // SurveyCTO: We need a absolute "ref" to populate the dynamic choices,
-                                    // like we do when we populate those at FormEntryPrompt (line 251).
-                                    // The "ref" here is ambiguous, so we need to make it concrete first.
+                                    // ref, the reference used to specify where choices are defined, could be an absolute
+                                    // reference to a repeat nodeset. In that case, we need to convert that nodeset ref
+                                    // into a node ref. First try to contextualize based on the current repeat in case the
+                                    // choice-name call is from inside a repeat. Then use position 1 for any repeats that
+                                    // weren't contextualized (this is what a standards-compliant XPath engine would always do).
                                     ref = ref.contextualize(ec.getContextRef());
+
+                                    for (int i = 0; i < ref.size(); i++) {
+                                        if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
+                                            ref.setMultiplicity(i, TreeReference.DEFAULT_MULTIPLICITY);
+                                        }
+                                    }
                                 }
                                 choices = itemset.getChoices(f, ref);
                             } else { // static choices

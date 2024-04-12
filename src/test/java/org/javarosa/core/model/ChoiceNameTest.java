@@ -10,7 +10,9 @@ import static org.javarosa.core.util.XFormsElement.html;
 import static org.javarosa.core.util.XFormsElement.item;
 import static org.javarosa.core.util.XFormsElement.mainInstance;
 import static org.javarosa.core.util.XFormsElement.model;
+import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.select1;
+import static org.javarosa.core.util.XFormsElement.select1Dynamic;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
@@ -116,5 +118,76 @@ public class ChoiceNameTest {
 
         scenario.answer("/data/city", "grenoble");
         assertThat(scenario.answerOf("/data/city_name"), is(stringAnswer("Grenoble")));
+    }
+
+    @Test public void choiceNameCallWithIndexedRepeatAndStaticChoices_worksWithMultipleRepeats() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Static choices in repeat", html(
+            head(
+                title("Static choices in repeat"),
+                model(
+                    mainInstance(t("data id=\"static-choices-repeat\"",
+                        t("thing",
+                            t("choice")),
+                        t("choice1_label")
+                    )),
+
+                    bind("/data/thing/choice").type("string"),
+                    bind("/data/choice1_label").type("string").calculate("jr:choice-name(indexed-repeat(/data/thing/choice, /data/thing, 1),'/data/thing/choice')")
+                )
+            ),
+            body(
+                repeat("/data/thing",
+                    select1("/data/thing/choice",
+                        item("choice1", "Choice1"),
+                        item("choice2", "Choice2"))
+            ))));
+
+        scenario.next();
+        scenario.next();
+        scenario.next();
+        scenario.createNewRepeat();
+
+        scenario.answer("/data/thing[1]/choice", "choice1");
+        assertThat(scenario.answerOf("/data/choice1_label"), is(stringAnswer("Choice1")));
+
+        scenario.answer("/data/thing[2]/choice", "choice2");
+        assertThat(scenario.answerOf("/data/choice1_label"), is(stringAnswer("Choice1")));
+    }
+
+    @Test public void choiceNameCallWithIndexedRepeatAndDynamicChoices_worksWithMultipleRepeats() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Dynamic choices in repeat", html(
+            head(
+                title("Dynamic choices in repeat"),
+                model(
+                    mainInstance(t("data id=\"dynamic-choices-repeat\"",
+                        t("thing",
+                            t("choice")),
+                        t("choice1_label")
+                    )),
+
+                    t("instance id=\"choices\"",
+                        t("root",
+                            item("choice1", "Choice1"),
+                            item("choice2", "Choice2"))
+                    ),
+                    bind("/data/thing/choice").type("string"),
+                    bind("/data/choice1_label").type("string").calculate("jr:choice-name(indexed-repeat(/data/thing/choice, /data/thing, 1),'/data/thing/choice')")
+                )
+            ),
+            body(
+                repeat("/data/thing",
+                    select1Dynamic("/data/thing/choice", "instance('choices')/root/item"))
+            )));
+
+        scenario.next();
+        scenario.next();
+        scenario.next();
+        scenario.createNewRepeat();
+
+        scenario.answer("/data/thing[1]/choice","choice1");
+        assertThat(scenario.answerOf("/data/choice1_label"), is(stringAnswer("Choice1")));
+
+        scenario.answer("/data/thing[2]/choice", "choice2");
+        assertThat(scenario.answerOf("/data/choice1_label"), is(stringAnswer("Choice1")));
     }
 }
