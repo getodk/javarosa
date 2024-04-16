@@ -132,8 +132,8 @@ public class SelectChoiceTest {
                     input("value"),
                     input("label"),
                     input("special-property")),
-                input("filter"),
-                select1Dynamic("/data/select", "../repeat")
+                input("/data/filter"),
+                select1Dynamic("/data/select", "/data/repeat")
             )));
         scenario.answer("/data/repeat[0]/value", "a");
         scenario.answer("/data/repeat[0]/label", "A");
@@ -201,8 +201,8 @@ public class SelectChoiceTest {
                     input("value"),
                     input("label"),
                     input("special-property")),
-                input("filter"),
-                select1Dynamic("/data/select", "../repeat")
+                input("/data/filter"),
+                select1Dynamic("/data/select", "/data/repeat")
             )));
         scenario.answer("/data/repeat[0]/value", "a");
         scenario.answer("/data/repeat[0]/label", "A");
