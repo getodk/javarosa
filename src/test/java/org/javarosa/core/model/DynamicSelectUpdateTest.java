@@ -131,10 +131,10 @@ public class DynamicSelectUpdateTest {
                             t("select"))))),
             body(
                 repeat("/data/repeat",
-                    input("value"),
-                    input("label")),
-                input("filter"),
-                select1Dynamic("/data/select", "../repeat" + (!predicate.isEmpty() ? "[" + predicate + "]" : ""))
+                    input("/data/repeat/value"),
+                    input("/data/repeat/label")),
+                input("/data/filter"),
+                select1Dynamic("/data/select", "/data/repeat" + (!predicate.isEmpty() ? "[" + predicate + "]" : ""))
             ));
     }
     //endregion
@@ -274,7 +274,7 @@ public class DynamicSelectUpdateTest {
                         item("bb", "BB")))),
             body(
                 repeat("/data/repeat",
-                    input("filter"),
+                    input("/data/filter"),
                     select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"))
             )));
 
