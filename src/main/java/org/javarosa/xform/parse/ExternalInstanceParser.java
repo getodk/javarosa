@@ -9,33 +9,37 @@ import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
 
 public class ExternalInstanceParser {
 
     private List<ExternalDataInstanceProcessor> externalDataInstanceProcessors = new ArrayList<>();
-    private List<ExternalDataInstanceInterceptor> externalDataInstanceInterceptors = new ArrayList<>();
+    private List<FileInstanceParser> fileInstanceParsers = asList(
+        new CsvExternalInstance(),
+        new GeoJsonExternalInstance()
+    );
 
     public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
-        TreeElement root = null;
+        String path = getPath(referenceManager, instanceSrc);
 
-        for (ExternalDataInstanceInterceptor interceptor : externalDataInstanceInterceptors) {
-            root = interceptor.parse(instanceId, instanceSrc);
-            if (root != null) {
-                break;
-            }
-        }
+        Optional<FileInstanceParser> fileParser = fileInstanceParsers.stream()
+            .filter(fileInstanceParser -> fileInstanceParser.isSupported(instanceId, instanceSrc))
+            .findFirst();
 
-        if (root == null) {
-            String path = getPath(referenceManager, instanceSrc);
-            root = instanceSrc.contains("file-csv") ? CsvExternalInstance.parse(instanceId, path)
-                : instanceSrc.endsWith("geojson") ? GeoJsonExternalInstance.parse(instanceId, path)
-                : XmlExternalInstance.parse(instanceId, path);
+        TreeElement root;
+        if (fileParser.isPresent()) {
+            root = fileParser.get().parse(instanceId, path);
+        } else {
+            root = XmlExternalInstance.parse(instanceId, path);
         }
 
         for (ExternalDataInstanceProcessor processor : externalDataInstanceProcessors) {
@@ -46,11 +50,18 @@ public class ExternalInstanceParser {
     }
 
     public void addProcessor(Processor processor) {
-        if (processor instanceof ExternalDataInstanceProcessor) {
-            externalDataInstanceProcessors.add((ExternalDataInstanceProcessor) processor);
-        } else {
-            externalDataInstanceInterceptors.add((ExternalDataInstanceInterceptor) processor);
-        }
+        externalDataInstanceProcessors.add((ExternalDataInstanceProcessor) processor);
+    }
+
+    /**
+     * Adds {@link FileInstanceParser} before others. The last added {@link FileInstanceParser} will be checked
+     * (via {@link FileInstanceParser#isSupported(String, String)}) first.
+     */
+    public void addFileInstanceParser(FileInstanceParser fileInstanceParser) {
+        fileInstanceParsers = Stream.concat(
+            Stream.of(fileInstanceParser),
+            fileInstanceParsers.stream()
+        ).collect(Collectors.toList());
     }
 
     /**
@@ -68,12 +79,12 @@ public class ExternalInstanceParser {
 
     }
 
-    public interface ExternalDataInstanceInterceptor extends ExternalInstanceParser.Processor {
-        @Nullable
-        TreeElement parse(@NotNull String instanceId, @NotNull String instanceSrc);
-    }
-
     public interface ExternalDataInstanceProcessor extends ExternalInstanceParser.Processor {
         void processInstance(@NotNull String id, @NotNull TreeElement root);
+    }
+
+    public interface FileInstanceParser {
+        TreeElement parse(String instanceId, String path) throws IOException;
+        boolean isSupported(String instanceId, String instanceSrc);
     }
 }
