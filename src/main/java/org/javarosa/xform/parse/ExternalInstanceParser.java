@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -58,10 +56,7 @@ public class ExternalInstanceParser {
      * (via {@link FileInstanceParser#isSupported(String, String)}) first.
      */
     public void addFileInstanceParser(FileInstanceParser fileInstanceParser) {
-        fileInstanceParsers = Stream.concat(
-            Stream.of(fileInstanceParser),
-            fileInstanceParsers.stream()
-        ).collect(Collectors.toList());
+        fileInstanceParsers.add(0, fileInstanceParser);
     }
 
     /**
