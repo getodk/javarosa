@@ -19,13 +19,16 @@ package org.javarosa.core.model.instance.geojson;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.xform.parse.ExternalInstanceParser;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
-import org.javarosa.core.model.instance.TreeElement;
 
-public class GeoJsonExternalInstance {
-    public static TreeElement parse(String instanceId, String path) throws IOException {
+public class GeoJsonExternalInstance implements ExternalInstanceParser.FileInstanceParser {
+
+    public TreeElement parse(String instanceId, String path) throws IOException {
         final TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
 
@@ -67,5 +70,10 @@ public class GeoJsonExternalInstance {
         }
 
         return root;
+    }
+
+    @Override
+    public boolean isSupported(String instanceId, String instanceSrc) {
+        return instanceSrc.endsWith("geojson");
     }
 }

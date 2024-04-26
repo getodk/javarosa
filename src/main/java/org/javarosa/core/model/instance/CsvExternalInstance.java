@@ -1,19 +1,22 @@
 package org.javarosa.core.model.instance;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
+import org.javarosa.core.model.data.UncastData;
+import org.javarosa.xform.parse.ExternalInstanceParser;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.input.BOMInputStream;
-import org.javarosa.core.model.data.UncastData;
 
-public class CsvExternalInstance {
-    public static TreeElement parse(String instanceId, String path) throws IOException {
+public class CsvExternalInstance implements ExternalInstanceParser.FileInstanceParser {
+
+    public TreeElement parse(String instanceId, String path) throws IOException {
         final TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
 
@@ -39,6 +42,11 @@ public class CsvExternalInstance {
         }
 
         return root;
+    }
+
+    @Override
+    public boolean isSupported(String instanceId, String instanceSrc) {
+        return instanceSrc.contains("file-csv");
     }
 
     private static char getDelimiter(String path) throws IOException {

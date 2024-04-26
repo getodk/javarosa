@@ -1,15 +1,16 @@
 package org.javarosa.core.model.instance;
 
+import org.apache.commons.io.input.BOMInputStream;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import org.apache.commons.io.input.BOMInputStream;
-import org.junit.Before;
-import org.junit.Test;
 
 public class CsvExternalInstanceTest {
     private TreeElement commaSeparated;
@@ -17,8 +18,8 @@ public class CsvExternalInstanceTest {
 
     @Before
     public void setUp() throws IOException {
-        commaSeparated = CsvExternalInstance.parse("id", r("external-secondary-comma-complex.csv").toString());
-        semiColonSeparated = CsvExternalInstance.parse("id", r("external-secondary-semicolon-complex.csv").toString());
+        commaSeparated = new CsvExternalInstance().parse("id", r("external-secondary-comma-complex.csv").toString());
+        semiColonSeparated = new CsvExternalInstance().parse("id", r("external-secondary-semicolon-complex.csv").toString());
     }
 
     @Test
@@ -58,13 +59,13 @@ public class CsvExternalInstanceTest {
         BOMInputStream bomIs = new BOMInputStream(new FileInputStream(r("external-secondary-csv-bom.csv").toFile()));
         assertThat(bomIs.hasBOM(), is(true));
 
-        TreeElement bomCsv = CsvExternalInstance.parse("id", r("external-secondary-csv-bom.csv").toString());
+        TreeElement bomCsv = new CsvExternalInstance().parse("id", r("external-secondary-csv-bom.csv").toString());
         assertThat(bomCsv.getChildAt(0).getChildAt(0).getName(), is("name"));
     }
 
     @Test
     public void parses_utf8_characters() throws IOException {
-        TreeElement bomCsv = CsvExternalInstance.parse("id", r("external-secondary-csv-bom.csv").toString());
+        TreeElement bomCsv = new CsvExternalInstance().parse("id", r("external-secondary-csv-bom.csv").toString());
         assertThat(bomCsv.getChildAt(0).getChild("elevation", 0).getValue().getValue(), is("testé"));
     }
 }

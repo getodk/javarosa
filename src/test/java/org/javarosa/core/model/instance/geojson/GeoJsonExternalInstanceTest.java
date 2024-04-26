@@ -16,21 +16,22 @@
 
 package org.javarosa.core.model.instance.geojson;
 
+import org.javarosa.core.model.instance.TreeElement;
+import org.junit.Test;
+
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.utils.ResourcePathHelper.r;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import org.javarosa.core.model.instance.TreeElement;
-import org.junit.Test;
-
 public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_addsGeometriesAsChildren_forMultipleFeatures() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection.geojson").toString());
         assertThat(featureCollection.getNumChildren(), is(3));
         assertThat(featureCollection.getChildAt(0).getChild("geometry", 0).getValue().getValue(), is("0.5 102 0 0"));
         assertThat(featureCollection.getChildAt(1).getChild("geometry", 0).getValue().getValue(), is("0.5 104 0 0; 0.5 105 0 0"));
@@ -40,7 +41,7 @@ public class GeoJsonExternalInstanceTest {
     @Test
     public void parse_throwsException_ifNoTopLevelObject() {
         try {
-            GeoJsonExternalInstance.parse("id", r("not-object.geojson").toString());
+            new GeoJsonExternalInstance().parse("id", r("not-object.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -50,7 +51,7 @@ public class GeoJsonExternalInstanceTest {
     @Test
     public void parse_throwsException_ifTopLevelObjectTypeNotFeatureCollection() {
         try {
-            GeoJsonExternalInstance.parse("id", r("invalid-type.geojson").toString());
+            new GeoJsonExternalInstance().parse("id", r("invalid-type.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -59,20 +60,20 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_ignoresExtraTopLevelProperties() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-toplevel.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-extra-toplevel.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
     }
 
     @Test
     public void parse_acceptsAnyToplevelPropertyOrder() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-toplevel-order.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-toplevel-order.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
     }
 
     @Test
     public void parse_throwsException_ifNoFeaturesArray() {
         try {
-            GeoJsonExternalInstance.parse("id", r("bad-futures-collection.geojson").toString());
+            new GeoJsonExternalInstance().parse("id", r("bad-futures-collection.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -82,7 +83,7 @@ public class GeoJsonExternalInstanceTest {
     @Test
     public void parse_throwsException_ifFeaturesNotArray() {
         try {
-            GeoJsonExternalInstance.parse("id", r("bad-features-not-array.geojson").toString());
+            new GeoJsonExternalInstance().parse("id", r("bad-features-not-array.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -92,7 +93,7 @@ public class GeoJsonExternalInstanceTest {
     @Test
     public void parse_throwsException_ifSingleFeatureNotOfFeatureType() {
         try {
-            GeoJsonExternalInstance.parse("id", r("bad-feature-not-feature.geojson").toString());
+            new GeoJsonExternalInstance().parse("id", r("bad-feature-not-feature.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -101,7 +102,7 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_addsAllOtherPropertiesAsChildren() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("name", 0).getValue().getValue(), is("My cool point"));
 
@@ -111,7 +112,7 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_usesTopLevelId() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-id-toplevel.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-id-toplevel.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("top-level-id"));
 
@@ -119,14 +120,14 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_prioritizesTopLevelId() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-id-twice.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-id-twice.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("top-level-id"));
     }
 
     @Test
     public void parse_allowsIntegerId() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-integer-id.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-integer-id.geojson").toString());
 
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("id", 0).getValue().getValue(), is("77"));
@@ -134,21 +135,21 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_ignoresUnknownToplevelProperties() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-extra-feature-toplevel.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-extra-feature-toplevel.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(3));
         assertThat(featureCollection.getChildAt(0).getChild("ignored", 0), nullValue());
     }
 
     @Test
     public void parse_addsFeaturesWithNoProperties() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-no-properties.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-no-properties.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(1));
     }
 
     @Test
     public void parse_throwsException_whenGeometryNotSupported() {
         try {
-            GeoJsonExternalInstance.parse("id", r("feature-collection-with-unsupported-type.geojson").toString());
+            new GeoJsonExternalInstance().parse("id", r("feature-collection-with-unsupported-type.geojson").toString());
             fail("Exception expected");
         } catch (IOException e) {
             // expected
@@ -157,7 +158,7 @@ public class GeoJsonExternalInstanceTest {
 
     @Test
     public void parse_allowsNullFeaturePropertyValues() throws IOException {
-        TreeElement featureCollection = GeoJsonExternalInstance.parse("id", r("feature-collection-with-null.geojson").toString());
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("id", r("feature-collection-with-null.geojson").toString());
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("extra", 0).getValue().getDisplayText(), is(""));
     }
