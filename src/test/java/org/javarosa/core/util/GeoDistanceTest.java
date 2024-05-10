@@ -17,6 +17,7 @@
 package org.javarosa.core.util;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
 import static org.javarosa.core.util.GeoUtils.EARTH_EQUATORIAL_CIRCUMFERENCE_METERS;
@@ -29,7 +30,6 @@ import static org.javarosa.core.util.XFormsElement.model;
 import static org.javarosa.core.util.XFormsElement.repeat;
 import static org.javarosa.core.util.XFormsElement.t;
 import static org.javarosa.core.util.XFormsElement.title;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import org.hamcrest.number.IsCloseTo;
@@ -138,6 +138,35 @@ public class GeoDistanceTest {
                     bind("/data/point5").type("geopoint"),
                     bind("/data/concat").type("string").calculate("concat(/data/point1, ';', /data/point2, ';', /data/point3, ';', /data/point4, ';', /data/point5)"),
                     bind("/data/distance").type("decimal").calculate("distance(/data/concat)")
+                )),
+            body(
+                input("/data/point1")
+            )
+        ));
+
+        // http://www.mapdevelopers.com/area_finder.php?&points=%5B%5B38.253094215699576%2C21.756382658677467%5D%2C%5B38.25021274773806%2C21.756382658677467%5D%2C%5B38.25007793942195%2C21.763892843919166%5D%2C%5B38.25290886154963%2C21.763935759263404%5D%2C%5B38.25146813817506%2C21.758421137528785%5D%5D
+        assertThat(Double.parseDouble(scenario.answerOf("/data/distance").getDisplayText()),
+            IsCloseTo.closeTo(1801, 0.5));
+    }
+
+    @Test
+    public void distance_isComputedForMultipleArguments() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("string distance", html(
+            head(
+                title("Multi parameter distance"),
+                model(
+                    mainInstance(t("data id=\"string-distance\"",
+                        t("point1", "38.253094215699576 21.756382658677467 0 0"),
+                        t("point3", "38.25007793942195 21.763892843919166 0 0"),
+                        t("point4", "38.25290886154963 21.763935759263404 0 0"),
+                        t("point5", "38.25146813817506 21.758421137528785 0 0"),
+                        t("distance")
+                    )),
+                    bind("/data/point1").type("geopoint"),
+                    bind("/data/point3").type("geopoint"),
+                    bind("/data/point4").type("geopoint"),
+                    bind("/data/point5").type("geopoint"),
+                    bind("/data/distance").type("decimal").calculate("distance(/data/point1, '38.25021274773806 21.756382658677467 0 0', /data/point3, /data/point4, /data/point5)")
                 )),
             body(
                 input("/data/point1")
