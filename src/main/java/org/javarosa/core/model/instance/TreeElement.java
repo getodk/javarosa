@@ -580,11 +580,18 @@ import org.jetbrains.annotations.Nullable;
         }
     }
 
+    @Nullable
     public String getAttributeValue() {
         if ( !isAttribute() ) {
             throw new IllegalStateException("this is not an attribute");
         }
-        return getValue().uncast().getString();
+
+        IAnswerData value = getValue();
+        if (value != null) {
+            return value.uncast().getString();
+        } else {
+            return null;
+        }
     }
 
     @Override

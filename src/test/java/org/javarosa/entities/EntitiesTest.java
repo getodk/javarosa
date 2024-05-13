@@ -214,6 +214,39 @@ public class EntitiesTest {
     }
 
     @Test
+    public void fillingFormWithUpdate_withNullId_doesNotMakeEntityAvailable() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Update entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2023.1.0")),
+                    mainInstance(
+                        t("data id=\"update-entity-form\"",
+                            t("id"),
+                            t("meta",
+                                t("entity dataset=\"people\" update=\"1\" id=\"\" baseVersion=\"\"")
+                            )
+                        )
+                    ),
+                    bind("/data/id").type("string"),
+                    bind("/data/meta/entity/@id").type("string").calculate("/data/id").readonly()
+                )
+            ),
+            body(
+                input("/data/id")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(0));
+    }
+
+    @Test
     public void fillingFormWithCreateAndUpdate_makesEntityAvailableAsSecondVersion() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
