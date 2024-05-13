@@ -128,6 +128,42 @@ public class EntitiesTest {
     }
 
     @Test
+    public void fillingFormWithCreate_withoutAnId_doesNotMakeEntityAvailable() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("id"),
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\" id=\"\"",
+                                    t("label")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/id").type("string"),
+                    bind("/data/meta/entity/@id").type("string").calculate("/data/id"),
+                    bind("/data/meta/entity/label").type("string").calculate("/data/name")
+                )
+            ),
+            body(
+                input("/data/id")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(0));
+    }
+
+    @Test
     public void fillingFormWithUpdate_makesEntityAvailable() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
@@ -348,7 +384,7 @@ public class EntitiesTest {
                             t("name"),
                             t("join"),
                             t("meta",
-                                t("entity dataset=\"members\" create=\"\"")
+                                t("entity dataset=\"members\" create=\"\" id=\"1\"")
                             )
                         )
                     ),

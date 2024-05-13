@@ -12,6 +12,7 @@ import org.javarosa.entities.internal.EntityFormParser;
 import org.javarosa.form.api.FormEntryFinalizationProcessor;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.model.xform.XPathReference;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +37,11 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
 
             if (action == EntityAction.CREATE) {
                 Entity entity = createEntity(entityElement, 1, dataset, saveTos, mainInstance, action);
-                formEntryModel.getExtras().put(new Entities(asList(entity)));
+                if (entity != null) {
+                    formEntryModel.getExtras().put(new Entities(asList(entity)));
+                } else {
+                    formEntryModel.getExtras().put(new Entities(emptyList()));
+                }
             } else if (action == EntityAction.UPDATE){
                 int baseVersion = EntityFormParser.parseBaseVersion(entityElement);
                 int newVersion = baseVersion + 1;
@@ -52,6 +57,7 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         }
     }
 
+    @Nullable
     private Entity createEntity(TreeElement entityElement, int version, String dataset, List<Pair<XPathReference, String>> saveTos, FormInstance mainInstance, EntityAction action) {
         List<Pair<String, String>> fields = saveTos.stream().map(saveTo -> {
             IDataReference reference = saveTo.getFirst();
