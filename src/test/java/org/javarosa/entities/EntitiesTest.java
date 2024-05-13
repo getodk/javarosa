@@ -128,7 +128,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithCreate_withoutAnId_doesNotMakeEntityAvailable() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithCreate_withoutAnId_makesEntityAvailable() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -139,6 +139,7 @@ public class EntitiesTest {
                     mainInstance(
                         t("data id=\"create-entity-form\"",
                             t("id"),
+                            t("name"),
                             t("meta",
                                 t("entity dataset=\"people\" create=\"1\" id=\"\"",
                                     t("label")
@@ -152,7 +153,8 @@ public class EntitiesTest {
                 )
             ),
             body(
-                input("/data/id")
+                input("/data/id"),
+                input("/data/name")
             )
         ));
 
@@ -160,7 +162,10 @@ public class EntitiesTest {
         scenario.finalizeInstance();
 
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
-        assertThat(entities.size(), equalTo(0));
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo(null));
+        assertThat(entities.get(0).action, equalTo(EntityAction.CREATE));
     }
 
     @Test
@@ -250,7 +255,7 @@ public class EntitiesTest {
     }
 
     @Test
-    public void fillingFormWithUpdate_withNullId_doesNotMakeEntityAvailable() throws IOException, XFormParser.ParseException {
+    public void fillingFormWithUpdate_withNullId_makesEntityAvailable() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
@@ -279,7 +284,10 @@ public class EntitiesTest {
         scenario.finalizeInstance();
 
         List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
-        assertThat(entities.size(), equalTo(0));
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo(null));
+        assertThat(entities.get(0).action, equalTo(EntityAction.UPDATE));
     }
 
     @Test
