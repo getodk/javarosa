@@ -41,7 +41,11 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
                 int baseVersion = EntityFormParser.parseBaseVersion(entityElement);
                 int newVersion = baseVersion + 1;
                 Entity entity = createEntity(entityElement, newVersion, dataset, saveTos, mainInstance, action);
-                formEntryModel.getExtras().put(new Entities(asList(entity)));
+                if (entity != null) {
+                    formEntryModel.getExtras().put(new Entities(asList(entity)));
+                } else {
+                    formEntryModel.getExtras().put(new Entities(emptyList()));
+                }
             } else {
                 formEntryModel.getExtras().put(new Entities(emptyList()));
             }
@@ -61,7 +65,11 @@ public class EntityFormFinalizationProcessor implements FormEntryFinalizationPro
         }).collect(Collectors.toList());
 
         String id = EntityFormParser.parseId(entityElement);
-        String label = EntityFormParser.parseLabel(entityElement);
-        return new Entity(action, dataset, id, label, version, fields);
+        if (id == null) {
+            return null;
+        } else {
+            String label = EntityFormParser.parseLabel(entityElement);
+            return new Entity(action, dataset, id, label, version, fields);
+        }
     }
 }

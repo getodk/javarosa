@@ -28,6 +28,7 @@ public class EntityFormParser {
         }
     }
 
+    @Nullable
     public static String parseId(TreeElement entity) {
         return entity.getAttributeValue("", "id");
     }

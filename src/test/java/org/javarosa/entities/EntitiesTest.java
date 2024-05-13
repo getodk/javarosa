@@ -398,7 +398,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entities:entity dataset=\"people\" create=\"1\"")
+                                t("entities:entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
@@ -438,7 +438,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
@@ -474,7 +474,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("team"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
@@ -510,7 +510,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
