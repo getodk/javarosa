@@ -78,6 +78,13 @@ public class SelectChoiceTest {
     }
 
     @Test
+    public void value_should_be_trimmed_when_select_choice_object_constructed() {
+        SelectChoice choice = new SelectChoice(null, "Label", " value ", false);
+
+        assertThat(choice.getValue(), is("value"));
+    }
+
+    @Test
     public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
 
