@@ -18,7 +18,7 @@ class XPathFuncExprGeo {
 
     List<GeoUtils.LatLong> getGpsCoordinatesFromNodeset(String name, Object argVal) {
         if (!(argVal instanceof XPathNodeset)) {
-            throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
+            throw new XPathUnhandledException("function '" + name + "' requires a field as the parameter.");
         }
         Object[] argList = ((XPathNodeset) argVal).toArgList();
         int repeatSize = argList.length;

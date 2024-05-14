@@ -476,8 +476,15 @@ public class XPathFuncExpr extends XPathExpression {
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
         } else if (name.equals("distance")) {
             if (args.length == 1) {
-                List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
-                return GeoUtils.calculateDistance(latLongs);
+                if (argVals[0] instanceof XPathNodeset) {
+                    List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
+                    return GeoUtils.calculateDistance(latLongs);
+                } else if (argVals[0] instanceof String) {
+                    List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().geopointsToLatLongs(name, ((String) argVals[0]).split(";"));
+                    return GeoUtils.calculateDistance(latLongs);
+                } else {
+                    throw new XPathUnhandledException("function 'distance' requires a field or text as the parameter.");
+                }
             } else if (args.length > 1) {
                 return GeoUtils.calculateDistance(new XPathFuncExprGeo().geopointsToLatLongs(name, argVals));
             } else {
