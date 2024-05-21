@@ -1,5 +1,7 @@
 package org.javarosa.xpath.expr;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.UncastData;
@@ -10,16 +12,13 @@ import org.javarosa.xpath.XPathUnhandledException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /** XPath function expression geographic logic */
 class XPathFuncExprGeo {
     private static final Logger logger = LoggerFactory.getLogger(XPathFuncExprGeo.class.getSimpleName());
 
     List<GeoUtils.LatLong> getGpsCoordinatesFromNodeset(String name, Object argVal) {
         if (!(argVal instanceof XPathNodeset)) {
-            throw new XPathUnhandledException("function \'" + name + "\' requires a field as the parameter.");
+            throw new XPathUnhandledException("function '" + name + "' requires a field as the parameter.");
         }
         Object[] argList = ((XPathNodeset) argVal).toArgList();
         int repeatSize = argList.length;
@@ -37,17 +36,22 @@ class XPathFuncExprGeo {
                 throwMismatch(name);
             }
         } else if (repeatSize >= 2) {
-            // treat the input as a series of GeoPointData
+            latLongs.addAll(geopointsToLatLongs(name, argList));
+        }
+        return latLongs;
+    }
 
-            for (Object arg : argList) {
-                try {
-                    GeoPointData geoPointData = new GeoPointData().cast(new UncastData(XPathFuncExpr.toString(arg)));
-                    latLongs.add(new GeoUtils.LatLong(geoPointData.getPart(0), geoPointData.getPart(1)));
-                } catch (Exception e) {
-                    throwMismatch(name);
-                }
+    public List<GeoUtils.LatLong> geopointsToLatLongs(String callingFunction, Object[] args) {
+        List<GeoUtils.LatLong> latLongs = new ArrayList<>();
+        for (Object arg : args) {
+            try {
+                GeoPointData geoPointData = new GeoPointData().cast(new UncastData(XPathFuncExpr.toString(arg)));
+                latLongs.add(new GeoUtils.LatLong(geoPointData.getPart(0), geoPointData.getPart(1)));
+            } catch (Exception e) {
+                throwMismatch(callingFunction);
             }
         }
+
         return latLongs;
     }
 

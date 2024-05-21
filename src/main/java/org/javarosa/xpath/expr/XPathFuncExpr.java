@@ -16,6 +16,18 @@
 
 package org.javarosa.xpath.expr;
 
+import static java.lang.Double.NaN;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -42,19 +54,6 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static java.lang.Double.NaN;
 
 /**
  * Representation of an xpath function expression.
@@ -476,9 +475,21 @@ public class XPathFuncExpr extends XPathExpression {
             List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
             return GeoUtils.calculateAreaOfGPSPolygonOnEarthInSquareMeters(latLongs);
         } else if (name.equals("distance")) {
-            assertArgsCount(name, args, 1);
-            List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
-            return GeoUtils.calculateDistance(latLongs);
+            if (args.length == 1) {
+                if (argVals[0] instanceof XPathNodeset) {
+                    List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[0]);
+                    return GeoUtils.calculateDistance(latLongs);
+                } else if (argVals[0] instanceof String) {
+                    List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().geopointsToLatLongs(name, ((String) argVals[0]).split(";"));
+                    return GeoUtils.calculateDistance(latLongs);
+                } else {
+                    throw new XPathUnhandledException("function 'distance' requires a field or text as the parameter.");
+                }
+            } else if (args.length > 1) {
+                return GeoUtils.calculateDistance(new XPathFuncExprGeo().geopointsToLatLongs(name, argVals));
+            } else {
+                throw new XPathUnhandledException("function 'distance' requires at least one parameter.");
+            }
         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from(toString(argVals[1])).digest(
                 toString(argVals[0]),
@@ -494,7 +505,7 @@ public class XPathFuncExpr extends XPathExpression {
             if (args.length == 2)
                 return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumeric(argVals[1]).longValue());
 
-            throw new XPathUnhandledException("function \'randomize\' requires 1 or 2 arguments. " + args.length + " provided.");
+            throw new XPathUnhandledException("function 'randomize' requires 1 or 2 arguments. " + args.length + " provided.");
         } else if (name.equals("base64-decode")) {
             assertArgsCount(name, args, 1);
             return base64Decode(argVals[0]);
