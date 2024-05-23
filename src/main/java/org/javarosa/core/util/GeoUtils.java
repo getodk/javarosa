@@ -97,6 +97,40 @@ public final class GeoUtils {
         return totalDistance;
     }
 
+    /**
+     * Returns whether a geopoint is inside the specified geoshape; aka 'geofencing'
+     * @param point the geopoint location to check for inclusion.
+     * @param polygon the closed list of geoshape coordinates defining the polygon 'fence'.
+     * @return true if the location is inside the polygon; false otherwise.
+     *
+     * Adapted from https://wrfranklin.org/Research/Short_Notes/pnpoly.html:
+     *
+     * int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy) {
+     *     int i, j, c = 0;
+     *     for (i = 0, j = nvert - 1; i < nvert; j = i++) {
+     *         if (((verty[i] > testy) != (verty[j] > testy)) &&
+     *             (testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i]))
+     *             c = !c;
+     *     }
+     *     return c;
+     * }
+     */
+    public static boolean calculateIsPointInGPSPolygon(LatLong point, List<LatLong> polygon) {
+        double nvert = polygon.size();
+        double testx = point.longitude; // x maps to longitude
+        double testy = point.latitude; // y maps to latitude
+        boolean c = false;
+        for (int i = 1; i < nvert; i++) { // geoshapes already duplicate the first point to last, so unlike the original algorithm there is no need to wrap j
+            LatLong p1 = polygon.get(i-1); // this is effectively j in the original algorithm
+            LatLong p2 = polygon.get(i); // this is effectively i in the original algorithm
+            if (((p2.latitude > testy) != (p1.latitude > testy)) &&
+                (testx < (p1.longitude - p2.longitude) * (testy - p2.latitude) / (p1.latitude - p2.latitude) + p2.longitude)) {
+                c = !c;
+            }
+        }
+        return c;
+    }
+
     private static void logDistance(LatLong p1, LatLong p2, double distance, double totalDistance) {
         logger.trace("\t{}\t{}\t{}\t{}\t{}\t{}",
             p1.latitude, p1.longitude,

@@ -261,6 +261,21 @@ public class XPathEvalTest {
     }
 
     @Test
+    public void geo_functions() {
+        testEval("geofence('')", new XPathUnhandledException());
+        testEval("geofence('', '')", new XPathUnhandledException());
+        testEval("geofence('0 0 0 0', '')", new XPathUnhandledException());
+        testEval("geofence('0.5 0.5 0 0', /data/geoshape)", buildInstance(), null, true); // inside
+        testEval("geofence('-1 0.5 0 0', /data/geoshape)", buildInstance(), null, false); // outside left
+        testEval("geofence('2 0.5 0 0', /data/geoshape)", buildInstance(), null, false); // outside right
+        testEval("geofence('0.5 2 0 0', /data/geoshape)", buildInstance(), null, false); // outside above
+        testEval("geofence('0.5 -1 0 0', /data/geoshape)", buildInstance(), null, false); // outside below
+        testEval("geofence('-1 0 0 0', /data/geoshape)", buildInstance(), null, false); // outside co-linear w/ bottom edge
+        testEval("geofence('-1 1 0 0', /data/geoshape)", buildInstance(), null, false); // outside co-linear w/ top edge
+        testEval("geofence('0 -1 0 0', /data/geoshape)", buildInstance(), null, false); // outside below vertex ("...They were carefully chosen to make the program work correctly when the point is vertically below a vertex.")
+    }
+
+    @Test
     public void other_string_functions() {
         testEval("normalize-space('')", "");
         testEval("normalize-space('  ')", "");
@@ -776,6 +791,10 @@ public class XPathEvalTest {
         data.addChild(path);
 
         data.addChild(new TreeElement("path", 4));
+
+        path = new TreeElement("geoshape", 0);
+        path.setValue(new StringData("0 0 0 0;0 1 0 0;1 1 0 0;1 0 0 0;0 0 0 0"));
+        data.addChild(path);
 
         return new FormInstance(data);
     }
