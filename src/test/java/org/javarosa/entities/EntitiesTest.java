@@ -215,7 +215,7 @@ public class EntitiesTest {
 
     @Test
     public void fillingFormWithUpdate_andNoLabel_makesEntityAvailableWithNullLabel() throws IOException, XFormParser.ParseException {
-        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+        Scenario scenario = Scenario.init("Update entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
             ),
