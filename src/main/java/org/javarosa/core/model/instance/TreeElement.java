@@ -15,13 +15,6 @@
  */
 package org.javarosa.core.model.instance;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
@@ -51,6 +44,13 @@ import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStringLiteral;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>An element of a FormInstance.</p>
@@ -580,11 +580,18 @@ import org.jetbrains.annotations.Nullable;
         }
     }
 
+    @Nullable
     public String getAttributeValue() {
         if ( !isAttribute() ) {
             throw new IllegalStateException("this is not an attribute");
         }
-        return getValue().uncast().getString();
+
+        IAnswerData value = getValue();
+        if (value != null) {
+            return value.uncast().getString();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -593,6 +600,7 @@ import org.jetbrains.annotations.Nullable;
     }
 
     @Override
+    @Nullable
     public String getAttributeValue(String namespace, String name) {
         TreeElement element = getAttribute(namespace,name);
         return element == null ? null: getAttributeValue(element);

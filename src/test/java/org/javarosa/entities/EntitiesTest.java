@@ -128,6 +128,47 @@ public class EntitiesTest {
     }
 
     @Test
+    public void fillingFormWithCreate_withoutAnId_makesEntityAvailable() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Create entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2022.1.1")),
+                    mainInstance(
+                        t("data id=\"create-entity-form\"",
+                            t("id"),
+                            t("name"),
+                            t("meta",
+                                t("entity dataset=\"people\" create=\"1\" id=\"\"",
+                                    t("label")
+                                )
+                            )
+                        )
+                    ),
+                    bind("/data/id").type("string"),
+                    bind("/data/meta/entity/@id").type("string").calculate("/data/id"),
+                    bind("/data/meta/entity/label").type("string").calculate("/data/name")
+                )
+            ),
+            body(
+                input("/data/id"),
+                input("/data/name")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo(null));
+        assertThat(entities.get(0).action, equalTo(EntityAction.CREATE));
+    }
+
+    @Test
     public void fillingFormWithUpdate_makesEntityAvailable() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
             asList(
@@ -174,7 +215,7 @@ public class EntitiesTest {
 
     @Test
     public void fillingFormWithUpdate_andNoLabel_makesEntityAvailableWithNullLabel() throws IOException, XFormParser.ParseException {
-        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+        Scenario scenario = Scenario.init("Update entity form", XFormsElement.html(
             asList(
                 new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
             ),
@@ -211,6 +252,42 @@ public class EntitiesTest {
         assertThat(entities.get(0).label, equalTo(null));
         assertThat(entities.get(0).version, equalTo(2));
         assertThat(entities.get(0).properties, equalTo(asList(new Pair<>("name", "Tom Wambsgans"))));
+    }
+
+    @Test
+    public void fillingFormWithUpdate_withNullId_makesEntityAvailable() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Create entity form", XFormsElement.html(
+            asList(
+                new Pair<>("entities", "http://www.opendatakit.org/xforms/entities")
+            ),
+            head(
+                title("Update entity form"),
+                model(asList(new Pair<>("entities:entities-version", "2023.1.0")),
+                    mainInstance(
+                        t("data id=\"update-entity-form\"",
+                            t("id"),
+                            t("meta",
+                                t("entity dataset=\"people\" update=\"1\" id=\"\" baseVersion=\"\"")
+                            )
+                        )
+                    ),
+                    bind("/data/id").type("string"),
+                    bind("/data/meta/entity/@id").type("string").calculate("/data/id").readonly()
+                )
+            ),
+            body(
+                input("/data/id")
+            )
+        ));
+
+        scenario.getFormEntryController().addPostProcessor(new EntityFormFinalizationProcessor());
+        scenario.finalizeInstance();
+
+        List<Entity> entities = scenario.getFormEntryController().getModel().getExtras().get(Entities.class).getEntities();
+        assertThat(entities.size(), equalTo(1));
+        assertThat(entities.get(0).dataset, equalTo("people"));
+        assertThat(entities.get(0).id, equalTo(null));
+        assertThat(entities.get(0).action, equalTo(EntityAction.UPDATE));
     }
 
     @Test
@@ -315,7 +392,7 @@ public class EntitiesTest {
                             t("name"),
                             t("join"),
                             t("meta",
-                                t("entity dataset=\"members\" create=\"\"")
+                                t("entity dataset=\"members\" create=\"\" id=\"1\"")
                             )
                         )
                     ),
@@ -365,7 +442,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entities:entity dataset=\"people\" create=\"1\"")
+                                t("entities:entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
@@ -405,7 +482,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
@@ -441,7 +518,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("team"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),
@@ -477,7 +554,7 @@ public class EntitiesTest {
                         t("data id=\"create-entity-form\"",
                             t("name"),
                             t("meta",
-                                t("entity dataset=\"people\" create=\"1\"")
+                                t("entity dataset=\"people\" create=\"1\" id=\"1\"")
                             )
                         )
                     ),

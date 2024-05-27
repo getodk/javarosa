@@ -1,5 +1,6 @@
 package org.javarosa.entities.internal;
 
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.entities.EntityAction;
@@ -22,12 +23,19 @@ public class EntityFormParser {
         TreeElement labelElement = entity.getFirstChild("label");
 
         if (labelElement != null) {
-            return (String) labelElement.getValue().getValue();
+            IAnswerData labelValue = labelElement.getValue();
+
+            if (labelValue != null) {
+                return (String) labelValue.getValue();
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
 
+    @Nullable
     public static String parseId(TreeElement entity) {
         return entity.getAttributeValue("", "id");
     }
