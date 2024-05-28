@@ -105,6 +105,18 @@ if (!project.hasProperty("android")) {
 
         duplicateClassesStrategy = DuplicatesStrategy.WARN
     }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = 'org.getodk'
+                artifactId = 'javarosa'
+                version = 'local'
+
+                from components.java
+            }
+        }
+    }
 } else {
     android {
         namespace 'com.example'
@@ -126,18 +138,6 @@ if (!project.hasProperty("android")) {
             release {
                 minifyEnabled false
             }
-        }
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId = 'org.getodk'
-            artifactId = 'javarosa'
-            version = 'local'
-
-            from components.java
         }
     }
 }
