@@ -15,7 +15,6 @@ out
 # mvn
 target
 secrets.xml
-pom-local.xml
 
 # logging
 logback.xml
