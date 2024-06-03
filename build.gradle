@@ -22,6 +22,7 @@ if (!project.hasProperty("android")) {
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'me.champeau.jmh'
+    apply plugin: 'maven-publish'
 } else {
     apply plugin: 'com.android.library'
 }
@@ -50,32 +51,6 @@ compileTestJava {
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
-
-tasks.register('installLocal') {
-    def lines = []
-    new File('pom.xml').withReader { reader ->
-        reader.eachLine {
-            lines.add(it)
-        }
-    }
-
-    def changedVersion = false
-    new File('pom-local.xml').withWriter { writer ->
-        lines.forEach {
-            if (it.trim().startsWith('<version>') && !changedVersion) {
-                writer.write('<version>local</version>')
-                changedVersion = true
-            } else {
-                writer.write(it)
-            }
-        }
-    }
-
-    exec {
-        executable 'mvn'
-        args '-f', 'pom-local.xml', '-Dgpg.skip', 'install'
-    }
-}
 
 if (!project.hasProperty("android")) {
     jar {
@@ -129,6 +104,18 @@ if (!project.hasProperty("android")) {
         forceGC = true
 
         duplicateClassesStrategy = DuplicatesStrategy.WARN
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = 'org.getodk'
+                artifactId = 'javarosa'
+                version = 'local'
+
+                from components.java
+            }
+        }
     }
 } else {
     android {
