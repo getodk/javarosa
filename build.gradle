@@ -18,7 +18,7 @@ buildscript {
  * for building archives (such as an APK), but is useful for performing Android checks like lint.
  */
 if (!project.hasProperty("android")) {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'me.champeau.jmh'
@@ -144,20 +144,18 @@ if (!project.hasProperty("android")) {
 
 dependencies {
     // Be sure to update dependencies in pom.xml to match
-    implementation 'joda-time:joda-time:2.10.13'
-    implementation 'org.slf4j:slf4j-api:1.7.33'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    api 'joda-time:joda-time:2.10.13'
+    api 'org.slf4j:slf4j-api:1.7.33'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    api 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
+    api 'org.bouncycastle:bcprov-jdk18on:1.77'
+    api 'net.sf.kxml:kxml2:2.3.0'
 
     // Upgrade to version higher than 1.4 when Collect minSDK >= 26
-    implementation 'org.apache.commons:commons-csv:1.4'
+    api 'org.apache.commons:commons-csv:1.4'
 
     // Upgrade to version higher than 2.5 when Collect minSDK >= 26
-    implementation 'commons-io:commons-io:2.5'
-
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.10'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
-
-    compileOnly 'net.sf.kxml:kxml2:2.3.0'
+    api 'commons-io:commons-io:2.5'
 
     testImplementation 'ch.qos.logback:logback-classic:1.2.10'
     testImplementation 'junit:junit:4.13.2'
