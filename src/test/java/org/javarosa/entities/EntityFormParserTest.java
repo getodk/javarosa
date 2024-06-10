@@ -2,6 +2,8 @@ package org.javarosa.entities;
 
 import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.XFormsElement;
 import org.javarosa.entities.internal.EntityFormParser;
 import org.javarosa.xform.parse.XFormParser;
@@ -86,5 +88,16 @@ public class EntityFormParserTest {
 
         EntityAction dataset = EntityFormParser.parseAction(EntityFormParser.getEntityElement(formDef.getMainInstance()));
         assertThat(dataset, equalTo(EntityAction.UPDATE));
+    }
+
+    @Test
+    public void parseLabel_whenLabelIsAnInt_convertsToString() {
+        TreeElement labelElement = new TreeElement("label");
+        labelElement.setAnswer(new IntegerData(0));
+        TreeElement entityElement = new TreeElement("entity");
+        entityElement.addChild(labelElement);
+
+        String label = EntityFormParser.parseLabel(entityElement);
+        assertThat(label, equalTo("0"));
     }
 }

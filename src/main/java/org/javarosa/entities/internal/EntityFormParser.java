@@ -26,7 +26,7 @@ public class EntityFormParser {
             IAnswerData labelValue = labelElement.getValue();
 
             if (labelValue != null) {
-                return (String) labelValue.getValue();
+                return String.valueOf(labelValue.getValue());
             } else {
                 return null;
             }
