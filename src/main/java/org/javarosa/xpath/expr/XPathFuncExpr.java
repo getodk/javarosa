@@ -32,6 +32,8 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
+import org.javarosa.core.model.data.GeoPointData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -490,7 +492,13 @@ public class XPathFuncExpr extends XPathExpression {
             } else {
                 throw new XPathUnhandledException("function 'distance' requires at least one parameter.");
             }
-        } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
+        } else if (name.equals("geofence")) {
+            assertArgsCount(name, args, 2);
+            GeoPointData geoPointData = new GeoPointData().cast(new UncastData(XPathFuncExpr.toString(argVals[0])));
+            GeoUtils.LatLong point = new GeoUtils.LatLong(geoPointData.getPart(0), geoPointData.getPart(1));
+            List<GeoUtils.LatLong> latLongs = new XPathFuncExprGeo().getGpsCoordinatesFromNodeset(name, argVals[1]);
+            return GeoUtils.calculateIsPointInGPSPolygon(point, latLongs);
+         } else if (name.equals("digest") && (args.length == 2 || args.length == 3)) {
             return DigestAlgorithm.from(toString(argVals[1])).digest(
                 toString(argVals[0]),
                 args.length == 3 ? Encoding.from(toString(argVals[2])) : Encoding.BASE64

@@ -102,6 +102,47 @@ public class GeoUtilsTest {
         }), 1e-6);
     }
 
+    /*
+    https://www.mapdevelopers.com/area_finder.php?polygons=%5B%5B%5B%5B38.253094215699576%2C21.756382658677467%5D%2C%5B38.25021274773806%2C21.756382658677467%5D%2C%5B38.25007793942195%2C21.763892843919166%5D%2C%5B38.25290886154963%2C21.763935759263404%5D%2C%5B38.25146813817506%2C21.758421137528785%5D%2C%5B38.253094215699576%2C21.756382658677467%5D%5D%2C%22%230000FF%22%2C%22%23FF0000%22%2C0.4%5D%5D
+     */
+    @Test
+    public void pointIsInPolygon() {
+        checkPointInPolygon(38.25081280703969, 21.760299116099116,
+            new double[][]{
+                {38.253094215699576, 21.756382658677467},
+                {38.25021274773806,  21.756382658677467},
+                {38.25007793942195,  21.763892843919166},
+                {38.25290886154963,  21.763935759263404},
+                {38.25146813817506,  21.758421137528785},
+                {38.253094215699576, 21.756382658677467} // last point in geoshape must match first
+        }, true);
+    }
+
+    @Test
+    public void point2IsInPolygon() {
+        checkPointInPolygon(38.251790, 21.756845,
+            new double[][]{
+                {38.253094215699576, 21.756382658677467},
+                {38.25021274773806,  21.756382658677467},
+                {38.25007793942195,  21.763892843919166},
+                {38.25290886154963,  21.763935759263404},
+                {38.25146813817506,  21.758421137528785},
+                {38.253094215699576, 21.756382658677467} // last point in geoshape must match first
+            }, true);
+    }
+    @Test
+    public void pointIsNotInPolygon() {
+        checkPointInPolygon(38.252062644683356, 21.758894013612437,
+            new double[][]{
+                {38.253094215699576, 21.756382658677467},
+                {38.25021274773806,  21.756382658677467},
+                {38.25007793942195,  21.763892843919166},
+                {38.25290886154963,  21.763935759263404},
+                {38.25146813817506,  21.758421137528785},
+                {38.253094215699576, 21.756382658677467} // last point in geoshape must match first
+            }, false);
+    }
+
     private double distance(double[][] points) {
         return GeoUtils.calculateDistance(getLatLongs(points));
     }
@@ -125,5 +166,16 @@ public class GeoUtilsTest {
             latLongs.add(new GeoUtils.LatLong(point[0], point[1]));
         }
         return latLongs;
+    }
+
+    private void checkPointInPolygon(double latitude, double longitude, double[][] points, boolean expectedResult) {
+        List<GeoUtils.LatLong> latLongs = new ArrayList<>();
+        for (double[] point : points) {
+            latLongs.add(new GeoUtils.LatLong(point[0], point[1]));
+        }
+
+        GeoUtils.LatLong point = new GeoUtils.LatLong(latitude, longitude);
+        boolean result = GeoUtils.calculateIsPointInGPSPolygon(point, latLongs);
+        assertEquals(expectedResult, result);
     }
 }
