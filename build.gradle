@@ -121,10 +121,10 @@ if (!project.hasProperty("android")) {
     android {
         namespace 'com.example'
 
-        compileSdkVersion 30
+        compileSdkVersion 34
         defaultConfig {
             minSdkVersion 21
-            targetSdkVersion 30
+            targetSdkVersion 33
             versionCode 1
             versionName "1.0"
             testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
