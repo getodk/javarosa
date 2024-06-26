@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.answerText;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;

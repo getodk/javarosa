@@ -21,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.test.Scenario.getRef;
+import static org.javarosa.test.Scenario.getRef;
 import static org.javarosa.smoketests.ChildVaccinationTest.Sex.FEMALE;
 import static org.javarosa.smoketests.ChildVaccinationTest.Sex.MALE;
 import static org.javarosa.smoketests.ChildVaccinationTest.Vaccines.DIPHTERIA;
@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 

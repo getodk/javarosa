@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.test.FormParseInit;
+import org.javarosa.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;

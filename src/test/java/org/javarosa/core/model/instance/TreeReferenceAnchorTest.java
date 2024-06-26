@@ -1,7 +1,7 @@
 package org.javarosa.core.model.instance;
 
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.test.Scenario.getRef;
+import static org.javarosa.test.Scenario.getRef;
 import static org.junit.Assert.assertThat;
 
 import org.javarosa.xpath.XPathException;

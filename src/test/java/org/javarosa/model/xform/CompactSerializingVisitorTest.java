@@ -3,7 +3,7 @@ package org.javarosa.model.xform;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.core.test.FormParseInit;
+import org.javarosa.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.XFormParser.NAMESPACE_ODK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

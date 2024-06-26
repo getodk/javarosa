@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.util;
+package org.javarosa.test;
 
 import java.util.HashMap;
 import java.util.Map;

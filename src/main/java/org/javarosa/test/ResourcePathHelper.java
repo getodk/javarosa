@@ -1,4 +1,4 @@
-package org.javarosa.test.utils;
+package org.javarosa.test;
 
 import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.Files.walk;

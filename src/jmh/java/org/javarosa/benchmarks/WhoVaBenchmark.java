@@ -19,11 +19,11 @@ package org.javarosa.benchmarks;
 
 import static org.javarosa.benchmarks.BenchmarkUtils.dryRun;
 import static org.javarosa.benchmarks.BenchmarkUtils.prepareAssets;
-import static org.javarosa.core.test.Scenario.init;
+import static org.javarosa.test.Scenario.init;
 
 import java.time.LocalDate;
 import java.util.stream.IntStream;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
