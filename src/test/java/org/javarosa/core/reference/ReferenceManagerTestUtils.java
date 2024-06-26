@@ -1,6 +1,6 @@
 package org.javarosa.core.reference;
 
-import java.nio.file.Path;
+import java.io.File;
 
 public class ReferenceManagerTestUtils {
     /**
@@ -23,14 +23,14 @@ public class ReferenceManagerTestUtils {
      * Please, be aware that this method resets the singleton ReferenceManager, which could
      * have unintended consequences for other classes using it during the same JVM session.
      */
-    public static ReferenceManager setUpSimpleReferenceManager(Path path, String... schemes) {
+    public static ReferenceManager setUpSimpleReferenceManager(File file, String... schemes) {
         ReferenceManager refManager = ReferenceManager.instance();
         refManager.reset();
 
         for (String scheme : schemes) {
             refManager.addReferenceFactory(buildReferenceFactory(
                 scheme,
-                path.toAbsolutePath().toString()
+                file.getAbsolutePath()
             ));
         }
         return refManager;

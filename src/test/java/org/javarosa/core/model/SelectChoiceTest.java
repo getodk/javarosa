@@ -86,7 +86,7 @@ public class SelectChoiceTest {
 
     @Test
     public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
-        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
         assertThat(scenario.choicesOf("/data/q").get(1).getChild("geometry"), CoreMatchers.is("0.5 104 0 0"));
@@ -95,7 +95,7 @@ public class SelectChoiceTest {
 
     @Test
     public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() throws XFormParser.ParseException {
-        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
         assertThat(scenario.choicesOf("/data/q").get(1).getChild("non-existent"), is(nullValue()));
@@ -171,7 +171,7 @@ public class SelectChoiceTest {
 
     @Test
     public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
-        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
 

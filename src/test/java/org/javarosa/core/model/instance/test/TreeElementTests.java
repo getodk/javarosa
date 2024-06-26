@@ -1,19 +1,19 @@
 package org.javarosa.core.model.instance.test;
 
 
+import org.apache.commons.io.FileUtils;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.test.FormParseInit;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
+import java.io.IOException;
+
 import static org.javarosa.test.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.nio.file.Files;
-
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.test.FormParseInit;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
 
 public class TreeElementTests {
 
@@ -24,7 +24,7 @@ public class TreeElementTests {
 
         FormEntryController formEntryController = formParseInit.getFormEntryController();
 
-        byte[] formInstanceAsBytes = Files.readAllBytes(r("populate-nodes-attributes-instance.xml"));
+        byte[] formInstanceAsBytes = FileUtils.readFileToByteArray(r("populate-nodes-attributes-instance.xml"));
         TreeElement savedRoot = XFormParser.restoreDataModel(formInstanceAsBytes, null).getRoot();
         FormDef formDef = formEntryController.getModel().getForm();
         TreeElement dataRootNode = formDef.getInstance().getRoot().deepCopy(true);

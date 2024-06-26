@@ -3,7 +3,6 @@ package org.javarosa.test;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,12 +24,12 @@ public class ResourcePathHelper {
      * @param filename the file name for which to create a path
      * @return a Path for the resource file
      */
-    public static Path r(String filename) {
+    public static File r(String filename) {
         if (resourcePathsCache == null)
             throw new RuntimeException("Too fast! The resources cache hasn't been built yet! Don't use r() within static members!");
         return resourcePathsCache.stream()
             .filter(f -> f.getAbsolutePath().endsWith(File.separator + filename))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("File " + filename + " not found among files in resources")).toPath();
+            .orElseThrow(() -> new RuntimeException("File " + filename + " not found among files in resources"));
     }
 }
