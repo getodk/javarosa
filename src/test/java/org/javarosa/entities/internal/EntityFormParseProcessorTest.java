@@ -2,7 +2,7 @@ package org.javarosa.entities.internal;
 
 import kotlin.Pair;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.util.XFormsElement;
+import org.javarosa.test.XFormsElement;
 import org.javarosa.entities.UnrecognizedEntityVersionException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParser.MissingModelAttributeException;
@@ -18,14 +18,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
 
 public class EntityFormParseProcessorTest {

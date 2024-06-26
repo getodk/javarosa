@@ -31,7 +31,7 @@ import org.javarosa.core.reference.ResourceReferenceFactory;
 import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.test.FormParseInit;
+import org.javarosa.test.FormParseInit;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryPrompt;

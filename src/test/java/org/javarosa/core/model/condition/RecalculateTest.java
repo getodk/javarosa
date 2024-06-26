@@ -1,12 +1,12 @@
 package org.javarosa.core.model.condition;
 
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.test.FormParseInit;
+import org.javarosa.test.FormParseInit;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;

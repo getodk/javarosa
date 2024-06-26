@@ -1,6 +1,6 @@
 package org.javarosa.benchmarks;
 
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 
 import java.io.IOException;

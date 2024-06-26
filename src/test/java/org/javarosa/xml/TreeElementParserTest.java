@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 

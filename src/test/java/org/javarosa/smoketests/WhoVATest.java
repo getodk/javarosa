@@ -21,13 +21,13 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
-import static org.javarosa.core.test.Scenario.getRef;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.Scenario.getRef;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.junit.Assert.assertThat;
 
 import java.time.LocalDate;
 import java.util.stream.IntStream;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
