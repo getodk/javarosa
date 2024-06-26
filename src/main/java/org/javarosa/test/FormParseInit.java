@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
@@ -47,10 +46,6 @@ public class FormParseInit {
     public FormParseInit(File form) throws XFormParser.ParseException {
         FORM_NAME = form.getAbsolutePath();
         this.init();
-    }
-
-    public FormParseInit(Path form) throws XFormParser.ParseException {
-        this(form.toFile());
     }
 
     private void init() throws XFormParser.ParseException {
