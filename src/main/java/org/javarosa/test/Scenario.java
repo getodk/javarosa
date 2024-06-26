@@ -68,6 +68,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -609,7 +610,7 @@ public class Scenario {
      * Answers the question at the form index
      */
     public AnswerResult answer(LocalDate value) {
-        return answer(new DateData(Date.valueOf(value)));
+        return answer(new DateData(Date.from(value.atStartOfDay(ZoneId.of("UTC")).toInstant())));
     }
 
     /**
