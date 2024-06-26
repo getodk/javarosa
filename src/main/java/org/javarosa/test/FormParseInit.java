@@ -13,6 +13,7 @@ import org.javarosa.xform.util.XFormUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,9 +44,13 @@ public class FormParseInit {
         this.init();
     }
 
-    public FormParseInit(Path form) throws XFormParser.ParseException {
-        FORM_NAME = form.toString();
+    public FormParseInit(File form) throws XFormParser.ParseException {
+        FORM_NAME = form.getAbsolutePath();
         this.init();
+    }
+
+    public FormParseInit(Path form) throws XFormParser.ParseException {
+        this(form.toFile());
     }
 
     private void init() throws XFormParser.ParseException {
