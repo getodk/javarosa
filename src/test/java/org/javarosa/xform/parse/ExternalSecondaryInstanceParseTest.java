@@ -13,6 +13,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -173,7 +174,7 @@ public class ExternalSecondaryInstanceParseTest {
     public void deserializedFormDefCreatedFromAFormWithExternalSecondaryXMLInstance_ShouldContainThatExternalInstance() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
-        Path formPath = r("external-select-xml.xml");
+        File formPath = r("external-select-xml.xml");
         FormDef originalFormDef = parse(r("external-select-xml.xml"));
         originalFormDef.setFormXmlPath(formPath.toString());
 
@@ -298,7 +299,7 @@ public class ExternalSecondaryInstanceParseTest {
     // All external secondary instances and forms are in the same folder. Configure the ReferenceManager to resolve
     // URIs to that folder.
     public static void configureReferenceManagerCorrectly() {
-        setUpSimpleReferenceManager(r("external-select-csv.xml").getParent(), "file-csv", "file");
+        setUpSimpleReferenceManager(r("external-select-csv.xml").getParentFile(), "file-csv", "file");
     }
 
     // Configure the ReferenceManager to resolve URIs to a folder that does not exist.

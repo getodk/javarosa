@@ -29,7 +29,7 @@ public class ExternalDataInstanceBuildBenchmark {
         @Setup(Level.Trial)
         public void initialize() {
             Path assetsPath = prepareAssets( "wards.xml", "lgas.xml");
-            setUpSimpleReferenceManager(assetsPath, "file");
+            setUpSimpleReferenceManager(assetsPath.toFile(), "file");
         }
     }
 

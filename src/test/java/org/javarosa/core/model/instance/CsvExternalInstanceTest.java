@@ -56,7 +56,7 @@ public class CsvExternalInstanceTest {
 
     @Test
     public void ignores_utf8_bom() throws IOException {
-        BOMInputStream bomIs = new BOMInputStream(new FileInputStream(r("external-secondary-csv-bom.csv").toFile()));
+        BOMInputStream bomIs = new BOMInputStream(new FileInputStream(r("external-secondary-csv-bom.csv")));
         assertThat(bomIs.hasBOM(), is(true));
 
         TreeElement bomCsv = new CsvExternalInstance().parse("id", r("external-secondary-csv-bom.csv").toString());
