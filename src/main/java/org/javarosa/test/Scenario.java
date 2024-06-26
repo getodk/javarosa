@@ -63,6 +63,9 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
@@ -78,10 +81,6 @@ import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.createTempFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
 import static java.nio.file.Files.write;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.stream.Collectors.joining;
@@ -267,17 +266,17 @@ public class Scenario {
         new XFormsModule().registerModule();
 
         // Serialize form in a temp file
-        Path tempFile = createTempFile("javarosa", "test");
-        formDef.writeExternal(new DataOutputStream(newOutputStream(tempFile)));
+        File tempFile = File.createTempFile("javarosa", "test");
+        formDef.writeExternal(new DataOutputStream(new FileOutputStream(tempFile)));
 
         // Create an empty FormDef and deserialize the form into it
         FormDef deserializedFormDef = new FormDef();
         deserializedFormDef.readExternal(
-            new DataInputStream(newInputStream(tempFile)),
+            new DataInputStream(new FileInputStream(tempFile)),
             PrototypeManager.getDefault()
         );
 
-        delete(tempFile);
+        tempFile.delete();
         deserializedFormDef.initialize(false, new InstanceInitializationFactory());
         return Scenario.from(deserializedFormDef);
     }
