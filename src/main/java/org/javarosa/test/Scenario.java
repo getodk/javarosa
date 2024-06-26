@@ -16,6 +16,7 @@
 
 package org.javarosa.test;
 
+import org.apache.commons.io.FileUtils;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -81,8 +82,6 @@ import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.write;
-import static java.nio.file.StandardOpenOption.CREATE;
 import static java.util.stream.Collectors.joining;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
@@ -432,18 +431,18 @@ public class Scenario {
      */
     // TODO Extract the form's name from the provided XFormsElement object to simplify args
     public static Scenario init(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
-        Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
+        File formFile = createTempDirectory("javarosa").resolve(formName + ".xml").toFile();
         String xml = form.asXml();
         System.out.println(xml);
-        write(formFile, xml.getBytes(UTF_8), CREATE);
+        FileUtils.write(formFile, xml, UTF_8);
         return Scenario.init(formFile);
     }
 
     public static FormDef createFormDef(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
-        Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
+        File formFile = createTempDirectory("javarosa").resolve(formName + ".xml").toFile();
         String xml = form.asXml();
         System.out.println(xml);
-        write(formFile, xml.getBytes(UTF_8), CREATE);
+        FileUtils.write(formFile, xml, UTF_8);
         return Scenario.createFormDef(formFile);
     }
 
@@ -456,10 +455,14 @@ public class Scenario {
         return init(ResourcePathHelper.r(formFileName));
     }
 
+    public static Scenario init(Path formFile) throws XFormParser.ParseException {
+        return init(formFile.toFile());
+    }
+
     /**
      * Initializes the Scenario with the form at the provided path
      */
-    public static Scenario init(Path formFile) throws XFormParser.ParseException {
+    public static Scenario init(File formFile) throws XFormParser.ParseException {
         FormDef formDef = createFormDef(formFile);
         formDef.initialize(true, new InstanceInitializationFactory());
         return Scenario.from(formDef);
@@ -471,7 +474,7 @@ public class Scenario {
     }
 
     @NotNull
-    public static FormDef createFormDef(Path formFile) throws XFormParser.ParseException {
+    public static FormDef createFormDef(File formFile) throws XFormParser.ParseException {
         // TODO explain why this sequence of calls
         StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();
