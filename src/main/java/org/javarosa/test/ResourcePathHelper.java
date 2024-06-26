@@ -1,29 +1,21 @@
 package org.javarosa.test;
 
-import static java.nio.file.Files.isRegularFile;
-import static java.nio.file.Files.walk;
-import static java.util.stream.Collectors.toSet;
+import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ResourcePathHelper {
-    private static Set<Path> resourcePathsCache = buildCache();
+    private static Set<File> resourcePathsCache = buildCache();
 
-    private static synchronized Set<Path> buildCache() {
-        try {
-            URI uri = ResourcePathHelper.class.getResource("/logback-test.xml.example").toURI();
-            Path root = Paths.get(uri).getParent();
-            return walk(root)
-                .filter(p -> isRegularFile(p))
-                .collect(toSet());
-        } catch (URISyntaxException | IOException e) {
-            throw new RuntimeException(e);
-        }
+    private static synchronized Set<File> buildCache() {
+        File root = new File(ResourcePathHelper.class.getResource("/logback-test.xml.example").getFile()).getParentFile();
+        Collection<File> files = FileUtils.listFiles(root, null, true);
+        return files.stream()
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -37,8 +29,8 @@ public class ResourcePathHelper {
         if (resourcePathsCache == null)
             throw new RuntimeException("Too fast! The resources cache hasn't been built yet! Don't use r() within static members!");
         return resourcePathsCache.stream()
-            .filter(p -> p.endsWith(filename))
+            .filter(f -> f.getAbsolutePath().endsWith(File.separator + filename))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("File " + filename + " not found among files in resources"));
+            .orElseThrow(() -> new RuntimeException("File " + filename + " not found among files in resources")).toPath();
     }
 }
