@@ -132,7 +132,6 @@ import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
-    private Path formFile;
     private final FormDef formDef;
     private FormEntryController controller;
     private EvaluationContext evaluationContext;
