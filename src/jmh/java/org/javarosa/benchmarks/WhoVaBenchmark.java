@@ -44,7 +44,7 @@ public class WhoVaBenchmark {
 
         @Setup(Level.Trial)
         public void initialize() throws XFormParser.ParseException {
-            scenario = init(prepareAssets("whova_form.xml").resolve("whova_form.xml"));
+            scenario = init(prepareAssets("whova_form.xml").resolve("whova_form.xml").toFile());
         }
     }
 
