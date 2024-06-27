@@ -81,7 +81,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createTempDirectory;
 import static java.util.stream.Collectors.joining;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
 import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
@@ -265,7 +264,7 @@ public class Scenario {
         new XFormsModule().registerModule();
 
         // Serialize form in a temp file
-        File tempFile = File.createTempFile("javarosa", "test");
+        File tempFile = TempFileUtils.createTempFile("javarosa", "test");
         formDef.writeExternal(new DataOutputStream(new FileOutputStream(tempFile)));
 
         // Create an empty FormDef and deserialize the form into it
@@ -431,7 +430,8 @@ public class Scenario {
      */
     // TODO Extract the form's name from the provided XFormsElement object to simplify args
     public static Scenario init(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
-        File formFile = createTempDirectory("javarosa").resolve(formName + ".xml").toFile();
+        File tempDir = TempFileUtils.createTempDir("javarosa");
+        File formFile = TempFileUtils.createTempFile(tempDir, formName, "xml");
         String xml = form.asXml();
         System.out.println(xml);
         FileUtils.write(formFile, xml, UTF_8);
@@ -439,7 +439,8 @@ public class Scenario {
     }
 
     public static FormDef createFormDef(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
-        File formFile = createTempDirectory("javarosa").resolve(formName + ".xml").toFile();
+        File tempDir = TempFileUtils.createTempDir("javarosa");
+        File formFile = TempFileUtils.createTempFile(tempDir, formName, "xml");
         String xml = form.asXml();
         System.out.println(xml);
         FileUtils.write(formFile, xml, UTF_8);
