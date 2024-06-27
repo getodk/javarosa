@@ -77,7 +77,7 @@ public class ChildVaccinationBenchmark {
             finalFlatRef = getRef("/data/household/finalflat");
             endOfVisitRefs = Arrays.asList(nextChildRef, finalFlatRef, getRef("/data/household/child_repeat"));
             today = LocalDate.now();
-            scenario = init(formFile);
+            scenario = init(formFile.toFile());
         }
     }
 

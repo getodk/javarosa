@@ -69,7 +69,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -454,10 +453,6 @@ public class Scenario {
      */
     public static Scenario init(String formFileName) throws XFormParser.ParseException {
         return init(ResourcePathHelper.r(formFileName));
-    }
-
-    public static Scenario init(Path formFile) throws XFormParser.ParseException {
-        return init(formFile.toFile());
     }
 
     /**
