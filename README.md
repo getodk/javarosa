@@ -30,7 +30,9 @@ Snapshots versions are also published for each commit to `master` and are availa
 
 JavaRosa works on Android API level 21+ (with desugaring enabled) and Java 8+.
 
-## Setting up your development environment
+## Development
+
+### Setting up your development environment
 
 1. Fork the javarosa project ([why and how to fork](https://help.github.com/articles/fork-a-repo/))
 
@@ -40,13 +42,13 @@ JavaRosa works on Android API level 21+ (with desugaring enabled) and Java 8+.
 
 We recommend using [IntelliJ IDEA](https://www.jetbrains.com/idea/) for development. On the welcome screen, click `Import Project`, navigate to your javarosa folder, and select the `build.gradle` file. Use the defaults through the wizard. Once the project is imported, IntelliJ may ask you to update your remote Maven repositories. Follow the instructions to do so. 
  
-## Building the project
+### Building the project
  
 To build the project, go to the `View` menu, then `Tool Windows > Gradle`. `build` will be in `javarosa > Tasks > build > build`. Double-click `build` to package the application. This Gradle task will now be the default action in your `Run` menu. 
 
 To package a jar, use the `jar` Gradle task.
 
-## Running benchmarks
+### Running benchmarks
 
 JavaRosa can be used to parse and fill very large forms on inexpensive devices and so it's important to keep an eye on performance. Benchmarks using [JMH](http://openjdk.java.net/projects/code-tools/jmh/) and the [JMH Gradle plugin](https://github.com/melix/jmh-gradle-plugin) have been introduced to compare relative performance as code changes are made. We have found that running these benchmarks with the `jmh` Gradle task or through IntelliJ can produce inconsistent results. The most reliable way we have found to run them is to first build a `jar` with the `jmhJar` Gradle task and then to run the jar:
 
@@ -56,17 +58,17 @@ This also makes it easy to selectively run a subset of benchmarks by including a
 
 While benchmarks can help identify relative performance improvements or regressions, they are not always a reliable proxy for how code will perform in a realistic context. Profiling is helpful for identifying parts of the code that are worth analyzing and optimizing as well as to validate that any performance changes have the intended effects.
 
-## Contributing code
+### Contributing code
 
 Any and all contributions to the project are welcome. ODK JavaRosa is used across the world primarily by organizations with a social purpose so you can have real impact!
 
 If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md).
 
-## Downloading builds
+### Downloading builds
 
 Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/getodk/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS.
 
-## Publishing the jar to OSSRH and Maven Central
+### Publishing the jar to OSSRH and Maven Central
 
 Project maintainers have the private keys to upload signed jars to Sonatype's OSS Repository Hosting (OSSRH) service which is then synced to Maven's Central Repository. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html).
 
