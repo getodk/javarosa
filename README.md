@@ -30,6 +30,10 @@ Snapshots versions are also published for each commit to `master` and are availa
 
 JavaRosa works on Android API level 21+ (with desugaring enabled) and Java 8+.
 
+## Extending
+
+JavaRosa is intended be extended to support extra features through a "plugin" approach documented [here](PLUGINS.md) .
+
 ## Development
 
 ### Setting up your development environment
