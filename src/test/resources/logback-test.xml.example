@@ -11,7 +11,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.javarosa.core.test.Scenario" level="debug" additivity="false">
+    <logger name="org.javarosa.test.Scenario" level="debug" additivity="false">
         <appender-ref ref="STDOUT_SCENARIO"/>
     </logger>
 

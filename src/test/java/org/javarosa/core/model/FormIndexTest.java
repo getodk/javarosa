@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.model.FormIndex.createBeginningOfFormIndex;
-import static org.javarosa.core.test.Scenario.getRef;
+import static org.javarosa.test.Scenario.getRef;
 
 public class FormIndexTest {
 

@@ -6,13 +6,14 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.test.FormParseInit;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.FormParseInit;
+import org.javarosa.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -22,16 +23,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.select1Dynamic;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.title;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.select1Dynamic;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -173,7 +174,7 @@ public class ExternalSecondaryInstanceParseTest {
     public void deserializedFormDefCreatedFromAFormWithExternalSecondaryXMLInstance_ShouldContainThatExternalInstance() throws IOException, DeserializationException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 
-        Path formPath = r("external-select-xml.xml");
+        File formPath = r("external-select-xml.xml");
         FormDef originalFormDef = parse(r("external-select-xml.xml"));
         originalFormDef.setFormXmlPath(formPath.toString());
 
@@ -298,7 +299,7 @@ public class ExternalSecondaryInstanceParseTest {
     // All external secondary instances and forms are in the same folder. Configure the ReferenceManager to resolve
     // URIs to that folder.
     public static void configureReferenceManagerCorrectly() {
-        setUpSimpleReferenceManager(r("external-select-csv.xml").getParent(), "file-csv", "file");
+        setUpSimpleReferenceManager(r("external-select-csv.xml").getParentFile(), "file-csv", "file");
     }
 
     // Configure the ReferenceManager to resolve URIs to a folder that does not exist.

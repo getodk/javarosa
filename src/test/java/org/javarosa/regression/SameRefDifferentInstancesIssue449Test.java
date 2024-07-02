@@ -16,35 +16,36 @@
 
 package org.javarosa.regression;
 
-import static org.hamcrest.Matchers.is;
-import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.title;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-import java.nio.file.Path;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
+import static org.junit.Assert.assertThat;
 
 public class SameRefDifferentInstancesIssue449Test {
     @Test
     public void formWithSameRefInDifferentInstances_isSuccessfullyDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
-        Path formFile = r("issue_449.xml");
-        ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParent(), "file");
+        File formFile = r("issue_449.xml");
+        ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParentFile(), "file");
         Scenario scenario = Scenario.init(formFile);
 
         scenario.answer("/data/new-part", "c");

@@ -1,7 +1,7 @@
 package org.javarosa.xpath;
 
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
 

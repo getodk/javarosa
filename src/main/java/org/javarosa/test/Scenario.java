@@ -14,43 +14,9 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.test;
+package org.javarosa.test;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.createTempFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static java.nio.file.Files.write;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.util.stream.Collectors.joining;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
-import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
-import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
-import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
-import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.apache.commons.io.FileUtils;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -77,7 +43,6 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.storage.util.DummyIndexedStorageUtility;
 import org.javarosa.core.util.JavaRosaCoreModule;
-import org.javarosa.core.util.XFormsElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
@@ -95,6 +60,37 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_TEMPLATE;
+import static org.javarosa.form.api.FormEntryController.EVENT_BEGINNING_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.form.api.FormEntryController.EVENT_GROUP;
+import static org.javarosa.form.api.FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_QUESTION;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT;
+import static org.javarosa.form.api.FormEntryController.EVENT_REPEAT_JUNCTURE;
+import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
+import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
 /**
  * <div style="border: 1px 1px 1px 1px; background-color: #556B2F; color: white; padding: 20px">
@@ -132,7 +128,6 @@ import org.slf4j.LoggerFactory;
 public class Scenario {
     private static final Logger log = LoggerFactory.getLogger(Scenario.class);
     public static final FormIndex BEGINNING_OF_FORM = FormIndex.createBeginningOfFormIndex();
-    private Path formFile;
     private final FormDef formDef;
     private FormEntryController controller;
     private EvaluationContext evaluationContext;
@@ -268,17 +263,17 @@ public class Scenario {
         new XFormsModule().registerModule();
 
         // Serialize form in a temp file
-        Path tempFile = createTempFile("javarosa", "test");
-        formDef.writeExternal(new DataOutputStream(newOutputStream(tempFile)));
+        File tempFile = TempFileUtils.createTempFile("javarosa", "test");
+        formDef.writeExternal(new DataOutputStream(new FileOutputStream(tempFile)));
 
         // Create an empty FormDef and deserialize the form into it
         FormDef deserializedFormDef = new FormDef();
         deserializedFormDef.readExternal(
-            new DataInputStream(newInputStream(tempFile)),
+            new DataInputStream(new FileInputStream(tempFile)),
             PrototypeManager.getDefault()
         );
 
-        delete(tempFile);
+        tempFile.delete();
         deserializedFormDef.initialize(false, new InstanceInitializationFactory());
         return Scenario.from(deserializedFormDef);
     }
@@ -434,18 +429,20 @@ public class Scenario {
      */
     // TODO Extract the form's name from the provided XFormsElement object to simplify args
     public static Scenario init(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
-        Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
+        File tempDir = TempFileUtils.createTempDir("javarosa");
+        File formFile = TempFileUtils.createTempFile(tempDir, formName, "xml");
         String xml = form.asXml();
         System.out.println(xml);
-        write(formFile, xml.getBytes(UTF_8), CREATE);
+        FileUtils.write(formFile, xml, UTF_8);
         return Scenario.init(formFile);
     }
 
     public static FormDef createFormDef(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
-        Path formFile = createTempDirectory("javarosa").resolve(formName + ".xml");
+        File tempDir = TempFileUtils.createTempDir("javarosa");
+        File formFile = TempFileUtils.createTempFile(tempDir, formName, "xml");
         String xml = form.asXml();
         System.out.println(xml);
-        write(formFile, xml.getBytes(UTF_8), CREATE);
+        FileUtils.write(formFile, xml, UTF_8);
         return Scenario.createFormDef(formFile);
     }
 
@@ -455,13 +452,13 @@ public class Scenario {
      * A form with the provided filename must exist in the classpath
      */
     public static Scenario init(String formFileName) throws XFormParser.ParseException {
-        return init(r(formFileName));
+        return init(ResourcePathHelper.r(formFileName));
     }
 
     /**
      * Initializes the Scenario with the form at the provided path
      */
-    public static Scenario init(Path formFile) throws XFormParser.ParseException {
+    public static Scenario init(File formFile) throws XFormParser.ParseException {
         FormDef formDef = createFormDef(formFile);
         formDef.initialize(true, new InstanceInitializationFactory());
         return Scenario.from(formDef);
@@ -473,7 +470,7 @@ public class Scenario {
     }
 
     @NotNull
-    public static FormDef createFormDef(Path formFile) throws XFormParser.ParseException {
+    public static FormDef createFormDef(File formFile) throws XFormParser.ParseException {
         // TODO explain why this sequence of calls
         StorageManager.setStorageFactory((name, type) -> new DummyIndexedStorageUtility<>());
         new XFormsModule().registerModule();
@@ -610,7 +607,7 @@ public class Scenario {
      * Answers the question at the form index
      */
     public AnswerResult answer(LocalDate value) {
-        return answer(new DateData(Date.valueOf(value)));
+        return answer(new DateData(Date.from(value.atStartOfDay(ZoneId.of("UTC")).toInstant())));
     }
 
     /**

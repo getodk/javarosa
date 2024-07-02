@@ -23,28 +23,28 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.instance;
-import static org.javarosa.core.util.XFormsElement.item;
-import static org.javarosa.core.util.XFormsElement.label;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.repeat;
-import static org.javarosa.core.util.XFormsElement.select1;
-import static org.javarosa.core.util.XFormsElement.select1Dynamic;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.title;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.instance;
+import static org.javarosa.test.XFormsElement.item;
+import static org.javarosa.test.XFormsElement.label;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.repeat;
+import static org.javarosa.test.XFormsElement.select1;
+import static org.javarosa.test.XFormsElement.select1Dynamic;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
+import static org.javarosa.test.ResourcePathHelper.r;
 
 import java.io.IOException;
 import java.util.List;
 import kotlin.Pair;
 import org.hamcrest.CoreMatchers;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
@@ -86,7 +86,7 @@ public class SelectChoiceTest {
 
     @Test
     public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
-        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
         assertThat(scenario.choicesOf("/data/q").get(1).getChild("geometry"), CoreMatchers.is("0.5 104 0 0"));
@@ -95,7 +95,7 @@ public class SelectChoiceTest {
 
     @Test
     public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() throws XFormParser.ParseException {
-        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
         assertThat(scenario.choicesOf("/data/q").get(1).getChild("non-existent"), is(nullValue()));
@@ -171,7 +171,7 @@ public class SelectChoiceTest {
 
     @Test
     public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
-        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParent(), "file");
+        setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
 

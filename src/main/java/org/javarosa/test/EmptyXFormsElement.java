@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.util;
+package org.javarosa.test;
 
-import static org.javarosa.core.util.XFormsElement.buildAttributesString;
+import static org.javarosa.test.XFormsElement.buildAttributesString;
 
-import java.util.List;
 import java.util.Map;
 
-public class TagXFormsElement implements XFormsElement {
+class EmptyXFormsElement implements XFormsElement {
     private final String name;
     private final Map<String, String> attributes;
-    private final List<XFormsElement> children;
 
-    TagXFormsElement(String name, Map<String, String> attributes, List<XFormsElement> children) {
-        assert !children.isEmpty();
+    EmptyXFormsElement(String name, Map<String, String> attributes) {
         this.name = name;
         this.attributes = attributes;
-        this.children = children;
     }
+
 
     @Override
     public String getName() {
@@ -41,16 +38,6 @@ public class TagXFormsElement implements XFormsElement {
     @Override
     public String asXml() {
         String attributesString = buildAttributesString(attributes);
-        StringBuilder childrenStringBuilder = new StringBuilder();
-        for (XFormsElement e : children)
-            childrenStringBuilder.append(e.asXml());
-        return String.format(
-            "%s<%s%s>%s</%s>",
-            name.equals("h:html") ? "<?xml version=\"1.0\"?>" : "",
-            name,
-            attributesString.isEmpty() ? "" : " " + attributesString,
-            childrenStringBuilder,
-            name
-        );
+        return String.format("<%s%s/>", name, attributesString.isEmpty() ? "" : " " + attributesString);
     }
 }

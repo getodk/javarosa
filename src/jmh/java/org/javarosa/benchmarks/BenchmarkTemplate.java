@@ -37,7 +37,7 @@ public class BenchmarkTemplate {
             // If your forms load external files, you'll need to prime the ResourceManager using the assetsDir
             // returned by BenchmarkUtils.prepareAssets(). You need to make sure that all external files in the
             // form are like jr://file/filename (all use the "file" hostname, all are located at the root).
-            setUpSimpleReferenceManager(assetsPath, "file");
+            setUpSimpleReferenceManager(assetsPath.toFile(), "file");
         }
     }
 

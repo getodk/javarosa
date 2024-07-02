@@ -23,22 +23,22 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.instance;
-import static org.javarosa.core.util.XFormsElement.item;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.repeat;
-import static org.javarosa.core.util.XFormsElement.select1Dynamic;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.instance;
+import static org.javarosa.test.XFormsElement.item;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.repeat;
+import static org.javarosa.test.XFormsElement.select1Dynamic;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
 
 import java.util.List;
-import org.javarosa.core.test.Scenario;
-import org.javarosa.core.util.XFormsElement;
+import org.javarosa.test.Scenario;
+import org.javarosa.test.XFormsElement;
 import org.junit.Test;
 
 /**

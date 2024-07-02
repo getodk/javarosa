@@ -35,7 +35,7 @@ public class FormDefValidateBenchmark {
         @Setup(Level.Trial)
         public void initialize() throws IOException, XFormParser.ParseException {
             Path resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
-            formDef = FormParserHelper.parse(resourcePath);
+            formDef = FormParserHelper.parse(resourcePath.toFile());
             FormEntryModel formEntryModel = new FormEntryModel(formDef);
             FormEntryController formEntryController = new FormEntryController(formEntryModel);
             formEntryController.stepToNextEvent();

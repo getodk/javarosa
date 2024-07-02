@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.test.FormParseInit;
+import org.javarosa.test.FormParseInit;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -38,7 +38,7 @@ public class PopulateTreeNodeBenchmark {
             Path assetsDir = prepareAssets("nigeria_wards_external_combined.xml", "wards.xml", "lgas.xml", "populate-nodes-attributes-instance.xml");
             Path formFile = assetsDir.resolve("nigeria_wards_external_combined.xml");
             Path submissionFile = assetsDir.resolve("populate-nodes-attributes-instance.xml");
-            FormParseInit formParseInit = new FormParseInit(formFile);
+            FormParseInit formParseInit = new FormParseInit(formFile.toFile());
             FormEntryController formEntryController = formParseInit.getFormEntryController();
             byte[] formInstanceAsBytes = Files.readAllBytes(submissionFile);
             savedRoot = XFormParser.restoreDataModel(formInstanceAsBytes, null).getRoot();

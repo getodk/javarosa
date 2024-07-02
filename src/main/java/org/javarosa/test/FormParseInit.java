@@ -1,13 +1,5 @@
-package org.javarosa.core.test;
+package org.javarosa.test;
 
-import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -20,6 +12,15 @@ import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
+import static org.javarosa.form.api.FormEntryController.EVENT_END_OF_FORM;
+import static org.javarosa.test.ResourcePathHelper.r;
 
 /**
  * This class sets up everything you need to perform tests on the models and form elements found in JR (such
@@ -42,8 +43,8 @@ public class FormParseInit {
         this.init();
     }
 
-    public FormParseInit(Path form) throws XFormParser.ParseException {
-        FORM_NAME = form.toString();
+    public FormParseInit(File form) throws XFormParser.ParseException {
+        FORM_NAME = form.getAbsolutePath();
         this.init();
     }
 
