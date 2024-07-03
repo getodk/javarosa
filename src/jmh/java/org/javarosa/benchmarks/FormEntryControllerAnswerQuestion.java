@@ -36,7 +36,7 @@ public class FormEntryControllerAnswerQuestion {
         @Setup(Level.Trial)
         public void initialize() throws IOException, XFormParser.ParseException {
             Path formFile = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
-            FormDef formDef = FormParserHelper.parse(formFile);
+            FormDef formDef = FormParserHelper.parse(formFile.toFile());
             formEntryModel = new FormEntryModel(formDef);
             formEntryController = new FormEntryController(formEntryModel);
 

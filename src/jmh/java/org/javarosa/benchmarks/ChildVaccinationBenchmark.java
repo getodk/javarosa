@@ -28,8 +28,8 @@ import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.DIPHTER
 import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.DIPHTERIA_FIRST_AND_MEASLES;
 import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.MEASLES;
 import static org.javarosa.benchmarks.ChildVaccinationBenchmark.Vaccines.NONE;
-import static org.javarosa.core.test.Scenario.getRef;
-import static org.javarosa.core.test.Scenario.init;
+import static org.javarosa.test.Scenario.getRef;
+import static org.javarosa.test.Scenario.init;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -77,7 +77,7 @@ public class ChildVaccinationBenchmark {
             finalFlatRef = getRef("/data/household/finalflat");
             endOfVisitRefs = Arrays.asList(nextChildRef, finalFlatRef, getRef("/data/household/child_repeat"));
             today = LocalDate.now();
-            scenario = init(formFile);
+            scenario = init(formFile.toFile());
         }
     }
 

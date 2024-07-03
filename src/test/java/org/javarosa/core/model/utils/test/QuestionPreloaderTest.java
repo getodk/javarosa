@@ -3,18 +3,18 @@ package org.javarosa.core.model.utils.test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.core.util.XFormsElement.title;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
 
 import java.io.IOException;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 

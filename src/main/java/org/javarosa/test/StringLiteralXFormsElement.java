@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package org.javarosa.core.util;
+package org.javarosa.test;
 
-import static org.javarosa.core.util.XFormsElement.buildAttributesString;
+import static org.javarosa.test.XFormsElement.buildAttributesString;
 
 import java.util.Map;
 
-public class EmptyXFormsElement implements XFormsElement {
+class StringLiteralXFormsElement implements XFormsElement {
     private final String name;
     private final Map<String, String> attributes;
+    private final String innerHtml;
 
-    EmptyXFormsElement(String name, Map<String, String> attributes) {
+    StringLiteralXFormsElement(String name, Map<String, String> attributes, String innerHtml) {
         this.name = name;
         this.attributes = attributes;
+        this.innerHtml = innerHtml;
     }
-
 
     @Override
     public String getName() {
@@ -38,6 +39,13 @@ public class EmptyXFormsElement implements XFormsElement {
     @Override
     public String asXml() {
         String attributesString = buildAttributesString(attributes);
-        return String.format("<%s%s/>", name, attributesString.isEmpty() ? "" : " " + attributesString);
+        return String.format(
+            "<%s%s>%s</%s>",
+            name,
+            attributesString.isEmpty() ? "" : " " + attributesString,
+            innerHtml,
+            name
+        );
     }
+
 }

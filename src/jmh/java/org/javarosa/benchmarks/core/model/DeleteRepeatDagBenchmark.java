@@ -8,7 +8,7 @@ import static org.javarosa.benchmarks.core.model.CreateRepeatDagBenchmark.getExp
 import static org.javarosa.benchmarks.core.model.CreateRepeatDagBenchmark.getSumExpressionOutsideScenario;
 
 import java.io.IOException;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;

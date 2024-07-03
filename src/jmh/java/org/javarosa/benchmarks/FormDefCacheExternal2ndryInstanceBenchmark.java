@@ -36,7 +36,7 @@ public class FormDefCacheExternal2ndryInstanceBenchmark {
         public void
         initialize() throws IOException, XFormParser.ParseException {
             resourcePath = BenchmarkUtils.getNigeriaWardsXMLWithExternal2ndryInstance();
-            formDef = FormParserHelper.parse(resourcePath);
+            formDef = FormParserHelper.parse(resourcePath.toFile());
             cachePath = getCachePath().toString();
             PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
             PrototypeManager.registerPrototypes(CoreModelModule.classNames);

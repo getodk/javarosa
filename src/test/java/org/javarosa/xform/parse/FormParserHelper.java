@@ -10,6 +10,7 @@ import org.javarosa.xform.util.XFormUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,12 +23,12 @@ public final class FormParserHelper {
     private FormParserHelper() {
     }
 
-    public static FormDef parse(Path formName) throws IOException, XFormParser.ParseException {
-        return XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()));
+    public static FormDef parse(File formName) throws IOException, XFormParser.ParseException {
+        return XFormUtils.getFormFromInputStream(new FileInputStream(formName));
     }
 
-    public static FormDef parse(Path formName, String lastSavedSrc) throws IOException, XFormParser.ParseException {
-        return XFormUtils.getFormFromInputStream(new FileInputStream(formName.toString()), lastSavedSrc);
+    public static FormDef parse(File formName, String lastSavedSrc) throws IOException, XFormParser.ParseException {
+        return XFormUtils.getFormFromInputStream(new FileInputStream(formName), lastSavedSrc);
     }
 
     static Path getSerializedFormPath(FormDef formDef) throws IOException {

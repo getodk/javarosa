@@ -1,12 +1,12 @@
 package org.javarosa.xform.parse;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.test.FormParseInit;
+import org.javarosa.test.FormParseInit;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.junit.Test;
 
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
 /**

@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Assert;
 import org.junit.Before;

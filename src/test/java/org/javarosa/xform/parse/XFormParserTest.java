@@ -9,15 +9,15 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.javarosa.core.model.Constants.CONTROL_RANGE;
 import static org.javarosa.core.model.Constants.CONTROL_RANK;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
-import static org.javarosa.core.util.BindBuilderXFormsElement.bind;
-import static org.javarosa.core.util.XFormsElement.body;
-import static org.javarosa.core.util.XFormsElement.head;
-import static org.javarosa.core.util.XFormsElement.html;
-import static org.javarosa.core.util.XFormsElement.input;
-import static org.javarosa.core.util.XFormsElement.mainInstance;
-import static org.javarosa.core.util.XFormsElement.model;
-import static org.javarosa.core.util.XFormsElement.t;
-import static org.javarosa.test.utils.ResourcePathHelper.r;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -47,7 +48,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.core.test.Scenario;
+import org.javarosa.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
@@ -65,7 +66,7 @@ public class XFormParserTest {
     private static final Logger logger = LoggerFactory.getLogger(XFormParserTest.class);
 
     private static Path FORM_INSTANCE_XML_FILE_NAME;
-    private static Path SECONDARY_INSTANCE_XML;
+    private static File SECONDARY_INSTANCE_XML;
     private static Path SECONDARY_INSTANCE_LARGE_XML;
 
     private static final String AUDIT_NODE = "audit";
@@ -143,14 +144,14 @@ public class XFormParserTest {
 
     @Test
     public void parsesSecondaryInstanceForm2() throws IOException, XFormParser.ParseException {
-        Path formName = r("internal_select_10.xml");
+        File formName = r("internal_select_10.xml");
         FormDef formDef = parse(formName);
         assertEquals("internal select 10", formDef.getTitle());
     }
 
     @Test
     public void parsesLastSavedInstanceWithNullSrc() throws IOException, XFormParser.ParseException {
-        Path formName = r("last-saved-blank.xml");
+        File formName = r("last-saved-blank.xml");
         FormDef formDef = parse(formName, null);
         assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
 
@@ -161,8 +162,8 @@ public class XFormParserTest {
 
     @Test
     public void parsesLastSavedInstanceWithFilledForm() throws IOException, XFormParser.ParseException {
-        Path formName = r("last-saved-blank.xml");
-        Path lastSavedSubmissionDirectory = r("last-saved-filled.xml").toAbsolutePath().getParent();
+        File formName = r("last-saved-blank.xml");
+        File lastSavedSubmissionDirectory = r("last-saved-filled.xml").getParentFile();
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(lastSavedSubmissionDirectory, "file");
         FormDef formDef = parse(formName, "jr://file/last-saved-filled.xml");
         assertEquals("Form with last-saved instance (blank)", formDef.getTitle());
@@ -233,7 +234,7 @@ public class XFormParserTest {
         exceptionRule.expect(XFormParseException.class);
         exceptionRule.expectMessage("Select question 'First' has no choices");
 
-        Path formName = r("internal_empty_select.xml");
+        File formName = r("internal_empty_select.xml");
         FormDef formDef = parse(formName);
     }
 

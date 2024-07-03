@@ -32,7 +32,7 @@ public class FormParserHelperParseInternalInstanceMinifiedBenchmark {
     @Benchmark
     public void
     benchmarkParseInternalInstanceFormMinified(FormParserHelperParseInternalInstanceMinifiedBenchmarkState state, Blackhole bh) throws IOException, XFormParser.ParseException {
-        bh.consume(FormParserHelper.parse(state.xFormFilePath));
+        bh.consume(FormParserHelper.parse(state.xFormFilePath.toFile()));
     }
 
 }
