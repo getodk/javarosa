@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.group;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
 import static org.javarosa.test.XFormsElement.input;
@@ -58,28 +59,30 @@ public class IndexedRepeatTest {
                 model(
                     mainInstance(t("data id=\"indexed-repeat\"",
                         t("index"),
-                        t("repeat",
-                            t("inside")),
+                        t("outer_group", // included to clarify intended evaluation context for index references
+                            t("repeat",
+                                t("inside"))),
                         t("calc")
                     )),
-                    bind("/data/calc").calculate("indexed-repeat(/data/repeat/inside, /data/repeat, /data/index)")
+                    bind("/data/calc").calculate("indexed-repeat(/data/outer_group/repeat/inside, /data/outer_group/repeat, ../index)")
                 )
             ),
             body(
                 input("/data/index"),
-                repeat("/data/repeat",
-                    input("/data/repeat/inside"))
+                group("/data/outer_group",
+                    repeat("/data/outer_group/repeat",
+                        input("/data/outer_group/repeat/inside")))
             ))
         );
 
-        scenario.createNewRepeat("/data/repeat");
-        scenario.answer("/data/repeat[1]/inside", "index1");
+        scenario.createNewRepeat("/data/outer_group[1]/repeat");
+        scenario.answer("/data/outer_group[1]/repeat[1]/inside", "index1");
 
-        scenario.createNewRepeat("/data/repeat");
-        scenario.answer("/data/repeat[2]/inside", "index2");
+        scenario.createNewRepeat("/data/outer_group[1]/repeat");
+        scenario.answer("/data/outer_group[1]/repeat[2]/inside", "index2");
 
-        scenario.createNewRepeat("/data/repeat");
-        scenario.answer("/data/repeat[3]/inside", "index3");
+        scenario.createNewRepeat("/data/outer_group[1]/repeat");
+        scenario.answer("/data/outer_group[1]/repeat[3]/inside", "index3");
 
         scenario.answer("/data/index", "2");
         assertThat(scenario.answerOf("/data/calc"), is(stringAnswer("index2")));
