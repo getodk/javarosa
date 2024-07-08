@@ -62,7 +62,7 @@ public class ExternalDataInstance extends DataInstance {
         throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
         TreeElement root;
         try {
-            root = parseExternalInstance(instanceSrc, instanceId);
+            root = XFormUtils.getExternalInstance(ReferenceManager.instance(), instanceId, instanceSrc, true);
 
             // Avoid parse error for missing name and label refs if a select is built on an empty placeholder file
             if (!root.hasChildren()) {
@@ -76,9 +76,20 @@ public class ExternalDataInstance extends DataInstance {
         return new ExternalDataInstance(root, instanceId, instanceSrc);
     }
 
-    private static TreeElement parseExternalInstance(String instanceSrc, String instanceId)
-        throws IOException, InvalidReferenceException, InvalidStructureException, XmlPullParserException, UnfullfilledRequirementsException {
-        return XFormUtils.getExternalInstance(ReferenceManager.instance(), instanceId, instanceSrc);
+    @Override
+    public AbstractTreeElement resolveReference(TreeReference ref) {
+        try {
+            return super.resolveReference(ref);
+        } catch (PartialElementEncounteredException e) {
+            try {
+                parseExternalFile(false);
+            } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException |
+                     UnfullfilledRequirementsException | IOException exception) {
+                throw new RuntimeException(new DeserializationException("Unable to parse external instance: " + exception));
+            }
+
+            return resolveReference(ref);
+        }
     }
 
     @Override
@@ -114,7 +125,7 @@ public class ExternalDataInstance extends DataInstance {
         super.readExternal(in, pf);
         path = ExtUtil.readString(in);
         try {
-            setRoot(parseExternalInstance(path, getInstanceId()));
+            parseExternalFile(true);
         } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException |
                  UnfullfilledRequirementsException e) {
             throw new DeserializationException("Unable to parse external instance: " + e);
@@ -125,5 +136,10 @@ public class ExternalDataInstance extends DataInstance {
     public void writeExternal(DataOutputStream out) throws IOException {
         super.writeExternal(out);
         ExtUtil.write(out, path);
+    }
+
+    private void parseExternalFile(boolean partial) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
+        String instanceId = getInstanceId();
+        setRoot(XFormUtils.getExternalInstance(ReferenceManager.instance(), instanceId, path, partial));
     }
 }

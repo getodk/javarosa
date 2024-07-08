@@ -1,17 +1,17 @@
 package org.javarosa.core.model.instance;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A data instance represents a tree structure of abstract tree
@@ -81,6 +81,10 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
         AbstractTreeElement<T> node = getBase();
         T result = null;
         for (int i = 0; i < ref.size(); i++) {
+            if (node instanceof TreeElement && ((TreeElement) node).isPartial()) {
+                throw new PartialElementEncounteredException();
+            }
+
             String name = ref.getName(i);
             int mult = ref.getMultiplicity(i);
 
@@ -299,4 +303,18 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 
     public abstract void initialize(InstanceInitializationFactory initializer, String instanceId);
 
+    public void replacePartialElements(List<TreeElement> elements) {
+        for (TreeElement element : elements) {
+            TreeElement root = (TreeElement) getRoot();
+            TreeElement matchingChild = root.getChild(element.getName(), element.getMultiplicity());
+
+            if (matchingChild != null) {
+                matchingChild.populatePartial(element);
+            }
+        }
+    }
+
+    public static class PartialElementEncounteredException extends RuntimeException {
+
+    }
 }

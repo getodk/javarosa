@@ -26,6 +26,5 @@ Inspect external instances (their ID and parsed XML) after parsing or provide cu
 
 ### API
 - `ExternalInstanceParser#addFileInstanceParser`
-- `ExternalInstanceparsser#addProcessor`
 
 The default `ExternalInstanceParser` can be overridden by creating an implementation of `ExternalInstanceParserFactory` and calling `XFormUtils.setExternalInstanceParserFactory` with it.

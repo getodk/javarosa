@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.xform.parse.ExternalInstanceParser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +29,7 @@ import java.util.Objects;
 
 public class GeoJsonExternalInstance implements ExternalInstanceParser.FileInstanceParser {
 
-    public TreeElement parse(String instanceId, String path) throws IOException {
+    public TreeElement parse(@NotNull String instanceId, @NotNull String path) throws IOException {
         final TreeElement root = new TreeElement("root", 0);
         root.setInstanceName(instanceId);
 
