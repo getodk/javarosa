@@ -179,8 +179,12 @@ public class XFormUtils {
         return returnForm;
     }
 
+    public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc, boolean partial) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
+        return externalInstanceParserFactory.getExternalInstanceParser().parse(referenceManager, id, instanceSrc, partial);
+    }
+
     public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
-        return externalInstanceParserFactory.getExternalInstanceParser().parse(referenceManager, id, instanceSrc);
+        return getExternalInstance(referenceManager, id, instanceSrc, false);
     }
 
     /////Parser Attribute warning stuff

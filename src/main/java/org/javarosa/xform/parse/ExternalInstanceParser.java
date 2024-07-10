@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,13 +21,12 @@ import static java.util.Arrays.asList;
 
 public class ExternalInstanceParser {
 
-    private List<ExternalDataInstanceProcessor> externalDataInstanceProcessors = new ArrayList<>();
     private List<FileInstanceParser> fileInstanceParsers = asList(
         new CsvExternalInstance(),
         new GeoJsonExternalInstance()
     );
 
-    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
+    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc, boolean partial) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
         String path = getPath(referenceManager, instanceSrc);
 
         Optional<FileInstanceParser> fileParser = fileInstanceParsers.stream()
@@ -37,20 +35,15 @@ public class ExternalInstanceParser {
 
         TreeElement root;
         if (fileParser.isPresent()) {
-            root = fileParser.get().parse(instanceId, path);
+            root = fileParser.get().parse(instanceId, path, partial);
         } else {
             root = XmlExternalInstance.parse(instanceId, path);
         }
-
-        for (ExternalDataInstanceProcessor processor : externalDataInstanceProcessors) {
-            processor.processInstance(instanceId, root);
-        }
-
         return root;
     }
 
-    public void addProcessor(Processor processor) {
-        externalDataInstanceProcessors.add((ExternalDataInstanceProcessor) processor);
+    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
+        return parse(referenceManager, instanceId, instanceSrc, false);
     }
 
     /**
@@ -75,16 +68,13 @@ public class ExternalInstanceParser {
         return uri.startsWith("//") /* todo why is this? */ ? uri.substring(1) : uri;
     }
 
-    public interface Processor {
-
-    }
-
-    public interface ExternalDataInstanceProcessor extends ExternalInstanceParser.Processor {
-        void processInstance(@NotNull String id, @NotNull TreeElement root);
-    }
-
     public interface FileInstanceParser {
-        TreeElement parse(String instanceId, String path) throws IOException;
+        TreeElement parse(@NotNull String instanceId, @NotNull String path) throws IOException;
+
+        default TreeElement parse(@NotNull String instanceId, @NotNull String path, boolean partial) throws IOException {
+            return parse(instanceId, path);
+        }
+
         boolean isSupported(String instanceId, String instanceSrc);
     }
 }

@@ -106,6 +106,7 @@ import java.util.List;
      * instance or null for the primary instance.
      */
     private String instanceName = null;
+    private boolean isPartial;
 
     /**
      * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
@@ -123,6 +124,11 @@ import java.util.List;
         this.multiplicity = multiplicity;
         this.parent = null;
         attributes = new ArrayList<TreeElement>(0);
+    }
+
+    public TreeElement(String name, int multiplicity, boolean isPartial) {
+        this(name, multiplicity);
+        this.isPartial = isPartial;
     }
 
     /**
@@ -1140,5 +1146,21 @@ import java.util.List;
 
     public void setNamespacePrefix(String namespacePrefix) {
         this.namespacePrefix = namespacePrefix;
+    }
+
+    public boolean isPartial() {
+        return isPartial;
+    }
+
+    public void populatePartial(TreeElement element) {
+        if (isPartial) {
+            children.clear();
+
+            for (int i = 0; i < element.getNumChildren(); i++) {
+                addChild(element.getChildAt(i));
+            }
+
+            isPartial = false;
+        }
     }
 }

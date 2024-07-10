@@ -13,7 +13,7 @@ public class TempFileUtils {
         return subDir;
     }
 
-    static File createTempFile(String prefix, String suffix) {
+    public static File createTempFile(String prefix, String suffix) {
         return createTempFile(null, prefix, suffix);
     }
 
