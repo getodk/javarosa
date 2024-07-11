@@ -16,25 +16,6 @@
 
 package org.javarosa.core.model;
 
-import static java.util.Collections.emptyList;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.Actions;
@@ -84,6 +65,26 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xml.InternalDataInstanceParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -162,7 +163,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private TriggerableDag dagImpl;
 
-    private boolean predicateCaching = true;
     private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
     private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
     private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
@@ -830,14 +830,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 evaluationContext.addFunctionHandler(new ChoiceNameFunctionHandler(this) );
             }
 
-            if (predicateCaching) {
-                List<FilterStrategy> filters = Stream.concat(
-                    customFilterStrategies.stream(),
-                    Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
-                ).collect(Collectors.toList());
+            List<FilterStrategy> filters = Stream.concat(
+                customFilterStrategies.stream(),
+                Stream.of(equalityExpressionIndexFilterStrategy, comparisonExpressionCacheFilterStrategy)
+            ).collect(Collectors.toList());
 
-                evaluationContext = new EvaluationContext(evaluationContext, filters);
-            }
+            evaluationContext = new EvaluationContext(evaluationContext, filters);
 
             for (IFunctionHandler functionHandler : customFunctionHandlers) {
                 evaluationContext.addFunctionHandler(functionHandler);
@@ -1629,11 +1627,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public Extras<Externalizable> getExtras() {
         return extras;
-    }
-
-    public void disablePredicateCaching() {
-        predicateCaching = false;
-        dagImpl.disablePredicateCaching();
     }
 
     public void addFilterStrategy(FilterStrategy filterStrategy) {

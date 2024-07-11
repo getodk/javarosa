@@ -348,10 +348,6 @@ public class FormEntryController {
         }
     }
 
-    public void disablePredicateCaching() {
-        model.getForm().disablePredicateCaching();
-    }
-
     public void addFilterStrategy(FilterStrategy filterStrategy) {
         model.getForm().addFilterStrategy(filterStrategy);
     }
