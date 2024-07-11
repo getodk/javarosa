@@ -166,6 +166,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     private final FilterStrategy comparisonExpressionCacheFilterStrategy = new ComparisonExpressionCacheFilterStrategy();
     private final FilterStrategy equalityExpressionIndexFilterStrategy = new EqualityExpressionIndexFilterStrategy();
     private final Queue<FilterStrategy> customFilterStrategies = new LinkedList<>();
+    private final List<IFunctionHandler> customFunctionHandlers = new ArrayList<>();
 
     private QuestionPreloader preloader = new QuestionPreloader();
 
@@ -836,6 +837,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 ).collect(Collectors.toList());
 
                 evaluationContext = new EvaluationContext(evaluationContext, filters);
+            }
+
+            for (IFunctionHandler functionHandler : customFunctionHandlers) {
+                evaluationContext.addFunctionHandler(functionHandler);
             }
         }
 
@@ -1633,6 +1638,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     public void addFilterStrategy(FilterStrategy filterStrategy) {
         customFilterStrategies.add(filterStrategy);
+        resetEvaluationContext();
+    }
+
+    public void addFunctionHandler(IFunctionHandler functionHandler) {
+        customFunctionHandlers.add(functionHandler);
+        resetEvaluationContext();
     }
 
     private void resetEvaluationContext() {
