@@ -28,3 +28,17 @@ Inspect external instances (their ID and parsed XML) after parsing or provide cu
 - `ExternalInstanceParser#addFileInstanceParser`
 
 The default `ExternalInstanceParser` can be overridden by creating an implementation of `ExternalInstanceParserFactory` and calling `XFormUtils.setExternalInstanceParserFactory` with it.
+
+## Function
+
+Add custom functions that can be called from XPath.
+
+### API
+- `FormEntryController#addFunctionHandler`
+
+## Predicate evaluation
+
+Add custom strategies for filtering nodes for predicate expressions.
+
+### API
+- `FormEntryController#addFilterStrategy`
