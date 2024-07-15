@@ -145,9 +145,14 @@ public class Scenario {
     private static Scenario from(FormDef formDef, boolean newInstance) {
         FormEntryModel formEntryModel = new FormEntryModel(formDef);
         FormEntryController formEntryController = new FormEntryController(formEntryModel);
-        formDef.initialize(newInstance, new InstanceInitializationFactory());
 
-        return new Scenario(formDef, formEntryController, formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
+        Scenario scenario = new Scenario(formDef, formEntryController, formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
+        scenario.init(newInstance);
+        return scenario;
+    }
+
+    public void init(boolean newInstance) {
+        formDef.initialize(newInstance, new InstanceInitializationFactory());
     }
 
     // region Miscellaneous
