@@ -22,6 +22,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.FilterStrategy;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
@@ -347,11 +348,11 @@ public class FormEntryController {
         }
     }
 
-    public void disablePredicateCaching() {
-        model.getForm().disablePredicateCaching();
-    }
-
     public void addFilterStrategy(FilterStrategy filterStrategy) {
         model.getForm().addFilterStrategy(filterStrategy);
+    }
+
+    public void addFunctionHandler(IFunctionHandler functionHandler) {
+        model.getForm().addFunctionHandler(functionHandler);
     }
 }
