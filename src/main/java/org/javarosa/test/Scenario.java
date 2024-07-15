@@ -142,9 +142,12 @@ public class Scenario {
         this.blankInstance = blankInstance;
     }
 
-    private static Scenario from(FormDef formDef) {
+    private static Scenario from(FormDef formDef, boolean newInstance) {
         FormEntryModel formEntryModel = new FormEntryModel(formDef);
-        return new Scenario(formDef, new FormEntryController(formEntryModel), formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
+        FormEntryController formEntryController = new FormEntryController(formEntryModel);
+        formDef.initialize(newInstance, new InstanceInitializationFactory());
+
+        return new Scenario(formDef, formEntryController, formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
     }
 
     // region Miscellaneous
@@ -227,10 +230,10 @@ public class Scenario {
      */
     public void newInstance() {
         formDef.setInstance(blankInstance.clone());
-        formDef.initialize(true, new InstanceInitializationFactory());
-        evaluationContext = formDef.getEvaluationContext();
         model = new FormEntryModel(formDef);
         controller = new FormEntryController(model);
+        formDef.initialize(true, new InstanceInitializationFactory());
+        evaluationContext = formDef.getEvaluationContext();
     }
 
     /**
@@ -274,8 +277,7 @@ public class Scenario {
         );
 
         tempFile.delete();
-        deserializedFormDef.initialize(false, new InstanceInitializationFactory());
-        return Scenario.from(deserializedFormDef);
+        return Scenario.from(deserializedFormDef, false);
     }
 
     // The fact that we need to pass in the same raw form definition that the current scenario is built around suggests
@@ -293,9 +295,7 @@ public class Scenario {
         XFormParser parser = new XFormParser(formReader, instanceReader);
         FormDef restoredFormDef = parser.parse();
 
-        Scenario restored = Scenario.from(restoredFormDef);
-
-        return restored;
+        return Scenario.from(restoredFormDef, false);
     }
 
     /**
@@ -460,13 +460,11 @@ public class Scenario {
      */
     public static Scenario init(File formFile) throws XFormParser.ParseException {
         FormDef formDef = createFormDef(formFile);
-        formDef.initialize(true, new InstanceInitializationFactory());
-        return Scenario.from(formDef);
+        return Scenario.from(formDef, true);
     }
 
     public static Scenario init(FormDef formDef) throws XFormParser.ParseException {
-        formDef.initialize(true, new InstanceInitializationFactory());
-        return Scenario.from(formDef);
+        return Scenario.from(formDef, true);
     }
 
     @NotNull
