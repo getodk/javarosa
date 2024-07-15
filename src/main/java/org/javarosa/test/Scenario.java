@@ -76,6 +76,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -133,22 +134,32 @@ public class Scenario {
     private EvaluationContext evaluationContext;
     private FormEntryModel model;
     private final FormInstance blankInstance;
+    private final Function<FormDef, FormEntryController> controllerSupplier;
 
-    private Scenario(FormDef formDef, EvaluationContext evaluationContext, FormInstance blankInstance) {
+    private Scenario(FormDef formDef, Function<FormDef, FormEntryController> controllerSupplier, EvaluationContext evaluationContext, FormInstance blankInstance) {
         this.formDef = formDef;
+        this.controllerSupplier = controllerSupplier;
         this.evaluationContext = evaluationContext;
         this.blankInstance = blankInstance;
     }
 
+    private Scenario(FormDef formDef, EvaluationContext evaluationContext, FormInstance blankInstance) {
+        this(formDef, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)), evaluationContext, blankInstance);
+    }
+
     private static Scenario from(FormDef formDef, boolean newInstance) {
-        Scenario scenario = new Scenario(formDef, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
+        return from(formDef, newInstance, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)));
+    }
+
+    private static Scenario from(FormDef formDef, boolean newInstance, Function<FormDef, FormEntryController> controllerSupplier) {
+        Scenario scenario = new Scenario(formDef, controllerSupplier, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
         scenario.init(newInstance);
         return scenario;
     }
 
     public void init(boolean newInstance) {
-        model = new FormEntryModel(formDef);
-        controller = new FormEntryController(model);
+        controller = controllerSupplier.apply(formDef);
+        model = controller.getModel();
         formDef.initialize(newInstance, new InstanceInitializationFactory());
     }
 
@@ -437,6 +448,15 @@ public class Scenario {
         return Scenario.init(formFile);
     }
 
+    public static Scenario init(String formName, XFormsElement form, Function<FormDef, FormEntryController> controllerSupplier) throws IOException, XFormParser.ParseException {
+        File tempDir = TempFileUtils.createTempDir("javarosa");
+        File formFile = TempFileUtils.createTempFile(tempDir, formName, "xml");
+        String xml = form.asXml();
+        System.out.println(xml);
+        FileUtils.write(formFile, xml, UTF_8);
+        return Scenario.init(formFile, controllerSupplier);
+    }
+
     public static FormDef createFormDef(String formName, XFormsElement form) throws IOException, XFormParser.ParseException {
         File tempDir = TempFileUtils.createTempDir("javarosa");
         File formFile = TempFileUtils.createTempFile(tempDir, formName, "xml");
@@ -461,6 +481,11 @@ public class Scenario {
     public static Scenario init(File formFile) throws XFormParser.ParseException {
         FormDef formDef = createFormDef(formFile);
         return Scenario.from(formDef, true);
+    }
+
+    private static Scenario init(File formFile, Function<FormDef, FormEntryController> controllerSupplier) throws XFormParser.ParseException {
+        FormDef formDef = createFormDef(formFile);
+        return Scenario.from(formDef, true, controllerSupplier);
     }
 
     public static Scenario init(FormDef formDef) throws XFormParser.ParseException {
