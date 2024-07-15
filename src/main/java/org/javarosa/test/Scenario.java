@@ -134,24 +134,21 @@ public class Scenario {
     private FormEntryModel model;
     private final FormInstance blankInstance;
 
-    private Scenario(FormDef formDef, FormEntryController controller, FormEntryModel model, EvaluationContext evaluationContext, FormInstance blankInstance) {
+    private Scenario(FormDef formDef, EvaluationContext evaluationContext, FormInstance blankInstance) {
         this.formDef = formDef;
-        this.controller = controller;
         this.evaluationContext = evaluationContext;
-        this.model = model;
         this.blankInstance = blankInstance;
     }
 
     private static Scenario from(FormDef formDef, boolean newInstance) {
-        FormEntryModel formEntryModel = new FormEntryModel(formDef);
-        FormEntryController formEntryController = new FormEntryController(formEntryModel);
-
-        Scenario scenario = new Scenario(formDef, formEntryController, formEntryModel, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
+        Scenario scenario = new Scenario(formDef, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
         scenario.init(newInstance);
         return scenario;
     }
 
     public void init(boolean newInstance) {
+        model = new FormEntryModel(formDef);
+        controller = new FormEntryController(model);
         formDef.initialize(newInstance, new InstanceInitializationFactory());
     }
 
@@ -235,9 +232,7 @@ public class Scenario {
      */
     public void newInstance() {
         formDef.setInstance(blankInstance.clone());
-        model = new FormEntryModel(formDef);
-        controller = new FormEntryController(model);
-        formDef.initialize(true, new InstanceInitializationFactory());
+        init(true);
         evaluationContext = formDef.getEvaluationContext();
     }
 
