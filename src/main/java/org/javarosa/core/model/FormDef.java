@@ -1629,11 +1629,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         return extras;
     }
 
+    /**
+     * @deprecated use {@link FormEntryController#addFilterStrategy(FilterStrategy)} instead
+     */
+    @Deprecated
     public void addFilterStrategy(FilterStrategy filterStrategy) {
         customFilterStrategies.add(filterStrategy);
         resetEvaluationContext();
     }
 
+
+    /**
+     * @deprecated use {@link FormEntryController#addFunctionHandler(IFunctionHandler)} instead
+     */
+    @Deprecated
     public void addFunctionHandler(IFunctionHandler functionHandler) {
         customFunctionHandlers.add(functionHandler);
         resetEvaluationContext();
