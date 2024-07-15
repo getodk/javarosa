@@ -143,10 +143,6 @@ public class Scenario {
         this.blankInstance = blankInstance;
     }
 
-    private Scenario(FormDef formDef, EvaluationContext evaluationContext, FormInstance blankInstance) {
-        this(formDef, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)), evaluationContext, blankInstance);
-    }
-
     private static Scenario from(FormDef formDef, boolean newInstance) {
         return from(formDef, newInstance, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)));
     }
