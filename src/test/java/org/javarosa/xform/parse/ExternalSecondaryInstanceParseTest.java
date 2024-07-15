@@ -6,9 +6,9 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.test.FormParseInit;
 import org.javarosa.test.Scenario;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
@@ -32,7 +33,6 @@ import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -125,6 +125,59 @@ public class ExternalSecondaryInstanceParseTest {
                 body(
                     // Define a select using value and label references that don't exist in the secondary instance
                     select1Dynamic("/data/first", "instance('external-csv')/root/item", "foo", "bar")
+                )));
+            fail("Expected XFormParseException because itemset references don't exist in external instance");
+        } catch (XFormParseException e) {
+            // pass
+        } catch (XFormParser.ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void itemsetBindingVerification_doesNotVerifySecondItem() throws IOException, XFormParser.ParseException {
+        configureReferenceManagerCorrectly();
+
+        Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("first")
+                    )),
+
+                    t("instance id=\"mixed-schema\" src=\"jr://file/mixed-schema.xml\""),
+
+                    bind("/data/first").type("string")
+                )
+            ),
+            body(
+                // Define a select using value and label references that only exist for the first item
+                select1Dynamic("/data/first", "instance('mixed-schema')/root/item", "name", "label")
+            )));
+    }
+
+    @Test
+    public void itemsetBindingVerification_verifiesFirstItem() throws IOException {
+        configureReferenceManagerCorrectly();
+
+        try {
+            Scenario.init("Some form", html(
+                head(
+                    title("Some form"),
+                    model(
+                        mainInstance(t("data id=\"some-form\"",
+                            t("first")
+                        )),
+
+                        t("instance id=\"mixed-schema\" src=\"jr://file/mixed-schema2.xml\""),
+
+                        bind("/data/first").type("string")
+                    )
+                ),
+                body(
+                    // Define a select using value and label references that only exist for the second item
+                    select1Dynamic("/data/first", "instance('mixed-schema')/root/item", "name", "label")
                 )));
             fail("Expected XFormParseException because itemset references don't exist in external instance");
         } catch (XFormParseException e) {

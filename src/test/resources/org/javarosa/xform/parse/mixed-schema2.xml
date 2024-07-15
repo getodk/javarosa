@@ -1,0 +1,9 @@
+<root>
+    <item>
+        <foo>bar</foo>
+    </item>
+    <item>
+        <label>A</label>
+        <name>a</name>
+    </item>
+</root>
