@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 public class ExternalInstanceParser {
 
@@ -26,20 +27,30 @@ public class ExternalInstanceParser {
         new GeoJsonExternalInstance()
     );
 
-    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc, boolean partial) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
-        String path = getPath(referenceManager, instanceSrc);
+    private List<InstanceProvider> instanceProviders = emptyList();
 
-        Optional<FileInstanceParser> fileParser = fileInstanceParsers.stream()
-            .filter(fileInstanceParser -> fileInstanceParser.isSupported(instanceId, instanceSrc))
+    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc, boolean partial) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
+        Optional<InstanceProvider> instanceProvider = instanceProviders.stream()
+            .filter(parser -> parser.isSupported(instanceId, instanceSrc))
             .findFirst();
 
-        TreeElement root;
-        if (fileParser.isPresent()) {
-            root = fileParser.get().parse(instanceId, path, partial);
+        if (instanceProvider.isPresent()) {
+            return instanceProvider.get().get(instanceId, instanceSrc, partial);
         } else {
-            root = XmlExternalInstance.parse(instanceId, path);
+            String path = getPath(referenceManager, instanceSrc);
+
+            Optional<FileInstanceParser> fileParser = fileInstanceParsers.stream()
+                .filter(parser -> parser.isSupported(instanceId, instanceSrc))
+                .findFirst();
+
+            TreeElement root;
+            if (fileParser.isPresent()) {
+                root = fileParser.get().parse(instanceId, path, partial);
+            } else {
+                root = XmlExternalInstance.parse(instanceId, path);
+            }
+            return root;
         }
-        return root;
     }
 
     public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
@@ -54,6 +65,17 @@ public class ExternalInstanceParser {
         fileInstanceParsers = Stream.concat(
             Stream.of(fileInstanceParser),
             fileInstanceParsers.stream()
+        ).collect(Collectors.toList());
+    }
+
+    /**
+     * Adds {@link InstanceProvider} before others. The last added {@link InstanceProvider} will be checked
+     * (via {@link InstanceProvider#isSupported(String, String)}) first.
+     */
+    public void addInstanceProvider(InstanceProvider instanceProvider) {
+        instanceProviders = Stream.concat(
+            Stream.of(instanceProvider),
+            instanceProviders.stream()
         ).collect(Collectors.toList());
     }
 
@@ -75,6 +97,16 @@ public class ExternalInstanceParser {
             return parse(instanceId, path);
         }
 
-        boolean isSupported(String instanceId, String instanceSrc);
+        boolean isSupported(@NotNull String instanceId, @NotNull String instanceSrc);
+    }
+
+    public interface InstanceProvider {
+        TreeElement get(@NotNull String instanceId, @NotNull String path) throws IOException;
+
+        default TreeElement get(@NotNull String instanceId, @NotNull String path, boolean partial) throws IOException {
+            return get(instanceId, path);
+        }
+
+        boolean isSupported(@NotNull String instanceId, @NotNull String instanceSrc);
     }
 }

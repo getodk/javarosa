@@ -264,7 +264,7 @@ public class InstancePluginTest {
         }
 
         @Override
-        public boolean isSupported(String instanceId, String instanceSrc) {
+        public boolean isSupported(@NotNull String instanceId, @NotNull String instanceSrc) {
             return instanceSrc.endsWith(".fake");
         }
     }
