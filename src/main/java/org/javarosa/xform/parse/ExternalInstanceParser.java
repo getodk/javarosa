@@ -101,10 +101,10 @@ public class ExternalInstanceParser {
     }
 
     public interface InstanceProvider {
-        TreeElement get(@NotNull String instanceId, @NotNull String path) throws IOException;
+        TreeElement get(@NotNull String instanceId, @NotNull String instanceSrc) throws IOException;
 
-        default TreeElement get(@NotNull String instanceId, @NotNull String path, boolean partial) throws IOException {
-            return get(instanceId, path);
+        default TreeElement get(@NotNull String instanceId, @NotNull String instanceSrc, boolean partial) throws IOException {
+            return get(instanceId, instanceSrc);
         }
 
         boolean isSupported(@NotNull String instanceId, @NotNull String instanceSrc);
