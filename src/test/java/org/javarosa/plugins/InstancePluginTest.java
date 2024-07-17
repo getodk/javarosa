@@ -50,7 +50,61 @@ public class InstancePluginTest {
     }
 
     @Test
-    public void supportsPartialElements() throws IOException, XFormParser.ParseException {
+    public void instanceProvider_supportsPartialElements() throws IOException, XFormParser.ParseException {
+        externalInstanceParserFactory.setInstanceProvider(new FakeFileInstanceParser(asList(
+            new Pair<>("0", "Item 0"),
+            new Pair<>("1", "Item 1")
+        ), true));
+
+        File tempFile = TempFileUtils.createTempFile("fake-instance", "fake");
+        setUpSimpleReferenceManager(tempFile, "file-csv", "file");
+
+        Scenario scenario = Scenario.init("Fake instance form", html(
+                head(
+                    title("Fake instance form"),
+                    model(
+                        mainInstance(
+                            t("data id=\"fake-instance-form\"",
+                                t("question")
+                            )
+                        ),
+                        t("instance id=\"fake-instance\" src=\"jr://file-csv/fake-instance.fake\""),
+                        bind("/data/question").type("string")
+                    )
+                ),
+                body(
+                    select1Dynamic("/data/question", "instance('fake-instance')/root/item")
+                )
+            )
+        );
+
+        HashMap<String, DataInstance> instances = scenario.getFormDef().getFormInstances();
+        DataInstance fakeInstance = instances.get("fake-instance");
+        assertThat(fakeInstance.getRoot().getNumChildren(), equalTo(2));
+
+        TreeElement firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
+        assertThat(firstItem.isPartial(), equalTo(true));
+        assertThat(firstItem.getNumChildren(), equalTo(2));
+        assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
+        assertThat(firstItem.getChildAt(0).getValue(), equalTo(null));
+        assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
+        assertThat(firstItem.getChildAt(1).getValue(), equalTo(null));
+
+        List<SelectChoice> selectChoices = scenario.choicesOf("/data/question");
+        assertThat(selectChoices.size(), equalTo(2));
+
+        assertThat(selectChoices.get(0).getValue(), equalTo("0"));
+        firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
+        assertThat(firstItem.isPartial(), equalTo(false));
+        assertThat(firstItem.getNumChildren(), equalTo(2));
+        assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
+        assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
+        assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
+        assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
+    }
+
+    @Test
+    public void fileInstanceParser_supportsPartialElements() throws IOException, XFormParser.ParseException {
         externalInstanceParserFactory.setFileInstanceParser(new FakeFileInstanceParser(asList(
             new Pair<>("0", "Item 0"),
             new Pair<>("1", "Item 1")
@@ -211,20 +265,33 @@ public class InstancePluginTest {
 
     private static class SwitchableExternalInstanceParserFactory implements ExternalInstanceParserFactory {
         private ExternalInstanceParser.FileInstanceParser fileInstanceParser;
+        private ExternalInstanceParser.InstanceProvider instanceProvider;
 
         @Override
         public ExternalInstanceParser getExternalInstanceParser() {
             ExternalInstanceParser externalInstanceParser = new ExternalInstanceParser();
-            externalInstanceParser.addFileInstanceParser(fileInstanceParser);
+
+            if (fileInstanceParser != null) {
+                externalInstanceParser.addFileInstanceParser(fileInstanceParser);
+            }
+
+            if (instanceProvider != null) {
+                externalInstanceParser.addInstanceProvider(instanceProvider);
+            }
+
             return externalInstanceParser;
         }
 
         public void setFileInstanceParser(ExternalInstanceParser.FileInstanceParser fileInstanceParser) {
             this.fileInstanceParser = fileInstanceParser;
         }
+
+        public void setInstanceProvider(ExternalInstanceParser.InstanceProvider instanceProvider) {
+            this.instanceProvider = instanceProvider;
+        }
     }
 
-    public static class FakeFileInstanceParser implements ExternalInstanceParser.FileInstanceParser {
+    public static class FakeFileInstanceParser implements ExternalInstanceParser.FileInstanceParser, ExternalInstanceParser.InstanceProvider {
 
         private final List<Pair<String, String>> items;
         private final boolean partialParse;
@@ -241,6 +308,25 @@ public class InstancePluginTest {
 
         @Override
         public TreeElement parse(@NotNull String instanceId, @NotNull String path, boolean partial) throws IOException {
+            return createRoot(partial);
+        }
+
+        @Override
+        public TreeElement get(@NotNull String instanceId, @NotNull String instanceSrc) throws IOException {
+            return get(instanceId, instanceSrc, false);
+        }
+
+        @Override
+        public TreeElement get(@NotNull String instanceId, @NotNull String path, boolean partial) throws IOException {
+            return createRoot(partial);
+        }
+
+        @Override
+        public boolean isSupported(@NotNull String instanceId, @NotNull String instanceSrc) {
+            return instanceSrc.endsWith(".fake");
+        }
+
+        private @NotNull TreeElement createRoot(boolean partial) {
             boolean isPartial = partialParse && partial;
             TreeElement root = new TreeElement("root", 0);
 
@@ -261,11 +347,6 @@ public class InstancePluginTest {
             }
 
             return root;
-        }
-
-        @Override
-        public boolean isSupported(String instanceId, String instanceSrc) {
-            return instanceSrc.endsWith(".fake");
         }
     }
 }
