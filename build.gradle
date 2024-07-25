@@ -53,18 +53,6 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 if (!project.hasProperty("android")) {
-    jar {
-        // Be sure to update version in pom.xml to match
-        // snapshot release = x.x.x-SNAPSHOT
-        // production release = x.x.x
-        archiveVersion = '5.5.0-SNAPSHOT'
-        archiveBaseName = "javarosa"
-
-        manifest {
-            attributes 'Manifest-Version': "$jar.archiveVersion"
-        }
-    }
-
     // TODO: does not build UML diagrams
     javadoc {
         failOnError = false
