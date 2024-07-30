@@ -24,24 +24,25 @@ public class CsvExternalInstance implements ExternalInstanceParser.FileInstanceP
             .withDelimiter(getDelimiter(path))
             .withFirstRecordAsHeader();
         Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(path)));
-        final CSVParser csvParser = new CSVParser(reader, csvFormat);
-        final String[] fieldNames = csvParser.getHeaderMap().keySet().toArray(new String[0]);
-        int multiplicity = 0;
+        try (final CSVParser csvParser = new CSVParser(reader, csvFormat)) {
+            final String[] fieldNames = csvParser.getHeaderMap().keySet().toArray(new String[0]);
+            int multiplicity = 0;
 
-        for (CSVRecord csvRecord : csvParser.getRecords()) {
-            TreeElement item = new TreeElement("item", multiplicity);
+            for (CSVRecord csvRecord : csvParser) {
+                TreeElement item = new TreeElement("item", multiplicity);
 
-            for (int i = 0; i < fieldNames.length; ++i) {
-                TreeElement field = new TreeElement(fieldNames[i], 0);
-                field.setValue(new UncastData(i < csvRecord.size() ? csvRecord.get(i) : ""));
-                item.addChild(field);
+                for (int i = 0; i < fieldNames.length; ++i) {
+                    TreeElement field = new TreeElement(fieldNames[i], 0);
+                    field.setValue(new UncastData(i < csvRecord.size() ? csvRecord.get(i) : ""));
+                    item.addChild(field);
+                }
+
+                root.addChild(item);
+                multiplicity++;
             }
 
-            root.addChild(item);
-            multiplicity++;
+            return root;
         }
-
-        return root;
     }
 
     @Override
