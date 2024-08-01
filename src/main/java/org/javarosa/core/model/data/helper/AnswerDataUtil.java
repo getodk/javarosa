@@ -15,6 +15,13 @@ public class AnswerDataUtil {
             return (int) Math.floor((Double) count);
         } else if (count instanceof Long) {
             return (int) ((Long) count).longValue();
+        } else if (count instanceof String) {
+            try {
+                double value = Double.parseDouble((String) count);
+                return (int) Math.floor(value);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         } else {
             return 0;
         }
