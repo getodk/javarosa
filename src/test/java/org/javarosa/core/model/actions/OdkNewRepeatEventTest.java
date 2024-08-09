@@ -98,7 +98,7 @@ public class OdkNewRepeatEventTest {
         while (!scenario.atTheEndOfForm()) {
             scenario.next();
         }
-        assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(0));
+        assertThat(scenario.countRepeatInstancesOf("/data/my-jr-count-repeat"), is(1));
 
         // Decimal
         scenario.jumpToBeginningOfForm();
