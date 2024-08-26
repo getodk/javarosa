@@ -1,8 +1,12 @@
 package org.javarosa.xpath.expr;
 
+import org.javarosa.test.Scenario;
+import org.javarosa.xpath.XPathTypeMismatchException;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
@@ -16,10 +20,6 @@ import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
-
-import org.javarosa.test.Scenario;
-import org.javarosa.xpath.XPathTypeMismatchException;
-import org.junit.Test;
 
 public class IndexedRepeatTest {
     @Test
@@ -35,7 +35,7 @@ public class IndexedRepeatTest {
                                 t("inside")),
                             t("calc")
                         )),
-                        bind("calc").calculate("indexed-repeat(/data/outside, /data/repeat, 1)")
+                        bind("/data/calc").calculate("indexed-repeat(/data/outside, /data/repeat, 1)")
                     )
                 ),
                 body(
@@ -113,7 +113,7 @@ public class IndexedRepeatTest {
                     input("/data/repeat1/inside1")),
 
                 repeat("/data/repeat2",
-                    input("/data/repeat2"))
+                    input("/data/repeat2/inside2"))
             ))
         );
 
