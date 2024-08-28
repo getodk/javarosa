@@ -143,7 +143,8 @@ public class SelectChoice implements Externalizable, Localizable {
         for (int i = 0; i < item.getNumChildren(); i++) {
             TreeElement child = item.getChildAt(i);
             if (!child.getRef().getNameLast().equals(labelRefName)) {
-                children.add(new Pair<>(child.getName(), child.getValue().getDisplayText()));
+                IAnswerData childValue = child.getValue();
+                children.add(new Pair<>(child.getName(), childValue != null ? childValue.getDisplayText() : ""));
             }
         }
         return children;

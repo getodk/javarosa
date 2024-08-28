@@ -16,14 +16,26 @@
 
 package org.javarosa.core.model;
 
+import kotlin.Pair;
+import org.hamcrest.CoreMatchers;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
@@ -38,16 +50,6 @@ import static org.javarosa.test.XFormsElement.select1;
 import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.test.ResourcePathHelper.r;
-
-import java.io.IOException;
-import java.util.List;
-import kotlin.Pair;
-import org.hamcrest.CoreMatchers;
-import org.javarosa.test.Scenario;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
 
 public class SelectChoiceTest {
     @Test
@@ -115,7 +117,7 @@ public class SelectChoiceTest {
                     ))),
             body(
                 select1Dynamic("/data/select", "instance('choices')/root/item", "name", "label"))
-            ));
+        ));
 
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("property"), is(""));
     }
@@ -240,5 +242,36 @@ public class SelectChoiceTest {
             )));
 
         assertThat(scenario.choicesOf("/data/select").get(0).getAdditionalChildren(), is(empty()));
+    }
+
+    @Test
+    public void getAdditionalChildren_returnsEmptyStringValue_forEmptyChildren() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Internal instance select", html(
+            head(
+                title("Internal instance select"),
+                model(
+                    mainInstance(
+                        t("data id='static-select'",
+                            t("select")
+                        )
+                    ),
+                    instance("instance",
+                        t("item",
+                            t("label", "label"),
+                            t("value", "value"),
+                            t("child")
+                        )
+                    )
+                )
+            ),
+            body(
+                select1Dynamic("/data/select", "instance('instance')/root/item")
+            ))
+        );
+
+        assertThat(
+            scenario.choicesOf("/data/select").get(0).getAdditionalChildren(),
+            is(contains(new Pair<>("value", "value"), new Pair<>("child", "")))
+        );
     }
 }
