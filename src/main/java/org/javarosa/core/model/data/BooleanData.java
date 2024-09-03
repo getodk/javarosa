@@ -64,7 +64,7 @@ public class BooleanData implements IAnswerData {
 
 
     @Override
-    public void setValue(Object o) {
+    public void setValue(@NotNull Object o) {
         data = (Boolean) o;
     }
 

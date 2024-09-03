@@ -17,6 +17,7 @@
 package org.javarosa.core.model.data;
 
 import org.javarosa.core.model.data.helper.Selection;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class SelectMultiData extends MultipleItemsData {
 
     }
 
-    public SelectMultiData(List<Selection> vs) {
+    public SelectMultiData(@NotNull List<Selection> vs) {
         setValue(vs);
     }
 }

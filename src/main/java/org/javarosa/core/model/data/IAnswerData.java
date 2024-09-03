@@ -125,7 +125,7 @@ public interface IAnswerData extends Externalizable {
      * Null Data will not overwrite existing values.
      * @throws NullPointerException if o is null
      */
-    void setValue (Object o); //can't be null
+    void setValue (@NotNull Object o); //can't be null
     /**
      * @return The value of this answer, will never
      * be null
