@@ -44,7 +44,7 @@ public class LongData implements IAnswerData {
     public LongData(long n) {
         this.n = n;
     }
-    public LongData(Long n) {
+    public LongData(@NotNull Long n) {
         setValue(n);
     }
 
@@ -64,7 +64,7 @@ public class LongData implements IAnswerData {
     }
 
     @Override
-    public void setValue(Object o) {
+    public void setValue(@NotNull Object o) {
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }

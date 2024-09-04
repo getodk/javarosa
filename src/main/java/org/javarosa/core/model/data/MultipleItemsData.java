@@ -49,7 +49,7 @@ public class MultipleItemsData implements IAnswerData {
 
     }
 
-    public MultipleItemsData(List<Selection> vs) {
+    public MultipleItemsData(@NotNull List<Selection> vs) {
         setValue(vs);
     }
 
@@ -63,7 +63,7 @@ public class MultipleItemsData implements IAnswerData {
     }
 
     @Override
-    public void setValue (Object o) {
+    public void setValue (@NotNull Object o) {
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }

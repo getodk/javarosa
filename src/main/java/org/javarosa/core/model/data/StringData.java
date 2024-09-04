@@ -41,7 +41,7 @@ public class StringData implements IAnswerData {
 
     }
 
-    public StringData (String s) {
+    public StringData (@NotNull String s) {
         setValue(s);
     }
 
@@ -51,7 +51,7 @@ public class StringData implements IAnswerData {
     }
 
     @Override
-    public void setValue (Object o) {
+    public void setValue (@NotNull Object o) {
         //string should not be null or empty; the entire StringData reference should be null in this case
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");

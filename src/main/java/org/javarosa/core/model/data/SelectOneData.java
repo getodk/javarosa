@@ -45,7 +45,7 @@ public class SelectOneData implements IAnswerData {
 
     }
 
-    public SelectOneData (Selection s) {
+    public SelectOneData (@NotNull Selection s) {
         setValue(s);
     }
 
@@ -55,7 +55,7 @@ public class SelectOneData implements IAnswerData {
     }
 
     @Override
-    public void setValue (Object o) {
+    public void setValue (@NotNull Object o) {
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }

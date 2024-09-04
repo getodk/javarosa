@@ -120,7 +120,7 @@ public class GeoTraceData implements IAnswerData, IExprDataType {
 
 
     @Override
-    public void setValue(Object o) {
+    public void setValue(@NotNull Object o) {
         if (o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }

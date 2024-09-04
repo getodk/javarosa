@@ -61,7 +61,7 @@ public class DateData implements IAnswerData {
     }
 
     @Override
-    public void setValue (Object o) {
+    public void setValue (@NotNull Object o) {
         //Should not ever be possible to set this to a null value
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
