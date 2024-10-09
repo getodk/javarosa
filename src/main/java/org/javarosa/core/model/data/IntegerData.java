@@ -45,9 +45,6 @@ public class IntegerData implements IAnswerData {
     public IntegerData(int n) {
         this.n = n;
     }
-    public IntegerData(@NotNull Integer n) {
-        setValue(n);
-    }
 
     @Override
     public IAnswerData clone () {
