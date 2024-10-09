@@ -44,9 +44,6 @@ public class LongData implements IAnswerData {
     public LongData(long n) {
         this.n = n;
     }
-    public LongData(@NotNull Long n) {
-        setValue(n);
-    }
 
     @Override
     public IAnswerData clone () {
