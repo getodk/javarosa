@@ -45,9 +45,6 @@ public class DecimalData implements IAnswerData {
     public DecimalData(double d) {
         this.d = d;
     }
-    public DecimalData(@NotNull Double d) {
-        setValue(d);
-    }
 
     @Override
     public IAnswerData clone () {
