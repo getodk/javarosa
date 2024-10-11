@@ -6,9 +6,8 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.test.FormParseInit;
-import org.javarosa.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.Test;
@@ -20,10 +19,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
@@ -32,7 +31,6 @@ import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
 import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
 import static org.javarosa.xform.parse.FormParserHelper.parse;
@@ -182,33 +180,6 @@ public class ExternalSecondaryInstanceParseTest {
         FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
         assertTrue(deserializedFormDef.getFormInstances().containsKey("external-xml"));
     }
-
-    //region ODK Collect database-driven external file features
-    // ODK Collect has CSV-parsing features that bypass XPath and use databases. This test verifies that if a
-    // secondary instance is declared but not referenced in an instance() call, it is ignored by JavaRosa.
-    @Test
-    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced() throws XFormParser.ParseException {
-        configureReferenceManagerCorrectly();
-
-        FormParseInit fpi = new FormParseInit(r("unused-secondary-instance.xml"));
-        FormDef formDef = fpi.getFormDef();
-
-        assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
-    }
-
-    @Test
-    public void externalInstanceDeclaration_ShouldBeIgnored_WhenNotReferenced_AfterParsingFormWithReference() throws XFormParser.ParseException {
-        configureReferenceManagerCorrectly();
-
-        FormParseInit fpi = new FormParseInit(r("external-select-csv.xml"));
-        FormDef formDef = fpi.getFormDef();
-        assertThat(formDef.getNonMainInstance("external-csv").getRoot().hasChildren(), is(true));
-
-        fpi = new FormParseInit(r("unused-secondary-instance.xml"));
-        formDef = fpi.getFormDef();
-        assertThat(formDef.getNonMainInstance("external-csv"), nullValue());
-    }
-    //endregion
 
     // See https://github.com/getodk/javarosa/issues/451
     @Test

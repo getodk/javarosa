@@ -16,18 +16,6 @@
 
 package org.javarosa.xpath.expr;
 
-import static java.lang.Double.NaN;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -48,7 +36,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathArityException;
 import org.javarosa.xpath.XPathNodeset;
@@ -56,6 +43,19 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static java.lang.Double.NaN;
 
 /**
  * Representation of an xpath function expression.
@@ -77,10 +77,6 @@ public class XPathFuncExpr extends XPathExpression {
     public XPathFuncExpr(XPathQName id, XPathExpression[] args) {
         this.id = id;
         this.args = args;
-
-        if (id.name.equals("instance") && args[0] instanceof XPathStringLiteral) {
-            XFormParser.recordInstanceFunctionCall(((XPathStringLiteral) args[0]).s);
-        }
     }
 
     public XPathFuncExpr(XPathQName id) {
