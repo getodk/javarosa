@@ -2,6 +2,7 @@ package org.javarosa.core.model;
 
 import static org.javarosa.core.model.FormDef.getAbsRef;
 import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toLongHash;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 import java.io.DataInputStream;
@@ -36,6 +37,7 @@ import org.javarosa.debug.Event;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
+import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 
@@ -309,10 +311,21 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     private Long resolveRandomSeed(DataInstance model, EvaluationContext ec) {
+        XPathNodeset seedNode = null;
         if (randomSeedNumericExpr != null)
             return ((Double) randomSeedNumericExpr.eval(model, ec)).longValue();
-        if (randomSeedPathExpr != null)
-            return toNumeric(randomSeedPathExpr.eval(model, ec)).longValue();
+        if (randomSeedPathExpr != null) {
+            seedNode = randomSeedPathExpr.eval(model, ec);
+            Double asDouble = toNumeric(seedNode);
+            if (asDouble == Double.NaN) {
+                // Reasonable attempts at reading the node's value as a number failed.
+                // Fall back to deriving the seed from it using hashing.
+                // See https://github.com/getodk/javarosa/issues/800
+                return toLongHash(seedNode);
+            } else {
+                return asDouble.longValue();
+            }
+        }
         return null;
     }
 
