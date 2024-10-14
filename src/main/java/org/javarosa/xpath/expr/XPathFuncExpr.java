@@ -22,6 +22,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
@@ -56,6 +58,7 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 
 /**
  * Representation of an xpath function expression.
@@ -697,6 +700,26 @@ public class XPathFuncExpr extends XPathExpression {
             return toNumeric(o);
         }
 
+    }
+
+    /**
+     * convert a string value to an integer by:
+     * - encoding it as utf-8
+     * - hashing it with sha256 (available cross-platform, including via browser crypto API)
+     * - interpreting the first 8 bytes of the hash as a long
+     */
+    public static long toLongHash(String sourceString) {
+        byte[] hasheeBuf = sourceString.getBytes(Charset.forName("UTF-8"));
+        SHA256Digest hasher = new SHA256Digest();
+        hasher.update(hasheeBuf, 0, hasheeBuf.length);
+        byte[] digestBuf = new byte[32];
+        hasher.doFinal(digestBuf, 0);
+        return (ByteBuffer.wrap(digestBuf)).getLong(0);
+    }
+
+    public static long toLongHash(Object o) {
+        String sourceString = (String) unpack(o);
+        return toLongHash(sourceString);
     }
 
     /**
