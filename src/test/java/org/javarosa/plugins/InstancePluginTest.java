@@ -331,17 +331,18 @@ public class InstancePluginTest {
             TreeElement root = new TreeElement("root", 0);
 
             for (int i = 0; i < items.size(); i++) {
-                TreeElement value = new TreeElement("value");
-                TreeElement label = new TreeElement("label");
+                TreeElement item = new TreeElement("item", i, isPartial);
 
-                if (!isPartial) {
+                if (!isPartial || i == 0) {
+                    TreeElement value = new TreeElement("value");
+                    TreeElement label = new TreeElement("label");
+
                     value.setValue(new StringData(items.get(i).getFirst()));
                     label.setValue(new StringData(items.get(i).getSecond()));
-                }
 
-                TreeElement item = new TreeElement("item", i, isPartial);
-                item.addChild(value);
-                item.addChild(label);
+                    item.addChild(value);
+                    item.addChild(label);
+                }
 
                 root.addChild(item);
             }
