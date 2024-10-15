@@ -86,14 +86,21 @@ public class InstancePluginTest {
         assertThat(firstItem.isPartial(), equalTo(true));
         assertThat(firstItem.getNumChildren(), equalTo(2));
         assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
-        assertThat(firstItem.getChildAt(0).getValue(), equalTo(null));
+        assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
         assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
-        assertThat(firstItem.getChildAt(1).getValue(), equalTo(null));
+        assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
+
+        TreeElement secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(true));
+        assertThat(secondItem.getNumChildren(), equalTo(0));
 
         List<SelectChoice> selectChoices = scenario.choicesOf("/data/question");
         assertThat(selectChoices.size(), equalTo(2));
-
+        assertThat(selectChoices.get(0).getLabelInnerText(), equalTo("Item 0"));
         assertThat(selectChoices.get(0).getValue(), equalTo("0"));
+        assertThat(selectChoices.get(1).getLabelInnerText(), equalTo("Item 1"));
+        assertThat(selectChoices.get(1).getValue(), equalTo("1"));
+
         firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
         assertThat(firstItem.isPartial(), equalTo(false));
         assertThat(firstItem.getNumChildren(), equalTo(2));
@@ -101,6 +108,14 @@ public class InstancePluginTest {
         assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
         assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
         assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
+
+        secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(false));
+        assertThat(secondItem.getNumChildren(), equalTo(2));
+        assertThat(secondItem.getChildAt(0).getName(), equalTo("value"));
+        assertThat(secondItem.getChildAt(0).getValue(), equalTo(new StringData("1")));
+        assertThat(secondItem.getChildAt(1).getName(), equalTo("label"));
+        assertThat(secondItem.getChildAt(1).getValue(), equalTo(new StringData("Item 1")));
     }
 
     @Test
@@ -140,14 +155,21 @@ public class InstancePluginTest {
         assertThat(firstItem.isPartial(), equalTo(true));
         assertThat(firstItem.getNumChildren(), equalTo(2));
         assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
-        assertThat(firstItem.getChildAt(0).getValue(), equalTo(null));
+        assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
         assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
-        assertThat(firstItem.getChildAt(1).getValue(), equalTo(null));
+        assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
+
+        TreeElement secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(true));
+        assertThat(secondItem.getNumChildren(), equalTo(0));
 
         List<SelectChoice> selectChoices = scenario.choicesOf("/data/question");
         assertThat(selectChoices.size(), equalTo(2));
-
+        assertThat(selectChoices.get(0).getLabelInnerText(), equalTo("Item 0"));
         assertThat(selectChoices.get(0).getValue(), equalTo("0"));
+        assertThat(selectChoices.get(1).getLabelInnerText(), equalTo("Item 1"));
+        assertThat(selectChoices.get(1).getValue(), equalTo("1"));
+
         firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
         assertThat(firstItem.isPartial(), equalTo(false));
         assertThat(firstItem.getNumChildren(), equalTo(2));
@@ -155,6 +177,14 @@ public class InstancePluginTest {
         assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
         assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
         assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
+
+        secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(false));
+        assertThat(secondItem.getNumChildren(), equalTo(2));
+        assertThat(secondItem.getChildAt(0).getName(), equalTo("value"));
+        assertThat(secondItem.getChildAt(0).getValue(), equalTo(new StringData("1")));
+        assertThat(secondItem.getChildAt(1).getName(), equalTo("label"));
+        assertThat(secondItem.getChildAt(1).getValue(), equalTo(new StringData("Item 1")));
     }
 
     @Test
@@ -189,29 +219,26 @@ public class InstancePluginTest {
         HashMap<String, DataInstance> instances = scenario.getFormDef().getFormInstances();
         DataInstance fakeInstance = instances.get("fake-instance");
 
-        TreeElement item = new TreeElement("item", 0);
+        TreeElement secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(true));
+        assertThat(secondItem.getNumChildren(), equalTo(0));
+
+        TreeElement item = new TreeElement("item", 1);
         TreeElement value = new TreeElement("value");
         TreeElement label = new TreeElement("label");
-        value.setValue(new StringData("0"));
-        label.setValue(new StringData("Item 0"));
+        value.setValue(new StringData("1"));
+        label.setValue(new StringData("Item 1"));
         item.addChild(value);
         item.addChild(label);
         fakeInstance.replacePartialElements(asList(item));
 
-        TreeElement firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
-        assertThat(firstItem.isPartial(), equalTo(false));
-        assertThat(firstItem.getNumChildren(), equalTo(2));
-        assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
-        assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
-        assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
-        assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
-        TreeElement secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
-        assertThat(secondItem.isPartial(), equalTo(true));
+        secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(false));
         assertThat(secondItem.getNumChildren(), equalTo(2));
         assertThat(secondItem.getChildAt(0).getName(), equalTo("value"));
-        assertThat(secondItem.getChildAt(0).getValue(), equalTo(null));
+        assertThat(secondItem.getChildAt(0).getValue(), equalTo(new StringData("1")));
         assertThat(secondItem.getChildAt(1).getName(), equalTo("label"));
-        assertThat(secondItem.getChildAt(1).getValue(), equalTo(null));
+        assertThat(secondItem.getChildAt(1).getValue(), equalTo(new StringData("Item 1")));
     }
 
     @Test
