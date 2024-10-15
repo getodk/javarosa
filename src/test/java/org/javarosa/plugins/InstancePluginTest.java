@@ -290,6 +290,71 @@ public class InstancePluginTest {
         assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
     }
 
+    @Test
+    public void replacingTheFirstPartialElement_doesNotBlockSupportingRestPartialElements() throws IOException, XFormParser.ParseException {
+        externalInstanceParserFactory.setFileInstanceParser(new FakeFileInstanceParser(asList(
+            new Pair<>("0", "Item 0"),
+            new Pair<>("1", "Item 1")
+        ), true));
+
+        File tempFile = TempFileUtils.createTempFile("fake-instance", "fake");
+        setUpSimpleReferenceManager(tempFile, "file-csv", "file");
+
+        Scenario scenario = Scenario.init("Fake instance form", html(
+                head(
+                    title("Fake instance form"),
+                    model(
+                        mainInstance(
+                            t("data id=\"fake-instance-form\"",
+                                t("question")
+                            )
+                        ),
+                        t("instance id=\"fake-instance\" src=\"jr://file-csv/fake-instance.fake\""),
+                        bind("/data/question").type("string")
+                    )
+                ),
+                body(
+                    select1Dynamic("/data/question", "instance('fake-instance')/root/item")
+                )
+            )
+        );
+
+        HashMap<String, DataInstance> instances = scenario.getFormDef().getFormInstances();
+        DataInstance fakeInstance = instances.get("fake-instance");
+
+        TreeElement item = new TreeElement("item", 0);
+        TreeElement value = new TreeElement("value");
+        TreeElement label = new TreeElement("label");
+        value.setValue(new StringData("0"));
+        label.setValue(new StringData("Item 0"));
+        item.addChild(value);
+        item.addChild(label);
+        fakeInstance.replacePartialElements(asList(item));
+
+        List<SelectChoice> selectChoices = scenario.choicesOf("/data/question");
+        assertThat(selectChoices.size(), equalTo(2));
+        assertThat(selectChoices.get(0).getLabelInnerText(), equalTo("Item 0"));
+        assertThat(selectChoices.get(0).getValue(), equalTo("0"));
+        assertThat(selectChoices.get(1).getLabelInnerText(), equalTo("Item 1"));
+        assertThat(selectChoices.get(1).getValue(), equalTo("1"));
+
+        TreeElement firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
+        assertThat(firstItem.isPartial(), equalTo(false));
+        assertThat(firstItem.getNumChildren(), equalTo(2));
+        assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
+        assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
+        assertThat(firstItem.getChildAt(1).getName(), equalTo("label"));
+        assertThat(firstItem.getChildAt(1).getValue(), equalTo(new StringData("Item 0")));
+
+        TreeElement secondItem = (TreeElement) fakeInstance.getRoot().getChild("item", 1);
+        assertThat(secondItem.isPartial(), equalTo(false));
+        assertThat(secondItem.getNumChildren(), equalTo(2));
+        assertThat(secondItem.getChildAt(0).getName(), equalTo("value"));
+        assertThat(secondItem.getChildAt(0).getValue(), equalTo(new StringData("1")));
+        assertThat(secondItem.getChildAt(1).getName(), equalTo("label"));
+        assertThat(secondItem.getChildAt(1).getValue(), equalTo(new StringData("Item 1")));
+    }
+
     private static class SwitchableExternalInstanceParserFactory implements ExternalInstanceParserFactory {
         private ExternalInstanceParser.FileInstanceParser fileInstanceParser;
         private ExternalInstanceParser.InstanceProvider instanceProvider;
