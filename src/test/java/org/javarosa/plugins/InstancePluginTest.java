@@ -83,7 +83,7 @@ public class InstancePluginTest {
         assertThat(fakeInstance.getRoot().getNumChildren(), equalTo(2));
 
         TreeElement firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
-        assertThat(firstItem.isPartial(), equalTo(true));
+        assertThat(firstItem.isPartial(), equalTo(false));
         assertThat(firstItem.getNumChildren(), equalTo(2));
         assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
         assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
@@ -152,7 +152,7 @@ public class InstancePluginTest {
         assertThat(fakeInstance.getRoot().getNumChildren(), equalTo(2));
 
         TreeElement firstItem = (TreeElement) fakeInstance.getRoot().getChild("item", 0);
-        assertThat(firstItem.isPartial(), equalTo(true));
+        assertThat(firstItem.isPartial(), equalTo(false));
         assertThat(firstItem.getNumChildren(), equalTo(2));
         assertThat(firstItem.getChildAt(0).getName(), equalTo("value"));
         assertThat(firstItem.getChildAt(0).getValue(), equalTo(new StringData("0")));
@@ -419,13 +419,14 @@ public class InstancePluginTest {
         }
 
         private @NotNull TreeElement createRoot(boolean partial) {
-            boolean isPartial = partialParse && partial;
             TreeElement root = new TreeElement("root", 0);
 
             for (int i = 0; i < items.size(); i++) {
+                boolean isPartial = partialParse && partial && i != 0;
+
                 TreeElement item = new TreeElement("item", i, isPartial);
 
-                if (!isPartial || i == 0) {
+                if (!isPartial) {
                     TreeElement value = new TreeElement("value");
                     TreeElement label = new TreeElement("label");
 
