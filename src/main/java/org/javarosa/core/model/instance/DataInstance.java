@@ -81,10 +81,6 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
         AbstractTreeElement<T> node = getBase();
         T result = null;
         for (int i = 0; i < ref.size(); i++) {
-            if (node instanceof TreeElement && ((TreeElement) node).isPartial()) {
-                throw new PartialElementEncounteredException();
-            }
-
             String name = ref.getName(i);
             int mult = ref.getMultiplicity(i);
 
@@ -110,7 +106,13 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
             }
         }
 
-        return (node == getBase() ? null : result); // never return a reference to '/'
+        if (node == getBase() || result == null) {
+            return null; // never return a reference to '/'
+        } else if (((TreeElement) result).isPartial()) {
+            throw new PartialElementEncounteredException();
+        } else {
+            return result;
+        }
     }
 
     public List<AbstractTreeElement<T>> explodeReference(TreeReference ref) {
