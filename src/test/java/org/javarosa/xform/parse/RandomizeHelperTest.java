@@ -15,20 +15,19 @@
  */
 package org.javarosa.xform.parse;
 
-import static java.util.stream.Collectors.toList;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotSame;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.Test;
+
+import static java.util.stream.Collectors.toList;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotSame;
+import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
+import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RandomizeHelperTest {
     @Test
@@ -50,20 +49,6 @@ public class RandomizeHelperTest {
         assertEquals("/some/path[someFilter]",                  cleanNodesetDefinition("randomize(/some/path[someFilter], 33)"));
         assertEquals("/some/path[someFilter(with, commas)]",    cleanNodesetDefinition("randomize(/some/path[someFilter(with, commas)])"));
         assertEquals("/some/path[someFilter(with, commas)]",    cleanNodesetDefinition("randomize(/some/path[someFilter(with, commas)], 33)"));
-    }
-
-    @Test
-    public void cleans_the_seed_definition() {
-        // We will try different combinations of whitespace and seed presence around the path
-        assertNull(cleanSeedDefinition("randomize(/some/path)"));
-        assertEquals("33",               cleanSeedDefinition("randomize(/some/path,33)"));
-        assertEquals("33",               cleanSeedDefinition("randomize(/some/path,33 )"));
-        assertEquals("33",               cleanSeedDefinition("randomize(/some/path, 33)"));
-        assertEquals("33",               cleanSeedDefinition("randomize(/some/path, 33 )"));
-        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path,/some/other/path)"));
-        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path,/some/other/path) "));
-        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path, /some/other/path)"));
-        assertEquals("/some/other/path", cleanSeedDefinition("randomize(/some/path, /some/other/path) "));
     }
 
     @Test(expected = IllegalArgumentException.class)

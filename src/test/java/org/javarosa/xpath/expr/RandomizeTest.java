@@ -29,7 +29,6 @@ import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.test.FormParseInit;
 import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
-import org.javarosa.xpath.XPathTypeMismatchException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,7 +64,6 @@ import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class RandomizeTest {
 
@@ -177,41 +175,33 @@ public class RandomizeTest {
         assertTrue(nodesEqualInOrder(choices2a, choices2c));
     }
 
-    // The current implementation for randomize for an ItemsetBinding requires a literal numeric value and does not
-    // attempt to convert
+    //region Type coercion
     @Test
-    public void throwsWhenSeedForItemsetExpressionNotNumeric() throws IOException, XFormParser.ParseException {
-        try {
-            Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
-                head(
-                    title("Randomize non-numeric seed"),
-                    model(
-                        mainInstance(t("data id=\"rand-non-numeric\"",
-                            t("choice")
-                        )),
-                        instance("choices",
-                            item("a", "A"),
-                            item("b", "B")
-                        ),
-                        bind("/data/choice").type("string")
-                    )
-                ),
-                body(
-                    select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, '0')")
+    public void stringNumberSeedConvertsToIntWhenUsedInNodesetExpression() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
+            head(
+                title("Randomize non-numeric seed"),
+                model(
+                    mainInstance(t("data id=\"rand-non-numeric\"",
+                        t("choice")
+                    )),
+                    instance("choices",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string")
                 )
-            ));
+            ),
+            body(
+                select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, '1')")
+            )
+        ));
 
-            System.out.println(scenario.choicesOf("/data/choice"));
-            fail("Expecting XPathTypeMismatchException");
-        } catch (XPathTypeMismatchException e) {
-            // Expected
-        }
+        assertThat(scenario.choicesOf("/data/choice").get(0).getValue(), is("b"));
     }
 
-    // When a randomize expression is used in a context other than in an itemset binding, the seed value is converted to
-    // numeric
     @Test
-    public void nonNumericSeedConvertsToIntWhenUsedInExpression() throws IOException, XFormParser.ParseException {
+    public void stringNumberSeedConvertsToIntWhenUsedInExpression() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
             head(
                 title("Randomize non-numeric seed"),
@@ -233,6 +223,7 @@ public class RandomizeTest {
 
         assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("B"));
     }
+    // endregion
 
     private FormDef serializeAndDeserializeForm(FormDef formDef) throws IOException, DeserializationException {
         // Initialize serialization

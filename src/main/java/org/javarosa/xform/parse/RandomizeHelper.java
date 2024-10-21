@@ -41,22 +41,6 @@ public final class RandomizeHelper {
     }
 
     /**
-     * Cleans an xform randomize() expression to leave only its second argument, if it exists, which
-     * should be a number or an xpath expression, or null if there's no second argument present
-     * <p>
-     * Can throw an {@link IllegalArgumentException} if the expression doesn't conform
-     * to an xform randomize() call.
-     *
-     * @param nodesetStr an xform randomize() expression
-     * @return a {@link String} with the second argument of the xform randomize() expression, or
-     *         null, if there's no second argument present
-     */
-    static String cleanSeedDefinition(String nodesetStr) {
-        String[] args = getArgs(nodesetStr);
-        return args.length > 1 ? args[1].trim() : null;
-    }
-
-    /**
      * This method will return a new list with the same elements, randomly reordered.
      * Every call to this method will produce a different random seed, which will
      * potentially produce a different ordering each time.

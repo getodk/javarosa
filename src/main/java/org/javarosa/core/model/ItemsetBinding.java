@@ -1,19 +1,5 @@
 package org.javarosa.core.model;
 
-import static org.javarosa.core.model.FormDef.getAbsRef;
-import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toLongHash;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
@@ -37,9 +23,23 @@ import org.javarosa.debug.Event;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathException;
-import org.javarosa.xpath.XPathNodeset;
-import org.javarosa.xpath.expr.XPathNumericLiteral;
+import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathPathExpr;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static org.javarosa.core.model.FormDef.getAbsRef;
+import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toLongHash;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 public class ItemsetBinding implements Externalizable, Localizable {
     // Temporarily cached filtered list (not serialized)
@@ -71,8 +71,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
     //not serialized -- set by QuestionDef.setDynamicChoices()
 
     public boolean randomize = false;
-    public XPathNumericLiteral randomSeedNumericExpr = null;
-    public XPathPathExpr randomSeedPathExpr = null;
+    public XPathExpression randomSeedExpr = null;
 
     /**
      * @deprecated No tests and no evidence it's used.
@@ -311,22 +310,20 @@ public class ItemsetBinding implements Externalizable, Localizable {
     }
 
     private Long resolveRandomSeed(DataInstance model, EvaluationContext ec) {
-        XPathNodeset seedNode = null;
-        if (randomSeedNumericExpr != null)
-            return ((Double) randomSeedNumericExpr.eval(model, ec)).longValue();
-        if (randomSeedPathExpr != null) {
-            seedNode = randomSeedPathExpr.eval(model, ec);
-            Double asDouble = toNumeric(seedNode);
-            if (asDouble == Double.NaN) {
+        if (randomSeedExpr != null) {
+            Object seed = randomSeedExpr.eval(model, ec);
+            Double asDouble = toNumeric(seed);
+            if (Double.isNaN(asDouble)) {
                 // Reasonable attempts at reading the node's value as a number failed.
                 // Fall back to deriving the seed from it using hashing.
                 // See https://github.com/getodk/javarosa/issues/800
-                return toLongHash(seedNode);
+                return toLongHash(seed);
             } else {
                 return asDouble.longValue();
             }
+        } else {
+            return null;
         }
-        return null;
     }
 
     public void localeChanged(String locale, Localizer localizer) {
@@ -392,8 +389,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
         labelIsItext = ExtUtil.readBool(in);
         copyMode = ExtUtil.readBool(in);
         randomize = ExtUtil.readBool(in);
-        randomSeedNumericExpr = (XPathNumericLiteral) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
-        randomSeedPathExpr = (XPathPathExpr) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
+        randomSeedExpr = (XPathExpression) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
@@ -405,7 +401,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         ExtUtil.writeBool(out, labelIsItext);
         ExtUtil.writeBool(out, copyMode);
         ExtUtil.writeBool(out, randomize);
-        ExtUtil.write(out, new ExtWrapNullable(randomSeedNumericExpr == null ? null : new ExtWrapTagged(randomSeedNumericExpr)));
-        ExtUtil.write(out, new ExtWrapNullable(randomSeedPathExpr == null ? null : new ExtWrapTagged(randomSeedPathExpr)));
+        ExtUtil.write(out, new ExtWrapNullable(randomSeedExpr == null ? null : new ExtWrapTagged(randomSeedExpr)));
     }
 }
