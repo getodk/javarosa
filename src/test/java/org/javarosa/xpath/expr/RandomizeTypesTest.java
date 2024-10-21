@@ -17,6 +17,7 @@ import static org.javarosa.test.XFormsElement.instance;
 import static org.javarosa.test.XFormsElement.item;
 import static org.javarosa.test.XFormsElement.mainInstance;
 import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
@@ -116,5 +117,42 @@ public class RandomizeTypesTest {
         ));
 
         assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("B"));
+    }
+
+    @Test
+    public void seedInRepeatIsEvaluatedForEachInstance() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
+            head(
+                title("Randomize non-numeric seed"),
+                model(
+                    mainInstance(t("data id=\"rand-non-numeric\"",
+                        t("repeat",
+                            t("input"),
+                            t("choice")
+                        )
+                    )),
+                    instance("choices",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/input").type("string"),
+                    bind("/data/choice").type("string")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/input"),
+                    select1Dynamic("/data/repeat/choice", "randomize(instance('choices')/root/item, 1 * ../input)")
+                )
+            )
+        ));
+
+        scenario.answer("/data/repeat[1]/input", 0);
+        assertThat(scenario.choicesOf("/data/repeat[1]/choice").get(0).getValue(), is("a"));
+
+        scenario.createNewRepeat("/data/repeat");
+        scenario.answer("/data/repeat[2]/input", 1);
+        assertThat(scenario.choicesOf("/data/repeat[2]/choice").get(0).getValue(), is("b"));
+        assertThat(scenario.choicesOf("/data/repeat[1]/choice").get(0).getValue(), is("a"));
     }
 }

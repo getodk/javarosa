@@ -100,7 +100,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
         Map<TreeReference, IAnswerData> currentTriggerValues = getCurrentTriggerValues(formDef, curQRef);
         boolean allTriggerRefsBound = currentTriggerValues != null;
 
-        Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), formDef.getEvaluationContext());
+        Long currentRandomizeSeed = resolveRandomSeed(formDef.getMainInstance(), new EvaluationContext(formDef.getEvaluationContext(), contextRef.contextualize(curQRef)));
 
         // Return cached list if possible
         if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
