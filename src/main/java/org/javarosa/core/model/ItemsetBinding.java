@@ -38,8 +38,7 @@ import java.util.Set;
 
 import static org.javarosa.core.model.FormDef.getAbsRef;
 import static org.javarosa.xform.parse.RandomizeHelper.shuffle;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toLongHash;
-import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
+import static org.javarosa.xform.parse.RandomizeHelper.toNumericWithLongHash;
 
 public class ItemsetBinding implements Externalizable, Localizable {
     // Temporarily cached filtered list (not serialized)
@@ -311,16 +310,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 
     private Long resolveRandomSeed(DataInstance model, EvaluationContext ec) {
         if (randomSeedExpr != null) {
-            Object seed = randomSeedExpr.eval(model, ec);
-            Double asDouble = toNumeric(seed);
-            if (Double.isNaN(asDouble)) {
-                // Reasonable attempts at reading the node's value as a number failed.
-                // Fall back to deriving the seed from it using hashing.
-                // See https://github.com/getodk/javarosa/issues/800
-                return toLongHash(seed);
-            } else {
-                return asDouble.longValue();
-            }
+            return toNumericWithLongHash(randomSeedExpr.eval(model, ec));
         } else {
             return null;
         }

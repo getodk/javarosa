@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.javarosa.xpath.expr.XPathFuncExpr.toLongHash;
+import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
+
 /**
  * This class contains all the code needed to implement the xform randomize()
  * function.
@@ -38,6 +41,18 @@ public final class RandomizeHelper {
      */
     static String cleanNodesetDefinition(String nodesetStr) {
         return getArgs(nodesetStr)[0].trim();
+    }
+
+    public static Long toNumericWithLongHash(Object value) {
+        Double asDouble = toNumeric(value);
+        if (Double.isNaN(asDouble)) {
+            // Reasonable attempts at reading the node's value as a number failed.
+            // Fall back to deriving the seed from it using hashing.
+            // See https://github.com/getodk/javarosa/issues/800
+            return toLongHash(value);
+        } else {
+            return asDouble.longValue();
+        }
     }
 
     /**

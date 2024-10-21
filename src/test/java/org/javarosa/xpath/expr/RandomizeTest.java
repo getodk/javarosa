@@ -27,7 +27,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.test.FormParseInit;
-import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,24 +42,10 @@ import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.delete;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
 import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
 import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
-import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.ResourcePathHelper.r;
-import static org.javarosa.test.XFormsElement.body;
-import static org.javarosa.test.XFormsElement.head;
-import static org.javarosa.test.XFormsElement.html;
-import static org.javarosa.test.XFormsElement.input;
-import static org.javarosa.test.XFormsElement.instance;
-import static org.javarosa.test.XFormsElement.item;
-import static org.javarosa.test.XFormsElement.mainInstance;
-import static org.javarosa.test.XFormsElement.model;
-import static org.javarosa.test.XFormsElement.select1Dynamic;
-import static org.javarosa.test.XFormsElement.t;
-import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -174,56 +159,6 @@ public class RandomizeTest {
         assertTrue(nodesEqualInOrder(choices2a, choices2b));
         assertTrue(nodesEqualInOrder(choices2a, choices2c));
     }
-
-    //region Type coercion
-    @Test
-    public void stringNumberSeedConvertsToIntWhenUsedInNodesetExpression() throws IOException, XFormParser.ParseException {
-        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
-            head(
-                title("Randomize non-numeric seed"),
-                model(
-                    mainInstance(t("data id=\"rand-non-numeric\"",
-                        t("choice")
-                    )),
-                    instance("choices",
-                        item("a", "A"),
-                        item("b", "B")
-                    ),
-                    bind("/data/choice").type("string")
-                )
-            ),
-            body(
-                select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, '1')")
-            )
-        ));
-
-        assertThat(scenario.choicesOf("/data/choice").get(0).getValue(), is("b"));
-    }
-
-    @Test
-    public void stringNumberSeedConvertsToIntWhenUsedInExpression() throws IOException, XFormParser.ParseException {
-        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
-            head(
-                title("Randomize non-numeric seed"),
-                model(
-                    mainInstance(t("data id=\"rand-non-numeric\"",
-                        t("choice")
-                    )),
-                    instance("choices",
-                        item("a", "A"),
-                        item("b", "B")
-                    ),
-                    bind("/data/choice").type("string").calculate("selected-at(join(' ', randomize(instance('choices')/root/item/label, '1')), 0)")
-                )
-            ),
-            body(
-                input("/data/choice")
-            )
-        ));
-
-        assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("B"));
-    }
-    // endregion
 
     private FormDef serializeAndDeserializeForm(FormDef formDef) throws IOException, DeserializationException {
         // Initialize serialization

@@ -16,20 +16,7 @@
 
 package org.javarosa.xpath.expr;
 
-import static java.lang.Double.NaN;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
 import org.javarosa.core.model.condition.IFunctionHandler;
@@ -58,7 +45,22 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-import org.bouncycastle.crypto.digests.SHA256Digest;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static java.lang.Double.NaN;
+import static org.javarosa.xform.parse.RandomizeHelper.toNumericWithLongHash;
 
 /**
  * Representation of an xpath function expression.
@@ -514,7 +516,7 @@ public class XPathFuncExpr extends XPathExpression {
                 return XPathNodeset.shuffle((XPathNodeset) argVals[0]);
 
             if (args.length == 2)
-                return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumeric(argVals[1]).longValue());
+                return XPathNodeset.shuffle((XPathNodeset) argVals[0], toNumericWithLongHash(argVals[1]));
 
             throw new XPathUnhandledException("function 'randomize' requires 1 or 2 arguments. " + args.length + " provided.");
         } else if (name.equals("base64-decode")) {
