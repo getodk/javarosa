@@ -15,24 +15,6 @@
  */
 package org.javarosa.xpath.expr;
 
-import static java.nio.file.Files.createTempFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
-import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
-import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
-import static org.javarosa.test.ResourcePathHelper.r;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -40,14 +22,50 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.PrototypeManager;
-import org.javarosa.test.FormParseInit;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.test.FormParseInit;
+import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathTypeMismatchException;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.javarosa.core.model.instance.TreeReference.CONTEXT_ABSOLUTE;
+import static org.javarosa.core.model.instance.TreeReference.INDEX_UNBOUND;
+import static org.javarosa.core.model.instance.TreeReference.REF_ABSOLUTE;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.instance;
+import static org.javarosa.test.XFormsElement.item;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.select1Dynamic;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class RandomizeTest {
 
@@ -157,6 +175,63 @@ public class RandomizeTest {
         assertTrue(nodesEqualInOrder(choices1a, choices1c));
         assertTrue(nodesEqualInOrder(choices2a, choices2b));
         assertTrue(nodesEqualInOrder(choices2a, choices2c));
+    }
+
+    // The current implementation for randomize for an ItemsetBinding requires a literal numeric value and does not
+    // attempt to convert
+    @Test
+    public void throwsWhenSeedForItemsetExpressionNotNumeric() throws IOException, XFormParser.ParseException {
+        try {
+            Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
+                head(
+                    title("Randomize non-numeric seed"),
+                    model(
+                        mainInstance(t("data id=\"rand-non-numeric\"",
+                            t("choice")
+                        )),
+                        instance("choices",
+                            item("a", "A"),
+                            item("b", "B")
+                        ),
+                        bind("/data/choice").type("string")
+                    )
+                ),
+                body(
+                    select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, '0')")
+                )
+            ));
+
+            System.out.println(scenario.choicesOf("/data/choice"));
+            fail("Expecting XPathTypeMismatchException");
+        } catch (XPathTypeMismatchException e) {
+            // Expected
+        }
+    }
+
+    // When a randomize expression is used in a context other than in an itemset binding, the seed value is converted to
+    // numeric
+    @Test
+    public void nonNumericSeedConvertsToIntWhenUsedInExpression() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
+            head(
+                title("Randomize non-numeric seed"),
+                model(
+                    mainInstance(t("data id=\"rand-non-numeric\"",
+                        t("choice")
+                    )),
+                    instance("choices",
+                        item("a", "A"),
+                        item("b", "B")
+                    ),
+                    bind("/data/choice").type("string").calculate("selected-at(join(' ', randomize(instance('choices')/root/item/label, '1')), 0)")
+                )
+            ),
+            body(
+                input("/data/choice")
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("B"));
     }
 
     private FormDef serializeAndDeserializeForm(FormDef formDef) throws IOException, DeserializationException {
