@@ -16,7 +16,6 @@
 
 package org.javarosa.xform.parse;
 
-import kotlin.Pair;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -59,9 +58,9 @@ import org.javarosa.xml.util.InvalidStructureException;
 import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.XPathUnsupportedException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
-import org.javarosa.xpath.expr.XPathNumericLiteral;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathStringLiteral;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -87,10 +86,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import kotlin.Pair;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
@@ -117,7 +118,6 @@ import static org.javarosa.xform.parse.Constants.RANK;
 import static org.javarosa.xform.parse.Constants.SELECT;
 import static org.javarosa.xform.parse.Constants.SELECTONE;
 import static org.javarosa.xform.parse.RandomizeHelper.cleanNodesetDefinition;
-import static org.javarosa.xform.parse.RandomizeHelper.cleanSeedDefinition;
 import static org.javarosa.xform.parse.RangeParser.populateQuestionWithRangeAttributes;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
@@ -1510,14 +1510,24 @@ public class XFormParser implements IXFormParserFunctions {
         if (nodesetStr == null)
             throw new RuntimeException("No nodeset attribute in element: [" + e.getName() + "]. This is required. (Element Printout:" + XFormSerializer.elementToString(e) + ")");
 
-        if (nodesetStr.startsWith("randomize(")) {
-            itemset.randomize = true;
-            String seedStr = cleanSeedDefinition(nodesetStr);
-            if (seedStr != null && seedStr.matches("\\d*\\.?\\d+"))
-                itemset.randomSeedNumericExpr = new XPathNumericLiteral(Double.parseDouble(seedStr));
-            else if (seedStr != null)
-                itemset.randomSeedPathExpr = XPathReference.getPathExpr(seedStr);
-            nodesetStr = cleanNodesetDefinition(nodesetStr);
+        // Handle choice randomization
+        try {
+            XPathExpression nodesetExpr = XPathParseTool.parseXPath(nodesetStr);
+            if (nodesetExpr instanceof XPathFuncExpr) {
+                XPathFuncExpr nodesetFuncExpr = (XPathFuncExpr) nodesetExpr;
+                if (Objects.equals(nodesetFuncExpr.id.name, "randomize")) {
+                    itemset.randomize = true;
+
+                    if (nodesetFuncExpr.args.length == 2) {
+                        itemset.randomSeedExpr = nodesetFuncExpr.args[1];
+                    }
+                    nodesetStr = cleanNodesetDefinition(nodesetStr);
+                } else {
+                    throw new XPathUnsupportedException("The only function that may be used in a nodeset expression is randomize().");
+                }
+            }
+        } catch (XPathSyntaxException exception) {
+            throw new XPathUnsupportedException("Unsupported nodeset expression: " + nodesetStr);
         }
 
         XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
