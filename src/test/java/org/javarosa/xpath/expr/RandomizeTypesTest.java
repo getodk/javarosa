@@ -30,21 +30,35 @@ public class RandomizeTypesTest {
                 title("Randomize non-numeric seed"),
                 model(
                     mainInstance(t("data id=\"rand-non-numeric\"",
-                        t("choice")
+                        t("choices_numeric_seed"),
+                        t("choices_stringified_numeric_seed")
                     )),
                     instance("choices",
                         item("a", "A"),
-                        item("b", "B")
+                        item("b", "B"),
+                        item("c", "C"),
+                        item("d", "D"),
+                        item("e", "E"),
+                        item("f", "F"),
+                        item("g", "G"),
+                        item("h", "H")
                     ),
-                    bind("/data/choice").type("string")
+                    bind("/data/choices_numeric_seed").type("string"),
+                    bind("/data/choices_stringified_numeric_seed").type("string")
                 )
             ),
             body(
-                select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, '1')")
+                select1Dynamic("/data/choices_numeric_seed", "randomize(instance('choices')/root/item, 1234)"),
+                select1Dynamic("/data/choices_stringified_numeric_seed", "randomize(instance('choices')/root/item, '1234')")
             )
         ));
-
-        assertThat(scenario.choicesOf("/data/choice").get(0).getValue(), is("b"));
+        String[] shuffled = {"g", "f", "e", "d", "a", "h", "b", "c"};
+        String[] nodes = {"/data/choices_numeric_seed", "/data/choices_stringified_numeric_seed"};
+        for (int i = 0; i < shuffled.length; i++) {
+            for (String node : nodes) {
+                assertThat(scenario.choicesOf(node).get(i).getValue(), is(shuffled[i]));
+            }
+        }
     }
 
     @Test
@@ -54,21 +68,30 @@ public class RandomizeTypesTest {
                 title("Randomize non-numeric seed"),
                 model(
                     mainInstance(t("data id=\"rand-non-numeric\"",
-                        t("choice")
+                        t("choices_numeric_seed"),
+                        t("choices_stringified_numeric_seed")
                     )),
                     instance("choices",
                         item("a", "A"),
-                        item("b", "B")
+                        item("b", "B"),
+                        item("c", "C"),
+                        item("d", "D"),
+                        item("e", "E"),
+                        item("f", "F"),
+                        item("g", "G"),
+                        item("h", "H")
                     ),
-                    bind("/data/choice").type("string").calculate("selected-at(join(' ', randomize(instance('choices')/root/item/label, '1')), 0)")
+                    bind("/data/choices_numeric_seed").type("string").calculate("join('', randomize(instance('choices')/root/item/label, 1234))"),
+                    bind("/data/choices_stringified_numeric_seed").type("string").calculate("join('', randomize(instance('choices')/root/item/label, '1234'))")
                 )
             ),
             body(
-                input("/data/choice")
+                input("/data/choices_numeric_seed"),
+                input("/data/choices_stringified_numeric_seed")
             )
         ));
-
-        assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("B"));
+        assertThat(scenario.answerOf("/data/choices_numeric_seed").getDisplayText(), is(scenario.answerOf("/data/choices_stringified_numeric_seed").getDisplayText()));
+        assertThat(scenario.answerOf("/data/choices_numeric_seed").getDisplayText(), is("GFEDAHBC"));
     }
 
     @Test
@@ -82,7 +105,13 @@ public class RandomizeTypesTest {
                     )),
                     instance("choices",
                         item("a", "A"),
-                        item("b", "B")
+                        item("b", "B"),
+                        item("c", "C"),
+                        item("d", "D"),
+                        item("e", "E"),
+                        item("f", "F"),
+                        item("g", "G"),
+                        item("h", "H")
                     ),
                     bind("/data/choice").type("string")
                 )
@@ -91,8 +120,10 @@ public class RandomizeTypesTest {
                 select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, 'foo')")
             )
         ));
-
-        assertThat(scenario.choicesOf("/data/choice").get(0).getValue(), is("b"));
+        String[] shuffled = {"e", "a", "d", "b", "h", "g", "c", "f"};
+        for (int i = 0; i < shuffled.length; i++) {
+            assertThat(scenario.choicesOf("/data/choice").get(i).getValue(), is(shuffled[i]));
+        }
     }
 
     @Test
@@ -106,9 +137,15 @@ public class RandomizeTypesTest {
                     )),
                     instance("choices",
                         item("a", "A"),
-                        item("b", "B")
+                        item("b", "B"),
+                        item("c", "C"),
+                        item("d", "D"),
+                        item("e", "E"),
+                        item("f", "F"),
+                        item("g", "G"),
+                        item("h", "H")
                     ),
-                    bind("/data/choice").type("string").calculate("selected-at(join(' ', randomize(instance('choices')/root/item/label, 'foo')), 0)")
+                    bind("/data/choice").type("string").calculate("join('', randomize(instance('choices')/root/item/label, 'foo'))")
                 )
             ),
             body(
@@ -116,7 +153,7 @@ public class RandomizeTypesTest {
             )
         ));
 
-        assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("B"));
+        assertThat(scenario.answerOf("/data/choice").getDisplayText(), is("EADBHGCF"));
     }
 
     @Test
