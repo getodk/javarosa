@@ -192,4 +192,41 @@ public class RandomizeTypesTest {
         assertThat(scenario.choicesOf("/data/repeat[2]/choice").get(0).getValue(), is("b"));
         assertThat(scenario.choicesOf("/data/repeat[1]/choice").get(0).getValue(), is("a"));
     }
+
+    @Test
+    public void seedFromArbitraryInputCanBeUsed() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
+            head(
+                title("Randomize non-numeric seed"),
+                model(
+                    mainInstance(t("data id=\"rand-non-numeric\"",
+                        t("input"),
+                        t("choice")
+                    )),
+                    instance("choices",
+                        item("a", "A"),
+                        item("b", "B"),
+                        item("c", "C"),
+                        item("d", "D"),
+                        item("e", "E"),
+                        item("f", "F"),
+                        item("g", "G"),
+                        item("h", "H")
+                    ),
+                    bind("/data/input").type("geopoint"),
+                    bind("/data/choice").type("string")
+                )
+            ),
+            body(
+                input("/data/input"),
+                select1Dynamic("/data/choice", "randomize(instance('choices')/root/item, /data/input)")
+            )
+        ));
+
+        scenario.answer("/data/input", "-6.8137120026589315 39.29392995851879");
+        String[] shuffled = {"h", "b", "d", "f", "a", "g", "c", "e"};
+        for (int i = 0; i < shuffled.length; i++) {
+            assertThat(scenario.choicesOf("/data/choice").get(i).getValue(), is(shuffled[i]));
+        }
+    }
 }
