@@ -705,12 +705,18 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * convert a string value to an integer by:
+     * Convert a non-zero-length string value to an integer by:
      * - encoding it as utf-8
      * - hashing it with sha256 (available cross-platform, including via browser crypto API)
      * - interpreting the first 8 bytes of the hash as a long
+     *
+     * A zero-length string results in a 0L — this is the classic behaviour that we want
+     * to conserve for backward compatibility with a case that is expected to be common.
+     * In practical terms, we don't want the sort order of choice lists using an empty string as
+     * a seed to change with the introduction of this seed derivation mechanism.
      */
     public static long toLongHash(String sourceString) {
+        if (sourceString.length() == 0) return 0L;
         byte[] hasheeBuf = sourceString.getBytes(Charset.forName("UTF-8"));
         SHA256Digest hasher = new SHA256Digest();
         hasher.update(hasheeBuf, 0, hasheeBuf.length);

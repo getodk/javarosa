@@ -5,6 +5,7 @@ import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -227,6 +228,63 @@ public class RandomizeTypesTest {
         String[] shuffled = {"h", "b", "d", "f", "a", "g", "c", "e"};
         for (int i = 0; i < shuffled.length; i++) {
             assertThat(scenario.choicesOf("/data/choice").get(i).getValue(), is(shuffled[i]));
+        }
+    }
+
+    @Test
+    public void seed0FromNaNs() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Randomize non-numeric seed", html(
+                head(
+                        title("Randomize non-numeric seed"),
+                        model(
+                                mainInstance(t("data id=\"rand-non-numeric\"",
+                                        t("input_emptystring"),
+                                        t("input_somestring"),
+                                        t("input_int"),
+                                        t("choice_emptystring"),
+                                        t("choice_somestring"),
+                                        t("choice_int")
+                                )),
+                                instance("choices",
+                                        item("a", "A"),
+                                        item("b", "B"),
+                                        item("c", "C"),
+                                        item("d", "D"),
+                                        item("e", "E"),
+                                        item("f", "F"),
+                                        item("g", "G"),
+                                        item("h", "H")
+                                ),
+                                bind("/data/input_emptystring").type("string"),
+                                bind("/data/input_somestring").type("string"),
+                                bind("/data/input_int").type("int")
+                        )
+                ),
+                body(
+                        input("/data/input_emptystring"),
+                        input("/data/input_somestring"),
+                        input("/data/input_int"),
+                        select1Dynamic("/data/choice_emptystring", "randomize(instance('choices')/root/item, /data/input_emptystring)"),
+                        select1Dynamic("/data/choice_somestring", "randomize(instance('choices')/root/item, /data/input_somestring)"),
+                        select1Dynamic("/data/choice_int", "randomize(instance('choices')/root/item, /data/input_int)")
+                )
+        ));
+
+        scenario.answer("/data/input_emptystring", "");
+        scenario.answer("/data/input_somestring", "somestring");
+        scenario.answer("/data/input_int", "0");
+
+        String[] shuffled_NaN_or_0 = {"c", "b", "h", "a", "f", "d", "g", "e"};
+        String[] shuffled_somestring = {"e", "b", "c", "g", "d", "a", "f", "h"};
+        assertThat("somestring-seeded expected order is distinct from 0-seeded expected order", !Arrays.equals(shuffled_NaN_or_0, shuffled_somestring));
+        String[] shuffledfields = {"/data/choice_emptystring", "/data/choice_int"};
+        for (int i = 0; i < shuffled_NaN_or_0.length; i++) {
+            for (String shuffledfield : shuffledfields) {
+                assertThat(scenario.choicesOf(shuffledfield).get(i).getValue(), is(shuffled_NaN_or_0[i]));
+            }
+        }
+        for (int i = 0; i < shuffled_somestring.length; i++) {
+            assertThat(scenario.choicesOf("/data/choice_somestring").get(i).getValue(), is(shuffled_somestring[i]));
         }
     }
 }
