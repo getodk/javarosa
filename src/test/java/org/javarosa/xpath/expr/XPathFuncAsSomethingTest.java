@@ -15,7 +15,7 @@ public class XPathFuncAsSomethingTest {
     @Test
     public void toLongHashHashesWell() {
         assertThat(toLongHash("Hello"), equalTo(1756278180214341157L));
-        assertThat(toLongHash(""), equalTo(-2039914840885289964L));
+        assertThat(toLongHash(""), equalTo(0L)); // the empty string would actually hash to -2039914840885289964L; but we've added this quirk for backward compatibility.
     }
 
     @Test
