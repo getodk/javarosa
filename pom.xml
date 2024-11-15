@@ -2,10 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.getodk</groupId>
   <artifactId>javarosa</artifactId>
-  <!-- Be sure to update version in build.gradle to match -->
   <!-- snapshot release = x.x.x-SNAPSHOT-${revision} -->
   <!-- production release = x.x.x -->
-  <version>5.0.0-SNAPSHOT-${revision}</version>
+  <version>5.0.0</version>
   <packaging>jar</packaging>
   <name>javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
