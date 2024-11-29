@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -42,7 +43,12 @@ public interface XFormsElement {
         if (!name.contains(" "))
             return emptyMap();
         Map<String, String> attributes = new HashMap<>();
-        String[] words = name.split(" ");
+
+        // Regex to split on spaces, ignoring spaces inside quoted text
+        final String SPACE_OUTSIDE_QUOTES_REGEX = " (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        Pattern spaceOutsideQuotesPattern = Pattern.compile(SPACE_OUTSIDE_QUOTES_REGEX);
+        String[] words = spaceOutsideQuotesPattern.split(name);
+
         for (String word : asList(words).subList(1, words.length)) {
             String[] parts = word.split("(?<!\\))=(\"|')", 2);
             attributes.put(parts[0], parts[1].substring(0, parts[1].length() - 1));
