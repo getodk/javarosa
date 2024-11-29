@@ -381,7 +381,7 @@ public class FormDefTest {
                 title("output with relative ref in translation"),
                 model(
                     t("itext", t("translation lang=\"Français\"",
-                        t("text id=\"/data/repeat/position_in_label:label",
+                        t("text id=\"/data/repeat/position_in_label:label\"",
                             t("value", "Position: <output value=\"../position\"/>"))
                     )),
                     mainInstance(t("data id=\"relative-output\"",
