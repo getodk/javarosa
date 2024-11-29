@@ -135,16 +135,7 @@ public interface XFormsElement {
     }
 
     static XFormsElement select1Dynamic(String ref, String nodesetRef) {
-        XFormsElement value = t("value ref=\"value\"");
-        XFormsElement label = t("label ref=\"label\"");
-
-        HashMap<String, String> itemsetAttributes = new HashMap<>();
-        itemsetAttributes.put("nodeset", nodesetRef);
-        TagXFormsElement itemset = new TagXFormsElement("itemset", itemsetAttributes, asList(value, label));
-
-        HashMap<String, String> select1Attributes = new HashMap<>();
-        select1Attributes.put("ref", ref);
-        return new TagXFormsElement("select1", select1Attributes, asList(itemset));
+        return select1Dynamic(ref, nodesetRef, "value", "label");
     }
 
     static XFormsElement select1Dynamic(String ref, String nodesetRef, String valueRef, String labelRef) {
