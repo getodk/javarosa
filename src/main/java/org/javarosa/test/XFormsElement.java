@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -42,7 +43,12 @@ public interface XFormsElement {
         if (!name.contains(" "))
             return emptyMap();
         Map<String, String> attributes = new HashMap<>();
-        String[] words = name.split(" ");
+
+        // Regex to split on spaces, ignoring spaces inside quoted text
+        final String SPACE_OUTSIDE_QUOTES_REGEX = " (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        Pattern spaceOutsideQuotesPattern = Pattern.compile(SPACE_OUTSIDE_QUOTES_REGEX);
+        String[] words = spaceOutsideQuotesPattern.split(name);
+
         for (String word : asList(words).subList(1, words.length)) {
             String[] parts = word.split("(?<!\\))=(\"|')", 2);
             attributes.put(parts[0], parts[1].substring(0, parts[1].length() - 1));
@@ -135,16 +141,7 @@ public interface XFormsElement {
     }
 
     static XFormsElement select1Dynamic(String ref, String nodesetRef) {
-        XFormsElement value = t("value ref=\"value\"");
-        XFormsElement label = t("label ref=\"label\"");
-
-        HashMap<String, String> itemsetAttributes = new HashMap<>();
-        itemsetAttributes.put("nodeset", nodesetRef);
-        TagXFormsElement itemset = new TagXFormsElement("itemset", itemsetAttributes, asList(value, label));
-
-        HashMap<String, String> select1Attributes = new HashMap<>();
-        select1Attributes.put("ref", ref);
-        return new TagXFormsElement("select1", select1Attributes, asList(itemset));
+        return select1Dynamic(ref, nodesetRef, "value", "label");
     }
 
     static XFormsElement select1Dynamic(String ref, String nodesetRef, String valueRef, String labelRef) {
