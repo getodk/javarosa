@@ -135,59 +135,6 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void itemsetBindingVerification_doesNotVerifySecondItem() throws IOException, XFormParser.ParseException {
-        configureReferenceManagerCorrectly();
-
-        Scenario.init("Some form", html(
-            head(
-                title("Some form"),
-                model(
-                    mainInstance(t("data id=\"some-form\"",
-                        t("first")
-                    )),
-
-                    t("instance id=\"mixed-schema\" src=\"jr://file/mixed-schema.xml\""),
-
-                    bind("/data/first").type("string")
-                )
-            ),
-            body(
-                // Define a select using value and label references that only exist for the first item
-                select1Dynamic("/data/first", "instance('mixed-schema')/root/item", "name", "label")
-            )));
-    }
-
-    @Test
-    public void itemsetBindingVerification_verifiesFirstItem() throws IOException {
-        configureReferenceManagerCorrectly();
-
-        try {
-            Scenario.init("Some form", html(
-                head(
-                    title("Some form"),
-                    model(
-                        mainInstance(t("data id=\"some-form\"",
-                            t("first")
-                        )),
-
-                        t("instance id=\"mixed-schema\" src=\"jr://file/mixed-schema2.xml\""),
-
-                        bind("/data/first").type("string")
-                    )
-                ),
-                body(
-                    // Define a select using value and label references that only exist for the second item
-                    select1Dynamic("/data/first", "instance('mixed-schema')/root/item", "name", "label")
-                )));
-            fail("Expected XFormParseException because itemset references don't exist in external instance");
-        } catch (XFormParseException e) {
-            // pass
-        } catch (XFormParser.ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
     public void csvSecondaryInstanceWithHeaderOnly_parsesWithoutError() throws IOException, XFormParser.ParseException {
         configureReferenceManagerCorrectly();
 

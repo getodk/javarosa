@@ -16,16 +16,17 @@
 
 package org.javarosa.core.model;
 
-import kotlin.Pair;
 import org.hamcrest.CoreMatchers;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
+import kotlin.Pair;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -50,6 +51,7 @@ import static org.javarosa.test.XFormsElement.select1;
 import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
+import static org.junit.Assert.fail;
 
 public class SelectChoiceTest {
     @Test
@@ -113,7 +115,7 @@ public class SelectChoiceTest {
                         t("data id='select-empty'",
                             t("select"))),
                     instance("choices",
-                        t("item", t("label", "Item"), t("property", ""))
+                        t("item", t("label", "Item"), t("name", "item"), t("property", ""))
                     ))),
             body(
                 select1Dynamic("/data/select", "instance('choices')/root/item", "name", "label"))
@@ -273,5 +275,70 @@ public class SelectChoiceTest {
             scenario.choicesOf("/data/select").get(0).getAdditionalChildren(),
             is(contains(new Pair<>("value", "value"), new Pair<>("child", "")))
         );
+    }
+
+    @Test
+    public void itemsetBindingVerification_doesNotVerifySecondItem() throws IOException, XFormParser.ParseException {
+        Scenario.init("Some form", html(
+            head(
+                title("Some form"),
+                model(
+                    mainInstance(t("data id=\"some-form\"",
+                        t("first")
+                    )),
+
+                    t("instance id=\"mixed-schema\"",
+                        t("root",
+                            t("item",
+                                t("label", "A"),
+                                t("name", "a")
+                            ),
+                            t("item",
+                                t("foo")))
+                    ),
+
+                    bind("/data/first").type("string")
+                )
+            ),
+            body(
+                // Define a select using value and label references that only exist for the first item
+                select1Dynamic("/data/first", "instance('mixed-schema')/root/item", "name", "label")
+            )));
+    }
+
+    @Test
+    public void itemsetBindingVerification_verifiesFirstItem() throws IOException {
+        try {
+            Scenario.init("Some form", html(
+                head(
+                    title("Some form"),
+                    model(
+                        mainInstance(t("data id=\"some-form\"",
+                            t("first")
+                        )),
+
+                        t("instance id=\"mixed-schema\"",
+                            t("root",
+                                t("item",
+                                    t("foo", "bar")),
+                                t("item",
+                                    t("label", "A"),
+                                    t("value", "a")
+                                ))
+                        ),
+
+                        bind("/data/first").type("string")
+                    )
+                ),
+                body(
+                    // Define a select using value and label references that only exist for the second item
+                    select1Dynamic("/data/first", "instance('mixed-schema')/root/item", "name", "label")
+                )));
+            fail("Expected XFormParseException because itemset references don't exist in external instance");
+        } catch (XFormParseException e) {
+            // pass
+        } catch (XFormParser.ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
