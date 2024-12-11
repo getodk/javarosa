@@ -1,8 +1,11 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -131,5 +134,146 @@ public class IndexedRepeatTest {
 
         assertThat(scenario.answerOf("/data/repeat2[1]/from_repeat1"), is(stringAnswer("index1")));
         assertThat(scenario.answerOf("/data/repeat2[2]/from_repeat1"), is(stringAnswer("index2")));
+    }
+
+    @Test
+    public void handlesTopLevelRepeats() throws IOException, XFormParser.ParseException {
+        Scenario scenario = buildNestedRepeatForm();
+        assertThat(scenario.answerOf("/data/r2-d1[1]/from-r1-d1"), is(stringAnswer("[1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/from-r1-d1"), is(stringAnswer("[2]")));
+    }
+
+    @Test
+    public void handlesRepeatsTwoDeep() throws IOException, XFormParser.ParseException {
+        Scenario scenario = buildNestedRepeatForm();
+
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/from-r1-d2-a"), is(stringAnswer("[1][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[2]/from-r1-d2-a"), is(stringAnswer("[1][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[1]/from-r1-d2-a"), is(stringAnswer("[2][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/from-r1-d2-a"), is(stringAnswer("[2][2]")));
+
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/from-r1-d2-b"), is(stringAnswer("[1][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[2]/from-r1-d2-b"), is(stringAnswer("[1][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[1]/from-r1-d2-b"), is(stringAnswer("[2][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/from-r1-d2-b"), is(stringAnswer("[2][2]")));
+    }
+
+    @Test
+    public void handlesRepeatsThreeDeep() throws IOException, XFormParser.ParseException {
+        Scenario scenario = buildNestedRepeatForm();
+
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/r2-d3[1]/from-r1-d3-a"), is(stringAnswer("[1][1][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/r2-d3[2]/from-r1-d3-a"), is(stringAnswer("[1][1][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[2]/r2-d3[1]/from-r1-d3-a"), is(stringAnswer("[1][2][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[2]/r2-d3[2]/from-r1-d3-a"), is(stringAnswer("[1][2][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[1]/r2-d3[1]/from-r1-d3-a"), is(stringAnswer("[2][1][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[1]/r2-d3[2]/from-r1-d3-a"), is(stringAnswer("[2][1][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/r2-d3[1]/from-r1-d3-a"), is(stringAnswer("[2][2][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/r2-d3[2]/from-r1-d3-a"), is(stringAnswer("[2][2][2]")));
+
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/r2-d3[1]/from-r1-d3-b"), is(stringAnswer("[1][1][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/r2-d3[2]/from-r1-d3-b"), is(stringAnswer("[1][1][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[2]/r2-d3[1]/from-r1-d3-b"), is(stringAnswer("[1][2][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[2]/r2-d3[2]/from-r1-d3-b"), is(stringAnswer("[1][2][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[1]/r2-d3[1]/from-r1-d3-b"), is(stringAnswer("[2][1][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[1]/r2-d3[2]/from-r1-d3-b"), is(stringAnswer("[2][1][2]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/r2-d3[1]/from-r1-d3-b"), is(stringAnswer("[2][2][1]")));
+        assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/r2-d3[2]/from-r1-d3-b"), is(stringAnswer("[2][2][2]")));
+    }
+
+    public static Scenario buildNestedRepeatForm() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("indexed-repeat", html(
+            head(
+                title("indexed-repeat"),
+                model(
+                    mainInstance(t("data id=\"indexed-repeat\"",
+                        t("r1-d1 jr:template=\"\"",
+                            t("inside-r1-d1"),
+                            t("r1-d2 jr:template=\"\"",
+                                t("inside-r1-d2"),
+                                t("r1-d3 jr:template=\"\"",
+                                    t("inside-r1-d3")))),
+                        t("r2-d1 jr:template=\"\"",
+                            t("inside-r2-d1"),
+                            t("from-r1-d1"),
+                            t("r2-d2 jr:template=\"\"",
+                                t("inside-r2-d2"),
+                                t("from-r1-d2-a"),
+                                t("from-r1-d2-b"),
+                                t("r2-d3 jr:template=\"\"",
+                                    t("inside-r2-d3"),
+                                    t("from-r1-d3-a"),
+                                    t("from-r1-d3-b"))))
+                    )),
+                    bind("/data/r1-d1/inside-r1-d1")
+                        .calculate("concat('[', position(..), ']')"),
+                    bind("/data/r1-d1/r1-d2/inside-r1-d2")
+                        .calculate("concat('[', position(../..), ']', '[', position(..), ']')"),
+                    bind("/data/r1-d1/r1-d2/r1-d3/inside-r1-d3")
+                        .calculate("concat('[', position(../../..), ']', '[', position(../..), ']', '[', position(..), ']')"),
+                    bind("/data/r2-d1/from-r1-d1")
+                        .calculate("indexed-repeat(/data/r1-d1/inside-r1-d1, /data/r1-d1, position(..))"),
+                    bind("/data/r2-d1/r2-d2/from-r1-d2-a")
+                        .calculate("indexed-repeat(/data/r1-d1/r1-d2/inside-r1-d2, /data/r1-d1, position(../..), /data/r1-d1/r1-d2, position(..))"),
+                    bind("/data/r2-d1/r2-d2/from-r1-d2-b")
+                        // Same as from-r1-d2-a with the repeatN/indexN pairs swapped
+                        .calculate("indexed-repeat(/data/r1-d1/r1-d2/inside-r1-d2, /data/r1-d1/r1-d2, position(..), /data/r1-d1, position(../..))"),
+                    bind("/data/r2-d1/r2-d2/r2-d3/from-r1-d3-a")
+                        .calculate("indexed-repeat(/data/r1-d1/r1-d2/r1-d3/inside-r1-d3, /data/r1-d1, position(../../..), /data/r1-d1/r1-d2, position(../..), /data/r1-d1/r1-d2/r1-d3, position(..))"),
+                    bind("/data/r2-d1/r2-d2/r2-d3/from-r1-d3-b")
+                        // Same as from-r1-d3-a with the repeatN/indexN pairs reordered
+                        .calculate("indexed-repeat(/data/r1-d1/r1-d2/r1-d3/inside-r1-d3, /data/r1-d1/r1-d2, position(../..), /data/r1-d1, position(../../..), /data/r1-d1/r1-d2/r1-d3, position(..))")
+                )
+            ),
+            body(
+                repeat("/data/r1-d1",
+                    input("/data/r1-d1/inside-r1-d1"),
+                    repeat("/data/r1-d1/r1-d2",
+                        input("/data/r1-d1/r1-d2/inside-r1-d2"),
+                        repeat("/data/r1-d1/r1-d2/r1-d3",
+                            input("/data/r1-d1/r1-d2/r1-d3/inside-r1-d3")))),
+                repeat("/data/r2-d1",
+                    input("/data/r2-d1/inside-r2-d1"),
+                    repeat("/data/r2-d1/r2-d2",
+                        input("/data/r2-d1/r2-d2/inside-r2-d2"),
+                        repeat("/data/r2-d1/r2-d2/r2-d3",
+                            input("/data/r2-d1/r2-d2/r2-d3/inside-r2-d3"))))
+            )));
+
+        scenario.createNewRepeat("/data/r1-d1");
+        scenario.createNewRepeat("/data/r1-d1");
+
+        scenario.createNewRepeat("/data/r1-d1[1]/r1-d2");
+        scenario.createNewRepeat("/data/r1-d1[1]/r1-d2");
+        scenario.createNewRepeat("/data/r1-d1[2]/r1-d2");
+        scenario.createNewRepeat("/data/r1-d1[2]/r1-d2");
+
+        scenario.createNewRepeat("/data/r1-d1[1]/r1-d2[1]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[1]/r1-d2[1]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[1]/r1-d2[2]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[1]/r1-d2[2]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[2]/r1-d2[1]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[2]/r1-d2[1]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[2]/r1-d2[2]/r1-d3");
+        scenario.createNewRepeat("/data/r1-d1[2]/r1-d2[2]/r1-d3");
+
+        scenario.createNewRepeat("/data/r2-d1");
+        scenario.createNewRepeat("/data/r2-d1");
+
+        scenario.createNewRepeat("/data/r2-d1[1]/r2-d2");
+        scenario.createNewRepeat("/data/r2-d1[1]/r2-d2");
+        scenario.createNewRepeat("/data/r2-d1[2]/r2-d2");
+        scenario.createNewRepeat("/data/r2-d1[2]/r2-d2");
+
+        scenario.createNewRepeat("/data/r2-d1[1]/r2-d2[1]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[1]/r2-d2[1]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[1]/r2-d2[2]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[1]/r2-d2[2]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[2]/r2-d2[1]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[2]/r2-d2[1]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[2]/r2-d2[2]/r2-d3");
+        scenario.createNewRepeat("/data/r2-d1[2]/r2-d2[2]/r2-d3");
+
+        return scenario;
     }
 }
