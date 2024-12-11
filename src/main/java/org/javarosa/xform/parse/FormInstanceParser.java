@@ -336,24 +336,24 @@ class FormInstanceParser {
 
             //make sure the labelref is tested against the right instance
             //check if it's not the main instance
-            DataInstance fi = null;
+            DataInstance secondaryInstance;
             if (itemset.labelRef.getInstanceName() != null) {
-                fi = formDef.getNonMainInstance(itemset.labelRef.getInstanceName());
-                if (fi == null) {
+                secondaryInstance = formDef.getNonMainInstance(itemset.labelRef.getInstanceName());
+                if (secondaryInstance == null) {
                     throw new XFormParseException("Instance: " + itemset.labelRef.getInstanceName() + " Does not exists");
                 }
             } else {
-                fi = instance;
+                secondaryInstance = instance;
             }
 
             // Don't try to validate references if the external instance could not be resolved. We allow parsing a form
             // with placeholder external secondary instances for cases where a ReferenceManager can't be configured.
-            if (!(fi instanceof ExternalDataInstance) || !((ExternalDataInstance) fi).isUsingPlaceholder()) {
-                if (fi.getTemplatePath(itemset.labelRef) == null) {
+            if (!(secondaryInstance instanceof ExternalDataInstance) || !((ExternalDataInstance) secondaryInstance).isUsingPlaceholder()) {
+                if (secondaryInstance.getTemplatePath(itemset.labelRef) == null) {
                     throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
                 }
                 //check value nodes exist
-                else if (itemset.valueRef != null && fi.getTemplatePath(itemset.valueRef) == null) {
+                else if (itemset.valueRef != null && secondaryInstance.getTemplatePath(itemset.valueRef) == null) {
                     throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
                 }
             }
