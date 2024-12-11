@@ -1001,15 +1001,15 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     /**
-     * This provides a method of indexing fields stored in prior repeat groups.
+     * Provides a method of indexing fields stored in a repeat without writing an XPath filter expression.
      * <p>
-     * args[0] = generic XPath expression to index
-     * args[1] = generic XPath expression for group to index
-     * args[2] = index number for group
-     * args[3] = generic XPath expression for add'l group to index (if 5 or 7 parameters passed)
-     * args[4] = index number for group (if 5 or 7 parameters passed)
-     * args[5] = generic XPath expression for add'l group to index (if 7 parameters passed)
-     * args[6] = index number for group (if 7 parameters passed)
+     * args[0] = reference to a field inside one or more repeats
+     * args[1] = generic XPath expression for repeat to index
+     * args[2] = index number for repeat instance
+     * args[3] = generic XPath expression for add'l repeat to index (if 5 or 7 parameters passed)
+     * args[4] = index number for repeat (if 5 or 7 parameters passed)
+     * args[5] = generic XPath expression for add'l repeat to index (if 7 parameters passed)
+     * args[6] = index number for repeat (if 7 parameters passed)
      */
     public static Object indexedRepeat(DataInstance model, EvaluationContext ec, XPathExpression[] args, Object[] argVals) throws XPathTypeMismatchException {
         // initialize target and context references
@@ -1025,7 +1025,7 @@ public class XPathFuncExpr extends XPathExpression {
         for (int pathargi = 1, idxargi = 2; idxargi < args.length; pathargi += 2, idxargi += 2) {
             // confirm that we were passed an XPath
             if (!(args[pathargi] instanceof XPathPathExpr)) {
-                throw new XPathTypeMismatchException("indexed-repeat(): parameter " + (pathargi + 1) + " must be XPath repeat-group reference");
+                throw new XPathTypeMismatchException("indexed-repeat(): parameter " + (pathargi + 1) + " must be a reference to a repeat");
             }
             // confirm that the passed XPath is a parent of our overall target path
             // Ensure we can deal with relative group refs by contextualizing with the EC's context ref
