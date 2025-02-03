@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 
-
 /**
  * This class represents the xform model instance
  */
@@ -94,10 +93,8 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
      */
     public void setRoot(TreeElement topLevel) {
         root = new TreeElement();
-        if(this.getName() != null) {
-            root.setInstanceName(this.getName());
-        }
         if (topLevel != null) {
+            root.setInstanceName(topLevel.getInstanceName());
             root.addChild(topLevel);
         }
     }

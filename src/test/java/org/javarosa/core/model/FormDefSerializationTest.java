@@ -24,12 +24,15 @@ import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
 import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.instance;
 import static org.javarosa.test.XFormsElement.mainInstance;
 import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 
 import java.io.IOException;
+
 import org.javarosa.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.XFormParser;
@@ -75,6 +78,32 @@ public class FormDefSerializationTest {
 
         deserialized.next();
         assertThat(deserialized.getFormDef().getMainInstance().getBase().getInstanceName(), is(nullValue()));
+    }
+
+    @Test public void serializeAndDeserializeFormWithDefaultAnswerInSelectQuestion_worksCorrectly() throws IOException, DeserializationException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Internal choices", html(
+            head(
+                title("Internal choices"),
+                model(
+                    mainInstance(
+                        t("data id='main-instance'",
+                            t("select-from-secondary-instance", "a")
+                        )
+                    ),
+                    instance("secondary-instance",
+                        t("item",
+                            t("label", "A"),
+                            t("value", "a")
+                        )
+                    )
+                )
+            ),
+            body(
+                select1Dynamic("/data/select-from-secondary-instance", "instance('secondary-instance')/root/item")
+            ))
+        );
+
+        scenario.serializeAndDeserializeForm();
     }
 
     private static Scenario getSimplestFormScenario() throws IOException, XFormParser.ParseException {
