@@ -889,7 +889,7 @@ public class XFormParser implements IXFormParserFunctions {
                 value = e.getText(0);
             }
 
-            action = new SetValueAction(treeref, value);
+            action = new SetValueAction(treeref, new XPathStringLiteral(value));
         } else {
             try {
                 action = new SetValueAction(treeref, valueExpression.equals("") ? new XPathStringLiteral("")
