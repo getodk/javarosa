@@ -137,6 +137,34 @@ public class SetValueActionTest {
         assertThat(scenario.answerOf("/data/destination"), is(intAnswer(16)));
     }
 
+    @Test
+    public void setvalueWithNoValue_isSerializedAndDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Setvalue action", html(
+            head(
+                title("Setvalue action"),
+                model(
+                    mainInstance(t("data id=\"setvalue\"",
+                        t("source"),
+                        t("destination", "10")
+                    )),
+                    bind("/data/destination").type("int")
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalue("xforms-value-changed", "/data/destination"))
+            )));
+
+        scenario.serializeAndDeserializeForm();
+
+        assertThat(scenario.answerOf("/data/destination"), is(intAnswer(10)));
+
+        scenario.next();
+        scenario.answer(5);
+
+        assertThat(scenario.answerOf("/data/destination"), is(nullValue()));
+    }
+
     //region groups
     @Test
     public void setvalueInGroup_setsValueOutsideOfGroup() throws IOException, XFormParser.ParseException {
