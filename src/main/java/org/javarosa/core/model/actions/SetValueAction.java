@@ -37,8 +37,6 @@ public class SetValueAction extends Action {
     /** the value to be assigned to the target when this action is triggered **/
     private XPathExpression value;
 
-    private String explicitValue;
-
     public static final String ELEMENT_NAME = "setvalue";
 
     public SetValueAction() {
@@ -49,12 +47,6 @@ public class SetValueAction extends Action {
         super(ELEMENT_NAME);
         this.target = target;
         this.value = value;
-    }
-
-    public SetValueAction(TreeReference target, String explicitValue) {
-        super(ELEMENT_NAME);
-        this.target = target;
-        this.explicitValue = explicitValue;
     }
 
     public static IElementHandler getHandler() {
@@ -101,12 +93,7 @@ public class SetValueAction extends Action {
             }
         }
 
-        Object result;
-        if (explicitValue != null) {
-            result = explicitValue;
-        } else {
-            result = XPathFuncExpr.unpack(value.eval(model.getMainInstance(), context));
-        }
+        Object result = XPathFuncExpr.unpack(value.eval(model.getMainInstance(), context));
 
         int dataType = node.getDataType();
         IAnswerData val = IAnswerData.wrapData(result, dataType);
@@ -123,19 +110,11 @@ public class SetValueAction extends Action {
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         target = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-        explicitValue = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
-        if(explicitValue == null) {
-            value = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
-        }
-
+        value = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.write(out, target);
-
-        ExtUtil.write(out, ExtUtil.emptyIfNull(explicitValue));
-        if(explicitValue == null) {
-            ExtUtil.write(out, new ExtWrapTagged(value));
-        }
+        ExtUtil.write(out, new ExtWrapTagged(value));
     }
 }
