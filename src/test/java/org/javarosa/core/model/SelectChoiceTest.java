@@ -209,9 +209,9 @@ public class SelectChoiceTest {
                             t("select"))))),
             body(
                 repeat("/data/repeat",
-                    input("value"),
-                    input("label"),
-                    input("special-property")),
+                    input("/data/repeat/value"),
+                    input("/data/repeat/label"),
+                    input("/data/repeat/special-property")),
                 input("filter"),
                 select1Dynamic("/data/select", "../repeat")
             )));
@@ -228,6 +228,28 @@ public class SelectChoiceTest {
         scenario.answer("/data/repeat[0]/special-property", "changed");
         children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
         assertThat(children.get(1), equalTo(new Pair<>("special-property", "changed")));
+    }
+
+    @Test
+    public void selectFromRepeat_usesSpecifiedValueAndLabelRefs() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init("Select from repeat", html(
+            head(
+                title("Select from repeat"),
+                model(
+                    mainInstance(
+                        t("data id='repeat-select'",
+                            t("repeat",
+                                t("first_name")),
+                            t("select"))))),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/first_name")),
+                select1Dynamic("/data/select", "/data/repeat[./first_name != '']", "first_name", "first_name")
+            )));
+        scenario.answer("/data/repeat[0]/first_name", "b");
+
+        assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("b"));
+        assertThat(scenario.choicesOf("/data/select").get(0).getLabelInnerText(), is("b"));
     }
 
     @Test
