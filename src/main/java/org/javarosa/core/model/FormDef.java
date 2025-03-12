@@ -29,6 +29,7 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.AnswerDataUtil;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
@@ -44,6 +45,7 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.Extras;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -1097,6 +1099,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         if (formInitializationMode == FormInitializationMode.NEW_FORM) {// only preload new forms (we may have to revisit
             // this)
             preloadInstance(mainInstance.getRoot());
+        } else if (formInitializationMode == FormInitializationMode.FINALIZED_FORM_EDIT) {
+            TreeElement metaSection = mainInstance.getRoot().getFirstChild("meta");
+            if (metaSection != null) {
+                TreeElement instanceId = metaSection.getFirstChild("instanceID");
+                if (instanceId  != null) {
+                    TreeElement deprecatedId = new TreeElement("deprecatedID");
+                    deprecatedId.setValue(instanceId.getValue());
+                    metaSection.addChild(deprecatedId);
+                    instanceId.setValue(new StringData("uuid:" + PropertyUtils.genUUID()));
+                }
+            }
         }
 
         if (getLocalizer() != null && getLocalizer().getLocale() == null) {
