@@ -1083,16 +1083,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /**
      * meant to be called after deserialization and initialization of handlers
      *
-     * @param newInstance true if the form is to be used for a new entry interaction,
-     *                    false if it is using an existing IDataModel
+     * @param formInitializationMode Specifies the mode in which the form is being initialized:
+     *                               NEW_FORM: The form is being initialized for a new entry interaction.
+     *                               DRAFT_FORM_EDIT: The form is being edited from a saved draft.
+     *                               FINALIZED_FORM_EDIT: The form is being edited after being finalized.
      */
-    public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
+    public void initialize(FormInitializationMode formInitializationMode, InstanceInitializationFactory factory) {
         HashMap<String, DataInstance> formInstances = getFormInstances();
         for (String instanceId : formInstances.keySet()) {
             DataInstance instance = formInstances.get(instanceId);
             instance.initialize(factory, instanceId);
         }
-        if (newInstance) {// only preload new forms (we may have to revisit
+        if (formInitializationMode == FormInitializationMode.NEW_FORM) {// only preload new forms (we may have to revisit
             // this)
             preloadInstance(mainInstance.getRoot());
         }
@@ -1101,7 +1103,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             getLocalizer().setToDefault();
         }
 
-        if (newInstance) {
+        if (formInitializationMode == FormInitializationMode.NEW_FORM) {
             actionController.triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_FIRST_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
 
             // xforms-ready is marked as deprecated as of JavaRosa 2.14.0 but is still dispatched for compatibility with

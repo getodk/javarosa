@@ -46,6 +46,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.FormInitializationMode;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.test.Scenario;
@@ -386,7 +387,7 @@ public class XFormParserTest {
         FormDef formDef = parse(r("form-with-setvalue-action.xml"));
 
         // dispatch 'odk-instance-first-load' event (Actions.EVENT_ODK_INSTANCE_FIRST_LOAD)
-        formDef.initialize(true, new InstanceInitializationFactory());
+        formDef.initialize(FormInitializationMode.NEW_FORM, new InstanceInitializationFactory());
 
         // Then
         assertEquals(formDef.getTitle(), "SetValue action");
