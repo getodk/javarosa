@@ -144,7 +144,7 @@ public class Scenario {
         this.blankInstance = blankInstance;
     }
 
-    private static Scenario from(FormDef formDef, FormInitializationMode formInitializationMode) {
+    public static Scenario from(FormDef formDef, FormInitializationMode formInitializationMode) {
         return from(formDef, formInitializationMode, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)));
     }
 

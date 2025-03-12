@@ -18,6 +18,7 @@ package org.javarosa.core.model.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.Scenario.AnswerResult.CONSTRAINT_VIOLATED;
 import static org.javarosa.test.Scenario.AnswerResult.OK;
@@ -30,6 +31,7 @@ import static org.javarosa.test.XFormsElement.input;
 import static org.javarosa.test.XFormsElement.item;
 import static org.javarosa.test.XFormsElement.label;
 import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.meta;
 import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.select1;
@@ -43,8 +45,11 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.FormInitializationMode;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
@@ -462,5 +467,35 @@ public class FormDefTest {
         });
 
         Scenario.init(formDef);
+    }
+
+    @Test public void addDeprecatedIDAndUpdateInstanceID_whenFormDefInitializedForFinalizedFormEdit() throws IOException, XFormParser.ParseException {
+        Scenario newFormScenario = Scenario.init("Simplest", html(
+            head(
+                title("Simplest"),
+                model(
+                    mainInstance(t("data id=\"simplest\"",
+                        t("a"),
+                        meta(t("instanceID"))
+                    )),
+                    bind("/data/a").type("string"),
+                    bind("/data/meta/instanceID").preload("uid")
+                )
+            ),
+            body(
+                input("/data/a")
+            )));
+
+        TreeElement meta  = newFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
+        IAnswerData originalInstanceID = meta.getFirstChild("instanceID").getValue();
+
+        Scenario editFinalizedFormScenario = Scenario.from(newFormScenario.getFormDef(), FormInitializationMode.FINALIZED_FORM_EDIT);
+
+        meta  = editFinalizedFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
+        IAnswerData newInstanceID = meta.getFirstChild("instanceID").getValue();
+        IAnswerData deprecatedID = meta.getFirstChild("deprecatedID").getValue();
+
+        assertThat(deprecatedID, is(originalInstanceID));
+        assertThat(newInstanceID, not(originalInstanceID));
     }
 }
