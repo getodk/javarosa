@@ -19,7 +19,6 @@ import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.FormInitializationMode;
 import org.javarosa.core.services.PrototypeManager;
@@ -183,7 +182,7 @@ public class RandomizeTest {
     }
 
     private static void initializeNewInstance(FormDef formDef) {
-        formDef.initialize(FormInitializationMode.NEW_FORM, new InstanceInitializationFactory());
+        formDef.initialize(FormInitializationMode.NEW_FORM);
     }
 
     private List<SelectChoice> getSelectChoices(FormDef formDef, String ref) {

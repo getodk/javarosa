@@ -35,7 +35,6 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.FormInitializationMode;
@@ -157,7 +156,7 @@ public class Scenario {
     public void init(FormInitializationMode formInitializationMode) {
         controller = controllerSupplier.apply(formDef);
         model = controller.getModel();
-        formDef.initialize(formInitializationMode, new InstanceInitializationFactory());
+        formDef.initialize(formInitializationMode);
     }
 
     // region Miscellaneous

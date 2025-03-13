@@ -35,7 +35,6 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -1090,11 +1089,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      *                               DRAFT_FORM_EDIT: The form is being edited from a saved draft.
      *                               FINALIZED_FORM_EDIT: The form is being edited after being finalized.
      */
-    public void initialize(FormInitializationMode formInitializationMode, InstanceInitializationFactory factory) {
+    public void initialize(FormInitializationMode formInitializationMode) {
         HashMap<String, DataInstance> formInstances = getFormInstances();
         for (String instanceId : formInstances.keySet()) {
             DataInstance instance = formInstances.get(instanceId);
-            instance.initialize(factory, instanceId);
+            instance.initialize(instanceId);
         }
         if (formInitializationMode == FormInitializationMode.NEW_FORM) {// only preload new forms (we may have to revisit
             // this)

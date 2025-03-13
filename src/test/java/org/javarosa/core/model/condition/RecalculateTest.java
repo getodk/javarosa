@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.FormInitializationMode;
 import org.javarosa.test.FormParseInit;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -19,7 +18,7 @@ public class RecalculateTest {
     public void setUp() throws XFormParser.ParseException {
         FormParseInit fpi = new FormParseInit(r("calculate-now.xml"));
         formDef = fpi.getFormDef();
-        formDef.initialize(FormInitializationMode.NEW_FORM, new InstanceInitializationFactory());
+        formDef.initialize(FormInitializationMode.NEW_FORM);
     }
 
     @Test
