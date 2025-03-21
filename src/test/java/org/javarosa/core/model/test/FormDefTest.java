@@ -498,4 +498,33 @@ public class FormDefTest {
         assertThat(deprecatedID, is(originalInstanceID));
         assertThat(newInstanceID, not(originalInstanceID));
     }
+
+    @Test public void updateInstanceIDAndDeprecatedID_whenFormDefInitializedForSubsequentEditsOfFinalizedForm() throws IOException, XFormParser.ParseException {
+        Scenario newFormScenario = Scenario.init("Simplest", html(
+            head(
+                title("Simplest"),
+                model(
+                    mainInstance(t("data id=\"simplest\"",
+                        t("a"),
+                        meta(t("instanceID"))
+                    )),
+                    bind("/data/a").type("string"),
+                    bind("/data/meta/instanceID").preload("uid")
+                )
+            ),
+            body(
+                input("/data/a")
+            )));
+
+        Scenario editFinalizedFormScenario = Scenario.from(newFormScenario.getFormDef(), FormInitializationMode.FINALIZED_FORM_EDIT);
+        TreeElement meta  = editFinalizedFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
+
+        IAnswerData instanceID = meta.getFirstChild("instanceID").getValue();
+
+        editFinalizedFormScenario = Scenario.from(newFormScenario.getFormDef(), FormInitializationMode.FINALIZED_FORM_EDIT);
+        meta  = editFinalizedFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
+
+        assertThat(instanceID, is(meta.getFirstChild("deprecatedID").getValue()));
+        assertThat(instanceID, not(meta.getFirstChild("instanceID").getValue()));
+    }
 }

@@ -1103,9 +1103,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             if (metaSection != null) {
                 TreeElement instanceId = metaSection.getFirstChild("instanceID");
                 if (instanceId  != null) {
-                    TreeElement deprecatedId = new TreeElement("deprecatedID");
+                    TreeElement deprecatedId = metaSection.getFirstChild("deprecatedID");
+                    if (deprecatedId == null) {
+                        deprecatedId = new TreeElement("deprecatedID");
+                        metaSection.addChild(deprecatedId);
+                    }
                     deprecatedId.setValue(instanceId.getValue());
-                    metaSection.addChild(deprecatedId);
                     instanceId.setValue(new StringData("uuid:" + PropertyUtils.genUUID()));
                 }
             }
