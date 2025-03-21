@@ -16,6 +16,7 @@
 
 package org.javarosa.core.model.test;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -49,7 +50,7 @@ import org.javarosa.core.model.FormInitializationMode;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
@@ -470,7 +471,7 @@ public class FormDefTest {
     }
 
     @Test public void addDeprecatedIDAndUpdateInstanceID_whenFormDefInitializedForFinalizedFormEdit() throws IOException, XFormParser.ParseException {
-        Scenario newFormScenario = Scenario.init("Simplest", html(
+        FormDef formDef = Scenario.createFormDef("Simplest", html(
             head(
                 title("Simplest"),
                 model(
@@ -486,21 +487,23 @@ public class FormDefTest {
                 input("/data/a")
             )));
 
-        TreeElement meta  = newFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
-        IAnswerData originalInstanceID = meta.getFirstChild("instanceID").getValue();
+        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setValue(new StringData("originalInstanceId"));
+        assertThat(
+            formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("deprecatedID"),
+            is(nullValue())
+        );
 
-        Scenario editFinalizedFormScenario = Scenario.from(newFormScenario.getFormDef(), FormInitializationMode.FINALIZED_FORM_EDIT);
+        formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
 
-        meta  = editFinalizedFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
-        IAnswerData newInstanceID = meta.getFirstChild("instanceID").getValue();
-        IAnswerData deprecatedID = meta.getFirstChild("deprecatedID").getValue();
+        IAnswerData newInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
+        IAnswerData deprecatedID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("deprecatedID").getValue();
 
-        assertThat(deprecatedID, is(originalInstanceID));
-        assertThat(newInstanceID, not(originalInstanceID));
+        assertThat(newInstanceID.getValue(), not("originalInstanceId"));
+        assertThat(deprecatedID.getValue(), is("originalInstanceId"));
     }
 
     @Test public void updateInstanceIDAndDeprecatedID_whenFormDefInitializedForSubsequentEditsOfFinalizedForm() throws IOException, XFormParser.ParseException {
-        Scenario newFormScenario = Scenario.init("Simplest", html(
+        FormDef formDef = Scenario.createFormDef("Simplest", html(
             head(
                 title("Simplest"),
                 model(
@@ -516,15 +519,19 @@ public class FormDefTest {
                 input("/data/a")
             )));
 
-        Scenario editFinalizedFormScenario = Scenario.from(newFormScenario.getFormDef(), FormInitializationMode.FINALIZED_FORM_EDIT);
-        TreeElement meta  = editFinalizedFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
+        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setValue(new StringData("originalInstanceId"));
+        formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
 
-        IAnswerData instanceID = meta.getFirstChild("instanceID").getValue();
+        IAnswerData originalInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
+        IAnswerData originalDeprecatedID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("deprecatedID").getValue();
 
-        editFinalizedFormScenario = Scenario.from(newFormScenario.getFormDef(), FormInitializationMode.FINALIZED_FORM_EDIT);
-        meta  = editFinalizedFormScenario.getFormDef().getMainInstance().getRoot().getFirstChild("meta");
+        formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
 
-        assertThat(instanceID, is(meta.getFirstChild("deprecatedID").getValue()));
-        assertThat(instanceID, not(meta.getFirstChild("instanceID").getValue()));
+        IAnswerData newInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
+        IAnswerData newDeprecatedID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("deprecatedID").getValue();
+
+        assertThat(newDeprecatedID.getValue(), not(originalDeprecatedID.getValue()));
+        assertThat(newDeprecatedID.getValue(), is(originalInstanceID.getValue()));
+        assertThat(originalInstanceID.getValue(), not(newInstanceID.getValue()));
     }
 }
