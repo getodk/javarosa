@@ -487,7 +487,7 @@ public class FormDefTest {
                 input("/data/a")
             )));
 
-        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setValue(new StringData("originalInstanceId"));
+        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setAnswer(new StringData("originalInstanceId"));
         assertThat(
             formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("deprecatedID"),
             is(nullValue())
@@ -519,7 +519,7 @@ public class FormDefTest {
                 input("/data/a")
             )));
 
-        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setValue(new StringData("originalInstanceId"));
+        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setAnswer(new StringData("originalInstanceId"));
         formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
 
         IAnswerData originalInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
