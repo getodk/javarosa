@@ -1095,8 +1095,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             DataInstance instance = formInstances.get(instanceId);
             instance.initialize(instanceId);
         }
-        if (formInitializationMode == FormInitializationMode.NEW_FORM) {// only preload new forms (we may have to revisit
-            // this)
+        if (formInitializationMode == FormInitializationMode.NEW_FORM) {
+            // Preload data only for new forms. Existing forms should retain their current state.
             preloadInstance(mainInstance.getRoot());
         } else if (formInitializationMode == FormInitializationMode.FINALIZED_FORM_EDIT) {
             TreeElement metaSection = mainInstance.getRoot().getFirstChild("meta");
