@@ -1084,10 +1084,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     /**
      * meant to be called after deserialization and initialization of handlers
      *
-     * @param formInitializationMode Specifies the mode in which the form is being initialized:
-     *                               NEW_FORM: The form is being initialized for a new entry interaction.
-     *                               DRAFT_FORM_EDIT: The form is being edited from a saved draft.
-     *                               FINALIZED_FORM_EDIT: The form is being edited after being finalized.
+     * @param formInitializationMode The mode in which the form is being initialized.
+     *                               See {@link FormInitializationMode] for available options.
+     *                               Note: {@link FormInitializationMode#FINALIZED_FORM_EDIT} populates `deprecatedId`.
      */
     public void initialize(FormInitializationMode formInitializationMode) {
         HashMap<String, DataInstance> formInstances = getFormInstances();
