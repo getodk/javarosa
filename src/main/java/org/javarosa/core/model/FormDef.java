@@ -36,6 +36,7 @@ import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.QuestionPreloader;
@@ -1079,6 +1080,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 getElementsFromReferences(referencesRemaining, candidate, elementsSoFar);
             }
         }
+    }
+
+    /**
+     * meant to be called after deserialization and initialization of handlers
+     *
+     * @param newInstance true if the form is to be used for a new entry interaction,
+     *                    false if it is using an existing IDataModel
+     *
+     * @deprecated Use {@link #initialize(FormInitializationMode)} instead.
+     */
+    @Deprecated
+    public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
+        initialize(newInstance ? FormInitializationMode.NEW_FORM : FormInitializationMode.DRAFT_FORM_EDIT);
     }
 
     /**
