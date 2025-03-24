@@ -503,7 +503,7 @@ public class FormDefTest {
     }
 
     @Test public void updateInstanceIDAndDeprecatedID_whenFormDefInitializedForSubsequentEditsOfFinalizedForm() throws IOException, XFormParser.ParseException {
-        FormDef formDef = Scenario.createFormDef("Simplest", html(
+        XFormsElement formXml = html(
             head(
                 title("Simplest"),
                 model(
@@ -517,7 +517,9 @@ public class FormDefTest {
             ),
             body(
                 input("/data/a")
-            )));
+            ));
+
+        FormDef formDef = Scenario.createFormDef("Simplest", formXml);
 
         formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setAnswer(new StringData("originalInstanceId"));
         formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
@@ -525,6 +527,9 @@ public class FormDefTest {
         IAnswerData originalInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
         IAnswerData originalDeprecatedID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("deprecatedID").getValue();
 
+        formDef = Scenario.createFormDef("Simplest", formXml);
+
+        formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setAnswer(originalInstanceID);
         formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
 
         IAnswerData newInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
