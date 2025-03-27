@@ -303,7 +303,7 @@ public abstract class DataInstance<T extends AbstractTreeElement<T>> implements 
 
 
 
-    public abstract void initialize(InstanceInitializationFactory initializer, String instanceId);
+    public abstract void initialize(String instanceId);
 
     public void replacePartialElements(List<TreeElement> elements) {
         for (TreeElement element : elements) {

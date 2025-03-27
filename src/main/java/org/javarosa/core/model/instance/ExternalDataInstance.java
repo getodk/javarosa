@@ -116,7 +116,7 @@ public class ExternalDataInstance extends DataInstance {
     }
 
     @Override
-    public void initialize(InstanceInitializationFactory initializer, String instanceId) {
+    public void initialize(String instanceId) {
     }
 
     @Override
