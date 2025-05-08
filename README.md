@@ -72,26 +72,26 @@ If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md
 
 Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/getodk/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS.
 
-### Publishing the jar to OSSRH and Maven Central
+### Publishing the jar to Central Repository and Maven Central
 
-Project maintainers have the private keys to upload signed jars to Sonatype's OSS Repository Hosting (OSSRH) service which is then synced to Maven's Central Repository. This process is [outlined here](http://central.sonatype.org/pages/apache-maven.html).
+Project maintainers have the private keys to upload signed jars to Sonatype's Central Repository which is then synced to Maven Central. This process is [outlined here](https://central.sonatype.org).
 
-While Gradle is the default build tool for all ODK tools (including this one), Maven is used for for publishing the jar because OSSRH's Gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
+While Gradle is the default build tool for all ODK tools (including this one), Maven is used for for publishing the jar because Sonatype's Gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
 
-Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and greater (not `gpg`), the latest versions of the Maven plugins in `pom.xml`, and a `secrets.xml` file that include the GPG home directory, key name, and pass phrase. All that is needed in the GPG home directory is `private-keys-v1.d` and `pubring.gpg`.
+Deviations from Sonatype's documentation are that maintainers use `gpg2` v2.1 and greater (not `gpg`), the latest versions of the Maven plugins in `pom.xml`, and a `secrets.xml` file that include the GPG home directory, key name, and pass phrase. All that is needed in the GPG home directory is `private-keys-v1.d` and `pubring.gpg`.
 ```
 <!-- secrets.xml -->
 <settings>
     <servers>
         <server>
-            <id>ossrh</id>
+            <id>central</id>
             <username>getodk</username>
             <password>very-secure-password</password>
         </server>
     </servers>
     <profiles>
         <profile>
-            <id>ossrh</id>
+            <id>central</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -108,13 +108,13 @@ Deviations from OSSRH's documentation are that maintainers use `gpg2` v2.1 and g
 
 Official releases are built by a Github action when a commit is tagged. Before tagging a release:
 
-1. Update the version in `build.gradle` and `pom.xml` and merge the changes to master.
+1. Update the version in `pom.xml` and merge the changes to master.
     * Use `x.x.x-SNAPSHOT` for snapshots releases and `x.x.x` for production releases.
 
 To manually generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 1. Run `mvn -v` to confirm the Java version and vendor used to build the release.
 1. In the repo folder, run `mvn -s secrets.xml clean deploy` to publish.
-    * If successful, both snapshots and production releases will appear in OSSRH [here](https://oss.sonatype.org/content/groups/public/org/getodk/javarosa/).
-    * Production releases are automatically synced to Central [here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22javarosa%22) a few hours later.
+    * If successful, both snapshots and production releases will appear in Sonatype [here](https://central.sonatype.com/artifact/org.getodk/javarosa).
+    * Production releases are automatically synced to Maven [here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22javarosa%22) a few hours later.
 
 Don't forget to update the `build.gradle` files in any downstream tools (e.g., ODK Collect, ODK Briefcase) to the newest version!
