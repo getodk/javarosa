@@ -35,9 +35,9 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.FormInitializationMode;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.StorageManager;
@@ -143,20 +143,20 @@ public class Scenario {
         this.blankInstance = blankInstance;
     }
 
-    public static Scenario from(FormDef formDef, FormInitializationMode formInitializationMode) {
-        return from(formDef, formInitializationMode, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)));
+    private static Scenario from(FormDef formDef, boolean newInstance) {
+        return from(formDef, newInstance, formDef1 -> new FormEntryController(new FormEntryModel(formDef1)));
     }
 
-    private static Scenario from(FormDef formDef, FormInitializationMode formInitializationMode, Function<FormDef, FormEntryController> controllerSupplier) {
+    private static Scenario from(FormDef formDef, boolean newInstance, Function<FormDef, FormEntryController> controllerSupplier) {
         Scenario scenario = new Scenario(formDef, controllerSupplier, formDef.getEvaluationContext(), formDef.getMainInstance().clone());
-        scenario.init(formInitializationMode);
+        scenario.init(newInstance);
         return scenario;
     }
 
-    public void init(FormInitializationMode formInitializationMode) {
+    public void init(boolean newInstance) {
         controller = controllerSupplier.apply(formDef);
         model = controller.getModel();
-        formDef.initialize(formInitializationMode);
+        formDef.initialize(newInstance, new InstanceInitializationFactory());
     }
 
     // region Miscellaneous
@@ -239,7 +239,7 @@ public class Scenario {
      */
     public void newInstance() {
         formDef.setInstance(blankInstance.clone());
-        init(FormInitializationMode.NEW_FORM);
+        init(true);
         evaluationContext = formDef.getEvaluationContext();
     }
 
@@ -284,7 +284,7 @@ public class Scenario {
         );
 
         tempFile.delete();
-        return Scenario.from(deserializedFormDef, FormInitializationMode.DRAFT_FORM_EDIT);
+        return Scenario.from(deserializedFormDef, false);
     }
 
     // The fact that we need to pass in the same raw form definition that the current scenario is built around suggests
@@ -302,7 +302,7 @@ public class Scenario {
         XFormParser parser = new XFormParser(formReader, instanceReader);
         FormDef restoredFormDef = parser.parse();
 
-        return Scenario.from(restoredFormDef, FormInitializationMode.DRAFT_FORM_EDIT);
+        return Scenario.from(restoredFormDef, false);
     }
 
     /**
@@ -476,16 +476,16 @@ public class Scenario {
      */
     public static Scenario init(File formFile) throws XFormParser.ParseException {
         FormDef formDef = createFormDef(formFile);
-        return Scenario.from(formDef, FormInitializationMode.NEW_FORM);
+        return Scenario.from(formDef, true);
     }
 
     private static Scenario init(File formFile, Function<FormDef, FormEntryController> controllerSupplier) throws XFormParser.ParseException {
         FormDef formDef = createFormDef(formFile);
-        return Scenario.from(formDef, FormInitializationMode.NEW_FORM, controllerSupplier);
+        return Scenario.from(formDef, true, controllerSupplier);
     }
 
     public static Scenario init(FormDef formDef) throws XFormParser.ParseException {
-        return Scenario.from(formDef, FormInitializationMode.NEW_FORM);
+        return Scenario.from(formDef, true);
     }
 
     @NotNull

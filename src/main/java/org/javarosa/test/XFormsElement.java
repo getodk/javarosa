@@ -128,10 +128,6 @@ public interface XFormsElement {
         return t("instance", children);
     }
 
-    static XFormsElement meta(XFormsElement... children) {
-        return t("meta", children);
-    }
-
     static XFormsElement instance(String name, XFormsElement... children) {
         return t("instance id=\"" + name + "\"", t("root", children));
     }
