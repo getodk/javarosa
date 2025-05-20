@@ -51,7 +51,6 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
@@ -531,9 +530,6 @@ public class FormDefTest {
         formDef = Scenario.createFormDef("Simplest", formXml);
 
         formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").setAnswer(originalInstanceID);
-        TreeElement deprecatedID = new TreeElement("deprecatedID");
-        deprecatedID.setAnswer(originalDeprecatedID);
-        formDef.getMainInstance().getRoot().getFirstChild("meta").addChild(deprecatedID);
         formDef.initialize(FormInitializationMode.FINALIZED_FORM_EDIT);
 
         IAnswerData newInstanceID = formDef.getMainInstance().getRoot().getFirstChild("meta").getFirstChild("instanceID").getValue();
