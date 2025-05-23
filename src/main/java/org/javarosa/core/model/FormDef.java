@@ -29,14 +29,13 @@ import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.AnswerDataUtil;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.ExternalDataInstance;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.InstanceInitializationFactory;
+import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.QuestionPreloader;
@@ -45,7 +44,6 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.Extras;
-import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -1087,51 +1085,23 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
      *
      * @param newInstance true if the form is to be used for a new entry interaction,
      *                    false if it is using an existing IDataModel
-     *
-     * @deprecated Use {@link #initialize(FormInitializationMode)} instead.
      */
-    @Deprecated
     public void initialize(boolean newInstance, InstanceInitializationFactory factory) {
-        initialize(newInstance ? FormInitializationMode.NEW_FORM : FormInitializationMode.DRAFT_FORM_EDIT);
-    }
-
-    /**
-     * meant to be called after deserialization and initialization of handlers
-     *
-     * @param formInitializationMode The mode in which the form is being initialized.
-     *                               See {@link FormInitializationMode] for available options.
-     *                               Note: {@link FormInitializationMode#FINALIZED_FORM_EDIT} populates `deprecatedId`.
-     */
-    public void initialize(FormInitializationMode formInitializationMode) {
         HashMap<String, DataInstance> formInstances = getFormInstances();
         for (String instanceId : formInstances.keySet()) {
             DataInstance instance = formInstances.get(instanceId);
-            instance.initialize(instanceId);
+            instance.initialize(factory, instanceId);
         }
-        if (formInitializationMode == FormInitializationMode.NEW_FORM) {
-            // Preload data only for new forms. Existing forms should retain their current state.
+        if (newInstance) {// only preload new forms (we may have to revisit
+            // this)
             preloadInstance(mainInstance.getRoot());
-        } else if (formInitializationMode == FormInitializationMode.FINALIZED_FORM_EDIT) {
-            TreeElement metaSection = mainInstance.getRoot().getFirstChild("meta");
-            if (metaSection != null) {
-                TreeElement instanceId = metaSection.getFirstChild("instanceID");
-                if (instanceId != null) {
-                    TreeElement deprecatedId = metaSection.getFirstChild("deprecatedID");
-                    if (deprecatedId == null) {
-                        deprecatedId = new TreeElement("deprecatedID");
-                        metaSection.addChild(deprecatedId);
-                    }
-                    deprecatedId.setAnswer(instanceId.getValue());
-                    instanceId.setAnswer(new StringData("uuid:" + PropertyUtils.genUUID()));
-                }
-            }
         }
 
         if (getLocalizer() != null && getLocalizer().getLocale() == null) {
             getLocalizer().setToDefault();
         }
 
-        if (formInitializationMode == FormInitializationMode.NEW_FORM) {
+        if (newInstance) {
             actionController.triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_FIRST_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
 
             // xforms-ready is marked as deprecated as of JavaRosa 2.14.0 but is still dispatched for compatibility with
