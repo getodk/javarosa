@@ -24,7 +24,7 @@ ODK JavaRosa is part of ODK, a free and open-source set of tools which help orga
 
 Releases are available from [Maven Central](https://central.sonatype.com/artifact/org.getodk/javarosa).
 
-Snapshots versions are also published for each commit to `master` and are available from [oss.sonatype.org](https://oss.sonatype.org).
+Snapshots are published for each commit to `master` and are available [here](https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/getodk/javarosa).
 
 ## Requirements
 
@@ -114,7 +114,7 @@ Official releases are built by a Github action when a commit is tagged. Before t
 To manually generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
 1. Run `mvn -v` to confirm the Java version and vendor used to build the release.
 1. In the repo folder, run `mvn -s secrets.xml clean deploy` to publish.
-    * If successful, both snapshots and production releases will appear in Sonatype [here](https://central.sonatype.com/artifact/org.getodk/javarosa).
-    * Production releases are automatically synced to Maven [here](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22javarosa%22) a few hours later.
+    * Snapshots will appear [here](https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/getodk/javarosa).
+    * Releases will appear in [Maven Central](https://central.sonatype.com/artifact/org.getodk/javarosa).
 
 Don't forget to update the `build.gradle` files in any downstream tools (e.g., ODK Collect, ODK Briefcase) to the newest version!
