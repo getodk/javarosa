@@ -2498,9 +2498,9 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface ModelAttributeProcessor extends Processor {
 
-        Set<Pair<String, String>> getModelAttributes();
+        @NotNull Set<@NotNull Pair<@NotNull String, @NotNull String>> getModelAttributes();
 
-        void processModelAttribute(String name, String value) throws ParseException;
+        void processModelAttribute(@NotNull String name, @NotNull String value) throws ParseException;
     }
 
     public interface QuestionProcessor extends Processor {
