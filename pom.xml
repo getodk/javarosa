@@ -4,7 +4,7 @@
   <artifactId>javarosa</artifactId>
   <!-- snapshot release = x.x.x-${revision}-SNAPSHOT -->
   <!-- production release = x.x.x -->
-  <version>5.1.0-${revision}-SNAPSHOT</version>
+  <version>5.1.0</version>
   <packaging>jar</packaging>
   <name>javarosa</name>
   <description>A Java library for rendering forms that are compliant with ODK XForms spec</description>
