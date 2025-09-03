@@ -7,6 +7,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.XFormsElement;
 import org.javarosa.model.xform.XPathReference;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -105,12 +106,12 @@ public class BindAttributeProcessorTest {
         }
 
         @Override
-        public Set<Pair<String, String>> getBindAttributes() {
+        public @NotNull Set<@NotNull Pair<@NotNull String, @NotNull String>> getBindAttributes() {
             return attributes;
         }
 
         @Override
-        public void processBindAttribute(String name, String value, DataBinding binding) {
+        public void processBindAttribute(@NotNull String name, @NotNull String value, @NotNull DataBinding binding) {
             processCalled = true;
         }
     }

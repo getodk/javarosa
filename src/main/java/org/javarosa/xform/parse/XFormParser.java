@@ -2491,16 +2491,16 @@ public class XFormParser implements IXFormParserFunctions {
 
     public interface BindAttributeProcessor extends Processor {
 
-        Set<Pair<String, String>> getBindAttributes();
+        @NotNull Set<@NotNull Pair<@NotNull String, @NotNull String>> getBindAttributes();
 
-        void processBindAttribute(String name, String value, DataBinding binding);
+        void processBindAttribute(@NotNull String name, @NotNull String value, @NotNull DataBinding binding);
     }
 
     public interface ModelAttributeProcessor extends Processor {
 
-        Set<Pair<String, String>> getModelAttributes();
+        @NotNull Set<@NotNull Pair<@NotNull String, @NotNull String>> getModelAttributes();
 
-        void processModelAttribute(String name, String value) throws ParseException;
+        void processModelAttribute(@NotNull String name, @NotNull String value) throws ParseException;
     }
 
     public interface QuestionProcessor extends Processor {
