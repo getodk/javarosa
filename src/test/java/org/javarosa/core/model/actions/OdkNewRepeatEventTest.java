@@ -1,10 +1,18 @@
 package org.javarosa.core.model.actions;
 
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
@@ -15,13 +23,6 @@ import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.setvalue;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.test.ResourcePathHelper.r;
-
-import java.io.IOException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
 
 /**
  * Specification: https://getodk.github.io/xforms-spec/#the-odk-new-repeat-event.
@@ -206,7 +207,47 @@ public class OdkNewRepeatEventTest {
 
     // Not part of ODK XForms so throws parse exception.
     @Test(expected = XFormParseException.class)
-    public void setValueOnRepeatInsertInModel_notAllowed() throws XFormParser.ParseException {
-        Scenario.init(r("event-odk-new-repeat-model.xml"));
+    public void setValueOnRepeatInsertInModel_notAllowed() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("new repeat in model", html(
+            head(
+                title("odk-new-repeat action in model"),
+                model(
+                    mainInstance(t("data id=\"odk-new-repeat-in\"",
+                        t("repeat",
+                            t("q"))
+                    )),
+                    bind("/data/repeat/q").type("int"),
+
+                    // setvalue event in model; not part of ODK XForms specification
+                    setvalue("odk-new-repeat", "/data/repeat/q", "now()")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/q")
+                ))));
+    }
+
+    // Not part of ODK XForms so throws parse exception.
+    @Test(expected = XFormParseException.class)
+    public void setValueOnRepeatInsertAndFirstLoadInModel_notAllowed() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("new repeat in model", html(
+            head(
+                title("odk-new-repeat action in model"),
+                model(
+                    mainInstance(t("data id=\"odk-new-repeat-in\"",
+                        t("repeat",
+                            t("q"))
+                    )),
+                    bind("/data/repeat/q").type("int"),
+
+                    // setvalue event in model; not part of ODK XForms specification
+                    setvalue("odk-instance-first-load odk-new-repeat", "/data/repeat/q", "now()")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/q")
+                ))));
     }
 }
