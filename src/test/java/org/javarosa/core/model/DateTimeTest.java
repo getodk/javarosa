@@ -13,8 +13,14 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
-import static org.javarosa.test.XFormsElement.*;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
 import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.test.XFormsElement.title;
 
 public class DateTimeTest {
     @Test

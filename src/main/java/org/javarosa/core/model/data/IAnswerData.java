@@ -23,7 +23,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
-import static org.javarosa.core.model.DataType.*;
+import static org.javarosa.core.model.DataType.BOOLEAN;
+import static org.javarosa.core.model.DataType.CHOICE;
+import static org.javarosa.core.model.DataType.DATE;
+import static org.javarosa.core.model.DataType.DATE_TIME;
+import static org.javarosa.core.model.DataType.GEOPOINT;
+import static org.javarosa.core.model.DataType.GEOSHAPE;
+import static org.javarosa.core.model.DataType.GEOTRACE;
+import static org.javarosa.core.model.DataType.INTEGER;
+import static org.javarosa.core.model.DataType.LONG;
+import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
+import static org.javarosa.core.model.DataType.TIME;
 
 /**
  * An IAnswerData object represents an answer to a question
