@@ -17,21 +17,13 @@
 package org.javarosa.core.model.data;
 
 import org.javarosa.core.model.DataType;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
-import static org.javarosa.core.model.DataType.BOOLEAN;
-import static org.javarosa.core.model.DataType.CHOICE;
-import static org.javarosa.core.model.DataType.DATE;
-import static org.javarosa.core.model.DataType.GEOPOINT;
-import static org.javarosa.core.model.DataType.GEOSHAPE;
-import static org.javarosa.core.model.DataType.GEOTRACE;
-import static org.javarosa.core.model.DataType.INTEGER;
-import static org.javarosa.core.model.DataType.LONG;
-import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
-import static org.javarosa.core.model.DataType.TIME;
+import static org.javarosa.core.model.DataType.*;
 
 /**
  * An IAnswerData object represents an answer to a question
@@ -107,14 +99,28 @@ public interface IAnswerData extends Externalizable {
             return new SelectOneData().cast(new UncastData(String.valueOf(val)));
         } else if (dataType == MULTIPLE_ITEMS) {
             return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
+        } else if (dataType == TIME) {
+            if (val instanceof String) {
+                return new TimeData().cast(new UncastData(String.valueOf(val)));
+            } else {
+                return new TimeData((Date) val);
+            }
+        } else if (dataType == DATE) {
+            if (val instanceof String) {
+                return new DateData(DateUtils.parseDate(String.valueOf(val)));
+            } else {
+                return new DateData((Date) val);
+            }
+        } else if (dataType == DATE_TIME) {
+            if (val instanceof String) {
+                return new DateTimeData(DateUtils.parseDateTime(String.valueOf(val)));
+            } else {
+                return new DateTimeData((Date) val);
+            }
+        } else if (val instanceof Date) {
+            return new DateTimeData((Date) val);
         } else if (val instanceof String) {
             return new StringData((String) val);
-        } else if (val instanceof Date) {
-            if (dataType == TIME)
-                return new TimeData((Date) val);
-            if (dataType == DATE)
-                return new DateData((Date) val);
-            return new DateTimeData((Date) val);
         } else {
             throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
         }
