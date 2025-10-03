@@ -30,28 +30,28 @@ public class DateTimeTest {
                 title("Time form"),
                 model(
                     mainInstance(t("data id=\"time-form\"",
-                        t("time1"),
-                        t("time2", "23:14:00.000+02:00"),
-                        t("time3")
+                        t("calculateLiteral"),
+                        t("empty", "23:14:00.000+02:00"),
+                        t("calculateReference")
                     )),
-                    bind("/data/time1").type("time").calculate("&quot;23:14:00.000+02:00&quot;"),
-                    bind("/data/time2").type("time"),
-                    bind("/data/time3").type("time").calculate("/data/time2")
+                    bind("/data/calculateLiteral").type("time").calculate("&quot;23:14:00.000+02:00&quot;"),
+                    bind("/data/empty").type("time"),
+                    bind("/data/calculateReference").type("time").calculate("/data/empty")
                 )
             ),
             body(
-                input("/data/time1"),
-                input("/data/time2"),
-                input("/data/time3")
+                input("/data/calculateLiteral"),
+                input("/data/empty"),
+                input("/data/calculateReference")
             )
         ));
-        IAnswerData answer1 = scenario.answerOf("/data/time1");
+        IAnswerData answer1 = scenario.answerOf("/data/calculateLiteral");
         assertThat(answer1 instanceof TimeData, equalTo(true));
 
-        IAnswerData answer2 = scenario.answerOf("/data/time2");
+        IAnswerData answer2 = scenario.answerOf("/data/empty");
         assertThat(answer2 instanceof TimeData, equalTo(true));
 
-        IAnswerData answer3 = scenario.answerOf("/data/time3");
+        IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof TimeData, equalTo(true));
     }
 
@@ -62,28 +62,28 @@ public class DateTimeTest {
                 title("Date form"),
                 model(
                     mainInstance(t("data id=\"date-form\"",
-                        t("date1"),
-                        t("date2", "2025-09-25"),
-                        t("date3")
+                        t("calculateLiteral"),
+                        t("empty", "2025-09-25"),
+                        t("calculateReference")
                     )),
-                    bind("/data/date1").type("date").calculate("&quot;2025-09-25&quot;"),
-                    bind("/data/date2").type("date"),
-                    bind("/data/date3").type("date").calculate("/data/date2")
+                    bind("/data/calculateLiteral").type("date").calculate("&quot;2025-09-25&quot;"),
+                    bind("/data/empty").type("date"),
+                    bind("/data/calculateReference").type("date").calculate("/data/empty")
                 )
             ),
             body(
-                input("/data/date1"),
-                input("/data/date2"),
-                input("/data/date3")
+                input("/data/calculateLiteral"),
+                input("/data/empty"),
+                input("/data/calculateReference")
             )
         ));
-        IAnswerData answer1 = scenario.answerOf("/data/date1");
+        IAnswerData answer1 = scenario.answerOf("/data/calculateLiteral");
         assertThat(answer1 instanceof DateData, equalTo(true));
 
-        IAnswerData answer2 = scenario.answerOf("/data/date2");
+        IAnswerData answer2 = scenario.answerOf("/data/empty");
         assertThat(answer2 instanceof DateData, equalTo(true));
 
-        IAnswerData answer3 = scenario.answerOf("/data/date3");
+        IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof DateData, equalTo(true));
     }
 
@@ -94,28 +94,28 @@ public class DateTimeTest {
                 title("DateTime form"),
                 model(
                     mainInstance(t("data id=\"datetime-form\"",
-                        t("dateTime1"),
-                        t("dateTime2", "2025-09-25T23:15:00.000+02:00"),
-                        t("dateTime3")
+                        t("calculateLiteral"),
+                        t("empty", "2025-09-25T23:15:00.000+02:00"),
+                        t("calculateReference")
                     )),
-                    bind("/data/dateTime1").type("dateTime").calculate("&quot;2025-09-25T23:15:00.000+02:00&quot;"),
-                    bind("/data/dateTime2").type("dateTime"),
-                    bind("/data/dateTime3").type("dateTime").calculate("/data/dateTime2")
+                    bind("/data/calculateLiteral").type("dateTime").calculate("&quot;2025-09-25T23:15:00.000+02:00&quot;"),
+                    bind("/data/empty").type("dateTime"),
+                    bind("/data/calculateReference").type("dateTime").calculate("/data/empty")
                 )
             ),
             body(
-                input("/data/dateTime1"),
-                input("/data/dateTime2"),
-                input("/data/dateTime3")
+                input("/data/calculateLiteral"),
+                input("/data/empty"),
+                input("/data/calculateReference")
             )
         ));
-        IAnswerData answer1 = scenario.answerOf("/data/dateTime1");
+        IAnswerData answer1 = scenario.answerOf("/data/calculateLiteral");
         assertThat(answer1 instanceof DateTimeData, equalTo(true));
 
-        IAnswerData answer2 = scenario.answerOf("/data/dateTime2");
+        IAnswerData answer2 = scenario.answerOf("/data/empty");
         assertThat(answer2 instanceof DateTimeData, equalTo(true));
 
-        IAnswerData answer3 = scenario.answerOf("/data/dateTime3");
+        IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof DateTimeData, equalTo(true));
     }
 }
