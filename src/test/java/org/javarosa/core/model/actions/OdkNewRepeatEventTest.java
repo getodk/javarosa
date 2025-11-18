@@ -1,10 +1,18 @@
 package org.javarosa.core.model.actions;
 
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
@@ -15,13 +23,6 @@ import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.setvalue;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.test.ResourcePathHelper.r;
-
-import java.io.IOException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
 
 /**
  * Specification: https://getodk.github.io/xforms-spec/#the-odk-new-repeat-event.
@@ -34,7 +35,7 @@ public class OdkNewRepeatEventTest {
         assertThat(scenario.countRepeatInstancesOf("/data/my-repeat"), is(0));
         scenario.createNewRepeat("/data/my-repeat");
         assertThat(scenario.countRepeatInstancesOf("/data/my-repeat"), is(1));
-        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-position").getDisplayText(), is("1"));
+        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-position").getDisplayText(), is("1"));
     }
 
     @Test
@@ -57,7 +58,7 @@ public class OdkNewRepeatEventTest {
         scenario.answer("/data/my-toplevel-value", "12");
 
         scenario.createNewRepeat("/data/my-repeat");
-        assertThat(scenario.answerOf("/data/my-repeat[0]/defaults-to-toplevel").getDisplayText(), is("14"));
+        assertThat(scenario.answerOf("/data/my-repeat[1]/defaults-to-toplevel").getDisplayText(), is("14"));
     }
 
     @Test
@@ -188,12 +189,12 @@ public class OdkNewRepeatEventTest {
         scenario.next();
         scenario.next();
         scenario.answer(7);
-        assertThat(scenario.answerOf("/data/repeat[0]/q"), is(intAnswer(7)));
+        assertThat(scenario.answerOf("/data/repeat[1]/q"), is(intAnswer(7)));
 
         scenario.next();
         scenario.createNewRepeat();
         scenario.next();
-        assertThat(scenario.answerOf("/data/repeat[1]/q"), is(intAnswer(7)));
+        assertThat(scenario.answerOf("/data/repeat[2]/q"), is(intAnswer(7)));
         scenario.answer(8); // override the default
 
         scenario.next();
