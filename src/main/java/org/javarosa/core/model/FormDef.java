@@ -63,6 +63,7 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xml.InternalDataInstanceParser;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -766,12 +767,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                 final FormDef f = this;
                 evaluationContext.addFunctionHandler(new IFunctionHandler() {
                     @Override
-                    public String getName() {
+                    public @NotNull String getName() {
                         return "jr:itext";
                     }
 
                     @Override
-                    public Object eval(Object[] args, EvaluationContext ec) {
+                    public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
                         String textID = (String) args[0];
                         try {
                             // SUUUUPER HACKY
@@ -791,7 +792,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                     }
 
                     @Override
-                    public List<Class[]> getPrototypes() {
+                    public @NotNull List<Class[]> getPrototypes() {
                         Class[] proto = {String.class};
                         List<Class[]> v = new ArrayList<>(1);
                         v.add(proto);

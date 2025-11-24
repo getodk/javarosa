@@ -50,6 +50,7 @@ import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.xform.parse.XFormParser;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 /**
  * See testAnswerConstraint() for an example of how to write the
@@ -436,12 +437,12 @@ public class FormDefTest {
 
         formDef.getEvaluationContext().addFunctionHandler(new IFunctionHandler() {
             @Override
-            public String getName() {
+            public @NotNull String getName() {
                 return "custom-func";
             }
 
             @Override
-            public List<Class[]> getPrototypes() {
+            public @NotNull List<Class[]> getPrototypes() {
                 return new ArrayList<Class[]>();
             }
 
@@ -451,7 +452,7 @@ public class FormDefTest {
             }
 
             @Override
-            public Object eval(Object[] args, EvaluationContext ec) {
+            public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
                 return "blah";
             }
         });

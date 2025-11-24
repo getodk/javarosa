@@ -16,24 +16,27 @@
 
 package org.javarosa.core.model.condition;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public interface IFunctionHandler {
+
     /**
      * @return The name of function being handled
      */
-    String getName();
+    @NotNull String getName();
 
     /**
      * @return List of allowed prototypes for this function. Each prototype is
-     *         an array of Class, corresponding to the types of the expected
-     *         arguments. The first matching prototype is used.
+     * an array of Class, corresponding to the types of the expected
+     * arguments. The first matching prototype is used.
      */
-   List<Class[]> getPrototypes();
+    @NotNull List<@NotNull Class @NotNull[]> getPrototypes();
 
     /**
      * @return true if this handler should be fed the raw argument list if no
-     *         prototype matches it
+     * prototype matches it
      */
     boolean rawArgs();
 
@@ -41,9 +44,7 @@ public interface IFunctionHandler {
      * @return true if the result of this handler depends on some dynamic data
      * source, and the expression cannot be pre-computed before the
      * question is reached
-     *
      * @deprecated un-supported
-     *
      */
     @Deprecated
     default boolean realTime() {
@@ -53,5 +54,5 @@ public interface IFunctionHandler {
     /**
      * Evaluate the function
      */
-    Object eval(Object[] args, EvaluationContext ec);
+    @NotNull Object eval(@NotNull Object @NotNull[] args, @NotNull EvaluationContext ec);
 }
