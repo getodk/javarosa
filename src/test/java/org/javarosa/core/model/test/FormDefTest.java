@@ -442,8 +442,8 @@ public class FormDefTest {
             }
 
             @Override
-            public @NotNull List<Class[]> getPrototypes() {
-                return new ArrayList<Class[]>();
+            public @NotNull List<Class<?>[]> getPrototypes() {
+                return new ArrayList<>();
             }
 
             @Override

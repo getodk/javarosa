@@ -32,7 +32,7 @@ public interface IFunctionHandler {
      * an array of Class, corresponding to the types of the expected
      * arguments. The first matching prototype is used.
      */
-    @NotNull List<@NotNull Class @NotNull[]> getPrototypes();
+    @NotNull List<@NotNull Class<?> @NotNull[]> getPrototypes();
 
     /**
      * @return true if this handler should be fed the raw argument list if no

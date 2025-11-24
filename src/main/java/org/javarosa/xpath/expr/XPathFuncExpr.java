@@ -556,7 +556,7 @@ public class XPathFuncExpr extends XPathExpression {
      * list if no prototype matches. (this lets functions support variable-length argument lists)
      */
     private static Object evalCustomFunction(IFunctionHandler handler, Object[] args, EvaluationContext ec) {
-        List<Class[]> prototypes = handler.getPrototypes();
+        List<Class<?>[]> prototypes = handler.getPrototypes();
         Object[] typedArgs = null;
 
         int i = 0;

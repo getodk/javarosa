@@ -102,9 +102,9 @@ public class ChoiceNameFunctionHandler implements IFunctionHandler {
     }
 
     @Override
-    public @NotNull List<Class[]> getPrototypes() {
-        Class[] proto = {String.class, String.class};
-        List<Class[]> v = new ArrayList<>(1);
+    public @NotNull List<Class<?>[]> getPrototypes() {
+        Class<?>[] proto = {String.class, String.class};
+        List<Class<?>[]> v = new ArrayList<>(1);
         v.add(proto);
         return v;
     }

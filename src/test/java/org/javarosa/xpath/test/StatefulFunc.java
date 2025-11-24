@@ -27,10 +27,10 @@ import org.jetbrains.annotations.NotNull;
 class StatefulFunc implements IFunctionHandler {
     private final String name;
     private final BiFunction<StatefulFunc, Object[], Object> evalBlock;
-    private final Class[] prototypes;
+    private final Class<?>[] prototypes;
     String value;
 
-    StatefulFunc(String name, BiFunction<StatefulFunc, Object[], Object> evalBlock, Class... prototypes) {
+    StatefulFunc(String name, BiFunction<StatefulFunc, Object[], Object> evalBlock, Class<?>... prototypes) {
         this.name = name;
         this.evalBlock = evalBlock;
         this.prototypes = prototypes;
@@ -42,7 +42,7 @@ class StatefulFunc implements IFunctionHandler {
     }
 
     @Override
-    public @NotNull List<Class[]> getPrototypes() {
+    public @NotNull List<Class<?>[]> getPrototypes() {
         return singletonList(prototypes);
     }
 

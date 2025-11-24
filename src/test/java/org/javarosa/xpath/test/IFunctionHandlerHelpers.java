@@ -93,7 +93,7 @@ class IFunctionHandlerHelpers {
         return buildHandler(name, evalBlock, true, new Class[][]{prototypes});
     }
 
-    private static IFunctionHandler buildHandler(String name, BiFunction<Object[], EvaluationContext, Object> evalBlock, boolean rawArgs, Class[][] prototypeArrays) {
+    private static IFunctionHandler buildHandler(String name, BiFunction<Object[], EvaluationContext, Object> evalBlock, boolean rawArgs, Class<?>[][] prototypeArrays) {
         return new IFunctionHandler() {
             @Override
             public @NotNull String getName() {
@@ -101,7 +101,7 @@ class IFunctionHandlerHelpers {
             }
 
             @Override
-            public @NotNull List<Class[]> getPrototypes() {
+            public @NotNull List<Class<?>[]> getPrototypes() {
                 return Arrays.asList(prototypeArrays);
             }
 
@@ -125,7 +125,7 @@ class IFunctionHandlerHelpers {
             }
 
             @Override
-            public @NotNull List<Class[]> getPrototypes() {
+            public @NotNull List<Class<?>[]> getPrototypes() {
                 return null;
             }
 
