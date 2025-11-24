@@ -39,11 +39,16 @@ public interface IFunctionHandler {
 
     /**
      * @return true if the result of this handler depends on some dynamic data
-     *         source, and the expression cannot be pre-computed before the
-     *         question is reached (un-supported)
+     * source, and the expression cannot be pre-computed before the
+     * question is reached
+     *
+     * @deprecated un-supported
      *
      */
-    boolean realTime();
+    @Deprecated
+    default boolean realTime() {
+        return false;
+    }
 
     /**
      * Evaluate the function
