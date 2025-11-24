@@ -49,9 +49,6 @@ class StatefulFunc implements IFunctionHandler {
     public boolean rawArgs() { return false; }
 
     @Override
-    public boolean realTime() { return false; }
-
-    @Override
     public Object eval(Object[] args, EvaluationContext ec) {
         return evalBlock.apply(this, args);
     }

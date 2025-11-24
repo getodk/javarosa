@@ -110,11 +110,6 @@ class IFunctionHandlerHelpers {
             }
 
             @Override
-            public boolean realTime() {
-                return false;
-            }
-
-            @Override
             public Object eval(Object[] args, EvaluationContext ec) {
                 return evalBlock.apply(args, ec);
             }
@@ -135,11 +130,6 @@ class IFunctionHandlerHelpers {
 
             @Override
             public boolean rawArgs() {
-                return false;
-            }
-
-            @Override
-            public boolean realTime() {
                 return false;
             }
 

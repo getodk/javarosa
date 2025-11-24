@@ -112,9 +112,4 @@ public class ChoiceNameFunctionHandler implements IFunctionHandler {
     public boolean rawArgs() {
         return false;
     }
-
-    @Override
-    public boolean realTime() {
-        return false;
-    }
 }

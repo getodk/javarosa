@@ -451,11 +451,6 @@ public class FormDefTest {
             }
 
             @Override
-            public boolean realTime() {
-                return false;
-            }
-
-            @Override
             public Object eval(Object[] args, EvaluationContext ec) {
                 return "blah";
             }

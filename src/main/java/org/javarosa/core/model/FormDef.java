@@ -802,11 +802,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                     public boolean rawArgs() {
                         return false;
                     }
-
-                    @Override
-                    public boolean realTime() {
-                        return false;
-                    }
                 });
             }
 
