@@ -108,9 +108,4 @@ public class ChoiceNameFunctionHandler implements IFunctionHandler {
         v.add(proto);
         return v;
     }
-
-    @Override
-    public boolean rawArgs() {
-        return false;
-    }
 }

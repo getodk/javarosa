@@ -38,7 +38,9 @@ public interface IFunctionHandler {
      * @return true if this handler should be fed the raw argument list if no
      * prototype matches it
      */
-    boolean rawArgs();
+    default boolean rawArgs() {
+        return false;
+    }
 
     /**
      * @return true if the result of this handler depends on some dynamic data

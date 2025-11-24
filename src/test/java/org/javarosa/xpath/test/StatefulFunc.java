@@ -47,9 +47,6 @@ class StatefulFunc implements IFunctionHandler {
     }
 
     @Override
-    public boolean rawArgs() { return false; }
-
-    @Override
     public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
         return evalBlock.apply(this, args);
     }

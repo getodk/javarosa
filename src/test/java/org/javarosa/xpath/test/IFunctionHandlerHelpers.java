@@ -130,11 +130,6 @@ class IFunctionHandlerHelpers {
             }
 
             @Override
-            public boolean rawArgs() {
-                return false;
-            }
-
-            @Override
             public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
                 return evalBlock.apply(args, ec);
             }

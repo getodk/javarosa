@@ -798,11 +798,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
                         v.add(proto);
                         return v;
                     }
-
-                    @Override
-                    public boolean rawArgs() {
-                        return false;
-                    }
                 });
             }
 
