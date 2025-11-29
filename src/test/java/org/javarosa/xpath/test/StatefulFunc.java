@@ -22,37 +22,32 @@ import java.util.List;
 import java.util.function.BiFunction;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.jetbrains.annotations.NotNull;
 
 class StatefulFunc implements IFunctionHandler {
     private final String name;
     private final BiFunction<StatefulFunc, Object[], Object> evalBlock;
-    private final Class[] prototypes;
+    private final Class<?>[] prototypes;
     String value;
 
-    StatefulFunc(String name, BiFunction<StatefulFunc, Object[], Object> evalBlock, Class... prototypes) {
+    StatefulFunc(String name, BiFunction<StatefulFunc, Object[], Object> evalBlock, Class<?>... prototypes) {
         this.name = name;
         this.evalBlock = evalBlock;
         this.prototypes = prototypes;
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
     @Override
-    public List<Class[]> getPrototypes() {
+    public @NotNull List<Class<?>[]> getPrototypes() {
         return singletonList(prototypes);
     }
 
     @Override
-    public boolean rawArgs() { return false; }
-
-    @Override
-    public boolean realTime() { return false; }
-
-    @Override
-    public Object eval(Object[] args, EvaluationContext ec) {
+    public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
         return evalBlock.apply(this, args);
     }
 

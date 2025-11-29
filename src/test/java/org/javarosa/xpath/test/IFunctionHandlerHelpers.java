@@ -25,6 +25,7 @@ import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,15 +93,15 @@ class IFunctionHandlerHelpers {
         return buildHandler(name, evalBlock, true, new Class[][]{prototypes});
     }
 
-    private static IFunctionHandler buildHandler(String name, BiFunction<Object[], EvaluationContext, Object> evalBlock, boolean rawArgs, Class[][] prototypeArrays) {
+    private static IFunctionHandler buildHandler(String name, BiFunction<Object[], EvaluationContext, Object> evalBlock, boolean rawArgs, Class<?>[][] prototypeArrays) {
         return new IFunctionHandler() {
             @Override
-            public String getName() {
+            public @NotNull String getName() {
                 return name;
             }
 
             @Override
-            public List<Class[]> getPrototypes() {
+            public @NotNull List<Class<?>[]> getPrototypes() {
                 return Arrays.asList(prototypeArrays);
             }
 
@@ -110,12 +111,7 @@ class IFunctionHandlerHelpers {
             }
 
             @Override
-            public boolean realTime() {
-                return false;
-            }
-
-            @Override
-            public Object eval(Object[] args, EvaluationContext ec) {
+            public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
                 return evalBlock.apply(args, ec);
             }
         };
@@ -124,27 +120,17 @@ class IFunctionHandlerHelpers {
     private static IFunctionHandler buildNullProtoHandler(String name, BiFunction<Object[], EvaluationContext, Object> evalBlock) {
         return new IFunctionHandler() {
             @Override
-            public String getName() {
+            public @NotNull String getName() {
                 return name;
             }
 
             @Override
-            public List<Class[]> getPrototypes() {
+            public @NotNull List<Class<?>[]> getPrototypes() {
                 return null;
             }
 
             @Override
-            public boolean rawArgs() {
-                return false;
-            }
-
-            @Override
-            public boolean realTime() {
-                return false;
-            }
-
-            @Override
-            public Object eval(Object[] args, EvaluationContext ec) {
+            public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
                 return evalBlock.apply(args, ec);
             }
         };

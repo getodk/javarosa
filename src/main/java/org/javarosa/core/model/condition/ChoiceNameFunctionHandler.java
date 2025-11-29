@@ -12,6 +12,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class ChoiceNameFunctionHandler implements IFunctionHandler {
     FormDef f;
@@ -21,12 +22,12 @@ public class ChoiceNameFunctionHandler implements IFunctionHandler {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return "jr:choice-name";
     }
 
     @Override
-    public Object eval(Object[] args, EvaluationContext ec) {
+    public @NotNull Object eval(Object @NotNull [] args, @NotNull EvaluationContext ec) {
         try {
             String value = (String) args[0];
             String questionXpath = (String) args[1];
@@ -101,20 +102,10 @@ public class ChoiceNameFunctionHandler implements IFunctionHandler {
     }
 
     @Override
-    public List<Class[]> getPrototypes() {
-        Class[] proto = {String.class, String.class};
-        List<Class[]> v = new ArrayList<>(1);
+    public @NotNull List<Class<?>[]> getPrototypes() {
+        Class<?>[] proto = {String.class, String.class};
+        List<Class<?>[]> v = new ArrayList<>(1);
         v.add(proto);
         return v;
-    }
-
-    @Override
-    public boolean rawArgs() {
-        return false;
-    }
-
-    @Override
-    public boolean realTime() {
-        return false;
     }
 }
