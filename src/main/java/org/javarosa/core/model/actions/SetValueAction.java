@@ -3,11 +3,6 @@
  */
 package org.javarosa.core.model.actions;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -25,6 +20,11 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.kxml2.kdom.Element;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author ctsims
@@ -75,7 +75,7 @@ public class SetValueAction extends Action {
             }
             throw new NullPointerException(failMessage);
         } else if (references.size() > 1) {
-            throw new XPathTypeMismatchException("You are trying to target a repeated field. Currently you may only target a field in a specific repeat instance.\n\nXPath nodeset has more than one node [\" + references + \"].");
+            throw new XPathTypeMismatchException("You are trying to target a repeated field. Currently you may only target a field in a specific repeat instance.\n\nXPath nodeset has more than one node [\"" + references + "\"].");
         } else {
             targetReference = references.get(0);
         }

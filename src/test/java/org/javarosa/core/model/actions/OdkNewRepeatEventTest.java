@@ -207,7 +207,47 @@ public class OdkNewRepeatEventTest {
 
     // Not part of ODK XForms so throws parse exception.
     @Test(expected = XFormParseException.class)
-    public void setValueOnRepeatInsertInModel_notAllowed() throws XFormParser.ParseException {
-        Scenario.init(r("event-odk-new-repeat-model.xml"));
+    public void setValueOnRepeatInsertInModel_notAllowed() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("new repeat in model", html(
+            head(
+                title("odk-new-repeat action in model"),
+                model(
+                    mainInstance(t("data id=\"odk-new-repeat-in\"",
+                        t("repeat",
+                            t("q"))
+                    )),
+                    bind("/data/repeat/q").type("int"),
+
+                    // setvalue event in model; not part of ODK XForms specification
+                    setvalue("odk-new-repeat", "/data/repeat/q", "now()")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/q")
+                ))));
+    }
+
+    // Not part of ODK XForms so throws parse exception.
+    @Test(expected = XFormParseException.class)
+    public void setValueOnRepeatInsertAndFirstLoadInModel_notAllowed() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init("new repeat in model", html(
+            head(
+                title("odk-new-repeat action in model"),
+                model(
+                    mainInstance(t("data id=\"odk-new-repeat-in\"",
+                        t("repeat",
+                            t("q"))
+                    )),
+                    bind("/data/repeat/q").type("int"),
+
+                    // setvalue event in model; not part of ODK XForms specification
+                    setvalue("odk-instance-first-load odk-new-repeat", "/data/repeat/q", "now()")
+                )
+            ),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/q")
+                ))));
     }
 }
