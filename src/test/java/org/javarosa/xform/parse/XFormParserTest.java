@@ -1,37 +1,7 @@
 package org.javarosa.xform.parse;
 
-import static java.nio.file.Files.copy;
-import static java.nio.file.Files.readAllBytes;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.javarosa.core.model.Constants.CONTROL_RANGE;
-import static org.javarosa.core.model.Constants.CONTROL_RANK;
-import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
-import static org.javarosa.test.BindBuilderXFormsElement.bind;
-import static org.javarosa.test.XFormsElement.body;
-import static org.javarosa.test.XFormsElement.head;
-import static org.javarosa.test.XFormsElement.html;
-import static org.javarosa.test.XFormsElement.input;
-import static org.javarosa.test.XFormsElement.mainInstance;
-import static org.javarosa.test.XFormsElement.model;
-import static org.javarosa.test.XFormsElement.t;
-import static org.javarosa.test.ResourcePathHelper.r;
-import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
-import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
-import static org.javarosa.xform.parse.FormParserHelper.parse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
@@ -48,10 +18,13 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.reference.ReferenceManagerTestUtils;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.test.Scenario;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.test.Scenario;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Before;
@@ -61,6 +34,40 @@ import org.junit.rules.ExpectedException;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.readAllBytes;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.javarosa.core.model.Constants.CONTROL_RANGE;
+import static org.javarosa.core.model.Constants.CONTROL_RANK;
+import static org.javarosa.core.test.AnswerDataMatchers.intAnswer;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.ResourcePathHelper.r;
+import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.head;
+import static org.javarosa.test.XFormsElement.html;
+import static org.javarosa.test.XFormsElement.input;
+import static org.javarosa.test.XFormsElement.mainInstance;
+import static org.javarosa.test.XFormsElement.model;
+import static org.javarosa.test.XFormsElement.t;
+import static org.javarosa.xform.parse.FormParserHelper.deserializeAndCleanUpSerializedForm;
+import static org.javarosa.xform.parse.FormParserHelper.getSerializedFormPath;
+import static org.javarosa.xform.parse.FormParserHelper.parse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class XFormParserTest {
     private static final Logger logger = LoggerFactory.getLogger(XFormParserTest.class);
@@ -201,6 +208,22 @@ public class XFormParserTest {
         FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
 
         assertThat(originalFormDef.getTitle(), is(deserializedFormDef.getTitle()));
+
+        RangeQuestion question = (RangeQuestion) deserializedFormDef.getChild(0);
+        assertThat(question.getDynamicChoices(), is(nullValue()));
+    }
+
+    @Test
+    public void itemsetRangeFormSavesAndRestores() throws IOException, XFormParser.ParseException, DeserializationException {
+        FormDef originalFormDef = parse(r("range-form-itemset.xml"));
+
+        Path serializedForm = getSerializedFormPath(originalFormDef);
+        FormDef deserializedFormDef = deserializeAndCleanUpSerializedForm(serializedForm);
+
+        assertThat(originalFormDef.getTitle(), is(deserializedFormDef.getTitle()));
+
+        RangeQuestion question = (RangeQuestion) deserializedFormDef.getChild(0);
+        assertThat(question.getDynamicChoices(), is(notNullValue()));
     }
 
     @Test
@@ -220,6 +243,23 @@ public class XFormParserTest {
         assertEquals(-2.0d, question.getRangeStart().doubleValue(), 0);
         assertEquals(2.0d, question.getRangeEnd().doubleValue(), 0);
         assertEquals(0.5d, question.getRangeStep().doubleValue(), 0);
+    }
+
+    @Test
+    public void parsesRangeFormWithItemset() throws IOException, XFormParser.ParseException {
+        FormDef formDef = parse(r("range-form-itemset.xml"));
+        RangeQuestion question = (RangeQuestion) formDef.getChild(0);
+        assertEquals(CONTROL_RANGE, question.getControlType());
+        assertEquals(-2.0d, question.getRangeStart().doubleValue(), 0);
+        assertEquals(2.0d, question.getRangeEnd().doubleValue(), 0);
+        assertEquals(0.5d, question.getRangeStep().doubleValue(), 0);
+
+        FormEntryModel formEntryModel = new FormEntryModel(formDef);
+        FormEntryController formEntryController = new FormEntryController(formEntryModel);
+        formEntryController.stepToNextEvent();
+        FormIndex questionIndex = formEntryController.getModel().getFormIndex();
+        FormEntryPrompt formEntryPrompt = formEntryModel.getQuestionPrompt(questionIndex);
+        assertThat(formEntryPrompt.getSelectChoices().size(), is(2));
     }
 
     @Test(expected = XFormParseException.class)

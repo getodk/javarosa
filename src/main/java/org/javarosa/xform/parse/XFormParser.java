@@ -1170,10 +1170,12 @@ public class XFormParser implements IXFormParserFunctions {
             }
         }
 
-        boolean isItem =
+        final boolean hasItems =
             controlType == CONTROL_SELECT_MULTI
                 || controlType == CONTROL_RANK
                 || controlType == CONTROL_SELECT_ONE;
+
+        final boolean hasOptionalItemset = controlType == CONTROL_RANGE;
 
         question.setControlType(controlType);
         question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
@@ -1187,15 +1189,15 @@ public class XFormParser implements IXFormParserFunctions {
                 parseQuestionLabel(question, child);
             } else if ("hint".equals(childName)) {
                 parseHint(question, child);
-            } else if (isItem && "item".equals(childName)) {
+            } else if (hasItems && "item".equals(childName)) {
                 parseItem(question, child);
-            } else if (isItem && "itemset".equals(childName)) {
+            } else if ((hasItems || hasOptionalItemset) && "itemset".equals(childName)) {
                 parseItemset(question, child, parent);
             } else if (actionHandlers.containsKey(childName)) {
                 actionHandlers.get(childName).handle(this, child, question);
             }
         }
-        if (isItem) {
+        if (hasItems) {
             if (question.getNumChoices() > 0 && question.getDynamicChoices() != null) {
                 throw new XFormParseException("Select question contains both literal choices and <itemset>");
             } else if (question.getNumChoices() == 0 && question.getDynamicChoices() == null) {
