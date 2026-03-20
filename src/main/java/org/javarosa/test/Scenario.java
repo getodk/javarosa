@@ -918,12 +918,7 @@ public class Scenario {
         TreeReference reference = expandSingle(getRef(xPath));
 
         FormEntryPrompt questionPrompt = model.getQuestionPrompt(getIndexOf(reference));
-        QuestionDef control = questionPrompt.getQuestion();
-        return control.getChoices() == null
-            // If the (static) choices is null, that means there is an itemset and choices are dynamic
-            // ItemsetBinding.getChoices() will work because we've called questionPrompt.getAnswerValue()
-            ? control.getDynamicChoices().getChoices(formDef, reference)
-            : control.getChoices();
+        return questionPrompt.getSelectChoices();
     }
 
     public TreeElement getAnswerNode(String xPath) {
