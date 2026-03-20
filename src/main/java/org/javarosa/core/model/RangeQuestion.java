@@ -1,5 +1,6 @@
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -10,6 +11,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 /** A Range-type question, with information pulled from attributes of the range form element */
 public class RangeQuestion extends QuestionDef {
@@ -78,5 +81,10 @@ public class RangeQuestion extends QuestionDef {
         ExtUtil.write(dos, new ExtWrapNullable(rangeStep != null ? rangeStep.toString() : null));
         ExtUtil.write(dos, new ExtWrapNullable(tickInterval != null ? tickInterval.toString() : null));
         ExtUtil.write(dos, new ExtWrapNullable(placeholder != null ? placeholder.toString() : null));
+    }
+
+    @Override
+    public void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, List<SelectChoice> choices, Map<String, SelectChoice> selectChoicesForAnswer) {
+        // Do not perform any updates for RangeQuestion with choices
     }
 }
