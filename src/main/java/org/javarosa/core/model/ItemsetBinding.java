@@ -4,7 +4,6 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultipleItemsData;
-import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -105,7 +104,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         // Return cached list if possible
         if (cachedFilteredChoiceList != null && allTriggerRefsBound && Objects.equals(currentTriggerValues, cachedTriggerValues)
             && Objects.equals(currentRandomizeSeed, cachedRandomizeSeed)) {
-            updateQuestionAnswerInModel(formDef, curQRef);
 
             return randomize && cachedRandomizeSeed == null ? shuffle(cachedFilteredChoiceList) : cachedFilteredChoiceList;
         }
@@ -129,19 +127,11 @@ public class ItemsetBinding implements Externalizable, Localizable {
             throw new XPathException("Could not find references depended on by" + nodesetRef.getInstanceName());
         }
 
-        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
-
         List<SelectChoice> filteredChoiceList = new ArrayList<>();
         for (int i = 0; i < filteredItemReferences.size(); i++) {
             SelectChoice choice = getChoiceForTreeReference(formDef, formInstance, i, filteredItemReferences.get(i));
             filteredChoiceList.add(choice);
-            if (selectChoicesForAnswer != null && selectChoicesForAnswer.containsKey(choice.getValue())) {
-                // Keys with values that don't get set here will have null values and must be filtered out of the answer.
-                selectChoicesForAnswer.put(choice.getValue(), choice);
-            }
         }
-
-        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
 
         cachedFilteredChoiceList = randomize ? shuffle(filteredChoiceList, currentRandomizeSeed) : filteredChoiceList;
 
@@ -229,7 +219,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
      * after this process will be removed from the answer. We will also use this map to bind selection(s) in the IAnswerData
      * to Selection objects. The latter is necessary to get label text for the answers.
      */
-    private Map<String, SelectChoice> initializeAnswerMap(FormDef formDef, TreeReference curQRef) {
+    public Map<String, SelectChoice> initializeAnswerMap(FormDef formDef, TreeReference curQRef) {
         Map<String, SelectChoice> selectChoicesForAnswer = null;
         IAnswerData rawValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
         if (rawValue != null) {
@@ -245,67 +235,6 @@ public class ItemsetBinding implements Externalizable, Localizable {
         }
 
         return selectChoicesForAnswer;
-    }
-
-    /**
-     * Removes any answers that aren't in the filtered choice list. Binds the answer to its choice(s) so that the answer
-     * label can be retrieved.
-     *
-     * SIDE EFFECTS: mutates the instance node's value (TreeElement.value, type {@link SelectOneData} or {@link MultipleItemsData})
-     */
-    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, SelectChoice> selectChoicesForAnswer) {
-        IAnswerData originalValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
-
-        if (selectChoicesForAnswer != null) {
-            IAnswerData boundAndFilteredValue;
-            if (originalValue instanceof MultipleItemsData) {
-                boundAndFilteredValue = getFilteredAndBoundSelections((MultipleItemsData) originalValue, selectChoicesForAnswer);
-            } else if (selectChoicesForAnswer.containsValue(null)) {
-                boundAndFilteredValue = null;
-            } else {
-                SelectChoice selectChoice = selectChoicesForAnswer.get(originalValue.getDisplayText());
-                boundAndFilteredValue = new SelectOneData(selectChoice.selection());
-            }
-
-            formDef.getMainInstance().resolveReference(curQRef).setAnswer(boundAndFilteredValue);
-        }
-    }
-
-    /**
-     * Updates the model using the previously-cached choice list.
-     *
-     * @see #updateQuestionAnswerInModel(FormDef, TreeReference, Map) for details and side-effects
-     */
-    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef) {
-        Map<String, SelectChoice> selectChoicesForAnswer = initializeAnswerMap(formDef, curQRef);
-        if (selectChoicesForAnswer != null) {
-            for (SelectChoice choice : cachedFilteredChoiceList) {
-                if (selectChoicesForAnswer.containsKey(choice.getValue())) {
-                    selectChoicesForAnswer.put(choice.getValue(), choice);
-                }
-            }
-        }
-        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
-    }
-
-    /**
-     * @param selections          an answer to a multiple selection question
-     * @param selectChoicesForAnswer maps each value that could be in @{code selections} to a SelectChoice if it should be bound
-     *                            or null if it should be removed.
-     * @return a copy of {@code selections} without the values that were mapped to null in {@code selectChoicesForAnswer} and
-     * with all selections bound.
-     */
-    private static MultipleItemsData getFilteredAndBoundSelections(MultipleItemsData selections, Map<String, SelectChoice> selectChoicesForAnswer) {
-        List<Selection> newSelections = new ArrayList<>();
-        for (Selection oldSelection : (List<Selection>) selections.getValue()) {
-            String key = oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue;
-            SelectChoice selectChoice = selectChoicesForAnswer.get(key);
-            if (selectChoice != null) {
-                newSelections.add(selectChoice.selection());
-            }
-        }
-
-        return new MultipleItemsData(newSelections);
     }
 
     private Long resolveRandomSeed(DataInstance model, EvaluationContext ec) {

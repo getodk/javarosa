@@ -21,9 +21,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.javarosa.core.model.actions.ActionController;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.MultipleItemsData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.osm.OSMTag;
 import org.javarosa.core.services.locale.Localizable;
@@ -383,5 +389,65 @@ public class QuestionDef implements IFormElement, Localizable {
             textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
         }
         this.textID = textID;
+    }
+
+    /**
+     * Updates the model using the previously-cached choice list.
+     *
+     * @see #updateQuestionAnswerInModel(FormDef, TreeReference, Map) for details and side-effects
+     */
+    public void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, List<SelectChoice> choices, Map<String, SelectChoice> selectChoicesForAnswer) {
+        if (selectChoicesForAnswer != null) {
+            for (SelectChoice choice : choices) {
+                if (selectChoicesForAnswer.containsKey(choice.getValue())) {
+                    selectChoicesForAnswer.put(choice.getValue(), choice);
+                }
+            }
+        }
+        updateQuestionAnswerInModel(formDef, curQRef, selectChoicesForAnswer);
+    }
+
+    /**
+     * Removes any answers that aren't in the filtered choice list. Binds the answer to its choice(s) so that the answer
+     * label can be retrieved.
+     *
+     * SIDE EFFECTS: mutates the instance node's value (TreeElement.value, type {@link SelectOneData} or {@link MultipleItemsData})
+     */
+    private void updateQuestionAnswerInModel(FormDef formDef, TreeReference curQRef, Map<String, SelectChoice> selectChoicesForAnswer) {
+        IAnswerData originalValue = formDef.getMainInstance().resolveReference(curQRef).getValue();
+
+        if (selectChoicesForAnswer != null) {
+            IAnswerData boundAndFilteredValue;
+            if (originalValue instanceof MultipleItemsData) {
+                boundAndFilteredValue = getFilteredAndBoundSelections((MultipleItemsData) originalValue, selectChoicesForAnswer);
+            } else if (selectChoicesForAnswer.containsValue(null)) {
+                boundAndFilteredValue = null;
+            } else {
+                SelectChoice selectChoice = selectChoicesForAnswer.get(originalValue.getDisplayText());
+                boundAndFilteredValue = new SelectOneData(selectChoice.selection());
+            }
+
+            formDef.getMainInstance().resolveReference(curQRef).setAnswer(boundAndFilteredValue);
+        }
+    }
+
+    /**
+     * @param selections          an answer to a multiple selection question
+     * @param selectChoicesForAnswer maps each value that could be in @{code selections} to a SelectChoice if it should be bound
+     *                            or null if it should be removed.
+     * @return a copy of {@code selections} without the values that were mapped to null in {@code selectChoicesForAnswer} and
+     * with all selections bound.
+     */
+    private static MultipleItemsData getFilteredAndBoundSelections(MultipleItemsData selections, Map<String, SelectChoice> selectChoicesForAnswer) {
+        List<Selection> newSelections = new ArrayList<>();
+        for (Selection oldSelection : (List<Selection>) selections.getValue()) {
+            String key = oldSelection.choice != null ? oldSelection.choice.getValue() : oldSelection.xmlValue;
+            SelectChoice selectChoice = selectChoicesForAnswer.get(key);
+            if (selectChoice != null) {
+                newSelections.add(selectChoice.selection());
+            }
+        }
+
+        return new MultipleItemsData(newSelections);
     }
 }

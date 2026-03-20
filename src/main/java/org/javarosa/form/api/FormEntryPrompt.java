@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class gives you all the information you need to display a question when
@@ -219,7 +220,10 @@ public class FormEntryPrompt extends FormEntryCaption {
 
         ItemsetBinding itemset = q.getDynamicChoices();
         if (itemset != null) {
-            return itemset.getChoices(form, mTreeElement.getRef());
+            List<SelectChoice> choices = itemset.getChoices(form, mTreeElement.getRef());
+            Map<String, SelectChoice> selectChoicesForAnswer = itemset.initializeAnswerMap(form, mTreeElement.getRef());
+            q.updateQuestionAnswerInModel(form, mTreeElement.getRef(), choices, selectChoicesForAnswer);
+            return choices;
         } else { //static choices
             return q.getChoices();
         }
