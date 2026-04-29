@@ -16,13 +16,13 @@
 
 package org.javarosa.core.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.javarosa.core.services.PropertyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class PropertyUtils {
     private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
@@ -47,7 +47,7 @@ public class PropertyUtils {
      * @return a uuid
      */
     public static String genUUID() {
-        return randHex(8) + "-" + randHex(4) + "-4"  + randHex(3) + "-" + Integer.toString(8 + MathUtils.getRand().nextInt(4), 16) + randHex(3) + "-"  + randHex(12);
+        return UUID.randomUUID().toString();
     }
 
     /**
@@ -65,16 +65,7 @@ public class PropertyUtils {
         return b.toString().toUpperCase();
     }
 
-    public static String randHex(int len) {
-        StringBuilder b = new StringBuilder();
-        Random r = MathUtils.getRand();
-        for(int i = 0 ; i < len; ++i) {
-            b.append(Integer.toString(r.nextInt(16), 16));
-        }
-        return b.toString();
-    }
-
-    public static String trim (String guid, int len) {
+    public static String trim(String guid, int len) {
         return guid.substring(0, Math.min(len, guid.length()));
     }
 }
