@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
@@ -117,5 +118,95 @@ public class DateTimeTest {
 
         IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof DateTimeData, equalTo(true));
+    }
+
+    @Test
+    public void dateQuestionWithInvalidDateFormatLiteralResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Date form"),
+                model(
+                    mainInstance(t("data id=\"date-form\"",
+                        t("calculateLiteral")
+                    )),
+                    bind("/data/calculateLiteral").type("date").calculate("&quot;not-a-date&quot;")
+                )
+            ),
+            body(
+                input("/data/calculateLiteral")
+            )
+        ));
+
+        IAnswerData answer = scenario.answerOf("/data/calculateLiteral");
+        assertThat(answer, nullValue());
+    }
+
+    @Test
+    public void dateQuestionWithInvalidDateFormatReferenceResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Date form"),
+                model(
+                    mainInstance(t("data id=\"date-form\"",
+                        t("invalid", "not-a-date"),
+                        t("calculateReference")
+                    )),
+                    bind("/data/invalid").type("string"),
+                    bind("/data/calculateReference").type("date").calculate("/data/invalid")
+                )
+            ),
+            body(
+                input("/data/invalid"),
+                input("/data/calculateReference")
+            )
+        ));
+
+        IAnswerData answer = scenario.answerOf("/data/calculateReference");
+        assertThat(answer, nullValue());
+    }
+
+    @Test
+    public void dateTimeQuestionWithInvalidDateFormatLiteralResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("DateTime form"),
+                model(
+                    mainInstance(t("data id=\"datetime-form\"",
+                        t("calculateLiteral")
+                    )),
+                    bind("/data/calculateLiteral").type("dateTime").calculate("&quot;not-a-datetime&quot;")
+                )
+            ),
+            body(
+                input("/data/calculateLiteral")
+            )
+        ));
+
+        IAnswerData answer = scenario.answerOf("/data/calculateLiteral");
+        assertThat(answer, nullValue());
+    }
+
+    @Test
+    public void dateTimeQuestionWithInvalidDateFormatReferenceResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("DateTime form"),
+                model(
+                    mainInstance(t("data id=\"datetime-form\"",
+                        t("invalid", "not-a-datetime"),
+                        t("calculateReference")
+                    )),
+                    bind("/data/invalid").type("string"),
+                    bind("/data/calculateReference").type("dateTime").calculate("/data/invalid")
+                )
+            ),
+            body(
+                input("/data/invalid"),
+                input("/data/calculateReference")
+            )
+        ));
+
+        IAnswerData answer = scenario.answerOf("/data/calculateReference");
+        assertThat(answer, nullValue());
     }
 }
