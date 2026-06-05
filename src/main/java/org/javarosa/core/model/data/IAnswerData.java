@@ -117,13 +117,15 @@ public interface IAnswerData extends Externalizable {
             }
         } else if (dataType == DATE) {
             if (val instanceof String) {
-                return new DateData(DateUtils.parseDate(String.valueOf(val)));
+                Date date = DateUtils.parseDate(String.valueOf(val));
+                return date == null ? null : new DateData(date);
             } else {
                 return new DateData((Date) val);
             }
         } else if (dataType == DATE_TIME) {
             if (val instanceof String) {
-                return new DateTimeData(DateUtils.parseDateTime(String.valueOf(val)));
+                Date dateTime = DateUtils.parseDateTime(String.valueOf(val));
+                return dateTime == null ? null : new DateTimeData(dateTime);
             } else {
                 return new DateTimeData((Date) val);
             }
