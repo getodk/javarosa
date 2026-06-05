@@ -111,7 +111,8 @@ public interface IAnswerData extends Externalizable {
             return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
         } else if (dataType == TIME) {
             if (val instanceof String) {
-                return new TimeData().cast(new UncastData(String.valueOf(val)));
+                Date time = DateUtils.parseTime(String.valueOf(val));
+                return time == null ? null : new TimeData(time);
             } else {
                 return new TimeData((Date) val);
             }

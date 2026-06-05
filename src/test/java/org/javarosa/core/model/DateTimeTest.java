@@ -209,4 +209,49 @@ public class DateTimeTest {
         IAnswerData answer = scenario.answerOf("/data/calculateReference");
         assertThat(answer, nullValue());
     }
+
+    @Test
+    public void timeQuestionWithInvalidTimeFormatLiteralResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Time form"),
+                model(
+                    mainInstance(t("data id=\"time-form\"",
+                        t("calculateLiteral")
+                    )),
+                    bind("/data/calculateLiteral").type("time").calculate("&quot;notatime&quot;")
+                )
+            ),
+            body(
+                input("/data/calculateLiteral")
+            )
+        ));
+
+        IAnswerData answer = scenario.answerOf("/data/calculateLiteral");
+        assertThat(answer, nullValue());
+    }
+
+    @Test
+    public void timeQuestionWithInvalidTimeFormatReferenceResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Time form"),
+                model(
+                    mainInstance(t("data id=\"time-form\"",
+                        t("invalid", "notatime"),
+                        t("calculateReference")
+                    )),
+                    bind("/data/invalid").type("string"),
+                    bind("/data/calculateReference").type("time").calculate("/data/invalid")
+                )
+            ),
+            body(
+                input("/data/invalid"),
+                input("/data/calculateReference")
+            )
+        ));
+
+        IAnswerData answer = scenario.answerOf("/data/calculateReference");
+        assertThat(answer, nullValue());
+    }
 }
