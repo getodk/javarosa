@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
@@ -117,5 +118,89 @@ public class DateTimeTest {
 
         IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof DateTimeData, equalTo(true));
+    }
+
+    @Test
+    public void timeQuestionWithInvalidTimeFormatResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Time form"),
+                model(
+                    mainInstance(t("data id=\"time-form\"",
+                        t("calculateLiteral"),
+                        t("empty", "notatime"),
+                        t("calculateReference")
+                    )),
+                    bind("/data/calculateLiteral").type("time").calculate("&quot;notatime&quot;"),
+                    bind("/data/empty").type("time"),
+                    bind("/data/calculateReference").type("time").calculate("/data/empty")
+                )
+            ),
+            body(
+                input("/data/calculateLiteral"),
+                input("/data/empty"),
+                input("/data/calculateReference")
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/calculateLiteral"), nullValue());
+        assertThat(scenario.answerOf("/data/empty"), nullValue());
+        assertThat(scenario.answerOf("/data/calculateReference"), nullValue());
+    }
+
+    @Test
+    public void dateQuestionWithInvalidDateFormatResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Date form"),
+                model(
+                    mainInstance(t("data id=\"date-form\"",
+                        t("calculateLiteral"),
+                        t("empty", "not-a-date"),
+                        t("calculateReference")
+                    )),
+                    bind("/data/calculateLiteral").type("date").calculate("&quot;not-a-date&quot;"),
+                    bind("/data/empty").type("date"),
+                    bind("/data/calculateReference").type("date").calculate("/data/empty")
+                )
+            ),
+            body(
+                input("/data/calculateLiteral"),
+                input("/data/empty"),
+                input("/data/calculateReference")
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/calculateLiteral"), nullValue());
+        assertThat(scenario.answerOf("/data/empty"), nullValue());
+        assertThat(scenario.answerOf("/data/calculateReference"), nullValue());
+    }
+
+    @Test
+    public void dateTimeQuestionWithInvalidDateTimeFormatResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("DateTime form"),
+                model(
+                    mainInstance(t("data id=\"datetime-form\"",
+                        t("calculateLiteral"),
+                        t("empty", "not-a-datetime"),
+                        t("calculateReference")
+                    )),
+                    bind("/data/calculateLiteral").type("dateTime").calculate("&quot;not-a-datetime&quot;"),
+                    bind("/data/empty").type("dateTime"),
+                    bind("/data/calculateReference").type("dateTime").calculate("/data/empty")
+                )
+            ),
+            body(
+                input("/data/calculateLiteral"),
+                input("/data/empty"),
+                input("/data/calculateReference")
+            )
+        ));
+
+        assertThat(scenario.answerOf("/data/calculateLiteral"), nullValue());
+        assertThat(scenario.answerOf("/data/empty"), nullValue());
+        assertThat(scenario.answerOf("/data/calculateReference"), nullValue());
     }
 }

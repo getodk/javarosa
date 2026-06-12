@@ -111,19 +111,22 @@ public interface IAnswerData extends Externalizable {
             return new MultipleItemsData().cast(new UncastData(String.valueOf(val)));
         } else if (dataType == TIME) {
             if (val instanceof String) {
-                return new TimeData().cast(new UncastData(String.valueOf(val)));
+                Date time = DateUtils.parseTime(String.valueOf(val));
+                return time == null ? null : new TimeData(time);
             } else {
                 return new TimeData((Date) val);
             }
         } else if (dataType == DATE) {
             if (val instanceof String) {
-                return new DateData(DateUtils.parseDate(String.valueOf(val)));
+                Date date = DateUtils.parseDate(String.valueOf(val));
+                return date == null ? null : new DateData(date);
             } else {
                 return new DateData((Date) val);
             }
         } else if (dataType == DATE_TIME) {
             if (val instanceof String) {
-                return new DateTimeData(DateUtils.parseDateTime(String.valueOf(val)));
+                Date dateTime = DateUtils.parseDateTime(String.valueOf(val));
+                return dateTime == null ? null : new DateTimeData(dateTime);
             } else {
                 return new DateTimeData((Date) val);
             }
