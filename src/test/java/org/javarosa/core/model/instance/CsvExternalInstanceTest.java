@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.test.ResourcePathHelper.r;
 import static org.junit.Assert.assertEquals;
 
@@ -67,5 +68,18 @@ public class CsvExternalInstanceTest {
     public void parses_utf8_characters() throws IOException {
         TreeElement bomCsv = new CsvExternalInstance().parse("id", r("external-secondary-csv-bom.csv").toString());
         assertThat(bomCsv.getChildAt(0).getChild("elevation", 0).getValue().getValue(), is("testé"));
+    }
+
+    @Test
+    public void preserves_whitespace() throws IOException {
+        TreeElement csv = new CsvExternalInstance().parse("csv", r("whitespace.csv").toString());
+        assertThat(csv.getChildAt(0).getChild("name", 0), nullValue());
+        assertThat(csv.getChildAt(0).getChild(" name", 0).getValue().getDisplayText(), is(" person1"));
+
+        assertThat(csv.getChildAt(0).getChild("label", 0), nullValue());
+        assertThat(csv.getChildAt(0).getChild(" label", 0).getValue().getDisplayText(), is(" Person1"));
+
+        assertThat(csv.getChildAt(0).getChild("age", 0), nullValue());
+        assertThat(csv.getChildAt(0).getChild("age ", 0).getValue().getDisplayText(), is("13 "));
     }
 }
