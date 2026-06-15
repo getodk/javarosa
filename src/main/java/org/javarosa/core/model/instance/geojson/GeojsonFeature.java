@@ -16,12 +16,14 @@
 
 package org.javarosa.core.model.instance.geojson;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.io.IOException;
-import java.util.Map;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
+
+import java.io.IOException;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,9 +42,11 @@ public class GeojsonFeature {
 
         TreeElement item = new TreeElement("item", multiplicity);
 
-        TreeElement geoField = new TreeElement(GEOMETRY_CHILD_NAME, 0);
-        geoField.setValue(new UncastData(geometry.getOdkCoordinates()));
-        item.addChild(geoField);
+        if (geometry != null) {
+            TreeElement geoField = new TreeElement(GEOMETRY_CHILD_NAME, 0);
+            geoField.setValue(new UncastData(geometry.getOdkCoordinates()));
+            item.addChild(geoField);
+        }
 
         if (properties != null) {
             for (String property : properties.keySet()) {

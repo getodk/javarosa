@@ -162,4 +162,18 @@ public class GeoJsonExternalInstanceTest {
         assertThat(featureCollection.getChildAt(0).getNumChildren(), is(4));
         assertThat(featureCollection.getChildAt(0).getChild("extra", 0).getValue().getDisplayText(), is(""));
     }
+
+    @Test
+    public void parse_preservesWhiteSpace() throws IOException {
+        TreeElement featureCollection = new GeoJsonExternalInstance().parse("places", r("spaces-in-names.geojson").toString());
+        assertThat(featureCollection.getChildAt(0).getChild("geometry", 0), nullValue());
+
+        assertThat(featureCollection.getChildAt(0).getChild("name", 0), nullValue());
+        assertThat(featureCollection.getChildAt(0).getChild(" name ", 0).getValue().getDisplayText(), is(" My cool point "));
+        assertThat(featureCollection.getChildAt(0).getChild("id", 0), nullValue());
+        assertThat(featureCollection.getChildAt(0).getChild(" id ", 0).getValue().getDisplayText(), is(" fs87b "));
+
+        assertThat(featureCollection.getChildAt(0).getChild("foo", 0), nullValue());
+        assertThat(featureCollection.getChildAt(0).getChild(" foo ", 0).getValue().getDisplayText(), is(" bar "));
+    }
 }
