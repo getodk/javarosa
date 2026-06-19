@@ -27,12 +27,16 @@ import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 
+/**
+ * SIDE-EFFECT: Mutates JVM-default timezone and Joda-Time's current millis.
+ * Must not be run in parallel with other timezone-sensitive tests.
+ */
 public class DateTimeTest {
     private TimeZone originalTimeZone;
-    String SIMULATED_NOW = "1998-05-23T17:49:42-07:00"; // 1998-05-24 in UTC
-    Instant SIMULATED_INSTANT = OffsetDateTime.parse(SIMULATED_NOW).toInstant();
+    private static final String SIMULATED_NOW = "1998-05-23T17:49:42.123-07:00"; // 1998-05-24 in UTC
+    private static final Instant SIMULATED_INSTANT = OffsetDateTime.parse(SIMULATED_NOW).toInstant();
 
-    TimeZone SIMULATED_TZ = TimeZone.getTimeZone("America/Los_Angeles");
+    private static final TimeZone SIMULATED_TZ = TimeZone.getTimeZone("America/Los_Angeles");
 
     @Before
     public void setUp() {
@@ -51,29 +55,29 @@ public class DateTimeTest {
 
     @Test
     public void nowLabelOutput_isIsoOffsetDateTime() throws IOException, XFormParser.ParseException {
-            Scenario scenario = Scenario.init(html(
-                head(
-                    title("Date time"),
-                    model(
-                        mainInstance(t("data id=\"date-time\"",
-                            t("now"),
-                            t("now_note")
-                        )),
-                        bind("/data/now").type("string").calculate("now()")
-                    )
-                ),
-                body(
-                    input("/data/now_note",
-                        label("Now: <output ref=\"/data/now\"/>"))
-                )));
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Date time"),
+                model(
+                    mainInstance(t("data id=\"date-time\"",
+                        t("now"),
+                        t("now_note")
+                    )),
+                    bind("/data/now").type("string").calculate("now()")
+                )
+            ),
+            body(
+                input("/data/now_note",
+                    label("Now: <output ref=\"/data/now\"/>"))
+            )));
 
-            scenario.next();
-            assertThat(scenario.answerOf("/data/now").getValue(), is(Date.from(SIMULATED_INSTANT)));
+        scenario.next();
+        assertThat(scenario.answerOf("/data/now").getValue(), is(Date.from(SIMULATED_INSTANT)));
 
-            // Unclear if/where getDisplayText is used; outputs in labels use XPathFuncExpr.toString
-            assertThat(scenario.answerOf("/data/now").getDisplayText(), is("23/05/98 17:49"));
-            FormEntryCaption nowCaption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-            assertThat(nowCaption.getQuestionText(), is("Now: 1998-05-23T17:49:42-07:00"));
+        // Unclear if/where getDisplayText is used; outputs in labels use XPathFuncExpr.toString
+        assertThat(scenario.answerOf("/data/now").getDisplayText(), is("23/05/98 17:49"));
+        FormEntryCaption nowCaption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
+        assertThat(nowCaption.getQuestionText(), is("Now: 1998-05-23T17:49:42.123-07:00"));
     }
 
     @Test
@@ -83,7 +87,7 @@ public class DateTimeTest {
                 title("Date time"),
                 model(
                     mainInstance(t("data id=\"date-time\"",
-                        t("date_time", "1998-05-23T17:49:42-07:00"),
+                        t("date_time", "1998-05-23T17:49:42.123-07:00"),
                         t("date_time_note")
                     )),
                     bind("/data/date_time").type("string")
@@ -95,10 +99,10 @@ public class DateTimeTest {
             )));
 
         scenario.next();
-        assertThat(scenario.answerOf("/data/date_time").getValue(), is("1998-05-23T17:49:42-07:00"));
-        assertThat(scenario.answerOf("/data/date_time").getDisplayText(), is("1998-05-23T17:49:42-07:00"));
+        assertThat(scenario.answerOf("/data/date_time").getValue(), is("1998-05-23T17:49:42.123-07:00"));
+        assertThat(scenario.answerOf("/data/date_time").getDisplayText(), is("1998-05-23T17:49:42.123-07:00"));
         FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-        assertThat(caption.getQuestionText(), is("Date time: 1998-05-23T17:49:42-07:00"));
+        assertThat(caption.getQuestionText(), is("Date time: 1998-05-23T17:49:42.123-07:00"));
     }
 
     @Test
@@ -128,7 +132,7 @@ public class DateTimeTest {
 
         scenario.next();
         FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
-        assertThat(caption.getQuestionText(), is("Date time: 1998-05-23T17:49-07:00"));
+        assertThat(caption.getQuestionText(), is("Date time: 1998-05-23T17:49:42.123-07:00"));
     }
 
     @Test

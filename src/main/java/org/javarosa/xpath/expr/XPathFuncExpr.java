@@ -825,7 +825,13 @@ public class XPathFuncExpr extends XPathExpression {
         } else if (o instanceof String) {
             val = (String) o;
         } else if (o instanceof Date) {
-            val = DateUtils.formatDate((Date) o, DateUtils.FORMAT_ISO8601);
+            Date d = (Date) o;
+            // java.util.Date does not distinguish XForms date from dateTime. DateData values
+            // are normalized to local midnight, so treat midnight Dates as date-only values.
+            // This means dateTime values exactly at midnight will also be displayed as dates.
+            val = DateUtils.isMidnight(d) ?
+                DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601)
+                : DateUtils.formatDateTime(d, DateUtils.FORMAT_ISO8601);
         } else if (o instanceof IExprDataType) {
             val = ((IExprDataType) o).toString();
         }
