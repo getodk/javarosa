@@ -345,7 +345,8 @@ public class XPathFuncExpr extends XPathExpression {
             }
         } else if (name.equals("today")) {
             assertArgsCount(name, args, 0);
-            return DateUtils.roundDate(new Date());
+            DateTime dt = new DateTime();
+            return DateUtils.roundDate(dt.toDate());
         } else if (name.equals("now")) {
             assertArgsCount(name, args, 0);
             return new DateTime().toDate();
