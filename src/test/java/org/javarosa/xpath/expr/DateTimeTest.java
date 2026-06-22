@@ -74,7 +74,6 @@ public class DateTimeTest {
         scenario.next();
         assertThat(scenario.answerOf("/data/now").getValue(), is(Date.from(SIMULATED_INSTANT)));
 
-        // Unclear if/where getDisplayText is used; outputs in labels use XPathFuncExpr.toString
         assertThat(scenario.answerOf("/data/now").getDisplayText(), is("23/05/98 17:49"));
         FormEntryCaption nowCaption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
         assertThat(nowCaption.getQuestionText(), is("Now: 1998-05-23T17:49:42.123-07:00"));
@@ -163,7 +162,6 @@ public class DateTimeTest {
         scenario.next();
         assertThat(scenario.answerOf("/data/today").getValue(), is(expectedDay));
 
-        // Unclear if/where getDisplayText is used; outputs in labels use XPathFuncExpr.toString
         assertThat(scenario.answerOf("/data/today").getDisplayText(), is("23/05/98"));
         FormEntryCaption nowCaption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
         assertThat(nowCaption.getQuestionText(), is("Today: 1998-05-23"));
@@ -198,7 +196,6 @@ public class DateTimeTest {
         scenario.next();
         assertThat(scenario.answerOf("/data/now").getValue(), is(expectedDay));
 
-        // Unclear if/where getDisplayText is used; outputs in labels use XPathFuncExpr.toString
         assertThat(scenario.answerOf("/data/now").getDisplayText(), is("23/05/98"));
         FormEntryCaption nowCaption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
         assertThat(nowCaption.getQuestionText(), is("Today: 1998-05-23"));
