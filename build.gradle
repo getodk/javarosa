@@ -56,23 +56,6 @@ if (!project.hasProperty("android")) {
         }
     }
 
-    test {
-        exclude '**/DateTimeTest.class'
-    }
-
-    tasks.register('isolatedDateTimeTest', Test) {
-        description = 'Runs DateTimeTest without parallelization'
-        group = 'verification'
-
-        testClassesDirs = sourceSets.test.output.classesDirs
-        classpath = sourceSets.test.runtimeClasspath
-
-        include '**/DateTimeTest.class'
-        maxParallelForks = 1
-    }
-
-    check.dependsOn isolatedDateTimeTest
-
     tasks.named('compileJava', JavaCompile) {
         options.encoding = "UTF-8"
         options.compilerArgs << "-Xlint:deprecation"
