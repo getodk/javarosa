@@ -27,10 +27,6 @@ import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 
-/**
- * SIDE-EFFECT: Mutates JVM-default timezone and Joda-Time's current millis.
- * Must not be run in parallel with other timezone-sensitive tests.
- */
 public class DateTimeTest {
     private TimeZone originalTimeZone;
     private static final String SIMULATED_NOW = "1998-05-23T17:49:42.123-07:00"; // 1998-05-24 in UTC
@@ -40,17 +36,17 @@ public class DateTimeTest {
 
     @Before
     public void setUp() {
-        originalTimeZone = TimeZone.getDefault();
-
         DateTimeUtils.setCurrentMillisFixed(SIMULATED_INSTANT.toEpochMilli());
 
+        originalTimeZone = TimeZone.getDefault();
         TimeZone.setDefault(SIMULATED_TZ);
     }
 
     @After
     public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
         TimeZone.setDefault(originalTimeZone);
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
