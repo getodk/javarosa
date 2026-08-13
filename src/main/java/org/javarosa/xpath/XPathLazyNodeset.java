@@ -29,6 +29,7 @@ import org.javarosa.xpath.expr.XPathPathExpr;
  */
 public class XPathLazyNodeset extends XPathNodeset {
 
+    private final Object lock = new Object();
     Boolean evaluated = Boolean.FALSE;
     TreeReference unExpandedRef;
 
@@ -46,7 +47,7 @@ public class XPathLazyNodeset extends XPathNodeset {
 
 
     private void performEvaluation() {
-        synchronized(evaluated) {
+        synchronized(lock) {
             if(evaluated.booleanValue()) {
                 return;
             }
@@ -71,7 +72,7 @@ public class XPathLazyNodeset extends XPathNodeset {
      * existed, but didn't, rather than a reference which could not represent a real node).
      */
     public Object unpack () {
-        synchronized(evaluated) {
+        synchronized(lock) {
             if(evaluated.booleanValue()) {
                 return super.unpack();
             }
