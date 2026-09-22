@@ -55,7 +55,7 @@ public class WhoVATest {
         // (Id10022) Is the date of death known? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10022
         scenario.next();
         scenario.answer("yes");
-        // (Id10021) When was the deceased born? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10021
+        // (Id10023_a) When did (s)he die?
         scenario.next();
         scenario.answer(LocalDate.parse("2018-01-01"));
         // endregion
@@ -102,7 +102,7 @@ public class WhoVATest {
         // This question triggers one of the longest evaluation chain of triggerables including 5 calculations
         scenario.next();
         scenario.answer("yes");
-        // (Id10021) When was the deceased born? ref:/data/consented/deceased_CRVS/info_on_deceased/Id10021
+        // (Id10023_a) When did (s)he die?
         scenario.next();
         scenario.answer(LocalDate.parse("2018-01-01"));
 
