@@ -587,7 +587,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void calculateWithOneEmptyOperand_evaluatesToEmpty() throws IOException, XFormParser.ParseException {
+    public void addWithOneEmptyOperand_evaluatesToEmpty() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Calculate with empty operand"),
