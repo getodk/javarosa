@@ -48,7 +48,7 @@ import org.junit.Test;
  * See also:
  * - {@see SelectOneChoiceFilterTest}
  * - {@see SelectMultipleChoiceFilterTest} for coverage of dynamic select multiples
- * - {@see XPathFuncExprRandomizeTest} for coverage of choice list updates when randomization is specified
+ * - {@see RandomizeTest} for coverage of choice list updates when randomization is specified
  */
 public class DynamicSelectUpdateTest {
     //region Select from repeat
