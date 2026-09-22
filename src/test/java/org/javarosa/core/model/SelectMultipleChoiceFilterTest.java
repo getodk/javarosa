@@ -30,13 +30,11 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void dependentLevelsInBlankInstance_haveNoChoices() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
     }
 
     @Test public void selectingValueAtLevel1_filtersChoicesAtLevel2() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
 
         scenario.answer("/data/level1", "a", "b");
@@ -51,7 +49,6 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void selectingValuesAtLevels1And2_filtersChoicesAtLevel3() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -65,7 +62,6 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void newChoiceFilterEvaluation_removesIrrelevantAnswersAtAllLevels_withoutChangingOrder() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -92,7 +88,6 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void newChoiceFilterEvaluation_leavesAnswerUnchangedIfAllSelectionsStillInChoices() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
