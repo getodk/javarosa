@@ -1497,7 +1497,7 @@ public class TriggerableDagTest {
             head(
                 title("Form"),
                 model(
-                    mainInstance(t("data",
+                    mainInstance(t("data id=\"id\"",
                         t("count"),
                         t("repeat jr:template=\"\"",
                             t("string")
@@ -1529,7 +1529,7 @@ public class TriggerableDagTest {
             head(
                 title("Form"),
                 model(
-                    mainInstance(t("data",
+                    mainInstance(t("data id=\"id\"",
                         t("repeat jr:template=\"\"",
                             t("string"),
                             t("group",

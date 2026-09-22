@@ -421,7 +421,7 @@ public class FormDefTest {
             head(
                 title("custom-func-form"),
                 model(
-                    mainInstance(t("data",
+                    mainInstance(t("data id=\"id\"",
                         t("calculate"),
                         t("input")
                     )),
