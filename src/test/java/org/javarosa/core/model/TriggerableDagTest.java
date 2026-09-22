@@ -72,7 +72,7 @@ public class TriggerableDagTest {
     public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
-    public void order_of_the_DAG_is_ensured() throws IOException, XFormParser.ParseException {
+    public void recomputesCalculateExpressions_whenDependenciesUpdated() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Some form"),
