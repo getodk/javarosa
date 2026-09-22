@@ -21,19 +21,12 @@ import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 
 import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParser;
-import org.junit.Before;
 import org.junit.Test;
 
 public class CurrentGroupCountRefTest {
-    private Scenario scenario;
-
-    @Before
-    public void setUp() throws XFormParser.ParseException {
-        scenario = Scenario.init("relative-current-ref-group-count-ref.xml");
-    }
-
     @Test
-    public void current_in_repeat_count_should_work_as_expected() {
+    public void current_in_repeat_count_should_work_as_expected() throws XFormParser.ParseException {
+        Scenario scenario = Scenario.init("relative-current-ref-group-count-ref.xml");
         // Since the form sets a count of 3 repeats, we should be at the end of the
         // form after answering three times
         scenario.next();
@@ -53,5 +46,4 @@ public class CurrentGroupCountRefTest {
         assertThat(scenario.atTheEndOfForm(), is(true));
         assertThat(scenario.countRepeatInstancesOf("/data/my_group"), is(3));
     }
-
 }
