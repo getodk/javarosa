@@ -16,17 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.hamcrest.CoreMatchers;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.List;
-
-import kotlin.Pair;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -52,6 +41,17 @@ import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.List;
+import org.hamcrest.CoreMatchers;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
+import kotlin.Pair;
 
 public class SelectChoiceTest {
     @Test
@@ -140,9 +140,9 @@ public class SelectChoiceTest {
                             t("select"))))),
             body(
                 repeat("/data/repeat",
-                    input("value"),
-                    input("label"),
-                    input("special-property")),
+                    input("/data/repeat/value"),
+                    input("/data/repeat/label"),
+                    input("/data/repeat/special-property")),
                 input("/data/filter"),
                 select1Dynamic("/data/select", "/data/repeat")
             )));
