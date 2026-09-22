@@ -466,7 +466,7 @@ public class TriggerableDagTest {
                 )
             ),
             body(
-                group("/data/node", input("/data/node/value"))
+                repeat("/data/node", input("/data/node/value"))
             )));
 
         // The XPathPathExprEval is used when evaluating the nodesets that the
