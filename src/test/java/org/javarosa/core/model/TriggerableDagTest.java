@@ -1137,7 +1137,7 @@ public class TriggerableDagTest {
 
     //region Deleting repeats
     @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnPrecedingRepeatGroupSiblings() throws IOException, XFormParser.ParseException {
+    public void deleteSecondRepeatInstance_evaluatesTriggerables_dependentOnPrecedingRepeatInsteanceSiblings() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Some form"),
@@ -1178,7 +1178,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void deleteSecondRepeatGroup_evaluatesTriggerables_dependentOnTheParentPosition() throws IOException, XFormParser.ParseException {
+    public void deleteSecondRepeatInstance_evaluatesTriggerables_dependentOnTheParentPosition() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Some form"),
@@ -1229,7 +1229,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void deleteSecondRepeatGroup_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() throws IOException, XFormParser.ParseException {
+    public void deleteSecondRepeatInstance_doesNotEvaluateTriggerables_notDependentOnTheParentPosition() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Some form"),
@@ -1280,7 +1280,7 @@ public class TriggerableDagTest {
     }
 
     @Test
-    public void deleteThirdRepeatGroup_evaluatesTriggerables_dependentOnTheRepeatGroupsNumber() throws IOException, XFormParser.ParseException {
+    public void deleteThirdRepeatInstance_evaluatesTriggerables_dependentOnTheRepeatInstancesNumber() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Some form"),
@@ -1393,7 +1393,7 @@ public class TriggerableDagTest {
      * has been deleted along with its parent (the repeat group instance).
      */
     @Test
-    public void deleteThirdRepeatGroup_evaluatesTriggerables_indirectlyDependentOnTheRepeatGroupsNumber() throws IOException, XFormParser.ParseException {
+    public void deleteThirdRepeatInstance_evaluatesTriggerables_indirectlyDependentOnTheRepeatInstancesNumber() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Some form"),
