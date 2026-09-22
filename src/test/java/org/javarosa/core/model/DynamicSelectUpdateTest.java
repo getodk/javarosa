@@ -19,6 +19,7 @@ package org.javarosa.core.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
@@ -37,6 +38,7 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 
 import java.util.List;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
 import org.junit.Test;
@@ -141,7 +143,7 @@ public class DynamicSelectUpdateTest {
 
     //region Multi-language
     @Test
-    public void multilanguage() throws Exception {
+    public void choiceLabels_areTranslated() throws Exception {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Multilingual dynamic select"),
@@ -176,11 +178,20 @@ public class DynamicSelectUpdateTest {
             ));
 
         scenario.setLanguage("en");
-        assertThat(scenario.choicesOf("/data/select").size(), is(3));
-        assertThat(scenario.choicesOf("/data/select"), containsInAnyOrder(
-            choice("a", "choices-0"),
-            choice("b", "choices-1"),
-            choice("c", "choices-2")));
+        Localizer localizer = scenario.getFormDef().getLocalizer();
+
+        List<SelectChoice> choices = scenario.choicesOf("/data/select");
+
+        assertThat(choices, hasSize(3));
+        assertThat(localizer.getText(choices.get(0).getTextID()), is("A (en)"));
+        assertThat(localizer.getText(choices.get(1).getTextID()), is("B (en)"));
+        assertThat(localizer.getText(choices.get(2).getTextID()), is("C (en)"));
+
+        scenario.setLanguage("fr");
+
+        assertThat(localizer.getText(choices.get(0).getTextID()), is("A (fr)"));
+        assertThat(localizer.getText(choices.get(1).getTextID()), is("B (fr)"));
+        assertThat(localizer.getText(choices.get(2).getTextID()), is("C (fr)"));
     }
     //endregion
 
