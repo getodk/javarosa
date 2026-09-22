@@ -16,17 +16,6 @@
 
 package org.javarosa.regression;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
@@ -41,9 +30,19 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
+import java.io.IOException;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.javarosa.core.reference.ReferenceManagerTestUtils;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
 public class SameRefDifferentInstancesIssue449Test {
     @Test
-    public void formWithSameRefInDifferentInstances_isSuccessfullyDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void formWithSameRefInDifferentInstances_isDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
         File formFile = r("issue_449.xml");
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParentFile(), "file");
         Scenario scenario = Scenario.init(formFile);
