@@ -1553,17 +1553,17 @@ public class TriggerableDagTest {
         scenario.createNewRepeat();
         scenario.next();
         scenario.next();
-        assertThat(scenario.getAnswerNode("/data/repeat[0]/group/int"), is(nonRelevant()));
-
-        scenario.createNewRepeat();
-        scenario.next();
-        scenario.next();
         assertThat(scenario.getAnswerNode("/data/repeat[1]/group/int"), is(nonRelevant()));
 
         scenario.createNewRepeat();
         scenario.next();
         scenario.next();
         assertThat(scenario.getAnswerNode("/data/repeat[2]/group/int"), is(nonRelevant()));
+
+        scenario.createNewRepeat();
+        scenario.next();
+        scenario.next();
+        assertThat(scenario.getAnswerNode("/data/repeat[3]/group/int"), is(nonRelevant()));
     }
     //endregion
 
