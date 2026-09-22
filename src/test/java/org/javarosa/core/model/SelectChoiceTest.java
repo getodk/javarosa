@@ -194,7 +194,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
+    public void getAdditionalChildren_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select from repeat"),
