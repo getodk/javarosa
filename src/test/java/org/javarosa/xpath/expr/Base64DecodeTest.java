@@ -51,16 +51,16 @@ public class Base64DecodeTest {
     @Test
     public void utf16String_isDecodedToGarbage() throws IOException, XFormParser.ParseException {
         Scenario scenario = getBase64DecodeScenario("UTF-16 encoded string", "AGEAYgBj");
-        assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("\u0000a\u0000b\u0000c"))); // source string: "abc" in UTF-16
+        assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("\u0000a\u0000b\u0000c"))); // encoded string: "abc" in UTF-16
     }
 
-    private static Scenario getBase64DecodeScenario(String testName, String source) throws IOException, XFormParser.ParseException {
+    private static Scenario getBase64DecodeScenario(String testName, String encodedText) throws IOException, XFormParser.ParseException {
         return Scenario.init(html(
             head(
                 title(testName),
                 model(
                     mainInstance(t("data id=\"base64\"",
-                        t("text", source),
+                        t("text", encodedText),
                         t("decoded")
                     )),
                     bind("/data/text").type("string"),
