@@ -1,19 +1,5 @@
 package org.javarosa.xpath.expr;
 
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.joda.time.DateTimeUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.util.Date;
-import java.util.TimeZone;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
@@ -27,27 +13,26 @@ import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.TimeZone;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.test.Scenario;
+import org.javarosa.test.utils.FixedTimeZoneAndInstantRule;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Rule;
+import org.junit.Test;
+
 public class DateTimeTest {
-    private TimeZone originalTimeZone;
     private static final String SIMULATED_NOW = "1998-05-23T17:49:42.123-07:00"; // 1998-05-24 in UTC
     private static final Instant SIMULATED_INSTANT = OffsetDateTime.parse(SIMULATED_NOW).toInstant();
-
     private static final TimeZone SIMULATED_TZ = TimeZone.getTimeZone("America/Los_Angeles");
 
-    @Before
-    public void setUp() {
-        DateTimeUtils.setCurrentMillisFixed(SIMULATED_INSTANT.toEpochMilli());
-
-        originalTimeZone = TimeZone.getDefault();
-        TimeZone.setDefault(SIMULATED_TZ);
-    }
-
-    @After
-    public void tearDown() {
-        TimeZone.setDefault(originalTimeZone);
-
-        DateTimeUtils.setCurrentMillisSystem();
-    }
+    @Rule
+    public final FixedTimeZoneAndInstantRule fixedTimeZoneAndInstant =
+        new FixedTimeZoneAndInstantRule(SIMULATED_INSTANT, SIMULATED_TZ);
 
     @Test
     public void nowLabelOutput_isIsoOffsetDateTime() throws IOException, XFormParser.ParseException {
@@ -128,6 +113,37 @@ public class DateTimeTest {
         scenario.next();
         FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
         assertThat(caption.getQuestionText(), is("Date time: 1998-05-23T17:49:42.123-07:00"));
+    }
+
+    @Test
+    public void dateTimeQuestionAtMidnightLabelOutput_isIsoDate() throws IOException, XFormParser.ParseException {
+        Instant midnight = OffsetDateTime.parse("1998-05-23T00:00:00-07:00").toInstant();
+
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Date time"),
+                model(
+                    mainInstance(t("data id=\"date-time\"",
+                        t("date_time"),
+                        t("date_time_note")
+                    )),
+                    bind("/data/date_time").type("dateTime")
+                )
+            ),
+            body(
+                input("/data/date_time",
+                    label("Enter a date time")),
+                input("/data/date_time_note",
+                    label("Date time: <output ref=\"/data/date_time\"/>"))
+            )));
+
+        scenario.next();
+        scenario.answer(midnight, true);
+
+        scenario.next();
+        FormEntryCaption caption = new FormEntryCaption(scenario.getFormDef(), scenario.getCurrentIndex());
+        // Here we lost the time which was legitimately midnight. This is a compromise because we don't have type information
+        assertThat(caption.getQuestionText(), is("Date time: 1998-05-23"));
     }
 
     @Test
