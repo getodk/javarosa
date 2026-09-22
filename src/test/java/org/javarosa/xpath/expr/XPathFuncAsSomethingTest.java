@@ -1,14 +1,15 @@
 package org.javarosa.xpath.expr;
 
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toLongHash;
 import static org.javarosa.xpath.expr.XPathFuncExpr.toNumeric;
 
 import java.util.Date;
+import java.util.TimeZone;
+import org.junit.Test;
 
 public class XPathFuncAsSomethingTest {
 
@@ -37,6 +38,8 @@ public class XPathFuncAsSomethingTest {
 
     @Test
     public void toNumericHandlesDates() {
-        assertThat(toNumeric(new Date(86400 * 1000L)), equalTo(1.0));
+        withTimeZone(TimeZone.getTimeZone("UTC"), () ->
+            assertThat(toNumeric(new Date(86400 * 1000L)), equalTo(1.0))
+        );
     }
 }
