@@ -372,7 +372,7 @@ public class SelectCachingTest {
                         item("b", "B")))),
             body(
                 repeat("/data/outer",
-                    input("/data/filter"),
+                    input("/data/outer/filter"),
                     repeat("/data/outer/inner",
                         select1Dynamic("/data/outer/inner/select", "instance('choices')/root/item[value=current()/../../filter]"))
                 ))));
