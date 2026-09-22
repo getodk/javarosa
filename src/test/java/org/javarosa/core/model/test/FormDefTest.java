@@ -59,7 +59,7 @@ import org.junit.Test;
 public class FormDefTest {
     @Test
     public void enforces_constraints_defined_in_a_field() throws XFormParser.ParseException {
-        Scenario scenario = Scenario.init(r("ImageSelectTester.xhtml"));
+        Scenario scenario = Scenario.init(r("ImageSelectTester.xml"));
         scenario.next();
         scenario.next();
         scenario.next();
