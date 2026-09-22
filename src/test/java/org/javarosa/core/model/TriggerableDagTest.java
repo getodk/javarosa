@@ -875,9 +875,7 @@ public class TriggerableDagTest {
                 repeat("/data/repeat",
                     input("/data/repeat/question")
                 )
-            ))).onDagEvent(dagEvents::add);
-
-        dagEvents.clear();
+            )));
 
         range(1, 6).forEach(n -> {
             scenario.next();
