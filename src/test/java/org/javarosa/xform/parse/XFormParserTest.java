@@ -1,47 +1,5 @@
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.RangeQuestion;
-import org.javarosa.core.model.SubmissionProfile;
-import org.javarosa.core.model.actions.Actions;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.AbstractTreeElement;
-import org.javarosa.core.model.instance.DataInstance;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.model.xform.XFormSerializingVisitor;
-import org.javarosa.model.xform.XPathReference;
-import org.javarosa.test.Scenario;
-import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.kxml2.kdom.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -69,13 +27,43 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.RangeQuestion;
+import org.javarosa.core.model.SubmissionProfile;
+import org.javarosa.core.model.actions.Actions;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.reference.ReferenceManagerTestUtils;
+import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.model.xform.XFormSerializingVisitor;
+import org.javarosa.model.xform.XPathReference;
+import org.javarosa.test.Scenario;
+import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.kxml2.kdom.Element;
+
 public class XFormParserTest {
-    private static final Logger logger = LoggerFactory.getLogger(XFormParserTest.class);
-
-    private static Path FORM_INSTANCE_XML_FILE_NAME;
-    private static File SECONDARY_INSTANCE_XML;
-    private static Path SECONDARY_INSTANCE_LARGE_XML;
-
     private static final String AUDIT_NODE = "audit";
     private static final String AUDIT_ANSWER = "audit111.csv";
 
@@ -87,22 +75,6 @@ public class XFormParserTest {
 
     private static final String ORX_2_NAMESPACE_PREFIX = "orx2";
     private static final String ORX_2_NAMESPACE_URI = "http://openrosa.org/xforms";
-
-    @Before
-    public void setUp() {
-        try {
-            FORM_INSTANCE_XML_FILE_NAME = Files.createTempFile("instance.xml", null);
-            SECONDARY_INSTANCE_XML = r("secondary-instance.xml");
-            SECONDARY_INSTANCE_LARGE_XML = Files.createTempFile("secondary-instance-large.xml", null);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        Files.deleteIfExists(FORM_INSTANCE_XML_FILE_NAME);
-    }
 
     @Test
     public void parsesSimpleForm() throws IOException, XFormParser.ParseException {
@@ -145,7 +117,7 @@ public class XFormParserTest {
     
     @Test
     public void parsesSecondaryInstanceForm() throws IOException, XFormParser.ParseException {
-        FormDef formDef = parse(SECONDARY_INSTANCE_XML);
+        FormDef formDef = parse(r("secondary-instance.xml"));
         assertEquals("Form with secondary instance", formDef.getTitle());
     }
 
@@ -326,10 +298,11 @@ public class XFormParserTest {
         // serialize the form instance
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
         ByteArrayPayload xml = (ByteArrayPayload) serializer.createSerializedPayload(formDef.getInstance());
-        copy(xml.getPayloadStream(), FORM_INSTANCE_XML_FILE_NAME, REPLACE_EXISTING);
+        Path tempFile = Files.createTempFile("instance.xml", null);
+        copy(xml.getPayloadStream(), tempFile, REPLACE_EXISTING);
 
         // restore (deserialize) the form instance
-        byte[] formInstanceBytes = readAllBytes(FORM_INSTANCE_XML_FILE_NAME);
+        byte[] formInstanceBytes = readAllBytes(tempFile);
         FormInstance formInstance = XFormParser.restoreDataModel(formInstanceBytes, null);
 
         // Then
