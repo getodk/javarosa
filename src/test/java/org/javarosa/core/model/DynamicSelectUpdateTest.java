@@ -285,7 +285,7 @@ public class DynamicSelectUpdateTest {
                         item("bb", "BB")))),
             body(
                 repeat("/data/repeat",
-                    input("/data/repeat/filter"),
+                    input("/data/repeat/bfilter"),
                     select1Dynamic("/data/repeat/select", "instance('choices')/root/item[starts-with(value,current()/../filter)]"))
             )));
 
