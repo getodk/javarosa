@@ -56,4 +56,24 @@ public class ReadOnlyCalculateTest {
 
         assertThat(scenario.answerOf("/data/readonly-calculate"), is(intAnswer(14)));
     }
+
+    @Test
+    public void valueOfaReadonlyFieldCanBeSet() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Readonly"),
+                model(
+                    mainInstance(t("data id=\"readonly\"",
+                        t("readonly")
+                    )),
+                    bind("/data/readonly").readonly("1")
+                )
+            ),
+            body(
+                input("/data/readonly")
+            )));
+
+        scenario.answer("/data/readonly", 14);
+        assertThat(scenario.answerOf("/data/readonly"), is(intAnswer(14)));
+    }
 }
