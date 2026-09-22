@@ -27,6 +27,7 @@ import org.javarosa.core.model.ValidateOutcome;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
@@ -69,10 +70,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -629,10 +631,26 @@ public class Scenario {
     }
 
     /**
-     * Answers the question at the form index
+     * Answers with DateData representing the LocalDate as midnight UTC on that date.
+     *
+     * Because the resulting value represents an instant in time, viewing it in a
+     * non-UTC time zone may yield a different local calendar date. For example,
+     * 2024-01-01 is stored as 2024-01-01T00:00:00Z, which is 2023-12-31 in some
+     * western time zones.
      */
     public AnswerResult answer(LocalDate value) {
         return answer(new DateData(Date.from(value.atStartOfDay(ZoneId.of("UTC")).toInstant())));
+    }
+
+    /**
+     * Answers with either DateTimeData or DateData for the specified instant.
+     *
+     * When {@code isDateTime} is false, the instant is converted to a DateData and
+     * normalized according to DateData's date-only semantics.
+     */
+    public AnswerResult answer(Instant instant, boolean isDateTime) {
+        Date date = Date.from(instant);
+        return answer(isDateTime ? new DateTimeData(date) : new DateData(date));
     }
 
     /**
