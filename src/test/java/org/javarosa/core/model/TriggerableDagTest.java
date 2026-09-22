@@ -387,10 +387,10 @@ public class TriggerableDagTest {
                         t("is-field-relevant"),
                         t("group", t("field"))
                     )),
-                    bind("/data/is-group-relevant").type("boolean"),
-                    bind("/data/is-field-relevant").type("boolean"),
-                    bind("/data/group").relevant("/data/is-group-relevant"),
-                    bind("/data/group/field").type("string").relevant("/data/is-field-relevant")
+                    bind("/data/is-group-relevant").type("int"),
+                    bind("/data/is-field-relevant").type("int"),
+                    bind("/data/group").relevant("/data/is-group-relevant = 1"),
+                    bind("/data/group/field").type("string").relevant("/data/is-field-relevant = 1")
                 )
             ),
             body(
@@ -405,15 +405,15 @@ public class TriggerableDagTest {
         assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
 
         // Now we make both relevant
-        scenario.answer("/data/is-group-relevant", true);
-        scenario.answer("/data/is-field-relevant", true);
+        scenario.answer("/data/is-group-relevant", 1);
+        scenario.answer("/data/is-field-relevant", 1);
         assertThat(scenario.getAnswerNode("/data/group"), is(relevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(relevant()));
 
         // Now we make the group non-relevant, which makes the field non-relevant
         // regardless of its local relevance expression, which would be satisfied
         // in this case
-        scenario.answer("/data/is-group-relevant", false);
+        scenario.answer("/data/is-group-relevant", 0);
         assertThat(scenario.getAnswerNode("/data/group"), is(nonRelevant()));
         assertThat(scenario.getAnswerNode("/data/group/field"), is(nonRelevant()));
     }
@@ -507,9 +507,9 @@ public class TriggerableDagTest {
                         t("result"),
                         t("some-field", "42")
                     )),
-                    bind("/data/relevance-trigger").type("boolean"),
+                    bind("/data/relevance-trigger").type("int"),
                     bind("/data/result").type("int").calculate("if(/data/some-field != '', /data/some-field + 33, 33)"),
-                    bind("/data/some-field").type("int").relevant("/data/relevance-trigger")
+                    bind("/data/some-field").type("int").relevant("/data/relevance-trigger = 1")
                 )
             ),
             body(
@@ -519,7 +519,7 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/result"), is(intAnswer(75)));
         assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
 
-        scenario.answer("/data/relevance-trigger", false);
+        scenario.answer("/data/relevance-trigger", 0);
 
         // This shows how JavaRosa will ignore the actual values of non-relevant fields. The
         // W3C XForm specs regard relevance a purely UI concern. No side effects on node values
@@ -638,12 +638,12 @@ public class TriggerableDagTest {
                             t("inner",
                                 t("field")))
                     )),
-                    bind("/data/is-outer-readonly").type("boolean"),
-                    bind("/data/is-inner-readonly").type("boolean"),
-                    bind("/data/is-field-readonly").type("boolean"),
-                    bind("/data/outer").readonly("/data/is-outer-readonly"),
-                    bind("/data/outer/inner").readonly("/data/is-inner-readonly"),
-                    bind("/data/outer/inner/field").type("string").readonly("/data/is-field-readonly")
+                    bind("/data/is-outer-readonly").type("int"),
+                    bind("/data/is-inner-readonly").type("int"),
+                    bind("/data/is-field-readonly").type("int"),
+                    bind("/data/outer").readonly("/data/is-outer-readonly = 1"),
+                    bind("/data/outer/inner").readonly("/data/is-inner-readonly = 1"),
+                    bind("/data/outer/inner/field").type("string").readonly("/data/is-field-readonly = 1")
                 )
             ),
             body(
@@ -659,21 +659,21 @@ public class TriggerableDagTest {
         assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(enabled()));
 
         // Make the outer group read-only
-        scenario.answer("/data/is-outer-readonly", true);
+        scenario.answer("/data/is-outer-readonly", 1);
         assertThat(scenario.getAnswerNode("/data/outer"), is(readOnly()));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(readOnly()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
 
         // Make the inner group read-only
-        scenario.answer("/data/is-outer-readonly", false);
-        scenario.answer("/data/is-inner-readonly", true);
+        scenario.answer("/data/is-outer-readonly", 0);
+        scenario.answer("/data/is-inner-readonly", 1);
         assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(readOnly()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
 
         // Make the field read-only
-        scenario.answer("/data/is-inner-readonly", false);
-        scenario.answer("/data/is-field-readonly", true);
+        scenario.answer("/data/is-inner-readonly", 0);
+        scenario.answer("/data/is-field-readonly", 1);
         assertThat(scenario.getAnswerNode("/data/outer"), is(enabled()));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(enabled()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/field"), is(readOnly()));
@@ -692,7 +692,7 @@ public class TriggerableDagTest {
                         t("b")
                     )),
                     bind("/data/a").type("string").constraint("/data/b"),
-                    bind("/data/b").type("boolean")
+                    bind("/data/b").type("int")
                 )
             ),
             body(
@@ -701,7 +701,7 @@ public class TriggerableDagTest {
             )));
 
         // Ensure that the constraint expression in /data/a won't be satisfied
-        scenario.answer("/data/b", false);
+        scenario.answer("/data/b", 0);
 
         // Verify that regardless of the constraint defined in /data/a, the
         // form appears to be valid
@@ -719,7 +719,7 @@ public class TriggerableDagTest {
                         t("b")
                     )),
                     bind("/data/a").type("string").required(),
-                    bind("/data/b").type("boolean")
+                    bind("/data/b").type("int")
                 )
             ),
             body(
@@ -743,8 +743,8 @@ public class TriggerableDagTest {
                         t("a"),
                         t("b")
                     )),
-                    bind("/data/a").type("string").constraint("/data/b"),
-                    bind("/data/b").type("boolean")
+                    bind("/data/a").type("string").constraint("/data/b = 1"),
+                    bind("/data/b").type("int")
                 )
             ),
             body(
@@ -755,13 +755,13 @@ public class TriggerableDagTest {
         // First, ensure we will be able to commit an answer in /data/a by
         // making it match its constraint. No values can be committed to the
         // instance if constraints aren't satisfied.
-        scenario.answer("/data/b", true);
+        scenario.answer("/data/b", 1);
 
         // Then, commit an answer (answers with empty values are always valid)
         scenario.answer("/data/a", "cocotero");
 
         // Then, make the constraint defined at /data/a impossible to satisfy
-        scenario.answer("/data/b", false);
+        scenario.answer("/data/b", 0);
 
         // At this point, the form has /data/a filled with an answer that's
         // invalid according to its constraint expression, but we can't be
