@@ -16,15 +16,6 @@
 
 package org.javarosa.core.model.actions;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.javarosa.xpath.XPathTypeMismatchException;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -45,6 +36,14 @@ import static org.javarosa.test.XFormsElement.setvalueLiteral;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathTypeMismatchException;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class SetValueActionTest {
     @Test
@@ -435,8 +434,8 @@ public class SetValueActionTest {
                         input("/data/repeat1/repeat2/destination")
             )))));
 
-            scenario.answer("/data/repeat1[0]/source", "foo");
-            assertThat(scenario.answerOf("/data/repeat1[0]/repeat2[0]/destination").getDisplayText(), is("foo"));
+            scenario.answer("/data/repeat1[1]/source", "foo");
+            assertThat(scenario.answerOf("/data/repeat1[1]/repeat2[1]/destination").getDisplayText(), is("foo"));
     }
     //endregion
 

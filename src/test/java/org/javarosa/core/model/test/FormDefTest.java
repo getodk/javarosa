@@ -150,7 +150,7 @@ public class FormDefTest {
             )));
         FormDef formDef = scenario.getFormDef();
 
-        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/repeat1[1]")), is(false));
     }
 
     @Test
@@ -180,10 +180,10 @@ public class FormDefTest {
             )));
         FormDef formDef = scenario.getFormDef();
 
-        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[1]")), is(false));
 
         scenario.answer("/data/selectYesNo", "yes");
-        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(true));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[1]")), is(true));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class FormDefTest {
             )));
         FormDef formDef = scenario.getFormDef();
 
-        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[0]")), is(false));
+        assertThat(formDef.isRepeatRelevant(getRef("/data/outer/inner/repeat1[1]")), is(false));
     }
 
     @Test

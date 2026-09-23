@@ -51,11 +51,11 @@ public class SameRefDifferentInstancesIssue449Test {
         assertThat(scenario.answerOf("/data/aggregated"), is(stringAnswer("a b c")));
 
         Scenario deserialized = scenario.serializeAndDeserializeForm();
-        assertThat(deserialized.answerOf("/data/new-part[0]"), is(stringAnswer("c")));
-        assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c")));
+        assertThat(deserialized.answerOf("/data/new-part[1]"), is(stringAnswer("c")));
+        assertThat(deserialized.answerOf("/data/aggregated[1]"), is(stringAnswer("a b c")));
 
         deserialized.answer("/data/new-part", "c2");
-        assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c2")));
+        assertThat(deserialized.answerOf("/data/aggregated[1]"), is(stringAnswer("a b c2")));
     }
 
     @Test
@@ -78,18 +78,18 @@ public class SameRefDifferentInstancesIssue449Test {
 
         scenario.next();
         scenario.answer("ok");
-        MatcherAssert.assertThat(scenario.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(scenario.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
 
         scenario.answer("not ok");
-        MatcherAssert.assertThat(scenario.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(scenario.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
 
         Scenario deserialized = scenario.serializeAndDeserializeForm();
 
         deserialized.next();
         deserialized.answer("ok");
-        MatcherAssert.assertThat(deserialized.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(deserialized.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
 
         deserialized.answer("not ok");
-        MatcherAssert.assertThat(deserialized.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(deserialized.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
     }
 }
