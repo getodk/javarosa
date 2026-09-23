@@ -146,14 +146,14 @@ public class SelectChoiceTest {
                 input("/data/filter"),
                 select1Dynamic("/data/select", "/data/repeat")
             )));
-        scenario.answer("/data/repeat[0]/value", "a");
-        scenario.answer("/data/repeat[0]/label", "A");
-        scenario.answer("/data/repeat[0]/special-property", "AA");
+        scenario.answer("/data/repeat[1]/value", "a");
+        scenario.answer("/data/repeat[1]/label", "A");
+        scenario.answer("/data/repeat[1]/special-property", "AA");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("AA"));
 
-        scenario.answer("/data/repeat[0]/special-property", "changed");
+        scenario.answer("/data/repeat[1]/special-property", "changed");
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("changed"));
     }
 
@@ -215,9 +215,9 @@ public class SelectChoiceTest {
                 input("/data/filter"),
                 select1Dynamic("/data/select", "/data/repeat")
             )));
-        scenario.answer("/data/repeat[0]/value", "a");
-        scenario.answer("/data/repeat[0]/label", "A");
-        scenario.answer("/data/repeat[0]/special-property", "AA");
+        scenario.answer("/data/repeat[1]/value", "a");
+        scenario.answer("/data/repeat[1]/label", "A");
+        scenario.answer("/data/repeat[1]/special-property", "AA");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
         List<Pair<String, String>> children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
@@ -225,7 +225,7 @@ public class SelectChoiceTest {
         assertThat(children.get(0), equalTo(new Pair<>("value", "a")));
         assertThat(children.get(1), equalTo(new Pair<>("special-property", "AA")));
 
-        scenario.answer("/data/repeat[0]/special-property", "changed");
+        scenario.answer("/data/repeat[1]/special-property", "changed");
         children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
         assertThat(children.get(1), equalTo(new Pair<>("special-property", "changed")));
     }
@@ -246,7 +246,7 @@ public class SelectChoiceTest {
                     input("/data/repeat/first_name")),
                 select1Dynamic("/data/select", "/data/repeat[./first_name != '']", "first_name", "first_name")
             )));
-        scenario.answer("/data/repeat[0]/first_name", "b");
+        scenario.answer("/data/repeat[1]/first_name", "b");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("b"));
         assertThat(scenario.choicesOf("/data/select").get(0).getLabelInnerText(), is("b"));
