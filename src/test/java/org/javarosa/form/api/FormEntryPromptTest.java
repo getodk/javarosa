@@ -235,6 +235,34 @@ public class FormEntryPromptTest {
     }
 
     @Test
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawStringThatIsAValidXPathExpression() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1"),
+                            t("q2")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "Age > 18"),
+                    bind("/data/q2").type("int").withAttribute("jr", "requiredMsg", "1.50")
+                )
+            ),
+            body(
+                input("/data/q1"),
+                input("/data/q2")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("Age > 18"));
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("1.50"));
+    }
+
+    @Test
     public void getConstraintText_shouldReturnNullIfConstraintTextNotSpecified() throws XFormParser.ParseException, IOException {
         Scenario scenario = Scenario.init(html(
             head(
@@ -315,5 +343,33 @@ public class FormEntryPromptTest {
 
         scenario.next();
         assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("message"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingRawStringThatIsAValidXPathExpression() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("q1"),
+                            t("q2")
+                        )
+                    ),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "Age > 18"),
+                    bind("/data/q2").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "1.50")
+                )
+            ),
+            body(
+                input("/data/q1"),
+                input("/data/q2")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("Age > 18"));
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("1.50"));
     }
 }
