@@ -16,6 +16,9 @@
 
 package org.javarosa.form.api;
 
+import static org.javarosa.xform.parse.XFormParser.ITEXT_CLOSE;
+import static org.javarosa.xform.parse.XFormParser.ITEXT_OPEN;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -193,6 +196,11 @@ public class FormEntryPrompt extends FormEntryCaption {
         String requiredMsgText = form.getMainInstance().resolveReference(index.getReference()).getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA,
             "requiredMsg");
         if (requiredMsgText != null) {
+            if (!requiredMsgText.startsWith(ITEXT_OPEN) || !requiredMsgText.endsWith(ITEXT_CLOSE)) {
+                // This is a string literal, so no need to evaluate anything.
+                return requiredMsgText;
+            }
+
             XPathExpression xpathRequiredMsg;
             try {
                 xpathRequiredMsg = XPathParseTool.parseXPath("string(" + requiredMsgText + ")");
