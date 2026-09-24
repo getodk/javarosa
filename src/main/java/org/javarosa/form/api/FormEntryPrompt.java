@@ -218,7 +218,7 @@ public class FormEntryPrompt extends FormEntryCaption {
                         treeElement.getRef());
                     Object value = xpathRequiredMsg.eval(form.getMainInstance(), ec);
                     if (!value.equals("")) {
-                        return (String) value;
+                        return substituteStringArgs((String) value);
                     }
                     return requiredMsgText;
                 } catch (Exception e) {
