@@ -75,7 +75,7 @@ public class SetValueAction extends Action {
             }
             throw new NullPointerException(failMessage);
         } else if (references.size() > 1) {
-            throw new XPathTypeMismatchException("You are trying to target a repeated field. Currently you may only target a field in a specific repeat instance.\n\nXPath nodeset has more than one node [\" + references + \"].");
+            throw new XPathTypeMismatchException("You are trying to target a repeated field. Currently you may only target a field in a specific repeat instance.\n\nXPath nodeset has more than one node [\"" + references + "\"].");
         } else {
             targetReference = references.get(0);
         }
