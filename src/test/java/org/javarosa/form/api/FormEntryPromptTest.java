@@ -205,6 +205,40 @@ public class FormEntryPromptTest {
     }
 
     @Test
+    public void getRequiredText_shouldReturnRequiredTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "Please enter <output value=\"/data/name\"/>'s age")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("name"),
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/name").type("string"),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "jr:itext('/data/q1:requiredMsg')")
+                )
+            ),
+            body(
+                input("/data/name"),
+                input("/data/q1")
+            )
+        ));
+
+        scenario.answer("/data/name", "John");
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("Please enter John's age"));
+    }
+
+    @Test
     public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawString() throws XFormParser.ParseException, IOException {
         Scenario scenario = Scenario.init(html(
             head(
@@ -313,6 +347,40 @@ public class FormEntryPromptTest {
 
         scenario.next();
         assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("message"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:constraintMsg'",
+                                t("value", "Please enter <output value=\"/data/name\"/>'s age")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("name"),
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/name").type("string"),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "jr:itext('/data/q1:constraintMsg')")
+                )
+            ),
+            body(
+                input("/data/name"),
+                input("/data/q1")
+            )
+        ));
+
+        scenario.answer("/data/name", "John");
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("Please enter John's age"));
     }
 
     @Test
