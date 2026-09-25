@@ -16,6 +16,21 @@
 
 package org.javarosa.xpath.expr;
 
+import static java.lang.Double.NaN;
+import static org.javarosa.xform.parse.RandomizeHelper.toNumericWithLongHash;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFallbackFunctionHandler;
@@ -45,22 +60,6 @@ import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static java.lang.Double.NaN;
-import static org.javarosa.xform.parse.RandomizeHelper.toNumericWithLongHash;
 
 /**
  * Representation of an xpath function expression.
@@ -696,12 +695,15 @@ public class XPathFuncExpr extends XPathExpression {
     }
 
     public static Double toDouble(Object o) {
+        if (o instanceof XPathNodeset) {
+            o = ((XPathNodeset) o).unpack();
+        }
+
         if (o instanceof Date) {
             return DateUtils.fractionalDaysSinceEpoch((Date) o);
         } else {
             return toNumeric(o);
         }
-
     }
 
     /**
