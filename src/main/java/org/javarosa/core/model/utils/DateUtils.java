@@ -352,7 +352,9 @@ public class DateUtils {
 
     public static Date parseDate (String str) {
         DateFields fields = new DateFields();
-        if (!parseDate(str, fields)) {
+        int i = str.indexOf("T");
+
+        if (!parseDate(i == -1 ? str : str.substring(0, i), fields)) {
             return null;
         }
         return getDate(fields);
