@@ -35,6 +35,7 @@ public class DateUtilsParseDateTests {
             {"2016-04-13T16:26:00.000+08", LocalDate.parse("2016-04-13")},
             {"2016-04-13T00:30:00.000+12", LocalDate.parse("2016-04-13")},
             {"2016-04-13T23:30:00.000-13", LocalDate.parse("2016-04-13")},
+            {"2016-04-13Twhatever", LocalDate.parse("2016-04-13")}
         });
     }
 
