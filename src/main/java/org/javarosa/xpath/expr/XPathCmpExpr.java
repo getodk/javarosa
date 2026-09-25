@@ -53,8 +53,8 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
         boolean result = false;
 
         //xpath spec says comparisons only defined for numbers (not defined for strings)
-        aval = XPathFuncExpr.toNumeric(aval);
-        bval = XPathFuncExpr.toNumeric(bval);
+        aval = XPathFuncExpr.toDouble(aval);
+        bval = XPathFuncExpr.toDouble(bval);
 
         double fa = ((Double)aval).doubleValue();
         double fb = ((Double)bval).doubleValue();
