@@ -16,17 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.hamcrest.CoreMatchers;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.List;
-
-import kotlin.Pair;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -52,6 +41,17 @@ import static org.javarosa.test.XFormsElement.select1Dynamic;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.List;
+import org.hamcrest.CoreMatchers;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
+import kotlin.Pair;
 
 public class SelectChoiceTest {
     @Test
@@ -140,20 +140,20 @@ public class SelectChoiceTest {
                             t("select"))))),
             body(
                 repeat("/data/repeat",
-                    input("value"),
-                    input("label"),
-                    input("special-property")),
-                input("filter"),
-                select1Dynamic("/data/select", "../repeat")
+                    input("/data/repeat/value"),
+                    input("/data/repeat/label"),
+                    input("/data/repeat/special-property")),
+                input("/data/filter"),
+                select1Dynamic("/data/select", "/data/repeat")
             )));
-        scenario.answer("/data/repeat[0]/value", "a");
-        scenario.answer("/data/repeat[0]/label", "A");
-        scenario.answer("/data/repeat[0]/special-property", "AA");
+        scenario.answer("/data/repeat[1]/value", "a");
+        scenario.answer("/data/repeat[1]/label", "A");
+        scenario.answer("/data/repeat[1]/special-property", "AA");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("AA"));
 
-        scenario.answer("/data/repeat[0]/special-property", "changed");
+        scenario.answer("/data/repeat[1]/special-property", "changed");
         assertThat(scenario.choicesOf("/data/select").get(0).getChild("special-property"), is("changed"));
     }
 
@@ -194,7 +194,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
+    public void getAdditionalChildren_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select from repeat"),
@@ -212,12 +212,12 @@ public class SelectChoiceTest {
                     input("/data/repeat/value"),
                     input("/data/repeat/label"),
                     input("/data/repeat/special-property")),
-                input("filter"),
-                select1Dynamic("/data/select", "../repeat")
+                input("/data/filter"),
+                select1Dynamic("/data/select", "/data/repeat")
             )));
-        scenario.answer("/data/repeat[0]/value", "a");
-        scenario.answer("/data/repeat[0]/label", "A");
-        scenario.answer("/data/repeat[0]/special-property", "AA");
+        scenario.answer("/data/repeat[1]/value", "a");
+        scenario.answer("/data/repeat[1]/label", "A");
+        scenario.answer("/data/repeat[1]/special-property", "AA");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("a"));
         List<Pair<String, String>> children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
@@ -225,7 +225,7 @@ public class SelectChoiceTest {
         assertThat(children.get(0), equalTo(new Pair<>("value", "a")));
         assertThat(children.get(1), equalTo(new Pair<>("special-property", "AA")));
 
-        scenario.answer("/data/repeat[0]/special-property", "changed");
+        scenario.answer("/data/repeat[1]/special-property", "changed");
         children = scenario.choicesOf("/data/select").get(0).getAdditionalChildren();
         assertThat(children.get(1), equalTo(new Pair<>("special-property", "changed")));
     }
@@ -246,7 +246,7 @@ public class SelectChoiceTest {
                     input("/data/repeat/first_name")),
                 select1Dynamic("/data/select", "/data/repeat[./first_name != '']", "first_name", "first_name")
             )));
-        scenario.answer("/data/repeat[0]/first_name", "b");
+        scenario.answer("/data/repeat[1]/first_name", "b");
 
         assertThat(scenario.choicesOf("/data/select").get(0).getValue(), is("b"));
         assertThat(scenario.choicesOf("/data/select").get(0).getLabelInnerText(), is("b"));

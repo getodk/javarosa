@@ -20,7 +20,7 @@ import java.util.Arrays;
  * and a PrefixedRootFactory with roots "file" and "file://" will
  * be used by the ReferenceManager to derive any URI with the roots
  * <ul><li>jr://file/</li><li>file://</li></ul> like
- * <pre>jr://file/myxform.xhtml</pre> or <pre>file://myxform.xhtml</pre>
+ * <pre>jr://file/myxform.xml</pre> or <pre>file://myxform.xml</pre>
  *
  * @author ctsims
  */

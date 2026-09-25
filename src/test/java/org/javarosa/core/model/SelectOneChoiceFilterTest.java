@@ -16,12 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -29,6 +23,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.core.test.SelectChoiceMatchers.choice;
 import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
+
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * When itemsets are dynamically generated, the choices available to a user in a select one question can change based on
@@ -47,14 +47,12 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void dependentLevelsInBlankInstance_ShouldHaveNoChoices() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
     }
 
     @Test
     public void selectingValueAtLevel1_ShouldFilterChoicesAtLevel2() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
 
         scenario.answer("/data/level1", "b");
@@ -67,7 +65,6 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void selectingValuesAtLevels1And2_ShouldFilterChoicesAtLevel3() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -80,7 +77,6 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void clearingValueAtLevel2_ShouldClearChoicesAtLevel3() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -95,7 +91,6 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void clearingValueAtLevel1_ShouldClearChoicesAtLevels2And3() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -115,7 +110,6 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void clearingValueAtLevel1_ShouldClearValuesAtLevels2And3() {
-        scenario.newInstance();
         assertThat(scenario.answerOf("/data/level2"), nullValue());
         assertThat(scenario.answerOf("/data/level3"), nullValue());
 
@@ -142,8 +136,6 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void changingValueAtLevel2_ShouldClearLevel3_IfChoiceNoLongerAvailable() {
-        scenario.newInstance();
-
         scenario.answer("/data/level1_contains", "a");
         scenario.answer("/data/level2_contains", "aa");
         assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
@@ -162,8 +154,6 @@ public class SelectOneChoiceFilterTest {
 
     @Test
     public void changingValueAtLevel2_ShouldNotClearLevel3_IfChoiceStillAvailable() {
-        scenario.newInstance();
-
         scenario.answer("/data/level1_contains", "a");
         scenario.answer("/data/level2_contains", "aa");
         assertThat(scenario.choicesOf("/data/level3_contains"), containsInAnyOrder(
