@@ -1,16 +1,7 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.DateTimeData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.TimeData;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
@@ -22,6 +13,18 @@ import static org.javarosa.test.XFormsElement.mainInstance;
 import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.TimeZone;
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.TimeData;
+import org.javarosa.test.Scenario;
+import org.javarosa.test.utils.SystemHelper;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
 
 public class DateTimeTest {
     @Test
@@ -202,5 +205,31 @@ public class DateTimeTest {
         assertThat(scenario.answerOf("/data/calculateLiteral"), nullValue());
         assertThat(scenario.answerOf("/data/empty"), nullValue());
         assertThat(scenario.answerOf("/data/calculateReference"), nullValue());
+    }
+
+    @Test
+    public void dateField_withDateTimeDefault_truncatesTime() {
+        SystemHelper.withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            try {
+                Scenario scenario = Scenario.init(html(
+                    head(
+                        title("Date question with datetime default"),
+                        model(
+                            mainInstance(t("data id=\"datetime_default\"",
+                                t("date", "2025-01-14T03:43:58+00:00")
+                            )),
+                            bind("/data/date").type("date")
+                        )
+                    ),
+                    body(
+                        input("/data/date")
+                    )));
+
+                // Would be 2025-01-13 in America/Los_Angeles so this shows time is truncated without TZ conversion
+                assertThat(scenario.answerOf("/data/date").uncast().getValue(), is("2025-01-14"));
+            } catch (IOException | XFormParser.ParseException e) {
+                fail(e.getMessage());
+            }
+        });
     }
 }
