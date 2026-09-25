@@ -16,6 +16,9 @@
 
 package org.javarosa.form.api;
 
+import static org.javarosa.xform.parse.XFormParser.ITEXT_CLOSE;
+import static org.javarosa.xform.parse.XFormParser.ITEXT_OPEN;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -35,6 +38,9 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,6 +189,42 @@ public class FormEntryPrompt extends FormEntryCaption {
             }
             return text;
         }
+    }
+
+    public String getRequiredText() {
+        // look for the text under the requiredMsg bind attribute
+        String requiredMsgText = mTreeElement.getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA, "requiredMsg");
+        if (requiredMsgText != null) {
+            if (!requiredMsgText.startsWith(ITEXT_OPEN) || !requiredMsgText.endsWith(ITEXT_CLOSE)) {
+                // This is a string literal, so no need to evaluate anything.
+                return requiredMsgText;
+            }
+
+            XPathExpression xpathRequiredMsg;
+            try {
+                xpathRequiredMsg = XPathParseTool.parseXPath("string(" + requiredMsgText + ")");
+            } catch (Exception e) {
+                // Expected in probably most cases.
+                // This is a string literal, so no need to evaluate anything.
+                return requiredMsgText;
+            }
+
+            if (xpathRequiredMsg != null) {
+                try {
+                    EvaluationContext ec = new EvaluationContext(form.getEvaluationContext(), mTreeElement.getRef());
+                    Object value = xpathRequiredMsg.eval(form.getMainInstance(), ec);
+                    if (!value.equals("")) {
+                        return substituteStringArgs((String) value);
+                    }
+                    return requiredMsgText;
+                } catch (Exception e) {
+                    return requiredMsgText;
+                }
+            } else {
+                return requiredMsgText;
+            }
+        }
+        return null;
     }
 
     public String getConstraintText() {

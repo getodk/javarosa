@@ -18,6 +18,8 @@ package org.javarosa.form.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
@@ -148,4 +150,294 @@ public class FormEntryPromptTest {
         assertThat(questionPrompt.getAnswerText(), is("A"));
     }
     //endregion
+
+    @Test
+    public void getRequiredText_shouldReturnNullIfRequiredTextNotSpecified() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is(nullValue()));
+    }
+
+    @Test
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "jr:itext('/data/q1:requiredMsg')")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("message"));
+    }
+
+    @Test
+    public void getRequiredText_shouldReturnRequiredTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "Please enter <output value=\"/data/name\"/>'s age")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("name"),
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/name").type("string"),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "jr:itext('/data/q1:requiredMsg')")
+                )
+            ),
+            body(
+                input("/data/name"),
+                input("/data/q1")
+            )
+        ));
+
+        scenario.answer("/data/name", "John");
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("Please enter John's age"));
+    }
+
+    @Test
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawString() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "Your message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "message")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("message"));
+    }
+
+    @Test
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawStringThatIsAValidXPathExpression() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1"),
+                            t("q2")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", "Age > 18"),
+                    bind("/data/q2").type("int").withAttribute("jr", "requiredMsg", "1.50")
+                )
+            ),
+            body(
+                input("/data/q1"),
+                input("/data/q2")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("Age > 18"));
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("1.50"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnNullIfConstraintTextNotSpecified() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").constraint(". > 10")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is(nullValue()));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:constraintMsg'",
+                                t("value", "message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "jr:itext('/data/q1:constraintMsg')")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("message"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:constraintMsg'",
+                                t("value", "Please enter <output value=\"/data/name\"/>'s age")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("name"),
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/name").type("string"),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "jr:itext('/data/q1:constraintMsg')")
+                )
+            ),
+            body(
+                input("/data/name"),
+                input("/data/q1")
+            )
+        ));
+
+        scenario.answer("/data/name", "John");
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("Please enter John's age"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingRawString() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:constraintMsg'",
+                                t("value", "Your message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "message")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("message"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingRawStringThatIsAValidXPathExpression() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("q1"),
+                            t("q2")
+                        )
+                    ),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "Age > 18"),
+                    bind("/data/q2").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "1.50")
+                )
+            ),
+            body(
+                input("/data/q1"),
+                input("/data/q2")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("Age > 18"));
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("1.50"));
+    }
 }
