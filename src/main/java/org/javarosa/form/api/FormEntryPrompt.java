@@ -193,8 +193,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 
     public String getRequiredText() {
         // look for the text under the requiredMsg bind attribute
-        String requiredMsgText = form.getMainInstance().resolveReference(index.getReference()).getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA,
-            "requiredMsg");
+        String requiredMsgText = mTreeElement.getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA, "requiredMsg");
         if (requiredMsgText != null) {
             if (!requiredMsgText.startsWith(ITEXT_OPEN) || !requiredMsgText.endsWith(ITEXT_CLOSE)) {
                 // This is a string literal, so no need to evaluate anything.
@@ -212,10 +211,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 
             if (xpathRequiredMsg != null) {
                 try {
-                    TreeElement treeElement = form.getMainInstance().resolveReference(
-                        index.getReference());
-                    EvaluationContext ec = new EvaluationContext(form.getEvaluationContext(),
-                        treeElement.getRef());
+                    EvaluationContext ec = new EvaluationContext(form.getEvaluationContext(), mTreeElement.getRef());
                     Object value = xpathRequiredMsg.eval(form.getMainInstance(), ec);
                     if (!value.equals("")) {
                         return substituteStringArgs((String) value);
