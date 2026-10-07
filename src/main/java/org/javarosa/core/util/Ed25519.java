@@ -1,11 +1,10 @@
 package org.javarosa.core.util;
 
+import java.nio.charset.StandardCharsets;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.charset.StandardCharsets;
 
 public class Ed25519 {
 
@@ -39,7 +38,7 @@ public class Ed25519 {
             signer.update(message, 0, message.length);
 
             return signer.verifySignature(signature);
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             // The key was too small
             return false;
         } catch (IllegalArgumentException e) {
