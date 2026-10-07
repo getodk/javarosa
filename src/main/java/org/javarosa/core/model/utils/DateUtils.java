@@ -16,15 +16,16 @@
 
 package org.javarosa.core.model.utils;
 
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.util.MathUtils;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.util.MathUtils;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
 
 /**
  * Static utility methods for Dates in j2me
@@ -554,6 +555,16 @@ public class DateUtils {
         if ( d == null ) return null;
         DateFields f = getFields(d);
         return getDate(f.year, f.month, f.day);
+    }
+
+    public static boolean isMidnight(Date d) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+
+        return c.get(Calendar.HOUR_OF_DAY) == 0
+            && c.get(Calendar.MINUTE) == 0
+            && c.get(Calendar.SECOND) == 0
+            && c.get(Calendar.MILLISECOND) == 0;
     }
 
     public static Date today () {
