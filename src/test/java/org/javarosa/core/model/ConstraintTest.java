@@ -23,47 +23,47 @@ public class ConstraintTest {
 
     @Test
     public void dateTimeConstraint_withEarlierTime_isSatisfied() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference");
+        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T11:00:00Z")), is(OK));
     }
 
     @Test
     public void dateTimeConstraint_withSameTime_isSatisfied() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference");
+        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T12:00:00Z")), is(OK));
     }
 
     @Test
     public void dateTimeConstraint_withLaterTime_isViolated() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference");
+        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T13:00:00Z")), is(CONSTRAINT_VIOLATED));
     }
 
     @Test
     public void dateTimeConstraint_withLaterDate_isViolated() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference");
+        Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-16T11:00:00Z")), is(CONSTRAINT_VIOLATED));
     }
 
     @Test
     public void dateTimeConstraint_withSameTime_greaterThanOrEqual_isSatisfied() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". >= /data/reference");
+        Scenario scenario = scenarioWithDateTimeConstraint(". >= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T12:00:00Z")), is(OK));
     }
 
     @Test
     public void dateTimeConstraint_withEarlierTime_greaterThanOrEqual_isViolated() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". >= /data/reference");
+        Scenario scenario = scenarioWithDateTimeConstraint(". >= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T11:00:00Z")), is(CONSTRAINT_VIOLATED));
     }
 
     @Test
     public void dateTimeConstraint_withFutureTime_comparedToNow_isViolated() throws Exception {
-        Scenario scenario = scenarioWithDateTimeConstraint(". <= now()");
+        Scenario scenario = scenarioWithDateTimeConstraint(". <= now()", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.now().plusSeconds(3600)), is(CONSTRAINT_VIOLATED));
     }
 
-    private Scenario scenarioWithDateTimeConstraint(String constraint) throws Exception {
+    private Scenario scenarioWithDateTimeConstraint(String constraint, String reference) throws Exception {
         Scenario scenario = Scenario.init(html(
             head(
                 title("DateTime constraint"),
@@ -71,7 +71,7 @@ public class ConstraintTest {
                     mainInstance(
                         t("data id='datetime'",
                             t("date_time"),
-                            t("reference", "2021-06-15T12:00:00.000Z")
+                            t("reference", reference)
                         )
                     ),
                     bind("/data/date_time").type("dateTime").constraint(constraint),
