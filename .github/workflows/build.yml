@@ -25,16 +25,6 @@ jobs:
       - name: Build
         run: ./gradlew check jacocoTestReport javadoc jar
 
-      - name: Upload reports
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: gradle-reports
-          path: |
-            build/reports
-            build/docs
-          if-no-files-found: ignore
-
       - name: Upload JAR
         uses: actions/upload-artifact@v6
         with:
@@ -42,7 +32,7 @@ jobs:
           path: build/libs/*.jar
 
   android:
-    name: Android
+    name: Verify Android compatibility
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -57,14 +47,6 @@ jobs:
 
       - name: Android lint
         run: ./gradlew -Pandroid lintDebug --max-workers=1
-
-      - name: Upload lint report
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: android-lint
-          path: build/reports/lint-results-debug.html
-          if-no-files-found: ignore
 
   maven:
     name: Maven
@@ -82,9 +64,3 @@ jobs:
 
       - name: Build
         run: mvn clean verify -Dgpg.skip=true
-
-      - name: Upload JARs
-        uses: actions/upload-artifact@v6
-        with:
-          name: maven-jars
-          path: target/*.jar
