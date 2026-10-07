@@ -19,28 +19,28 @@ import java.time.Instant;
 import org.javarosa.test.Scenario;
 import org.junit.Test;
 
-public class ConstraintTest {
+public class DateTimeConstraintTest {
 
     @Test
-    public void dateTimeConstraint_withEarlierTime_isSatisfied() throws Exception {
+    public void dateTimeConstraint_withEarlierTime_lessThanOrEqual_isSatisfied() throws Exception {
         Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T11:00:00Z")), is(OK));
     }
 
     @Test
-    public void dateTimeConstraint_withSameTime_isSatisfied() throws Exception {
+    public void dateTimeConstraint_withSameTime_lessThanOrEqual_isSatisfied() throws Exception {
         Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T12:00:00Z")), is(OK));
     }
 
     @Test
-    public void dateTimeConstraint_withLaterTime_isViolated() throws Exception {
+    public void dateTimeConstraint_withLaterTime_lessThanOrEqual_isViolated() throws Exception {
         Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-15T13:00:00Z")), is(CONSTRAINT_VIOLATED));
     }
 
     @Test
-    public void dateTimeConstraint_withLaterDate_isViolated() throws Exception {
+    public void dateTimeConstraint_withLaterDate_lessThanOrEqual_isViolated() throws Exception {
         Scenario scenario = scenarioWithDateTimeConstraint(". <= /data/reference", "2021-06-15T12:00:00.000Z");
         assertThat(scenario.answer(Instant.parse("2021-06-16T11:00:00Z")), is(CONSTRAINT_VIOLATED));
     }
