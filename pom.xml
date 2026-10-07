@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.getodk</groupId>
   <artifactId>javarosa</artifactId>
-  <!-- snapshot release = x.x.x-${revision}-SNAPSHOT -->
-  <!-- production release = x.x.x -->
   <version>6.0.0</version>
   <packaging>jar</packaging>
   <name>javarosa</name>
@@ -40,7 +39,6 @@
   </distributionManagement>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <revision/>
   </properties>
   <dependencies>
     <!-- Be sure to update dependencies in build.gradle to match -->
@@ -50,29 +48,29 @@
       <version>2.3.0</version>
     </dependency>
     <dependency>
-       <groupId>joda-time</groupId>
-       <artifactId>joda-time</artifactId>
-       <version>2.10.13</version>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.10.13</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.2.1</version>
+      <version>2.22.3</version>
     </dependency>
     <dependency>
-       <groupId>org.apache.commons</groupId>
-       <artifactId>commons-csv</artifactId>
-       <version>1.4</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>1.4</version>
     </dependency>
     <dependency>
-       <groupId>commons-io</groupId>
-       <artifactId>commons-io</artifactId>
-       <version>2.5</version>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.14.0</version>
     </dependency>
     <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-stdlib</artifactId>
-        <version>1.6.10</version>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib</artifactId>
+      <version>2.4.20</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -80,14 +78,14 @@
       <version>1.7.33</version>
     </dependency>
     <dependency>
-       <groupId>org.bouncycastle</groupId>
-       <artifactId>bcprov-jdk18on</artifactId>
-       <version>1.77</version>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>1.86</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.10</version>
+      <version>1.6.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -100,6 +98,7 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
       <version>1.3</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains</groupId>
@@ -113,16 +112,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.16.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>8</release>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -135,7 +133,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.12.0</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -143,9 +141,7 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <!-- Fix for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
-              <source>8</source>
-              <!-- Turn off doclint in JDK 8 because it errors instead of warns -->
+              <!-- JavaRosa has legacy Javadocs that don't pass doclint -->
               <doclint>none</doclint>
             </configuration>
           </execution>
@@ -154,7 +150,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
+        <version>3.2.8</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -163,12 +159,7 @@
               <goal>sign</goal>
             </goals>
             <configuration>
-              <!-- This is necessary for GPG to get passphrase from file -->
-              <!-- https://stackoverflow.com/a/28860520/152938 -->
-              <gpgArguments>
-                <arg>--pinentry-mode</arg>
-                <arg>loopback</arg>
-              </gpgArguments>
+              <passphraseEnvName>MAVEN_GPG_PASSPHRASE</passphraseEnvName>
             </configuration>
           </execution>
         </executions>
@@ -176,51 +167,12 @@
       <plugin>
         <groupId>org.sonatype.central</groupId>
         <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.7.0</version>
+        <version>0.11.0</version>
         <extensions>true</extensions>
         <configuration>
           <publishingServerId>central</publishingServerId>
           <autoPublish>true</autoPublish>
         </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.jetbrains.kotlin</groupId>
-          <artifactId>kotlin-maven-plugin</artifactId>
-          <version>1.6.10</version>
-          <executions>
-              <execution>
-                  <id>compile</id>
-                  <phase>compile</phase>
-                  <goals>
-                      <goal>compile</goal>
-                  </goals>
-              </execution>
-          </executions>
-      </plugin>
-      <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>flatten-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <configuration>
-              <updatePomFile>true</updatePomFile>
-              <flattenMode>resolveCiFriendliesOnly</flattenMode>
-          </configuration>
-          <executions>
-              <execution>
-                  <id>flatten</id>
-                  <phase>process-resources</phase>
-                  <goals>
-                      <goal>flatten</goal>
-                  </goals>
-              </execution>
-              <execution>
-                  <id>flatten.clean</id>
-                  <phase>clean</phase>
-                  <goals>
-                      <goal>clean</goal>
-                  </goals>
-              </execution>
-          </executions>
       </plugin>
     </plugins>
   </build>
