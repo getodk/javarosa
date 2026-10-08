@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
@@ -71,6 +72,16 @@ public class XPathFuncAsSomethingTest {
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () ->
             assertThat(toDouble(jan2_1970Utc_6am), equalTo(1.25))
+        );
+    }
+
+    @Test
+    public void toDoubleForDateTime_usesDefaultTimezone() {
+        Date jan2_1970Utc = new Date(24 * 60 * 60 * 1000L);
+
+        // Midnight UTC on Jan 2, 1970 is 16:00 on Jan 1 in GMT-8
+        withTimeZone(TimeZone.getTimeZone("GMT-08:00"), () ->
+            assertThat(toDouble(jan2_1970Utc), closeTo(16.0 / 24, 1e-10))
         );
     }
 }
