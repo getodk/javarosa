@@ -244,13 +244,6 @@ public class FormEntryPromptTest {
             head(
                 title("Required questions"),
                 model(
-                    t("itext",
-                        t("translation lang='en'",
-                            t("text id='/data/q1:requiredMsg'",
-                                t("value", "Your message")
-                            )
-                        )
-                    ),
                     mainInstance(
                         t("data id='required-questions'",
                             t("q1")
@@ -389,13 +382,6 @@ public class FormEntryPromptTest {
             head(
                 title("Constrained questions"),
                 model(
-                    t("itext",
-                        t("translation lang='en'",
-                            t("text id='/data/q1:constraintMsg'",
-                                t("value", "Your message")
-                            )
-                        )
-                    ),
                     mainInstance(
                         t("data id='constrained-questions'",
                             t("q1")
