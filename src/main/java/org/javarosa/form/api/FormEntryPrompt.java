@@ -196,7 +196,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         String requiredMsgText = mTreeElement.getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA, "requiredMsg");
         if (requiredMsgText != null) {
             if (!requiredMsgText.startsWith(ITEXT_OPEN) || !requiredMsgText.endsWith(ITEXT_CLOSE)) {
-                // This is a string literal, so no need to evaluate anything.
+                // String literal. The spec doesn't allow <output> here (only via jr:itext()), so return it as-is.
                 return requiredMsgText;
             }
 
@@ -204,8 +204,7 @@ public class FormEntryPrompt extends FormEntryCaption {
             try {
                 xpathRequiredMsg = XPathParseTool.parseXPath("string(" + requiredMsgText + ")");
             } catch (Exception e) {
-                // Expected in probably most cases.
-                // This is a string literal, so no need to evaluate anything.
+                // Malformed itext call, fall back to the raw value.
                 return requiredMsgText;
             }
 
