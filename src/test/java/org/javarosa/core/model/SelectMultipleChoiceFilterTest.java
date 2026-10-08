@@ -30,13 +30,11 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void dependentLevelsInBlankInstance_haveNoChoices() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
     }
 
     @Test public void selectingValueAtLevel1_filtersChoicesAtLevel2() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
 
         scenario.answer("/data/level1", "a", "b");
@@ -51,7 +49,6 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void selectingValuesAtLevels1And2_filtersChoicesAtLevel3() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -64,8 +61,7 @@ public class SelectMultipleChoiceFilterTest {
             choice("bab")));
     }
 
-    @Test public void newChoiceFilterEvaluation_removesIrrelevantAnswersAtAllLevels_withoutChangingOrder() {
-        scenario.newInstance();
+    @Test public void newChoiceFilterEvaluation_removesFilteredOutItemsAtAllLevels_withoutChangingOrder() {
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -76,12 +72,12 @@ public class SelectMultipleChoiceFilterTest {
         // Remove b from the level1 answer; this should filter out b-related answers and choices at levels 2 and 3
         scenario.answer("/data/level1", "a", "c");
 
-        // Force populateDynamicChoices to run again which is what filters out irrelevant answers
+        // Force populateDynamicChoices to run again which is what filters out choices
         scenario.choicesOf("/data/level2");
 
         assertThat(scenario.answerOf("/data/level2"), is(answerText("aa, ca")));
 
-        // This also runs populateDynamicChoices and filters out irrelevant answers
+        // This also runs populateDynamicChoices and filters out items that fail the filter test
         assertThat(scenario.choicesOf("/data/level3"), containsInAnyOrder(
             choice("aaa"),
             choice("aab"),
@@ -92,7 +88,6 @@ public class SelectMultipleChoiceFilterTest {
     }
 
     @Test public void newChoiceFilterEvaluation_leavesAnswerUnchangedIfAllSelectionsStillInChoices() {
-        scenario.newInstance();
         assertThat(scenario.choicesOf("/data/level2"), empty());
         assertThat(scenario.choicesOf("/data/level3"), empty());
 
@@ -103,12 +98,12 @@ public class SelectMultipleChoiceFilterTest {
         // Remove c from the level1 answer; this should have no effect on levels 2 and 3
         scenario.answer("/data/level1", "a", "b");
 
-        // Force populateDynamicChoices to run again which is what filters out irrelevant answers
+        // Force populateDynamicChoices to run again which is what filters out items
         scenario.choicesOf("/data/level2");
 
         assertThat(scenario.answerOf("/data/level2"), is(answerText("aa, ba, bb, ab")));
 
-        // This also runs populateDynamicChoices and filters out irrelevant answers
+        // This also runs populateDynamicChoices and filters out items
         assertThat(scenario.choicesOf("/data/level3"), containsInAnyOrder(
             choice("aaa"),
             choice("aab"),

@@ -49,7 +49,7 @@ public class TreeReferenceContextualizeTest {
 
             {"Contextualizing a ref with itself and multiplicity #1", getRef("/foo"), getRef("/foo[2]"), getRef("/foo[2]")},
             {"Contextualizing a ref with itself and multiplicity #2", getRef("/foo[-1]"), getRef("/foo[2]"), getRef("/foo[2]")},
-            {"Contextualizing a ref with itself and multiplicity #3", getRef("/foo[0]"), getRef("/foo[2]"), getRef("/foo[2]")},
+            {"Contextualizing a ref with itself and multiplicity #3", getRef("/foo[1]"), getRef("/foo[2]"), getRef("/foo[2]")},
             {"Contextualizing a ref with itself and multiplicity #4", getRef("/foo[3]"), getRef("/foo[2]"), getRef("/foo[2]")},
 
             {"Contextualizing a ref with itself and predicate #1", getRef("/foo"), getRef("/foo[position() = 3]"), getRef("/foo[position() = 3]")},
@@ -68,8 +68,8 @@ public class TreeReferenceContextualizeTest {
             {"Predicates #3", getRef("bar[@foo = 'baz']"), getRef("/foo"), getRef("/foo/bar[@foo = 'baz']")},
             {"Predicates #4", getRef("/foo[@foo = 'foo']"), getRef("/foo[@foo = 'bar']"), getRef("/foo[@foo = 'foo']")},
 
-            {"Parent refs in nested repeats", getRef("../../inner"), getRef("/data/outer[0]/inner[1]/count[0]"), getRef("/data/outer[0]/inner")},
-            {"Parent refs in child of repeat", getRef("../../repeat/value"), getRef("/data/repeat[0]/sum[0]"), getRef("/data/repeat/value")},
+            {"Parent refs in nested repeats", getRef("../../inner"), getRef("/data/outer[1]/inner[1]/count[1]"), getRef("/data/outer[1]/inner")},
+            {"Parent refs in child of repeat", getRef("../../repeat/value"), getRef("/data/repeat[1]/sum[1]"), getRef("/data/repeat/value")},
             {"Parent refs in child of repeat", getRef("../../../outer/inner/bar/baz"), getRef("/data/outer[17]/inner[5]/foo"), getRef("/data/outer/inner/bar/baz")}
         });
     }

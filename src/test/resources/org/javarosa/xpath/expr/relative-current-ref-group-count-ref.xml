@@ -23,7 +23,7 @@
         <group ref="/data/my_group">
             <label>Some label</label>
             <repeat nodeset="/data/my_group" jr:count="current()/../count">
-                <input ref="name">
+                <input ref="/data/my_group/name">
                     <label>Name</label>
                 </input>
             </repeat>

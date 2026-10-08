@@ -367,10 +367,15 @@ public class Scenario {
         if (predicates == null || predicates.size() != 1)
             return Optional.empty();
 
-        if (isPositiveNumberPredicate(predicates))
-            return Optional.ofNullable(predicates.get(0))
-                .map(p -> ((XPathNumericLiteral) p).d - 1)
-                .map(Double::intValue);
+        if (isPositiveNumberPredicate(predicates)) {
+            double position = ((XPathNumericLiteral) predicates.get(0)).d;
+
+            if (position == 0) {
+                throw new RuntimeException("XPath positions are 1-based");
+            }
+
+            return Optional.of((int) position - 1);
+        }
 
         if (isNegativeNumberPredicate(predicates))
             return Optional.ofNullable(predicates.get(0))
@@ -386,14 +391,14 @@ public class Scenario {
     }
 
     /**
-     * Detects [0] (example) textual representation of a node's multiplicity as a predicate
+     * Detects positive numeric position predicate shortcut syntax (e.g. [2])
      */
     private static boolean isPositiveNumberPredicate(List<XPathExpression> predicates) {
         return predicates.get(0) instanceof XPathNumericLiteral;
     }
 
     /**
-     * Detects [-2] (example) textual representation of a node's multiplicity as a predicate
+     * Detects negative numeric position predicate shortcut syntax (e.g. [-2])
      */
     private static boolean isNegativeNumberPredicate(List<XPathExpression> predicates) {
         return predicates.get(0) instanceof XPathNumNegExpr && ((XPathNumNegExpr) predicates.get(0)).a instanceof XPathNumericLiteral;

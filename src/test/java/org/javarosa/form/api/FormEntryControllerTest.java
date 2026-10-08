@@ -30,7 +30,7 @@ public class FormEntryControllerTest {
                 title("form"),
                 model(
                     mainInstance(
-                        t("data",
+                        t("data id=\"id\"",
                             t("repeat",
                                 t("question1"),
                                 t("question2")
@@ -68,7 +68,7 @@ public class FormEntryControllerTest {
                 title("form"),
                 model(
                     mainInstance(
-                        t("data",
+                        t("data id=\"id\"",
                             t("repeat1",
                                 t("question1"),
                                 t("question2"),
@@ -115,7 +115,7 @@ public class FormEntryControllerTest {
                 title("form"),
                 model(
                     mainInstance(
-                        t("data",
+                        t("data id=\"id\"",
                             t("repeat1",
                                 t("question1"),
                                 t("question2"),
@@ -165,7 +165,7 @@ public class FormEntryControllerTest {
                 title("form"),
                 model(
                     mainInstance(
-                        t("data",
+                        t("data id=\"id\"",
                             t("repeat",
                                 t("group",
                                     t("question1"),
@@ -208,7 +208,7 @@ public class FormEntryControllerTest {
                 title("form"),
                 model(
                     mainInstance(
-                        t("data",
+                        t("data id=\"id\"",
                             t("question1"),
                             t("question2")
                         )

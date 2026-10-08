@@ -16,17 +16,6 @@
 
 package org.javarosa.regression;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.javarosa.core.reference.ReferenceManagerTestUtils;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
@@ -41,9 +30,19 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
+import java.io.IOException;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.javarosa.core.reference.ReferenceManagerTestUtils;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParser;
+import org.junit.Test;
+
 public class SameRefDifferentInstancesIssue449Test {
     @Test
-    public void formWithSameRefInDifferentInstances_isSuccessfullyDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void formWithSameRefInDifferentInstances_isDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
         File formFile = r("issue_449.xml");
         ReferenceManagerTestUtils.setUpSimpleReferenceManager(formFile.getParentFile(), "file");
         Scenario scenario = Scenario.init(formFile);
@@ -52,11 +51,11 @@ public class SameRefDifferentInstancesIssue449Test {
         assertThat(scenario.answerOf("/data/aggregated"), is(stringAnswer("a b c")));
 
         Scenario deserialized = scenario.serializeAndDeserializeForm();
-        assertThat(deserialized.answerOf("/data/new-part[0]"), is(stringAnswer("c")));
-        assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c")));
+        assertThat(deserialized.answerOf("/data/new-part[1]"), is(stringAnswer("c")));
+        assertThat(deserialized.answerOf("/data/aggregated[1]"), is(stringAnswer("a b c")));
 
         deserialized.answer("/data/new-part", "c2");
-        assertThat(deserialized.answerOf("/data/aggregated[0]"), is(stringAnswer("a b c2")));
+        assertThat(deserialized.answerOf("/data/aggregated[1]"), is(stringAnswer("a b c2")));
     }
 
     @Test
@@ -79,18 +78,18 @@ public class SameRefDifferentInstancesIssue449Test {
 
         scenario.next();
         scenario.answer("ok");
-        MatcherAssert.assertThat(scenario.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(scenario.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
 
         scenario.answer("not ok");
-        MatcherAssert.assertThat(scenario.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(scenario.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
 
         Scenario deserialized = scenario.serializeAndDeserializeForm();
 
         deserialized.next();
         deserialized.answer("ok");
-        MatcherAssert.assertThat(deserialized.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(deserialized.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
 
         deserialized.answer("not ok");
-        MatcherAssert.assertThat(deserialized.answerOf("/data/b[0]"), CoreMatchers.is(stringAnswer("ok")));
+        MatcherAssert.assertThat(deserialized.answerOf("/data/b[1]"), CoreMatchers.is(stringAnswer("ok")));
     }
 }
