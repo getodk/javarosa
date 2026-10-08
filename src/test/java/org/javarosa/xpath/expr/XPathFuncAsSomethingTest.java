@@ -38,23 +38,39 @@ public class XPathFuncAsSomethingTest {
     }
 
     @Test
-    public void toNumericAtStartOfDay_returnsWholeDay() {
+    public void toNumericForDates_atStartOfDay_returnsWholeDay() {
+        Date jan2_1970Utc = new Date(24 * 60 * 60 * 1000L);
+
         withTimeZone(TimeZone.getTimeZone("UTC"), () ->
-            assertThat(toNumeric(new Date(24 * 60 * 60 * 1000L)), equalTo(1.0))
+            assertThat(toNumeric(jan2_1970Utc), equalTo(1.0))
         );
     }
 
     @Test
-    public void toNumericWithTimeOfDay_discardsFractionalDay() {
-        withTimeZone(TimeZone.getTimeZone("UTC"), () ->
-            assertThat(toNumeric(new Date(30 * 60 * 60 * 1000L)), equalTo(1.0))
+    public void toNumericForDates_usesDefaultTimezone() {
+        Date jan2_1970Utc = new Date(24 * 60 * 60 * 1000L);
+
+        // The instant at midnight UTC on Jan 2, 1970 was still Jan 1, 1970 in GMT-8
+        withTimeZone(TimeZone.getTimeZone("GMT-08:00"), () ->
+            assertThat(toNumeric(jan2_1970Utc), equalTo(0.0))
         );
     }
 
     @Test
-    public void toDoubleWithTimeOfDay_includesFractionalDay() {
+    public void toNumericForDateTime_discardsFractionalDay() {
+        Date jan2_1970Utc_6am = new Date(30 * 60 * 60 * 1000L);
+
         withTimeZone(TimeZone.getTimeZone("UTC"), () ->
-            assertThat(toDouble(new Date(30 * 60 * 60 * 1000L)), equalTo(1.25))
+            assertThat(toNumeric(jan2_1970Utc_6am), equalTo(1.0))
+        );
+    }
+
+    @Test
+    public void toDoubleForDateTime_includesFractionalDay() {
+        Date jan2_1970Utc_6am = new Date(30 * 60 * 60 * 1000L);
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () ->
+            assertThat(toDouble(jan2_1970Utc_6am), equalTo(1.25))
         );
     }
 }
