@@ -195,6 +195,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         // look for the text under the requiredMsg bind attribute
         String requiredMsgText = mTreeElement.getBindAttributeValue(XFormParser.NAMESPACE_JAVAROSA, "requiredMsg");
         if (requiredMsgText != null) {
+            requiredMsgText = requiredMsgText.trim();
             if (!requiredMsgText.startsWith(ITEXT_OPEN) || !requiredMsgText.endsWith(ITEXT_CLOSE)) {
                 // String literal. The spec doesn't allow <output> here (only via jr:itext()), so return it as-is.
                 return requiredMsgText;

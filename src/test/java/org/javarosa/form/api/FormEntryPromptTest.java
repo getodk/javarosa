@@ -205,6 +205,36 @@ public class FormEntryPromptTest {
     }
 
     @Test
+    public void getRequiredText_shouldReturnRequiredTextIfItextFunctionIsSurroundedByWhitespace() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Required questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:requiredMsg'",
+                                t("value", "message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='required-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").withAttribute("jr", "requiredMsg", " jr:itext('/data/q1:requiredMsg') ")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getRequiredText(), is("message"));
+    }
+
+    @Test
     public void getRequiredText_shouldReturnRequiredTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
         Scenario scenario = Scenario.init(html(
             head(
@@ -331,6 +361,36 @@ public class FormEntryPromptTest {
                         )
                     ),
                     bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", "jr:itext('/data/q1:constraintMsg')")
+                )
+            ),
+            body(
+                input("/data/q1")
+            )
+        ));
+
+        scenario.next();
+        assertThat(scenario.getFormEntryPromptAtIndex().getConstraintText(), is("message"));
+    }
+
+    @Test
+    public void getConstraintText_shouldReturnConstraintTextIfItextFunctionIsSurroundedByWhitespace() throws XFormParser.ParseException, IOException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Constrained questions"),
+                model(
+                    t("itext",
+                        t("translation lang='en'",
+                            t("text id='/data/q1:constraintMsg'",
+                                t("value", "message")
+                            )
+                        )
+                    ),
+                    mainInstance(
+                        t("data id='constrained-questions'",
+                            t("q1")
+                        )
+                    ),
+                    bind("/data/q1").type("int").constraint(". > 10").withAttribute("jr", "constraintMsg", " jr:itext('/data/q1:constraintMsg') ")
                 )
             ),
             body(
