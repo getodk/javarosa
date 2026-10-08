@@ -262,7 +262,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawStringThatIsAValidXPathExpression() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_treatsRawStringAsLiteralEvenWhenValidXPath() throws XFormParser.ParseException, IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -400,7 +400,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingRawStringThatIsAValidXPathExpression() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_treatsRawStringAsLiteralEvenWhenValidXPath() throws XFormParser.ParseException, IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),
