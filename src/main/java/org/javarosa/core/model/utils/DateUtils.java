@@ -16,16 +16,15 @@
 
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.util.MathUtils;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.util.MathUtils;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  * Static utility methods for Dates in j2me
@@ -162,7 +161,7 @@ public class DateUtils {
 
     /* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
 
-    public static String formatDateTime (Date d, int format) {
+    public static String formatDateTime(Date d, int format) {
         if (d == null) {
             return "";
         }
@@ -171,21 +170,25 @@ public class DateUtils {
 
         String delim;
         switch (format) {
-        case FORMAT_ISO8601: delim = "T"; break;
-        case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
-        case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
-        default: delim = " "; break;
+            case FORMAT_ISO8601: delim = "T"; break;
+            case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
+            case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
+            default: delim = " "; break;
         }
 
-        return formatDate(fields, format) + delim + formatTime(fields, format);
+        return formatDate(fields, format) + delim + formatTime(fields, format, d);
     }
 
     public static String formatDate (Date d, int format) {
         return (d == null ? "" :formatDate(getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
     }
 
-    public static String formatTime (Date d, int format) {
-        return (d == null ? "" : formatTime(getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
+    public static String formatTime(Date d, int format) {
+        return d == null ? "" : formatTime(
+            getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null),
+            format,
+            d
+        );
     }
 
     private static String formatDate (DateFields f, int format) {
@@ -199,13 +202,13 @@ public class DateUtils {
         }
     }
 
-    private static String formatTime (DateFields f, int format) {
+    private static String formatTime(DateFields f, int format, Date d) {
         switch (format) {
-        case FORMAT_ISO8601: return formatTimeISO8601(f);
-        case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
-        case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
-        case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
-        default: return null;
+            case FORMAT_ISO8601: return formatTimeISO8601(f, d);
+            case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
+            case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
+            case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
+            default: return null;
         }
     }
 
@@ -239,22 +242,17 @@ public class DateUtils {
         return f.year + intPad(f.month, 2) + intPad(f.day, 2);
     }
 
-    private static String formatTimeISO8601 (DateFields f) {
-        String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
+    private static String formatTimeISO8601(DateFields f, Date d) {
+        String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":"
+            + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
 
-        //Time Zone ops (1 in the first field corresponds to 'CE' ERA)
-        int milliday = ((f.hour * 60 + f.minute)*60 + f.second) * 1000 + f.secTicks;
-        int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, milliday);
+        // Calculate the offset from the instant to distinguish repeated hours during DST fallback.
+        int offset = TimeZone.getDefault().getOffset(d.getTime());
 
-        //NOTE: offset is in millis
-        if(offset ==0 ) {
+        if (offset == 0) {
             time += "Z";
-        }
-        else {
-
-            //Start with sign
-            String offsetSign = offset >0 ? "+" : "-";
-
+        } else {
+            String offsetSign = offset > 0 ? "+" : "-";
             int value = Math.abs(offset) / 1000 / 60;
 
             String hrs = intPad(value / 60, 2);
@@ -262,6 +260,7 @@ public class DateUtils {
 
             time += offsetSign + hrs + mins;
         }
+
         return time;
     }
 
@@ -336,11 +335,14 @@ public class DateUtils {
 
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
 
-    public static Date parseDateTime (String str) {
+    public static Date parseDateTime(String str) {
         DateFields fields = new DateFields();
+        Date[] offsetDate = new Date[1];
+
         int i = str.indexOf("T");
         if (i != -1) {
-            if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
+            if (!parseDate(str.substring(0, i), fields)
+                || !parseTime(str.substring(i + 1), fields, offsetDate)) {
                 return null;
             }
         } else {
@@ -348,7 +350,8 @@ public class DateUtils {
                 return null;
             }
         }
-        return getDate(fields);
+
+        return offsetDate[0] != null ? offsetDate[0] : getDate(fields);
     }
 
     public static Date parseDate (String str) {
@@ -361,22 +364,26 @@ public class DateUtils {
         return getDate(fields);
     }
 
-    public static Date parseTime (String str) {
+    public static Date parseTime(String str) {
         DateFields fields = getFields(new Date());
         fields.second = 0;
         fields.secTicks = 0;
-        if (!parseTime(str, fields)) {
+
+        Date[] offsetDate = new Date[1];
+        if (!parseTime(str, fields, offsetDate)) {
             return null;
         }
-        return getDate(fields);
+
+        return offsetDate[0] != null ? offsetDate[0] : getDate(fields);
     }
 
-
     public static Date parseTimeWithFixedDate(String str, DateFields fields) {
-        if (!parseTime(str, fields)) {
+        Date[] offsetDate = new Date[1];
+        if (!parseTime(str, fields, offsetDate)) {
             return null;
         }
-        return getDate(fields);
+
+        return offsetDate[0] != null ? offsetDate[0] : getDate(fields);
     }
 
     private static boolean parseDate (String dateStr, DateFields f) {
@@ -395,7 +402,11 @@ public class DateUtils {
         return f.check();
     }
 
-    private static boolean parseTime (String timeStr, DateFields f) {
+    private static boolean parseTime(String timeStr, DateFields f) {
+        return parseTime(timeStr, f, null);
+    }
+
+    private static boolean parseTime(String timeStr, DateFields f, Date[] offsetDate) {
         //get timezone information first. Make a Datefields set for the possible offset
         //NOTE: DO NOT DO DIRECT COMPUTATIONS AGAINST THIS. It's a holder for hour/minute
         //data only, but has data in other fields
@@ -455,6 +466,10 @@ public class DateUtils {
 
         long msecOffset = (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
         c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
+
+        if (offsetDate != null) {
+            offsetDate[0] = c.getTime();
+        }
 
         //c is now in the timezone of the parsed value, so put
         //it in the local timezone.
@@ -576,22 +591,22 @@ public class DateUtils {
     /* ==== CALENDAR FUNCTIONS ==== */
 
     /**
-     * Returns the fractional time within the local day.
+     * Returns the fraction of a 24-hour day represented by the given date
+     * in the system's local timezone.
      *
-     * @param d
-     * @return
+     * Dates without an explicit timezone retain their original time of day.
+     * Dates with an explicit timezone are converted to local time first.
      */
     public static double decimalTimeOfLocalDay(Date d) {
-        long milli = d.getTime();
-        // time is local time.
-        // We want to obtain milliseconds from start of local day.
-        // the Math.floor() function below will do milliseconds from
-        // start of UTC day. Adjust back to UTC time-of-day.
         Calendar c = Calendar.getInstance(TimeZone.getDefault());
-        long milliOff = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET));
-        milli += milliOff;
-        // and now convert to fractional day.
-        Double v = ((double) milli) / DAY_IN_MS;
+        c.setTime(d); // account for DST on the given date
+
+        long milli = d.getTime(); // ms since the Unix epoch (UTC)
+
+        long milliOff = c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET);
+        milli += milliOff; // adjust to local time
+
+        double v = ((double) milli) / DAY_IN_MS;
         return v - Math.floor(v);
     }
 
