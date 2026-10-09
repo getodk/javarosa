@@ -335,11 +335,14 @@ public class DateUtils {
 
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
 
-    public static Date parseDateTime (String str) {
+    public static Date parseDateTime(String str) {
         DateFields fields = new DateFields();
+        Date[] offsetDate = new Date[1];
+
         int i = str.indexOf("T");
         if (i != -1) {
-            if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
+            if (!parseDate(str.substring(0, i), fields)
+                || !parseTime(str.substring(i + 1), fields, offsetDate)) {
                 return null;
             }
         } else {
@@ -347,7 +350,8 @@ public class DateUtils {
                 return null;
             }
         }
-        return getDate(fields);
+
+        return offsetDate[0] != null ? offsetDate[0] : getDate(fields);
     }
 
     public static Date parseDate (String str) {
@@ -360,22 +364,26 @@ public class DateUtils {
         return getDate(fields);
     }
 
-    public static Date parseTime (String str) {
+    public static Date parseTime(String str) {
         DateFields fields = getFields(new Date());
         fields.second = 0;
         fields.secTicks = 0;
-        if (!parseTime(str, fields)) {
+
+        Date[] offsetDate = new Date[1];
+        if (!parseTime(str, fields, offsetDate)) {
             return null;
         }
-        return getDate(fields);
+
+        return offsetDate[0] != null ? offsetDate[0] : getDate(fields);
     }
 
-
     public static Date parseTimeWithFixedDate(String str, DateFields fields) {
-        if (!parseTime(str, fields)) {
+        Date[] offsetDate = new Date[1];
+        if (!parseTime(str, fields, offsetDate)) {
             return null;
         }
-        return getDate(fields);
+
+        return offsetDate[0] != null ? offsetDate[0] : getDate(fields);
     }
 
     private static boolean parseDate (String dateStr, DateFields f) {
@@ -394,7 +402,11 @@ public class DateUtils {
         return f.check();
     }
 
-    private static boolean parseTime (String timeStr, DateFields f) {
+    private static boolean parseTime(String timeStr, DateFields f) {
+        return parseTime(timeStr, f, null);
+    }
+
+    private static boolean parseTime(String timeStr, DateFields f, Date[] offsetDate) {
         //get timezone information first. Make a Datefields set for the possible offset
         //NOTE: DO NOT DO DIRECT COMPUTATIONS AGAINST THIS. It's a holder for hour/minute
         //data only, but has data in other fields
@@ -454,6 +466,10 @@ public class DateUtils {
 
         long msecOffset = (((60 * timeOffset.hour) + timeOffset.minute) * 60 * 1000L);
         c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + msecOffset));
+
+        if (offsetDate != null) {
+            offsetDate[0] = c.getTime();
+        }
 
         //c is now in the timezone of the parsed value, so put
         //it in the local timezone.

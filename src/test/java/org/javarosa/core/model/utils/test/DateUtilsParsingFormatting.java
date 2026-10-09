@@ -12,9 +12,7 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 
 import java.time.Instant;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Test;
@@ -32,12 +30,13 @@ public class DateUtilsParsingFormatting {
     }
 
     @Test
-    public void parseDateTime_appliesDaylightSavingTimeWhenConvertingOffsets() {
-        withTimeZone(buildDstTimeZone(), () -> {
-            Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
-            String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
+    public void parseDateTime_preservesOffsetDuringDaylightSavingFallBack() {
+        Date before = Date.from(Instant.parse("2024-11-03T08:30:00Z"));
+        Date after = Date.from(Instant.parse("2024-11-03T09:30:00Z"));
 
-            assertEquals("2014-10-05T00:03:05.244+03:00", str);
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            assertThat(DateUtils.parseDateTime("2024-11-03T01:30:00.000-07:00"), is(before));
+            assertThat(DateUtils.parseDateTime("2024-11-03T01:30:00.000-08:00"), is(after));
         });
     }
 
@@ -53,7 +52,7 @@ public class DateUtilsParsingFormatting {
             assertEquals("11:03:05.011+02:00", formatted);
         });
     }
-    
+
     @Test
     public void formatDateTime_preservesOffsetDuringDaylightSavingFallBack() {
         // Both instants are 1:30 AM in Los Angeles, but with different UTC offsets.
