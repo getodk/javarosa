@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DateUtilsParsingFormatting {
@@ -54,23 +53,7 @@ public class DateUtilsParsingFormatting {
             assertEquals("11:03:05.011+02:00", formatted);
         });
     }
-
-    @Test
-    @Ignore
-    // parseTime() uses the current date to resolve timezone offsets. This test depends on whether DST
-    // is active on the day it runs, so its expected result is not deterministic.
-    public void parseTime_appliesDaylightSavingTimeWhenConvertingOffsets() {
-        withTimeZone(buildDstTimeZone(), () -> {
-            String time = "12:03:05.011+03";
-
-            Date date = DateUtils.parseTime(time);
-
-            String formatted = DateUtils.formatTime(date, DateUtils.FORMAT_ISO8601);
-
-            assertEquals("12:03:05.011+03", formatted);
-        });
-    }
-
+    
     @Test
     public void formatDateTime_preservesOffsetDuringDaylightSavingFallBack() {
         // Both instants are 1:30 AM in Los Angeles, but with different UTC offsets.
@@ -98,16 +81,5 @@ public class DateUtilsParsingFormatting {
             assertThat(DateUtils.formatTime(after, DateUtils.FORMAT_ISO8601),
                 is("01:30:00.000-08:00"));
         });
-    }
-
-    private SimpleTimeZone buildDstTimeZone() {
-        return new SimpleTimeZone(
-            2 * 60 * 60 * 1000,
-            "Europe/Athens",
-            Calendar.JANUARY, 1, 0,
-            0, SimpleTimeZone.UTC_TIME,
-            Calendar.DECEMBER, 31, 0,
-            24 * 60 * 60 * 1000, SimpleTimeZone.UTC_TIME,
-            60 * 60 * 1000);
     }
 }
