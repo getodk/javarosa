@@ -1,6 +1,7 @@
 package org.javarosa.core.model.utils.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 
@@ -101,6 +102,28 @@ public class DateUtilsTimeZoneConsistencyTests {
             assertThat(DateUtils.formatDate(end, DateUtils.FORMAT_ISO8601),
                 is("2024-03-11"));
             assertThat(DateUtils.dateDiff(start, end), is(2));
+        });
+    }
+
+    @Test
+    public void decimalTimeOfLocalDay_convertsExplicitOffsetToSystemTimeZone() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Date date = DateUtils.parseDateTime("2024-07-15T12:00:00+10:00");
+
+            assertThat(DateUtils.decimalTimeOfLocalDay(date), closeTo(2.0 / 24, 1e-10));
+        });
+    }
+
+    @Test
+    public void decimalTimeOfLocalDay_isConsistentAcrossDST() {
+        withTimeZone(TimeZone.getTimeZone("Australia/Sydney"), () -> {
+            // Date in standard time (UTC+10)
+            Date winter = DateUtils.parseDateTime("2024-07-15T12:00:00");
+            assertThat(DateUtils.decimalTimeOfLocalDay(winter), is(0.5));
+
+            // Date in daylight saving time (UTC+11)
+            Date summer = DateUtils.parseDateTime("2024-10-15T12:00:00");
+            assertThat(DateUtils.decimalTimeOfLocalDay(summer), is(0.5));
         });
     }
 }

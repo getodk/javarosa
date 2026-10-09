@@ -16,16 +16,15 @@
 
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.util.MathUtils;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.util.MathUtils;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  * Static utility methods for Dates in j2me
@@ -576,22 +575,22 @@ public class DateUtils {
     /* ==== CALENDAR FUNCTIONS ==== */
 
     /**
-     * Returns the fractional time within the local day.
+     * Returns the fraction of a 24-hour day represented by the given date
+     * in the system's local timezone.
      *
-     * @param d
-     * @return
+     * Dates without an explicit timezone retain their original time of day.
+     * Dates with an explicit timezone are converted to local time first.
      */
     public static double decimalTimeOfLocalDay(Date d) {
-        long milli = d.getTime();
-        // time is local time.
-        // We want to obtain milliseconds from start of local day.
-        // the Math.floor() function below will do milliseconds from
-        // start of UTC day. Adjust back to UTC time-of-day.
         Calendar c = Calendar.getInstance(TimeZone.getDefault());
-        long milliOff = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET));
-        milli += milliOff;
-        // and now convert to fractional day.
-        Double v = ((double) milli) / DAY_IN_MS;
+        c.setTime(d); // account for DST on the given date
+
+        long milli = d.getTime(); // ms since the Unix epoch (UTC)
+
+        long milliOff = c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET);
+        milli += milliOff; // adjust to local time
+
+        double v = ((double) milli) / DAY_IN_MS;
         return v - Math.floor(v);
     }
 
