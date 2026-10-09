@@ -16,15 +16,6 @@
 
 package org.javarosa.core.model.actions;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
-import org.javarosa.xpath.XPathTypeMismatchException;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -45,6 +36,17 @@ import static org.javarosa.test.XFormsElement.setvalueLiteral;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.TimeZone;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.Scenario;
+import org.javarosa.test.utils.SystemHelper;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xpath.XPathTypeMismatchException;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class SetValueActionTest {
     @Test
@@ -113,7 +115,7 @@ public class SetValueActionTest {
                         t("some-field")
                     )),
                     bind("/data/destination").type("string")
-            )),
+                )),
             body(
                 input("/data/source",
                     setvalue("xforms-value-changed", "/data/destination", "concat('foo',/data/some-field)")),
@@ -363,7 +365,7 @@ public class SetValueActionTest {
                     setvalue("xforms-value-changed", "/data/repeat/destination", "/data/source")),
                 repeat("/data/repeat",
                     input("/data/repeat/destination")
-            ))));
+                ))));
 
         scenario.createNewRepeat("/data/repeat");
         scenario.createNewRepeat("/data/repeat");
@@ -433,10 +435,10 @@ public class SetValueActionTest {
                         setvalue("xforms-value-changed", "/data/repeat1/repeat2/destination", "../../source")),
                     repeat("/data/repeat1/repeat2",
                         input("/data/repeat1/repeat2/destination")
-            )))));
+                    )))));
 
-            scenario.answer("/data/repeat1[0]/source", "foo");
-            assertThat(scenario.answerOf("/data/repeat1[0]/repeat2[0]/destination").getDisplayText(), is("foo"));
+        scenario.answer("/data/repeat1[0]/source", "foo");
+        assertThat(scenario.answerOf("/data/repeat1[0]/repeat2[0]/destination").getDisplayText(), is("foo"));
     }
     //endregion
 
@@ -548,7 +550,7 @@ public class SetValueActionTest {
             body(
                 input("/data/source",
                     setvalue("xforms-value-changed", "/data/destination", "/data/calculate")
-            ))));
+                ))));
 
         scenario.answer("/data/source", 12);
         assertThat(scenario.answerOf("/data/destination"), is(intAnswer(24)));
@@ -595,5 +597,58 @@ public class SetValueActionTest {
 
         cached.newInstance();
         assertThat(cached.answerOf("/data/element/@attr").getDisplayText(), is("7"));
+    }
+
+    @Test
+    public void setvalueWithNow_setsDateWithoutTime() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Setvalue now into date"),
+                model(
+                    mainInstance(t("data id=\"setvalue-now-into-date\"",
+                        t("source"),
+                        t("destination")
+                    )),
+                    bind("/data/destination").type("date")
+                )
+            ),
+            body(
+                input("/data/source",
+                    setvalue("xforms-value-changed", "/data/destination", "now()"))
+            )));
+
+        scenario.answer("/data/source", "trigger");
+
+        assertThat(scenario.answerOf("/data/destination").uncast().getValue(), is(LocalDate.now().toString()));
+    }
+
+    @Test
+    public void setvalueWithDateTime_setsDateWithoutTime() throws IOException, XFormParser.ParseException {
+        SystemHelper.withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            try {
+                Scenario scenario = Scenario.init(html(
+                    head(
+                        title("Setvalue datetime literal into date"),
+                        model(
+                            mainInstance(t("data id=\"setvalue-datetime-into-date\"",
+                                t("source"),
+                                t("destination")
+                            )),
+                            bind("/data/destination").type("date")
+                        )
+                    ),
+                    body(
+                        input("/data/source",
+                            setvalue("xforms-value-changed", "/data/destination", "'2025-01-14T03:43:58+00:00'"))
+                    )));
+
+                scenario.answer("/data/source", "trigger");
+
+                // Would be 2025-01-13 in America/Los_Angeles so this shows time is truncated without TZ conversion
+                assertThat(scenario.answerOf("/data/destination").uncast().getValue(), is("2025-01-14"));
+            } catch (IOException | XFormParser.ParseException e) {
+                fail(e.getMessage());
+            }
+        });
     }
 }
