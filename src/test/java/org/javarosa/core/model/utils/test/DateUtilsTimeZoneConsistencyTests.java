@@ -74,4 +74,33 @@ public class DateUtilsTimeZoneConsistencyTests {
         });
     }
 
+    @Test
+    public void getDate_andGetFields_useConsistentTimeZones() {
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            DateUtils.DateFields fields = DateUtils.DateFields.of(
+                2024, 7, 15, 12, 30, 0, 0
+            );
+
+            Date date = DateUtils.getDate(fields);
+            DateUtils.DateFields result = DateUtils.getFields(date);
+
+            assertThat(result.year, is(2024));
+            assertThat(result.month, is(7));
+            assertThat(result.day, is(15));
+            assertThat(result.hour, is(12));
+            assertThat(result.minute, is(30));
+        });
+    }
+
+    @Test
+    public void dateAdd_andDateDiff_areConsistentAcrossDST() {
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            Date start = DateUtils.parseDate("2024-03-09");
+            Date end = DateUtils.dateAdd(start, 2);
+
+            assertThat(DateUtils.formatDate(end, DateUtils.FORMAT_ISO8601),
+                is("2024-03-11"));
+            assertThat(DateUtils.dateDiff(start, end), is(2));
+        });
+    }
 }
