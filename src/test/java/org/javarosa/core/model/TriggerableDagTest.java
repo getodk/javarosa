@@ -16,8 +16,10 @@ import static org.javarosa.core.test.QuestionDefMatchers.enabled;
 import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
 import static org.javarosa.core.test.QuestionDefMatchers.readOnly;
 import static org.javarosa.core.test.QuestionDefMatchers.relevant;
-import static org.javarosa.test.Scenario.getRef;
+import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
+import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.Scenario.getRef;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.group;
 import static org.javarosa.test.XFormsElement.head;
@@ -31,8 +33,6 @@ import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.select1;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
-import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,11 +41,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.hamcrest.CoreMatchers;
-import org.javarosa.test.Scenario;
-import org.javarosa.test.BindBuilderXFormsElement;
-import org.javarosa.test.XFormsElement;
 import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.test.BindBuilderXFormsElement;
+import org.javarosa.test.Scenario;
+import org.javarosa.test.XFormsElement;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -1762,6 +1762,43 @@ public class TriggerableDagTest {
         assertThat(scenario.answerOf("/data/outer/inner_condition"), is(booleanAnswer(true)));
         assertThat(scenario.getAnswerNode("/data/outer/inner"), is(nonRelevant()));
         assertThat(scenario.getAnswerNode("/data/outer/inner/target_question"), is(relevant()));
+    }
+
+    @Ignore("Group node dependencies should include all descendant nodes (issue 862)")
+    @Test
+    public void calculateDependingOnGroupNode_recomputesWhenAnyChildChanges() throws IOException, XFormParser.ParseException {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Group dependency"),
+                model(
+                    mainInstance(
+                        t("data id=\"group-dependency\"",
+                            t("g1",
+                                t("t1"),
+                                t("t2")),
+                            t("group_text"))
+                    ),
+                    bind("/data/g1/t1").type("string"),
+                    bind("/data/g1/t2").type("string"),
+                    bind("/data/group_text").type("string").calculate("/data/g1")
+                )
+            ),
+            body(
+                group("/data/g1",
+                    input("/data/g1/t1"),
+                    input("/data/g1/t2")
+                )
+            )
+        ));
+
+        scenario.answer("/data/g1/t1", "first");
+        assertThat(scenario.answerOf("/data/group_text"), is(stringAnswer("first")));
+
+        scenario.answer("/data/g1/t2", "second");
+        assertThat(scenario.answerOf("/data/group_text"), is(stringAnswer("firstsecond")));
+
+        scenario.answer("/data/g1/t1", "changed");
+        assertThat(scenario.answerOf("/data/group_text"), is(stringAnswer("changedsecond")));
     }
     //endregion
 
