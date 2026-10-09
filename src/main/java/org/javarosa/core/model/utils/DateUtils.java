@@ -161,7 +161,7 @@ public class DateUtils {
 
     /* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
 
-    public static String formatDateTime (Date d, int format) {
+    public static String formatDateTime(Date d, int format) {
         if (d == null) {
             return "";
         }
@@ -170,21 +170,25 @@ public class DateUtils {
 
         String delim;
         switch (format) {
-        case FORMAT_ISO8601: delim = "T"; break;
-        case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
-        case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
-        default: delim = " "; break;
+            case FORMAT_ISO8601: delim = "T"; break;
+            case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
+            case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
+            default: delim = " "; break;
         }
 
-        return formatDate(fields, format) + delim + formatTime(fields, format);
+        return formatDate(fields, format) + delim + formatTime(fields, format, d);
     }
 
     public static String formatDate (Date d, int format) {
         return (d == null ? "" :formatDate(getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
     }
 
-    public static String formatTime (Date d, int format) {
-        return (d == null ? "" : formatTime(getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
+    public static String formatTime(Date d, int format) {
+        return d == null ? "" : formatTime(
+            getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null),
+            format,
+            d
+        );
     }
 
     private static String formatDate (DateFields f, int format) {
@@ -198,13 +202,13 @@ public class DateUtils {
         }
     }
 
-    private static String formatTime (DateFields f, int format) {
+    private static String formatTime(DateFields f, int format, Date d) {
         switch (format) {
-        case FORMAT_ISO8601: return formatTimeISO8601(f);
-        case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
-        case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
-        case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
-        default: return null;
+            case FORMAT_ISO8601: return formatTimeISO8601(f, d);
+            case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
+            case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
+            case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
+            default: return null;
         }
     }
 
@@ -238,22 +242,17 @@ public class DateUtils {
         return f.year + intPad(f.month, 2) + intPad(f.day, 2);
     }
 
-    private static String formatTimeISO8601 (DateFields f) {
-        String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
+    private static String formatTimeISO8601(DateFields f, Date d) {
+        String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":"
+            + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
 
-        //Time Zone ops (1 in the first field corresponds to 'CE' ERA)
-        int milliday = ((f.hour * 60 + f.minute)*60 + f.second) * 1000 + f.secTicks;
-        int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, milliday);
+        // Calculate the offset from the instant to distinguish repeated hours during DST fallback.
+        int offset = TimeZone.getDefault().getOffset(d.getTime());
 
-        //NOTE: offset is in millis
-        if(offset ==0 ) {
+        if (offset == 0) {
             time += "Z";
-        }
-        else {
-
-            //Start with sign
-            String offsetSign = offset >0 ? "+" : "-";
-
+        } else {
+            String offsetSign = offset > 0 ? "+" : "-";
             int value = Math.abs(offset) / 1000 / 60;
 
             String hrs = intPad(value / 60, 2);
@@ -261,6 +260,7 @@ public class DateUtils {
 
             time += offsetSign + hrs + mins;
         }
+
         return time;
     }
 
