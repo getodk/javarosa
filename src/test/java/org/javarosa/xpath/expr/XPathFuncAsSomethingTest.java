@@ -39,49 +39,36 @@ public class XPathFuncAsSomethingTest {
     }
 
     @Test
-    public void toNumericForDates_atStartOfDay_returnsWholeDay() {
+    public void toNumericForDates_returnsWholeDaysSinceEpoch_usingDefaultTimeZone() {
         Date jan2_1970Utc = new Date(24 * 60 * 60 * 1000L);
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () ->
             assertThat(toNumeric(jan2_1970Utc), equalTo(1.0))
         );
-    }
 
-    @Test
-    public void toNumericForDates_usesDefaultTimezone() {
-        Date jan2_1970Utc = new Date(24 * 60 * 60 * 1000L);
-
-        // The instant at midnight UTC on Jan 2, 1970 was still Jan 1, 1970 in GMT-8
         withTimeZone(TimeZone.getTimeZone("GMT-08:00"), () ->
             assertThat(toNumeric(jan2_1970Utc), equalTo(0.0))
         );
-    }
 
-    @Test
-    public void toNumericForDateTime_discardsFractionalDay() {
-        Date jan2_1970Utc_6am = new Date(30 * 60 * 60 * 1000L);
-
-        withTimeZone(TimeZone.getTimeZone("UTC"), () ->
-            assertThat(toNumeric(jan2_1970Utc_6am), equalTo(1.0))
+        withTimeZone(TimeZone.getTimeZone("GMT+08:00"), () ->
+            assertThat(toNumeric(jan2_1970Utc), equalTo(1.0))
         );
     }
 
     @Test
-    public void toDoubleForDateTime_includesFractionalDay() {
-        Date jan2_1970Utc_6am = new Date(30 * 60 * 60 * 1000L);
+    public void toDoubleForDates_returnsFractionalDaysSinceEpoch_usingDefaultTimeZone() {
+        Date jan2_1970Utc = new Date(30 * 60 * 60 * 1000L);
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () ->
-            assertThat(toDouble(jan2_1970Utc_6am), equalTo(1.25))
+            assertThat(toDouble(jan2_1970Utc), equalTo(1.25))
         );
-    }
 
-    @Test
-    public void toDoubleForDateTime_usesDefaultTimezone() {
-        Date jan2_1970Utc = new Date(24 * 60 * 60 * 1000L);
-
-        // Midnight UTC on Jan 2, 1970 is 16:00 on Jan 1 in GMT-8
         withTimeZone(TimeZone.getTimeZone("GMT-08:00"), () ->
-            assertThat(toDouble(jan2_1970Utc), closeTo(16.0 / 24, 1e-10))
+            assertThat(toDouble(jan2_1970Utc), closeTo(22.0 / 24, 1e-10))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("GMT+08:00"), () ->
+            assertThat(toDouble(jan2_1970Utc), closeTo(1 + 14.0 / 24, 1e-10))
         );
     }
 }
