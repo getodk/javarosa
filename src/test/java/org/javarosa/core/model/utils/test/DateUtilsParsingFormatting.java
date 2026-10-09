@@ -17,10 +17,10 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class DateUtilsSCTOTests {
+public class DateUtilsParsingFormatting {
 
     @Test
-    public void testParseDateTime() {
+    public void parseDateTime_convertsExplicitOffsetToSystemTimeZone() {
         withTimeZone(TimeZone.getTimeZone("GMT+02"), () -> {
             Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
             String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
@@ -30,7 +30,7 @@ public class DateUtilsSCTOTests {
     }
 
     @Test
-    public void testParseDateTime_withDST() {
+    public void parseDateTime_appliesDaylightSavingTimeWhenConvertingOffsets() {
         withTimeZone(buildDstTimeZone(), () -> {
             Date date = DateUtils.parseDateTime("2014-10-05T00:03:05.244+03");
             String str = DateUtils.formatDateTime(date, DateUtils.FORMAT_ISO8601);
@@ -40,7 +40,7 @@ public class DateUtilsSCTOTests {
     }
 
     @Test
-    public void testParseTime() {
+    public void parseTime_convertsExplicitOffsetToSystemTimeZone() {
         withTimeZone(TimeZone.getTimeZone("GMT+02"), () -> {
             String time = "12:03:05.011+03";
 
@@ -54,12 +54,9 @@ public class DateUtilsSCTOTests {
 
     @Test
     @Ignore
-    // This test doesn't make sense:
-    // - A time has no offset nor zone. It can only have one
-    //   when bound to a date, which is not the case
-    // - We're effectively binding all times to the EPOCH date
-    //   (1970-01-01, UTC), which has no DST
-    public void testParseTime_withDST() {
+    // parseTime() uses the current date to resolve timezone offsets. This test depends on whether DST
+    // is active on the day it runs, so its expected result is not deterministic.
+    public void parseTime_appliesDaylightSavingTimeWhenConvertingOffsets() {
         withTimeZone(buildDstTimeZone(), () -> {
             String time = "12:03:05.011+03";
 
