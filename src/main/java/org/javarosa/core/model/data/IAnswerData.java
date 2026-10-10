@@ -16,13 +16,6 @@
 
 package org.javarosa.core.model.data;
 
-import org.javarosa.core.model.DataType;
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Date;
-
 import static org.javarosa.core.model.DataType.BOOLEAN;
 import static org.javarosa.core.model.DataType.CHOICE;
 import static org.javarosa.core.model.DataType.DATE;
@@ -33,7 +26,15 @@ import static org.javarosa.core.model.DataType.GEOTRACE;
 import static org.javarosa.core.model.DataType.INTEGER;
 import static org.javarosa.core.model.DataType.LONG;
 import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
+import static org.javarosa.core.model.DataType.TEXT;
 import static org.javarosa.core.model.DataType.TIME;
+import static org.javarosa.core.model.utils.DateUtils.FORMAT_ISO8601;
+
+import java.util.Date;
+import org.javarosa.core.model.DataType;
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An IAnswerData object represents an answer to a question
@@ -131,7 +132,14 @@ public interface IAnswerData extends Externalizable {
                 return new DateTimeData((Date) val);
             }
         } else if (val instanceof Date) {
-            return new DateTimeData((Date) val);
+            Date date = (Date) val;
+
+            if (dataType == TEXT) {
+                return new StringData(DateUtils.roundDate(date).equals(date)
+                        ? DateUtils.formatDate(date, FORMAT_ISO8601)
+                        : DateUtils.formatDateTime(date, FORMAT_ISO8601));
+            }
+            return new DateTimeData(date);
         } else if (val instanceof String) {
             return new StringData((String) val);
         } else {
