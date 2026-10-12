@@ -16,6 +16,10 @@
 
 package org.javarosa.core.model.utils;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -336,6 +340,20 @@ public class DateUtils {
     /* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
 
     public static Date parseDateTime (String str) {
+        try {
+            TemporalAccessor parsed = DateTimeFormatter.ISO_DATE_TIME.parseBest(
+                str,
+                OffsetDateTime::from,
+                java.time.LocalDateTime::from
+            );
+
+            if (parsed instanceof OffsetDateTime) {
+                return Date.from(((OffsetDateTime) parsed).toInstant());
+            }
+        } catch (DateTimeParseException ignored) {
+            // Fall back to the more lenient legacy parser (e.g. allows +03 as offset, not just +03:00)
+        }
+
         DateFields fields = new DateFields();
         int i = str.indexOf("T");
         if (i != -1) {
