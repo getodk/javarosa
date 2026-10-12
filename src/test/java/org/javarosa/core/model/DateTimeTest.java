@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,16 +14,18 @@ import static org.javarosa.test.XFormsElement.mainInstance;
 import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
+import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.TimeZone;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.test.Scenario;
-import org.javarosa.test.utils.SystemHelper;
+import org.javarosa.test.XFormsElement;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
@@ -89,6 +92,41 @@ public class DateTimeTest {
 
         IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof DateData, equalTo(true));
+    }
+
+
+    @Test
+    public void dateArithmetic_withDateBind_preservesDateType() {
+        for (String timezone : new String[] {"UTC", "GMT-08:00"}) {
+            withTimeZone(TimeZone.getTimeZone(timezone), () -> {
+                Scenario scenario;
+                try {
+                    scenario = Scenario.init(html(
+                        head(title("Date arithmetic"),
+                            model(
+                                mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                                    t("date"),
+                                    t("nextDate")
+                                )),
+                                bind("/data/date").type("date"),
+                                bind("/data/nextDate").type("date").calculate("/data/date + 1")
+                            )
+                        ),
+                        body(
+                            input("/data/date"),
+                            input("/data/nextDate")
+                        )
+                    ));
+                } catch (IOException | XFormParser.ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+                scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+
+                assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+                assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-01"));
+            });
+        }
     }
 
     @Test
@@ -209,7 +247,7 @@ public class DateTimeTest {
 
     @Test
     public void dateField_withDateTimeDefault_truncatesTime() {
-        SystemHelper.withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
             try {
                 Scenario scenario = Scenario.init(html(
                     head(
