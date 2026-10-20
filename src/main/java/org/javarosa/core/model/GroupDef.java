@@ -16,11 +16,15 @@
 
 package org.javarosa.core.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -31,12 +35,6 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /** The definition of a group in a form or questionaire.
  *
@@ -276,13 +274,10 @@ public class GroupDef implements IFormElement, Localizable {
     }
 
     public void setTextID(String textID) {
-        if(textID==null){
-            this.textID = null;
-            return;
-        }
-        if(DateUtils.stringContains(textID,";")){
-            logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(textID.indexOf(";")));
-            textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
+        int separator = textID == null ? -1 : textID.indexOf(';');
+        if (separator != -1) {
+            logger.warn("TextID contains ;form modifier:: \"{}\"... will be stripped.", textID.substring(separator));
+            textID = textID.substring(0, separator);
         }
         this.textID = textID;
     }
