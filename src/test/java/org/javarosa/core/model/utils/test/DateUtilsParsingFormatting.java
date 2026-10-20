@@ -30,7 +30,7 @@ public class DateUtilsParsingFormatting {
     }
 
     @Test
-    public void parseDateTime_preservesOffsetDuringDaylightSavingFallBack() {
+    public void parseDateTime_preservesOffsetDuringDaylightSaving() {
         // Both instants are 1:30 AM in Los Angeles, but with different UTC offsets.
         Date before = Date.from(Instant.parse("2024-11-03T08:30:00Z")); // PDT (UTC-7)
         Date after = Date.from(Instant.parse("2024-11-03T09:30:00Z")); // PST (UTC-8)
@@ -55,14 +55,14 @@ public class DateUtilsParsingFormatting {
     }
 
     @Test
-    public void formatDateTime_preservesOffsetDuringDaylightSavingFallBack() {
+    public void formatDateTime_preservesOffsetDuringDaylightSavings() {
         // Both instants are 1:30 AM in Los Angeles, but with different UTC offsets.
-        Date beforeFallBack = Date.from(Instant.parse("2024-11-03T08:30:00Z")); // PDT (UTC-7)
-        Date afterFallBack = Date.from(Instant.parse("2024-11-03T09:30:00Z"));  // PST (UTC-8)
+        Date before = Date.from(Instant.parse("2024-11-03T08:30:00Z")); // PDT (UTC-7)
+        Date after = Date.from(Instant.parse("2024-11-03T09:30:00Z"));  // PST (UTC-8)
 
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
-            String formattedBefore = DateUtils.formatDateTime(beforeFallBack, DateUtils.FORMAT_ISO8601);
-            String formattedAfter = DateUtils.formatDateTime(afterFallBack, DateUtils.FORMAT_ISO8601);
+            String formattedBefore = DateUtils.formatDateTime(before, DateUtils.FORMAT_ISO8601);
+            String formattedAfter = DateUtils.formatDateTime(after, DateUtils.FORMAT_ISO8601);
 
             assertThat(formattedBefore, is("2024-11-03T01:30:00.000-07:00"));
 
@@ -71,7 +71,7 @@ public class DateUtilsParsingFormatting {
     }
 
     @Test
-    public void formatTime_preservesOffsetDuringDaylightSavingFallBack() {
+    public void formatTime_preservesOffsetDuringDaylightSavings() {
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
             Date before = Date.from(Instant.parse("2024-11-03T08:30:00Z"));
             Date after = Date.from(Instant.parse("2024-11-03T09:30:00Z"));
