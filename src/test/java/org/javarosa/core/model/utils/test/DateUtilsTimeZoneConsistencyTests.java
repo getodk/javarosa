@@ -15,13 +15,13 @@ public class DateUtilsTimeZoneConsistencyTests {
     @Test
     public void parseDate_andDaysSinceEpoch_useConsistentTimeZones() {
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            Date date = DateUtils.getDateFromString("1970-01-02");
+            Date date = DateUtils.parseDate("1970-01-02");
 
             assertThat(DateUtils.daysSinceEpoch(date), is(1));
         });
 
         withTimeZone(TimeZone.getTimeZone("GMT-08:00"), () -> {
-            Date date = DateUtils.getDateFromString("1970-01-02");
+            Date date = DateUtils.parseDate("1970-01-02");
 
             assertThat(DateUtils.daysSinceEpoch(date), is(1));
         });
@@ -36,13 +36,13 @@ public class DateUtilsTimeZoneConsistencyTests {
     @Test
     public void parseDateTime_andFractionalDaysSinceEpoch_useConsistentTimeZones() {
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            Date date = DateUtils.getDateTimeFromString("1970-01-02T06:00:00");
+            Date date = DateUtils.parseDateTime("1970-01-02T06:00:00");
 
             assertThat(DateUtils.fractionalDaysSinceEpoch(date), is(1.25));
         });
 
         withTimeZone(TimeZone.getTimeZone("GMT-08:00"), () -> {
-            Date date = DateUtils.getDateTimeFromString("1970-01-02T06:00:00");
+            Date date = DateUtils.parseDateTime("1970-01-02T06:00:00");
 
             assertThat(DateUtils.fractionalDaysSinceEpoch(date), is(1.25));
         });

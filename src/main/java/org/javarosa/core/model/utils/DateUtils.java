@@ -845,42 +845,4 @@ public class DateUtils {
     private static boolean inRange(int x, int min, int max) {
         return (x >= min && x <= max);
     }
-
-    /* ==== GARBAGE (backward compatibility; too lazy to remove them now) ==== */
-
-    public static String formatDateToTimeStamp(Date date) {
-        return formatDateTime(date, FORMAT_ISO8601);
-    }
-
-    public static String getShortStringValue(Date val) {
-        return formatDate(val, FORMAT_HUMAN_READABLE_SHORT);
-    }
-
-    public static String getXMLStringValue(Date val) {
-        return formatDate(val, FORMAT_ISO8601);
-    }
-
-    public static String get24HourTimeFromDate(Date d) {
-        return formatTime(d, FORMAT_HUMAN_READABLE_SHORT);
-    }
-
-    public static Date getDateFromString(String value) {
-        return parseDate(value);
-    }
-
-    public static Date getDateTimeFromString(String value) {
-        return parseDateTime(value);
-    }
-
-    public static boolean stringContains(String string,String substring){
-        if(string == null || substring == null){
-            return false;
-        }
-        if(string.indexOf(substring)== -1){
-            return false;
-        }else{
-            return true;
-        }
-    }
-
 }
