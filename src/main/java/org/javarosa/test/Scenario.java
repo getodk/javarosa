@@ -30,11 +30,10 @@ import static org.javarosa.xpath.expr.XPathPathExpr.INIT_CONTEXT_RELATIVE;
 import static org.javarosa.xpath.expr.XPathStep.AXIS_ATTRIBUTE;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -267,24 +266,34 @@ public class Scenario {
      * Returns a new Scenario instance using a new form obtained by
      * serializing and deserializing the form being used by this instance.
      */
-    public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
-        // Initialize serialization
+    public Scenario serializeAndDeserializeForm()
+        throws IOException, DeserializationException {
+        return deserializeForm(serializeForm());
+    }
+
+    public byte[] serializeForm() throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        try (DataOutputStream dataOutput = new DataOutputStream(output)) {
+            formDef.writeExternal(dataOutput);
+        }
+
+        return output.toByteArray();
+    }
+
+    public static Scenario deserializeForm(byte[] serializedForm)
+        throws IOException, DeserializationException {
         PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
         PrototypeManager.registerPrototypes(CoreModelModule.classNames);
         new XFormsModule().registerModule();
 
-        // Serialize form in a temp file
-        File tempFile = TempFileUtils.createTempFile("test");
-        formDef.writeExternal(new DataOutputStream(new FileOutputStream(tempFile)));
-
-        // Create an empty FormDef and deserialize the form into it
         FormDef deserializedFormDef = new FormDef();
-        deserializedFormDef.readExternal(
-            new DataInputStream(new FileInputStream(tempFile)),
-            PrototypeManager.getDefault()
-        );
 
-        tempFile.delete();
+        try (DataInputStream input = new DataInputStream(
+            new ByteArrayInputStream(serializedForm))) {
+            deserializedFormDef.readExternal(input, PrototypeManager.getDefault());
+        }
+
         return Scenario.from(deserializedFormDef, false);
     }
 
@@ -293,12 +302,24 @@ public class Scenario {
     // copies because the FormDef may be built from cache meaning there won't be a Reader/Document available and because it makes
     // some extra calls for search(). We pass in an XFormsElement for now until we decide on an interface that Collect can use.
     public Scenario serializeAndDeserializeInstance(XFormsElement form) throws IOException, XFormParser.ParseException {
+        return deserializeInstance(form, serializeInstance());
+    }
+
+    public byte[] serializeInstance() throws IOException {
         FormInstance originalInstance = getFormDef().getMainInstance();
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
-        byte[] formInstanceBytes = serializer.serializeInstance(originalInstance);
 
-        InputStreamReader instanceReader = new InputStreamReader(new ByteArrayInputStream(formInstanceBytes));
-        InputStreamReader formReader = new InputStreamReader(new ByteArrayInputStream(form.asXml().getBytes()));
+        return serializer.serializeInstance(originalInstance);
+    }
+
+    public static Scenario deserializeInstance(XFormsElement form, byte[] instanceBytes)
+        throws XFormParser.ParseException {
+        InputStreamReader instanceReader = new InputStreamReader(
+            new ByteArrayInputStream(instanceBytes)
+        );
+        InputStreamReader formReader = new InputStreamReader(
+            new ByteArrayInputStream(form.asXml().getBytes())
+        );
 
         XFormParser parser = new XFormParser(formReader, instanceReader);
         FormDef restoredFormDef = parser.parse();
@@ -670,7 +691,7 @@ public class Scenario {
         return answer(new BooleanData(value));
     }
 
-    private AnswerResult answer(IAnswerData data) {
+    public AnswerResult answer(IAnswerData data) {
         FormIndex formIndex = model.getFormIndex();
         log.info("Answer {} at {}", data, formIndex.getReference().toString(true, true));
         return AnswerResult.from(controller.answerQuestion(formIndex, data, true));

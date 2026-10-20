@@ -16,77 +16,101 @@
 
 package org.javarosa.core.model.data;
 
-
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents a timezone-independent wall-clock time.
+ *
+ * Values are serialized as HH:mm:ss, without a date, timezone,or fractional seconds. When parsing legacy values containing
+ * fractional seconds or timezone offsets, those components are discarded without adjusting the wall-clock time.
+ */
 public class TimeData implements IAnswerData {
-    Date d;
+    private static final DateTimeFormatter TIME_FORMAT =
+        DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    /**
-     * Empty Constructor, necessary for dynamic construction during deserialization.
-     * Shouldn't be used otherwise.
-     */
+    private LocalTime time;
+
     public TimeData() {
     }
 
-    public TimeData (@NotNull Date d) {
-        setValue(d);
+    public TimeData(@NotNull Date date) {
+        setValue(date);
+    }
+
+    private TimeData(LocalTime time) {
+        this.time = time.truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override
-    public IAnswerData clone () {
-        return new TimeData(new Date(d.getTime()));
+    public IAnswerData clone() {
+        return new TimeData(time);
     }
 
     @Override
-    public void setValue (@NotNull Object o) {
-        if(o == null) {
-            throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+    public void setValue(@NotNull Object value) {
+        if (value == null) {
+            throw new NullPointerException("TimeData cannot be null");
         }
-        d = new Date(((Date)o).getTime());
 
+        time = ((Date) value).toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalTime()
+            .truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override
-    public @NotNull Object getValue () {
-        return new Date(d.getTime());
+    public @NotNull Object getValue() {
+        return Date.from(
+            LocalDate.now()
+                .atTime(time)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+        );
     }
 
     @Override
-    public String getDisplayText () {
-        return DateUtils.formatTime(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
-    }
-
-    @Override
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
-        setValue(ExtUtil.readDate(in));
-    }
-
-    @Override
-    public void writeExternal(DataOutputStream out) throws IOException {
-        ExtUtil.writeDate(out, d);
+    public String getDisplayText() {
+        return time.format(TIME_FORMAT);
     }
 
     @Override
     public UncastData uncast() {
-        return new UncastData(DateUtils.formatTime(d, DateUtils.FORMAT_ISO8601));
+        return new UncastData(time.format(TIME_FORMAT));
     }
 
     @Override
-    public TimeData cast(UncastData data) throws IllegalArgumentException {
-        Date ret = DateUtils.parseTime(data.value);
-        if(ret != null) {
-            return new TimeData(ret);
-        }
+    public TimeData cast(UncastData data) {
+        try {
+            LocalTime parsed = LocalTime.from(
+                DateTimeFormatter.ISO_TIME.parse(data.value)
+            );
 
-        throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Time");
+            return new TimeData(parsed);
+        } catch (DateTimeException e) {
+            throw new IllegalArgumentException("Invalid time: " + data.value, e);
+        }
+    }
+
+    // Serialize the wall-clock time as seconds since midnight, without a date or
+    // timezone. Prior to JavaRosa 7, was serialized as Date representing an instant.
+    @Override
+    public void writeExternal(DataOutputStream out) throws IOException {
+        out.writeInt(time.toSecondOfDay());
+    }
+
+    @Override
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
+        time = LocalTime.ofSecondOfDay(in.readInt());
     }
 }

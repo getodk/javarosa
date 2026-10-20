@@ -119,7 +119,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
      * formatting
      */
     public Object serializeAnswerData(TimeData data) {
-        return DateUtils.formatTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
+        return data.uncast().getValue();
     }
 
     /**
