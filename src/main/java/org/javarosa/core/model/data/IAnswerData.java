@@ -16,13 +16,6 @@
 
 package org.javarosa.core.model.data;
 
-import org.javarosa.core.model.DataType;
-import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Date;
-
 import static org.javarosa.core.model.DataType.BOOLEAN;
 import static org.javarosa.core.model.DataType.CHOICE;
 import static org.javarosa.core.model.DataType.DATE;
@@ -34,6 +27,13 @@ import static org.javarosa.core.model.DataType.INTEGER;
 import static org.javarosa.core.model.DataType.LONG;
 import static org.javarosa.core.model.DataType.MULTIPLE_ITEMS;
 import static org.javarosa.core.model.DataType.TIME;
+
+import java.util.Date;
+import org.javarosa.core.model.DataType;
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An IAnswerData object represents an answer to a question
@@ -91,7 +91,10 @@ public interface IAnswerData extends Externalizable {
             double d = (Double) val;
             long l = (long) d;
             boolean isIntegral = Math.abs(d - l) < 1.0e-9;
-            if (INTEGER == dataType ||
+
+            if (dataType == DATE) {
+                return new DateData((Date) XPathFuncExpr.toDate(val, false));
+            } else if (INTEGER == dataType ||
                 (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
                 return new IntegerData((int) d);
             } else if (LONG == dataType || isIntegral) {
