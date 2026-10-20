@@ -109,8 +109,14 @@ public class XFormAnswerDataParser {
                 return d == null ? null : new DateData(d);
 
             case TIME:
-                Date t = trimmedText == null ? null : DateUtils.parseTime(trimmedText);
-                return t == null ? null : new TimeData(t);
+                if (trimmedText == null) {
+                    return null;
+                }
+                try {
+                    return new TimeData().cast(new UncastData(trimmedText));
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
 
             case BOOLEAN:
                 if (trimmedText == null) {

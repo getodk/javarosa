@@ -7,6 +7,7 @@ import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
 
 public class AnswerDataMatchers {
     public static Matcher<StringData> stringAnswer(String expectedAnswer) {
@@ -119,6 +120,26 @@ public class AnswerDataMatchers {
             @Override
             protected boolean matchesSafely(BooleanData item) {
                 return item.getValue().equals(expectedAnswer);
+            }
+        };
+    }
+
+    public static Matcher<TimeData> timeAnswer(String expectedAnswer) {
+        return new TypeSafeMatcher<TimeData>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("time answer with value " + expectedAnswer);
+            }
+
+            @Override
+            protected void describeMismatchSafely(TimeData item, Description mismatchDescription) {
+                mismatchDescription.appendText("was time answer ")
+                    .appendValue(item.uncast().getValue());
+            }
+
+            @Override
+            protected boolean matchesSafely(TimeData item) {
+                return item.uncast().getValue().equals(expectedAnswer);
             }
         };
     }
