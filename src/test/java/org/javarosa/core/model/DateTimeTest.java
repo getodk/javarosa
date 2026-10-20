@@ -94,39 +94,69 @@ public class DateTimeTest {
         assertThat(answer3 instanceof DateData, equalTo(true));
     }
 
+    @Test
+    public void dateArithmetic_whenInstantFallsOnSameLocalDate_preservesDateType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario;
+            try {
+                scenario = Scenario.init(html(
+                    head(title("Date arithmetic"),
+                        model(
+                            mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                                t("date"),
+                                t("nextDate")
+                            )),
+                            bind("/data/date").type("date"),
+                            bind("/data/nextDate").type("date").calculate("/data/date + 1")
+                        )
+                    ),
+                    body(
+                        input("/data/date"),
+                        input("/data/nextDate")
+                    )
+                ));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-01"));
+        });
+    }
 
     @Test
-    public void dateArithmetic_withDateBind_preservesDateType() {
-        for (String timezone : new String[] {"UTC", "GMT-08:00"}) {
-            withTimeZone(TimeZone.getTimeZone(timezone), () -> {
-                Scenario scenario;
-                try {
-                    scenario = Scenario.init(html(
-                        head(title("Date arithmetic"),
-                            model(
-                                mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
-                                    t("date"),
-                                    t("nextDate")
-                                )),
-                                bind("/data/date").type("date"),
-                                bind("/data/nextDate").type("date").calculate("/data/date + 1")
-                            )
-                        ),
-                        body(
-                            input("/data/date"),
-                            input("/data/nextDate")
+    public void dateArithmetic_whenInstantFallsOnNextLocalDate_preservesDateType() {
+        withTimeZone(TimeZone.getTimeZone("Pacific/Auckland"), () -> {
+            Scenario scenario;
+            try {
+                scenario = Scenario.init(html(
+                    head(title("Date arithmetic"),
+                        model(
+                            mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                                t("date"),
+                                t("nextDate")
+                            )),
+                            bind("/data/date").type("date"),
+                            bind("/data/nextDate").type("date").calculate("/data/date + 1")
                         )
-                    ));
-                } catch (IOException | XFormParser.ParseException e) {
-                    throw new RuntimeException(e);
-                }
+                    ),
+                    body(
+                        input("/data/date"),
+                        input("/data/nextDate")
+                    )
+                ));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
 
-                scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+            // In UTC+13:30, it's 2021-12-01 already
+            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
 
-                assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
-                assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-01"));
-            });
-        }
+            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-02"));
+        });
     }
 
     @Test
