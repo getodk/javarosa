@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.TimeZone;
 import org.javarosa.core.model.utils.DateUtils;
@@ -79,10 +80,13 @@ public class DateUtilsTimeZoneConsistencyTests {
     public void getDate_andGetFields_useConsistentTimeZones() {
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
             DateUtils.DateFields fields = DateUtils.DateFields.of(
-                2024, 7, 15, 12, 30, 0, 0
+                2024, 7, 15, 12, 30, 45, 123
             );
 
             Date date = DateUtils.getDate(fields);
+
+            assertThat(date.toInstant(), is(Instant.parse("2024-07-15T19:30:45.123Z")));
+
             DateUtils.DateFields result = DateUtils.getFields(date);
 
             assertThat(result.year, is(2024));
@@ -90,6 +94,8 @@ public class DateUtilsTimeZoneConsistencyTests {
             assertThat(result.day, is(15));
             assertThat(result.hour, is(12));
             assertThat(result.minute, is(30));
+            assertThat(result.second, is(45));
+            assertThat(result.secTicks, is(123));
         });
     }
 
