@@ -18,6 +18,7 @@ package org.javarosa.core.model.data.test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.javarosa.core.test.AnswerDataMatchers.timeAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
@@ -357,5 +358,79 @@ public class TimeDataTests {
             Scenario.deserializeForm(serializedForm)
         );
         assertThat(restoredForm.answerOf("/data/time"), is(timeAnswer(original)));
+    }
+
+    @Test
+    public void timeSubtraction_withDecimalTime_isIndependentOfTimezone() throws Exception {
+        XFormsElement form = html(
+            head(
+                title("Time subtraction"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-subtraction\"",
+                            t("start", "09:15:00"),
+                            t("end", "10:45:00"),
+                            t("duration")
+                        )
+                    ),
+                    bind("/data/start").type("time"),
+                    bind("/data/end").type("time"),
+                    bind("/data/duration")
+                        .type("decimal")
+                        .calculate(
+                            "(decimal-time(/data/end) - decimal-time(/data/start)) * 24"
+                        )
+                )
+            ),
+            body(
+                input("/data/start"),
+                input("/data/end")
+            )
+        );
+
+        Scenario scenario = withTimeZone(TimeZone.getTimeZone("GMT+07:00"), () ->
+            Scenario.init(form)
+        );
+        assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
+            is(closeTo(1.5, 0.000001)));
+
+        scenario = withTimeZone(TimeZone.getTimeZone("GMT-07:00"), () ->
+            Scenario.init(form)
+        );
+        assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
+            is(closeTo(1.5, 0.000001)));
+    }
+
+    @Test
+    public void timeSubtraction_withoutDecimalTime_isIndependentOfTimezone() throws Exception {
+        XFormsElement form = html(
+            head(
+                title("Direct time subtraction"),
+                model(
+                    mainInstance(
+                        t("data id=\"direct-time-subtraction\"",
+                            t("start", "09:15:00"),
+                            t("end", "10:45:00"),
+                            t("duration")
+                        )
+                    ),
+                    bind("/data/start").type("time"),
+                    bind("/data/end").type("time"),
+                    bind("/data/duration")
+                        .type("decimal")
+                        .calculate(
+                            "(/data/end - /data/start) * 24"
+                        )
+                )
+            ),
+            body(
+                input("/data/start"),
+                input("/data/end")
+            )
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
+            is(closeTo(1.5, 0.000001)));
     }
 }
