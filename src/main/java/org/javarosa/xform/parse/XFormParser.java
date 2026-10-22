@@ -234,7 +234,7 @@ public class XFormParser implements IXFormParserFunctions {
                     // Attributes that are passed through to additionalAttributes but shouldn't lead to warnings.
                     // These are consistently used by clients but are expected in additionalAttributes for historical
                     // reasons.
-                    List<String> passedThroughInputAtts = unmodifiableList(asList("rows", "query"));
+                    List<String> passedThroughInputAtts = unmodifiableList(asList("rows", "query", "autoplay", "playColor", "accuracyThreshold"));
                     p.parseControl((IFormElement) parent, e, CONTROL_INPUT, passedThroughInputAtts, passedThroughInputAtts);
                 }
             });
@@ -1640,6 +1640,9 @@ public class XFormParser implements IXFormParserFunctions {
         usedAtts.add(APPEARANCE_ATTR);
         usedAtts.add("count");
         usedAtts.add("noAddRemove");
+        // Client attributes that are recognized but still stored in additionalAttributes.
+        List<String> passedThroughAtts = asList("intent");
+        usedAtts.addAll(passedThroughAtts);
 
         if (groupType == CONTAINER_REPEAT) {
             group.setRepeat(true);
@@ -1733,7 +1736,7 @@ public class XFormParser implements IXFormParserFunctions {
         // save all the unused attributes verbatim...
         for (int i = 0; i < e.getAttributeCount(); i++) {
             String name = e.getAttributeName(i);
-            if (usedAtts.contains(name))
+            if (usedAtts.contains(name) && !passedThroughAtts.contains(name))
                 continue;
             group.setAdditionalAttribute(e.getAttributeNamespace(i), name, e.getAttributeValue(i));
         }
