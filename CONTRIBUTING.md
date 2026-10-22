@@ -49,6 +49,17 @@ To contribute code to ODK JavaRosa, you will need to open a [pull request](https
 
 1. Follow the guidelines below.
 
+## Writing tests
+New tests involving forms should use [Scenario](src/main/java/org/javarosa/test/Scenario.java) and the form-building DSL provided by [XFormsElement](src/main/java/org/javarosa/test/XFormsElement.java) and [BindBuilderXFormsElement](src/main/java/org/javarosa/test/BindBuilderXFormsElement.java). Define the form inline with the DSL and pass it to `Scenario.init(...)` to initialize it. Use `Scenario` methods such as `answer(...)` to fill the form and `answerOf(...)` to inspect its answers.
+
+See [IndexedRepeatTest](src/test/java/org/javarosa/xpath/expr/IndexedRepeatTest.java) for examples of building forms, answering questions, and asserting calculated values.
+
+To run just this test class during development:
+
+    ./gradlew test --tests org.javarosa.xpath.expr.IndexedRepeatTest
+
+Run `./gradlew check` before submitting your pull request.
+
 ## The review process
 Bug fixes, pull requests corresponding to issues with a clearly stated goal and pull requests with clear tests and/or process for manual verification are given priority. Pull requests that are unclear or controversial may be tagged as `needs discussion` and/or may take longer to review.
 
