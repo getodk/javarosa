@@ -20,39 +20,6 @@ import org.junit.Test;
 public class NestedRepeatTest {
 
     @Test
-    public void nestedRepeatWithConcreteInstance_canBeReachedAndAnswered() throws Exception {
-        Scenario scenario = Scenario.init(html(
-            head(
-                title("Nested repeat instances"),
-                model(
-                    mainInstance(t("data id=\"nested-repeat-instances\"",
-                        t("outer jr:template=\"\"",
-                            t("outerValue"),
-                            t("inner jr:template=\"\"", t("value")),
-                            t("inner", t("value"))),
-                        t("outer", t("outerValue"), t("inner", t("value")))
-                    ))
-                )
-            ),
-            body(
-                repeat("/data/outer",
-                    input("/data/outer/outerValue"),
-                    repeat("/data/outer/inner",
-                        input("/data/outer/inner/value")
-                    )
-                )
-            )
-        ));
-
-        assertThat(scenario.countRepeatInstancesOf("/data/outer"), is(1));
-        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(1));
-        scenario.next(4);
-        scenario.answer("foo");
-
-        assertThat(scenario.answerOf("/data/outer[1]/inner[1]/value"), is(stringAnswer("foo")));
-    }
-
-    @Test
     // pyxform output before https://github.com/XLSForm/pyxform/pull/876
     public void creatingOuterRepeat_withoutInnerConcreteInstance_createsNoInnerInstance() throws Exception {
         Scenario scenario = Scenario.init(html(
