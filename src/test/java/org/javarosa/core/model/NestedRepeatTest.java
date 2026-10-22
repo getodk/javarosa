@@ -53,17 +53,21 @@ public class NestedRepeatTest {
     }
 
     @Test
-    public void creatingOuterRepeat_withOnlyInnerTemplate_createsNoInnerInstances() throws Exception {
+    // pyxform output before https://github.com/XLSForm/pyxform/pull/876
+    public void creatingOuterRepeat_withoutInnerConcreteInstance_createsNoInnerInstance() throws Exception {
         Scenario scenario = Scenario.init(html(
             head(
-                title("New outer repeat without concrete inner starter"),
+                title("Nested repeat with prior pyxform structure"),
                 model(
-                    mainInstance(t("data id=\"nested-repeat-new-outer-no-inner\"",
+                    mainInstance(t("data id=\"nested-repeat-prior-pyxform\"",
                         t("outer jr:template=\"\"",
                             t("outerValue"),
-                            t("inner jr:template=\"\"", t("value"))),
+                            t("inner jr:template=\"\"", t("innerValue"))
+                        ),
                         t("outer",
-                            t("outerValue"))
+                            t("outerValue"),
+                            t("inner", t("innerValue"))
+                        )
                     ))
                 )
             ),
@@ -71,19 +75,19 @@ public class NestedRepeatTest {
                 repeat("/data/outer",
                     input("/data/outer/outerValue"),
                     repeat("/data/outer/inner",
-                        input("/data/outer/inner/value")
+                        input("/data/outer/inner/innerValue")
                     )
                 )
             )
         ));
 
         assertThat(scenario.countRepeatInstancesOf("/data/outer"), is(1));
-        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(0));
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(1));
 
         scenario.createNewRepeat("/data/outer");
 
         assertThat(scenario.countRepeatInstancesOf("/data/outer"), is(2));
-        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(0));
+        assertThat(scenario.countRepeatInstancesOf("/data/outer[1]/inner"), is(1));
         assertThat(scenario.countRepeatInstancesOf("/data/outer[2]/inner"), is(0));
     }
 
