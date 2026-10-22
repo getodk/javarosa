@@ -452,14 +452,9 @@ public class NestedRepeatTest {
             )
         ));
 
-        scenario.next(2);
-        scenario.answer("manual outer");
-
-        scenario.next(2);
-        scenario.answer("manual middle");
-
-        scenario.next(2);
-        scenario.answer("manual inner");
+        scenario.answer("/data/outer[1]/outerValue","manual outer");
+        scenario.answer("/data/outer[1]/middle[1]/middleValue","manual middle");
+        scenario.answer("/data/outer[1]/middle[1]/inner[1]/value","manual inner");
 
         scenario.createNewRepeat("/data/outer");
 
