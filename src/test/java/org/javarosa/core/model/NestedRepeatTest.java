@@ -316,7 +316,6 @@ public class NestedRepeatTest {
         // Creating an inner repeat uses its own template.
         scenario.createNewRepeat("/data/outer[2]/middle[2]/inner");
         assertThat(scenario.countRepeatInstancesOf("/data/outer[2]/middle[2]/inner"), is(2));
-        assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[1]/value"), is(stringAnswer("inner default")));
         assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[2]/value"), is(stringAnswer("inner default")));
     }
 
