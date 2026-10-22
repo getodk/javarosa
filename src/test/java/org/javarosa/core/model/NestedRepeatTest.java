@@ -246,6 +246,103 @@ public class NestedRepeatTest {
         assertThat(scenario.answerOf("/data/outer[2]/group[1]/inner[1]/value"), is(stringAnswer("new outer")));
     }
 
+    //region attributes
+
+    @Test
+    public void creatingRepeat_preservesInstanceAttributes() throws Exception {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Repeat instance attributes"),
+                model(
+                    mainInstance(t("data id=\"repeat-attributes\"",
+                        t("q1"),
+                        t("repeat jr:template=\"\" k=\"kt\"",
+                            t("q2")
+                        ),
+                        t("repeat k=\"kt\"",
+                            t("q2")
+                        )
+                    ))
+                )
+            ),
+            body(
+                input("/data/q1"),
+                repeat("/data/repeat",
+                    input("/data/repeat/q2")
+                )
+            )
+        ));
+
+        assertThat(scenario.countRepeatInstancesOf("/data/repeat"), is(1));
+        assertThat(scenario.getAnswerNode("/data/repeat[1]").getAttributeValue(null, "k"), is("kt"));
+
+        scenario.createNewRepeat("/data/repeat");
+
+        assertThat(scenario.countRepeatInstancesOf("/data/repeat"), is(2));
+        assertThat(scenario.getAnswerNode("/data/repeat[1]").getAttributeValue(null, "k"), is("kt"));
+        assertThat(scenario.getAnswerNode("/data/repeat[2]").getAttributeValue(null, "k"), is("kt"));
+    }
+
+    @Test
+    public void creatingNestedRepeats_preservesInstanceAttributes() throws Exception {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Nested repeat instance attributes"),
+                model(
+                    mainInstance(t("data id=\"nested-repeat-attributes\"",
+                        t("q1"),
+                        t("r1 jr:template=\"\" k=\"kr1\"",
+                            t("t jr:template=\"\" k=\"kt\"",
+                                t("q2")
+                            ),
+                            t("t k=\"kt\"",
+                                t("q2")
+                            )
+                        ),
+                        t("r1 k=\"kr1\"",
+                            t("t k=\"kt\"",
+                                t("q2")
+                            )
+                        )
+                    ))
+                )
+            ),
+            body(
+                input("/data/q1"),
+                repeat("/data/r1",
+                    repeat("/data/r1/t",
+                        input("/data/r1/t/q2")
+                    )
+                )
+            )
+        ));
+
+        assertThat(scenario.countRepeatInstancesOf("/data/r1"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[1]/t"), is(1));
+
+        assertThat(scenario.getAnswerNode("/data/r1[1]").getAttributeValue(null, "k"), is("kr1"));
+        assertThat(scenario.getAnswerNode("/data/r1[1]/t[1]").getAttributeValue(null, "k"), is("kt"));
+
+        scenario.createNewRepeat("/data/r1");
+
+        assertThat(scenario.countRepeatInstancesOf("/data/r1"), is(2));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[2]/t"), is(1));
+
+        assertThat(scenario.getAnswerNode("/data/r1[2]").getAttributeValue(null, "k"), is("kr1"));
+        assertThat(scenario.getAnswerNode("/data/r1[2]/t[1]").getAttributeValue(null, "k"), is("kt"));
+
+        scenario.createNewRepeat("/data/r1[2]/t");
+
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[2]/t"), is(2));
+        assertThat(scenario.getAnswerNode("/data/r1[2]/t[2]").getAttributeValue(null, "k"), is("kt"));
+
+        assertThat(scenario.getAnswerNode("/data/r1[1]").getAttributeValue(null, "k"), is("kr1"));
+        assertThat(scenario.getAnswerNode("/data/r1[1]/t[1]").getAttributeValue(null, "k"), is("kt"));
+    }
+
+    //endregion
+
+    //region defaults
     @Test
     public void creatingOuterRepeat_withThreeLevelStaticDefaults_preservesDefaultsInAllInstances() throws Exception {
         Scenario scenario = Scenario.init(html(
@@ -546,9 +643,7 @@ public class NestedRepeatTest {
 
         scenario.createNewRepeat("/data/outer[2]/middle[2]/inner");
 
-        assertThat(
-            scenario.answerOf("/data/outer[2]/middle[2]/inner[2]/value"),
-            is(stringAnswer("outer default middle inner"))
-        );
+        assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[2]/value"), is(stringAnswer("outer default middle inner")));
     }
+    //endregion
 }
