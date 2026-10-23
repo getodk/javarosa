@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
+import static org.javarosa.test.XFormsElement.group;
 import static org.javarosa.test.XFormsElement.head;
 import static org.javarosa.test.XFormsElement.html;
 import static org.javarosa.test.XFormsElement.input;
@@ -218,9 +219,7 @@ public class NestedRepeatTest {
                         ),
                         t("outer",
                             t("outerValue"),
-                            t("group",
-                                t("inner", t("value"))
-                            )
+                            t("group", t("inner", t("value")))
                         )
                     ))
                 )
@@ -228,8 +227,10 @@ public class NestedRepeatTest {
             body(
                 repeat("/data/outer",
                     input("/data/outer/outerValue"),
-                    repeat("/data/outer/group/inner",
-                        input("/data/outer/group/inner/value")
+                    group("/data/outer/group",
+                        repeat("/data/outer/group/inner",
+                            input("/data/outer/group/inner/value")
+                        )
                     )
                 )
             )
@@ -242,8 +243,126 @@ public class NestedRepeatTest {
         assertThat(scenario.countRepeatInstancesOf("/data/outer[2]/group/inner"), is(1));
 
         scenario.answer("/data/outer[2]/group[1]/inner[1]/value", "new outer");
-
         assertThat(scenario.answerOf("/data/outer[2]/group[1]/inner[1]/value"), is(stringAnswer("new outer")));
+    }
+
+
+    @Test
+    public void creatingOuterRepeat_insideGroup_createsConcreteInnerInstance() throws Exception {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Nested repeats inside a group"),
+                model(
+                    mainInstance(t("data id=\"nested-repeat-inside-group\"",
+                        t("group",
+                            t("outer jr:template=\"\"",
+                                t("outerValue"),
+                                t("inner jr:template=\"\"", t("value")),
+                                t("inner", t("value"))
+                            ),
+                            t("outer",
+                                t("outerValue"),
+                                t("inner", t("value"))
+                            )
+                        )
+                    ))
+                )
+            ),
+            body(
+                group("/data/group",
+                    repeat("/data/group/outer",
+                        input("/data/group/outer/outerValue"),
+                        repeat("/data/group/outer/inner",
+                            input("/data/group/outer/inner/value")
+                        )
+                    )
+                )
+            )
+        ));
+
+        assertThat(scenario.countRepeatInstancesOf("/data/group/outer"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/group/outer[1]/inner"), is(1));
+
+        scenario.createNewRepeat("/data/group[1]/outer");
+
+        assertThat(scenario.countRepeatInstancesOf("/data/group/outer"), is(2));
+        assertThat(scenario.countRepeatInstancesOf("/data/group/outer[1]/inner"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/group/outer[2]/inner"), is(1));
+
+        scenario.answer("/data/group[1]/outer[2]/inner[1]/value", "new outer");
+
+        assertThat(scenario.answerOf("/data/group[1]/outer[2]/inner[1]/value"),
+            is(stringAnswer("new outer"))
+        );
+    }
+
+
+    @Test
+    public void creatingOuterRepeat_withDeeplyNestedStarters_createsConcreteDescendants() throws Exception {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Deeply nested repeat starter instances"),
+                model(
+                    mainInstance(t("data id=\"deep_nested\"",
+                        t("r1 jr:template=\"\"",
+                            t("r2 jr:template=\"\"",
+                                t("g1",
+                                    t("r3 jr:template=\"\"",
+                                        t("g2", t("g3",
+                                            t("r4 jr:template=\"\"",
+                                                t("r5 jr:template=\"\"", t("value")),
+                                                t("r5", t("value"))
+                                            ),
+                                            t("r4", t("r5", t("value")))
+                                        ))
+                                    ),
+                                    t("r3", t("g2", t("g3", t("r4", t("r5", t("value"))))))
+                                )
+                            ),
+                            t("r2", t("g1", t("r3", t("g2", t("g3", t("r4", t("r5", t("value"))))))))
+                        ),
+                        t("r1", t("r2", t("g1", t("r3", t("g2", t("g3", t("r4", t("r5", t("value")))))))))
+                    ))
+                )
+            ),
+
+            body(
+                group("/data/r1",
+                    repeat("/data/r1",
+                        group("/data/r1/r2",
+                            repeat("/data/r1/r2",
+                                group("/data/r1/r2/g1",
+                                    group("/data/r1/r2/g1/r3",
+                                        repeat("/data/r1/r2/g1/r3",
+                                            group("/data/r1/r2/g1/r3/g2",
+                                                group("/data/r1/r2/g1/r3/g2/g3",
+                                                    group("/data/r1/r2/g1/r3/g2/g3/r4",
+                                                        repeat("/data/r1/r2/g1/r3/g2/g3/r4",
+                                                            group("/data/r1/r2/g1/r3/g2/g3/r4/r5",
+                                                                repeat("/data/r1/r2/g1/r3/g2/g3/r4/r5",
+                                                                    input("/data/r1/r2/g1/r3/g2/g3/r4/r5/value")
+            ))))))))))))))
+        ));
+
+        assertThat(scenario.countRepeatInstancesOf("/data/r1"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[1]/r2"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[1]/r2[1]/g1/r3"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[1]/r2[1]/g1/r3[1]/g2/g3/r4"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[1]/r2[1]/g1/r3[1]/g2/g3/r4[1]/r5"), is(1));
+
+        scenario.createNewRepeat("/data/r1");
+
+        assertThat(scenario.countRepeatInstancesOf("/data/r1"), is(2));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[2]/r2"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[2]/r2[1]/g1/r3"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[2]/r2[1]/g1/r3[1]/g2/g3/r4"), is(1));
+        assertThat(scenario.countRepeatInstancesOf("/data/r1[2]/r2[1]/g1/r3[1]/g2/g3/r4[1]/r5"), is(1));
+
+        scenario.answer("/data/r1[2]/r2[1]/g1[1]/r3[1]/g2[1]/g3[1]/r4[1]/r5[1]/value", "deep value");
+        assertThat(
+            scenario.answerOf("/data/r1[2]/r2[1]/g1[1]/r3[1]/g2[1]/g3[1]/r4[1]/r5[1]/value"),
+            is(stringAnswer("deep value"))
+        );
     }
 
     //region attributes
