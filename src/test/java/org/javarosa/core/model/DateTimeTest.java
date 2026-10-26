@@ -111,8 +111,7 @@ public class DateTimeTest {
                         )
                     ),
                     body(
-                        input("/data/date"),
-                        input("/data/nextDate")
+                        input("/data/date")
                     )
                 ));
             } catch (IOException | XFormParser.ParseException e) {
@@ -143,8 +142,7 @@ public class DateTimeTest {
                         )
                     ),
                     body(
-                        input("/data/date"),
-                        input("/data/nextDate")
+                        input("/data/date")
                     )
                 ));
             } catch (IOException | XFormParser.ParseException e) {
