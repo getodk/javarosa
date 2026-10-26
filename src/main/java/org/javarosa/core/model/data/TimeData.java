@@ -36,8 +36,8 @@ import org.jetbrains.annotations.NotNull;
  * fractional seconds or timezone offsets, those components are discarded without adjusting the wall-clock time.
  */
 public class TimeData implements IAnswerData {
-    private static final DateTimeFormatter TIME_FORMAT =
-        DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final LocalDate TIME_SENTINEL = LocalDate.of(1970, 1, 1);
 
     private LocalTime time;
 
@@ -72,7 +72,7 @@ public class TimeData implements IAnswerData {
     @Override
     public @NotNull Object getValue() {
         return Date.from(
-            LocalDate.now()
+            TIME_SENTINEL
                 .atTime(time)
                 .atZone(ZoneId.systemDefault())
                 .toInstant()

@@ -37,6 +37,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.TimeZone;
 import org.javarosa.core.model.data.TimeData;
@@ -60,6 +62,19 @@ public class TimeDataTests {
     }
 
     @Test
+    public void getValue_usesLocalEpoch() {
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            TimeData data = new TimeData().cast(new UncastData("10:30:00"));
+
+            LocalDateTime value = ((Date) data.getValue()).toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+            assertThat(value, is(LocalDateTime.of(1970, 1, 1, 10, 30)));
+        });
+    }
+
+    @Test
     public void setValue_rejectsNullWithoutChangingTime() {
         TimeData data = new TimeData().cast(new UncastData("10:45:00"));
 
@@ -71,6 +86,17 @@ public class TimeDataTests {
         }
 
         assertEquals("10:45:00", data.uncast().getValue());
+    }
+
+    @Test
+    public void setValue_preservesTimeFromLocalEpochDate() {
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            TimeData original = new TimeData().cast(new UncastData("10:30:00"));
+
+            TimeData restored = new TimeData((Date) original.getValue());
+
+            assertThat(restored.uncast().getValue(), is("10:30:00"));
+        });
     }
 
     @Test
@@ -439,5 +465,83 @@ public class TimeDataTests {
         );
         assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
             is(closeTo(1.5, 0.000001)));
+    }
+
+    @Test
+    public void timeNumericConversions_areFractionalTime_acrossTimezones() throws Exception {
+        XFormsElement form = html(
+            head(
+                title("Time numeric conversions"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-numeric\"",
+                            t("time", "10:30:00"),
+                            t("decimalTime")
+                        )
+                    ),
+                    bind("/data/time").type("time"),
+                    bind("/data/decimalTime").type("decimal").calculate("decimal-time(/data/time)")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+                assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+                assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    // This is not semantically valid and ideally we would get a blank value to represent invalid mixed-type subtraction.
+    // But that's a much bigger change so for now we accept at least a stable result.
+    @Test
+    public void subtractingDateTimeAndTime_usesFractionalDays() {
+        XFormsElement form = html(
+            head(
+                title("DateTime and time subtraction"),
+                model(
+                    mainInstance(
+                        t("data id=\"datetime-time-subtraction\"",
+                            t("datetime", "1970-01-02T09:00:00Z"),
+                            t("time", "10:30:00"),
+                            t("dtMinusTime"),
+                            t("timeMinusDt")
+                        )
+                    ),
+                    bind("/data/datetime").type("dateTime"),
+                    bind("/data/time").type("time"),
+                    bind("/data/dtMinusTime").type("decimal").calculate("/data/datetime - /data/time"),
+                    bind("/data/timeMinusDt").type("decimal").calculate("/data/time - /data/datetime")
+                )
+            ),
+            body(
+                input("/data/datetime"),
+                input("/data/time")
+            )
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+
+                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("0.9375"));
+                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-0.9375"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }
