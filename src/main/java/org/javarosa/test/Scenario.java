@@ -645,6 +645,13 @@ public class Scenario {
         return answer(new DateTimeData(Date.from(value)));
     }
 
+    public AnswerResult answer(String xPath, Instant value) {
+        createMissingRepeats(xPath);
+        TreeReference ref = getRef(xPath);
+        silentJump(getIndexOf(ref));
+        return answer(value);
+    }
+
     /**
      * Answers with either DateTimeData or DateData for the specified instant.
      *
