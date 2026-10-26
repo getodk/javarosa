@@ -528,7 +528,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         TreeElement newNode = mainInstance.resolveReference(repeatContextRef);
         preloadInstance(newNode);
 
-        actionController.triggerActionsFromEvent(Actions.EVENT_JR_INSERT, this, repeatContextRef, this);
         actionController.triggerActionsFromEvent(Actions.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
 
         triggerNewRepeatActions(getChild(index), newNode);
@@ -538,7 +537,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     private void triggerNewRepeatActions(IFormElement element, TreeElement instanceNode) {
         if (element instanceof GroupDef && ((GroupDef) element).getRepeat()) {
-            element.getActionController().triggerActionsFromEvent(Actions.EVENT_JR_INSERT, this, instanceNode.getRef(), this);
             element.getActionController().triggerActionsFromEvent(Actions.EVENT_ODK_NEW_REPEAT, this, instanceNode.getRef(), this);
         }
 
@@ -565,9 +563,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
     @Override
     public void processResultOfAction(TreeReference refSetByAction, String event) {
-        if (Actions.EVENT_JR_INSERT.equals(event)) {
-            // CommCare has an implementation if needed
-        }
+
     }
 
     public boolean isRepeatRelevant(TreeReference repeatRef) {
@@ -1118,10 +1114,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         if (newInstance) {
             actionController.triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_FIRST_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
-
-            // xforms-ready is marked as deprecated as of JavaRosa 2.14.0 but is still dispatched for compatibility with
-            // old form definitions
-            actionController.triggerActionsFromEvent(Actions.EVENT_XFORMS_READY, elementsWithActionTriggeredByToplevelEvent, this);
         }
 
         actionController.triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
