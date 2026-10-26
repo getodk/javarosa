@@ -62,7 +62,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void getValue_usesLocalEpoch() {
+    public void getValue_usesSentinelDate() {
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
             TimeData data = new TimeData().cast(new UncastData("10:30:00"));
 
@@ -70,7 +70,7 @@ public class TimeDataTests {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
-            assertThat(value, is(LocalDateTime.of(1970, 1, 1, 10, 30)));
+            assertThat(value, is(LocalDateTime.of(1900, 1, 1, 10, 30)));
         });
     }
 
@@ -89,7 +89,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void setValue_preservesTimeFromLocalEpochDate() {
+    public void setValue_preservesTime() {
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
             TimeData original = new TimeData().cast(new UncastData("10:30:00"));
 
@@ -505,8 +505,8 @@ public class TimeDataTests {
         });
     }
 
-    // This is not semantically valid and ideally we would get a blank value to represent invalid mixed-type subtraction.
-    // But that's a much bigger change so for now we accept at least a stable result.
+    // Arithmetic between time and datetime is not semantically valid and ideally we would get a blank value to represent
+    // invalid mixed-type subtraction. But that's a much bigger change so for now we accept at least a stable result.
     @Test
     public void subtractingDateTimeAndTime_usesFractionalDays() {
         XFormsElement form = html(
@@ -537,8 +537,47 @@ public class TimeDataTests {
             try {
                 Scenario scenario = Scenario.init(form);
 
-                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("0.9375"));
-                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-0.9375"));
+                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("25567.9375"));
+                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-25567.9375"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Test
+    public void castingTimeToString_doesNotIncludeSentinelDate() throws Exception {
+        XFormsElement form = html(
+            head(
+                title("Time to string conversion"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-to-string\"",
+                            t("time", "10:30:00"),
+                            t("result")
+                        )
+                    ),
+                    bind("/data/time").type("time"),
+                    bind("/data/result").type("string")
+                        .calculate("string(/data/time)")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+                assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+                assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
             } catch (IOException | XFormParser.ParseException e) {
                 throw new RuntimeException(e);
             }

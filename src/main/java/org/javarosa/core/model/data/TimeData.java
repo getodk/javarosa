@@ -20,12 +20,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class TimeData implements IAnswerData {
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final LocalDate TIME_SENTINEL = LocalDate.of(1970, 1, 1);
 
     private LocalTime time;
 
@@ -72,8 +71,7 @@ public class TimeData implements IAnswerData {
     @Override
     public @NotNull Object getValue() {
         return Date.from(
-            TIME_SENTINEL
-                .atTime(time)
+            DateUtils.TIME_SENTINEL.atTime(time)
                 .atZone(ZoneId.systemDefault())
                 .toInstant()
         );
