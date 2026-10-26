@@ -247,7 +247,6 @@ public class TimeDataTests {
         assertThat(deserialized.answerOf("/data/time"), is(timeAnswer("10:45:00")));
     }
 
-
     @Test
     public void legacyInstanceWithTimeWithOffset_isDeserializedWithoutTimezoneConversion() throws Exception {
         XFormsElement form = html(
@@ -429,7 +428,15 @@ public class TimeDataTests {
             )
         );
 
-        Scenario scenario = Scenario.init(form);
+        Scenario scenario = withTimeZone(TimeZone.getTimeZone("GMT+07:00"), () ->
+            Scenario.init(form)
+        );
+        assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
+            is(closeTo(1.5, 0.000001)));
+
+        scenario = withTimeZone(TimeZone.getTimeZone("GMT-07:00"), () ->
+            Scenario.init(form)
+        );
         assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
             is(closeTo(1.5, 0.000001)));
     }
