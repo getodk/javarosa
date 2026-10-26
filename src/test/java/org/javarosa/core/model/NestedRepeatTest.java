@@ -746,22 +746,15 @@ public class NestedRepeatTest {
         assertThat(scenario.answerOf("/data/outer[1]/middle[1]/inner[1]/value"), is(stringAnswer("outer default middle inner")));
 
         scenario.createNewRepeat("/data/outer");
-
         assertThat(scenario.answerOf("/data/outer[2]/outerValue"), is(stringAnswer("outer default")));
         assertThat(scenario.answerOf("/data/outer[2]/middle[1]/middleValue"), is(stringAnswer("outer default middle")));
         assertThat(scenario.answerOf("/data/outer[2]/middle[1]/inner[1]/value"), is(stringAnswer("outer default middle inner")));
 
         scenario.createNewRepeat("/data/outer[2]/middle");
-
         assertThat(scenario.answerOf("/data/outer[2]/middle[2]/middleValue"), is(stringAnswer("outer default middle")));
         assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[1]/value"), is(stringAnswer("outer default middle inner")));
 
         scenario.createNewRepeat("/data/outer[2]/middle[2]/inner");
-
-        assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[2]/value"), is(stringAnswer("outer default middle inner")));
-
-        scenario.createNewRepeat("/data/outer[2]/middle[2]/inner");
-
         assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[2]/value"), is(stringAnswer("outer default middle inner")));
     }
     //endregion
