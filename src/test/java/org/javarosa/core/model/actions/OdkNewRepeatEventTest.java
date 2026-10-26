@@ -499,6 +499,31 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
+    public void creatingRepeat_runsSetvalueBeforeCalculation() throws Exception {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Setvalue before calculation"),
+                model(
+                    mainInstance(t("data id=\"setvalue-before-calculate\"",
+                        t("item jr:template=\"\"", t("value"))
+                    )),
+                    bind("/data/item/value").type("int").calculate("10")
+                )
+            ),
+            body(
+                repeat("/data/item",
+                    setvalue("odk-new-repeat", "/data/item/value", "5"),
+                    input("/data/item/value")
+                )
+            )
+        ));
+
+        scenario.createNewRepeat("/data/item");
+
+        assertThat(scenario.answerOf("/data/item[1]/value"), is(intAnswer(10)));
+    }
+
+    @Test
     public void creatingOuterRepeat_usesConcreteNestedInstanceDefaults_notTemplateDefaults() throws Exception {
         Scenario scenario = Scenario.init(html(
             head(

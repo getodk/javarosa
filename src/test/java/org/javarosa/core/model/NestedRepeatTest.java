@@ -764,7 +764,5 @@ public class NestedRepeatTest {
 
         assertThat(scenario.answerOf("/data/outer[2]/middle[2]/inner[2]/value"), is(stringAnswer("outer default middle inner")));
     }
-
-
     //endregion
 }

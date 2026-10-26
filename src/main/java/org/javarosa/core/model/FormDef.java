@@ -529,9 +529,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         preloadInstance(newNode);
 
         actionController.triggerActionsFromEvent(Actions.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
-
         triggerNewRepeatActions(getChild(index), newNode);
-
         dagImpl.createRepeatInstance(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
     }
 
