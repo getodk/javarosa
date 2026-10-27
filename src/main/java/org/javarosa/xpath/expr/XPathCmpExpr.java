@@ -65,13 +65,18 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
         double fa = XPathFuncExpr.toDouble(aval);
         double fb = XPathFuncExpr.toDouble(bval);
 
-        return switch (op) {
-            case LT -> fa < fb;
-            case GT -> fa > fb;
-            case LTE -> fa <= fb;
-            case GTE -> fa >= fb;
-            default -> false;
-        };
+        switch (op) {
+            case LT:
+                return fa < fb;
+            case GT:
+                return fa > fb;
+            case LTE:
+                return fa <= fb;
+            case GTE:
+                return fa >= fb;
+            default:
+                return false;
+        }
     }
 
     private static Object parseDateString(String value) {
