@@ -16,6 +16,25 @@
 
 package org.javarosa.core.model;
 
+import static java.util.Collections.emptyList;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.javarosa.core.model.TriggerableDag.EventNotifierAccessor;
 import org.javarosa.core.model.actions.ActionController;
 import org.javarosa.core.model.actions.Actions;
@@ -66,26 +85,6 @@ import org.javarosa.xml.InternalDataInstanceParser;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -529,21 +528,40 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
         TreeElement newNode = mainInstance.resolveReference(repeatContextRef);
         preloadInstance(newNode);
 
-        // Fire events before form re-computation (calculates, relevance, etc). First trigger actions defined in the
-        // model and then trigger actions defined in the body
-        actionController.triggerActionsFromEvent(Actions.EVENT_JR_INSERT, this, repeatContextRef, this);
         actionController.triggerActionsFromEvent(Actions.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
-        // Trigger actions nested in the new repeat
-        getChild(index).getActionController().triggerActionsFromEvent(Actions.EVENT_ODK_NEW_REPEAT, this, repeatContextRef, this);
-
+        triggerNewRepeatActions(getChild(index), newNode);
         dagImpl.createRepeatInstance(getMainInstance(), getEvaluationContext(), repeatContextRef, newNode);
+    }
+
+    private void triggerNewRepeatActions(IFormElement element, TreeElement instanceNode) {
+        if (element instanceof GroupDef && ((GroupDef) element).getRepeat()) {
+            element.getActionController().triggerActionsFromEvent(Actions.EVENT_ODK_NEW_REPEAT, this, instanceNode.getRef(), this);
+        }
+
+        for (IFormElement child : element.getChildren()) {
+            if (!(child instanceof GroupDef)) {
+                continue;
+            }
+
+            TreeReference childRef = FormInstance.unpackReference(child.getBind()).genericize();
+
+            for (int i = 0; i < instanceNode.getNumChildren(); i++) {
+                TreeElement instanceChild = instanceNode.getChildAt(i);
+
+                if (instanceChild.getMult() == TreeReference.INDEX_TEMPLATE) {
+                    continue;
+                }
+
+                if (instanceChild.getRef().genericize().equals(childRef)) {
+                    triggerNewRepeatActions(child, instanceChild);
+                }
+            }
+        }
     }
 
     @Override
     public void processResultOfAction(TreeReference refSetByAction, String event) {
-        if (Actions.EVENT_JR_INSERT.equals(event)) {
-            // CommCare has an implementation if needed
-        }
+
     }
 
     public boolean isRepeatRelevant(TreeReference repeatRef) {
@@ -1094,10 +1112,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
         if (newInstance) {
             actionController.triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_FIRST_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
-
-            // xforms-ready is marked as deprecated as of JavaRosa 2.14.0 but is still dispatched for compatibility with
-            // old form definitions
-            actionController.triggerActionsFromEvent(Actions.EVENT_XFORMS_READY, elementsWithActionTriggeredByToplevelEvent, this);
         }
 
         actionController.triggerActionsFromEvent(Actions.EVENT_ODK_INSTANCE_LOAD, elementsWithActionTriggeredByToplevelEvent, this);
