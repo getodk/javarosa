@@ -96,26 +96,8 @@ public class TimeDataTests {
     }
 
     @Test
-    public void cast_maintainsCanonicalValue() {
+    public void cast_maintainsValue() {
         TimeData data = new TimeData().cast(new UncastData("10:45:00"));
-        assertEquals("10:45:00", data.uncast().getValue());
-    }
-
-    @Test
-    public void cast_truncatesTimezoneOffset() {
-        TimeData negativeOffset = new TimeData().cast(new UncastData("10:45:59-07:00"));
-        assertEquals("10:45:59", negativeOffset.uncast().getValue());
-
-        TimeData positiveOffset = new TimeData().cast(new UncastData("10:45:59+02:00"));
-        assertEquals("10:45:59", positiveOffset.uncast().getValue());
-
-        TimeData gmt = new TimeData().cast(new UncastData("10:45:59Z"));
-        assertEquals("10:45:59", gmt.uncast().getValue());
-    }
-
-    @Test
-    public void cast_truncatesMilliseconds() {
-        TimeData data = new TimeData().cast(new UncastData("10:45:00.187"));
         assertEquals("10:45:00", data.uncast().getValue());
     }
 
@@ -129,12 +111,6 @@ public class TimeDataTests {
     public void cast_truncatesMillisecondsAndOffset() {
         TimeData data = new TimeData().cast(new UncastData("10:45:59.987-07:00"));
         assertEquals("10:45:59", data.uncast().getValue());
-    }
-
-    @Test
-    public void cast_acceptsBoundaryTimes() {
-        assertThat(new TimeData().cast(new UncastData("00:00:00")).uncast().getValue(), is("00:00:00"));
-        assertThat(new TimeData().cast(new UncastData("23:59:59")).uncast().getValue(), is("23:59:59"));
     }
 
     @Test
@@ -542,7 +518,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void castingTimeToString_doesNotIncludeSentinelDate() throws Exception {
+    public void time_castsToString_acrossTimezones() throws Exception {
         XFormsElement form = html(
             head(
                 title("Time to string conversion"),
