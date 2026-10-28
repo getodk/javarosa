@@ -1,7 +1,6 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.junit.Test;
 
@@ -137,14 +136,14 @@ public class IndexedRepeatTest {
     }
 
     @Test
-    public void handlesTopLevelRepeats() throws IOException, XFormParser.ParseException {
+    public void handlesTopLevelRepeats() throws IOException {
         Scenario scenario = buildNestedRepeatForm();
         assertThat(scenario.answerOf("/data/r2-d1[1]/from-r1-d1"), is(stringAnswer("[1]")));
         assertThat(scenario.answerOf("/data/r2-d1[2]/from-r1-d1"), is(stringAnswer("[2]")));
     }
 
     @Test
-    public void handlesRepeatsTwoDeep() throws IOException, XFormParser.ParseException {
+    public void handlesRepeatsTwoDeep() throws IOException {
         Scenario scenario = buildNestedRepeatForm();
 
         assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/from-r1-d2-a"), is(stringAnswer("[1][1]")));
@@ -159,7 +158,7 @@ public class IndexedRepeatTest {
     }
 
     @Test
-    public void handlesRepeatsThreeDeep() throws IOException, XFormParser.ParseException {
+    public void handlesRepeatsThreeDeep() throws IOException {
         Scenario scenario = buildNestedRepeatForm();
 
         assertThat(scenario.answerOf("/data/r2-d1[1]/r2-d2[1]/r2-d3[1]/from-r1-d3-a"), is(stringAnswer("[1][1][1]")));
@@ -181,7 +180,7 @@ public class IndexedRepeatTest {
         assertThat(scenario.answerOf("/data/r2-d1[2]/r2-d2[2]/r2-d3[2]/from-r1-d3-b"), is(stringAnswer("[2][2][2]")));
     }
 
-    public static Scenario buildNestedRepeatForm() throws IOException, XFormParser.ParseException {
+    public static Scenario buildNestedRepeatForm() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("indexed-repeat"),

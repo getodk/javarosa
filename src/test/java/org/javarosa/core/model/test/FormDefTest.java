@@ -58,7 +58,7 @@ import org.junit.Test;
  */
 public class FormDefTest {
     @Test
-    public void enforces_constraints_defined_in_a_field() throws XFormParser.ParseException {
+    public void enforces_constraints_defined_in_a_field() {
         Scenario scenario = Scenario.init(r("ImageSelectTester.xhtml"));
         scenario.next();
         scenario.next();
@@ -103,7 +103,7 @@ public class FormDefTest {
 
     //region Repeat relevance
     @Test
-    public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException, XFormParser.ParseException {
+    public void repeatRelevanceChanges_whenDependentValuesOfRelevanceExpressionChange() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Repeat relevance - dynamic expression"),
@@ -132,7 +132,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatIsIrrelevant_whenRelevanceSetToFalse() throws IOException, XFormParser.ParseException {
+    public void repeatIsIrrelevant_whenRelevanceSetToFalse() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Repeat relevance - false()"),
@@ -154,7 +154,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatRelevanceChanges_whenDependentValuesOfGrandparentRelevanceExpressionChange() throws IOException, XFormParser.ParseException {
+    public void repeatRelevanceChanges_whenDependentValuesOfGrandparentRelevanceExpressionChange() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Repeat relevance - dynamic expression"),
@@ -187,7 +187,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void repeatIsIrrelevant_whenGrandparentRelevanceSetToFalse() throws IOException, XFormParser.ParseException {
+    public void repeatIsIrrelevant_whenGrandparentRelevanceSetToFalse() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Repeat relevance - false()"),
@@ -214,7 +214,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException, XFormParser.ParseException {
+    public void nestedRepeatRelevance_updatesBasedOnParentPosition() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested repeat relevance"),
@@ -274,7 +274,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void innerRepeatGroupIsIrrelevant_whenItsParentRepeatGroupDoesNotExist() throws IOException, XFormParser.ParseException {
+    public void innerRepeatGroupIsIrrelevant_whenItsParentRepeatGroupDoesNotExist() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested repeat relevance"),
@@ -303,7 +303,7 @@ public class FormDefTest {
     //endregion
 
     @Test
-    public void canCreateRepeat_returnsFalse_when_repeatCountSetButTheGroupItBelongsToDoesNotExist() throws IOException, XFormParser.ParseException {
+    public void canCreateRepeat_returnsFalse_when_repeatCountSetButTheGroupItBelongsToDoesNotExist() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested repeat relevance"),
@@ -340,7 +340,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void fillTemplateString_resolvesRelativeReferences() throws IOException, XFormParser.ParseException {
+    public void fillTemplateString_resolvesRelativeReferences() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("output with relative ref"),
@@ -376,7 +376,7 @@ public class FormDefTest {
     }
 
     @Test
-    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException, XFormParser.ParseException {
+    public void fillTemplateString_resolvesRelativeReferences_inItext() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("output with relative ref in translation"),

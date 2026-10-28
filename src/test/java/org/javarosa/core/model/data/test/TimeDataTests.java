@@ -43,10 +43,8 @@ import java.util.TimeZone;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class TimeDataTests {
@@ -185,7 +183,7 @@ public class TimeDataTests {
 
     @Test
     public void timeIsPreserved_afterDeserialization()
-        throws IOException, DeserializationException, XFormParser.ParseException {
+        throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Time deserialization"),
@@ -459,21 +457,13 @@ public class TimeDataTests {
         );
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
-                assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
         });
 
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
-                assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
         });
     }
 
@@ -506,14 +496,10 @@ public class TimeDataTests {
         );
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
+            Scenario scenario = Scenario.init(form);
 
-                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("25567.9375"));
-                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-25567.9375"));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("25567.9375"));
+            assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-25567.9375"));
         });
     }
 
@@ -538,21 +524,13 @@ public class TimeDataTests {
         );
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
-                assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
         });
 
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
-                assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
         });
     }
 }

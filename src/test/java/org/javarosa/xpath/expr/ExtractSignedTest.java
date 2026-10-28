@@ -9,7 +9,6 @@ import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -170,7 +169,7 @@ public class ExtractSignedTest {
     }
 
     @NotNull
-    private static Scenario createScenario(String encodedContents, String encodedPublicKey) throws IOException, XFormParser.ParseException {
+    private static Scenario createScenario(String encodedContents, String encodedPublicKey) throws IOException {
         return Scenario.init(html(
             head(
                 title("extract signed form"),

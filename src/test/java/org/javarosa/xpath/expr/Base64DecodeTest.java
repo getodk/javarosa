@@ -18,43 +18,42 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.junit.Test;
 
 public class Base64DecodeTest {
 
     @Test
-    public void asciiString_isSuccessfullyDecoded() throws IOException, XFormParser.ParseException {
+    public void asciiString_isSuccessfullyDecoded() throws IOException {
         Scenario scenario = getBase64DecodeScenario("ASCII string", "SGVsbG8=");
         assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("Hello")));
     }
 
     @Test
-    public void exampleFromSaxonica_isSuccessfullyDecoded() throws IOException, XFormParser.ParseException {
+    public void exampleFromSaxonica_isSuccessfullyDecoded() throws IOException {
         Scenario scenario = getBase64DecodeScenario("Example from Saxonica", "RGFzc2Vs");
         assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("Dassel")));
     }
 
     @Test
-    public void accentString_isSuccessfullyDecoded() throws IOException, XFormParser.ParseException {
+    public void accentString_isSuccessfullyDecoded() throws IOException {
         Scenario scenario = getBase64DecodeScenario("String with accented characters", "w6nDqMOx");
         assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("éèñ")));
     }
 
     @Test
-    public void emojiString_isSuccessfullyDecoded() throws IOException, XFormParser.ParseException {
+    public void emojiString_isSuccessfullyDecoded() throws IOException {
         Scenario scenario = getBase64DecodeScenario("String with emoji", "8J+lsA==");
         assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("🥰")));
     }
 
     @Test
-    public void utf16String_isDecodedToGarbage() throws IOException, XFormParser.ParseException {
+    public void utf16String_isDecodedToGarbage() throws IOException {
         Scenario scenario = getBase64DecodeScenario("UTF-16 encoded string", "AGEAYgBj");
         assertThat(scenario.answerOf("/data/decoded"), is(stringAnswer("\u0000a\u0000b\u0000c"))); // source string: "abc" in UTF-16
     }
 
-    private static Scenario getBase64DecodeScenario(String testName, String source) throws IOException, XFormParser.ParseException {
+    private static Scenario getBase64DecodeScenario(String testName, String source) throws IOException {
         return Scenario.init(html(
             head(
                 title(testName),
@@ -74,7 +73,7 @@ public class Base64DecodeTest {
     }
 
     @Test
-    public void base64DecodeFunction_throwsWhenNotExactlyOneArg() throws IOException, XFormParser.ParseException {
+    public void base64DecodeFunction_throwsWhenNotExactlyOneArg() throws IOException {
         try {
             Scenario scenario = Scenario.init(html(
                 head(
@@ -100,7 +99,7 @@ public class Base64DecodeTest {
     }
 
     @Test
-    public void base64DecodeFunction_returnsEmptyStringWhenInputInvalid() throws IOException, XFormParser.ParseException {
+    public void base64DecodeFunction_returnsEmptyStringWhenInputInvalid() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Invalid base64 string"),

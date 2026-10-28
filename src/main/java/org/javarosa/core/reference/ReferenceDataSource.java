@@ -19,7 +19,6 @@ package org.javarosa.core.reference;
 import org.javarosa.core.services.locale.LocaleDataSource;
 import org.javarosa.core.services.locale.LocalizationUtils;
 import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 import java.io.DataInputStream;
@@ -77,7 +76,7 @@ public class ReferenceDataSource implements LocaleDataSource {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-        throws IOException, DeserializationException {
+        throws IOException {
         referenceURI = in.readUTF();
     }
 

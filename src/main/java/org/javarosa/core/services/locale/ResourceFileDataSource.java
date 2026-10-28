@@ -20,7 +20,6 @@
 package org.javarosa.core.services.locale;
 
 import org.javarosa.core.util.OrderedMap;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 import java.io.DataInputStream;
@@ -72,7 +71,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
      * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         resourceURI = in.readUTF();
     }
 

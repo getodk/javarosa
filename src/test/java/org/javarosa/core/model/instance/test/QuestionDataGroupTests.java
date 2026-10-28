@@ -32,7 +32,6 @@ import org.javarosa.core.model.instance.AbstractTreeElement;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +87,7 @@ public class QuestionDataGroupTests {
                 return newReference;
             }
             */
-            public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
+            public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {}
 
             public void writeExternal(DataOutputStream out) throws IOException {};
 
@@ -123,7 +122,7 @@ public class QuestionDataGroupTests {
                 return newReference;
             }
             */
-            public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
+            public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {}
 
             public void writeExternal(DataOutputStream out) throws IOException {};
 

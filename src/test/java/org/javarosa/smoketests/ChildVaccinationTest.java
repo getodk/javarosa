@@ -19,7 +19,6 @@ package org.javarosa.smoketests;
 
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -62,7 +61,7 @@ public class ChildVaccinationTest {
     public static final LocalDate TODAY = LocalDate.now();
 
     @Test
-    public void smoke_test() throws XFormParser.ParseException {
+    public void smoke_test() {
         Scenario scenario = Scenario.init("child_vaccination_VOL_tool_v12.xml");
 
         // region Answer questions about the building

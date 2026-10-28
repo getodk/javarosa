@@ -35,13 +35,12 @@ import static org.javarosa.test.XFormsElement.title;
 
 import java.io.IOException;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class FormEntryPromptTest {
     //region Binding of select choice values to labels
     @Test
-    public void getSelectItemText_onSelectionFromDynamicSelect_withoutTranslations_returnsLabelInnerText() throws IOException, XFormParser.ParseException {
+    public void getSelectItemText_onSelectionFromDynamicSelect_withoutTranslations_returnsLabelInnerText() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select"),
@@ -70,7 +69,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getSelectItemText_onSelectionFromDynamicSelect_withTranslations_returnsCorrectTranslation() throws IOException, XFormParser.ParseException {
+    public void getSelectItemText_onSelectionFromDynamicSelect_withTranslations_returnsCorrectTranslation() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Multilingual dynamic select"),
@@ -115,7 +114,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getSelectItemText_onSelectionsInRepeatInstances_returnsLabelInnerText() throws IOException, XFormParser.ParseException {
+    public void getSelectItemText_onSelectionsInRepeatInstances_returnsLabelInnerText() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select"),
@@ -152,7 +151,7 @@ public class FormEntryPromptTest {
     //endregion
 
     @Test
-    public void getRequiredText_shouldReturnNullIfRequiredTextNotSpecified() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_shouldReturnNullIfRequiredTextNotSpecified() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -175,7 +174,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingItextFunction() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -205,7 +204,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getRequiredText_shouldReturnRequiredTextIfItextFunctionIsSurroundedByWhitespace() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_shouldReturnRequiredTextIfItextFunctionIsSurroundedByWhitespace() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -235,7 +234,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getRequiredText_shouldReturnRequiredTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_shouldReturnRequiredTextWithOutputValuesIfSpecifiedUsingItextFunction() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -269,7 +268,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawString() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_shouldReturnRequiredTextIfSpecifiedUsingRawString() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -292,7 +291,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getRequiredText_treatsRawStringAsLiteralEvenWhenValidXPath() throws XFormParser.ParseException, IOException {
+    public void getRequiredText_treatsRawStringAsLiteralEvenWhenValidXPath() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Required questions"),
@@ -320,7 +319,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_shouldReturnNullIfConstraintTextNotSpecified() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_shouldReturnNullIfConstraintTextNotSpecified() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),
@@ -343,7 +342,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingItextFunction() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),
@@ -373,7 +372,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_shouldReturnConstraintTextIfItextFunctionIsSurroundedByWhitespace() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_shouldReturnConstraintTextIfItextFunctionIsSurroundedByWhitespace() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),
@@ -403,7 +402,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_shouldReturnConstraintTextWithOutputValuesIfSpecifiedUsingItextFunction() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_shouldReturnConstraintTextWithOutputValuesIfSpecifiedUsingItextFunction() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),
@@ -437,7 +436,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingRawString() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_shouldReturnConstraintTextIfSpecifiedUsingRawString() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),
@@ -460,7 +459,7 @@ public class FormEntryPromptTest {
     }
 
     @Test
-    public void getConstraintText_treatsRawStringAsLiteralEvenWhenValidXPath() throws XFormParser.ParseException, IOException {
+    public void getConstraintText_treatsRawStringAsLiteralEvenWhenValidXPath() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Constrained questions"),

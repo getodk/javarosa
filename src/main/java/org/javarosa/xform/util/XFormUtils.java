@@ -29,7 +29,6 @@ import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.parse.XFormParserFactory;
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.kdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,11 +178,11 @@ public class XFormUtils {
         return returnForm;
     }
 
-    public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc, boolean partial) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
+    public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc, boolean partial) throws InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
         return externalInstanceParserFactory.getExternalInstanceParser().parse(referenceManager, id, instanceSrc, partial);
     }
 
-    public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
+    public static TreeElement getExternalInstance(ReferenceManager referenceManager, String id, String instanceSrc) throws InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
         return getExternalInstance(referenceManager, id, instanceSrc, false);
     }
 
