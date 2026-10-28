@@ -34,7 +34,6 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -182,9 +181,8 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeIsPreserved_afterDeserialization()
-        throws IOException {
-        Scenario scenario = Scenario.init(html(
+    public void timeIsPreserved_afterDeserialization() {
+        XFormsElement form = html(
             head(
                 title("Time deserialization"),
                 model(
@@ -197,8 +195,11 @@ public class TimeDataTests {
             body(
                 input("/data/time")
             )
-        ));
+        );
 
+        Scenario scenario = withTimeZone(TimeZone.getTimeZone("GMT+07:00"), () ->
+            Scenario.init(form)
+        );
         scenario.next();
         scenario.answer(new TimeData().cast(new UncastData("10:45:00")));
 
@@ -210,7 +211,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeIsPreserved_afterInstanceDeserializationAcrossTimezoneChange() throws Exception {
+    public void timeIsPreserved_afterInstanceDeserializationAcrossTimezoneChange() {
         XFormsElement form = html(
             head(
                 title("Time deserialization across timezones"),
@@ -226,7 +227,9 @@ public class TimeDataTests {
             )
         );
 
-        Scenario scenario = Scenario.init(form);
+        Scenario scenario = withTimeZone(TimeZone.getTimeZone("UTC"), () ->
+            Scenario.init(form)
+        );
         scenario.next();
         scenario.answer(new TimeData().cast(new UncastData("10:45:00")));
 
@@ -244,7 +247,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void legacyInstanceWithTimeWithOffset_isDeserializedWithoutTimezoneConversion() throws Exception {
+    public void legacyInstanceWithTimeWithOffset_isDeserializedWithoutTimezoneConversion() {
         XFormsElement form = html(
             head(
                 title("Legacy time default across timezone change"),
@@ -264,7 +267,9 @@ public class TimeDataTests {
                 "<time>10:45:00.000-08:00</time>" +
                 "</data>";
 
-        Scenario.init(form);
+        Scenario scenario = withTimeZone(TimeZone.getTimeZone("UTC"), () ->
+            Scenario.init(form)
+        );
 
         Scenario deserialized = withTimeZone(TimeZone.getTimeZone("GMT-07:00"), () -> Scenario.deserializeInstance(
                 form,
@@ -280,8 +285,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void legacyTimeDefault_isPreservedAfterFormSerializationAcrossTimezoneChange()
-        throws Exception {
+    public void legacyTimeDefault_isPreservedAfterFormSerializationAcrossTimezoneChange() {
         XFormsElement form = html(
             head(
                 title("Legacy time default across timezone change"),
@@ -315,7 +319,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeCalculate_usingNow_isPreservedAcrossTimezoneChange() throws Exception {
+    public void timeCalculate_usingNow_isPreservedAcrossTimezoneChange() {
         XFormsElement form = html(
             head(
                 title("Calculated time across timezone change"),
@@ -356,7 +360,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeSubtraction_withDecimalTime_isIndependentOfTimezone() throws Exception {
+    public void timeSubtraction_withDecimalTime_isIndependentOfTimezone() {
         XFormsElement form = html(
             head(
                 title("Time subtraction"),
@@ -397,7 +401,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeSubtraction_withoutDecimalTime_isIndependentOfTimezone() throws Exception {
+    public void timeSubtraction_withoutDecimalTime_isIndependentOfTimezone() {
         XFormsElement form = html(
             head(
                 title("Direct time subtraction"),
@@ -438,7 +442,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeNumericConversions_areFractionalTime_acrossTimezones() throws Exception {
+    public void timeNumericConversions_areFractionalTime_acrossTimezones() {
         XFormsElement form = html(
             head(
                 title("Time numeric conversions"),
@@ -504,7 +508,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void time_castsToString_acrossTimezones() throws Exception {
+    public void time_castsToString_acrossTimezones() {
         XFormsElement form = html(
             head(
                 title("Time to string conversion"),
