@@ -828,12 +828,16 @@ public class XPathFuncExpr extends XPathExpression {
             val = (String) o;
         } else if (o instanceof Date) {
             Date d = (Date) o;
-            // java.util.Date does not distinguish XForms date from dateTime. DateData values
-            // are normalized to local midnight, so treat midnight Dates as date-only values.
-            // This means dateTime values exactly at midnight will also be displayed as dates.
-            val = DateUtils.isMidnight(d) ?
-                DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601)
-                : DateUtils.formatDateTime(d, DateUtils.FORMAT_ISO8601);
+            // Date cannot distinguish XForms types. Treat sentinel dates as times,
+            // midnight as dates, and everything else as dateTime.
+            // Actual dates on the sentinel and dateTimes at midnight are ambiguous.
+            if (DateUtils.isTime(d)) {
+                val = DateUtils.format(d, "%H:%M:%S");
+            } else if (DateUtils.isMidnight(d)) {
+                val = DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601);
+            } else {
+                val = DateUtils.formatDateTime(d, DateUtils.FORMAT_ISO8601);
+            }
         } else if (o instanceof IExprDataType) {
             val = ((IExprDataType) o).toString();
         }

@@ -18,6 +18,7 @@ package org.javarosa.test.utils;
 
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -31,6 +32,17 @@ public class SystemHelper {
         TimeZone.setDefault(timeZone);
         block.accept(timeZone);
         TimeZone.setDefault(backupZone);
+    }
+
+    public static <T> T withTimeZone(TimeZone timeZone, Callable<T> block) throws Exception {
+        TimeZone backupZone = TimeZone.getDefault();
+        TimeZone.setDefault(timeZone);
+
+        try {
+            return block.call();
+        } finally {
+            TimeZone.setDefault(backupZone);
+        }
     }
 
     public static void withLocale(Locale locale, Runnable block) {

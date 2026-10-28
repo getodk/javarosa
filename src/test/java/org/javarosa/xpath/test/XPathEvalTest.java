@@ -199,6 +199,23 @@ public class XPathEvalTest {
         testEval("string('  ')", "  ");
         testEval("string('a string')", "a string");
         testEval("string(date('1989-11-09'))", "1989-11-09");
+        withLocaleAndTimeZone(locale, GMT, () -> {
+            // Sentinel takes precedence over midnight.
+            testEval("string(date('1900-01-01'))", "00:00:00");
+            testEval("string(date-time('1900-01-01T10:30:00'))", "10:30:00");
+
+            // Midnight takes precedence over dateTime.
+            testEval("string(date('2024-07-15'))", "2024-07-15");
+            testEval("string(date-time('2024-07-15T00:00:00'))", "2024-07-15");
+
+            // Other values remain dateTimes.
+            testEval("string(date-time('2024-07-15T10:30:00'))",
+                "2024-07-15T10:30:00.000Z");
+        });
+        withLocaleAndTimeZone(locale, TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            testEval("string(date-time('1900-01-01T00:00:00'))", "00:00:00");
+            testEval("string(date-time('1900-01-01T10:30:00'))", "10:30:00");
+        });
         testEval("string(convertible())", null, ec, "hi");
         testEval("string(inconvertible())", null, ec, new XPathTypeMismatchException());
         testEval("int('100')", 100.0);

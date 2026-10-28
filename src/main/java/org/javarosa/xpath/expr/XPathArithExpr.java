@@ -43,8 +43,8 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
     }
 
     public Object eval (DataInstance model, EvaluationContext evalContext) {
-        double aval = XPathFuncExpr.toNumeric(a.eval(model, evalContext)).doubleValue();
-        double bval = XPathFuncExpr.toNumeric(b.eval(model, evalContext)).doubleValue();
+        double aval = XPathFuncExpr.toDouble(a.eval(model, evalContext)).doubleValue();
+        double bval = XPathFuncExpr.toDouble(b.eval(model, evalContext)).doubleValue();
 
         double result = 0;
         switch (op) {
