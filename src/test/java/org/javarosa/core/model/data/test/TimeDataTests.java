@@ -37,12 +37,12 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.TimeZone;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.UncastData;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
@@ -66,11 +66,7 @@ public class TimeDataTests {
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
             TimeData data = new TimeData().cast(new UncastData("10:30:00"));
 
-            LocalDateTime value = ((Date) data.getValue()).toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-
-            assertThat(value, is(LocalDateTime.of(1900, 1, 1, 10, 30)));
+            assertThat(data.getValue(), is(DateUtils.getDateForTime(LocalTime.parse("10:30:00"))));
         });
     }
 

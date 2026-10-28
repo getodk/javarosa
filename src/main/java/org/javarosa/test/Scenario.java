@@ -266,8 +266,7 @@ public class Scenario {
      * Returns a new Scenario instance using a new form obtained by
      * serializing and deserializing the form being used by this instance.
      */
-    public Scenario serializeAndDeserializeForm()
-        throws IOException, DeserializationException {
+    public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
         return deserializeForm(serializeForm());
     }
 

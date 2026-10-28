@@ -831,7 +831,7 @@ public class XPathFuncExpr extends XPathExpression {
             // Date cannot distinguish XForms types. Treat sentinel dates as times,
             // midnight as dates, and everything else as dateTime.
             // Actual dates on the sentinel and dateTimes at midnight are ambiguous.
-            if (DateUtils.isTimeSentinel(d)) {
+            if (DateUtils.isTime(d)) {
                 val = DateUtils.format(d, "%H:%M:%S");
             } else if (DateUtils.isMidnight(d)) {
                 val = DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601);

@@ -70,11 +70,7 @@ public class TimeData implements IAnswerData {
 
     @Override
     public @NotNull Object getValue() {
-        return Date.from(
-            DateUtils.TIME_SENTINEL.atTime(time)
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-        );
+        return DateUtils.getDateForTime(time);
     }
 
     @Override

@@ -17,6 +17,7 @@
 package org.javarosa.core.model.utils;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +52,7 @@ public class DateUtils {
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
     public static final long DAY_IN_MS = 86400000l;
-    public static final LocalDate TIME_SENTINEL = LocalDate.of(1900, 1, 1);
+    private static final LocalDate TIME_SENTINEL = LocalDate.of(1900, 1, 1);
 
     public DateUtils() {
         super();
@@ -580,11 +581,19 @@ public class DateUtils {
             && c.get(Calendar.MILLISECOND) == 0;
     }
 
-    public static boolean isTimeSentinel(Date date) {
+    public static boolean isTime(Date date) {
         return date.toInstant()
             .atZone(ZoneId.systemDefault())
             .toLocalDate()
             .equals(TIME_SENTINEL);
+    }
+
+    public static Date getDateForTime(LocalTime time) {
+        return Date.from(
+            DateUtils.TIME_SENTINEL.atTime(time)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+        );
     }
 
     public static Date today () {
