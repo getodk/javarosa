@@ -203,7 +203,7 @@ public class XPathFuncExpr extends XPathExpression {
             return toBoolean(argVals[0]);
         } else if (name.equals("number")) {
             assertArgsCount(name, args, 1);
-            return toNumeric(argVals[0]);
+            return toDouble(argVals[0]);
         } else if (name.equals("int")) { //non-standard
             assertArgsCount(name, args, 1);
             return toInt(argVals[0]);
@@ -701,7 +701,7 @@ public class XPathFuncExpr extends XPathExpression {
         }
 
         if (o instanceof Date) {
-            return DateUtils.fractionalDaysSinceEpoch((Date) o);
+            return DateUtils.toDouble((Date) o);
         } else {
             return toNumeric(o);
         }
