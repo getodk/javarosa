@@ -2,6 +2,8 @@ package org.javarosa.core.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.javarosa.test.Scenario.getRef;
+import static org.junit.Assert.assertThrows;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
@@ -17,6 +19,9 @@ import static org.javarosa.test.XFormsElement.title;
 
 import java.io.IOException;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InvalidReferenceException;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.Scenario;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.xform.parse.XFormParser;
@@ -167,5 +172,29 @@ public class RepeatTest {
         // would always be equivalent to /data/outer[1]/inner[1]/innerq1
         assertThat(scenario.answerOf("/data/outer[1]/inner[2]/innercalcabs"), is(new IntegerData(21)));
         assertThat(scenario.answerOf("/data/outer[1]/inner[2]/innercalcrel"), is(new IntegerData(21)));
+    }
+
+    @Test
+    public void creatingRepeatInstance_thatWouldLeaveAGap_throwsException() throws Exception {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Repeat"),
+                model(
+                    mainInstance(t("data id=\"repeat\"",
+                        t("repeat",
+                            t("q1"))
+                    ))
+                )),
+            body(
+                repeat("/data/repeat",
+                    input("/data/repeat/q1")
+                )
+            )));
+
+        FormInstance mainInstance = scenario.getFormDef().getMainInstance();
+        TreeReference thirdRepeat = getRef("/data/repeat[3]");
+
+        InvalidReferenceException exception = assertThrows(InvalidReferenceException.class, () -> mainInstance.copyNode(mainInstance.getTemplate(thirdRepeat), thirdRepeat));
+        assertThat(exception.getMessage(), is("Destination /data/repeat[3] would leave a gap: there are 1 existing children named 'repeat'"));
     }
 }
