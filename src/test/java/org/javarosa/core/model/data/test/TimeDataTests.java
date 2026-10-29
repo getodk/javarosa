@@ -555,4 +555,38 @@ public class TimeDataTests {
             }
         });
     }
+
+    @Test
+    public void addingFractionalDayToTime_returnsExpectedTime() {
+        XFormsElement form = html(
+            head(
+                title("Time and number addition"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-number-addition\"",
+                            t("time", "10:30:00"),
+                            t("result")
+                        )
+                    ),
+                    bind("/data/time").type("time"),
+                    bind("/data/result").type("time").calculate("/data/time + 0.5")
+                )
+            ),
+            body(
+                input("/data/time")
+            )
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+
+                assertThat(
+                    scenario.answerOf("/data/result").getDisplayText(), is("0.9375") // 22:30:00
+                );
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 }
