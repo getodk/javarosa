@@ -136,6 +136,9 @@ public class FormInstance extends DataInstance<TreeElement> implements Persistab
             dstMult = parent.getChildMultiplicity(dstName);
         } else if (parent.getChild(dstName, dstMult) != null) {
             throw new InvalidReferenceException("Destination already exists!", to);
+        } else if (dstMult > parent.getChildMultiplicity(dstName)) {
+            throw new InvalidReferenceException("Destination " + to.toString(true) + " would leave a gap: there are "
+                + parent.getChildMultiplicity(dstName) + " existing children named '" + dstName + "'", to);
         }
 
         TreeElement dest = src.deepCopy(false);
