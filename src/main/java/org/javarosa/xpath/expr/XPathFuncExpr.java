@@ -701,7 +701,7 @@ public class XPathFuncExpr extends XPathExpression {
         }
 
         if (o instanceof Date) {
-            return DateUtils.fractionalDaysSinceEpoch((Date) o);
+            return DateUtils.toDouble((Date) o);
         } else {
             return toNumeric(o);
         }
