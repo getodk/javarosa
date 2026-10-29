@@ -34,6 +34,7 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -44,6 +45,7 @@ import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
+import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class TimeDataTests {
@@ -442,7 +444,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeNumericConversions_areFractionalTime_acrossTimezones() {
+    public void decimalTime_isFractionalTime_acrossTimezones() {
         XFormsElement form = html(
             head(
                 title("Time numeric conversions"),
@@ -455,6 +457,36 @@ public class TimeDataTests {
                     ),
                     bind("/data/time").type("time"),
                     bind("/data/decimalTime").type("decimal").calculate("decimal-time(/data/time)")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
+        });
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
+        });
+    }
+
+    @Test
+    public void number_isFractionalTime_acrossTimezones() throws Exception {
+        XFormsElement form = html(
+            head(
+                title("Time numeric conversions"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-numeric\"",
+                            t("time", "10:30:00"),
+                            t("decimalTime")
+                        )
+                    ),
+                    bind("/data/time").type("time"),
+                    bind("/data/decimalTime").type("decimal").calculate("number(/data/time)")
                 )
             ),
             body(input("/data/time"))
@@ -501,9 +533,8 @@ public class TimeDataTests {
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
             Scenario scenario = Scenario.init(form);
-
-            assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("25567.9375"));
-            assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-25567.9375"));
+                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("0.9375"));
+                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-0.9375"));
         });
     }
 
@@ -560,15 +591,11 @@ public class TimeDataTests {
         );
 
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
+            Scenario scenario = Scenario.init(form);
 
-                assertThat(
-                    scenario.answerOf("/data/result").getDisplayText(), is("0.9375") // 22:30:00
-                );
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            assertThat(
+                scenario.answerOf("/data/result").getDisplayText(), is("0.9375") // 22:30:00
+            );
         });
     }
 }
