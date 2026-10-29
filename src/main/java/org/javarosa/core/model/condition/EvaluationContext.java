@@ -296,7 +296,9 @@ public class EvaluationContext {
                 for (int i = 0; i < count; i++) {
                     TreeElement child = childrenWithName.get(i);
                     if (child.getMultiplicity() != i) {
-                        throw new IllegalStateException("Unexpected multiplicity mismatch");
+                        throw new IllegalStateException("Unexpected multiplicity mismatch expanding " + sourceRef.toString(true)
+                            + " at " + workingRef.toString(true) + ": " + count + " children match '" + name
+                            + "' but child " + (i + 1) + " is " + child.getName() + "[" + (child.getMultiplicity() + 1) + "]");
                     }
                     treeReferences.add(child.getRef());
                 }
