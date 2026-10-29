@@ -784,6 +784,8 @@ public class DateUtils {
     public static double toDouble(Date d) {
         if (isTime(d)) {
             return decimalTimeOfLocalDay(d);
+        } else if (isMidnight(d)) {
+            return daysSinceEpoch(d);
         } else {
             return fractionalDaysSinceEpoch(d);
         }

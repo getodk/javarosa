@@ -440,7 +440,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void timeNumericConversions_areFractionalTime_acrossTimezones() throws Exception {
+    public void decimalTime_isFractionalTime_acrossTimezones() {
         XFormsElement form = html(
             head(
                 title("Time numeric conversions"),
@@ -453,6 +453,44 @@ public class TimeDataTests {
                     ),
                     bind("/data/time").type("time"),
                     bind("/data/decimalTime").type("decimal").calculate("decimal-time(/data/time)")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+                assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            try {
+                Scenario scenario = Scenario.init(form);
+                assertThat(scenario.answerOf("/data/decimalTime").getDisplayText(), is("0.4375"));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Test
+    public void number_isFractionalTime_acrossTimezones() throws Exception {
+        XFormsElement form = html(
+            head(
+                title("Time numeric conversions"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-numeric\"",
+                            t("time", "10:30:00"),
+                            t("decimalTime")
+                        )
+                    ),
+                    bind("/data/time").type("time"),
+                    bind("/data/decimalTime").type("decimal").calculate("number(/data/time)")
                 )
             ),
             body(input("/data/time"))
@@ -509,8 +547,8 @@ public class TimeDataTests {
             try {
                 Scenario scenario = Scenario.init(form);
 
-                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("25567.9375"));
-                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-25567.9375"));
+                assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("0.9375"));
+                assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-0.9375"));
             } catch (IOException | XFormParser.ParseException e) {
                 throw new RuntimeException(e);
             }
