@@ -149,11 +149,43 @@ public class DateTimeTest {
                 throw new RuntimeException(e);
             }
 
-            // In UTC+13:30, it's 2021-12-01 already
+            // In UTC+13, it's 2021-12-01 already
             scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
 
             assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
             assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-02"));
+        });
+    }
+
+    @Test
+    public void dateTimeArithmetic_whenInstantFallsOnSameLocalDate_preservesDateTimeType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario;
+            try {
+                scenario = Scenario.init(html(
+                    head(title("DateTime arithmetic"),
+                        model(
+                            mainInstance(t("data id=\"datetime-arithmetic\"",
+                                t("dateTime"),
+                                t("nextDateTime")
+                            )),
+                            bind("/data/dateTime").type("dateTime"),
+                            bind("/data/nextDateTime").type("dateTime").calculate("/data/dateTime + 1")
+                        )
+                    ),
+                    body(
+                        input("/data/dateTime")
+                    )
+                ));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            scenario.answer("/data/dateTime", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDateTime"), instanceOf(DateTimeData.class));
+            assertThat(scenario.answerOf("/data/nextDateTime").uncast().getValue(),
+                is("2021-12-01T12:00:00.000Z"));
         });
     }
 
