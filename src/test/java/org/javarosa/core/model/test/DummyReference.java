@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -47,7 +46,7 @@ public class DummyReference implements IDataReference {
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         ref = in.readUTF();
 
     }

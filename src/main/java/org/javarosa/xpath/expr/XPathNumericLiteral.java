@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.instance.DataInstance;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +62,7 @@ public class XPathNumericLiteral extends XPathExpression {
         }
     }
 
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         if (in.readByte() == (byte)0x00) {
             d = ExtUtil.readNumeric(in);
         } else {

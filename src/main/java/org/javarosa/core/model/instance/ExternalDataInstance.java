@@ -1,5 +1,9 @@
 package org.javarosa.core.model.instance;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -9,15 +13,9 @@ import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xml.TreeElementParser;
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 // This is still a work in progress.
 
@@ -54,12 +52,11 @@ public class ExternalDataInstance extends DataInstance {
      * @param instanceId  the ID of the new instance
      * @return a new ExternalDataInstance
      * @throws IOException                       if ElementParser can’t read the stream
-     * @throws UnfullfilledRequirementsException thrown by {@link TreeElementParser#parse()}
      * @throws XmlPullParserException            thrown by {@link TreeElementParser#parse()}
      * @throws InvalidStructureException         thrown by {@link TreeElementParser#parse()}
      */
     public static ExternalDataInstance build(String instanceSrc, String instanceId)
-        throws IOException, UnfullfilledRequirementsException, XmlPullParserException, InvalidStructureException {
+        throws IOException, XmlPullParserException, InvalidStructureException {
         TreeElement root;
         try {
             root = XFormUtils.getExternalInstance(ReferenceManager.instance(), instanceId, instanceSrc, true);
@@ -84,7 +81,7 @@ public class ExternalDataInstance extends DataInstance {
             try {
                 parseExternalFile(false);
             } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException |
-                     UnfullfilledRequirementsException | IOException exception) {
+                     IOException exception) {
                 throw new RuntimeException(new DeserializationException("Unable to parse external instance: " + exception));
             }
 
@@ -126,8 +123,7 @@ public class ExternalDataInstance extends DataInstance {
         path = ExtUtil.readString(in);
         try {
             parseExternalFile(true);
-        } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException |
-                 UnfullfilledRequirementsException e) {
+        } catch (InvalidReferenceException | InvalidStructureException | XmlPullParserException e) {
             throw new DeserializationException("Unable to parse external instance: " + e);
         }
     }
@@ -138,7 +134,7 @@ public class ExternalDataInstance extends DataInstance {
         ExtUtil.write(out, path);
     }
 
-    private void parseExternalFile(boolean partial) throws UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
+    private void parseExternalFile(boolean partial) throws InvalidStructureException, XmlPullParserException, IOException, InvalidReferenceException {
         String instanceId = getInstanceId();
         setRoot(XFormUtils.getExternalInstance(ReferenceManager.instance(), instanceId, path, partial));
     }

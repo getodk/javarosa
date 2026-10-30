@@ -338,7 +338,7 @@ public class Parser {
         return step;
     }
 
-    private static ASTNodeFilterExpr parseFilterExp (ASTNodeAbstractExpr node) throws XPathSyntaxException {
+    private static ASTNodeFilterExpr parseFilterExp (ASTNodeAbstractExpr node) {
         ASTNodeFilterExpr filt = new ASTNodeFilterExpr();
         int i;
         for (i = node.content.size() - 1; i >= 0; i--) {

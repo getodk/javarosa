@@ -19,7 +19,7 @@ public class ExtWrapExternalizable extends ExternalizableWrapper {
     }
 
     @Override
-    public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
 
     }
 

@@ -1,7 +1,6 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import static org.javarosa.test.XFormsElement.title;
 
 public class RandomizeTypesTest {
     @Test
-    public void stringNumberSeedConvertsWhenUsedInNodesetExpression() throws IOException, XFormParser.ParseException {
+    public void stringNumberSeedConvertsWhenUsedInNodesetExpression() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Randomize non-numeric seed"),
@@ -63,7 +62,7 @@ public class RandomizeTypesTest {
     }
 
     @Test
-    public void stringNumberSeedConvertsWhenUsedInCalculate() throws IOException, XFormParser.ParseException {
+    public void stringNumberSeedConvertsWhenUsedInCalculate() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Randomize non-numeric seed"),
@@ -96,7 +95,7 @@ public class RandomizeTypesTest {
     }
 
     @Test
-    public void stringTextSeedConvertsWhenUsedInNodesetExpression() throws IOException, XFormParser.ParseException {
+    public void stringTextSeedConvertsWhenUsedInNodesetExpression() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Randomize non-numeric seed"),
@@ -128,7 +127,7 @@ public class RandomizeTypesTest {
     }
 
     @Test
-    public void stringTextSeedConvertsWhenUsedInCalculate() throws IOException, XFormParser.ParseException {
+    public void stringTextSeedConvertsWhenUsedInCalculate() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Randomize non-numeric seed"),
@@ -158,7 +157,7 @@ public class RandomizeTypesTest {
     }
 
     @Test
-    public void seedInRepeatIsEvaluatedForEachInstance() throws IOException, XFormParser.ParseException {
+    public void seedInRepeatIsEvaluatedForEachInstance() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Randomize non-numeric seed"),
@@ -195,7 +194,7 @@ public class RandomizeTypesTest {
     }
 
     @Test
-    public void seedFromArbitraryInputCanBeUsed() throws IOException, XFormParser.ParseException {
+    public void seedFromArbitraryInputCanBeUsed() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Randomize non-numeric seed"),
@@ -232,7 +231,7 @@ public class RandomizeTypesTest {
     }
 
     @Test
-    public void seed0FromNaNs() throws IOException, XFormParser.ParseException {
+    public void seed0FromNaNs() throws IOException {
         Scenario scenario = Scenario.init(html(
                 head(
                         title("Randomize non-numeric seed"),

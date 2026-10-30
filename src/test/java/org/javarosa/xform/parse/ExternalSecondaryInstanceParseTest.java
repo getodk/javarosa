@@ -1,27 +1,9 @@
 package org.javarosa.xform.parse;
 
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.AbstractTreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.FormParseInit;
-import org.javarosa.test.Scenario;
-import org.javarosa.xpath.expr.XPathPathExpr;
-import org.javarosa.xpath.parser.XPathSyntaxException;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.javarosa.core.reference.ReferenceManagerTestUtils.setUpSimpleReferenceManager;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.ResourcePathHelper.r;
@@ -40,6 +22,24 @@ import static org.javarosa.xpath.XPathParseTool.parseXPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.AbstractTreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.test.FormParseInit;
+import org.javarosa.test.Scenario;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.parser.XPathSyntaxException;
+import org.junit.Test;
 
 public class ExternalSecondaryInstanceParseTest {
 
@@ -77,7 +77,7 @@ public class ExternalSecondaryInstanceParseTest {
     }
 
     @Test
-    public void itemsFromExternalSecondaryGeoJsonInstance_withIntegerIds_canBeSelected() throws XFormParser.ParseException {
+    public void itemsFromExternalSecondaryGeoJsonInstance_withIntegerIds_canBeSelected() {
         configureReferenceManagerCorrectly();
 
         Scenario scenario = Scenario.init(r("external-select-geojson.xml"));
@@ -105,7 +105,7 @@ public class ExternalSecondaryInstanceParseTest {
     //endregion
 
     @Test
-    public void xformParseException_whenItemsetConfiguresValueOrLabelNotInExternalInstance() throws IOException {
+    public void xformParseException_whenItemsetConfiguresValueOrLabelNotInExternalInstance() {
         configureReferenceManagerCorrectly();
 
         try {
@@ -129,13 +129,11 @@ public class ExternalSecondaryInstanceParseTest {
             fail("Expected XFormParseException because itemset references don't exist in external instance");
         } catch (XFormParseException e) {
             // pass
-        } catch (XFormParser.ParseException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Test
-    public void csvSecondaryInstanceWithHeaderOnly_parsesWithoutError() throws IOException, XFormParser.ParseException {
+    public void csvSecondaryInstanceWithHeaderOnly_parsesWithoutError() {
         configureReferenceManagerCorrectly();
 
         Scenario scenario = Scenario.init(html(
@@ -224,15 +222,14 @@ public class ExternalSecondaryInstanceParseTest {
 
     //region Missing external file
     @Test
-    public void emptyPlaceholderInstanceIsUsed_whenExternalInstanceNotFound() throws XFormParser.ParseException {
+    public void emptyPlaceholderInstanceIsUsed_whenExternalInstanceNotFound() {
         configureReferenceManagerIncorrectly();
         Scenario scenario = Scenario.init("external-select-csv.xml");
-
         assertThat(scenario.choicesOf("/data/first").size(), is(0));
     }
 
     @Test
-    public void realInstanceIsResolved_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileNowExists() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void realInstanceIsResolved_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileNowExists() {
         configureReferenceManagerIncorrectly();
         Scenario scenario = Scenario.init("external-select-csv.xml");
 
@@ -246,15 +243,15 @@ public class ExternalSecondaryInstanceParseTest {
 
     @Test
     // Clients would typically catch this exception and try parsing the form again which would succeed by using the placeholder.
-    public void fileNotFoundException_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileStillMissing() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void fileNotFoundException_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileStillMissing() {
         configureReferenceManagerIncorrectly();
         Scenario scenario = Scenario.init("external-select-csv.xml");
 
         try {
             scenario.serializeAndDeserializeForm();
             fail("Expected FileNotFoundException");
-        } catch (FileNotFoundException e) {
-            // pass
+        } catch (RuntimeException e) {
+            assertThat(e.getCause(), instanceOf(FileNotFoundException.class));
         }
     }
 
@@ -262,7 +259,7 @@ public class ExternalSecondaryInstanceParseTest {
     // It would be possible for a formdef to be serialized without access to the external secondary instance and then
     // deserialized with access. In that case, there's nothing to validate that the value and label references for a
     // dynamic select correspond to real nodes in the secondary instance so there's a runtime exception when making a choice.
-    public void exceptionFromChoiceSelection_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileMissingColumns() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void exceptionFromChoiceSelection_whenFormIsDeserialized_afterPlaceholderInstanceUsed_andFileMissingColumns() {
         configureReferenceManagerIncorrectly();
 
         Scenario scenario = Scenario.init(html(

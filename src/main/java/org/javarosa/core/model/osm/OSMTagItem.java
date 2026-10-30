@@ -1,6 +1,5 @@
 package org.javarosa.core.model.osm;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -17,7 +16,7 @@ public class OSMTagItem implements Externalizable {
     public String label;
     public String value;
 
-    public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException {
         label = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
         value = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
     }

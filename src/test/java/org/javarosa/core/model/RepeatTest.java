@@ -24,7 +24,6 @@ import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.test.Scenario;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class RepeatTest {
@@ -119,7 +118,7 @@ public class RepeatTest {
      * create relative references in expressions within a repeat. We currently maintain this behavior for legacy purposes.
      */
     @Test
-    public void absoluteSingleNodePaths_areQualified_forLegacyPurposes() throws IOException, XFormParser.ParseException {
+    public void absoluteSingleNodePaths_areQualified_forLegacyPurposes() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Absolute relative ref"),

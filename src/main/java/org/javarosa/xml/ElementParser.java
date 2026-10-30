@@ -1,7 +1,6 @@
 package org.javarosa.xml;
 
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.io.KXmlParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public abstract class ElementParser<T> {
      * @throws XmlPullParserException    If the document does not contain well-
      *                                   formed XML.
      */
-    public abstract T parse() throws InvalidStructureException, IOException, XmlPullParserException, UnfullfilledRequirementsException;
+    public abstract T parse() throws InvalidStructureException, IOException, XmlPullParserException;
 
 
     int nextNonWhitespace() throws XmlPullParserException, IOException {

@@ -6,7 +6,6 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -165,7 +164,7 @@ public class SelectChoice implements Externalizable, Localizable {
         // }
     }
 
-    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         isLocalizable = ExtUtil.readBool(in);
         setLabelInnerText(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
         setTextID(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
