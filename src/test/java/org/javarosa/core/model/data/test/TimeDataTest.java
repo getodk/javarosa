@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.javarosa.core.test.AnswerDataMatchers.timeAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
@@ -49,7 +50,7 @@ import org.javarosa.test.XFormsElement;
 import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
-public class TimeDataTests {
+public class TimeDataTest {
 
     @Test
     public void getValue_doesNotExposeMutableState() {
@@ -437,6 +438,35 @@ public class TimeDataTests {
         );
         assertThat(Double.parseDouble(scenario.answerOf("/data/duration").uncast().getString()),
             is(closeTo(1.5, 0.000001)));
+    }
+
+    @Test
+    public void timeArithmetic_preservesTimeType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario;
+            try {
+                scenario = Scenario.init(html(
+                    head(title("Time arithmetic"),
+                        model(
+                            mainInstance(t("data id=\"time-arithmetic\"",
+                                t("time"),
+                                t("nextTime")
+                            )),
+                            bind("/data/time").type("time"),
+                            bind("/data/nextTime").type("time").calculate("/data/time + 0.25")
+                        )
+                    ),
+                    body(input("/data/time"))
+                ));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            scenario.answer("/data/time", Instant.parse("1974-05-20T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextTime"), instanceOf(TimeData.class));
+            assertThat(scenario.answerOf("/data/nextTime").uncast().getValue(), is("18:00:00"));
+        });
     }
 
     @Test
