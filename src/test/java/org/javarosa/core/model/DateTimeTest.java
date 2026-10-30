@@ -17,7 +17,6 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.TimeZone;
 import org.javarosa.core.model.data.DateData;

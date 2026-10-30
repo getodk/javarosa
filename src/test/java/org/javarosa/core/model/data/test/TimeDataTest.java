@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.javarosa.core.test.AnswerDataMatchers.timeAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
@@ -46,7 +47,9 @@ import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
 import org.junit.Test;
 
-public class TimeDataTests {
+import javax.xml.xpath.XPath;
+
+public class TimeDataTest {
 
     @Test
     public void getValue_doesNotExposeMutableState() {
@@ -442,7 +445,32 @@ public class TimeDataTests {
     }
 
     @Test
-    public void decimalTime_isFractionalTime_acrossTimezones() {
+    public void timeArithmetic_preservesTimeType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario;
+            scenario = Scenario.init(html(
+                head(title("Time arithmetic"),
+                    model(
+                        mainInstance(t("data id=\"time-arithmetic\"",
+                            t("time"),
+                            t("nextTime")
+                        )),
+                        bind("/data/time").type("time"),
+                        bind("/data/nextTime").type("time").calculate("/data/time + 0.25")
+                    )
+                ),
+                body(input("/data/time"))
+            ));
+
+            scenario.answer("/data/time", Instant.parse("1974-05-20T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextTime"), instanceOf(TimeData.class));
+            assertThat(scenario.answerOf("/data/nextTime").uncast().getValue(), is("18:00:00"));
+        });
+    }
+
+    @Test
+    public void timeNumericConversions_areFractionalTime_acrossTimezones() {
         XFormsElement form = html(
             head(
                 title("Time numeric conversions"),
@@ -472,7 +500,7 @@ public class TimeDataTests {
     }
 
     @Test
-    public void number_isFractionalTime_acrossTimezones() throws Exception {
+    public void number_isFractionalTime_acrossTimezones() {
         XFormsElement form = html(
             head(
                 title("Time numeric conversions"),
