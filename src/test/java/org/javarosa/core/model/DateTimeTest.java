@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.javarosa.core.test.AnswerDataMatchers.booleanAnswer;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
@@ -296,6 +297,112 @@ public class DateTimeTest {
             } catch (IOException | XFormParser.ParseException e) {
                 fail(e.getMessage());
             }
+        });
+    }
+
+    @Test
+    public void dateTimeComparedWithString_usesDateTimeComparison() throws Exception {
+        withTimeZone(TimeZone.getTimeZone("Europe/Warsaw"), () -> {
+            Scenario scenario;
+            try {
+                scenario = Scenario.init(html(
+                    head(
+                        title("DateTime and string comparisons"),
+                        model(
+                            mainInstance(t("data id=\"datetime-comparison\"",
+                                t("answer"),
+                                t("deadline", "2026-12-01T18:00:00+01:00"),
+                                t("lt"),
+                                t("lte"),
+                                t("gt"),
+                                t("gte"),
+                                t("reversedGt")
+                            )),
+                            bind("/data/answer").type("dateTime"),
+                            bind("/data/deadline").type("string"),
+                            bind("/data/lt").type("string")
+                                .calculate("/data/answer < /data/deadline"),
+                            bind("/data/lte").type("string")
+                                .calculate("/data/answer <= /data/deadline"),
+                            bind("/data/gt").type("string")
+                                .calculate("/data/answer > /data/deadline"),
+                            bind("/data/gte").type("string")
+                                .calculate("/data/answer >= /data/deadline"),
+                            bind("/data/reversedGt").type("string")
+                                .calculate("/data/deadline > /data/answer")
+                        )
+                    ),
+                    body(
+                        input("/data/answer"),
+                        input("/data/deadline"),
+                        input("/data/lt"),
+                        input("/data/lte"),
+                        input("/data/gt"),
+                        input("/data/gte")
+                    )
+                ));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            scenario.answer("/data/answer", Instant.parse("2026-12-01T11:30:00Z"));
+
+            assertThat(scenario.answerOf("/data/lt"), is(booleanAnswer(true)));
+            assertThat(scenario.answerOf("/data/lte"), is(booleanAnswer(true)));
+            assertThat(scenario.answerOf("/data/gt"), is(booleanAnswer(false)));
+            assertThat(scenario.answerOf("/data/gte"), is(booleanAnswer(false)));
+            assertThat(scenario.answerOf("/data/reversedGt"), is(booleanAnswer(true)));
+        });
+    }
+
+    @Test
+    public void dateComparedWithString_usesDateComparison() throws Exception {
+        withTimeZone(TimeZone.getTimeZone("Europe/Warsaw"), () -> {
+            Scenario scenario;
+            try {
+                scenario = Scenario.init(html(
+                    head(
+                        title("Date and string comparisons"),
+                        model(
+                            mainInstance(t("data id=\"date-comparison\"",
+                                t("answer"),
+                                t("deadline", "2026-12-01"),
+                                t("lt"),
+                                t("lte"),
+                                t("gt"),
+                                t("gte")
+                            )),
+                            bind("/data/answer").type("date"),
+                            bind("/data/deadline").type("string"),
+                            bind("/data/lt").type("string")
+                                .calculate("/data/answer < /data/deadline"),
+                            bind("/data/lte").type("string")
+                                .calculate("/data/answer <= /data/deadline"),
+                            bind("/data/gt").type("string")
+                                .calculate("/data/answer > /data/deadline"),
+                            bind("/data/gte").type("string")
+                                .calculate("/data/answer >= /data/deadline")
+                        )
+                    ),
+                    body(
+                        input("/data/answer"),
+                        input("/data/deadline"),
+                        input("/data/lt"),
+                        input("/data/lte"),
+                        input("/data/gt"),
+                        input("/data/gte")
+                    )
+                ));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            scenario.answer("/data/answer", Instant.parse("2026-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/lt"), is(booleanAnswer(true)));
+            assertThat(scenario.answerOf("/data/lte"), is(booleanAnswer(true)));
+            assertThat(scenario.answerOf("/data/gt"), is(booleanAnswer(false)));
+            assertThat(scenario.answerOf("/data/gte"), is(booleanAnswer(false)));
         });
     }
 }
