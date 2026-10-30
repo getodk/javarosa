@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
@@ -295,6 +296,56 @@ public class DateTimeTest {
                 assertThat(scenario.answerOf("/data/date").uncast().getValue(), is("2025-01-14"));
             } catch (IOException | XFormParser.ParseException e) {
                 fail(e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    public void dateTimeArithmetic_atMidnight_dependsOnEpochTimezoneOffset() {
+        // Warsaw was UTC+1 on January 1, 1970. When the offset matches, midnight arithmetic is continuous. When it
+        // differs, midnight is treated as a date while the following millisecond is treated as a datetime, producing
+        // a discontinuity.
+        withTimeZone(TimeZone.getTimeZone("Europe/Warsaw"), () -> {
+            try {
+                Scenario scenario = Scenario.init(html(
+                    head(
+                        title("Datetime arithmetic"),
+                        model(
+                            mainInstance(t("data id=\"datetime-arithmetic\"",
+                                t("winterMidnight", "2026-01-15T00:00:00.000"),
+                                t("winterAfterMidnight", "2026-01-15T00:00:00.001"),
+                                t("winterDifference"),
+                                t("summerMidnight", "2026-07-15T00:00:00.000"),
+                                t("summerAfterMidnight", "2026-07-15T00:00:00.001"),
+                                t("summerDifference")
+                            )),
+                            bind("/data/winterMidnight").type("dateTime"),
+                            bind("/data/winterAfterMidnight").type("dateTime"),
+                            bind("/data/winterDifference").type("decimal").calculate("/data/winterAfterMidnight - /data/winterMidnight"),
+                            bind("/data/summerMidnight").type("dateTime"),
+                            bind("/data/summerAfterMidnight").type("dateTime"),
+                            bind("/data/summerDifference").type("decimal").calculate("/data/summerAfterMidnight - /data/summerMidnight")
+                        )
+                    ),
+                    body(
+                        input("/data/winterMidnight"),
+                        input("/data/winterAfterMidnight"),
+                        input("/data/summerMidnight"),
+                        input("/data/summerAfterMidnight")
+                    )
+                ));
+
+                double winterDifference = Double.parseDouble(scenario.answerOf("/data/winterDifference").uncast().getDisplayText());
+                double summerDifference = Double.parseDouble(scenario.answerOf("/data/summerDifference").uncast().getDisplayText());
+
+                // Winter: UTC+1 matches the epoch offset, so the difference is the expected one millisecond, expressed in days.
+                assertThat(winterDifference, is(closeTo(1.0 / 86400000, 1e-9)));
+
+                // Summer: UTC+2 differs from the epoch offset by one hour. The numeric value decreases by approximately
+                // one hour instead of increasing by one millisecond.
+                assertThat(summerDifference, is(closeTo(-1.0 / 24, 1e-6)));
+            } catch (IOException | XFormParser.ParseException e) {
+                throw new RuntimeException(e);
             }
         });
     }

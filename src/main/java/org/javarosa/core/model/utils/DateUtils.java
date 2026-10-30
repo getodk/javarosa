@@ -778,7 +778,15 @@ public class DateUtils {
 
 
     public static Double fractionalDaysSinceEpoch(Date a) {
-        return new Double((a.getTime() - getDate(1970, 1, 1).getTime()) / (double)DAY_IN_MS);
+        return (a.getTime() - getDate(1970, 1, 1).getTime()) / (double) DAY_IN_MS;
+    }
+
+    public static double toDouble(Date d) {
+        if (isMidnight(d)) {
+            return daysSinceEpoch(d);
+        } else {
+            return fractionalDaysSinceEpoch(d);
+        }
     }
 
     /**
