@@ -618,7 +618,7 @@ public class TimeDataTest {
             Scenario scenario = Scenario.init(form);
 
             assertThat(
-                scenario.answerOf("/data/result").getDisplayText(), is("0.9375") // 22:30:00
+                scenario.answerOf("/data/result").getDisplayText(), is("22:30:00")
             );
         });
     }
