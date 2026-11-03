@@ -235,15 +235,11 @@ public class DateDataTests {
         );
 
         withTimeZone(TimeZone.getTimeZone(timezone), () -> {
-            try {
-                Scenario scenario = Scenario.init(form);
+            Scenario scenario = Scenario.init(form);
 
-                assertThat(scenario.answerOf("/data/nextDay").uncast().getString(), is(nextDay));
-                assertThat(scenario.answerOf("/data/previousDay").uncast().getString(), is(previousDay));
-                assertThat(scenario.answerOf("/data/twoWeeksLater").uncast().getString(), is(twoWeeksLater));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            assertThat(scenario.answerOf("/data/nextDay").uncast().getString(), is(nextDay));
+            assertThat(scenario.answerOf("/data/previousDay").uncast().getString(), is(previousDay));
+            assertThat(scenario.answerOf("/data/twoWeeksLater").uncast().getString(), is(twoWeeksLater));
         });
     }
 
