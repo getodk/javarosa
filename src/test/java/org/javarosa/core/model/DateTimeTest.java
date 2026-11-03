@@ -286,11 +286,14 @@ public class DateTimeTest {
         });
     }
 
+    /**
+     * Documents a limitation of using local epoch as reference for datetime.
+     * Warsaw was UTC+1 on January 1, 1970. When the offset matches, midnight arithmetic is continuous. When it
+     * differs, midnight is treated as a date while the following millisecond is treated as a datetime, producing
+     * a discontinuity.
+     */
     @Test
     public void dateTimeArithmetic_atMidnight_dependsOnEpochTimezoneOffset() {
-        // Warsaw was UTC+1 on January 1, 1970. When the offset matches, midnight arithmetic is continuous. When it
-        // differs, midnight is treated as a date while the following millisecond is treated as a datetime, producing
-        // a discontinuity.
         withTimeZone(TimeZone.getTimeZone("Europe/Warsaw"), () -> {
             Scenario scenario = Scenario.init(html(
                 head(
