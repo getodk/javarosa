@@ -47,8 +47,6 @@ import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
 import org.junit.Test;
 
-import javax.xml.xpath.XPath;
-
 public class TimeDataTest {
 
     @Test
