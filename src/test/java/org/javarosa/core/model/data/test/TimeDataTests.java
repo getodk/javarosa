@@ -34,7 +34,6 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -45,7 +44,6 @@ import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class TimeDataTests {
