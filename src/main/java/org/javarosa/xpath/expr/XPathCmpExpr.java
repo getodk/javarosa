@@ -16,9 +16,12 @@
 
 package org.javarosa.xpath.expr;
 
+import static org.javarosa.xpath.expr.XPathFuncExpr.unpack;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -27,6 +30,7 @@ import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.DataInstance;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -47,26 +51,36 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
         this.op = op;
     }
 
-    public Object eval (DataInstance model, EvaluationContext evalContext) {
-        Object aval = a.eval(model, evalContext);
-        Object bval = b.eval(model, evalContext);
-        boolean result = false;
+    @Override
+    public Object eval(DataInstance model, EvaluationContext evalContext) {
+        Object aval = unpack(a.eval(model, evalContext));
+        Object bval = unpack(b.eval(model, evalContext));
 
-        //xpath spec says comparisons only defined for numbers (not defined for strings)
-        aval = XPathFuncExpr.toDouble(aval);
-        bval = XPathFuncExpr.toDouble(bval);
-
-        double fa = ((Double)aval).doubleValue();
-        double fb = ((Double)bval).doubleValue();
-
-        switch (op) {
-        case LT: result = fa < fb; break;
-        case GT: result = fa > fb; break;
-        case LTE: result = fa <= fb; break;
-        case GTE: result = fa >= fb; break;
+        if (aval instanceof Date && bval instanceof String) {
+            bval = parseDateString((String) bval);
+        } else if (bval instanceof Date && aval instanceof String) {
+            aval = parseDateString((String) aval);
         }
 
-        return new Boolean(result);
+        double fa = XPathFuncExpr.toDouble(aval);
+        double fb = XPathFuncExpr.toDouble(bval);
+
+        switch (op) {
+            case LT:
+                return fa < fb;
+            case GT:
+                return fa > fb;
+            case LTE:
+                return fa <= fb;
+            case GTE:
+                return fa >= fb;
+            default:
+                return false;
+        }
+    }
+
+    private static Object parseDateString(String value) {
+        return DateUtils.parseDateTime(value);
     }
 
     public String toString () {
