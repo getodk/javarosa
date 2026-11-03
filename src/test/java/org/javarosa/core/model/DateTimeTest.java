@@ -17,7 +17,6 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.TimeZone;
 import org.javarosa.core.model.data.DateData;
@@ -30,7 +29,7 @@ import org.junit.Test;
 
 public class DateTimeTest {
     @Test
-    public void timeQuestionReturnsTimeDataAnswer() throws IOException {
+    public void timeQuestionReturnsTimeDataAnswer() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Time form"),
@@ -62,7 +61,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateQuestionReturnsDateDataAnswer() throws IOException {
+    public void dateQuestionReturnsDateDataAnswer() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date form"),
@@ -140,7 +139,7 @@ public class DateTimeTest {
                 )
             ));
 
-            // In UTC+13:30, it's 2021-12-01 already
+            // In UTC+13, it's 2021-12-01 already
             scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
 
             assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
@@ -149,7 +148,35 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeQuestionReturnsDateTimeDataAnswer() throws IOException {
+    public void dateTimeArithmetic_preservesDateTimeType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+        Scenario scenario;
+            scenario = Scenario.init(html(
+                head(title("DateTime arithmetic"),
+                    model(
+                        mainInstance(t("data id=\"datetime-arithmetic\"",
+                            t("dateTime"),
+                            t("nextDateTime")
+                        )),
+                        bind("/data/dateTime").type("dateTime"),
+                        bind("/data/nextDateTime").type("dateTime").calculate("/data/dateTime + 1")
+                    )
+                ),
+                body(
+                    input("/data/dateTime")
+                )
+            ));
+
+            scenario.answer("/data/dateTime", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDateTime"), instanceOf(DateTimeData.class));
+            assertThat(scenario.answerOf("/data/nextDateTime").uncast().getValue(),
+                is("2021-12-01T12:00:00.000Z"));
+        });
+    }
+
+    @Test
+    public void dateTimeQuestionReturnsDateTimeDataAnswer() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("DateTime form"),
@@ -181,7 +208,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void timeQuestionWithInvalidTimeFormatResultsInNoAnswer() throws IOException {
+    public void timeQuestionWithInvalidTimeFormatResultsInNoAnswer() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Time form"),
@@ -209,7 +236,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateQuestionWithInvalidDateFormatResultsInNoAnswer() throws IOException {
+    public void dateQuestionWithInvalidDateFormatResultsInNoAnswer()  {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date form"),
@@ -237,7 +264,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeQuestionWithInvalidDateTimeFormatResultsInNoAnswer() throws IOException {
+    public void dateTimeQuestionWithInvalidDateTimeFormatResultsInNoAnswer() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("DateTime form"),

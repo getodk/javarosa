@@ -92,8 +92,12 @@ public interface IAnswerData extends Externalizable {
             long l = (long) d;
             boolean isIntegral = Math.abs(d - l) < 1.0e-9;
 
-            if (dataType == DATE) {
+            if (dataType == DATE_TIME) {
+                return new DateTimeData((Date) XPathFuncExpr.toDate(val, true));
+            } else if (dataType == DATE) {
                 return new DateData((Date) XPathFuncExpr.toDate(val, false));
+            } else if (dataType == TIME) {
+                return new TimeData((Date) XPathFuncExpr.toDate(val, true));
             } else if (INTEGER == dataType ||
                 (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
                 return new IntegerData((int) d);
