@@ -2,7 +2,6 @@ package org.javarosa.core.model.data.test;
 
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class GeoPointDataTests {
     }
 
     @Test
-    public void missingAccuracy_isNotTreatedAs0() throws IOException, XFormParser.ParseException {
+    public void missingAccuracy_isNotTreatedAs0() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Missing accuracy"),

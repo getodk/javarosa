@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -63,7 +62,7 @@ public class RootTranslator implements ReferenceFactory, Externalizable {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         prefix = ExtUtil.readString(in);
         translatedPrefix = ExtUtil.readString(in);
     }

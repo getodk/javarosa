@@ -15,7 +15,6 @@ import static org.javarosa.test.XFormsElement.model;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.javarosa.test.utils.SystemHelper.withTimeZone;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -26,12 +25,11 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.XFormsElement;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class DateTimeTest {
     @Test
-    public void timeQuestionReturnsTimeDataAnswer() throws IOException, XFormParser.ParseException {
+    public void timeQuestionReturnsTimeDataAnswer() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Time form"),
@@ -63,7 +61,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateQuestionReturnsDateDataAnswer() throws IOException, XFormParser.ParseException {
+    public void dateQuestionReturnsDateDataAnswer() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date form"),
@@ -98,25 +96,21 @@ public class DateTimeTest {
     public void dateArithmetic_whenInstantFallsOnSameLocalDate_preservesDateType() {
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
             Scenario scenario;
-            try {
-                scenario = Scenario.init(html(
-                    head(title("Date arithmetic"),
-                        model(
-                            mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
-                                t("date"),
-                                t("nextDate")
-                            )),
-                            bind("/data/date").type("date"),
-                            bind("/data/nextDate").type("date").calculate("/data/date + 1")
-                        )
-                    ),
-                    body(
-                        input("/data/date")
+            scenario = Scenario.init(html(
+                head(title("Date arithmetic"),
+                    model(
+                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                            t("date"),
+                            t("nextDate")
+                        )),
+                        bind("/data/date").type("date"),
+                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
                     )
-                ));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+                ),
+                body(
+                    input("/data/date")
+                )
+            ));
 
             scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
 
@@ -129,25 +123,21 @@ public class DateTimeTest {
     public void dateArithmetic_whenInstantFallsOnNextLocalDate_preservesDateType() {
         withTimeZone(TimeZone.getTimeZone("Pacific/Auckland"), () -> {
             Scenario scenario;
-            try {
-                scenario = Scenario.init(html(
-                    head(title("Date arithmetic"),
-                        model(
-                            mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
-                                t("date"),
-                                t("nextDate")
-                            )),
-                            bind("/data/date").type("date"),
-                            bind("/data/nextDate").type("date").calculate("/data/date + 1")
-                        )
-                    ),
-                    body(
-                        input("/data/date")
+            scenario = Scenario.init(html(
+                head(title("Date arithmetic"),
+                    model(
+                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                            t("date"),
+                            t("nextDate")
+                        )),
+                        bind("/data/date").type("date"),
+                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
                     )
-                ));
-            } catch (IOException | XFormParser.ParseException e) {
-                throw new RuntimeException(e);
-            }
+                ),
+                body(
+                    input("/data/date")
+                )
+            ));
 
             // In UTC+13:30, it's 2021-12-01 already
             scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
@@ -158,7 +148,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeQuestionReturnsDateTimeDataAnswer() throws IOException, XFormParser.ParseException {
+    public void dateTimeQuestionReturnsDateTimeDataAnswer() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("DateTime form"),
@@ -190,7 +180,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void timeQuestionWithInvalidTimeFormatResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+    public void timeQuestionWithInvalidTimeFormatResultsInNoAnswer() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Time form"),
@@ -218,7 +208,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateQuestionWithInvalidDateFormatResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+    public void dateQuestionWithInvalidDateFormatResultsInNoAnswer() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date form"),
@@ -246,7 +236,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeQuestionWithInvalidDateTimeFormatResultsInNoAnswer() throws IOException, XFormParser.ParseException {
+    public void dateTimeQuestionWithInvalidDateTimeFormatResultsInNoAnswer() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("DateTime form"),
@@ -276,26 +266,22 @@ public class DateTimeTest {
     @Test
     public void dateField_withDateTimeDefault_truncatesTime() {
         withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
-            try {
-                Scenario scenario = Scenario.init(html(
-                    head(
-                        title("Date question with datetime default"),
-                        model(
-                            mainInstance(t("data id=\"datetime_default\"",
-                                t("date", "2025-01-14T03:43:58+00:00")
-                            )),
-                            bind("/data/date").type("date")
-                        )
-                    ),
-                    body(
-                        input("/data/date")
-                    )));
+            Scenario scenario = Scenario.init(html(
+                head(
+                    title("Date question with datetime default"),
+                    model(
+                        mainInstance(t("data id=\"datetime_default\"",
+                            t("date", "2025-01-14T03:43:58+00:00")
+                        )),
+                        bind("/data/date").type("date")
+                    )
+                ),
+                body(
+                    input("/data/date")
+                )));
 
-                // Would be 2025-01-13 in America/Los_Angeles so this shows time is truncated without TZ conversion
-                assertThat(scenario.answerOf("/data/date").uncast().getValue(), is("2025-01-14"));
-            } catch (IOException | XFormParser.ParseException e) {
-                fail(e.getMessage());
-            }
+            // Would be 2025-01-13 in America/Los_Angeles so this shows time is truncated without TZ conversion
+            assertThat(scenario.answerOf("/data/date").uncast().getValue(), is("2025-01-14"));
         });
     }
 }

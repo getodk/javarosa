@@ -33,12 +33,11 @@ import java.io.IOException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 public class FormEntryModelTest {
     @Test
-    public void isIndexRelevant_respectsRelevanceOfOutermostGroup() throws IOException, XFormParser.ParseException {
+    public void isIndexRelevant_respectsRelevanceOfOutermostGroup() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested relevance"),

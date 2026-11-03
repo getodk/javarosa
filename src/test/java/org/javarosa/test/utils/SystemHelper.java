@@ -34,12 +34,14 @@ public class SystemHelper {
         TimeZone.setDefault(backupZone);
     }
 
-    public static <T> T withTimeZone(TimeZone timeZone, Callable<T> block) throws Exception {
+    public static <T> T withTimeZone(TimeZone timeZone, Callable<T> block) {
         TimeZone backupZone = TimeZone.getDefault();
         TimeZone.setDefault(timeZone);
 
         try {
             return block.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             TimeZone.setDefault(backupZone);
         }

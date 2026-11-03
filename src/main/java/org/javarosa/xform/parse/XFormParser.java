@@ -55,7 +55,6 @@ import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -586,7 +585,7 @@ public class XFormParser implements IXFormParserFunctions {
                                 processor.processInstance(externalDataInstance);
                             }
 
-                        } catch (IOException | UnfullfilledRequirementsException | InvalidStructureException | XmlPullParserException e) {
+                        } catch (IOException | InvalidStructureException | XmlPullParserException e) {
                             String msg = "Unable to parse external secondary instance";
                             logger.error(msg, e);
                             throw new XFormParseException(msg + ": " + e.toString(), instance);
@@ -2488,7 +2487,7 @@ public class XFormParser implements IXFormParserFunctions {
     }
 
     public interface FormDefProcessor extends Processor {
-        void processFormDef(FormDef formDef) throws ParseException;
+        void processFormDef(FormDef formDef);
     }
 
     public interface BindAttributeProcessor extends Processor {
@@ -2502,7 +2501,7 @@ public class XFormParser implements IXFormParserFunctions {
 
         @NotNull Set<@NotNull Pair<@NotNull String, @NotNull String>> getModelAttributes();
 
-        void processModelAttribute(@NotNull String name, @NotNull String value) throws ParseException;
+        void processModelAttribute(@NotNull String name, @NotNull String value);
     }
 
     public interface QuestionProcessor extends Processor {

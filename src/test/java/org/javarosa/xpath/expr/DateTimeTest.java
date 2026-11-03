@@ -21,7 +21,6 @@ import java.util.TimeZone;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.utils.FixedTimeZoneAndInstantRule;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -35,7 +34,7 @@ public class DateTimeTest {
         new FixedTimeZoneAndInstantRule(SIMULATED_INSTANT, SIMULATED_TZ);
 
     @Test
-    public void nowLabelOutput_isIsoOffsetDateTime() throws IOException, XFormParser.ParseException {
+    public void nowLabelOutput_isIsoOffsetDateTime() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date time"),
@@ -61,7 +60,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeStringLabelOutput_isIsoOffsetDateTime() throws IOException, XFormParser.ParseException {
+    public void dateTimeStringLabelOutput_isIsoOffsetDateTime() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date time"),
@@ -86,7 +85,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeQuestionLabelOutput_isIsoOffsetDateTime() throws IOException, XFormParser.ParseException {
+    public void dateTimeQuestionLabelOutput_isIsoOffsetDateTime() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Date time"),
@@ -116,7 +115,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateTimeQuestionAtMidnightLabelOutput_isIsoDate() throws IOException, XFormParser.ParseException {
+    public void dateTimeQuestionAtMidnightLabelOutput_isIsoDate() throws IOException {
         Instant midnight = OffsetDateTime.parse("1998-05-23T00:00:00-07:00").toInstant();
 
         Scenario scenario = Scenario.init(html(
@@ -147,7 +146,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void todayLabelOutput_isIsoDate() throws IOException, XFormParser.ParseException {
+    public void todayLabelOutput_isIsoDate() throws IOException {
         Date expectedDay = Date.from(
             SIMULATED_INSTANT.atZone(SIMULATED_TZ.toZoneId())
                 .toLocalDate()
@@ -181,7 +180,7 @@ public class DateTimeTest {
 
     // Date field type, now() expression
     @Test
-    public void nowDateLabelOutput_isIsoDate() throws IOException, XFormParser.ParseException {
+    public void nowDateLabelOutput_isIsoDate() throws IOException {
         Date expectedDay = Date.from(
             SIMULATED_INSTANT.atZone(SIMULATED_TZ.toZoneId())
                 .toLocalDate()
@@ -214,7 +213,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void dateQuestionLabelOutput_isIsoDate() throws IOException, XFormParser.ParseException {
+    public void dateQuestionLabelOutput_isIsoDate() throws IOException {
         Date expectedDay = Date.from(
             SIMULATED_INSTANT.atZone(SIMULATED_TZ.toZoneId())
                 .toLocalDate()

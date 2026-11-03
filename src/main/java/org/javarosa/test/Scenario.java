@@ -266,22 +266,23 @@ public class Scenario {
      * Returns a new Scenario instance using a new form obtained by
      * serializing and deserializing the form being used by this instance.
      */
-    public Scenario serializeAndDeserializeForm() throws IOException, DeserializationException {
+    public Scenario serializeAndDeserializeForm() {
         return deserializeForm(serializeForm());
     }
 
-    public byte[] serializeForm() throws IOException {
+    public byte[] serializeForm() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         try (DataOutputStream dataOutput = new DataOutputStream(output)) {
             formDef.writeExternal(dataOutput);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return output.toByteArray();
     }
 
-    public static Scenario deserializeForm(byte[] serializedForm)
-        throws IOException, DeserializationException {
+    public static Scenario deserializeForm(byte[] serializedForm) {
         PrototypeManager.registerPrototypes(JavaRosaCoreModule.classNames);
         PrototypeManager.registerPrototypes(CoreModelModule.classNames);
         new XFormsModule().registerModule();
@@ -291,6 +292,8 @@ public class Scenario {
         try (DataInputStream input = new DataInputStream(
             new ByteArrayInputStream(serializedForm))) {
             deserializedFormDef.readExternal(input, PrototypeManager.getDefault());
+        } catch (IOException | DeserializationException e) {
+            throw new RuntimeException(e);
         }
 
         return Scenario.from(deserializedFormDef, false);
@@ -304,11 +307,15 @@ public class Scenario {
         return deserializeInstance(form, serializeInstance());
     }
 
-    public byte[] serializeInstance() throws IOException {
+    public byte[] serializeInstance() {
         FormInstance originalInstance = getFormDef().getMainInstance();
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
 
-        return serializer.serializeInstance(originalInstance);
+        try {
+            return serializer.serializeInstance(originalInstance);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Scenario deserializeInstance(XFormsElement form, byte[] instanceBytes)
@@ -455,22 +462,30 @@ public class Scenario {
     /**
      * Initializes the Scenario using a form defined using the DSL in XFormsElement
      */
-    public static Scenario init(XFormsElement form) throws IOException, XFormParser.ParseException {
+    public static Scenario init(XFormsElement form) {
         File tempDir = TempFileUtils.createTempDir();
         File formFile = TempFileUtils.createTempFile(tempDir, "xml");
         String xml = form.asXml();
         System.out.println(xml);
-        FileUtils.write(formFile, xml, UTF_8);
-        return Scenario.init(formFile);
+        try {
+            FileUtils.write(formFile, xml, UTF_8);
+            return Scenario.init(formFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static Scenario init(XFormsElement form, Function<FormDef, FormEntryController> controllerSupplier) throws IOException, XFormParser.ParseException {
+    public static Scenario init(XFormsElement form, Function<FormDef, FormEntryController> controllerSupplier) {
         File tempDir = TempFileUtils.createTempDir();
         File formFile = TempFileUtils.createTempFile(tempDir, "xml");
         String xml = form.asXml();
         System.out.println(xml);
-        FileUtils.write(formFile, xml, UTF_8);
-        return Scenario.init(formFile, controllerSupplier);
+        try {
+            FileUtils.write(formFile, xml, UTF_8);
+            return Scenario.init(formFile, controllerSupplier);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static FormDef createFormDef(XFormsElement form) throws IOException, XFormParser.ParseException {
@@ -487,24 +502,34 @@ public class Scenario {
      * <p>
      * A form with the provided filename must exist in the classpath
      */
-    public static Scenario init(String formFileName) throws XFormParser.ParseException {
+    public static Scenario init(String formFileName) {
         return init(ResourcePathHelper.r(formFileName));
     }
 
     /**
      * Initializes the Scenario with the form at the provided path
      */
-    public static Scenario init(File formFile) throws XFormParser.ParseException {
-        FormDef formDef = createFormDef(formFile);
+    public static Scenario init(File formFile) {
+        FormDef formDef;
+        try {
+            formDef = createFormDef(formFile);
+        } catch (XFormParser.ParseException e) {
+            throw new RuntimeException(e);
+        }
         return Scenario.from(formDef, true);
     }
 
-    private static Scenario init(File formFile, Function<FormDef, FormEntryController> controllerSupplier) throws XFormParser.ParseException {
-        FormDef formDef = createFormDef(formFile);
+    private static Scenario init(File formFile, Function<FormDef, FormEntryController> controllerSupplier) {
+        FormDef formDef;
+        try {
+            formDef = createFormDef(formFile);
+        } catch (XFormParser.ParseException e) {
+            throw new RuntimeException(e);
+        }
         return Scenario.from(formDef, true, controllerSupplier);
     }
 
-    public static Scenario init(FormDef formDef) throws XFormParser.ParseException {
+    public static Scenario init(FormDef formDef) {
         return Scenario.from(formDef, true);
     }
 

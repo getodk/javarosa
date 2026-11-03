@@ -19,7 +19,6 @@
  */
 package org.javarosa.core.services.transport.payload;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.slf4j.Logger;
@@ -81,7 +80,7 @@ public class ByteArrayPayload implements IDataPayload {
 
     @Override
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-        throws IOException, DeserializationException {
+        throws IOException {
         int length = in.readInt();
         if (length > 0) {
             this.payload = new byte[length];

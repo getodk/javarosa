@@ -1,7 +1,6 @@
 package org.javarosa.regression;
 
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import static org.javarosa.test.XFormsElement.title;
 
 public class TriggersForRelativeRefsTest {
     @Test
-    public void indefiniteRepeatJrCountExpression_inSingleRepeat_addsRepeatsUntilConditionMet() throws IOException, XFormParser.ParseException {
+    public void indefiniteRepeatJrCountExpression_inSingleRepeat_addsRepeatsUntilConditionMet() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Indefinite repeat"),
@@ -61,7 +60,7 @@ public class TriggersForRelativeRefsTest {
     }
 
     @Test
-    public void indefiniteRepeatJrCountExpression_inNestedRepeat_addsRepeatsUntilConditionMet() throws IOException, XFormParser.ParseException {
+    public void indefiniteRepeatJrCountExpression_inNestedRepeat_addsRepeatsUntilConditionMet() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Indefinite repeat in nested repeat"),
@@ -112,7 +111,7 @@ public class TriggersForRelativeRefsTest {
     }
 
     @Test
-    public void indefiniteRepeatJrCountExpression_inNestedRepeat_withRelativePaths_addsRepeatsUntilConditionMet() throws IOException, XFormParser.ParseException {
+    public void indefiniteRepeatJrCountExpression_inNestedRepeat_withRelativePaths_addsRepeatsUntilConditionMet() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Indefinite repeat in nested repeat"),
@@ -163,7 +162,7 @@ public class TriggersForRelativeRefsTest {
     }
 
     @Test
-    public void predicateWithRelativePathExpression_reevaluated_whenTriggerChanges() throws IOException, XFormParser.ParseException {
+    public void predicateWithRelativePathExpression_reevaluated_whenTriggerChanges() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Predicate trigger"),
@@ -216,7 +215,7 @@ public class TriggersForRelativeRefsTest {
     }
 
     @Test
-    public void predicateWithCurrentPathExpression_reevaluated_whenTriggerChanges() throws IOException, XFormParser.ParseException {
+    public void predicateWithCurrentPathExpression_reevaluated_whenTriggerChanges() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Predicate trigger"),

@@ -25,7 +25,6 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.test.Scenario;
-import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -119,7 +118,7 @@ public class XFormParserTest {
     }
     
     @Test
-    public void spacesBetweenOutputs_areRespected() throws IOException, XFormParser.ParseException {
+    public void spacesBetweenOutputs_areRespected() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 model(
@@ -281,7 +280,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException, XFormParser.ParseException {
+    public void formWithCountNonEmptyFunc_ShouldNotThrowException() throws IOException {
         Scenario scenario = Scenario.init("countNonEmptyForm.xml");
         assertThat(scenario.answerOf("/test/count_value"), is(intAnswer(4)));
         assertThat(scenario.answerOf("/test/count_non_empty_value"), is(intAnswer(2)));
@@ -465,7 +464,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void parseGroupWithRefAttrForm() throws IOException, XPathSyntaxException, XFormParser.ParseException {
+    public void parseGroupWithRefAttrForm() throws IOException, XFormParser.ParseException {
         // Given & When
         FormDef formDef = parse(r("group-with-ref-attr.xml"));
 
@@ -501,7 +500,7 @@ public class XFormParserTest {
     }
 
     @Test
-    public void testSetValueWithStrings() throws IOException, XFormParser.ParseException {
+    public void testSetValueWithStrings() throws IOException {
         
         Scenario scenario = Scenario.init("default_test.xml");
         assertEquals("string-value", scenario.getAnswerNode("/data/string_val").getValue().getValue().toString());

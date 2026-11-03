@@ -373,7 +373,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
             throw new RuntimeException("not supported");
         }
 
-        public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+        public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
             throw new RuntimeException("not supported");
         }
 

@@ -65,7 +65,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
         return maxInclusive;
     }
 
-    private void evaluatePivot(CmpPivot pivot, IConditionExpr conditional, EvaluationContext c, FormInstance instance) throws UnpivotableExpressionException {
+    private void evaluatePivot(CmpPivot pivot, IConditionExpr conditional, EvaluationContext c, FormInstance instance) {
         double unit = unit();
         double val = pivot.getVal();
         double lt = val - unit;
@@ -95,7 +95,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
         }
     }
 
-    protected abstract T castToValue(double value) throws UnpivotableExpressionException;
+    protected abstract T castToValue(double value);
 
     protected abstract double unit();
 }

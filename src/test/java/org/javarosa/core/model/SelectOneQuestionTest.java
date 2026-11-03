@@ -1,9 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,7 +26,7 @@ import static org.javarosa.test.XFormsElement.title;
 public class SelectOneQuestionTest {
 
     @Test
-    public void choiceIsSelectedWhenLiteralStringValueMatchesChoiceValue() throws IOException, XFormParser.ParseException {
+    public void choiceIsSelectedWhenLiteralStringValueMatchesChoiceValue() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("String calculate"),
@@ -54,7 +52,7 @@ public class SelectOneQuestionTest {
     }
 
     @Test
-    public void choiceIsSelectedWhenLiteralIntegerValueMatchesChoiceValue() throws IOException, XFormParser.ParseException {
+    public void choiceIsSelectedWhenLiteralIntegerValueMatchesChoiceValue() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Integer calculate"),
@@ -80,7 +78,7 @@ public class SelectOneQuestionTest {
     }
 
     @Test
-    public void choiceIsSelectedWhenLiteralIntegerValueMatchesChoiceValue_afterDeserialization() throws IOException, XFormParser.ParseException, DeserializationException {
+    public void choiceIsSelectedWhenLiteralIntegerValueMatchesChoiceValue_afterDeserialization() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Integer calculate"),
@@ -106,7 +104,7 @@ public class SelectOneQuestionTest {
     }
 
     @Test
-    public void selectQuestionValueBlankWhenValueNotInChoices() throws IOException, XFormParser.ParseException {
+    public void selectQuestionValueBlankWhenValueNotInChoices() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("String calculate"),

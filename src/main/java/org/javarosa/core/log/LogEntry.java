@@ -24,7 +24,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -85,7 +84,7 @@ public class LogEntry implements Externalizable {
      * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf)
-            throws IOException, DeserializationException {
+            throws IOException {
         time = ExtUtil.readDate(in);
         type = ExtUtil.readString(in);
         message = ExtUtil.readString(in);

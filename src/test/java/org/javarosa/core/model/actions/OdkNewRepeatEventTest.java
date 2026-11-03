@@ -21,7 +21,6 @@ import static org.javarosa.test.XFormsElement.title;
 import java.io.IOException;
 import org.javarosa.test.Scenario;
 import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 
 /**
@@ -29,7 +28,7 @@ import org.junit.Test;
  */
 public class OdkNewRepeatEventTest {
     @Test
-    public void setValueOnRepeatInsertInBody_setsValueInRepeat() throws XFormParser.ParseException {
+    public void setValueOnRepeatInsertInBody_setsValueInRepeat() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         assertThat(scenario.countRepeatInstancesOf("/data/my-repeat"), is(0));
@@ -39,7 +38,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void addingRepeat_doesNotChangeValueSetForPreviousRepeat() throws XFormParser.ParseException {
+    public void addingRepeat_doesNotChangeValueSetForPreviousRepeat() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         scenario.createNewRepeat("/data/my-repeat");
@@ -52,7 +51,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void setValueOnRepeatInBody_usesCurrentContextForRelativeReferences() throws XFormParser.ParseException {
+    public void setValueOnRepeatInBody_usesCurrentContextForRelativeReferences() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         scenario.answer("/data/my-toplevel-value", "12");
@@ -62,7 +61,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void setValueOnRepeatWithCount_setsValueForEachRepeat() throws XFormParser.ParseException {
+    public void setValueOnRepeatWithCount_setsValueForEachRepeat() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         scenario.answer("/data/repeat-count", 4);
@@ -91,7 +90,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void setOtherThanIntegerValueOnRepeatWithCount_convertsValueToInteger() throws XFormParser.ParseException {
+    public void setOtherThanIntegerValueOnRepeatWithCount_convertsValueToInteger() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         // String
@@ -119,7 +118,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void repeatInFormDefInstance_neverFiresNewRepeatEvent() throws XFormParser.ParseException {
+    public void repeatInFormDefInstance_neverFiresNewRepeatEvent() {
         Scenario scenario = Scenario.init(r("event-odk-new-repeat.xml"));
 
         assertThat(scenario.answerOf("/data/my-repeat-without-template[1]/my-value"), is(nullValue()));
@@ -130,7 +129,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void newRepeatInstance_doesNotTriggerActionOnUnrelatedRepeat() throws IOException, XFormParser.ParseException {
+    public void newRepeatInstance_doesNotTriggerActionOnUnrelatedRepeat() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Parallel repeats"),
@@ -169,7 +168,7 @@ public class OdkNewRepeatEventTest {
     }
 
     @Test
-    public void newRepeatInstance_canUsePreviousInstanceAsDefault() throws IOException, XFormParser.ParseException {
+    public void newRepeatInstance_canUsePreviousInstanceAsDefault() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Default from prior instance"),
@@ -207,7 +206,7 @@ public class OdkNewRepeatEventTest {
 
     // Not part of ODK XForms so throws parse exception.
     @Test(expected = XFormParseException.class)
-    public void setValueOnRepeatInsertInModel_notAllowed() throws XFormParser.ParseException {
+    public void setValueOnRepeatInsertInModel_notAllowed() {
         Scenario.init(r("event-odk-new-repeat-model.xml"));
     }
 

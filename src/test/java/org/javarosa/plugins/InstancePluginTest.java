@@ -9,7 +9,6 @@ import org.javarosa.test.Scenario;
 import org.javarosa.test.TempFileUtils;
 import org.javarosa.xform.parse.ExternalInstanceParser;
 import org.javarosa.xform.parse.ExternalInstanceParserFactory;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -50,7 +49,7 @@ public class InstancePluginTest {
     }
 
     @Test
-    public void instanceProvider_supportsPartialElements() throws IOException, XFormParser.ParseException {
+    public void instanceProvider_supportsPartialElements() throws IOException {
         externalInstanceParserFactory.setInstanceProvider(new FakeFileInstanceParser(asList(
             new Pair<>("0", "Item 0"),
             new Pair<>("1", "Item 1")
@@ -119,7 +118,7 @@ public class InstancePluginTest {
     }
 
     @Test
-    public void fileInstanceParser_supportsPartialElements() throws IOException, XFormParser.ParseException {
+    public void fileInstanceParser_supportsPartialElements() throws IOException {
         externalInstanceParserFactory.setFileInstanceParser(new FakeFileInstanceParser(asList(
             new Pair<>("0", "Item 0"),
             new Pair<>("1", "Item 1")
@@ -188,7 +187,7 @@ public class InstancePluginTest {
     }
 
     @Test
-    public void supportsReplacingPartialElements() throws IOException, XFormParser.ParseException {
+    public void supportsReplacingPartialElements() throws IOException {
         externalInstanceParserFactory.setFileInstanceParser(new FakeFileInstanceParser(asList(
             new Pair<>("0", "Item 0"),
             new Pair<>("1", "Item 1")
@@ -242,7 +241,7 @@ public class InstancePluginTest {
     }
 
     @Test
-    public void replacePartialElements_DoesNotOverrideNonPartialElements() throws IOException, XFormParser.ParseException {
+    public void replacePartialElements_DoesNotOverrideNonPartialElements() throws IOException {
         externalInstanceParserFactory.setFileInstanceParser(new FakeFileInstanceParser(asList(
             new Pair<>("0", "Item 0")
         ), false));

@@ -1,8 +1,5 @@
 package org.javarosa.benchmarks;
 
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.kxml2.kdom.Document;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -10,7 +7,6 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -47,8 +43,7 @@ public class XFormParserBenchmark {
     @Benchmark
     public void
     benchmarkParseExternalInstanceXFormOnly(XFormParserBenchmarkState state, Blackhole bh)
-        throws IOException, XmlPullParserException, InvalidReferenceException,
-        UnfullfilledRequirementsException, InvalidStructureException {
+        throws IOException {
         Reader reader = new FileReader(state.xFormInternalSecondaryInstancesMinified.toFile());
         Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
@@ -57,8 +52,7 @@ public class XFormParserBenchmark {
     @Benchmark
     public void
     benchmarkParseInternalInstanceXForm(XFormParserBenchmarkState state, Blackhole bh)
-        throws IOException, XmlPullParserException, InvalidReferenceException,
-        UnfullfilledRequirementsException, InvalidStructureException {
+        throws IOException {
         Reader reader = new FileReader(state.xFormInternalSecondaryInstances.toFile());
         Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
@@ -68,8 +62,7 @@ public class XFormParserBenchmark {
     @Benchmark
     public void
     benchmarkParseExternalInstanceLGA(XFormParserBenchmarkState state, Blackhole bh)
-        throws IOException, XmlPullParserException, InvalidReferenceException,
-        UnfullfilledRequirementsException, InvalidStructureException {
+        throws IOException {
         Reader reader = new FileReader(state.lgaSecondaryInstance.toFile());
         Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
@@ -78,8 +71,7 @@ public class XFormParserBenchmark {
     @Benchmark
     public void
     benchmarkParseExternalInstanceWards(XFormParserBenchmarkState state, Blackhole bh)
-        throws IOException, XmlPullParserException, InvalidReferenceException,
-        UnfullfilledRequirementsException, InvalidStructureException {
+        throws IOException {
         Reader reader = new FileReader(state.wardExternalSecondaryInstance.toFile());
         Document kxmlDocument = org.javarosa.xform.parse.XFormParser.getXMLDocument(reader);
         bh.consume(kxmlDocument);
@@ -88,8 +80,7 @@ public class XFormParserBenchmark {
     @Benchmark
     public void
     benchmarkParseExternalInstanceXFormWithInstanceFiles(XFormParserBenchmarkState state, Blackhole bh)
-        throws IOException, XmlPullParserException, InvalidReferenceException,
-        UnfullfilledRequirementsException, InvalidStructureException {
+        throws IOException {
 
         Reader externalInstanceXFormReader = new FileReader(state.xFormExternalSecondaryInstances.toFile());
         Reader lgaSecondaryInstanceReader = new FileReader(state.lgaSecondaryInstance.toFile());

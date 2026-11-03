@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.is;
 import static org.javarosa.core.test.AnswerDataMatchers.stringAnswer;
 
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +27,7 @@ public class CurrentFieldRefTest {
     private Scenario scenario;
 
     @Before
-    public void setUp() throws XFormParser.ParseException {
+    public void setUp() {
         scenario = Scenario.init("relative-current-ref-field-ref.xml");
     }
 

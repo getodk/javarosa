@@ -17,7 +17,6 @@
 package org.javarosa.core.model;
 
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,7 @@ public class SelectOneChoiceFilterTest {
     private Scenario scenario;
 
     @Before
-    public void setUp() throws XFormParser.ParseException {
+    public void setUp() {
         scenario = Scenario.init("three-level-cascading-select.xml");
     }
 

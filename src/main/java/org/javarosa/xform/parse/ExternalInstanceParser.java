@@ -7,7 +7,6 @@ import org.javarosa.core.model.instance.geojson.GeoJsonExternalInstance;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.xml.util.InvalidStructureException;
-import org.javarosa.xml.util.UnfullfilledRequirementsException;
 import org.jetbrains.annotations.NotNull;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -29,7 +28,7 @@ public class ExternalInstanceParser {
 
     private List<InstanceProvider> instanceProviders = emptyList();
 
-    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc, boolean partial) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
+    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc, boolean partial) throws IOException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
         Optional<InstanceProvider> instanceProvider = instanceProviders.stream()
             .filter(parser -> parser.isSupported(instanceId, instanceSrc))
             .findFirst();
@@ -53,7 +52,7 @@ public class ExternalInstanceParser {
         }
     }
 
-    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, UnfullfilledRequirementsException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
+    public TreeElement parse(ReferenceManager referenceManager, String instanceId, String instanceSrc) throws IOException, InvalidStructureException, XmlPullParserException, InvalidReferenceException {
         return parse(referenceManager, instanceId, instanceSrc, false);
     }
 

@@ -16,17 +16,6 @@
 
 package org.javarosa.core.model;
 
-import org.hamcrest.CoreMatchers;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.List;
-
-import kotlin.Pair;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -53,9 +42,18 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.util.List;
+import org.hamcrest.CoreMatchers;
+import org.javarosa.test.Scenario;
+import org.javarosa.xform.parse.XFormParseException;
+import org.junit.Test;
+
+import kotlin.Pair;
+
 public class SelectChoiceTest {
     @Test
-    public void value_should_continue_being_an_empty_string_after_deserialization() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void value_should_continue_being_an_empty_string_after_deserialization() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("SelectChoice.getValue() regression test form"),
@@ -89,7 +87,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
+    public void getChild_returnsNamedChild_whenChoicesAreFromSecondaryInstance() {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
@@ -98,7 +96,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() throws XFormParser.ParseException {
+    public void getChild_returnsNull_whenChoicesAreFromSecondaryInstance_andRequestedChildDoesNotExist() {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
@@ -106,7 +104,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsEmptyString_whenChoicesAreFromSecondaryInstance_andRequestedChildHasNoValue() throws XFormParser.ParseException, IOException {
+    public void getChild_returnsEmptyString_whenChoicesAreFromSecondaryInstance_andRequestedChildHasNoValue() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select with empty value"),
@@ -125,7 +123,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
+    public void getChild_updates_whenChoicesAreFromRepeat() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select from repeat"),
@@ -158,7 +156,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChild_returnsNull_whenCalledOnAChoiceFromInlineSelect() throws IOException, XFormParser.ParseException {
+    public void getChild_returnsNull_whenCalledOnAChoiceFromInlineSelect() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Static select"),
@@ -174,7 +172,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() throws XFormParser.ParseException {
+    public void getAdditionalChildren_returnsChildrenInOrder_whenChoicesAreFromSecondaryInstance() {
         setUpSimpleReferenceManager(r("external-select-geojson.xml").getParentFile(), "file");
 
         Scenario scenario = Scenario.init("external-select-geojson.xml");
@@ -194,7 +192,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException, XFormParser.ParseException {
+    public void getChildren_updates_whenChoicesAreFromRepeat() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select from repeat"),
@@ -231,7 +229,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void selectFromRepeat_usesSpecifiedValueAndLabelRefs() throws IOException, XFormParser.ParseException {
+    public void selectFromRepeat_usesSpecifiedValueAndLabelRefs() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Select from repeat"),
@@ -253,7 +251,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_returnsEmpty_whenCalledOnAChoiceFromInlineSelect() throws IOException, XFormParser.ParseException {
+    public void getAdditionalChildren_returnsEmpty_whenCalledOnAChoiceFromInlineSelect() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Static select"),
@@ -269,7 +267,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void getAdditionalChildren_returnsEmptyStringValue_forEmptyChildren() throws IOException, XFormParser.ParseException {
+    public void getAdditionalChildren_returnsEmptyStringValue_forEmptyChildren() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Internal instance select"),
@@ -300,7 +298,7 @@ public class SelectChoiceTest {
     }
 
     @Test
-    public void itemsetBindingVerification_doesNotVerifySecondItem() throws IOException, XFormParser.ParseException {
+    public void itemsetBindingVerification_doesNotVerifySecondItem() throws IOException {
         Scenario.init(html(
             head(
                 title("Some form"),
@@ -359,8 +357,6 @@ public class SelectChoiceTest {
             fail("Expected XFormParseException because itemset references don't exist in external instance");
         } catch (XFormParseException e) {
             // pass
-        } catch (XFormParser.ParseException e) {
-            throw new RuntimeException(e);
         }
     }
 }

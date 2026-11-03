@@ -37,7 +37,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import org.hamcrest.number.IsCloseTo;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class GeoDistanceTest {
     private static final double NINETY_DEGREES_ON_EQUATOR_KM = EARTH_EQUATORIAL_CIRCUMFERENCE_METERS / 4;
 
     @Test
-    public void distance_isComputedForGeopointNodeset() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForGeopointNodeset() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Geopoint nodeset distance"),
@@ -75,7 +74,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForGeotrace() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForGeotrace() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Geotrace distance"),
@@ -98,7 +97,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForGeoshape() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForGeoshape() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Geoshape distance"),
@@ -121,7 +120,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForString() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForString() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("String distance"),
@@ -154,7 +153,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForInlineString() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForInlineString() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("String distance"),
@@ -185,7 +184,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_throwsForNonPoint() throws IOException, XFormParser.ParseException {
+    public void distance_throwsForNonPoint() throws IOException {
         try {
             Scenario.init(html(
                 head(
@@ -209,7 +208,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForMultiplePathArguments() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForMultiplePathArguments() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Multi parameter distance"),
@@ -240,7 +239,7 @@ public class GeoDistanceTest {
     }
 
     @Test
-    public void distance_isComputedForMixedPathAndStringArguments() throws IOException, XFormParser.ParseException {
+    public void distance_isComputedForMixedPathAndStringArguments() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Multi parameter distance"),

@@ -37,20 +37,17 @@ import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.TimeZone;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.test.Scenario;
 import org.javarosa.test.utils.SystemHelper;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class SetValueActionTest {
     @Test
-    public void when_triggerNodeIsUpdated_targetNodeCalculation_isEvaluated() throws IOException, XFormParser.ParseException {
+    public void when_triggerNodeIsUpdated_targetNodeCalculation_isEvaluated() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested setvalue action"),
@@ -77,7 +74,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void expressionAsLiteralValue_isNotEvaluated() throws IOException, XFormParser.ParseException {
+    public void expressionAsLiteralValue_isNotEvaluated() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Literal setvalue"),
@@ -104,7 +101,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void when_triggerNodeIsUpdatedWithTheSameValue_targetNodeCalculation_isNotEvaluated() throws IOException, XFormParser.ParseException {
+    public void when_triggerNodeIsUpdatedWithTheSameValue_targetNodeCalculation_isNotEvaluated() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested setvalue action"),
@@ -140,7 +137,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalue_isSerializedAndDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void setvalue_isSerializedAndDeserialized() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested setvalue action"),
@@ -168,7 +165,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalueWithNoValue_isSerializedAndDeserialized() throws IOException, DeserializationException, XFormParser.ParseException {
+    public void setvalueWithNoValue_isSerializedAndDeserialized() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue action"),
@@ -197,7 +194,7 @@ public class SetValueActionTest {
 
     //region groups
     @Test
-    public void setvalueInGroup_setsValueOutsideOfGroup() throws IOException, XFormParser.ParseException {
+    public void setvalueInGroup_setsValueOutsideOfGroup() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue"),
@@ -223,7 +220,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalueOutsideGroup_setsValueInGroup() throws IOException, XFormParser.ParseException {
+    public void setvalueOutsideGroup_setsValueInGroup() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue"),
@@ -250,7 +247,7 @@ public class SetValueActionTest {
 
     //region repeats
     @Test
-    public void sourceInRepeat_updatesDestInSameRepeatInstance() throws IOException, XFormParser.ParseException {
+    public void sourceInRepeat_updatesDestInSameRepeatInstance() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested setvalue action with repeats"),
@@ -288,7 +285,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalueAtRoot_setsValueOfNodeInFirstRepeatInstance() throws IOException, XFormParser.ParseException {
+    public void setvalueAtRoot_setsValueOfNodeInFirstRepeatInstance() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue into repeat"),
@@ -318,7 +315,7 @@ public class SetValueActionTest {
 
     @Ignore("TODO: verifyActions seems like it may be overzealous")
     @Test
-    public void setvalueAtRoot_setsValueOfNodeInRepeatInstanceAddedAfterFormLoad() throws IOException, XFormParser.ParseException {
+    public void setvalueAtRoot_setsValueOfNodeInRepeatInstanceAddedAfterFormLoad() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue into repeat"),
@@ -347,7 +344,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setValueAtRoot_throwsExpression_whenTargetIsUnboundReference() throws IOException, XFormParser.ParseException {
+    public void setValueAtRoot_throwsExpression_whenTargetIsUnboundReference() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue into repeat"),
@@ -380,7 +377,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setValueInRepeat_setsValueOutsideOfRepeat() throws IOException, XFormParser.ParseException {
+    public void setValueInRepeat_setsValueOutsideOfRepeat() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested setvalue action with repeats"),
@@ -415,7 +412,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalueInOuterRepeat_setsInnerRepeatValue() throws IOException, XFormParser.ParseException {
+    public void setvalueInOuterRepeat_setsInnerRepeatValue() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Nested repeats"),
@@ -447,7 +444,7 @@ public class SetValueActionTest {
      * field.
      */
     @Test
-    public void setvalue_setsValueOfReadOnlyField() throws IOException, XFormParser.ParseException {
+    public void setvalue_setsValueOfReadOnlyField() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue readonly"),
@@ -467,7 +464,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalue_withInnerEmptyString_clearsTarget() throws IOException, XFormParser.ParseException {
+    public void setvalue_withInnerEmptyString_clearsTarget() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue empty string"),
@@ -487,7 +484,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalue_withEmptyStringValue_clearsTarget() throws IOException, XFormParser.ParseException {
+    public void setvalue_withEmptyStringValue_clearsTarget() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue empty string"),
@@ -507,7 +504,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalue_setsValueOfMultipleFields() throws IOException, XFormParser.ParseException {
+    public void setvalue_setsValueOfMultipleFields() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue multiple destinations"),
@@ -533,7 +530,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void xformsValueChanged_triggeredAfterRecomputation() throws IOException, XFormParser.ParseException {
+    public void xformsValueChanged_triggeredAfterRecomputation() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Value changed event"),
@@ -557,7 +554,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalue_setsValueOfAttribute() throws IOException, XFormParser.ParseException {
+    public void setvalue_setsValueOfAttribute() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue attribute"),
@@ -576,7 +573,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalue_setsValueOfAttribute_afterDeserialization() throws IOException, XFormParser.ParseException, DeserializationException {
+    public void setvalue_setsValueOfAttribute_afterDeserialization() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue attribute"),
@@ -600,7 +597,7 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalueWithNow_setsDateWithoutTime() throws IOException, XFormParser.ParseException {
+    public void setvalueWithNow_setsDateWithoutTime() {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Setvalue now into date"),
@@ -623,32 +620,28 @@ public class SetValueActionTest {
     }
 
     @Test
-    public void setvalueWithDateTime_setsDateWithoutTime() throws IOException, XFormParser.ParseException {
+    public void setvalueWithDateTime_setsDateWithoutTime() {
         SystemHelper.withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
-            try {
-                Scenario scenario = Scenario.init(html(
-                    head(
-                        title("Setvalue datetime literal into date"),
-                        model(
-                            mainInstance(t("data id=\"setvalue-datetime-into-date\"",
-                                t("source"),
-                                t("destination")
-                            )),
-                            bind("/data/destination").type("date")
-                        )
-                    ),
-                    body(
-                        input("/data/source",
-                            setvalue("xforms-value-changed", "/data/destination", "'2025-01-14T03:43:58+00:00'"))
-                    )));
+            Scenario scenario = Scenario.init(html(
+                head(
+                    title("Setvalue datetime literal into date"),
+                    model(
+                        mainInstance(t("data id=\"setvalue-datetime-into-date\"",
+                            t("source"),
+                            t("destination")
+                        )),
+                        bind("/data/destination").type("date")
+                    )
+                ),
+                body(
+                    input("/data/source",
+                        setvalue("xforms-value-changed", "/data/destination", "'2025-01-14T03:43:58+00:00'"))
+                )));
 
-                scenario.answer("/data/source", "trigger");
+            scenario.answer("/data/source", "trigger");
 
-                // Would be 2025-01-13 in America/Los_Angeles so this shows time is truncated without TZ conversion
-                assertThat(scenario.answerOf("/data/destination").uncast().getValue(), is("2025-01-14"));
-            } catch (IOException | XFormParser.ParseException e) {
-                fail(e.getMessage());
-            }
+            // Would be 2025-01-13 in America/Los_Angeles so this shows time is truncated without TZ conversion
+            assertThat(scenario.answerOf("/data/destination").uncast().getValue(), is("2025-01-14"));
         });
     }
 }

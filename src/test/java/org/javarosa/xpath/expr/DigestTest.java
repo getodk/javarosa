@@ -39,7 +39,6 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import java.util.Arrays;
 import org.javarosa.test.Scenario;
-import org.javarosa.xform.parse.XFormParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -86,7 +85,7 @@ public class DigestTest {
     }
 
     @Test
-    public void digestFunction_acceptsDynamicParameters() throws IOException, XFormParser.ParseException {
+    public void digestFunction_acceptsDynamicParameters() throws IOException {
         Scenario scenario = Scenario.init(html(
             head(
                 title("Digest form"),

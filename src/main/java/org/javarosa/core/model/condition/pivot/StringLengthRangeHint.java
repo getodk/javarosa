@@ -11,7 +11,7 @@ import org.javarosa.core.model.data.StringData;
  */
 public class StringLengthRangeHint extends RangeHint<StringData> {
 
-    protected StringData castToValue(double value) throws UnpivotableExpressionException {
+    protected StringData castToValue(double value) {
         StringBuilder sb = new StringBuilder();
         for(int i = 0 ; i < ((int)value) ; ++i) {
             sb.append("X");
