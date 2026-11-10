@@ -101,9 +101,11 @@ public class TimeDataTest {
                 title("Invalid time"),
                 model(
                     mainInstance(t("data id=\"invalid-time\"",
-                        t("time", "25:00:00")
+                        t("time", "25:00:00"),
+                        t("reference")
                     )),
-                    bind("/data/time").type("time")
+                    bind("/data/time").type("time"),
+                    bind("/data/reference").type("time").calculate("/data/time")
                 )
             ),
             body(input("/data/time"))
@@ -111,6 +113,7 @@ public class TimeDataTest {
 
         Scenario scenario = Scenario.init(form);
         assertThat(scenario.answerOf("/data/time"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/reference"), is(nullValue()));
     }
 
     @Test
@@ -504,6 +507,27 @@ public class TimeDataTest {
             assertThat(scenario.answerOf("/data/nextTime"), instanceOf(TimeData.class));
             assertThat(scenario.answerOf("/data/nextTime").uncast().getValue(), is("18:00:00"));
         });
+    }
+
+    @Test
+    public void timeCalculation_reference_preservesTimeType() {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Time reference"),
+                model(
+                    mainInstance(t("data id=\"time-reference\"",
+                        t("source", "23:14:00"),
+                        t("result")
+                    )),
+                    bind("/data/source").type("time"),
+                    bind("/data/result").type("time").calculate("/data/source")
+                )
+            ),
+            body(input("/data/source"))
+        ));
+
+        assertThat(scenario.answerOf("/data/result"), instanceOf(TimeData.class));
+        assertThat(scenario.answerOf("/data/result").uncast().getValue(), is("23:14:00"));
     }
 
     @Test

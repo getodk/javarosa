@@ -17,6 +17,7 @@
 package org.javarosa.core.model.data.test;
 
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
@@ -33,6 +34,7 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.TimeZone;
@@ -115,9 +117,11 @@ public class DateDataTests {
                 title("Invalid date"),
                 model(
                     mainInstance(t("data id=\"invalid-date\"",
-                        t("date", "2026-02-30")
+                        t("date", "2026-02-30"),
+                        t("reference")
                     )),
-                    bind("/data/date").type("date")
+                    bind("/data/date").type("date"),
+                    bind("/data/reference").type("date").calculate("/data/date")
                 )
             ),
             body(input("/data/date"))
@@ -125,6 +129,7 @@ public class DateDataTests {
 
         Scenario scenario = Scenario.init(form);
         assertThat(scenario.answerOf("/data/date"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/reference"), is(nullValue()));
     }
 
     @Test
@@ -436,4 +441,81 @@ public class DateDataTests {
             assertThat(scenario.answerOf("/data/subtract19").uncast().getString(), is("2026-07-13"));
         });
     }
+
+    @Test
+    public void dateArithmetic_whenInstantFallsOnSameLocalDate_preservesDateType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario;
+            scenario = Scenario.init(html(
+                head(title("Date arithmetic"),
+                    model(
+                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                            t("date"),
+                            t("nextDate")
+                        )),
+                        bind("/data/date").type("date"),
+                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
+                    )
+                ),
+                body(
+                    input("/data/date")
+                )
+            ));
+
+            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-01"));
+        });
+    }
+
+    @Test
+    public void dateArithmetic_whenInstantFallsOnNextLocalDate_preservesDateType() {
+        withTimeZone(TimeZone.getTimeZone("Pacific/Auckland"), () -> {
+            Scenario scenario;
+            scenario = Scenario.init(html(
+                head(title("Date arithmetic"),
+                    model(
+                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                            t("date"),
+                            t("nextDate")
+                        )),
+                        bind("/data/date").type("date"),
+                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
+                    )
+                ),
+                body(
+                    input("/data/date")
+                )
+            ));
+
+            // In UTC+13, it's 2021-12-01 already
+            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-02"));
+        });
+    }
+
+    @Test
+    public void dateCalculation_stringResult_isConvertedToDateData() {
+        XFormsElement form = html(
+            head(
+                title("Date calculation"),
+                model(
+                    mainInstance(t("data id=\"date-calculation\"",
+                        t("date")
+                    )),
+                    bind("/data/date").type("date").calculate("'2026-02-02'")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+
+        assertThat(scenario.answerOf("/data/date"), instanceOf(DateData.class));
+        assertThat(scenario.answerOf("/data/date").uncast().getValue(), is("2026-02-02"));
+    }
+
 }
