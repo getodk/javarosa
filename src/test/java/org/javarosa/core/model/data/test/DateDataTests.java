@@ -222,7 +222,9 @@ public class DateDataTests {
                             t("date", date),
                             t("nextDay"),
                             t("previousDay"),
-                            t("twoWeeksLater")
+                            t("twoWeeksLater"),
+                            t("fractionalAddition"),
+                            t("fractionalSubtraction")
                         )
                     ),
                     bind("/data/date").type("date"),
@@ -252,7 +254,10 @@ public class DateDataTests {
             {"Europe/Warsaw", 20469.0, 2026, 1, 16},
             {"Europe/Warsaw", 20751.0, 2026, 10, 25},
             {"America/Los_Angeles", 20650.0, 2026, 7, 16},
-            {"Asia/Tokyo", 20650.0, 2026, 7, 16}
+            {"Asia/Tokyo", 20650.0, 2026, 7, 16},
+            {"UTC", -1.0, 1969, 12, 31},
+            {"America/Los_Angeles", -1.0, 1969, 12, 31},
+            {"Asia/Tokyo", -365.0, 1969, 1, 1}
         };
 
         for (Object[] testCase : cases) {
@@ -307,7 +312,8 @@ public class DateDataTests {
             {2026, 7, 15},
             {2026, 10, 24},
             {2026, 10, 25},
-            {2026, 12, 31}
+            {2026, 12, 31},
+            {1969, 12, 31}
         };
 
         for (String timezone : timezones) {
@@ -321,5 +327,75 @@ public class DateDataTests {
                 }
             });
         }
+    }
+
+    @Test
+    public void dateArithmetic_beforeEpoch_truncatesFractionalResults() {
+        XFormsElement form = html(
+            head(
+                title("Fractional date arithmetic before epoch"),
+                model(
+                    mainInstance(
+                        t("data id=\"date-arithmetic\"",
+                            t("date", "1958-07-01"),
+                            t("add11"),
+                            t("add19"),
+                            t("subtract11"),
+                            t("subtract19")
+                        )
+                    ),
+                    bind("/data/date").type("date"),
+                    bind("/data/add11").type("date").calculate("/data/date + 1.1"),
+                    bind("/data/add19").type("date").calculate("/data/date + 1.9"),
+                    bind("/data/subtract11").type("date").calculate("/data/date - 1.1"),
+                    bind("/data/subtract19").type("date").calculate("/data/date - 1.9")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(scenario.answerOf("/data/add11").uncast().getString(), is("1958-07-03"));
+            assertThat(scenario.answerOf("/data/add19").uncast().getString(), is("1958-07-03"));
+            assertThat(scenario.answerOf("/data/subtract11").uncast().getString(), is("1958-06-30"));
+            assertThat(scenario.answerOf("/data/subtract19").uncast().getString(), is("1958-06-30"));
+        });
+    }
+
+    @Test
+    public void dateArithmetic_afterEpoch_truncatesFractionalResults() {
+        XFormsElement form = html(
+            head(
+                title("Fractional date arithmetic after epoch"),
+                model(
+                    mainInstance(
+                        t("data id=\"date-arithmetic\"",
+                            t("date", "2026-07-15"),
+                            t("add11"),
+                            t("add19"),
+                            t("subtract11"),
+                            t("subtract19")
+                        )
+                    ),
+                    bind("/data/date").type("date"),
+                    bind("/data/add11").type("date").calculate("/data/date + 1.1"),
+                    bind("/data/add19").type("date").calculate("/data/date + 1.9"),
+                    bind("/data/subtract11").type("date").calculate("/data/date - 1.1"),
+                    bind("/data/subtract19").type("date").calculate("/data/date - 1.9")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(scenario.answerOf("/data/add11").uncast().getString(), is("2026-07-16"));
+            assertThat(scenario.answerOf("/data/add19").uncast().getString(), is("2026-07-16"));
+            assertThat(scenario.answerOf("/data/subtract11").uncast().getString(), is("2026-07-13"));
+            assertThat(scenario.answerOf("/data/subtract19").uncast().getString(), is("2026-07-13"));
+        });
     }
 }
