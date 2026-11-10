@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.util.MathUtils;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -811,7 +810,7 @@ public class DateUtils {
      * @return # days difference
      */
     public static int dateDiff (Date a, Date b) {
-        return (int)MathUtils.divLongNotSuck(roundDate(b).getTime() - roundDate(a).getTime() + DAY_IN_MS / 2, DAY_IN_MS);
+        return (int) Math.floorDiv(roundDate(b).getTime() - roundDate(a).getTime() + DAY_IN_MS / 2, DAY_IN_MS);
         //half-day offset is needed to handle differing DST offsets!
     }
 
