@@ -44,13 +44,12 @@ public class DateUtils {
     public static final int FORMAT_ISO8601 = 1;
     public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
     public static final int FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY = 5;
-    //public static final int FORMAT_HUMAN_READABLE_LONG = 3;
     public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
 
     /** RFC 822 **/
     public static final int FORMAT_TIMESTAMP_HTTP = 9;
 
-    public static final long DAY_IN_MS = 86400000l;
+    public static final long DAY_IN_MS = 86400000L;
     private static final LocalDate TIME_SENTINEL = LocalDate.of(1900, 1, 1);
 
     public DateUtils() {
@@ -68,9 +67,6 @@ public class DateUtils {
             secTicks = 0;
             dow = 0;
             week = 1;
-
-//            tzStr = "Z";
-//            tzOffset = 0;
         }
 
         public int year;
@@ -84,9 +80,6 @@ public class DateUtils {
 
         /** NOTE: CANNOT BE USED TO SPECIFY A DATE **/
         public int dow; //1-7;
-
-//        public String tzStr;
-//        public int tzOffset; //s ahead of UTC
 
         DateFields(int year, int month, int day, int hour, int minute, int second, int secTicks, int dow, int week) {
             this.year = year;
@@ -376,14 +369,6 @@ public class DateUtils {
         DateFields fields = getFields(new Date());
         fields.second = 0;
         fields.secTicks = 0;
-        if (!parseTime(str, fields)) {
-            return null;
-        }
-        return getDate(fields);
-    }
-
-
-    public static Date parseTimeWithFixedDate(String str, DateFields fields) {
         if (!parseTime(str, fields)) {
             return null;
         }
@@ -744,27 +729,6 @@ public class DateUtils {
         }
 
         return d;
-    }
-
-    /**
-     * Gets the number of months separating the two dates.
-     * @param earlierDate The earlier date, chronologically
-     * @param laterDate The later date, chronologically
-     * @return the number of months separating the two dates.
-     */
-    public static int getMonthsDifference(Date earlierDate, Date laterDate) {
-        Date span = new Date(laterDate.getTime() - earlierDate.getTime());
-        Date firstDate = new Date(0);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(firstDate);
-        int firstYear = calendar.get(Calendar.YEAR);
-        int firstMonth = calendar.get(Calendar.MONTH);
-
-        calendar.setTime(span);
-        int spanYear = calendar.get(Calendar.YEAR);
-        int spanMonth = calendar.get(Calendar.MONTH);
-        int months = (spanYear - firstYear)*12 + (spanMonth - firstMonth);
-        return months;
     }
 
     /**
