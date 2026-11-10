@@ -17,6 +17,7 @@
 package org.javarosa.core.model.data.test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.containsString;
@@ -91,6 +92,44 @@ public class TimeDataTest {
 
             assertThat(restored.uncast().getValue(), is("10:30:00"));
         });
+    }
+
+    @Test
+    public void invalidTimeInInstance_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid time"),
+                model(
+                    mainInstance(t("data id=\"invalid-time\"",
+                        t("time", "25:00:00")
+                    )),
+                    bind("/data/time").type("time")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/time"), is(nullValue()));
+    }
+
+    @Test
+    public void invalidTimeCalculation_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid time calculation"),
+                model(
+                    mainInstance(t("data id=\"invalid-time-calculation\"",
+                        t("time")
+                    )),
+                    bind("/data/time").type("time").calculate("'25:00:00'")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/time"), is(nullValue()));
     }
 
     @Test

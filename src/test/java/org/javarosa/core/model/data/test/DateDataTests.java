@@ -19,6 +19,7 @@ package org.javarosa.core.model.data.test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
@@ -35,7 +36,6 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.TimeZone;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.test.Scenario;
@@ -106,6 +106,44 @@ public class DateDataTests {
         }
         assertTrue("DateData failed to throw an exception when setting null data", exceptionThrown);
         assertTrue("DateData overwrote existing value on incorrect input", data.getValue().equals(today));
+    }
+
+    @Test
+    public void invalidDateInInstance_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid date"),
+                model(
+                    mainInstance(t("data id=\"invalid-date\"",
+                        t("date", "2026-02-30")
+                    )),
+                    bind("/data/date").type("date")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/date"), is(nullValue()));
+    }
+
+    @Test
+    public void invalidDateCalculation_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid date calculation"),
+                model(
+                    mainInstance(t("data id=\"invalid-date-calculation\"",
+                        t("date")
+                    )),
+                    bind("/data/date").type("date").calculate("'2026-02-30'")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/date"), is(nullValue()));
     }
 
     @Test
