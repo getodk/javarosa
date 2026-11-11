@@ -54,7 +54,7 @@ if (!project.hasProperty("android")) {
     }
 
     tasks.named('compileJava', JavaCompile) {
-        options.release = 8
+        options.release = 17
     }
 
     // TODO: does not build UML diagrams
