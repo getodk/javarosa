@@ -49,15 +49,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathParseTool;
-import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -290,6 +294,114 @@ public class XPathEvalTest {
         testEval("geofence('-1 0 0 0', /data/geoshape)", buildInstance(), null, false); // outside co-linear w/ bottom edge
         testEval("geofence('-1 1 0 0', /data/geoshape)", buildInstance(), null, false); // outside co-linear w/ top edge
         testEval("geofence('0 -1 0 0', /data/geoshape)", buildInstance(), null, false); // outside below vertex ("...They were carefully chosen to make the program work correctly when the point is vertically below a vertex.")
+    }
+
+    @Test
+    public void date_comparisons() {
+        FormInstance instance = new FormInstance(new TreeElement("data"));
+
+        String[] dates = {
+            "1969-12-31",
+            "2026-07-15",
+            "2026-07-15",
+            "2026-07-16"
+        };
+
+        for (int i = 0; i < dates.length; i++) {
+            TreeElement node = new TreeElement("date" + i);
+            node.setValue(new DateData().cast(new UncastData(dates[i])));
+            instance.getRoot().addChild(node);
+        }
+
+        testEval("/data/date1 = /data/date2", instance, null, TRUE);
+        testEval("/data/date1 = /data/date3", instance, null, FALSE);
+        testEval("/data/date1 != /data/date3", instance, null, TRUE);
+        testEval("/data/date1 != /data/date2", instance, null, FALSE);
+
+        testEval("/data/date1 < /data/date3", instance, null, TRUE);
+        testEval("/data/date1 < /data/date2", instance, null, FALSE);
+        testEval("/data/date1 <= /data/date2", instance, null, TRUE);
+        testEval("/data/date3 <= /data/date1", instance, null, FALSE);
+
+        testEval("/data/date3 > /data/date1", instance, null, TRUE);
+        testEval("/data/date1 > /data/date2", instance, null, FALSE);
+        testEval("/data/date1 >= /data/date2", instance, null, TRUE);
+        testEval("/data/date0 >= /data/date1", instance, null, FALSE);
+
+        testEval("/data/date0 < /data/date1", instance, null, TRUE);
+    }
+
+    @Test
+    public void time_comparisons() {
+        FormInstance instance = new FormInstance(new TreeElement("data"));
+
+        String[] times = {
+            "01:00:00",
+            "12:00:00",
+            "12:00:00",
+            "23:00:00"
+        };
+
+        for (int i = 0; i < times.length; i++) {
+            TreeElement node = new TreeElement("time" + i);
+            node.setValue(new TimeData().cast(new UncastData(times[i])));
+            instance.getRoot().addChild(node);
+        }
+
+        testEval("/data/time1 = /data/time2", instance, null, TRUE);
+        testEval("/data/time1 = /data/time3", instance, null, FALSE);
+        testEval("/data/time1 != /data/time3", instance, null, TRUE);
+        testEval("/data/time1 != /data/time2", instance, null, FALSE);
+
+        testEval("/data/time1 < /data/time3", instance, null, TRUE);
+        testEval("/data/time1 < /data/time2", instance, null, FALSE);
+        testEval("/data/time1 <= /data/time2", instance, null, TRUE);
+        testEval("/data/time3 <= /data/time1", instance, null, FALSE);
+
+        testEval("/data/time3 > /data/time1", instance, null, TRUE);
+        testEval("/data/time1 > /data/time2", instance, null, FALSE);
+        testEval("/data/time1 >= /data/time2", instance, null, TRUE);
+        testEval("/data/time0 >= /data/time1", instance, null, FALSE);
+
+        testEval("/data/time0 < /data/time3", instance, null, TRUE);
+    }
+
+    @Test
+    public void datetime_comparisons() {
+        FormInstance instance = new FormInstance(new TreeElement("data"));
+
+        String[] datetimes = {
+            "2026-07-15T11:00:00Z",
+            "2026-07-15T12:00:00Z",
+            "2026-07-15T14:00:00+02:00",
+            "2026-07-15T13:00:00Z",
+            "2026-07-15T11:00:00-02:00"
+        };
+
+        for (int i = 0; i < datetimes.length; i++) {
+            TreeElement node = new TreeElement("datetime" + i);
+            node.setValue(new DateTimeData().cast(new UncastData(datetimes[i])));
+            instance.getRoot().addChild(node);
+        }
+
+        // Different offsets, same instant.
+        testEval("/data/datetime1 = /data/datetime2", instance, null, TRUE);
+        testEval("/data/datetime1 = /data/datetime3", instance, null, FALSE);
+        testEval("/data/datetime1 != /data/datetime3", instance, null, TRUE);
+        testEval("/data/datetime1 != /data/datetime2", instance, null, FALSE);
+
+        testEval("/data/datetime1 < /data/datetime3", instance, null, TRUE);
+        testEval("/data/datetime1 < /data/datetime2", instance, null, FALSE);
+        testEval("/data/datetime1 <= /data/datetime2", instance, null, TRUE);
+        testEval("/data/datetime3 <= /data/datetime1", instance, null, FALSE);
+
+        testEval("/data/datetime3 > /data/datetime1", instance, null, TRUE);
+        testEval("/data/datetime1 > /data/datetime2", instance, null, FALSE);
+        testEval("/data/datetime1 >= /data/datetime2", instance, null, TRUE);
+        testEval("/data/datetime0 >= /data/datetime1", instance, null, FALSE);
+
+        // Earlier wall-clock time, later instant.
+        testEval("/data/datetime4 > /data/datetime1", instance, null, TRUE);
     }
 
     @Test

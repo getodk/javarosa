@@ -19,134 +19,12 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 
 import java.time.Instant;
 import java.util.TimeZone;
-import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.TimeData;
 import org.javarosa.test.Scenario;
-import org.javarosa.test.XFormsElement;
 import org.junit.Test;
 
 public class DateTimeTest {
-    @Test
-    public void timeQuestionReturnsTimeDataAnswer() {
-        Scenario scenario = Scenario.init(html(
-            head(
-                title("Time form"),
-                model(
-                    mainInstance(t("data id=\"time-form\"",
-                        t("calculateLiteral"),
-                        t("empty", "23:14:00.000+02:00"),
-                        t("calculateReference")
-                    )),
-                    bind("/data/calculateLiteral").type("time").calculate("&quot;23:14:00.000+02:00&quot;"),
-                    bind("/data/empty").type("time"),
-                    bind("/data/calculateReference").type("time").calculate("/data/empty")
-                )
-            ),
-            body(
-                input("/data/calculateLiteral"),
-                input("/data/empty"),
-                input("/data/calculateReference")
-            )
-        ));
-        IAnswerData answer1 = scenario.answerOf("/data/calculateLiteral");
-        assertThat(answer1 instanceof TimeData, equalTo(true));
-
-        IAnswerData answer2 = scenario.answerOf("/data/empty");
-        assertThat(answer2 instanceof TimeData, equalTo(true));
-
-        IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
-        assertThat(answer3 instanceof TimeData, equalTo(true));
-    }
-
-    @Test
-    public void dateQuestionReturnsDateDataAnswer() {
-        Scenario scenario = Scenario.init(html(
-            head(
-                title("Date form"),
-                model(
-                    mainInstance(t("data id=\"date-form\"",
-                        t("calculateLiteral"),
-                        t("empty", "2025-09-25"),
-                        t("calculateReference")
-                    )),
-                    bind("/data/calculateLiteral").type("date").calculate("&quot;2025-09-25&quot;"),
-                    bind("/data/empty").type("date"),
-                    bind("/data/calculateReference").type("date").calculate("/data/empty")
-                )
-            ),
-            body(
-                input("/data/calculateLiteral"),
-                input("/data/empty"),
-                input("/data/calculateReference")
-            )
-        ));
-        IAnswerData answer1 = scenario.answerOf("/data/calculateLiteral");
-        assertThat(answer1 instanceof DateData, equalTo(true));
-
-        IAnswerData answer2 = scenario.answerOf("/data/empty");
-        assertThat(answer2 instanceof DateData, equalTo(true));
-
-        IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
-        assertThat(answer3 instanceof DateData, equalTo(true));
-    }
-
-    @Test
-    public void dateArithmetic_whenInstantFallsOnSameLocalDate_preservesDateType() {
-        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            Scenario scenario;
-            scenario = Scenario.init(html(
-                head(title("Date arithmetic"),
-                    model(
-                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
-                            t("date"),
-                            t("nextDate")
-                        )),
-                        bind("/data/date").type("date"),
-                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
-                    )
-                ),
-                body(
-                    input("/data/date")
-                )
-            ));
-
-            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
-
-            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
-            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-01"));
-        });
-    }
-
-    @Test
-    public void dateArithmetic_whenInstantFallsOnNextLocalDate_preservesDateType() {
-        withTimeZone(TimeZone.getTimeZone("Pacific/Auckland"), () -> {
-            Scenario scenario;
-            scenario = Scenario.init(html(
-                head(title("Date arithmetic"),
-                    model(
-                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
-                            t("date"),
-                            t("nextDate")
-                        )),
-                        bind("/data/date").type("date"),
-                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
-                    )
-                ),
-                body(
-                    input("/data/date")
-                )
-            ));
-
-            // In UTC+13, it's 2021-12-01 already
-            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
-
-            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
-            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-02"));
-        });
-    }
-
     @Test
     public void dateTimeArithmetic_preservesDateTimeType() {
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
@@ -205,62 +83,6 @@ public class DateTimeTest {
 
         IAnswerData answer3 = scenario.answerOf("/data/calculateReference");
         assertThat(answer3 instanceof DateTimeData, equalTo(true));
-    }
-
-    @Test
-    public void timeQuestionWithInvalidTimeFormatResultsInNoAnswer() {
-        Scenario scenario = Scenario.init(html(
-            head(
-                title("Time form"),
-                model(
-                    mainInstance(t("data id=\"time-form\"",
-                        t("calculateLiteral"),
-                        t("empty", "notatime"),
-                        t("calculateReference")
-                    )),
-                    bind("/data/calculateLiteral").type("time").calculate("&quot;notatime&quot;"),
-                    bind("/data/empty").type("time"),
-                    bind("/data/calculateReference").type("time").calculate("/data/empty")
-                )
-            ),
-            body(
-                input("/data/calculateLiteral"),
-                input("/data/empty"),
-                input("/data/calculateReference")
-            )
-        ));
-
-        assertThat(scenario.answerOf("/data/calculateLiteral"), nullValue());
-        assertThat(scenario.answerOf("/data/empty"), nullValue());
-        assertThat(scenario.answerOf("/data/calculateReference"), nullValue());
-    }
-
-    @Test
-    public void dateQuestionWithInvalidDateFormatResultsInNoAnswer()  {
-        Scenario scenario = Scenario.init(html(
-            head(
-                title("Date form"),
-                model(
-                    mainInstance(t("data id=\"date-form\"",
-                        t("calculateLiteral"),
-                        t("empty", "not-a-date"),
-                        t("calculateReference")
-                    )),
-                    bind("/data/calculateLiteral").type("date").calculate("&quot;not-a-date&quot;"),
-                    bind("/data/empty").type("date"),
-                    bind("/data/calculateReference").type("date").calculate("/data/empty")
-                )
-            ),
-            body(
-                input("/data/calculateLiteral"),
-                input("/data/empty"),
-                input("/data/calculateReference")
-            )
-        ));
-
-        assertThat(scenario.answerOf("/data/calculateLiteral"), nullValue());
-        assertThat(scenario.answerOf("/data/empty"), nullValue());
-        assertThat(scenario.answerOf("/data/calculateReference"), nullValue());
     }
 
     @Test

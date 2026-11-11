@@ -17,6 +17,7 @@
 package org.javarosa.core.model.data.test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.containsString;
@@ -91,6 +92,47 @@ public class TimeDataTest {
 
             assertThat(restored.uncast().getValue(), is("10:30:00"));
         });
+    }
+
+    @Test
+    public void invalidTimeInInstance_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid time"),
+                model(
+                    mainInstance(t("data id=\"invalid-time\"",
+                        t("time", "25:00:00"),
+                        t("reference")
+                    )),
+                    bind("/data/time").type("time"),
+                    bind("/data/reference").type("time").calculate("/data/time")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/time"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/reference"), is(nullValue()));
+    }
+
+    @Test
+    public void invalidTimeCalculation_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid time calculation"),
+                model(
+                    mainInstance(t("data id=\"invalid-time-calculation\"",
+                        t("time")
+                    )),
+                    bind("/data/time").type("time").calculate("'25:00:00'")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/time"), is(nullValue()));
     }
 
     @Test
@@ -443,6 +485,42 @@ public class TimeDataTest {
     }
 
     @Test
+    public void timeSubtraction_acrossMidnight_returnsSignedDifference() {
+        XFormsElement form = html(
+            head(
+                title("Time subtraction across midnight"),
+                model(
+                    mainInstance(t("data id=\"time-subtraction-midnight\"",
+                        t("early", "01:00:00"),
+                        t("late", "23:00:00"),
+                        t("earlyMinusLate"),
+                        t("lateMinusEarly")
+                    )),
+                    bind("/data/early").type("time"),
+                    bind("/data/late").type("time"),
+                    bind("/data/earlyMinusLate").type("decimal").calculate("/data/early - /data/late"),
+                    bind("/data/lateMinusEarly").type("decimal").calculate("/data/late - /data/early")
+                )
+            ),
+            body(
+                input("/data/early"),
+                input("/data/late")
+            )
+        );
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(Double.parseDouble(scenario.answerOf("/data/earlyMinusLate").getDisplayText()),
+                is(closeTo(-22.0 / 24, 1e-10))
+            );
+            assertThat(Double.parseDouble(scenario.answerOf("/data/lateMinusEarly").getDisplayText()),
+                is(closeTo(22.0 / 24, 1e-10))
+            );
+        });
+    }
+
+    @Test
     public void timeArithmetic_preservesTimeType() {
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
             Scenario scenario;
@@ -465,6 +543,27 @@ public class TimeDataTest {
             assertThat(scenario.answerOf("/data/nextTime"), instanceOf(TimeData.class));
             assertThat(scenario.answerOf("/data/nextTime").uncast().getValue(), is("18:00:00"));
         });
+    }
+
+    @Test
+    public void timeCalculation_reference_preservesTimeType() {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Time reference"),
+                model(
+                    mainInstance(t("data id=\"time-reference\"",
+                        t("source", "23:14:00"),
+                        t("result")
+                    )),
+                    bind("/data/source").type("time"),
+                    bind("/data/result").type("time").calculate("/data/source")
+                )
+            ),
+            body(input("/data/source"))
+        ));
+
+        assertThat(scenario.answerOf("/data/result"), instanceOf(TimeData.class));
+        assertThat(scenario.answerOf("/data/result").uncast().getValue(), is("23:14:00"));
     }
 
     @Test
@@ -527,6 +626,67 @@ public class TimeDataTest {
         });
     }
 
+    @Test
+    public void numericCalculations_areConvertedToTime() {
+        XFormsElement form = html(
+            head(
+                title("Numeric to time conversion"),
+                model(
+                    mainInstance(t("data id=\"numeric-to-time\"",
+                        t("halfDay"),
+                        t("moreThanOneDay"),
+                        t("negativeFraction")
+                    )),
+                    bind("/data/halfDay").type("time").calculate("0.5"),
+                    bind("/data/moreThanOneDay").type("time").calculate("1.25"),
+                    bind("/data/negativeFraction").type("time").calculate("-0.25")
+                )
+            ),
+            body(
+                input("/data/halfDay")
+            )
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(scenario.answerOf("/data/halfDay"), instanceOf(TimeData.class));
+            assertThat(scenario.answerOf("/data/halfDay").uncast().getValue(), is("12:00:00"));
+            assertThat(scenario.answerOf("/data/moreThanOneDay").uncast().getValue(), is("06:00:00"));
+            assertThat(scenario.answerOf("/data/negativeFraction").uncast().getValue(), is("18:00:00"));
+        });
+    }
+
+    @Test
+    public void time_castsToString_acrossTimezones() {
+        XFormsElement form = html(
+            head(
+                title("Time to string conversion"),
+                model(
+                    mainInstance(
+                        t("data id=\"time-to-string\"",
+                            t("time", "10:30:00"),
+                            t("result")
+                        )
+                    ),
+                    bind("/data/time").type("time"),
+                    bind("/data/result").type("string").calculate("string(/data/time)")
+                )
+            ),
+            body(input("/data/time"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
+        });
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            Scenario scenario = Scenario.init(form);
+            assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
+        });
+    }
+
     // Arithmetic between time and datetime is not semantically valid and ideally we would get a blank value to represent
     // invalid mixed-type subtraction. But that's a much bigger change so for now we accept at least a stable result.
     @Test
@@ -559,37 +719,6 @@ public class TimeDataTest {
             Scenario scenario = Scenario.init(form);
                 assertThat(scenario.answerOf("/data/dtMinusTime").getDisplayText(), is("0.9375"));
                 assertThat(scenario.answerOf("/data/timeMinusDt").getDisplayText(), is("-0.9375"));
-        });
-    }
-
-    @Test
-    public void time_castsToString_acrossTimezones() {
-        XFormsElement form = html(
-            head(
-                title("Time to string conversion"),
-                model(
-                    mainInstance(
-                        t("data id=\"time-to-string\"",
-                            t("time", "10:30:00"),
-                            t("result")
-                        )
-                    ),
-                    bind("/data/time").type("time"),
-                    bind("/data/result").type("string")
-                        .calculate("string(/data/time)")
-                )
-            ),
-            body(input("/data/time"))
-        );
-
-        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
-            Scenario scenario = Scenario.init(form);
-            assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
-        });
-
-        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
-            Scenario scenario = Scenario.init(form);
-            assertThat(scenario.answerOf("/data/result").getDisplayText(), is("10:30:00"));
         });
     }
 

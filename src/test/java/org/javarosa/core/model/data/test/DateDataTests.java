@@ -17,8 +17,10 @@
 package org.javarosa.core.model.data.test;
 
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.head;
@@ -32,10 +34,10 @@ import static org.javarosa.test.utils.SystemHelper.withTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.TimeZone;
-
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.test.Scenario;
@@ -106,6 +108,47 @@ public class DateDataTests {
         }
         assertTrue("DateData failed to throw an exception when setting null data", exceptionThrown);
         assertTrue("DateData overwrote existing value on incorrect input", data.getValue().equals(today));
+    }
+
+    @Test
+    public void invalidDateInInstance_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid date"),
+                model(
+                    mainInstance(t("data id=\"invalid-date\"",
+                        t("date", "2026-02-30"),
+                        t("reference")
+                    )),
+                    bind("/data/date").type("date"),
+                    bind("/data/reference").type("date").calculate("/data/date")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/date"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/reference"), is(nullValue()));
+    }
+
+    @Test
+    public void invalidDateCalculation_isBlank() {
+        XFormsElement form = html(
+            head(
+                title("Invalid date calculation"),
+                model(
+                    mainInstance(t("data id=\"invalid-date-calculation\"",
+                        t("date")
+                    )),
+                    bind("/data/date").type("date").calculate("'2026-02-30'")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+        assertThat(scenario.answerOf("/data/date"), is(nullValue()));
     }
 
     @Test
@@ -212,6 +255,36 @@ public class DateDataTests {
         );
     }
 
+    @Test
+    public void dateArithmetic_acrossLeapDay_returnsCorrectDates() {
+        assertDateArithmetic(
+            "UTC",
+            "2024-02-28",
+            "2024-02-29",
+            "2024-02-27",
+            "2024-03-13"
+        );
+
+        assertDateArithmetic(
+            "UTC",
+            "2024-02-29",
+            "2024-03-01",
+            "2024-02-28",
+            "2024-03-14"
+        );
+    }
+
+    @Test
+    public void dateArithmetic_acrossFebruaryInNonLeapYear_returnsCorrectDates() {
+        assertDateArithmetic(
+            "UTC",
+            "2025-02-28",
+            "2025-03-01",
+            "2025-02-27",
+            "2025-03-14"
+        );
+    }
+
     private void assertDateArithmetic(String timezone, String date, String nextDay, String previousDay, String twoWeeksLater) {
         XFormsElement form = html(
             head(
@@ -222,7 +295,9 @@ public class DateDataTests {
                             t("date", date),
                             t("nextDay"),
                             t("previousDay"),
-                            t("twoWeeksLater")
+                            t("twoWeeksLater"),
+                            t("fractionalAddition"),
+                            t("fractionalSubtraction")
                         )
                     ),
                     bind("/data/date").type("date"),
@@ -252,7 +327,10 @@ public class DateDataTests {
             {"Europe/Warsaw", 20469.0, 2026, 1, 16},
             {"Europe/Warsaw", 20751.0, 2026, 10, 25},
             {"America/Los_Angeles", 20650.0, 2026, 7, 16},
-            {"Asia/Tokyo", 20650.0, 2026, 7, 16}
+            {"Asia/Tokyo", 20650.0, 2026, 7, 16},
+            {"UTC", -1.0, 1969, 12, 31},
+            {"America/Los_Angeles", -1.0, 1969, 12, 31},
+            {"Asia/Tokyo", -365.0, 1969, 1, 1}
         };
 
         for (Object[] testCase : cases) {
@@ -307,7 +385,8 @@ public class DateDataTests {
             {2026, 7, 15},
             {2026, 10, 24},
             {2026, 10, 25},
-            {2026, 12, 31}
+            {2026, 12, 31},
+            {1969, 12, 31}
         };
 
         for (String timezone : timezones) {
@@ -322,4 +401,151 @@ public class DateDataTests {
             });
         }
     }
+
+    @Test
+    public void dateArithmetic_beforeEpoch_truncatesFractionalResults() {
+        XFormsElement form = html(
+            head(
+                title("Fractional date arithmetic before epoch"),
+                model(
+                    mainInstance(
+                        t("data id=\"date-arithmetic\"",
+                            t("date", "1958-07-01"),
+                            t("add11"),
+                            t("add19"),
+                            t("subtract11"),
+                            t("subtract19")
+                        )
+                    ),
+                    bind("/data/date").type("date"),
+                    bind("/data/add11").type("date").calculate("/data/date + 1.1"),
+                    bind("/data/add19").type("date").calculate("/data/date + 1.9"),
+                    bind("/data/subtract11").type("date").calculate("/data/date - 1.1"),
+                    bind("/data/subtract19").type("date").calculate("/data/date - 1.9")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(scenario.answerOf("/data/add11").uncast().getString(), is("1958-07-03"));
+            assertThat(scenario.answerOf("/data/add19").uncast().getString(), is("1958-07-03"));
+            assertThat(scenario.answerOf("/data/subtract11").uncast().getString(), is("1958-06-30"));
+            assertThat(scenario.answerOf("/data/subtract19").uncast().getString(), is("1958-06-30"));
+        });
+    }
+
+    @Test
+    public void dateArithmetic_afterEpoch_truncatesFractionalResults() {
+        XFormsElement form = html(
+            head(
+                title("Fractional date arithmetic after epoch"),
+                model(
+                    mainInstance(
+                        t("data id=\"date-arithmetic\"",
+                            t("date", "2026-07-15"),
+                            t("add11"),
+                            t("add19"),
+                            t("subtract11"),
+                            t("subtract19")
+                        )
+                    ),
+                    bind("/data/date").type("date"),
+                    bind("/data/add11").type("date").calculate("/data/date + 1.1"),
+                    bind("/data/add19").type("date").calculate("/data/date + 1.9"),
+                    bind("/data/subtract11").type("date").calculate("/data/date - 1.1"),
+                    bind("/data/subtract19").type("date").calculate("/data/date - 1.9")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(scenario.answerOf("/data/add11").uncast().getString(), is("2026-07-16"));
+            assertThat(scenario.answerOf("/data/add19").uncast().getString(), is("2026-07-16"));
+            assertThat(scenario.answerOf("/data/subtract11").uncast().getString(), is("2026-07-13"));
+            assertThat(scenario.answerOf("/data/subtract19").uncast().getString(), is("2026-07-13"));
+        });
+    }
+
+    @Test
+    public void dateArithmetic_whenInstantFallsOnSameLocalDate_preservesDateType() {
+        withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
+            Scenario scenario;
+            scenario = Scenario.init(html(
+                head(title("Date arithmetic"),
+                    model(
+                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                            t("date"),
+                            t("nextDate")
+                        )),
+                        bind("/data/date").type("date"),
+                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
+                    )
+                ),
+                body(
+                    input("/data/date")
+                )
+            ));
+
+            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-01"));
+        });
+    }
+
+    @Test
+    public void dateArithmetic_whenInstantFallsOnNextLocalDate_preservesDateType() {
+        withTimeZone(TimeZone.getTimeZone("Pacific/Auckland"), () -> {
+            Scenario scenario;
+            scenario = Scenario.init(html(
+                head(title("Date arithmetic"),
+                    model(
+                        mainInstance(XFormsElement.t("data id=\"date-arithmetic\"",
+                            t("date"),
+                            t("nextDate")
+                        )),
+                        bind("/data/date").type("date"),
+                        bind("/data/nextDate").type("date").calculate("/data/date + 1")
+                    )
+                ),
+                body(
+                    input("/data/date")
+                )
+            ));
+
+            // In UTC+13, it's 2021-12-01 already
+            scenario.answer("/data/date", Instant.parse("2021-11-30T12:00:00Z"));
+
+            assertThat(scenario.answerOf("/data/nextDate"), instanceOf(DateData.class));
+            assertThat(scenario.answerOf("/data/nextDate").uncast().getValue(), is("2021-12-02"));
+        });
+    }
+
+    @Test
+    public void dateCalculation_stringResult_isConvertedToDateData() {
+        XFormsElement form = html(
+            head(
+                title("Date calculation"),
+                model(
+                    mainInstance(t("data id=\"date-calculation\"",
+                        t("date")
+                    )),
+                    bind("/data/date").type("date").calculate("'2026-02-02'")
+                )
+            ),
+            body(input("/data/date"))
+        );
+
+        Scenario scenario = Scenario.init(form);
+
+        assertThat(scenario.answerOf("/data/date"), instanceOf(DateData.class));
+        assertThat(scenario.answerOf("/data/date").uncast().getValue(), is("2026-02-02"));
+    }
+
 }

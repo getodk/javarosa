@@ -1359,7 +1359,7 @@ public class XPathFuncExpr extends XPathExpression {
             throw new RuntimeException("error in subsetting arglist");
         }
 
-        Object[] subargs = new Object[(int) MathUtils.divLongNotSuck(args.length - start - 1, skip) + 1];
+        Object[] subargs = new Object[(int) Math.floorDiv(args.length - start - 1, skip) + 1];
         for (int i = start, j = 0; i < args.length; i += skip, j++) {
             subargs[j] = args[i];
         }
