@@ -2,15 +2,17 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
+        gradlePluginPortal()
     }
 
     dependencies {
         classpath("com.android.tools.build:gradle:9.1.1")
         classpath("me.champeau.jmh:jmh-gradle-plugin:0.7.3")
     }
+}
+
+plugins {
+    id 'com.vanniktech.maven.publish' version '0.37.0' apply false
 }
 
 /**
@@ -22,7 +24,7 @@ if (!project.hasProperty("android")) {
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
     apply plugin: 'me.champeau.jmh'
-    apply plugin: 'maven-publish'
+    apply plugin: 'com.vanniktech.maven.publish'
 } else {
     apply plugin: 'com.android.library'
 }
@@ -39,31 +41,20 @@ repositories {
 }
 
 if (!project.hasProperty("android")) {
-    sourceSets {
-        main {
-            java.srcDirs = ['src/main/java']
-            resources.srcDirs = ['src/main/resources']
-        }
-        test {
-            java.srcDirs = ['src/test/java']
-            resources.srcDirs = ['src/test/resources']
-        }
-    }
-
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
-    tasks.named('compileJava', JavaCompile) {
-        options.encoding = "UTF-8"
-        options.compilerArgs << "-Xlint:deprecation"
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs.add('-Xlint:deprecation')
     }
 
-    tasks.named('compileTestJava', JavaCompile) {
-        options.encoding = "UTF-8"
-        options.compilerArgs << "-Xlint:deprecation"
+    tasks.named('compileJava', JavaCompile) {
+        options.release = 17
     }
 
     // TODO: does not build UML diagrams
@@ -106,13 +97,49 @@ if (!project.hasProperty("android")) {
         duplicateClassesStrategy = DuplicatesStrategy.WARN
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                groupId = 'org.getodk'
-                artifactId = 'javarosa'
-                version = 'local'
-                from components.java
+    group = 'org.getodk'
+
+    def git = { args -> "git ${args}".execute().text.trim() }
+    def tag = git('describe --tags --exact-match --match v[0-9]*')
+
+    version = tag.startsWith('v')
+        ? tag.substring(1)
+        : "${git('rev-parse --short=7 HEAD')}-SNAPSHOT"
+
+    mavenPublishing {
+        publishToMavenCentral(true)
+
+        if (providers.environmentVariable('ORG_GRADLE_PROJECT_signingInMemoryKey').isPresent()) {
+            signAllPublications()
+        }
+
+        coordinates(group.toString(), 'javarosa', version.toString())
+
+        pom {
+            name = 'javarosa'
+            description = 'A Java library for rendering ODK XForms'
+            url = 'https://github.com/getodk/javarosa'
+
+            licenses {
+                license {
+                    name = 'The Apache Software License, Version 2.0'
+                    url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+
+            developers {
+                developer {
+                    name = 'getodk'
+                    email = 'email@getodk.org'
+                    organization = 'Get ODK'
+                    organizationUrl = 'https://getodk.org'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:https://github.com/getodk/javarosa.git'
+                developerConnection = 'scm:git:ssh://git@github.com/getodk/javarosa.git'
+                url = 'https://github.com/getodk/javarosa'
             }
         }
     }
@@ -151,7 +178,6 @@ if (!project.hasProperty("android")) {
 }
 
 dependencies {
-    // Be sure to update dependencies in pom.xml to match
     api 'joda-time:joda-time:2.10.13'
     api 'org.slf4j:slf4j-api:1.7.33'
     api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
