@@ -2,9 +2,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
+        gradlePluginPortal()
     }
 
     dependencies {
@@ -39,31 +37,20 @@ repositories {
 }
 
 if (!project.hasProperty("android")) {
-    sourceSets {
-        main {
-            java.srcDirs = ['src/main/java']
-            resources.srcDirs = ['src/main/resources']
-        }
-        test {
-            java.srcDirs = ['src/test/java']
-            resources.srcDirs = ['src/test/resources']
-        }
-    }
-
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
-    tasks.named('compileJava', JavaCompile) {
-        options.encoding = "UTF-8"
-        options.compilerArgs << "-Xlint:deprecation"
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs.add('-Xlint:deprecation')
     }
 
-    tasks.named('compileTestJava', JavaCompile) {
-        options.encoding = "UTF-8"
-        options.compilerArgs << "-Xlint:deprecation"
+    tasks.named('compileJava', JavaCompile) {
+        options.release = 8
     }
 
     // TODO: does not build UML diagrams
@@ -151,7 +138,6 @@ if (!project.hasProperty("android")) {
 }
 
 dependencies {
-    // Be sure to update dependencies in pom.xml to match
     api 'joda-time:joda-time:2.10.13'
     api 'org.slf4j:slf4j-api:1.7.33'
     api 'com.fasterxml.jackson.core:jackson-databind:2.22.3'
