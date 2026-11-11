@@ -485,6 +485,42 @@ public class TimeDataTest {
     }
 
     @Test
+    public void timeSubtraction_acrossMidnight_returnsSignedDifference() {
+        XFormsElement form = html(
+            head(
+                title("Time subtraction across midnight"),
+                model(
+                    mainInstance(t("data id=\"time-subtraction-midnight\"",
+                        t("early", "01:00:00"),
+                        t("late", "23:00:00"),
+                        t("earlyMinusLate"),
+                        t("lateMinusEarly")
+                    )),
+                    bind("/data/early").type("time"),
+                    bind("/data/late").type("time"),
+                    bind("/data/earlyMinusLate").type("decimal").calculate("/data/early - /data/late"),
+                    bind("/data/lateMinusEarly").type("decimal").calculate("/data/late - /data/early")
+                )
+            ),
+            body(
+                input("/data/early"),
+                input("/data/late")
+            )
+        );
+
+        withTimeZone(TimeZone.getTimeZone("America/Los_Angeles"), () -> {
+            Scenario scenario = Scenario.init(form);
+
+            assertThat(Double.parseDouble(scenario.answerOf("/data/earlyMinusLate").getDisplayText()),
+                is(closeTo(-22.0 / 24, 1e-10))
+            );
+            assertThat(Double.parseDouble(scenario.answerOf("/data/lateMinusEarly").getDisplayText()),
+                is(closeTo(22.0 / 24, 1e-10))
+            );
+        });
+    }
+
+    @Test
     public void timeArithmetic_preservesTimeType() {
         withTimeZone(TimeZone.getTimeZone("UTC"), () -> {
             Scenario scenario;
