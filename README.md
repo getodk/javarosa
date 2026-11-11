@@ -2,8 +2,7 @@
 
 ![Platform](https://img.shields.io/badge/platform-Java-blue.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build status](https://circleci.com/gh/getodk/javarosa.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/getodk/javarosa)
-[![Slack](https://img.shields.io/badge/chat-on%20slack-brightgreen)](https://slack.getodk.org)
+[![Build](https://github.com/getodk/javarosa/actions/workflows/build.yml/badge.svg)](https://github.com/getodk/javarosa/actions/workflows/build.yml)
 
 JavaRosa is a Java library for rendering forms that are compliant with [ODK XForms spec](http://getodk.github.io/xforms-spec). It is at the heart of many of the ODK tools. ODK JavaRosa is a fork of [JavaRosa](https://bitbucket.org/javarosa/javarosa/wiki/Home) 1.0 that has been modified to NOT run on J2ME devices. The key differences are:
 
@@ -70,51 +69,44 @@ If you're ready to contribute code, see [the contribution guide](CONTRIBUTING.md
 
 ### Downloading builds
 
-Per-commit debug builds can be found on [CircleCI](https://circleci.com/gh/getodk/javarosa). Login with your GitHub account, click the build you'd like, then find the JAR in the Artifacts tab under $CIRCLE_ARTIFACTS.
+JARs from each build are available as artifacts in [GitHub Actions](https://github.com/getodk/javarosa/actions/workflows/build.yml). Select a successful workflow run and download the `gradle-jar` artifact.
 
-### Publishing the jar to Central Repository and Maven Central
+### Publishing
 
-Project maintainers have the private keys to upload signed jars to Sonatype's Central Repository which is then synced to Maven Central. This process is [outlined here](https://central.sonatype.org).
+Releases are published to [Maven Central](https://central.sonatype.com/artifact/org.getodk/javarosa) when a commit is tagged with a version such as `v23.1.3`. Snapshots are published for each commit to `master` and are available in the [Sonatype snapshot repository](https://central.sonatype.com/repository/maven-snapshots/org/getodk/javarosa/).
 
-While Gradle is the default build tool for all ODK tools (including this one), Maven is used for for publishing the jar because Sonatype's Gradle support is unreliable (e.g., snapshots don't always update). This means version and dependency changes must be made in both `build.gradle` and `pom.xml`.
+Publishing is handled automatically by [GitHub Actions](https://github.com/getodk/javarosa/actions/workflows/publish.yml).
 
-Deviations from Sonatype's documentation are that maintainers use `gpg2` v2.1 and greater (not `gpg`), the latest versions of the Maven plugins in `pom.xml`, and a `secrets.xml` file that include the GPG home directory, key name, and pass phrase. All that is needed in the GPG home directory is `private-keys-v1.d` and `pubring.gpg`.
-```
-<!-- secrets.xml -->
-<settings>
-    <servers>
-        <server>
-            <id>central</id>
-            <username>getodk</username>
-            <password>very-secure-password</password>
-        </server>
-    </servers>
-    <profiles>
-        <profile>
-            <id>central</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <gpg.executable>/path/to/gpg2</gpg.executable>
-                <gpg.homedir>/path/to/javarosa/gpg/folder</gpg.homedir>
-                <gpg.keyname>1234ABCD</gpg.keyname>
-                <gpg.passphrase>very-secure-passphrase</gpg.passphrase>
-            </properties>
-        </profile>
-    </profiles>
-</settings>
+To publish a release:
+
+1. Ensure the build passes on `master`.
+2. Create and publish a Github release with a tag corresponding to the version with a `v` prefix (e.g. `v23.1.3`)
+
+#### Manual publishing
+
+Maintainers can also publish directly using Gradle. This requires Sonatype Central Portal credentials and a GPG private key.
+
+Configure the following Gradle properties, either in `~/.gradle/gradle.properties` or as environment variables prefixed with `ORG_GRADLE_PROJECT_`:
+
+- `mavenCentralUsername`
+- `mavenCentralPassword`
+- `signingInMemoryKey`
+- `signingInMemoryKeyPassword`
+
+For `signingInMemoryKey`, use an ASCII-armored export of the GPG private key.
+
+Verify the version before publishing:
+
+```bash
+./gradlew properties -q | grep '^version:'
 ```
 
-Official releases are built by a Github action when a commit is tagged. Before tagging a release:
+Then publish:
 
-1. Update the version in `pom.xml` and merge the changes to master.
-    * Use `x.x.x-SNAPSHOT` for snapshots releases and `x.x.x` for production releases.
+```bash
+./gradlew publishToMavenCentral
+```
 
-To manually generate official signed releases, you'll need the GPG folder, GPG passwords, a configured `secrets.xml` file.
-1. Run `mvn -v` to confirm the Java version and vendor used to build the release.
-1. In the repo folder, run `mvn -s secrets.xml clean deploy` to publish.
-    * Snapshots will appear [here](https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/org/getodk/javarosa).
-    * Releases will appear in [Maven Central](https://central.sonatype.com/artifact/org.getodk/javarosa).
+The version comes from `git`. Tagged commits publish releases, while untagged commits publish snapshots.
 
-Don't forget to update the `build.gradle` files in any downstream tools (e.g., ODK Collect, ODK Briefcase) to the newest version!
+After publishing, update downstream tools such as ODK Collect and ODK Validate to use the new version.
