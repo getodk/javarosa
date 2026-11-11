@@ -255,6 +255,36 @@ public class DateDataTests {
         );
     }
 
+    @Test
+    public void dateArithmetic_acrossLeapDay_returnsCorrectDates() {
+        assertDateArithmetic(
+            "UTC",
+            "2024-02-28",
+            "2024-02-29",
+            "2024-02-27",
+            "2024-03-13"
+        );
+
+        assertDateArithmetic(
+            "UTC",
+            "2024-02-29",
+            "2024-03-01",
+            "2024-02-28",
+            "2024-03-14"
+        );
+    }
+
+    @Test
+    public void dateArithmetic_acrossFebruaryInNonLeapYear_returnsCorrectDates() {
+        assertDateArithmetic(
+            "UTC",
+            "2025-02-28",
+            "2025-03-01",
+            "2025-02-27",
+            "2025-03-14"
+        );
+    }
+
     private void assertDateArithmetic(String timezone, String date, String nextDay, String previousDay, String twoWeeksLater) {
         XFormsElement form = html(
             head(
