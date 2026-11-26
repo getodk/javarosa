@@ -16,8 +16,10 @@ import static org.javarosa.core.test.QuestionDefMatchers.enabled;
 import static org.javarosa.core.test.QuestionDefMatchers.nonRelevant;
 import static org.javarosa.core.test.QuestionDefMatchers.readOnly;
 import static org.javarosa.core.test.QuestionDefMatchers.relevant;
-import static org.javarosa.test.Scenario.getRef;
+import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
+import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 import static org.javarosa.test.BindBuilderXFormsElement.bind;
+import static org.javarosa.test.Scenario.getRef;
 import static org.javarosa.test.XFormsElement.body;
 import static org.javarosa.test.XFormsElement.group;
 import static org.javarosa.test.XFormsElement.head;
@@ -31,8 +33,6 @@ import static org.javarosa.test.XFormsElement.repeat;
 import static org.javarosa.test.XFormsElement.select1;
 import static org.javarosa.test.XFormsElement.t;
 import static org.javarosa.test.XFormsElement.title;
-import static org.javarosa.form.api.FormEntryController.ANSWER_CONSTRAINT_VIOLATED;
-import static org.javarosa.form.api.FormEntryController.ANSWER_REQUIRED_BUT_EMPTY;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,11 +41,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.hamcrest.CoreMatchers;
-import org.javarosa.test.Scenario;
-import org.javarosa.test.BindBuilderXFormsElement;
-import org.javarosa.test.XFormsElement;
 import org.javarosa.debug.Event;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.test.BindBuilderXFormsElement;
+import org.javarosa.test.Scenario;
+import org.javarosa.test.XFormsElement;
 import org.javarosa.xform.parse.XFormParseException;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.expr.XPathPathExprEval;
@@ -527,6 +527,102 @@ public class TriggerableDagTest {
         // a 75 after making /data/some-field non-relevant.
         assertThat(scenario.answerOf("/data/result"), is(intAnswer(33)));
         assertThat(scenario.answerOf("/data/some-field"), is(intAnswer(42)));
+    }
+
+    // Users use relevance on calculates to ensure that calculated values are only exposed when all their
+    // references are populated. Using relevance is easier than adding a condition.
+    @Test
+    public void relevance_appliesToElementsWithoutControls() {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Relevance on calculate"),
+                model(
+                    mainInstance(t("data id=\"relevance-calculate\"",
+                        t("q1"),
+                        t("c1"),
+                        t("c2")
+                    )),
+                    bind("/data/q1").type("string"),
+                    bind("/data/c1").calculate("concat('q1: ', /data/q1)").relevant("/data/q1 = 'yes'"),
+                    bind("/data/c2").calculate("/data/c1")
+                )),
+            body(
+                input("/data/q1")
+            )));
+
+        // c1's underlying value is "q1: "
+        assertThat(scenario.answerOf("/data/c1"), is(stringAnswer("q1: ")));
+
+        // When c1 is referenced in a calculate and its relevance expression evaluates to false, blank is returned
+        assertThat(scenario.answerOf("/data/c2"), is(nullValue()));
+
+        // When q1 gets a value, c1 becomes relevant
+        scenario.answer("/data/q1", "yes");
+        assertThat(scenario.answerOf("/data/c1"), is(stringAnswer("q1: yes")));
+        assertThat(scenario.answerOf("/data/c2"), is(stringAnswer("q1: yes")));
+    }
+
+    @Test
+    public void multiplication_withEmptyOperand_evaluatesToEmpty() {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Calculate with empty operand"),
+                model(
+                    mainInstance(t("data id=\"calculate-empty\"",
+                        t("q1"),
+                        t("c1"),
+                        t("c2")
+                    )),
+                    bind("/data/q1").type("integer"),
+                    bind("/data/c1").calculate("2 * /data/q1"),
+                    bind("/data/c2").calculate("/data/c1")
+                )),
+            body(
+                input("/data/q1"),
+                input("/data/c2")
+            )));
+
+        assertThat(scenario.answerOf("/data/c1"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/c2"), is(nullValue()));
+
+        scenario.answer("/data/q1", "7");
+        assertThat(scenario.answerOf("/data/c1"), is(intAnswer(14)));
+        assertThat(scenario.answerOf("/data/c2"), is(intAnswer(14)));
+    }
+
+    @Test
+    public void addition_withEmptyOperand_evaluatesToEmpty() {
+        Scenario scenario = Scenario.init(html(
+            head(
+                title("Calculate with empty operand"),
+                model(
+                    mainInstance(t("data id=\"calculate-empty\"",
+                        t("a"),
+                        t("b"),
+                        t("a_plus_b"),
+                        t("disp")
+                    )),
+                    bind("/data/a").type("integer"),
+                    bind("/data/b").type("integer"),
+                    bind("/data/a_plus_b").calculate("/data/a + /data/b"),
+                    bind("/data/disp").calculate("/data/a_plus_b")
+                )),
+            body(
+                input("/data/a"),
+                input("/data/b"),
+                input("/data/disp")
+            )));
+
+        assertThat(scenario.answerOf("/data/a_plus_b"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/disp"), is(nullValue()));
+
+        scenario.answer("/data/a", "7");
+        assertThat(scenario.answerOf("/data/a_plus_b"), is(nullValue()));
+        assertThat(scenario.answerOf("/data/disp"), is(nullValue()));
+
+        scenario.answer("/data/b", "3");
+        assertThat(scenario.answerOf("/data/a_plus_b"), is(intAnswer(10)));
+        assertThat(scenario.answerOf("/data/disp"), is(intAnswer(10)));
     }
 
     /**
